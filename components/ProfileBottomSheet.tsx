@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import { UPDATE_PROFILE } from '@/apis/login';
+import { AUTH_QUERY_KEYS } from '@/apis/login';
+import { UPDATE_PROFILE } from '@/apis/profile';
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -13,12 +15,12 @@ import { useTheme } from '@/context/ThemeContext';
 
 export type ProfileBottomSheetRef = BottomSheet;
 
-const ProfileBottomSheet = forwardRef<ProfileBottomSheetRef>((_, ref) => {
+const ProfileBottomSheet = React.memo(forwardRef<ProfileBottomSheetRef>((_, ref) => {
     const { user, updateUser } = useAuth();
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
+    const queryClient = useQueryClient();
 
-    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -38,6 +40,31 @@ const ProfileBottomSheet = forwardRef<ProfileBottomSheetRef>((_, ref) => {
     }, [user]);
 
     const snapPoints = useMemo(() => ['60%', '95%'], []);
+
+    const profileMutation = useMutation({
+        mutationFn: UPDATE_PROFILE,
+        onSuccess: async (response) => {
+            if (response.user) {
+                await updateUser(response.user);
+                queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
+            }
+            Toast.show({
+                type: 'success',
+                text1: 'Success!',
+                text2: 'Profile updated successfully',
+            });
+            (ref as any)?.current?.close();
+        },
+        onError: (error: any) => {
+            Toast.show({
+                type: 'error',
+                text1: 'Update Failed',
+                text2: error?.response?.data?.message || 'Something went wrong',
+            });
+        }
+    });
+
+    const loading = profileMutation.isPending;
 
     const getProfileSource = () => {
         if (user?.user?.profileImage) {
@@ -62,7 +89,7 @@ const ProfileBottomSheet = forwardRef<ProfileBottomSheetRef>((_, ref) => {
         []
     );
 
-    const handleUpdate = async () => {
+    const handleUpdate = () => {
         if (!formData.name || !formData.phone || !formData.city) {
             Toast.show({
                 type: 'error',
@@ -72,31 +99,7 @@ const ProfileBottomSheet = forwardRef<ProfileBottomSheetRef>((_, ref) => {
             return;
         }
 
-        setLoading(true);
-        try {
-            const response = await UPDATE_PROFILE(formData);
-
-            if (response.user) {
-                await updateUser(response.user);
-            }
-
-            Toast.show({
-                type: 'success',
-                text1: 'Success!',
-                text2: 'Profile updated successfully',
-            });
-
-            // Optionally close the sheet
-            (ref as any)?.current?.close();
-        } catch (error: any) {
-            Toast.show({
-                type: 'error',
-                text1: 'Update Failed',
-                text2: error?.response?.data?.message || 'Something went wrong',
-            });
-        } finally {
-            setLoading(false);
-        }
+        profileMutation.mutate(formData);
     };
 
     return (
@@ -233,7 +236,7 @@ const ProfileBottomSheet = forwardRef<ProfileBottomSheetRef>((_, ref) => {
             </BottomSheetScrollView>
         </BottomSheet>
     );
-});
+}));
 
 
 const styles = StyleSheet.create({

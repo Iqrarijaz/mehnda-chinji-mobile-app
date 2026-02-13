@@ -80,21 +80,15 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="categories"
-          options={{
-            title: 'Categories',
-          }}
-        />
-        <Tabs.Screen
           name="blood"
           options={{
             title: 'Blood',
           }}
         />
         <Tabs.Screen
-          name="explore"
+          name="business"
           options={{
-            href: null,
+            title: 'Business',
           }}
         />
       </Tabs>

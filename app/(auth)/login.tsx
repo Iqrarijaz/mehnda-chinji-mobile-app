@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Device from 'expo-device';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -40,10 +41,18 @@ export default function LoginScreen() {
         showPassword: false,
         loading: false,
     });
+    const [isBiometricAvailable, setIsBiometricAvailable] = useState(false);
 
     useEffect(() => {
         loadSavedEmail();
+        checkBiometricStatus();
     }, []);
+
+    const checkBiometricStatus = async () => {
+        const available = await Biometrics.checkBiometricAvailability();
+        const creds = await Biometrics.getBiometricCredentials();
+        setIsBiometricAvailable(available && !!creds);
+    };
 
     const loadSavedEmail = async () => {
         try {
@@ -70,17 +79,26 @@ export default function LoginScreen() {
             return;
         }
 
+        performLogin(formData.email, formData.password);
+    };
+
+    const performLogin = async (email: string, password: string) => {
         setFormData(prev => ({ ...prev, loading: true }));
 
         try {
+            const deviceName = Device.modelName || `Unknown ${Platform.OS} Device`;
+            const platform = Platform.OS;
+
             const response = await LOGIN_API({
-                email: formData.email,
-                password: formData.password,
+                email,
+                password,
+                deviceName,
+                platform,
             });
 
             // Save or clear email for Remember Me
             if (formData.rememberMe) {
-                await AsyncStorage.setItem('remember_email', formData.email);
+                await AsyncStorage.setItem('remember_email', email);
             } else {
                 await AsyncStorage.removeItem('remember_email');
             }
@@ -103,6 +121,18 @@ export default function LoginScreen() {
             });
         } finally {
             setFormData(prev => ({ ...prev, loading: false }));
+        }
+    };
+
+    const handleBiometricLogin = async () => {
+        const success = await Biometrics.authenticateWithBiometrics();
+        if (success) {
+            const creds = await Biometrics.getBiometricCredentials();
+            if (creds && creds.email && creds.password) {
+                performLogin(creds.email, creds.password);
+            } else {
+                Toast.show({ type: 'error', text1: 'Error', text2: 'No credentials found.' });
+            }
         }
     };
 
@@ -242,6 +272,17 @@ export default function LoginScreen() {
                                 <ThemedText style={styles.loginButtonText}>Log In</ThemedText>
                             )}
                         </TouchableOpacity>
+
+                        {isBiometricAvailable && (
+                            <TouchableOpacity
+                                style={styles.biometricButton}
+                                onPress={handleBiometricLogin}
+                                disabled={formData.loading}
+                            >
+                                <Ionicons name="finger-print-outline" size={24} color="#FF9B51" />
+                                <ThemedText style={styles.biometricButtonText}>Login with FaceID</ThemedText>
+                            </TouchableOpacity>
+                        )}
 
                         {/* Footer */}
                         <View style={styles.footer}>
@@ -407,6 +448,23 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: '800',
         zIndex: 1,
+    },
+    biometricButton: {
+        flexDirection: 'row',
+        height: 56,
+        borderRadius: 18,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 155, 81, 0.3)',
+        backgroundColor: 'rgba(255, 155, 81, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 24,
+        gap: 10,
+    },
+    biometricButtonText: {
+        color: '#FF9B51',
+        fontSize: 16,
+        fontWeight: '700',
     },
     footer: {
         flexDirection: 'row',

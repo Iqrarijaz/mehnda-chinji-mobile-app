@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "473762889914",
+    "project_id": "mehnda-chinji",
+    "storage_bucket": "mehnda-chinji.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473762889914:android:e2b65c22d5470dd39cc283",
+        "android_client_info": {
+          "package_name": "com.company.mehnda_chinji_mobile_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArX4QzBcfxlPBdh1n970jum8iKbMvJuLU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

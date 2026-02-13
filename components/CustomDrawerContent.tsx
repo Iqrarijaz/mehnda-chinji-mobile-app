@@ -49,19 +49,18 @@ export default function CustomDrawerContent(
             type: 'font-awesome',
             route: '/(tabs)/blood',
         },
-        { label: 'Learn and Earn', icon: 'verified-user', type: 'material' },
-        { label: 'Invite Friends', icon: 'person-add', type: 'material' },
         {
-            label: 'Send a Gift',
-            icon: 'card-giftcard',
+            label: 'Business Directory',
+            icon: 'business',
             type: 'material',
-            badge: '$10',
+            route: '/(tabs)/business',
         },
+        { label: 'Invite Friends', icon: 'person-add', type: 'material' },
         {
             label: 'Settings',
             icon: 'settings',
             type: 'material',
-            route: '/(tabs)/settings',
+            route: '/settings',
         },
     ];
 
@@ -189,22 +188,12 @@ export default function CustomDrawerContent(
                                     </ThemedText>
                                 </View>
 
-                                {item.badge ? (
-                                    <View style={styles.badge}>
-                                        <ThemedText
-                                            style={styles.badgeText}
-                                        >
-                                            {item.badge}
-                                        </ThemedText>
-                                    </View>
-                                ) : (
-                                    <Ionicons
-                                        name="chevron-forward"
-                                        size={16}
-                                        color="#FFFFFF"
-                                        style={{ opacity: 0.4 }}
-                                    />
-                                )}
+                                <Ionicons
+                                    name="chevron-forward"
+                                    size={16}
+                                    color="#FFFFFF"
+                                    style={{ opacity: 0.4 }}
+                                />
                             </TouchableOpacity>
                         );
                     })}

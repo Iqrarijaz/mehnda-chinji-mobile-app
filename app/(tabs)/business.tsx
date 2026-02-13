@@ -1,38 +1,32 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
-    Modal,
-    Pressable,
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
 
-import { DONOR_QUERY_KEYS, GET_DONORS_LIST } from '@/apis/bloodDonation';
-import BloodRegistration from '@/components/BloodRegistration';
-import DonorCard from '@/components/DonorCard';
+import { BUSINESS_QUERY_KEYS, GET_BUSINESSES_LIST } from '@/apis/business';
+import BusinessCard from '@/components/BusinessCard';
+import BusinessRegistration from '@/components/BusinessRegistration';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { LiquidGlassLoader } from '@/components/ui/LiquidGlassLoader';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
-const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-
-export default function BloodScreen() {
+export default function BusinessScreen() {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
     const [activeTab, setActiveTab] = useState<'find' | 'portal'>('find');
     const [searchQuery, setSearchQuery] = useState('');
     const [appliedSearch, setAppliedSearch] = useState('');
-    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-    const [groupModalVisible, setGroupModalVisible] = useState(false);
 
     const {
         data: infiniteData,
@@ -43,13 +37,9 @@ export default function BloodScreen() {
         isFetchingNextPage,
         refetch
     } = useInfiniteQuery({
-        queryKey: DONOR_QUERY_KEYS.list({
-            name: appliedSearch || undefined,
-            bloodGroup: selectedGroup || undefined
-        }),
-        queryFn: ({ pageParam = 1 }) => GET_DONORS_LIST({
-            name: appliedSearch || undefined,
-            bloodGroup: selectedGroup || undefined,
+        queryKey: BUSINESS_QUERY_KEYS.list({ search: appliedSearch || undefined }),
+        queryFn: ({ pageParam = 1 }) => GET_BUSINESSES_LIST({
+            search: appliedSearch || undefined,
             currentPage: pageParam
         }),
         getNextPageParam: (lastPage: any, allPages: any[]) => {
@@ -68,26 +58,19 @@ export default function BloodScreen() {
         enabled: activeTab === 'find',
     });
 
-    const donors = (infiniteData as any)?.pages?.flatMap((page: any) => Array.isArray(page?.data) ? page.data : []) || [];
+    const businesses = (infiniteData as any)?.pages?.flatMap((page: any) => Array.isArray(page?.data) ? page.data : []) || [];
     const loading = queryLoading || isRefetching;
 
     const handleSearch = () => {
         setAppliedSearch(searchQuery);
-        // The query will automatically refetch due to appliedSearch change in queryKey
     };
 
     const handleRefresh = () => {
         refetch();
     };
 
-    const handleGroupSelect = (group: string | null) => {
-        setSelectedGroup(group);
-        setGroupModalVisible(false);
-        // The query will automatically refetch due to selectedGroup change in queryKey
-    };
-
-    const renderItem = useCallback(({ item }: { item: any }) => <DonorCard donor={item} />, []);
-    const keyExtractor = useCallback((item: any) => item._id, []);
+    const renderItem = React.useCallback(({ item }: { item: any }) => <BusinessCard business={item} />, []);
+    const keyExtractor = React.useCallback((item: any) => item._id, []);
 
     return (
         <ThemedView style={styles.container}>
@@ -122,7 +105,7 @@ export default function BloodScreen() {
                             styles.tabText,
                             activeTab === 'find' && { color: '#FFFFFF', fontWeight: '800' }
                         ]}>
-                            Find Donors
+                            Find Service
                         </ThemedText>
                     </TouchableOpacity>
 
@@ -140,7 +123,7 @@ export default function BloodScreen() {
                             />
                         )}
                         <Ionicons
-                            name="water"
+                            name="business"
                             size={16}
                             color={activeTab === 'portal' ? '#FFFFFF' : isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'}
                             style={{ marginRight: 6 }}
@@ -149,23 +132,22 @@ export default function BloodScreen() {
                             styles.tabText,
                             activeTab === 'portal' && { color: '#FFFFFF', fontWeight: '800' }
                         ]}>
-                            Donor Portal
+                            My Business
                         </ThemedText>
                     </TouchableOpacity>
                 </LinearGradient>
             </View>
 
+            {/* Find Service Section */}
             <View style={[styles.content, { display: activeTab === 'find' ? 'flex' : 'none' }]}>
-                {/* Liquid Glass Search & Filter Header */}
+                {/* Search Header */}
                 <View style={[styles.searchSection, { backgroundColor: isDark ? '#1e293b' : '#0F172A' }]}>
-                    <ThemedText style={styles.searchTitle}>Find Donors</ThemedText>
-
+                    <ThemedText style={styles.searchTitle}>Service Directory</ThemedText>
                     <View style={styles.searchRow}>
-                        {/* Search Bar */}
                         <View style={[styles.glassSearchInput, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)' }]}>
                             <Ionicons name="search" size={18} color="#94a3b8" />
                             <TextInput
-                                placeholder="Search name or area..."
+                                placeholder="Search mechanic, shop, area..."
                                 placeholderTextColor="#94a3b8"
                                 style={styles.searchInput}
                                 value={searchQuery}
@@ -173,28 +155,17 @@ export default function BloodScreen() {
                                 onSubmitEditing={handleSearch}
                             />
                         </View>
-
-                        {/* Group Selector Dropdown */}
-                        <TouchableOpacity
-                            style={[styles.groupDropdown, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)' }]}
-                            onPress={() => setGroupModalVisible(true)}
-                        >
-                            <ThemedText style={[styles.groupTag, !selectedGroup && { opacity: 0.6 }]}>
-                                {selectedGroup || 'Any'}
-                            </ThemedText>
-                            <Ionicons name="water" size={14} color="#ef4444" style={{ marginLeft: 4 }} />
-                        </TouchableOpacity>
                     </View>
                 </View>
 
-                {/* Donors List */}
-                {loading && donors.length === 0 ? (
-                    <View style={styles.emptyContainer}>
+                {/* Listing */}
+                {loading && businesses.length === 0 ? (
+                    <View style={styles.loaderContainer}>
                         <LiquidGlassLoader />
                     </View>
                 ) : (
                     <FlatList
-                        data={donors}
+                        data={businesses}
                         renderItem={renderItem}
                         keyExtractor={keyExtractor}
                         contentContainerStyle={styles.listContent}
@@ -209,89 +180,28 @@ export default function BloodScreen() {
                         ListFooterComponent={
                             isFetchingNextPage ? (
                                 <View style={{ paddingVertical: 20 }}>
-                                    <ActivityIndicator color={Colors[theme].secondary} />
+                                    <ActivityIndicator color={colors.secondary} />
                                 </View>
-                            ) : hasNextPage ? null : donors.length > 0 ? (
+                            ) : hasNextPage ? null : businesses.length > 0 ? (
                                 <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, paddingVertical: 20 }}>
-                                    End of list
+                                    End of directory
                                 </ThemedText>
                             ) : null
                         }
                         ListEmptyComponent={
                             <View style={styles.emptyContainer}>
-                                <Ionicons name="water-outline" size={64} color="#94a3b8" />
-                                <ThemedText style={styles.emptyText}>No donors found yet.</ThemedText>
+                                <Ionicons name="business-outline" size={64} color="#94a3b8" />
+                                <ThemedText style={styles.emptyText}>No businesses found yet.</ThemedText>
                             </View>
                         }
                     />
                 )}
             </View>
 
+            {/* My Business Section (Portal) */}
             <View style={{ flex: 1, display: activeTab === 'portal' ? 'flex' : 'none' }}>
-                <BloodRegistration />
+                <BusinessRegistration />
             </View>
-
-            {/* Blood Group Modal */}
-            <Modal
-                visible={groupModalVisible}
-                animationType="fade"
-                transparent={true}
-                onRequestClose={() => setGroupModalVisible(false)}
-            >
-                <Pressable
-                    style={styles.modalOverlay}
-                    onPress={() => setGroupModalVisible(false)}
-                >
-                    <View style={styles.dropdownModalContent}>
-                        <LinearGradient
-                            colors={['#1e293b', '#0F172A']}
-                            style={StyleSheet.absoluteFill}
-                        />
-                        <View style={styles.modalHeader}>
-                            <ThemedText style={styles.modalTitle}>Filter by Group</ThemedText>
-                        </View>
-
-                        <TouchableOpacity
-                            style={styles.groupItem}
-                            onPress={() => {
-                                setSelectedGroup(null);
-                                setGroupModalVisible(false);
-                            }}
-                        >
-                            <ThemedText style={[
-                                styles.itemText,
-                                !selectedGroup && styles.selectedItemText
-                            ]}>
-                                All Groups
-                            </ThemedText>
-                            {!selectedGroup && (
-                                <Ionicons name="checkmark" size={20} color="#FF9B51" />
-                            )}
-                        </TouchableOpacity>
-
-                        {BLOOD_GROUPS.map((group) => (
-                            <TouchableOpacity
-                                key={group}
-                                style={styles.groupItem}
-                                onPress={() => {
-                                    setSelectedGroup(group);
-                                    setGroupModalVisible(false);
-                                }}
-                            >
-                                <ThemedText style={[
-                                    styles.itemText,
-                                    selectedGroup === group && styles.selectedItemText
-                                ]}>
-                                    {group}
-                                </ThemedText>
-                                {selectedGroup === group && (
-                                    <Ionicons name="checkmark" size={20} color="#FF9B51" />
-                                )}
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </Pressable>
-            </Modal>
         </ThemedView>
     );
 }
@@ -368,76 +278,24 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
     },
-    groupDropdown: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 48,
-        paddingHorizontal: 14,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.08)',
-        minWidth: 70,
-    },
-    groupTag: {
-        fontSize: 14,
-        fontWeight: '800',
-        color: '#FFFFFF',
-    },
     listContent: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
+        paddingTop: 10,
         paddingBottom: 100,
+    },
+    loaderContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     emptyContainer: {
         alignItems: 'center',
-        marginTop: 50,
+        marginTop: 60,
     },
     emptyText: {
         marginTop: 16,
         color: '#94a3b8',
         fontSize: 16,
         textAlign: 'center',
-    },
-    // Modal Styles
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    dropdownModalContent: {
-        width: '85%',
-        maxHeight: '70%',
-        borderRadius: 24,
-        padding: 20,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-    },
-    modalHeader: {
-        marginBottom: 16,
-        zIndex: 1,
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: '800',
-        color: '#FFFFFF',
-        textAlign: 'center',
-    },
-    groupItem: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 14,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-    },
-    itemText: {
-        fontSize: 16,
-        color: '#FFFFFF',
-    },
-    selectedItemText: {
-        color: '#FF9B51',
-        fontWeight: '700',
     },
 });

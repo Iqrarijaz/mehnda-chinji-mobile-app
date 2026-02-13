@@ -13,19 +13,27 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     const colors = Colors[theme];
     const secondaryColor = Colors.dark.secondary;
 
-    const tabCount = state.routes.length;
-    const tabWidth = (width - 28 - 16) / tabCount; // width - paddingHorizontal * 2 - containerPaddingHorizontal * 2
+    const visibleRoutes = state.routes.filter(route => {
+        const { options } = descriptors[route.key];
+        return (options as any).href !== null;
+    });
+
+    const tabCount = visibleRoutes.length;
+    const tabWidth = (width - 28 - 16) / tabCount;
 
     const translateX = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
-        Animated.spring(translateX, {
-            toValue: state.index * tabWidth,
-            useNativeDriver: true,
-            bounciness: 4,
-            speed: 12,
-        }).start();
-    }, [state.index, tabWidth]);
+        const activeIndex = visibleRoutes.findIndex(route => route.key === state.routes[state.index].key);
+        if (activeIndex !== -1) {
+            Animated.spring(translateX, {
+                toValue: activeIndex * tabWidth,
+                useNativeDriver: true,
+                bounciness: 4,
+                speed: 12,
+            }).start();
+        }
+    }, [state.index, tabWidth, visibleRoutes]);
 
     return (
         <View style={styles.outerContainer}>
@@ -61,9 +69,9 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                     />
                 </Animated.View>
 
-                {state.routes.map((route, index) => {
+                {visibleRoutes.map((route, index) => {
                     const { options } = descriptors[route.key];
-                    const isFocused = state.index === index;
+                    const isFocused = state.routes[state.index].key === route.key;
 
                     const onPress = () => {
                         const event = navigation.emit({
@@ -86,11 +94,9 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
                     let iconName = 'house.fill';
                     if (route.name === 'index') iconName = 'house.fill';
-                    else if (route.name === 'cart') iconName = 'cart.fill';
-                    else if (route.name === 'categories') iconName = 'square.grid.2x2.fill';
                     else if (route.name === 'blood') iconName = 'drop.fill';
+                    else if (route.name === 'business') iconName = 'briefcase.fill';
                     else if (route.name === 'chat') iconName = 'message.fill';
-                    else if (route.name === 'settings') iconName = 'gearshape.fill';
 
                     // @ts-ignore
                     const safeIconName = iconName as import('expo-symbols').SymbolViewProps['name'];

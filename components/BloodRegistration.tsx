@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import {
@@ -16,12 +17,19 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import { GET_DONOR_STATUS, MANAGE_DONOR_STATUS, REGISTER_AS_DONOR, REMOVE_AS_DONOR } from '@/apis/bloodDonation';
+import {
+    DONOR_QUERY_KEYS,
+    GET_DONOR_STATUS,
+    MANAGE_DONOR_STATUS,
+    REGISTER_AS_DONOR,
+    REMOVE_AS_DONOR
+} from '@/apis/bloodDonation';
 import { CityPicker } from '@/components/CityPicker';
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { GlassCard } from './ui/GlassCard';
 import { GlassConfirmationModal } from './ui/GlassConfirmationModal';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
@@ -30,10 +38,8 @@ const BloodRegistration = React.memo(() => {
     const { user } = useAuth();
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
+    const queryClient = useQueryClient();
 
-    const [loading, setLoading] = useState(false);
-    const [isRegistered, setIsRegistered] = useState(false);
-    const [isAvailable, setIsAvailable] = useState(true);
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
     const [selectedCity, setSelectedCity] = useState<string>(user?.user?.city || '');
     const [village, setVillage] = useState<string>(user?.user?.village || '');
@@ -46,34 +52,76 @@ const BloodRegistration = React.memo(() => {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showStatusConfirmModal, setShowStatusConfirmModal] = useState(false);
 
+    // Query
+    const { data: statusRes, isLoading: loading } = useQuery({
+        queryKey: DONOR_QUERY_KEYS.status(),
+        queryFn: GET_DONOR_STATUS,
+    });
+
+    const donorData = statusRes?.data;
+    const isRegistered = !!donorData;
+    const isAvailable = donorData?.available ?? true;
+
+    // Sync state with query data
     useEffect(() => {
-        fetchDonorStatus();
-    }, []);
-
-    const fetchDonorStatus = async () => {
-        try {
-            setLoading(true);
-            const response = await GET_DONOR_STATUS();
-            if (response.success && response.data) {
-                setIsRegistered(true);
-                setIsAvailable(response.data.available);
-                setSelectedGroup(response.data.bloodGroup);
-                setSelectedCity(response.data.city || user?.user?.city || '');
-                setVillage(response.data.village || user?.user?.village || '');
-                if (response.data.lastDonationDate) {
-                    setLastDonationDate(new Date(response.data.lastDonationDate));
-                }
-            } else {
-                setIsRegistered(false);
+        if (donorData) {
+            setSelectedGroup(donorData.bloodGroup);
+            setSelectedCity(donorData.city || user?.user?.city || '');
+            setVillage(donorData.village || user?.user?.village || '');
+            if (donorData.lastDonationDate) {
+                setLastDonationDate(new Date(donorData.lastDonationDate));
             }
-        } catch (error) {
-            console.error("Error fetching donor status:", error);
-        } finally {
-            setLoading(false);
         }
-    };
+    }, [donorData]);
 
-    const handleToggleRegistration = async () => {
+    // Mutations
+    const registerMutation = useMutation({
+        mutationFn: REGISTER_AS_DONOR,
+        onSuccess: (res) => {
+            if (res.success) {
+                queryClient.invalidateQueries({ queryKey: DONOR_QUERY_KEYS.all });
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success',
+                    text2: 'Registered as donor successfully!',
+                });
+            }
+        },
+    });
+
+    const removeMutation = useMutation({
+        mutationFn: REMOVE_AS_DONOR,
+        onSuccess: (res) => {
+            if (res.success) {
+                queryClient.invalidateQueries({ queryKey: DONOR_QUERY_KEYS.all });
+                setShowConfirmModal(false);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success',
+                    text2: 'Removed from donor list.',
+                });
+            }
+        },
+    });
+
+    const manageStatusMutation = useMutation({
+        mutationFn: MANAGE_DONOR_STATUS,
+        onSuccess: (res) => {
+            if (res.success) {
+                queryClient.invalidateQueries({ queryKey: DONOR_QUERY_KEYS.all });
+                setShowStatusConfirmModal(false);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Status Updated',
+                    text2: `You are now ${!isAvailable ? 'available' : 'unavailable'} for donation.`,
+                });
+            }
+        },
+    });
+
+    const isProcessing = registerMutation.isPending || removeMutation.isPending || manageStatusMutation.isPending;
+
+    const handleToggleRegistration = () => {
         if (!isRegistered && !selectedGroup) {
             Toast.show({
                 type: 'error',
@@ -97,77 +145,24 @@ const BloodRegistration = React.memo(() => {
             return;
         }
 
-        await processRegistration();
+        registerMutation.mutate({
+            bloodGroup: selectedGroup,
+            city: selectedCity,
+            village: village,
+            lastDonationDate: lastDonationDate?.toISOString(),
+        });
     };
 
-    const processRegistration = async () => {
-        try {
-            setLoading(true);
-            if (isRegistered) {
-                const response = await REMOVE_AS_DONOR();
-                if (response.success) {
-                    setIsRegistered(false);
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Removed from Donors',
-                        text2: 'You are no longer listed as a donor.',
-                    });
-                }
-            } else {
-                const response = await REGISTER_AS_DONOR({
-                    bloodGroup: selectedGroup,
-                    city: selectedCity,
-                    village: village,
-                    lastDonationDate: lastDonationDate?.toISOString(),
-                });
-                if (response.success) {
-                    setIsRegistered(true);
-                    setIsAvailable(true);
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Registered Successfully',
-                        text2: 'You are now part of our donor community!',
-                    });
-                }
-            }
-        } catch (error: any) {
-            Toast.show({
-                type: 'error',
-                text1: 'Request Failed',
-                text2: error.message || 'Something went wrong.',
-            });
-        } finally {
-            setLoading(false);
-            setShowConfirmModal(false);
-        }
+    const confirmRemoveRegistration = () => {
+        removeMutation.mutate();
     };
 
     const handleToggleAvailability = () => {
         setShowStatusConfirmModal(true);
     };
 
-    const processToggleAvailability = async () => {
-        try {
-            setLoading(true);
-            const response = await MANAGE_DONOR_STATUS();
-            if (response.success) {
-                setIsAvailable(response.data.available);
-                Toast.show({
-                    type: 'success',
-                    text1: 'Status Updated',
-                    text2: response.data.available ? 'You are now available.' : 'You are now listed as busy.',
-                });
-            }
-        } catch (error: any) {
-            Toast.show({
-                type: 'error',
-                text1: 'Update Failed',
-                text2: error.message || 'Something went wrong.',
-            });
-        } finally {
-            setLoading(false);
-            setShowStatusConfirmModal(false);
-        }
+    const confirmToggleStatus = () => {
+        manageStatusMutation.mutate();
     };
 
     const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -178,7 +173,7 @@ const BloodRegistration = React.memo(() => {
         }
     };
 
-    if (loading && !isRegistered && !selectedGroup) {
+    if (loading && !donorData) {
         return (
             <View style={[styles.container, styles.centerContent]}>
                 <ActivityIndicator size="large" color="#ef4444" />
@@ -194,208 +189,199 @@ const BloodRegistration = React.memo(() => {
             </View>
 
             {/* Main Liquid Glass Registration Card */}
-            <View style={styles.cardWrapper}>
-                <LinearGradient
-                    colors={isDark
-                        ? ['rgba(30, 41, 59, 0.7)', 'rgba(15, 23, 42, 0.8)']
-                        : ['rgba(255, 255, 255, 0.9)', 'rgba(241, 245, 249, 0.9)']}
-                    style={[
-                        styles.mainCard,
-                        { borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.4)' }
-                    ]}
-                >
-                    <View style={styles.statusHeader}>
-                        <View style={styles.statusLabelContainer}>
-                            <ThemedText style={styles.statusLabel}>REGISTRATION</ThemedText>
-                            <ThemedText style={[styles.statusValue, { color: isRegistered ? '#10B981' : '#64748b' }]}>
-                                {isRegistered ? 'ACTIVE' : 'INACTIVE'}
-                            </ThemedText>
-                        </View>
-                        <Ionicons
-                            name={isRegistered ? "checkmark-circle" : "ellipse-outline"}
-                            size={32}
-                            color={isRegistered ? "#10B981" : isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}
-                        />
+            <GlassCard>
+
+                <View style={styles.statusHeader}>
+                    <View style={styles.statusLabelContainer}>
+                        <ThemedText style={styles.statusLabel}>REGISTRATION</ThemedText>
+                        <ThemedText style={[styles.statusValue, { color: isRegistered ? '#10B981' : '#64748b' }]}>
+                            {isRegistered ? 'ACTIVE' : 'INACTIVE'}
+                        </ThemedText>
                     </View>
+                    <Ionicons
+                        name={isRegistered ? "checkmark-circle" : "ellipse-outline"}
+                        size={32}
+                        color={isRegistered ? "#10B981" : isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}
+                    />
+                </View>
 
-                    {isRegistered ? (
-                        <View style={styles.controlsSection}>
-                            <View style={[styles.infoRow, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(15, 23, 42, 0.03)' }]}>
-                                <View style={styles.infoItem}>
-                                    <ThemedText style={styles.infoLabel}>Blood Group</ThemedText>
-                                    <ThemedText style={styles.infoValue}>{selectedGroup}</ThemedText>
-                                </View>
-                                <View style={styles.infoDivider} />
-                                <View style={styles.infoItem}>
-                                    <ThemedText style={styles.infoLabel}>Location</ThemedText>
-                                    <ThemedText style={styles.infoValue} numberOfLines={1}>{village}, {selectedCity}</ThemedText>
-                                </View>
+                {isRegistered ? (
+                    <View style={styles.controlsSection}>
+                        <View style={[styles.infoRow, { backgroundColor: 'transparent' }]}>
+                            <View style={styles.infoItem}>
+                                <ThemedText style={styles.infoLabel}>Blood Group</ThemedText>
+                                <ThemedText style={styles.infoValue}>{selectedGroup}</ThemedText>
                             </View>
+                            <View style={styles.infoDivider} />
+                            <View style={styles.infoItem}>
+                                <ThemedText style={styles.infoLabel}>Location</ThemedText>
+                                <ThemedText style={styles.infoValue} numberOfLines={1}>{village}, {selectedCity}</ThemedText>
+                            </View>
+                        </View>
 
-                            <View style={styles.row}>
-                                <View style={{ flex: 1 }}>
-                                    <ThemedText style={styles.controlTitle}>Availability Status</ThemedText>
-                                    <ThemedText style={styles.controlDesc}>
-                                        {isAvailable ? 'Visible to those in need' : 'Currently hidden'}
+                        <View style={styles.row}>
+                            <View style={{ flex: 1 }}>
+                                <ThemedText style={styles.controlTitle}>Availability Status</ThemedText>
+                                <ThemedText style={styles.controlDesc}>
+                                    {isAvailable ? 'Visible to those in need' : 'Currently hidden'}
+                                </ThemedText>
+                            </View>
+                            <Switch
+                                value={isAvailable}
+                                onValueChange={handleToggleAvailability}
+                                trackColor={{ false: '#7f1d1d', true: '#064e3b' }}
+                                thumbColor={isAvailable ? '#10B981' : '#ef4444'}
+                                style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }}
+                            />
+                        </View>
+
+                        <TouchableOpacity
+                            style={styles.actionBtnWrapper}
+                            onPress={handleToggleRegistration}
+                            disabled={loading}
+                        >
+                            <LinearGradient
+                                colors={['#ef4444', '#b91c1c']}
+                                style={styles.gradientBtn}
+                            >
+                                <ThemedText style={styles.btnText}>
+                                    {isProcessing ? 'Processing...' : 'UNREGISTER AS DONOR'}
+                                </ThemedText>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <View style={styles.setupSection}>
+                        {/* Blood Group Dropdown */}
+                        <View style={styles.inputField}>
+                            <ThemedText style={styles.setupLabel}>BLOOD GROUP</ThemedText>
+                            <TouchableOpacity
+                                style={[styles.dropdownTrigger, { backgroundColor: 'transparent' }]}
+                                onPress={() => setGroupModalVisible(true)}
+                            >
+                                <View style={styles.triggerContent}>
+                                    <Ionicons name="water" size={18} color="#ef4444" style={{ marginRight: 10 }} />
+                                    <ThemedText style={[styles.triggerText, !selectedGroup && { opacity: 0.5 }]}>
+                                        {selectedGroup || 'Select Blood Group'}
                                     </ThemedText>
                                 </View>
-                                <Switch
-                                    value={isAvailable}
-                                    onValueChange={handleToggleAvailability}
-                                    trackColor={{ false: '#7f1d1d', true: '#064e3b' }}
-                                    thumbColor={isAvailable ? '#10B981' : '#ef4444'}
-                                    style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }}
+                                <Ionicons name="chevron-down" size={16} color="#64748b" />
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* City Dropdown */}
+                        <View style={styles.inputField}>
+                            <ThemedText style={styles.setupLabel}>CITY</ThemedText>
+                            <TouchableOpacity
+                                style={[styles.dropdownTrigger, { backgroundColor: 'transparent' }]}
+                                onPress={() => setCityModalVisible(true)}
+                            >
+                                <View style={styles.triggerContent}>
+                                    <Ionicons name="location" size={18} color="#ef4444" style={{ marginRight: 10 }} />
+                                    <ThemedText style={[styles.triggerText, !selectedCity && { opacity: 0.5 }]}>
+                                        {selectedCity || 'Select City'}
+                                    </ThemedText>
+                                </View>
+                                <Ionicons name="chevron-down" size={16} color="#64748b" />
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Village Input */}
+                        <View style={styles.inputField}>
+                            <ThemedText style={styles.setupLabel}>VILLAGE / LOCAL AREA (OPTIONAL)</ThemedText>
+                            <View style={[styles.dropdownTrigger, { backgroundColor: 'transparent', paddingLeft: 14 }]}>
+                                <Ionicons name="home" size={18} color="#ef4444" style={{ marginRight: 10 }} />
+                                <TextInput
+                                    placeholder="Enter village or area"
+                                    placeholderTextColor={isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"}
+                                    style={[styles.textInput, { color: colors.text }]}
+                                    value={village}
+                                    onChangeText={setVillage}
                                 />
                             </View>
-
-                            <TouchableOpacity
-                                style={styles.actionBtnWrapper}
-                                onPress={handleToggleRegistration}
-                                disabled={loading}
-                            >
-                                <LinearGradient
-                                    colors={['#ef4444', '#b91c1c']}
-                                    style={styles.gradientBtn}
-                                >
-                                    <ThemedText style={styles.btnText}>
-                                        {loading ? 'Processing...' : 'UNREGISTER AS DONOR'}
-                                    </ThemedText>
-                                </LinearGradient>
-                            </TouchableOpacity>
                         </View>
-                    ) : (
-                        <View style={styles.setupSection}>
-                            {/* Blood Group Dropdown */}
-                            <View style={styles.inputField}>
-                                <ThemedText style={styles.setupLabel}>BLOOD GROUP</ThemedText>
-                                <TouchableOpacity
-                                    style={[styles.dropdownTrigger, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}
-                                    onPress={() => setGroupModalVisible(true)}
-                                >
-                                    <View style={styles.triggerContent}>
-                                        <Ionicons name="water" size={18} color="#ef4444" style={{ marginRight: 10 }} />
-                                        <ThemedText style={[styles.triggerText, !selectedGroup && { opacity: 0.5 }]}>
-                                            {selectedGroup || 'Select Blood Group'}
-                                        </ThemedText>
-                                    </View>
-                                    <Ionicons name="chevron-down" size={16} color="#64748b" />
-                                </TouchableOpacity>
-                            </View>
 
-                            {/* City Dropdown */}
-                            <View style={styles.inputField}>
-                                <ThemedText style={styles.setupLabel}>CITY</ThemedText>
-                                <TouchableOpacity
-                                    style={[styles.dropdownTrigger, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}
-                                    onPress={() => setCityModalVisible(true)}
-                                >
-                                    <View style={styles.triggerContent}>
-                                        <Ionicons name="location" size={18} color="#ef4444" style={{ marginRight: 10 }} />
-                                        <ThemedText style={[styles.triggerText, !selectedCity && { opacity: 0.5 }]}>
-                                            {selectedCity || 'Select City'}
-                                        </ThemedText>
-                                    </View>
-                                    <Ionicons name="chevron-down" size={16} color="#64748b" />
-                                </TouchableOpacity>
-                            </View>
-
-                            {/* Village Input */}
-                            <View style={styles.inputField}>
-                                <ThemedText style={styles.setupLabel}>VILLAGE / LOCAL AREA (OPTIONAL)</ThemedText>
-                                <View style={[styles.dropdownTrigger, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', paddingLeft: 14 }]}>
-                                    <Ionicons name="home" size={18} color="#ef4444" style={{ marginRight: 10 }} />
-                                    <TextInput
-                                        placeholder="Enter village or area"
-                                        placeholderTextColor={isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"}
-                                        style={[styles.textInput, { color: colors.text }]}
-                                        value={village}
-                                        onChangeText={setVillage}
-                                    />
+                        {/* Last Donation Date Selector */}
+                        <View style={styles.inputField}>
+                            <ThemedText style={styles.setupLabel}>LAST DONATION DATE</ThemedText>
+                            <TouchableOpacity
+                                style={[styles.dropdownTrigger, { backgroundColor: 'transparent' }]}
+                                onPress={() => setShowDatePicker(true)}
+                            >
+                                <View style={styles.triggerContent}>
+                                    <Ionicons name="calendar" size={18} color="#ef4444" style={{ marginRight: 10 }} />
+                                    <ThemedText style={[styles.triggerText, !lastDonationDate && { opacity: 0.5 }]}>
+                                        {lastDonationDate ? lastDonationDate.toLocaleDateString() : 'Tap to select date'}
+                                    </ThemedText>
                                 </View>
-                            </View>
+                                <Ionicons name="chevron-down" size={16} color="#64748b" />
+                            </TouchableOpacity>
 
-                            {/* Last Donation Date Selector */}
-                            <View style={styles.inputField}>
-                                <ThemedText style={styles.setupLabel}>LAST DONATION DATE</ThemedText>
-                                <TouchableOpacity
-                                    style={[styles.dropdownTrigger, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}
-                                    onPress={() => setShowDatePicker(true)}
-                                >
-                                    <View style={styles.triggerContent}>
-                                        <Ionicons name="calendar" size={18} color="#ef4444" style={{ marginRight: 10 }} />
-                                        <ThemedText style={[styles.triggerText, !lastDonationDate && { opacity: 0.5 }]}>
-                                            {lastDonationDate ? lastDonationDate.toLocaleDateString() : 'Tap to select date'}
-                                        </ThemedText>
-                                    </View>
-                                    <Ionicons name="chevron-down" size={16} color="#64748b" />
-                                </TouchableOpacity>
+                            <Modal
+                                visible={showDatePicker}
+                                transparent={true}
+                                animationType="fade"
+                                onRequestClose={() => setShowDatePicker(false)}
+                            >
+                                <View style={styles.modalOverlay}>
+                                    <View style={styles.dateModalContent}>
+                                        <LinearGradient
+                                            colors={['#1e293b', '#0F172A']}
+                                            style={StyleSheet.absoluteFill}
+                                        />
+                                        <View style={styles.modalHeader}>
+                                            <ThemedText style={styles.modalTitle}>Select Date</ThemedText>
+                                        </View>
 
-                                <Modal
-                                    visible={showDatePicker}
-                                    transparent={true}
-                                    animationType="fade"
-                                    onRequestClose={() => setShowDatePicker(false)}
-                                >
-                                    <View style={styles.modalOverlay}>
-                                        <View style={styles.dateModalContent}>
-                                            <LinearGradient
-                                                colors={['#1e293b', '#0F172A']}
-                                                style={StyleSheet.absoluteFill}
+                                        <View style={styles.pickerContainer}>
+                                            <DateTimePicker
+                                                value={lastDonationDate || new Date()}
+                                                mode="date"
+                                                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                                onChange={onDateChange}
+                                                maximumDate={new Date()}
+                                                textColor="#FFFFFF"
                                             />
-                                            <View style={styles.modalHeader}>
-                                                <ThemedText style={styles.modalTitle}>Select Date</ThemedText>
-                                            </View>
+                                        </View>
 
-                                            <View style={styles.pickerContainer}>
-                                                <DateTimePicker
-                                                    value={lastDonationDate || new Date()}
-                                                    mode="date"
-                                                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                                                    onChange={onDateChange}
-                                                    maximumDate={new Date()}
-                                                    textColor="#FFFFFF"
-                                                />
-                                            </View>
-
-                                            <View style={styles.modalFooter}>
-                                                <TouchableOpacity
-                                                    style={styles.modalBtn}
-                                                    onPress={() => setShowDatePicker(false)}
-                                                >
-                                                    <ThemedText style={styles.modalBtnText}>Cancel</ThemedText>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity
-                                                    style={[styles.modalBtn, styles.modalBtnPrimary]}
-                                                    onPress={() => setShowDatePicker(false)}
-                                                >
-                                                    <ThemedText style={[styles.modalBtnText, { color: '#FF9B51' }]}>Confirm</ThemedText>
-                                                </TouchableOpacity>
-                                            </View>
+                                        <View style={styles.modalFooter}>
+                                            <TouchableOpacity
+                                                style={styles.modalBtn}
+                                                onPress={() => setShowDatePicker(false)}
+                                            >
+                                                <ThemedText style={styles.modalBtnText}>Cancel</ThemedText>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={[styles.modalBtn, styles.modalBtnPrimary]}
+                                                onPress={() => setShowDatePicker(false)}
+                                            >
+                                                <ThemedText style={[styles.modalBtnText, { color: '#FF9B51' }]}>Confirm</ThemedText>
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
-                                </Modal>
-                            </View>
-
-                            <TouchableOpacity
-                                style={styles.actionBtnWrapper}
-                                onPress={handleToggleRegistration}
-                                disabled={loading}
-                            >
-                                <LinearGradient
-                                    colors={['#ef4444', '#b91c1c']}
-                                    style={styles.gradientBtn}
-                                >
-                                    {loading ? (
-                                        <ActivityIndicator size="small" color="#FFFFFF" />
-                                    ) : (
-                                        <ThemedText style={styles.btnText}>REGISTER AS DONOR</ThemedText>
-                                    )}
-                                </LinearGradient>
-                            </TouchableOpacity>
+                                </View>
+                            </Modal>
                         </View>
-                    )}
-                </LinearGradient>
-            </View>
+
+                        <TouchableOpacity
+                            style={styles.actionBtnWrapper}
+                            onPress={handleToggleRegistration}
+                            disabled={isProcessing}
+                        >
+                            <LinearGradient
+                                colors={['#ef4444', '#b91c1c']}
+                                style={styles.gradientBtn}
+                            >
+                                {isProcessing ? (
+                                    <ActivityIndicator size="small" color="#FFFFFF" />
+                                ) : (
+                                    <ThemedText style={styles.btnText}>REGISTER AS DONOR</ThemedText>
+                                )}
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            </GlassCard>
 
             {/* Donation Tips */}
             <View style={styles.tipsSection}>
@@ -468,25 +454,25 @@ const BloodRegistration = React.memo(() => {
             <GlassConfirmationModal
                 visible={showConfirmModal}
                 onClose={() => setShowConfirmModal(false)}
-                onConfirm={processRegistration}
+                onConfirm={confirmRemoveRegistration}
                 title="Unregister as Donor?"
                 message="Are you sure you want to stop being a blood donor? You can always register again later."
-                confirmText={loading ? "Unregistering..." : "Yes, Unregister"}
+                confirmText={isProcessing ? "Unregistering..." : "Yes, Unregister"}
                 type="danger"
             />
 
             <GlassConfirmationModal
                 visible={showStatusConfirmModal}
                 onClose={() => setShowStatusConfirmModal(false)}
-                onConfirm={processToggleAvailability}
+                onConfirm={confirmToggleStatus}
                 title={isAvailable ? "Go Offline?" : "Go Online?"}
                 message={isAvailable
                     ? "Other users won't be able to find you in the donor list. You can change this anytime."
                     : "You will be visible to users searching for blood donors. Ready to help?"}
-                confirmText={loading ? "Updating..." : (isAvailable ? "Yes, Go Offline" : "Yes, Go Online")}
+                confirmText={isProcessing ? "Updating..." : (isAvailable ? "Yes, Go Offline" : "Yes, Go Online")}
                 type={isAvailable ? "danger" : "info"}
             />
-        </ScrollView>
+        </ScrollView >
     );
 });
 
@@ -498,7 +484,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 14,
-        paddingBottom: 80,
+        paddingBottom: 100,
     },
     headerBox: {
         marginBottom: 14,
@@ -509,25 +495,14 @@ const styles = StyleSheet.create({
         letterSpacing: -0.5,
     },
     cardWrapper: {
-        borderRadius: 24,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.12,
-        shadowRadius: 16,
-        elevation: 6,
-    },
-    mainCard: {
-        borderRadius: 24,
-        padding: 14,
-        borderWidth: 1.2,
+        marginBottom: 20,
     },
     statusHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingBottom: 12,
-        borderBottomWidth: 1,
+        borderBottomWidth: 4,
         borderBottomColor: 'rgba(255,255,255,0.08)',
         marginBottom: 12,
     },
@@ -570,7 +545,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     infoDivider: {
-        width: 1,
+        width: 4,
         backgroundColor: 'rgba(255,255,255,0.1)',
         marginHorizontal: 12,
     },

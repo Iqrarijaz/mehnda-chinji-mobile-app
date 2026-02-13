@@ -1,0 +1,210 @@
+[
+    {
+        "name_eng": "Tailor",
+        "name_ur": "درزی"
+    },
+    {
+        "name_eng": "Carpenter",
+        "name_ur": "ترکھان"
+    },
+    {
+        "name_eng": "Electrician",
+        "name_ur": "برقی کاریگر"
+    },
+    {
+        "name_eng": "Plumber",
+        "name_ur": "پلمبر"
+    },
+    {
+        "name_eng": "Teacher",
+        "name_ur": "استاد"
+    },
+    {
+        "name_eng": "Shopkeeper",
+        "name_ur": "دکان دار"
+    },
+    {
+        "name_eng": "Farmer",
+        "name_ur": "کسان"
+    },
+    {
+        "name_eng": "Driver",
+        "name_ur": "ڈرائیور"
+    },
+    {
+        "name_eng": "Mechanic",
+        "name_ur": "میکانیک"
+    },
+    {
+        "name_eng": "Doctor",
+        "name_ur": "ڈاکٹر"
+    },
+    {
+        "name_eng": "Nurse",
+        "name_ur": "نرس"
+    },
+    {
+        "name_eng": "Welder",
+        "name_ur": "ویلڈر"
+    },
+    {
+        "name_eng": "Construction Worker",
+        "name_ur": "مزدور"
+    },
+    {
+        "name_eng": "Painter",
+        "name_ur": "رنگ ساز"
+    },
+    {
+        "name_eng": "Vendor",
+        "name_ur": "فروشندہ"
+    },
+    {
+        "name_eng": "Hairdresser",
+        "name_ur": "حجام"
+    },
+    {
+        "name_eng": "Cobbler",
+        "name_ur": "موزہ ساز"
+    },
+    {
+        "name_eng": "Mobile Shop Owner",
+        "name_ur": "موبائل کی دکان کا مالک"
+    },
+    {
+        "name_eng": "Computer Technician",
+        "name_ur": "کمپیوٹر ٹیکنیشن"
+    },
+    {
+        "name_eng": "Driver Assistant",
+        "name_ur": "ڈرائیور کا مددگار"
+    },
+    {
+        "name_eng": "Electrician Assistant",
+        "name_ur": "برقی مددگار"
+    },
+    {
+        "name_eng": "Tailor Assistant",
+        "name_ur": "درزی کا مددگار"
+    },
+    {
+        "name_eng": "Construction Foreman",
+        "name_ur": "تعمیراتی سپروائزر"
+    },
+    {
+        "name_eng": "Shop Assistant",
+        "name_ur": "دکان کا معاون"
+    },
+    {
+        "name_eng": "Baker",
+        "name_ur": "بیکر"
+    },
+    {
+        "name_eng": "Cook",
+        "name_ur": "باورچی"
+    },
+    {
+        "name_eng": "Barber",
+        "name_ur": "حجام"
+    },
+    {
+        "name_eng": "Security Guard",
+        "name_ur": "سکیورٹی گارڈ"
+    },
+    {
+        "name_eng": "Milkman",
+        "name_ur": "دودھ والا"
+    },
+    {
+        "name_eng": "Fisherman",
+        "name_ur": "ماہی گیر"
+    },
+    {
+        "name_eng": "Stone Cutter",
+        "name_ur": "پتھر تراش"
+    },
+    {
+        "name_eng": "Mason",
+        "name_ur": "بنیاد ساز"
+    },
+    {
+        "name_eng": "Driver (Taxi/Bus)",
+        "name_ur": "ڈرائیور (ٹیکسی/بس)"
+    },
+    {
+        "name_eng": "Vegetable Vendor",
+        "name_ur": "سبزی فروش"
+    },
+    {
+        "name_eng": "Fruit Vendor",
+        "name_ur": "پھل فروش"
+    },
+    {
+        "name_eng": "Grocery Shop Owner",
+        "name_ur": "گروسری دکان کا مالک"
+    },
+    {
+        "name_eng": "Handyman",
+        "name_ur": "ہینڈ مین"
+    },
+    {
+        "name_eng": "Laborer",
+        "name_ur": "مزدور"
+    },
+    {
+        "name_eng": "Plasterer",
+        "name_ur": "پلستر کرنے والا"
+    },
+    {
+        "name_eng": "Welder Assistant",
+        "name_ur": "ویلڈر کا مددگار"
+    },
+    {
+        "name_eng": "Car Washer",
+        "name_ur": "کار واشر"
+    },
+    {
+        "name_eng": "Rickshaw Driver",
+        "name_ur": "رکشہ ڈرائیور"
+    },
+    {
+        "name_eng": "Mechanic Assistant",
+        "name_ur": "میکانیک کا مددگار"
+    },
+    {
+        "name_eng": "Car Painter",
+        "name_ur": "کار پینٹر"
+    },
+    {
+        "name_eng": "Electric Bike Repairer",
+        "name_ur": "الیکٹرک بائیک مرمت کرنے والا"
+    },
+    {
+        "name_eng": "Labor Contractor",
+        "name_ur": "مزدور ٹھیکیدار"
+    },
+    {
+        "name_eng": "Auto Electrician",
+        "name_ur": "آٹو برقی کاریگر"
+    },
+    {
+        "name_eng": "Photographer",
+        "name_ur": "فوٹوگرافر"
+    },
+    {
+        "name_eng": "Driver Trainer",
+        "name_ur": "ڈرائیور ٹرینر"
+    },
+    {
+        "name_eng": "CCTV Installer",
+        "name_ur": "سی سی ٹی وی انسٹالر"
+    },
+    {
+        "name_eng": "Mobile Repairer",
+        "name_ur": "موبائل مرمت کرنے والا"
+    },
+    {
+        "name_eng": "Others",
+        "name_ur": "دیگر"
+    }
+]

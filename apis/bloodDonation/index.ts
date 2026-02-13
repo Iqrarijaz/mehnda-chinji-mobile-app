@@ -2,6 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { baseUrl } from '../../configs';
 
+export const DONOR_QUERY_KEYS = {
+    all: ['donors'] as const,
+    list: (filters: any) => [...DONOR_QUERY_KEYS.all, 'infinite-list', filters] as const,
+    status: () => [...DONOR_QUERY_KEYS.all, 'status'] as const,
+};
+
 // Helper to get token
 const getAuthHeader = async () => {
     try {
@@ -21,6 +27,7 @@ export async function REGISTER_AS_DONOR(data: any) {
         const response = await axios.post(`${baseUrl}/api/user/v1/register-as-donor`, data, {
             headers,
         });
+        console.log("API RESPONSE LOGS", response.data);
         return response.data;
     } catch (error) {
         console.error("Register as Donor error", error);
@@ -31,9 +38,11 @@ export async function REGISTER_AS_DONOR(data: any) {
 export async function GET_DONOR_STATUS() {
     try {
         const headers = await getAuthHeader();
+        console.log("API REQUEST LOGS");
         const response = await axios.get(`${baseUrl}/api/user/v1/get-donor-status`, {
             headers,
         });
+        console.log("API RESPONSE LOGS", response.data);
         return response.data;
     } catch (error) {
         console.error("Get Donor Status error", error);
@@ -71,13 +80,15 @@ export async function MANAGE_DONOR_STATUS() {
     }
 }
 
-export async function GET_DONORS_LIST(params: { bloodGroup?: string; name?: string; location?: string }) {
+export async function GET_DONORS_LIST(params: { bloodGroup?: string; name?: string; location?: string; currentPage?: number }) {
     try {
         const headers = await getAuthHeader();
+        console.log("API REQUEST LOGS", params);
         const response = await axios.get(`${baseUrl}/api/user/v1/get-donors-list`, {
             headers,
             params,
         });
+        console.log("API RESPONSE LOGS", response.data);
         return response.data;
     } catch (error) {
         console.error("Get Donors List error", error);
