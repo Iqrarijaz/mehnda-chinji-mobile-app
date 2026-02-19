@@ -1,7 +1,18 @@
+import { CHANGE_PASSWORD, DELETE_ACCOUNT, GET_ACTIVE_SESSIONS, MANAGE_NOTIFICATIONS, REVOKE_SESSION } from '@/apis/profile';
+import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/colors';
+import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { DrawerActions } from '@react-navigation/native';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigation } from 'expo-router';
 import React, { useState } from 'react';
 import {
     ActivityIndicator,
+    Image,
     KeyboardAvoidingView,
     Modal,
     Platform,
@@ -12,21 +23,26 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-
-import { CHANGE_PASSWORD, DELETE_ACCOUNT, GET_ACTIVE_SESSIONS, REVOKE_SESSION } from '@/apis/profile';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Colors } from '@/constants/colors';
-import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
-import * as Biometrics from '../utils/biometrics';
 
 export default function SettingsScreen() {
     const { theme, themePreference, setThemePreference, isDark } = useTheme();
     const { user, updateUser, logout } = useAuth();
+    const navigation = useNavigation();
     const colors = Colors[theme];
+
+    const getProfileSource = () => {
+        if (user?.user?.profileImage) {
+            return { uri: user.user.profileImage };
+        }
+        const gender = user?.user?.gender?.toUpperCase();
+        if (gender === 'FEMALE') {
+            return require('../assets/icons/user-female.png');
+        }
+        return require('../assets/icons/user-male.png');
+    };
 
     // Password Modal State
     const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
@@ -41,8 +57,11 @@ export default function SettingsScreen() {
     const [isDeleting, setIsDeleting] = useState(false);
 
     // Notification States
-    const [bloodAlerts, setBloodAlerts] = useState(true);
-    const [businessUpdates, setBusinessUpdates] = useState(true);
+    const [bloodAlerts, setBloodAlerts] = useState(user?.user?.notifications?.bloodRequest ?? true);
+    const [businessUpdates, setBusinessUpdates] = useState(user?.user?.notifications?.business ?? true);
+    const [notificationModalVisible, setNotificationModalVisible] = useState(false);
+    const [pendingNotification, setPendingNotification] = useState<{ type: 'bloodRequest' | 'business', value: boolean } | null>(null);
+    const [isUpdatingNotification, setIsUpdatingNotification] = useState(false);
 
     // Privacy States
     const [showPhone, setShowPhone] = useState(true);
@@ -50,60 +69,45 @@ export default function SettingsScreen() {
 
     // Active Sessions State
     const [isSessionsModalVisible, setIsSessionsModalVisible] = useState(false);
-    const [sessions, setSessions] = useState<any[]>([]);
-    const [isLoadingSessions, setIsLoadingSessions] = useState(false);
-    const [revokingSessionId, setRevokingSessionId] = useState<string | null>(null);
+    const queryClient = useQueryClient();
 
-    // Biometric State
-    const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
-    const [isBiometricModalVisible, setIsBiometricModalVisible] = useState(false);
-    const [biometricPassword, setBiometricPassword] = useState('');
-    const [isEnablingBiometric, setIsEnablingBiometric] = useState(false);
-
-    React.useEffect(() => {
-        if (isSessionsModalVisible) {
-            loadSessions();
-        }
-    }, [isSessionsModalVisible]);
-
-    React.useEffect(() => {
-        checkBiometricStatus();
-    }, []);
-
-    const checkBiometricStatus = async () => {
-        const creds = await Biometrics.getBiometricCredentials();
-        setIsBiometricEnabled(!!creds);
-    };
-
-    const loadSessions = async () => {
-        setIsLoadingSessions(true);
-        try {
+    const { data: sessionsData, isLoading: isLoadingSessions } = useQuery({
+        queryKey: ['activeSessions'],
+        queryFn: async () => {
             const response = await GET_ACTIVE_SESSIONS();
-            if (response.success) {
-                setSessions(response.data);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoadingSessions(false);
-        }
-    };
+            if (response.success) return response.data;
+            throw new Error(response.message || 'Failed to load sessions');
+        },
+        enabled: isSessionsModalVisible,
+    });
 
-    const handleRevokeSession = async (sessionId: string) => {
-        setRevokingSessionId(sessionId);
-        try {
+    const sessions = sessionsData ?? [];
+
+    const revokeSessionMutation = useMutation({
+        mutationFn: async (sessionId: string) => {
             const response = await REVOKE_SESSION({ sessionId });
-            if (response.success) {
-                Toast.show({ type: 'success', text1: 'Session Revoked', text2: 'Device logged out successfully' });
-                loadSessions();
-            } else {
-                Toast.show({ type: 'error', text1: 'Error', text2: response.message });
-            }
-        } catch (error: any) {
+            if (!response.success) throw new Error(response.message || 'Failed to revoke session');
+            return response;
+        },
+        onSuccess: () => {
+            Toast.show({ type: 'success', text1: 'Session Revoked', text2: 'Device logged out successfully' });
+            queryClient.invalidateQueries({ queryKey: ['activeSessions'] });
+        },
+        onError: (error: any) => {
             Toast.show({ type: 'error', text1: 'Error', text2: error.message || 'Failed to revoke session' });
-        } finally {
-            setRevokingSessionId(null);
+        },
+    });
+
+    React.useEffect(() => {
+        if (user?.user?.notifications) {
+            setBloodAlerts(user.user.notifications.bloodRequest ?? true);
+            setBusinessUpdates(user.user.notifications.business ?? true);
         }
+    }, [user]);
+
+
+    const handleRevokeSession = (sessionId: string) => {
+        revokeSessionMutation.mutate(sessionId);
     };
 
     const getPlatformIcon = (platform: string) => {
@@ -114,60 +118,42 @@ export default function SettingsScreen() {
         return 'phone-portrait-outline';
     };
 
-    const handleToggleBiometric = async (value: boolean) => {
-        if (value) {
-            const available = await Biometrics.checkBiometricAvailability();
-            if (!available) {
-                Toast.show({ type: 'error', text1: 'Not Available', text2: 'Biometric authentication is not available on this device.' });
-                return;
-            }
-            setIsBiometricModalVisible(true);
-        } else {
-            await Biometrics.deleteBiometricCredentials();
-            setIsBiometricEnabled(false);
-            Toast.show({ type: 'success', text1: 'Disabled', text2: 'Biometric login disabled.' });
-        }
+    const confirmNotificationChange = (type: 'bloodRequest' | 'business', value: boolean) => {
+        setPendingNotification({ type, value });
+        setNotificationModalVisible(true);
     };
 
-    const handleEnableBiometric = async () => {
-        if (!biometricPassword) {
-            Toast.show({ type: 'error', text1: 'Error', text2: 'Password is required' });
-            return;
-        }
+    const handleUpdateNotification = async () => {
 
-        setIsEnablingBiometric(true);
+        if (!pendingNotification) return;
+
+        setIsUpdatingNotification(true);
         try {
-            // Here we should ideally verify the password with the server.
-            // For now, we will save it. Use login to check if password is correct?
-            // To be safe, let's just save it. If wrong, login will fail.
-            // But better user experience: try to login first?
-            // Since we don't have a direct "verify password" API, we can assume the user knows it
-            // or we could implement a verify endpoint. 
-            // For simplicity and speed, let's save it. 
-            // IMPROVEMENT: Call login API to verify.
+            const response = await MANAGE_NOTIFICATIONS({
+                [pendingNotification.type]: pendingNotification.value
+            });
 
-            const email = user?.user?.email;
-            if (!email) {
-                Toast.show({ type: 'error', text1: 'Error', text2: 'User email not found.' });
-                return;
-            }
-
-            const success = await Biometrics.saveBiometricCredentials(email, biometricPassword);
-            if (success) {
-                setIsBiometricEnabled(true);
-                setIsBiometricModalVisible(false);
-                setBiometricPassword('');
-                Toast.show({ type: 'success', text1: 'Enabled', text2: 'Biometric login enabled successfully.' });
+            if (response.success) {
+                if (response.user) {
+                    await updateUser(response.user);
+                }
+                Toast.show({ type: 'success', text1: 'Success', text2: 'Notification settings updated' });
+                setNotificationModalVisible(false);
             } else {
-                Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to save credentials.' });
+                Toast.show({ type: 'error', text1: 'Error', text2: response.message });
+                // Revert state if needed, but useEffect handles sync with user object
             }
-        } catch (error) {
-            console.error(error);
-            Toast.show({ type: 'error', text1: 'Error', text2: 'Something went wrong.' });
+        } catch (error: any) {
+            Toast.show({ type: 'error', text1: 'Error', text2: error.message || 'Failed to update settings' });
         } finally {
-            setIsEnablingBiometric(false);
+            setIsUpdatingNotification(false);
+            setPendingNotification(null);
         }
     };
+
+
+
+
 
     const handlePasswordChange = async () => {
         if (!currentPassword || !newPassword || !confirmPassword) {
@@ -235,8 +221,8 @@ export default function SettingsScreen() {
 
     const renderHeader = (title: string, icon: any) => (
         <View style={styles.sectionHeader}>
-            <View style={[styles.headerIconBox, { backgroundColor: colors.secondary + '15' }]}>
-                <Ionicons name={icon} size={18} color={colors.secondary} />
+            <View style={[styles.headerIconBox, { backgroundColor: '#004030' + '15' }]}>
+                <Ionicons name={icon} size={18} color="#004030" />
             </View>
             <ThemedText style={styles.sectionTitle}>{title}</ThemedText>
         </View>
@@ -248,7 +234,7 @@ export default function SettingsScreen() {
             <Switch
                 value={value}
                 onValueChange={onValueChange}
-                trackColor={{ false: '#94a3b8', true: colors.secondary }}
+                trackColor={{ false: '#94a3b8', true: '#004030' }}
                 thumbColor="#FFFFFF"
             />
         </View>
@@ -259,12 +245,43 @@ export default function SettingsScreen() {
 
     const newPasswordRef = React.useRef<TextInput>(null);
     const confirmPasswordRef = React.useRef<TextInput>(null);
+    const insets = useSafeAreaInsets();
 
     return (
         <ThemedView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            {/* Header Section with Dark Green Background */}
+            {/* Header Section with Dark Green Background */}
+            <View style={[styles.headerSection, { paddingTop: insets.top + 20, backgroundColor: '#004030' }]}>
+                {/* Top Row: Menu & Profile */}
+                <View style={styles.topNavRow}>
+                    <TouchableOpacity
+                        onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                        style={[styles.iconButton, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+                    >
+                        <Ionicons name="grid-outline" size={20} color="#FFFFFF" />
+                    </TouchableOpacity>
 
-                {/* Appearance Section */}
+                    <ThemedText style={styles.headerTitle}>Settings</ThemedText>
+
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('profile' as never)}
+                        style={styles.profileButton}
+                    >
+                        <Image
+                            source={getProfileSource()}
+                            style={styles.profileImage}
+                        />
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                bounces={false}
+            >
+
+                {/* Appearance Section - TEMPORARILY DISABLED FOR V1 */}
+                {/* 
                 {renderHeader('Appearance', 'color-palette-outline')}
                 <View style={[styles.glassCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(15, 23, 42, 0.03)' }]}>
                     <View style={styles.appearanceRow}>
@@ -273,37 +290,38 @@ export default function SettingsScreen() {
                                 key={pref}
                                 style={[
                                     styles.appearanceOption,
-                                    themePreference === pref && [styles.activeOption, { borderColor: colors.secondary }]
+                                    themePreference === pref && [styles.activeOption, { borderColor: '#004030' }]
                                 ]}
                                 onPress={() => setThemePreference(pref)}
                             >
                                 <Ionicons
                                     name={pref === 'light' ? 'sunny' : pref === 'dark' ? 'moon' : 'settings-outline'}
                                     size={20}
-                                    color={themePreference === pref ? colors.secondary : colors.text}
+                                    color={themePreference === pref ? '#004030' : colors.text}
                                 />
                                 <ThemedText style={[
                                     styles.optionText,
-                                    themePreference === pref && { color: colors.secondary, fontWeight: '700' }
+                                    themePreference === pref && { color: '#004030', fontWeight: '700' }
                                 ]}>
                                     {pref.charAt(0).toUpperCase() + pref.slice(1)}
                                 </ThemedText>
                             </TouchableOpacity>
                         ))}
                     </View>
-                </View>
+                </View> 
+                */}
 
                 {/* Notifications Section */}
                 {renderHeader('Notifications', 'notifications-outline')}
                 <View style={[styles.glassCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(15, 23, 42, 0.03)' }]}>
-                    {renderSettingRow('Blood alerts', bloodAlerts, setBloodAlerts)}
-                    {renderSettingRow('Business updates', businessUpdates, setBusinessUpdates, true)}
+                    {renderSettingRow('Blood alerts', bloodAlerts, (val) => confirmNotificationChange('bloodRequest', val))}
+                    {renderSettingRow('Business updates', businessUpdates, (val) => confirmNotificationChange('business', val), true)}
                 </View>
 
                 {/* Privacy Section */}
                 {renderHeader('Privacy', 'lock-closed-outline')}
                 <View style={[styles.glassCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(15, 23, 42, 0.03)' }]}>
-                    {renderSettingRow('Biometric Login', isBiometricEnabled, handleToggleBiometric)}
+
                     {renderSettingRow('Show phone number', showPhone, setShowPhone)}
                     {renderSettingRow('Who can contact me', canContact, setCanContact, true)}
                 </View>
@@ -512,7 +530,7 @@ export default function SettingsScreen() {
                             {isLoadingSessions ? (
                                 <ActivityIndicator color={colors.secondary} style={{ padding: 20 }} />
                             ) : (
-                                sessions.map((session, index) => (
+                                sessions.map((session: any, index: number) => (
                                     <View key={session._id} style={[styles.sessionRow, index === sessions.length - 1 && { borderBottomWidth: 0 }]}>
                                         <View style={styles.sessionIconBox}>
                                             <Ionicons name={getPlatformIcon(session.platform)} size={22} color="#94a3b8" />
@@ -533,10 +551,10 @@ export default function SettingsScreen() {
                                         {!session.isCurrent && (
                                             <TouchableOpacity
                                                 onPress={() => handleRevokeSession(session._id)}
-                                                disabled={!!revokingSessionId}
+                                                disabled={revokeSessionMutation.isPending}
                                                 style={styles.revokeButton}
                                             >
-                                                {revokingSessionId === session._id ? (
+                                                {revokeSessionMutation.isPending && revokeSessionMutation.variables === session._id ? (
                                                     <ActivityIndicator size="small" color="#ef4444" />
                                                 ) : (
                                                     <Ionicons name="trash-outline" size={18} color="#ef4444" />
@@ -556,52 +574,18 @@ export default function SettingsScreen() {
                 </KeyboardAvoidingView>
             </Modal>
 
-            <Modal
-                visible={isBiometricModalVisible}
-                animationType="slide"
-                transparent={true}
-                onRequestClose={() => setIsBiometricModalVisible(false)}
-            >
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    style={styles.modalOverlay}
-                >
-                    <ThemedView style={styles.modalContent}>
-                        <View style={styles.modalHeader}>
-                            <ThemedText style={styles.modalTitle}>Enable Biometric Login</ThemedText>
-                            <TouchableOpacity onPress={() => setIsBiometricModalVisible(false)}>
-                                <Ionicons name="close" size={24} color={colors.text} />
-                            </TouchableOpacity>
-                        </View>
 
-                        <View style={styles.inputContainer}>
-                            <ThemedText style={styles.inputLabel}>Confirm Password</ThemedText>
-                            <TextInput
-                                style={[styles.input, { color: colors.text, borderColor: colors.border }]}
-                                value={biometricPassword}
-                                onChangeText={setBiometricPassword}
-                                secureTextEntry
-                                placeholder="Enter your password"
-                                placeholderTextColor="#94a3b8"
-                                returnKeyType="done"
-                                onSubmitEditing={handleEnableBiometric}
-                            />
-                        </View>
-
-                        <TouchableOpacity
-                            style={[styles.saveButton, { backgroundColor: colors.secondary }]}
-                            onPress={handleEnableBiometric}
-                            disabled={isEnablingBiometric}
-                        >
-                            {isEnablingBiometric ? (
-                                <ActivityIndicator color="#FFFFFF" />
-                            ) : (
-                                <ThemedText style={styles.saveButtonText}>Enable</ThemedText>
-                            )}
-                        </TouchableOpacity>
-                    </ThemedView>
-                </KeyboardAvoidingView>
-            </Modal>
+            <CleanConfirmationModal
+                visible={notificationModalVisible}
+                onClose={() => setNotificationModalVisible(false)}
+                onConfirm={handleUpdateNotification}
+                title="Update Settings?"
+                message={`Are you sure you want to ${pendingNotification?.value ? 'enable' : 'disable'} notifications for ${pendingNotification?.type === 'bloodRequest' ? 'Blood Alerts' : 'Business Updates'}?`}
+                confirmText={isUpdatingNotification ? "Updating..." : "Confirm"}
+                cancelText="Cancel"
+                type="info"
+                isLoading={isUpdatingNotification}
+            />
         </ThemedView>
     );
 }
@@ -610,6 +594,52 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    headerSection: {
+        paddingBottom: 32,
+        borderBottomLeftRadius: 36,
+        borderBottomRightRadius: 36,
+    },
+    headerContent: {
+        paddingHorizontal: 24,
+    },
+    topNavRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        marginBottom: 10,
+    },
+    iconButton: {
+        width: 38,
+        height: 38,
+        borderRadius: 11,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    profileButton: {
+        width: 38,
+        height: 38,
+        borderRadius: 19,
+        borderWidth: 2,
+        borderColor: 'rgba(255,255,255,0.5)',
+        padding: 1.5,
+    },
+    profileImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 17,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: -0.5,
+    },
+    headerSubtitle: {
+        fontSize: 15,
+        color: 'rgba(255, 255, 255, 0.8)',
+        fontWeight: '500',
     },
     scrollContent: {
         padding: 20,
@@ -639,21 +669,21 @@ const styles = StyleSheet.create({
     glassCard: {
         borderRadius: 20,
         padding: 4,
-        marginBottom: 24,
+        marginBottom: 20,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.05)',
         overflow: 'hidden',
     },
     appearanceRow: {
         flexDirection: 'row',
-        padding: 8,
-        gap: 8,
+        padding: 4,
+        gap: 4,
     },
     appearanceOption: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 12,
+        paddingVertical: 4, // Reduced from 12
         borderRadius: 14,
         borderWidth: 1,
         borderColor: 'transparent',
@@ -671,7 +701,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 14,
+        paddingVertical: 10, // Reduced from 14
         paddingHorizontal: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.05)',
@@ -680,7 +710,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 16,
+        paddingVertical: 12, // Reduced from 16
         paddingHorizontal: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.05)',
@@ -746,21 +776,24 @@ const styles = StyleSheet.create({
         fontWeight: '800',
     },
     inputContainer: {
-        marginBottom: 18,
+        marginBottom: 16,
     },
     inputLabel: {
-        fontSize: 14,
-        fontWeight: '600',
+        fontSize: 11,
+        fontWeight: '700',
+        color: '#475569',
+        letterSpacing: 0.5,
         marginBottom: 8,
-        opacity: 0.7,
+        marginLeft: 2,
     },
     input: {
         height: 52,
-        borderWidth: 1,
-        borderRadius: 12,
-        paddingHorizontal: 16,
-        fontSize: 16,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderWidth: 1.5,
+        borderRadius: 14,
+        paddingHorizontal: 18,
+        fontSize: 15,
+        fontWeight: '500',
+        backgroundColor: 'transparent',
     },
     saveButton: {
         height: 56,

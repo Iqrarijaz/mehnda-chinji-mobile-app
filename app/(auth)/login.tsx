@@ -1,20 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Device from 'expo-device';
-import { LinearGradient } from 'expo-linear-gradient';
+import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
-    Image,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -40,19 +38,25 @@ export default function LoginScreen() {
         rememberMe: false,
         showPassword: false,
         loading: false,
+        googleLoading: false,
+        latitude: 0,
+        longitude: 0,
     });
-    const [isBiometricAvailable, setIsBiometricAvailable] = useState(false);
 
     useEffect(() => {
         loadSavedEmail();
-        checkBiometricStatus();
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status === 'granted') {
+                let location = await Location.getCurrentPositionAsync({});
+                setFormData(prev => ({
+                    ...prev,
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude
+                }));
+            }
+        })();
     }, []);
-
-    const checkBiometricStatus = async () => {
-        const available = await Biometrics.checkBiometricAvailability();
-        const creds = await Biometrics.getBiometricCredentials();
-        setIsBiometricAvailable(available && !!creds);
-    };
 
     const loadSavedEmail = async () => {
         try {
@@ -94,6 +98,8 @@ export default function LoginScreen() {
                 password,
                 deviceName,
                 platform,
+                latitude: formData.latitude,
+                longitude: formData.longitude,
             });
 
             // Save or clear email for Remember Me
@@ -124,101 +130,61 @@ export default function LoginScreen() {
         }
     };
 
-    const handleBiometricLogin = async () => {
-        const success = await Biometrics.authenticateWithBiometrics();
-        if (success) {
-            const creds = await Biometrics.getBiometricCredentials();
-            if (creds && creds.email && creds.password) {
-                performLogin(creds.email, creds.password);
-            } else {
-                Toast.show({ type: 'error', text1: 'Error', text2: 'No credentials found.' });
-            }
-        }
-    };
-
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
+            style={[styles.container, { backgroundColor: colors.background }]}
         >
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ flexGrow: 1 }}
+                contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.background }}
                 bounces={false}
             >
                 {/* Header / Top Section */}
-                <View style={[styles.headerSection, { paddingTop: insets.top }]}>
-                    <LinearGradient
-                        colors={['#1e293b', '#0F172A']}
-                        style={StyleSheet.absoluteFill}
-                    />
-                    {/* Specular Edge Highlight */}
-                    <LinearGradient
-                        colors={['rgba(255, 255, 255, 0.2)', 'transparent']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 0, y: 1 }}
-                        style={styles.glassEdge}
-                    />
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#004030' }]}>
                     <View style={styles.headerContent}>
                         <ThemedText style={styles.headerTitle}>Sign in to your{"\n"}Account</ThemedText>
+                        <ThemedText style={styles.headerSubtitle}>Welcome back! Please enter your details</ThemedText>
                     </View>
                 </View>
 
-                {/* Bottom Section / Card Container */}
-                <View style={styles.bottomSection}>
-                    <View style={styles.card}>
-                        {/* Card Specular Highlight */}
-                        <LinearGradient
-                            colors={['rgba(255, 255, 255, 0.15)', 'transparent']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 0, y: 1 }}
-                            style={styles.cardGlassEdge}
-                        />
-
-                        {/* Google Login */}
-                        <TouchableOpacity
-                            style={styles.googleButton}
-                            onPress={() => Alert.alert('Google Login', 'Implementation coming soon!')}
-                        >
-                            <Image
-                                source={require('../../assets/icons/google.png')}
-                                style={styles.googleIcon}
-                            />
-                            <ThemedText style={styles.googleButtonText}>
-                                Continue with Google
-                            </ThemedText>
-                        </TouchableOpacity>
-
-                        {/* Divider */}
-                        <View style={styles.dividerContainer}>
-                            <View style={styles.divider} />
-                            <ThemedText style={styles.dividerText}>or</ThemedText>
-                            <View style={styles.divider} />
-                        </View>
-
-                        {/* Form Fields */}
-                        <View style={styles.formSection}>
-                            <View style={[styles.inputGroup, { borderBottomColor: 'rgba(255, 255, 255, 0.1)' }]}>
-                                <Ionicons name="mail-outline" size={20} color="rgba(255, 255, 255, 0.5)" style={{ marginRight: 12 }} />
+                {/* Form Card */}
+                <View style={styles.formContainer}>
+                    <View style={[styles.formCard, { backgroundColor: colors.card }]}>
+                        {/* Email/Phone Input */}
+                        <View style={styles.inputField}>
+                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL OR PHONE <ThemedText style={styles.required}>*</ThemedText></ThemedText>
+                            <View style={[styles.inputBox, {
+                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+                            }]}>
+                                <Ionicons name="person-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
                                 <TextInput
-                                    placeholder="Email"
-                                    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                                    placeholder="Enter your email or phone"
+                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
                                     value={formData.email}
                                     onChangeText={(email: string) => setFormData(prev => ({ ...prev, email }))}
-                                    style={styles.input}
+                                    style={[styles.input, { color: colors.text }]}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                 />
                             </View>
+                        </View>
 
-                            <View style={styles.inputGroup}>
-                                <Ionicons name="lock-closed-outline" size={20} color="rgba(255, 255, 255, 0.5)" style={{ marginRight: 12 }} />
+                        {/* Password Input */}
+                        <View style={styles.inputField}>
+                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>PASSWORD <ThemedText style={styles.required}>*</ThemedText></ThemedText>
+                            <View style={[styles.inputBox, {
+                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+                            }]}>
+                                <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
                                 <TextInput
-                                    placeholder="Password"
-                                    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                                    placeholder="Enter your password"
+                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
                                     value={formData.password}
                                     onChangeText={(password: string) => setFormData(prev => ({ ...prev, password }))}
-                                    style={styles.input}
+                                    style={[styles.input, { color: colors.text }]}
                                     secureTextEntry={!formData.showPassword}
                                 />
                                 <TouchableOpacity
@@ -227,13 +193,13 @@ export default function LoginScreen() {
                                     <Ionicons
                                         name={formData.showPassword ? 'eye-outline' : 'eye-off-outline'}
                                         size={20}
-                                        color="rgba(255, 255, 255, 0.5)"
+                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
                                     />
                                 </TouchableOpacity>
                             </View>
                         </View>
 
-                        {/* Rememeber & Forgot */}
+                        {/* Remember & Forgot */}
                         <View style={styles.optionsRow}>
                             <TouchableOpacity
                                 style={styles.rememberMe}
@@ -241,31 +207,25 @@ export default function LoginScreen() {
                             >
                                 <Ionicons
                                     name={formData.rememberMe ? 'checkbox' : 'square-outline'}
-                                    size={18}
-                                    color={formData.rememberMe ? '#FF9B51' : 'rgba(255, 255, 255, 0.5)'}
+                                    size={20}
+                                    color={formData.rememberMe ? '#004030' : (isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B')}
                                 />
-                                <ThemedText style={styles.optionText}>Remember me</ThemedText>
+                                <ThemedText style={[styles.optionText, { color: colors.text }]}>Remember me</ThemedText>
                             </TouchableOpacity>
 
-                            <TouchableOpacity onPress={() => Alert.alert('Forgot Password', 'Contact support for now.')}>
-                                <ThemedText style={[styles.optionText, { color: '#FF9B51', fontWeight: '600' }]}>
-                                    Forgot Password ?
+                            <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password' as any)}>
+                                <ThemedText style={[styles.forgotText, { color: isDark ? '#FFFFFF' : '#004030' }]}>
+                                    Forgot Password?
                                 </ThemedText>
                             </TouchableOpacity>
                         </View>
 
                         {/* Login Button */}
                         <TouchableOpacity
-                            style={styles.loginButton}
+                            style={[styles.loginButton, { backgroundColor: '#004030' }]}
                             onPress={handleLogin}
                             disabled={formData.loading}
                         >
-                            <LinearGradient
-                                colors={['#FF9B51', '#FF8E3D']}
-                                style={StyleSheet.absoluteFill}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 0, y: 1 }}
-                            />
                             {formData.loading ? (
                                 <ActivityIndicator color="#FFFFFF" />
                             ) : (
@@ -273,22 +233,13 @@ export default function LoginScreen() {
                             )}
                         </TouchableOpacity>
 
-                        {isBiometricAvailable && (
-                            <TouchableOpacity
-                                style={styles.biometricButton}
-                                onPress={handleBiometricLogin}
-                                disabled={formData.loading}
-                            >
-                                <Ionicons name="finger-print-outline" size={24} color="#FF9B51" />
-                                <ThemedText style={styles.biometricButtonText}>Login with FaceID</ThemedText>
-                            </TouchableOpacity>
-                        )}
-
                         {/* Footer */}
                         <View style={styles.footer}>
-                            <ThemedText style={styles.footerText}>Don't have an account? </ThemedText>
+                            <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
+                                Don't have an account?{' '}
+                            </ThemedText>
                             <TouchableOpacity onPress={() => router.push('/(auth)/register' as any)}>
-                                <ThemedText style={styles.footerLink}>Sign Up</ThemedText>
+                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#004030' }]}>Sign Up</ThemedText>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -301,183 +252,120 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0F172A',
-    },
-    glassEdge: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 2,
-        zIndex: 10,
     },
     headerSection: {
-        height: '35%',
-        minHeight: 280,
-        width: '100%',
+        paddingBottom: 38,
+        borderBottomLeftRadius: 36,
+        borderBottomRightRadius: 36,
+        overflow: 'hidden',
     },
     headerContent: {
-        flex: 1,
-        justifyContent: 'center',
-        paddingHorizontal: 30,
-        zIndex: 1,
+        paddingHorizontal: 22,
+        paddingTop: 38,
     },
     headerTitle: {
-        fontSize: 36,
+        fontSize: 28, // Reduced from 32
         fontWeight: '800',
         color: '#FFFFFF',
-        lineHeight: 44,
-        marginBottom: 12,
+        lineHeight: 40,
+        marginBottom: 4,
     },
     headerSubtitle: {
-        fontSize: 16,
-        color: 'rgba(255, 255, 255, 0.6)',
+        fontSize: 15,
+        color: 'rgba(255, 255, 255, 0.9)',
         lineHeight: 22,
     },
-    bottomSection: {
+    formContainer: {
         flex: 1,
-        width: '100%',
-        alignItems: 'center',
-        backgroundColor: '#0F172A',
+        paddingHorizontal: 18,
+        paddingTop: 30,
     },
-    card: {
-        width: '90%',
-        maxWidth: 420,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: 28,
-        padding: 24,
-        marginTop: -60, // Overlap effect
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        overflow: 'hidden',
+    formCard: {
+        borderRadius: 24,
+        padding: 22,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
     },
-    cardGlassEdge: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 1.5,
+    inputField: {
+        marginBottom: 18,
     },
-    googleButton: {
-        flexDirection: 'row',
-        height: 56,
-        borderRadius: 28,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.15)',
-        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 12,
+    label: {
+        fontSize: 11,
+        fontWeight: '700',
+        color: '#475569',
+        letterSpacing: 0.5,
+        marginBottom: 6,
+        marginLeft: 0,
     },
-    googleIcon: {
-        width: 24,
-        height: 24,
+    required: {
+        color: '#EF4444',
     },
-    googleButtonText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#FFFFFF',
-    },
-    dividerContainer: {
+    inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 24,
-    },
-    divider: {
-        flex: 1,
-        height: 1,
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    },
-    dividerText: {
-        marginHorizontal: 16,
-        color: 'rgba(255, 255, 255, 0.4)',
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    formSection: {
-        borderRadius: 20,
+        height: 52,
+        borderRadius: 14,
+        paddingHorizontal: 12,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        backgroundColor: 'rgba(255, 255, 255, 0.04)',
-        overflow: 'hidden',
-        marginBottom: 20,
-    },
-    inputGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 58,
-        paddingHorizontal: 16,
-        borderBottomWidth: 1,
     },
     input: {
         flex: 1,
-        fontSize: 15,
-        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: '500',
     },
     optionsRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: 22,
     },
     rememberMe: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: 6,
     },
     optionText: {
         fontSize: 14,
-        color: 'rgba(255, 255, 255, 0.5)',
+        fontWeight: '500',
+    },
+    forgotText: {
+        fontSize: 14,
+        fontWeight: '600',
     },
     loginButton: {
-        height: 56,
-        borderRadius: 18,
-        backgroundColor: '#FF9B51',
+        height: 52,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: 18,
         overflow: 'hidden',
-        shadowColor: '#FF9B51',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
-        elevation: 8,
+        shadowColor: '#004030',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 4,
     },
     loginButtonText: {
         color: '#FFFFFF',
-        fontSize: 17,
-        fontWeight: '800',
-        zIndex: 1,
-    },
-    biometricButton: {
-        flexDirection: 'row',
-        height: 56,
-        borderRadius: 18,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 155, 81, 0.3)',
-        backgroundColor: 'rgba(255, 155, 81, 0.1)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 24,
-        gap: 10,
-    },
-    biometricButtonText: {
-        color: '#FF9B51',
         fontSize: 16,
         fontWeight: '700',
+        letterSpacing: 0.5,
     },
     footer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        gap: 4,
+        alignItems: 'center',
+        marginTop: 6,
     },
     footerText: {
         fontSize: 14,
-        color: 'rgba(255, 255, 255, 0.5)',
+        fontWeight: '500',
     },
     footerLink: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#FF9B51',
     },
 });

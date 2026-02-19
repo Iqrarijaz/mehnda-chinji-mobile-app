@@ -43,7 +43,14 @@
         }
       ],
       "expo-secure-store",
-      "expo-notifications"
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

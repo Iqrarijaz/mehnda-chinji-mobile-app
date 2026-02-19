@@ -1,17 +1,18 @@
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Linking from 'expo-linking';
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/colors';
+import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { Alert, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 interface DonorCardProps {
     donor: {
         _id: string;
         userId: {
+            _id: string;
             name: string;
             phone: string;
             profileImage?: string;
@@ -19,7 +20,8 @@ interface DonorCardProps {
         bloodGroup: string;
         lastDonationDate?: string | null;
         city: string;
-        village?: string;
+        address?: string;
+        village?: string; // Kept for backward compatibility
         available: boolean;
     };
 }
@@ -27,9 +29,11 @@ interface DonorCardProps {
 const DonorCard = React.memo(({ donor }: DonorCardProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
+    const router = useRouter();
+    const { user } = useAuth();
 
     const isAvailable = donor.available;
-    const location = [donor.village, donor.city].filter(Boolean).join(', ');
+    const location = [donor.address || donor.village, donor.city].filter(Boolean).join(', ');
 
     const formatLastDonated = (dateString?: string | null) => {
         if (!dateString) return 'Never';
@@ -42,9 +46,36 @@ const DonorCard = React.memo(({ donor }: DonorCardProps) => {
         return `${diffMonths} month${diffMonths > 1 ? 's' : ''} ago`;
     };
 
+
+
+    // const handleChat = async () => {
+    //     if (!user) {
+    //         Alert.alert("Login Required", "Please login to start a chat.");
+    //         return;
+    //     }
+
+    //     // don't allow chatting with self
+    //     if (user.user?._id === donor.userId._id) {
+    //         Alert.alert("Action Not Allowed", "You cannot chat with yourself.");
+    //         return;
+    //     }
+
+    //     try {
+    //         const res = await CREATE_OR_GET_CONVERSATION(donor.userId._id, ConversationSource.DONOR);
+    //         if (res.success && res.data) {
+    //             router.push(`/chat/${res.data._id}` as any);
+    //         }
+    //     } catch (error) {
+    //         console.error("Failed to start chat", error);
+    //         Alert.alert("Error", "Failed to start chat. Please try again.");
+    //     }
+    // };
+
     const handleCall = () => {
         if (donor.userId.phone) {
             Linking.openURL(`tel:${donor.userId.phone}`);
+        } else {
+            Alert.alert("No Phone", "Phone number is not available.");
         }
     };
 
@@ -80,19 +111,33 @@ const DonorCard = React.memo(({ donor }: DonorCardProps) => {
 
                     {/* Info Section */}
                     <View style={styles.info}>
-                        <ThemedText style={styles.name}>{donor.userId.name}</ThemedText>
-                        <View style={styles.locationRow}>
-                            <Ionicons name="location" size={13} color="#ef4444" />
-                            <ThemedText style={styles.locationText} numberOfLines={1}>{location}</ThemedText>
+                        <ThemedText style={[styles.name, { color: colors.text }]}>{donor.userId.name}</ThemedText>
+                        <View style={styles.locationContainer}>
+                            <View style={styles.locationRow}>
+                                <Ionicons name="location" size={12} color="#ef4444" />
+                                <ThemedText style={[styles.locationText, { color: colors.icon }]} numberOfLines={1}>{donor.city}</ThemedText>
+                            </View>
+                            {(donor.address || donor.village) && (
+                                <View style={styles.locationRow}>
+                                    <Ionicons name="home" size={12} color={colors.icon} />
+                                    <ThemedText style={[styles.locationText, { color: colors.icon }]} numberOfLines={1}>
+                                        {donor.address || donor.village}
+                                    </ThemedText>
+                                </View>
+                            )}
                         </View>
                         <View style={styles.statusRow}>
-                            <View style={[styles.statusBadge, { backgroundColor: isAvailable ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)' }]}>
-                                <View style={[styles.indicator, { backgroundColor: isAvailable ? '#10B981' : '#F59E0B' }]} />
-                                <ThemedText style={[styles.statusText, { color: isAvailable ? '#10B981' : '#F59E0B' }]}>
-                                    {isAvailable ? 'AVAILABLE' : 'BUSY'}
-                                </ThemedText>
-                            </View>
-                            <ThemedText style={styles.lastDonated}>{formatLastDonated(donor.lastDonationDate)}</ThemedText>
+                            {isAvailable && (
+                                <View style={[styles.statusBadge, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+                                    <View style={[styles.indicator, { backgroundColor: '#10B981' }]} />
+                                    <ThemedText style={[styles.statusText, { color: '#10B981' }]}>
+                                        AVAILABLE
+                                    </ThemedText>
+                                </View>
+                            )}
+                            {formatLastDonated(donor.lastDonationDate) !== 'Never' && (
+                                <ThemedText style={styles.lastDonated}>{formatLastDonated(donor.lastDonationDate)}</ThemedText>
+                            )}
                         </View>
                     </View>
 
@@ -104,10 +149,10 @@ const DonorCard = React.memo(({ donor }: DonorCardProps) => {
                             style={styles.actionBtnWrapper}
                         >
                             <LinearGradient
-                                colors={['#ef4444', '#b91c1c']}
+                                colors={['#10B981', '#059669']} // Green for call
                                 style={styles.actionBtn}
                             >
-                                <Ionicons name="call" size={18} color="#FFFFFF" />
+                                <Ionicons name="call" size={16} color="#FFFFFF" />
                             </LinearGradient>
                         </TouchableOpacity>
                     </View>
@@ -151,9 +196,9 @@ const styles = StyleSheet.create({
         elevation: 6,
     },
     bloodBadge: {
-        width: 50,
-        height: 50,
-        borderRadius: 18,
+        width: 46, // Reduced by 4px
+        height: 46, // Reduced by 4px
+        borderRadius: 16,
         padding: 1.5,
     },
     bloodBadgeInner: {
@@ -192,10 +237,13 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: -0.2,
     },
+    locationContainer: {
+        marginTop: 2,
+        gap: 2,
+    },
     locationRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 2,
     },
     locationText: {
         fontSize: 12,

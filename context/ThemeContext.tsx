@@ -41,11 +41,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
+        // TEMPORARY: Force Light Mode for v1 release
+        setTheme('light');
+        /*
         if (themePreference === 'system') {
             setTheme(systemColorScheme || 'light');
         } else {
             setTheme(themePreference);
         }
+        */
     }, [themePreference, systemColorScheme]);
 
     const setThemePreference = async (pref: ThemePreference) => {

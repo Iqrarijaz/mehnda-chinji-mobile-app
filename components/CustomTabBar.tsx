@@ -1,73 +1,65 @@
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-    const { theme, isDark } = useTheme();
-    const colors = Colors[theme];
-    const secondaryColor = Colors.dark.secondary;
+    const { theme, isDark } = useTheme(); // Note: Design requested is light floating pill, we can adapt for dark mode but stick to requests for now.
+    const insets = useSafeAreaInsets();
+    const primaryColor = Colors[theme].tint;
+    const inactiveColor = '#94a3b8'; // Always light since background is dark
 
     const visibleRoutes = state.routes.filter(route => {
         const { options } = descriptors[route.key];
+        // Hide chat tab for now as requested
+        if (route.name === 'chat') return false;
         return (options as any).href !== null;
     });
 
+    const [layout, setLayout] = useState({ width: 0, height: 0 });
     const tabCount = visibleRoutes.length;
-    const tabWidth = (width - 28 - 16) / tabCount;
+    const tabWidth = layout.width / tabCount;
 
     const translateX = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         const activeIndex = visibleRoutes.findIndex(route => route.key === state.routes[state.index].key);
-        if (activeIndex !== -1) {
+        if (activeIndex !== -1 && tabWidth > 0) {
             Animated.spring(translateX, {
                 toValue: activeIndex * tabWidth,
                 useNativeDriver: true,
-                bounciness: 4,
+                bounciness: 0,
                 speed: 12,
             }).start();
         }
     }, [state.index, tabWidth, visibleRoutes]);
 
-    return (
-        <View style={styles.outerContainer}>
-            <LinearGradient
-                colors={isDark ? ['#1e293b', '#0F172A'] : ['#25343F', '#1F2937']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={styles.container}
-            >
-                {/* Specular Edge Highlight */}
-                <LinearGradient
-                    colors={['rgba(255, 255, 255, 0.2)', 'transparent']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0, y: 1 }}
-                    style={styles.glassEdge}
-                />
+    const onLayout = (e: LayoutChangeEvent) => {
+        setLayout(e.nativeEvent.layout);
+    };
 
-                {/* Sliding Indicator (Pill) */}
-                <Animated.View
-                    style={[
-                        styles.indicatorContainer,
-                        {
-                            width: tabWidth,
-                            transform: [{ translateX }],
-                        }
-                    ]}
-                >
-                    <LinearGradient
-                        colors={[secondaryColor, '#FF7E21']} // Vibrancy gradient
-                        style={styles.focusedPill}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 0, y: 1 }}
+    return (
+        <View style={[styles.outerContainer, { paddingBottom: insets.bottom + 8 }]}>
+            <View style={[styles.container, { backgroundColor: '#004030' }]} onLayout={onLayout}>
+                {/* Sliding Indicator */}
+                {tabWidth > 0 && (
+                    <Animated.View
+                        style={[
+                            styles.indicator,
+                            {
+                                width: tabWidth,
+                                height: '100%',
+                                transform: [{ translateX }],
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        ]}
                     />
-                </Animated.View>
+                )}
 
                 {visibleRoutes.map((route, index) => {
                     const { options } = descriptors[route.key];
@@ -92,14 +84,24 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                         });
                     };
 
-                    let iconName = 'house.fill';
-                    if (route.name === 'index') iconName = 'house.fill';
-                    else if (route.name === 'blood') iconName = 'drop.fill';
-                    else if (route.name === 'business') iconName = 'briefcase.fill';
-                    else if (route.name === 'chat') iconName = 'message.fill';
+                    let iconName: keyof typeof Ionicons.glyphMap = 'home';
+                    let label = 'Home';
 
-                    // @ts-ignore
-                    const safeIconName = iconName as import('expo-symbols').SymbolViewProps['name'];
+                    if (route.name === 'index') { iconName = isFocused ? 'home' : 'home-outline'; label = 'Home'; }
+                    else if (route.name === 'business') { iconName = isFocused ? 'briefcase' : 'briefcase-outline'; label = 'Business'; }
+                    else if (route.name === 'blood') { iconName = isFocused ? 'water' : 'water-outline'; label = 'Donors'; }
+                    else if (route.name === 'chat') { iconName = isFocused ? 'chatbubbles' : 'chatbubbles-outline'; label = 'Chat'; }
+
+                    // Dark Mode Logic:
+                    // Selected: White
+                    // Unselected: Primary Color (Tint)
+                    // Light Mode Logic (keeping existing or defaulting):
+                    // Selected: White (as per existing code activeColor)
+                    // Unselected: Inactive Color
+
+                    const activeColor = '#FFFFFF';
+                    const inactiveColorCalculated = isDark ? primaryColor : inactiveColor;
+                    const color = isFocused ? activeColor : inactiveColorCalculated;
 
                     return (
                         <TouchableOpacity
@@ -113,16 +115,19 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                             style={styles.tabItem}
                             activeOpacity={0.7}
                         >
-                            <IconSymbol
-                                name={safeIconName}
-                                size={26}
-                                color={isFocused ? "#FFFFFF" : "rgba(255, 255, 255, 0.5)"}
-                                style={isFocused ? styles.focusedIcon : {}}
+                            <Ionicons
+                                name={iconName}
+                                size={22}
+                                color={color}
+                                style={{ marginBottom: 2 }}
                             />
+                            <Text style={[styles.label, { color, fontWeight: isFocused ? '600' : '400' }]}>
+                                {label}
+                            </Text>
                         </TouchableOpacity>
                     );
                 })}
-            </LinearGradient>
+            </View>
         </View>
     );
 }
@@ -133,63 +138,37 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
+        alignItems: 'center',
         backgroundColor: 'transparent',
-        paddingHorizontal: 14,
-        paddingBottom: 18,
     },
     container: {
         flexDirection: 'row',
-        borderRadius: 28,
-        height: 60,
+        width: width - 36, // Reduced width (2px more margin each side)
+        height: 60, // Reduced height (64 - 2)
+        borderRadius: 30, // Reduced radius (32 - 1 or match height/2)
         alignItems: 'center',
-        paddingHorizontal: 8,
-        elevation: 15,
+        justifyContent: 'space-between',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.4,
-        shadowRadius: 15,
-        borderWidth: 1,
-        borderColor: '#0f172a',
-        overflow: 'hidden',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+        elevation: 5,
+        overflow: 'hidden', // Clip the sliding indicator
     },
-    glassEdge: {
+    indicator: {
         position: 'absolute',
         top: 0,
         left: 0,
-        right: 0,
-        height: 2,
+        borderRadius: 30, // Match container radius
     },
     tabItem: {
         flex: 1,
-        height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 2,
-    },
-    indicatorContainer: {
-        position: 'absolute',
         height: '100%',
-        paddingHorizontal: 4,
-        justifyContent: 'center',
-        alignItems: 'center',
         zIndex: 1,
-        left: 8, // container paddingHorizontal
     },
-    focusedPill: {
-        width: '85%',
-        height: '75%',
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.3)',
-        shadowColor: Colors.dark.secondary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
-    },
-    focusedIcon: {
-        shadowColor: '#FFFFFF',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.8,
-        shadowRadius: 8,
-    },
+    label: {
+        fontSize: 10,
+    }
 });

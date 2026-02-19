@@ -1,63 +1,39 @@
-import { Image } from 'expo-image';
+import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
+import { CategoryGrid } from '@/components/home/CategoryGrid';
+import { HomeHeader } from '@/components/home/HomeHeader';
 import { ThemedView } from '@/components/themed-view';
-import { useAuth } from '@/context/AuthContext';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function HomeScreen() {
-  const { user } = useAuth();
-  const firstName = user?.user?.firstName || 'User';
+  const { theme } = useTheme();
+  const colors = Colors[theme];
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome back,</ThemedText>
-        <ThemedText type="title" style={{ color: '#FF9B51' }}>{firstName}!</ThemedText>
-        <HelloWave />
-      </ThemedView>
+    <ThemedView style={[styles.container, { backgroundColor: theme === 'dark' ? '#222831' : undefined }]}>
+      {/* Custom Header */}
+      <HomeHeader />
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Your Status</ThemedText>
-        <ThemedText>
-          You are successfully logged into the Mehnda Chinji Mobile App.
-        </ThemedText>
-      </ThemedView>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <CategoryGrid />
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Quick Actions</ThemedText>
-        <ThemedText>
-          Use the navigation bar below to browse categories, manage your cart, or view your settings.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        {/* Future: Recent Places or Popular Places can go here */}
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  scrollContent: {
+    paddingBottom: 20,
+  }
 });

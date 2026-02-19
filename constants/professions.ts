@@ -75,6 +75,18 @@ export const getProfessionIcon = (profession: string): string => {
 
 export const getCategoryColor = (category: string): string => {
     if (!category) return PALETTE[0];
+
+    const lowerCat = category.toLowerCase();
+
+    if (lowerCat === 'health' || lowerCat === 'hospital') return '#EF4444'; // Red
+    if (lowerCat === 'education' || lowerCat === 'school' || lowerCat === 'college' || lowerCat === 'academy') return '#3B82F6'; // Blue
+    if (lowerCat === 'religious' || lowerCat === 'mosque' || lowerCat === 'masjid') return '#10B981'; // Emerald
+    if (lowerCat === 'govt' || lowerCat === 'government' || lowerCat === 'office') return '#6366F1'; // Indigo
+    if (lowerCat === 'shops' || lowerCat === 'store' || lowerCat === 'market') return '#F59E0B'; // Amber
+    if (lowerCat === 'playgrounds' || lowerCat === 'sports' || lowerCat === 'ground') return '#8B5CF6'; // Violet
+    if (lowerCat === 'food' || lowerCat === 'restaurant' || lowerCat === 'cafe') return '#EC4899'; // Pink
+    if (lowerCat === 'services' || lowerCat === 'repair') return '#64748B'; // Slate Blue
+
     let hash = 0;
     for (let i = 0; i < category.length; i++) {
         hash = category.charCodeAt(i) + ((hash << 5) - hash);

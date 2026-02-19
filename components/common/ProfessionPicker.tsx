@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
     FlatList,
@@ -10,8 +9,10 @@ import {
     View,
 } from 'react-native';
 
-import professionsData from '../data/professions.json';
-import { ThemedText } from './themed-text';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
+import professionsData from '../../data/professions.json';
+import { ThemedText } from '../themed-text';
 
 interface Profession {
     name_eng: string;
@@ -26,6 +27,8 @@ interface ProfessionPickerProps {
 }
 
 export function ProfessionPicker({ visible, onClose, onSelect, currentProfession }: ProfessionPickerProps) {
+    const { theme, isDark } = useTheme();
+    const colors = Colors[theme];
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredProfessions = professionsData.filter(prof =>
@@ -41,25 +44,20 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
             onRequestClose={onClose}
         >
             <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                    <LinearGradient
-                        colors={['#1e293b', '#0F172A']}
-                        style={StyleSheet.absoluteFill}
-                    />
-
-                    <View style={styles.modalHeader}>
-                        <ThemedText style={styles.modalTitle}>Select Profession</ThemedText>
-                        <TouchableOpacity onPress={onClose}>
-                            <Ionicons name="close" size={24} color="#FFFFFF" />
+                <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                    <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+                        <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Profession</ThemedText>
+                        <TouchableOpacity onPress={onClose} style={[styles.closeButton, { backgroundColor: colors.background }]}>
+                            <Ionicons name="close" size={24} color={colors.text} />
                         </TouchableOpacity>
                     </View>
 
-                    <View style={styles.searchBar}>
-                        <Ionicons name="search" size={20} color="rgba(255, 255, 255, 0.4)" />
+                    <View style={[styles.searchBar, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
+                        <Ionicons name="search" size={20} color={colors.icon} />
                         <TextInput
-                            placeholder="Search profession (English or Urdu)..."
-                            placeholderTextColor="rgba(255, 255, 255, 0.4)"
-                            style={styles.searchInput}
+                            placeholder="Search profession..."
+                            placeholderTextColor={colors.icon}
+                            style={[styles.searchInput, { color: colors.text }]}
                             value={searchQuery}
                             onChangeText={setSearchQuery}
                             autoFocus={false}
@@ -71,7 +69,7 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                         keyExtractor={(item: Profession) => item.name_eng}
                         renderItem={({ item }: { item: Profession }) => (
                             <TouchableOpacity
-                                style={styles.item}
+                                style={[styles.item, { borderBottomColor: colors.border }]}
                                 onPress={() => {
                                     onSelect(item);
                                     setSearchQuery('');
@@ -81,19 +79,21 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                                 <View style={styles.labelContainer}>
                                     <ThemedText style={[
                                         styles.itemTextEng,
-                                        currentProfession === item.name_eng && styles.selectedText
+                                        { color: colors.text },
+                                        currentProfession === item.name_eng && { color: colors.primary, fontWeight: '700' }
                                     ]}>
                                         {item.name_eng}
                                     </ThemedText>
                                     <ThemedText style={[
                                         styles.itemTextUr,
-                                        currentProfession === item.name_eng && styles.selectedText
+                                        { color: colors.icon },
+                                        currentProfession === item.name_eng && { color: colors.primary, fontWeight: '700' }
                                     ]}>
                                         {item.name_ur}
                                     </ThemedText>
                                 </View>
                                 {currentProfession === item.name_eng && (
-                                    <Ionicons name="checkmark" size={20} color="#FF9B51" />
+                                    <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
                                 )}
                             </TouchableOpacity>
                         )}
@@ -101,54 +101,61 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                     />
                 </View>
             </View>
-        </Modal>
+        </Modal >
     );
 }
 
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'flex-end',
     },
     modalContent: {
         height: '80%',
+        backgroundColor: '#FFFFFF',
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
         padding: 24,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 10,
     },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 20,
-        zIndex: 1,
     },
     modalTitle: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#1E293B',
+        letterSpacing: -0.5,
+    },
+    closeButton: {
+        padding: 4,
+        backgroundColor: '#F1F5F9',
+        borderRadius: 20,
     },
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        backgroundColor: '#F8FAFC',
         height: 52,
-        borderRadius: 16,
+        borderRadius: 14,
         paddingHorizontal: 16,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        zIndex: 1,
+        borderColor: '#E2E8F0',
     },
     searchInput: {
         flex: 1,
         marginLeft: 12,
         fontSize: 16,
-        color: '#FFFFFF',
+        color: '#1E293B',
     },
     listContent: {
         paddingBottom: 40,
@@ -157,9 +164,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 14,
+        paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+        borderBottomColor: '#F1F5F9',
     },
     labelContainer: {
         flexDirection: 'row',
@@ -170,20 +177,19 @@ const styles = StyleSheet.create({
     },
     itemTextEng: {
         fontSize: 16,
-        color: '#FFFFFF',
+        color: '#334155',
         fontWeight: '600',
         paddingVertical: 2,
+        textTransform: 'capitalize',
     },
     itemTextUr: {
         fontSize: 18,
-        paddingVertical: 8,
         paddingRight: 16,
-        lineHeight: 28,
-        color: 'rgba(255, 255, 255, 0.7)',
+        color: '#64748B',
         fontWeight: '500',
     },
     selectedText: {
-        color: '#FF9B51',
+        color: '#004030',
         fontWeight: '700',
     },
 });

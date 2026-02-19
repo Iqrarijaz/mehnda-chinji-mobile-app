@@ -1,4 +1,3 @@
-import messaging from '@react-native-firebase/messaging';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { Drawer } from 'expo-router/drawer';
 import { StatusBar } from 'expo-status-bar';
@@ -22,6 +21,7 @@ function DrawerLayout() {
       screenOptions={{
         headerShown: false,
         swipeEnabled: isAuthenticated, // Secure swipe access
+        drawerType: 'front',
       }}
     >
       <Drawer.Screen
@@ -52,11 +52,19 @@ function DrawerLayout() {
           drawerLabel: 'Settings',
           title: 'Settings',
           drawerItemStyle: { display: 'none' },
-          headerShown: true,
+          headerShown: false,
           headerStyle: {
             backgroundColor: Colors[theme].background,
           },
           headerTintColor: Colors[theme].text,
+        }}
+      />
+      <Drawer.Screen
+        name="profile"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          headerShown: false,
+          swipeEnabled: false,
         }}
       />
     </Drawer>
@@ -66,38 +74,7 @@ function DrawerLayout() {
 export default function RootLayout() {
 
   useEffect(() => {
-    // Register and get token (handled in AuthContext, but we can double check here or just let AuthContext do it)
-    // Actually, AuthContext calls registerForPushNotificationsAsync which uses messaging().getToken() now.
-    // So we just need to set up listeners here.
-
-    // Foreground state messages
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
-      Toast.show({
-        type: 'success',
-        text1: remoteMessage.notification?.title || 'New Notification',
-        text2: remoteMessage.notification?.body || '',
-      });
-    });
-
-    // Background & Quit state messages are handled by the OS/Headless task, 
-    // but we can listen for when the user taps them:
-
-    // App opened from background state
-    messaging().onNotificationOpenedApp(remoteMessage => {
-      console.log('Notification caused app to open from background state:', remoteMessage.notification);
-    });
-
-    // App opened from quit state
-    messaging()
-      .getInitialNotification()
-      .then(remoteMessage => {
-        if (remoteMessage) {
-          console.log('Notification caused app to open from quit state:', remoteMessage.notification);
-        }
-      });
-
-    return unsubscribe;
+    // No-op for now as Firebase notifications are removed
   }, []);
 
   return (
@@ -110,7 +87,7 @@ export default function RootLayout() {
           <AuthProvider>
             <StatusBar style="auto" />
             <DrawerLayout />
-            <Toast config={toastConfig} />
+            <Toast config={toastConfig} topOffset={60} />
           </AuthProvider>
         </ThemeProvider>
       </GestureHandlerRootView>

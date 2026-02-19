@@ -1,21 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GET_AUTH_HEADER } from '@/utils/token';
 import axios from 'axios';
 import { baseUrl } from '../../configs';
 
-// Helper to get token
-const getAuthHeader = async () => {
-    try {
-        const userData = await AsyncStorage.getItem("userData");
-        const token = userData ? JSON.parse(userData).token : null;
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    } catch (e) {
-        return {};
-    }
-};
 
 export async function UPDATE_PROFILE(data: any) {
     try {
-        const headers = await getAuthHeader();
+        const headers = await GET_AUTH_HEADER();
         console.log("API REQUEST LOGS", data);
         const response = await axios.post(`${baseUrl}/api/user/v1/update-profile`, data, {
             headers,
@@ -30,7 +20,7 @@ export async function UPDATE_PROFILE(data: any) {
 
 export async function DELETE_ACCOUNT(data: any) {
     try {
-        const headers = await getAuthHeader();
+        const headers = await GET_AUTH_HEADER();
         console.log("API REQUEST LOGS", data);
         const response = await axios.post(`${baseUrl}/api/user/v1/delete-account`, data, {
             headers,
@@ -45,7 +35,7 @@ export async function DELETE_ACCOUNT(data: any) {
 
 export async function CHANGE_PASSWORD(data: any) {
     try {
-        const headers = await getAuthHeader();
+        const headers = await GET_AUTH_HEADER();
         console.log("API REQUEST LOGS", data);
         const response = await axios.post(`${baseUrl}/api/user/v1/change-password`, data, {
             headers,
@@ -61,7 +51,7 @@ export async function CHANGE_PASSWORD(data: any) {
 export async function GET_ACTIVE_SESSIONS() {
     try {
         console.log("API REQUEST LOGS");
-        const headers = await getAuthHeader();
+        const headers = await GET_AUTH_HEADER();
         const response = await axios.get(`${baseUrl}/api/user/v1/sessions`, {
             headers,
         });
@@ -75,7 +65,7 @@ export async function GET_ACTIVE_SESSIONS() {
 
 export async function REVOKE_SESSION(data: any) {
     try {
-        const headers = await getAuthHeader();
+        const headers = await GET_AUTH_HEADER();
         console.log("API REQUEST LOGS", data);
         const response = await axios.post(`${baseUrl}/api/user/v1/revoke-session`, data, {
             headers,
@@ -91,7 +81,7 @@ export async function REVOKE_SESSION(data: any) {
 
 export async function LOGOUT() {
     try {
-        const headers = await getAuthHeader();
+        const headers = await GET_AUTH_HEADER();
         console.log("API REQUEST LOGS");
         const response = await axios.post(
             `${baseUrl}/auth/user/logout`,
@@ -106,18 +96,49 @@ export async function LOGOUT() {
     }
 }
 
-
-export async function SAVE_PUSH_TOKEN(token: string) {
+export async function SAVE_PUSH_TOKEN(data: any) {
     try {
-        const headers = await getAuthHeader();
-        console.log("API REQUEST LOGS: Save Push Token", token);
-        const response = await axios.post(`${baseUrl}/api/user/v1/save-push-token`, { pushToken: token }, {
+        const headers = await GET_AUTH_HEADER();
+        console.log("API REQUEST LOGS", data);
+        const response = await axios.post(`${baseUrl}/api/user/v1/save-push-token`, data, {
+            headers,
+        });
+        console.log("API RESPONSE LOGS", response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error("Save Push Token error", error);
+        throw error;
+    }
+}
+
+export async function SAVE_FCM_TOKEN(data: any) {
+    try {
+        const headers = await GET_AUTH_HEADER();
+        console.log("API REQUEST LOGS", data);
+        const response = await axios.post(`${baseUrl}/api/user/v1/save-fcm-token`, data, {
+            headers,
+        });
+        console.log("API RESPONSE LOGS", response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error("Save FCM Token error", error);
+        throw error;
+    }
+}
+
+export async function MANAGE_NOTIFICATIONS(data: any) {
+    try {
+        const headers = await GET_AUTH_HEADER();
+        console.log("API REQUEST LOGS", data);
+        const response = await axios.post(`${baseUrl}/api/user/v1/manage-notifications`, data, {
             headers,
         });
         console.log("API RESPONSE LOGS", response.data);
         return response.data;
     } catch (error) {
-        console.error("Save Push Token error", error);
+        console.error("Manage Notifications error", error);
         throw error;
     }
 }

@@ -1,5 +1,4 @@
-import { SAVE_PUSH_TOKEN } from '@/apis/profile';
-import { registerForPushNotificationsAsync } from '@/utils/notifications';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useSegments } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -39,18 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const storedUser = await AsyncStorage.getItem('userData');
                 if (storedUser) {
                     setUser(JSON.parse(storedUser));
-                    // Register and save push token silently on load
-                    registerForPushNotificationsAsync().then(async token => {
-                        console.log('AuthContext: Got token on load:', token);
-                        if (token) {
-                            try {
-                                await SAVE_PUSH_TOKEN(token);
-                                console.log('AuthContext: Token saved successfully');
-                            } catch (err) {
-                                console.error('AuthContext: Failed to save token', err);
-                            }
-                        }
-                    }).catch(err => console.error("AuthContext: Error getting token", err));
+
                 }
             } catch (e) {
                 console.error('Failed to load user', e);
@@ -75,18 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(authData);
         await AsyncStorage.setItem('userData', JSON.stringify(authData));
 
-        // Register and save push token
-        registerForPushNotificationsAsync().then(async token => {
-            console.log('AuthContext: Got token on login:', token);
-            if (token) {
-                try {
-                    await SAVE_PUSH_TOKEN(token);
-                    console.log('AuthContext: Token saved successfully');
-                } catch (err) {
-                    console.error('AuthContext: Failed to save token', err);
-                }
-            }
-        }).catch(err => console.error("AuthContext: Error getting token", err));
+
 
         // @ts-ignore
         router.replace('/(tabs)');

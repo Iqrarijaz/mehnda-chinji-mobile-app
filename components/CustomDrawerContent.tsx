@@ -1,4 +1,4 @@
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import {
     DrawerContentComponentProps,
     DrawerContentScrollView,
@@ -9,14 +9,12 @@ import React from 'react';
 import {
     Image,
     StyleSheet,
-    Switch,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -25,7 +23,7 @@ export default function CustomDrawerContent(
     props: DrawerContentComponentProps
 ) {
     const { user, logout } = useAuth();
-    const { theme, toggleTheme, isDark } = useTheme();
+    const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
 
@@ -44,22 +42,24 @@ export default function CustomDrawerContent(
 
     const menuItems = [
         {
+            label: 'Home',
+            icon: 'home-outline',
+            route: '/(tabs)',
+        },
+        {
             label: 'Blood Donors',
-            icon: 'tint',
-            type: 'font-awesome',
+            icon: 'water-outline',
             route: '/(tabs)/blood',
         },
         {
             label: 'Business Directory',
-            icon: 'business',
-            type: 'material',
+            icon: 'briefcase-outline',
             route: '/(tabs)/business',
         },
-        { label: 'Invite Friends', icon: 'person-add', type: 'material' },
+        { label: 'Invite Friends', icon: 'person-add-outline' }, // Consistent icons
         {
             label: 'Settings',
-            icon: 'settings',
-            type: 'material',
+            icon: 'settings-outline',
             route: '/settings',
         },
     ];
@@ -73,7 +73,7 @@ export default function CustomDrawerContent(
     return (
         <ThemedView style={styles.container}>
             <LinearGradient
-                colors={['#1e293b', '#0F172A']}
+                colors={['#004030', '#022c22']} // Dark Green Gradient
                 style={StyleSheet.absoluteFill}
             />
 
@@ -83,7 +83,7 @@ export default function CustomDrawerContent(
             >
                 {/* Header */}
                 <LinearGradient
-                    colors={['#FF9B51', '#FF9B51']}
+                    colors={['#FFFFFF', '#FFFFFF']}
                     style={styles.header}
                 >
                     <View style={styles.headerRow}>
@@ -154,26 +154,11 @@ export default function CustomDrawerContent(
                                             },
                                         ]}
                                     >
-                                        {item.type === 'material' ? (
-                                            <MaterialIcons
-                                                name={item.icon as any}
-                                                size={22}
-                                                color="#FFFFFF"
-                                            />
-                                        ) : item.type ===
-                                            'font-awesome' ? (
-                                            <IconSymbol
-                                                name="drop.fill"
-                                                size={22}
-                                                color="#FFFFFF"
-                                            />
-                                        ) : (
-                                            <Ionicons
-                                                name={item.icon as any}
-                                                size={22}
-                                                color="#FFFFFF"
-                                            />
-                                        )}
+                                        <Ionicons
+                                            name={item.icon as any}
+                                            size={22}
+                                            color="#FFFFFF"
+                                        />
                                     </View>
 
                                     <ThemedText
@@ -199,37 +184,7 @@ export default function CustomDrawerContent(
                     })}
                 </View>
 
-                {/* Preferences */}
-                <View style={styles.preferencesContainer}>
-                    <ThemedText style={styles.sectionTitle}>
-                        PREFERENCES
-                    </ThemedText>
 
-                    <View style={styles.themeToggleContainer}>
-                        <View style={styles.menuItemLeft}>
-                            <View style={styles.iconContainer}>
-                                <Ionicons
-                                    name={isDark ? 'moon' : 'sunny'}
-                                    size={20}
-                                    color="#FFFFFF"
-                                />
-                            </View>
-                            <ThemedText style={styles.menuLabel}>
-                                Dark Mode
-                            </ThemedText>
-                        </View>
-
-                        <Switch
-                            value={isDark}
-                            onValueChange={toggleTheme}
-                            trackColor={{
-                                false: '#CBD5E1',
-                                true: Colors.dark.secondary,
-                            }}
-                            thumbColor="#FFFFFF"
-                        />
-                    </View>
-                </View>
             </DrawerContentScrollView>
 
             {/* Footer */}
@@ -277,7 +232,7 @@ const styles = StyleSheet.create({
         height: 54,
         borderRadius: 27,
         borderWidth: 2,
-        borderColor: 'rgba(255,255,255,0.4)',
+        borderColor: 'rgba(0,0,0,0.1)',
     },
 
     profileOnlineBadge: {
@@ -289,11 +244,11 @@ const styles = StyleSheet.create({
         borderRadius: 7,
         backgroundColor: '#10B981',
         borderWidth: 2,
-        borderColor: '#0F172A',
+        borderColor: '#FFFFFF',
     },
 
     name: {
-        color: '#FFFFFF',
+        color: '#004030',
         fontSize: 20,
         fontWeight: '700',
         textTransform: 'capitalize',
@@ -308,11 +263,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 10,
+        paddingVertical: 6, // Reduced by 4px (from 10)
         paddingHorizontal: 10,
         borderRadius: 16,
         borderWidth: 1,
         marginBottom: 8, // 👈 +2px spacing
+        overflow: 'hidden', // Ensure gradient respects border radius
     },
 
     menuItemLeft: {
@@ -351,33 +307,9 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
 
-    preferencesContainer: {
-        paddingHorizontal: 16,
-        paddingBottom: 20,
-    },
 
-    sectionTitle: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        letterSpacing: 1,
-        opacity: 0.5,
-        marginTop: 24,
-        marginBottom: 10,
-        marginLeft: 10,
-        color: '#FFFFFF',
-    },
 
-    themeToggleContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 12,
-        paddingHorizontal: 12,
-        borderRadius: 16,
-        backgroundColor: 'rgba(255,255,255,0.03)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
-    },
+
 
     footer: {
         padding: 24,
@@ -389,7 +321,7 @@ const styles = StyleSheet.create({
     signOutBtn: {
         flexDirection: 'row',
         gap: 10,
-        height: 56,
+        height: 48, // Reduced height
         borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',

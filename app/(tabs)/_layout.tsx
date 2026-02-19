@@ -1,11 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions } from '@react-navigation/native';
 import { Tabs, useNavigation } from 'expo-router';
-import React, { useRef } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { TouchableOpacity } from 'react-native';
 
 import { CustomTabBar } from '@/components/CustomTabBar';
-import ProfileBottomSheet, { ProfileBottomSheetRef } from '@/components/ProfileBottomSheet';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -14,11 +13,8 @@ export default function TabLayout() {
   const { theme } = useTheme();
   const { user } = useAuth();
   const navigation = useNavigation();
-  const profileSheetRef = useRef<ProfileBottomSheetRef>(null);
 
-  const openProfileSheet = () => {
-    profileSheetRef.current?.expand();
-  };
+
 
   const getProfileSource = () => {
     if (user?.user?.profileImage) {
@@ -49,51 +45,36 @@ export default function TabLayout() {
               <Ionicons name="menu" size={28} color={Colors[theme].text} />
             </TouchableOpacity>
           ),
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={openProfileSheet}
-              style={{ marginRight: 15 }}
-            >
-              <View style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                borderWidth: 2,
-                borderColor: '#0F172A',
-                padding: 2,
-                backgroundColor: '#f8fafc',
-                overflow: 'hidden',
-              }}>
-                <Image
-                  source={getProfileSource()}
-                  style={{ width: '100%', height: '100%', borderRadius: 16 }}
-                  resizeMode="cover"
-                />
-              </View>
-            </TouchableOpacity>
-          ),
         }}>
         <Tabs.Screen
           name="index"
           options={{
             title: 'Home',
-          }}
-        />
-        <Tabs.Screen
-          name="blood"
-          options={{
-            title: 'Blood',
+            headerShown: false,
           }}
         />
         <Tabs.Screen
           name="business"
           options={{
             title: 'Business',
+            headerShown: false,
+          }}
+        />
+        <Tabs.Screen
+          name="blood"
+          options={{
+            title: 'Blood',
+            headerShown: false,
+          }}
+        />
+        <Tabs.Screen
+          name="chat"
+          options={{
+            title: 'Chat',
           }}
         />
       </Tabs>
 
-      <ProfileBottomSheet ref={profileSheetRef} />
     </>
   );
 }

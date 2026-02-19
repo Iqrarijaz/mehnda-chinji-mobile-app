@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
         shadowRadius: 14,
         elevation: 6,
         marginTop: 16,
+        zIndex: 9999,
     },
 
     successBg: {
