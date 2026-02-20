@@ -8,9 +8,9 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
-configs/google-services.json
-configs/IOS_CLIENT_ID.plist
-configs/WEB_CLIENT_ID.json
+# configs/google-services.json
+# configs/IOS_CLIENT_ID.plist
+# configs/WEB_CLIENT_ID.json
 
 
 # Native
@@ -36,7 +36,7 @@ yarn-error.*
 
 # local env files
 .env*.local
-
+.env
 # typescript
 *.tsbuildinfo
 

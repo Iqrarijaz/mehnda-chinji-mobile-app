@@ -1,23 +1,27 @@
 import { AUTH_QUERY_KEYS } from '@/apis/login';
-import { UPDATE_PROFILE } from '@/apis/profile';
+import { DELETE_PROFILE_IMAGE, UPDATE_PROFILE, UPLOAD_PROFILE_IMAGE } from '@/apis/profile';
+import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/context/AuthContext';
 import citiesData from '@/data/cities.json';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
     KeyboardAvoidingView,
+    Modal,
     Platform,
+    Pressable,
     ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -36,6 +40,8 @@ export default function ProfileScreen() {
     });
 
     const [cityPickerVisible, setCityPickerVisible] = useState(false);
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [previewVisible, setPreviewVisible] = useState(false);
 
     useEffect(() => {
         if (user?.user) {
@@ -71,7 +77,49 @@ export default function ProfileScreen() {
         }
     });
 
-    const loading = profileMutation.isPending;
+    const uploadImageMutation = useMutation({
+        mutationFn: UPLOAD_PROFILE_IMAGE,
+        onSuccess: async (response) => {
+            if (response.data?.profileImage) {
+                await updateUser({ profileImage: response.data.profileImage });
+                queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success',
+                    text2: 'Profile image updated',
+                });
+            }
+        },
+        onError: (error: any) => {
+            Toast.show({
+                type: 'error',
+                text1: 'Upload Failed',
+                text2: error?.response?.data?.message || 'Failed to upload image',
+            });
+        }
+    });
+
+    const deleteImageMutation = useMutation({
+        mutationFn: DELETE_PROFILE_IMAGE,
+        onSuccess: async () => {
+            await updateUser({ profileImage: null });
+            queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Profile image removed',
+            });
+        },
+        onError: (error: any) => {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error?.response?.data?.message || 'Failed to remove image',
+            });
+        }
+    });
+
+    const loading = profileMutation.isPending || uploadImageMutation.isPending || deleteImageMutation.isPending;
 
     const getProfileSource = () => {
         if (user?.user?.profileImage) {
@@ -95,6 +143,44 @@ export default function ProfileScreen() {
         }
 
         profileMutation.mutate(formData);
+    };
+
+    const handleImagePick = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Toast.show({
+                type: 'error',
+                text1: 'Permission Required',
+                text2: 'We need camera roll permissions to change profile picture',
+            });
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+        });
+
+        if (!result.canceled) {
+            const asset = result.assets[0];
+            const formData = new FormData();
+
+            // @ts-ignore
+            formData.append('image', {
+                uri: asset.uri,
+                type: asset.mimeType || 'image/jpeg',
+                name: asset.fileName || `profile_${Date.now()}.jpg`,
+            });
+
+            uploadImageMutation.mutate(formData);
+        }
+    };
+
+    const handleDeleteImage = () => {
+        setDeleteModalVisible(false);
+        deleteImageMutation.mutate();
     };
 
     return (
@@ -124,17 +210,43 @@ export default function ProfileScreen() {
                     {/* Profile Image Section */}
                     <View style={styles.avatarSection}>
                         <View style={styles.imageWrapper}>
-                            <Image
-                                source={getProfileSource()}
-                                style={styles.profileImage}
-                                resizeMode="cover"
-                            />
-                            <TouchableOpacity style={styles.cameraButton}>
+                            {uploadImageMutation.isPending ? (
+                                <View style={[styles.profileImage, styles.loaderOverlay]}>
+                                    <ActivityIndicator size="large" color="#004030" />
+                                </View>
+                            ) : (
+                                <TouchableOpacity
+                                    activeOpacity={0.9}
+                                    onPress={() => setPreviewVisible(true)}
+                                    disabled={!user?.user?.profileImage}
+                                >
+                                    <Image
+                                        source={getProfileSource()}
+                                        style={styles.profileImage}
+                                        resizeMode="cover"
+                                    />
+                                </TouchableOpacity>
+                            )}
+                            <TouchableOpacity
+                                style={styles.cameraButton}
+                                onPress={handleImagePick}
+                                disabled={loading}
+                            >
                                 <Ionicons name="camera" size={18} color="#FFFFFF" />
                             </TouchableOpacity>
+
+                            {user?.user?.profileImage && !uploadImageMutation.isPending && (
+                                <TouchableOpacity
+                                    style={styles.deleteButton}
+                                    onPress={() => setDeleteModalVisible(true)}
+                                    disabled={loading}
+                                >
+                                    <Ionicons name="trash" size={16} color="#FFFFFF" />
+                                </TouchableOpacity>
+                            )}
                         </View>
-                        <ThemedText style={styles.userName}>{user?.user?.name || 'User'}</ThemedText>
-                        <ThemedText style={styles.userEmail}>{user?.user?.email || ''}</ThemedText>
+                        {/* <ThemedText style={styles.userName}>{user?.user?.name || 'User'}</ThemedText>
+                        <ThemedText style={styles.userEmail}>{user?.user?.email || ''}</ThemedText> */}
                     </View>
 
                     {/* Form Fields */}
@@ -237,6 +349,47 @@ export default function ProfileScreen() {
                 title="Select City"
                 placeholder="Search city..."
             />
+
+            <CleanConfirmationModal
+                visible={deleteModalVisible}
+                onClose={() => setDeleteModalVisible(false)}
+                onConfirm={handleDeleteImage}
+                title="Delete Profile Image"
+                message="Are you sure you want to remove your profile picture? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Keep it"
+                type="danger"
+                isLoading={deleteImageMutation.isPending}
+            />
+
+            {/* Image Preview Modal */}
+            <Modal
+                visible={previewVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setPreviewVisible(false)}
+            >
+                <Pressable
+                    style={styles.previewOverlay}
+                    onPress={() => setPreviewVisible(false)}
+                >
+                    <View style={styles.previewHeader}>
+                        <TouchableOpacity
+                            style={styles.closePreview}
+                            onPress={() => setPreviewVisible(false)}
+                        >
+                            <Ionicons name="close" size={28} color="#FFFFFF" />
+                        </TouchableOpacity>
+                    </View>
+                    <Pressable style={styles.previewImageContainer} onPress={(e) => e.stopPropagation()}>
+                        <Image
+                            source={getProfileSource()}
+                            style={styles.previewImage}
+                            resizeMode="contain"
+                        />
+                    </Pressable>
+                </Pressable>
+            </Modal>
         </View>
     );
 }
@@ -311,6 +464,54 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 3,
         borderColor: '#FFFFFF',
+    },
+    deleteButton: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        backgroundColor: '#DC2626',
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#FFFFFF',
+    },
+    loaderOverlay: {
+        backgroundColor: 'rgba(255,255,255,0.7)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    previewOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.9)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    previewHeader: {
+        position: 'absolute',
+        top: 50,
+        right: 20,
+        zIndex: 10,
+    },
+    closePreview: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    previewImageContainer: {
+        width: '100%',
+        height: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    previewImage: {
+        width: '100%',
+        height: '100%',
     },
     userName: {
         fontSize: 22,

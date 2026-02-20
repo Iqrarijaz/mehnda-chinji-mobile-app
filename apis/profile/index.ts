@@ -142,3 +142,32 @@ export async function MANAGE_NOTIFICATIONS(data: any) {
         throw error;
     }
 }
+
+export async function UPLOAD_PROFILE_IMAGE(formData: FormData) {
+    try {
+        const headers = await GET_AUTH_HEADER();
+        const response = await axios.post(`${baseUrl}/api/user/v1/upload-profile-image`, formData, {
+            headers: {
+                ...headers,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Upload Profile Image error", error);
+        throw error;
+    }
+}
+
+export async function DELETE_PROFILE_IMAGE() {
+    try {
+        const headers = await GET_AUTH_HEADER();
+        const response = await axios.delete(`${baseUrl}/api/user/v1/delete-profile-image`, {
+            headers,
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Delete Profile Image error", error);
+        throw error;
+    }
+}
