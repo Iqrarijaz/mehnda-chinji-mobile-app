@@ -9,6 +9,9 @@ dist/
 web-build/
 expo-env.d.ts
 configs/google-services.json
+configs/IOS_CLIENT_ID.plist
+configs/WEB_CLIENT_ID.json
+
 
 # Native
 .kotlin/
