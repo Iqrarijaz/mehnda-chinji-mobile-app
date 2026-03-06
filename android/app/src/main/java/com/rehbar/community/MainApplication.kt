@@ -1,4 +1,4 @@
-package com.iqrarijaz788.mehndachinjimobileapp
+package com.rehbar.community
 
 import android.app.Application
 import android.content.res.Configuration
