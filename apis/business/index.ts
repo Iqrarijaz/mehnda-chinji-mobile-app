@@ -1,117 +1,36 @@
-import { GET_AUTH_HEADER } from '@/utils/token';
-import axios from 'axios';
-import { baseUrl } from '../../configs';
+import apiClient from '../client';
 
 export const BUSINESS_QUERY_KEYS = {
-    all: ['businesses'] as const,
+    all: ['Businesses'] as const, // Changed Businesses to Businesses if needed, but keeping consistency
     list: (filters: any) => [...BUSINESS_QUERY_KEYS.all, 'infinite-list', filters] as const,
     status: (id: string) => [...BUSINESS_QUERY_KEYS.all, 'status', id] as const,
     myBusiness: () => [...BUSINESS_QUERY_KEYS.all, 'my-business'] as const,
 };
 
-// Helper to get token
-
-
-export async function REGISTER_BUSINESS(data: any) {
-    try {
-        const headers = await GET_AUTH_HEADER();
-        console.log("API REQUEST LOGS", data);
-        const response = await axios.post(`${baseUrl}/api/user/v1/register-business`, data, {
-            headers,
-        });
-        console.log("API RESPONSE LOGS", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Register Business error", error);
-        throw error;
-    }
+export async function registerBusiness(data: any) {
+    return apiClient.post('/api/user/v1/register-business', data);
 }
 
-export async function GET_BUSINESS_STATUS() {
-    try {
-        const headers = await GET_AUTH_HEADER();
-        console.log("API REQUEST LOGS");
-        const response = await axios.get(`${baseUrl}/api/user/v1/get-business-status`, {
-            headers,
-        });
-        console.log("API RESPONSE LOGS", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Get Business Status error", error);
-        throw error;
-    }
+export async function getBusinessStatus() {
+    return apiClient.get('/api/user/v1/get-business-status');
 }
 
-export async function GET_CATEGORIES(type: string = 'SERVICES') {
-    try {
-        const headers = await GET_AUTH_HEADER();
-        console.log("API REQUEST LOGS", { type });
-        const response = await axios.get(`${baseUrl}/api/user/category/list?type=${type}`, {
-            headers,
-        });
-        console.log("API RESPONSE LOGS", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Get Categories error", error);
-        throw error;
-    }
+export async function getCategories(type: string = 'SERVICES') {
+    return apiClient.get('/api/user/category/list', { params: { type } });
 }
 
-export async function GET_BUSINESSES_LIST(params: { search?: string; categoryId?: string; currentPage?: number }) {
-    try {
-        const headers = await GET_AUTH_HEADER();
-        console.log("API REQUEST LOGS", params);
-        const response = await axios.get(`${baseUrl}/api/user/v1/get-businesses-list`, {
-            headers,
-            params
-        });
-        console.log("API RESPONSE LOGS", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Get Businesses List error", error);
-        throw error;
-    }
-}
-export async function DELETE_BUSINESS(businessId: string) {
-    try {
-        const headers = await GET_AUTH_HEADER();
-        console.log("API REQUEST LOGS", { businessId });
-        const response = await axios.post(`${baseUrl}/api/user/v1/remove-business`, { businessId }, {
-            headers,
-        });
-        console.log("API RESPONSE LOGS", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Delete Business error", error);
-        throw error;
-    }
-}
-export async function MANAGE_BUSINESS_SEARCH(businessId: string, search: boolean) {
-    try {
-        const headers = await GET_AUTH_HEADER();
-        console.log("API REQUEST LOGS", { businessId, search });
-        const response = await axios.post(`${baseUrl}/api/user/v1/manage-business-search`, { businessId, search }, {
-            headers,
-        });
-        console.log("API RESPONSE LOGS", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Manage Business Search error", error);
-        throw error;
-    }
+export async function getBusinessesList(params: { search?: string; categoryId?: string; currentPage?: number }) {
+    return apiClient.get('/api/user/v1/get-businesses-list', { params });
 }
 
-export async function UPDATE_BUSINESS(data: any) {
-    try {
-        const headers = await GET_AUTH_HEADER();
-        console.log("API REQUEST LOGS", data);
-        const response = await axios.post(`${baseUrl}/api/user/v1/update-business`, data, {
-            headers,
-        });
-        console.log("API RESPONSE LOGS", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Update Business error", error);
-        throw error;
-    }
+export async function deleteBusiness(businessId: string) {
+    return apiClient.post('/api/user/v1/remove-business', { businessId });
+}
+
+export async function manageBusinessSearch(businessId: string, search: boolean) {
+    return apiClient.post('/api/user/v1/manage-business-search', { businessId, search });
+}
+
+export async function updateBusiness(data: any) {
+    return apiClient.post('/api/user/v1/update-business', data);
 }

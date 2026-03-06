@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { TintedCard } from '../ui/tintedCard';
 
 interface RequestCardProps {
     item: any;
@@ -28,9 +29,7 @@ const getStatusColor = (status: string) => {
 
 const formatDateTime = (dateStr: string) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
-        + ' \u2022 '
-        + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
 const RequestCard: React.FC<RequestCardProps> = ({ item, categoryColor, isDeleting, onEdit, onDelete }) => {
@@ -40,13 +39,15 @@ const RequestCard: React.FC<RequestCardProps> = ({ item, categoryColor, isDeleti
     const isPending = item.status === 'PENDING';
 
     return (
-        <View style={[styles.card, { backgroundColor: colors.card, borderLeftColor: categoryColor, borderColor: colors.border }]}>
-            <View style={[styles.statusBar, { backgroundColor: categoryColor }]} />
-
+        <TintedCard
+            tintColor={categoryColor}
+            bgColor="#FFFFFF"
+            style={styles.cardWrapper}
+        >
             <View style={styles.content}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <ThemedText style={[styles.title, { color: colors.text }]} numberOfLines={2}>
+                    <ThemedText style={[styles.title, { color: categoryColor }]} numberOfLines={2}>
                         {item.name.length > 30 ? `${item.name.substring(0, 30)}...` : item.name}
                     </ThemedText>
                     <View style={[styles.statusBadge, { backgroundColor: statusColor + '18' }]}>
@@ -59,8 +60,8 @@ const RequestCard: React.FC<RequestCardProps> = ({ item, categoryColor, isDeleti
 
                 {/* Address */}
                 <View style={styles.infoRow}>
-                    <Ionicons name="location-outline" size={13} color={colors.icon} />
-                    <ThemedText style={[styles.infoText, { color: colors.icon, textTransform: 'capitalize' }]}>
+                    <Ionicons name="location" size={13} color={categoryColor} style={{ opacity: 0.7 }} />
+                    <ThemedText style={[styles.infoText, { color: categoryColor, opacity: 0.7, textTransform: 'capitalize' }]}>
                         {item.address}
                     </ThemedText>
                 </View>
@@ -69,29 +70,19 @@ const RequestCard: React.FC<RequestCardProps> = ({ item, categoryColor, isDeleti
                 {item.contact?.map((contact: any, index: number) => (
                     contact.number ? (
                         <View key={index} style={styles.infoRow}>
-                            <Ionicons name="call-outline" size={13} color={colors.icon} />
-                            <ThemedText style={[styles.infoText, { color: colors.icon, textTransform: 'capitalize' }]} numberOfLines={1}>
+                            <Ionicons name="call" size={13} color={categoryColor} style={{ opacity: 0.7 }} />
+                            <ThemedText style={[styles.infoText, { color: categoryColor, opacity: 0.7, textTransform: 'capitalize' }]} numberOfLines={1}>
                                 {contact.name ? `${contact.name}: ` : ''}{contact.number}
                             </ThemedText>
                         </View>
                     ) : null
                 ))}
 
-                {/* Description */}
-                {item.description ? (
-                    <View style={styles.infoRow}>
-                        <Ionicons name="information-circle-outline" size={13} color={colors.icon} />
-                        <ThemedText style={[styles.infoText, { color: colors.icon }]} numberOfLines={2}>
-                            {item.description}
-                        </ThemedText>
-                    </View>
-                ) : null}
-
                 {/* Footer: Time (Left) + Actions (Right) */}
                 <View style={styles.footer}>
                     <View style={styles.timeContainer}>
-                        <Ionicons name="time-outline" size={13} color={colors.icon} />
-                        <ThemedText style={[styles.infoText, { color: colors.icon }]}>
+                        <Ionicons name="calendar-outline" size={13} color={categoryColor} style={{ opacity: 0.6 }} />
+                        <ThemedText style={[styles.infoText, { color: categoryColor, opacity: 0.6 }]}>
                             {formatDateTime(item.createdAt)}
                         </ThemedText>
                     </View>
@@ -102,8 +93,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ item, categoryColor, isDeleti
                                 onPress={() => onEdit(item)}
                                 style={[styles.actionBtn, styles.editBtn]}
                             >
-                                <Ionicons name="create-outline" size={12} color="#3B82F6" />
-                                <ThemedText style={[styles.actionText, { color: '#3B82F6' }]}>Edit</ThemedText>
+                                <Ionicons name="create-outline" size={20} color="#3B82F6" />
                             </TouchableOpacity>
 
                             <TouchableOpacity
@@ -114,52 +104,36 @@ const RequestCard: React.FC<RequestCardProps> = ({ item, categoryColor, isDeleti
                                 {isDeleting ? (
                                     <ActivityIndicator size="small" color="#EF4444" />
                                 ) : (
-                                    <>
-                                        <Ionicons name="trash-outline" size={12} color="#EF4444" />
-                                        <ThemedText style={[styles.actionText, { color: '#EF4444' }]}>Delete</ThemedText>
-                                    </>
+                                    <Ionicons name="trash-outline" size={20} color="#EF4444" />
                                 )}
                             </TouchableOpacity>
                         </View>
                     )}
                 </View>
             </View>
-        </View>
+        </TintedCard>
     );
 };
 
 export default React.memo(RequestCard);
 
 const styles = StyleSheet.create({
-    card: {
-        borderRadius: 14,
+    cardWrapper: {
         marginBottom: 10,
-        borderWidth: 1,
-        borderLeftWidth: 4,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.08,
-        shadowRadius: 6,
-        elevation: 4,
-    },
-    statusBar: {
-        height: 3,
-        width: '100%',
     },
     content: {
-        paddingHorizontal: 12,
-        paddingVertical: 10,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 4,
     },
     title: {
-        fontSize: 15,
-        fontWeight: '700',
+        fontSize: 16,
+        fontWeight: '800',
         textTransform: 'capitalize',
         flex: 1,
         marginRight: 8,
@@ -179,7 +153,7 @@ const styles = StyleSheet.create({
     },
     statusText: {
         fontSize: 10,
-        fontWeight: '700',
+        fontWeight: '800',
         textTransform: 'capitalize',
         letterSpacing: 0.3,
     },
@@ -187,20 +161,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
-        marginBottom: 4,
+        marginBottom: 2,
     },
     infoText: {
-        fontSize: 14,
+        fontSize: 13,
+        fontWeight: '600',
         flex: 1,
     },
     footer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 8,
+        marginTop: 6,
         paddingTop: 8,
         borderTopWidth: 1,
-        borderTopColor: '#f1f5f9',
+        borderTopColor: '#00000008',
     },
     timeContainer: {
         flexDirection: 'row',
@@ -210,27 +185,20 @@ const styles = StyleSheet.create({
     },
     actions: {
         flexDirection: 'row',
-        gap: 8,
+        gap: 6,
     },
     actionBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 8,
-        borderWidth: 1,
-        gap: 4,
+        padding: 8,
+        borderRadius: 10,
+        backgroundColor: '#FFFFFF',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        shadowRadius: 8,
     },
-    editBtn: {
-        backgroundColor: '#EFF6FF',
-        borderColor: '#DBEAFE',
-    },
-    deleteBtn: {
-        backgroundColor: '#FEF2F2',
-        borderColor: '#FEE2E2',
-    },
-    actionText: {
-        fontSize: 13,
-        fontWeight: '600',
-    },
+editBtn: {
+},
+deleteBtn: {
+},
 });

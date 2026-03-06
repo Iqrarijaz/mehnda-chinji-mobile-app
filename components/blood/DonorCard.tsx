@@ -1,12 +1,18 @@
-import { ThemedText } from '@/components/themed-text';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from 'react-native-reanimated';
+import { TintedCard } from '../ui/tintedCard';
 
 interface DonorCardProps {
     donor: {
@@ -21,55 +27,21 @@ interface DonorCardProps {
         lastDonationDate?: string | null;
         city: string;
         address?: string;
-        village?: string; // Kept for backward compatibility
+        village?: string;
         available: boolean;
     };
+    onReportPress?: (donorId: string) => void;
 }
 
-const DonorCard = React.memo(({ donor }: DonorCardProps) => {
-    const { theme, isDark } = useTheme();
+const DonorCard = React.memo(({ donor, onReportPress }: DonorCardProps) => {
+    const { theme } = useTheme();
     const colors = Colors[theme];
-    const router = useRouter();
     const { user } = useAuth();
 
     const isAvailable = donor.available;
     const location = [donor.address || donor.village, donor.city].filter(Boolean).join(', ');
 
-    const formatLastDonated = (dateString?: string | null) => {
-        if (!dateString) return 'Never';
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-
-        if (diffDays < 30) return `${diffDays} days ago`;
-        const diffMonths = Math.floor(diffDays / 30);
-        return `${diffMonths} month${diffMonths > 1 ? 's' : ''} ago`;
-    };
-
-
-
-    // const handleChat = async () => {
-    //     if (!user) {
-    //         Alert.alert("Login Required", "Please login to start a chat.");
-    //         return;
-    //     }
-
-    //     // don't allow chatting with self
-    //     if (user.user?._id === donor.userId._id) {
-    //         Alert.alert("Action Not Allowed", "You cannot chat with yourself.");
-    //         return;
-    //     }
-
-    //     try {
-    //         const res = await CREATE_OR_GET_CONVERSATION(donor.userId._id, ConversationSource.DONOR);
-    //         if (res.success && res.data) {
-    //             router.push(`/chat/${res.data._id}` as any);
-    //         }
-    //     } catch (error) {
-    //         console.error("Failed to start chat", error);
-    //         Alert.alert("Error", "Failed to start chat. Please try again.");
-    //     }
-    // };
+    const primaryColor = "#000000";
 
     const handleCall = () => {
         if (donor.userId.phone) {
@@ -79,85 +51,97 @@ const DonorCard = React.memo(({ donor }: DonorCardProps) => {
         }
     };
 
+    const translateX = useSharedValue(0);
+    const MAX_SWIPE = -80;
+    const REPORT_THRESHOLD = -40;
+
+    const pan = Gesture.Pan()
+        .activeOffsetX([-10, 10])
+        .onUpdate((e) => {
+            if (e.translationX < 0) {
+                translateX.value = Math.max(e.translationX, MAX_SWIPE);
+            } else {
+                translateX.value = Math.max(e.translationX * 0.2, 0); // Slight resistance for right swipe
+            }
+        })
+        .onEnd((e) => {
+            if (e.translationX < REPORT_THRESHOLD) {
+                translateX.value = withTiming(MAX_SWIPE, { duration: 200 });
+            } else {
+                translateX.value = withTiming(0, { duration: 200 });
+            }
+        });
+
+    const cardStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: translateX.value }],
+    }));
+
+    const reportBgStyle = useAnimatedStyle(() => ({
+        opacity: translateX.value < -10 ? 1 : 0,
+        transform: [{ scale: Math.min(Math.abs(translateX.value) / 60, 1) }],
+    }));
+
     return (
-        <View style={styles.cardWrapper}>
-            <LinearGradient
-                colors={isDark
-                    ? ['rgba(255, 255, 255, 0.08)', 'rgba(255, 255, 255, 0.02)']
-                    : ['rgba(15, 23, 42, 0.05)', 'rgba(15, 23, 42, 0.02)']}
-                style={[
-                    styles.card,
-                    { borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.1)' }
-                ]}
-            >
-                {/* Specular Highlight */}
-                <View style={[styles.specularHandle, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)' }]} />
+        <View style={styles.swipeContainer}>
+            {/* Report Background (Revealed on Swipe) */}
+            {onReportPress && (
+                <Animated.View style={[styles.reportBg, reportBgStyle]}>
+                    <TouchableOpacity
+                        style={styles.reportAction}
+                        onPress={() => {
+                            translateX.value = withTiming(0);
+                            onReportPress(donor._id);
+                        }}
+                    >
+                        <Ionicons name="flag" size={20} color="#FFFFFF" />
+                        <ThemedText style={styles.reportActionText}>Report</ThemedText>
+                    </TouchableOpacity>
+                </Animated.View>
+            )}
 
-                <View style={styles.content}>
-                    {/* Blood Group Badge */}
-                    <View style={styles.bloodBadgeWrapper}>
-                        <LinearGradient
-                            colors={['#ef4444', '#991b1b']}
-                            style={styles.bloodBadge}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
-                        >
-                            <View style={styles.bloodBadgeInner}>
-                                <View style={styles.bloodReflect} />
-                                <ThemedText style={styles.bloodType}>{donor.bloodGroup}</ThemedText>
-                            </View>
-                        </LinearGradient>
-                    </View>
-
-                    {/* Info Section */}
-                    <View style={styles.info}>
-                        <ThemedText style={[styles.name, { color: colors.text }]}>{donor.userId.name}</ThemedText>
-                        <View style={styles.locationContainer}>
-                            <View style={styles.locationRow}>
-                                <Ionicons name="location" size={12} color="#ef4444" />
-                                <ThemedText style={[styles.locationText, { color: colors.icon }]} numberOfLines={1}>{donor.city}</ThemedText>
-                            </View>
-                            {(donor.address || donor.village) && (
-                                <View style={styles.locationRow}>
-                                    <Ionicons name="home" size={12} color={colors.icon} />
-                                    <ThemedText style={[styles.locationText, { color: colors.icon }]} numberOfLines={1}>
-                                        {donor.address || donor.village}
+            <GestureDetector gesture={pan}>
+                <Animated.View style={cardStyle}>
+                    <TouchableOpacity activeOpacity={0.9} onPress={handleCall}>
+                        <TintedCard tintColor={primaryColor} bgColor="#FFFFFF" style={styles.cardWrapper}>
+                            <View style={styles.cardMain}>
+                                {/* Left: Blood Group */}
+                                <View style={styles.bloodCircle}>
+                                    <ThemedText style={styles.bloodText}>
+                                        {donor.bloodGroup}
                                     </ThemedText>
                                 </View>
-                            )}
-                        </View>
-                        <View style={styles.statusRow}>
-                            {isAvailable && (
-                                <View style={[styles.statusBadge, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
-                                    <View style={[styles.indicator, { backgroundColor: '#10B981' }]} />
-                                    <ThemedText style={[styles.statusText, { color: '#10B981' }]}>
-                                        AVAILABLE
-                                    </ThemedText>
-                                </View>
-                            )}
-                            {formatLastDonated(donor.lastDonationDate) !== 'Never' && (
-                                <ThemedText style={styles.lastDonated}>{formatLastDonated(donor.lastDonationDate)}</ThemedText>
-                            )}
-                        </View>
-                    </View>
 
-                    {/* Actions */}
-                    <View style={styles.actions}>
-                        <TouchableOpacity
-                            onPress={handleCall}
-                            activeOpacity={0.7}
-                            style={styles.actionBtnWrapper}
-                        >
-                            <LinearGradient
-                                colors={['#10B981', '#059669']} // Green for call
-                                style={styles.actionBtn}
-                            >
-                                <Ionicons name="call" size={16} color="#FFFFFF" />
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </LinearGradient>
+                                {/* Center: Info */}
+                                <View style={styles.contentContainer}>
+                                    <View style={styles.nameRow}>
+                                        <ThemedText style={[styles.name, { color: primaryColor }]} numberOfLines={1}>
+                                            {donor.userId.name}
+                                        </ThemedText>
+                                    </View>
+
+                                    <View style={styles.locationRow}>
+                                        <Ionicons name="location" size={14} color={primaryColor} style={{ marginTop: 4 }} />
+                                        <ThemedText style={[styles.locationText, { color: primaryColor, opacity: 0.7 }]} numberOfLines={2}>
+                                            {location.toLowerCase()}
+                                        </ThemedText>
+                                    </View>
+                                </View>
+
+                                {/* Right: Call ONLY */}
+                                <View style={styles.rightActions}>
+                                    <TouchableOpacity
+                                        style={[styles.callBtn, { backgroundColor: primaryColor + '10' }]}
+                                        onPress={handleCall}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Ionicons name="call" size={14} color={primaryColor} />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </TintedCard>
+                    </TouchableOpacity>
+                </Animated.View>
+            </GestureDetector>
         </View>
     );
 });
@@ -165,138 +149,112 @@ const DonorCard = React.memo(({ donor }: DonorCardProps) => {
 export default DonorCard;
 
 const styles = StyleSheet.create({
-    cardWrapper: {
-        marginVertical: 4,
-        marginBottom: 8,
-        borderRadius: 24,
-        overflow: 'hidden',
-    },
-    card: {
-        borderRadius: 24,
-        padding: 12,
-        borderWidth: 1,
+    swipeContainer: {
         position: 'relative',
+        marginBottom: 16,
     },
-    specularHandle: {
+    cardWrapper: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+    },
+    reportBg: {
         position: 'absolute',
+        right: 0,
         top: 0,
-        left: '15%',
-        right: '15%',
-        height: 1,
+        bottom: 0,
+        width: 80,
+        backgroundColor: '#EF4444',
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    content: {
+    reportAction: {
+        flex: 1,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 4,
+    },
+    reportActionText: {
+        color: '#FFFFFF',
+        fontSize: 10,
+        fontWeight: '800',
+    },
+    cardMain: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    bloodBadgeWrapper: {
-        shadowColor: '#ef4444',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 6,
-    },
-    bloodBadge: {
-        width: 46, // Reduced by 4px
-        height: 46, // Reduced by 4px
-        borderRadius: 16,
-        padding: 1.5,
-    },
-    bloodBadgeInner: {
-        flex: 1,
-        borderRadius: 16.5,
-        justifyContent: 'center',
+    bloodCircle: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: '#a91111ff',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.1)',
-        overflow: 'hidden',
+        justifyContent: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        marginRight: 10,
     },
-    bloodReflect: {
-        position: 'absolute',
-        top: 4,
-        left: 6,
-        width: 12,
-        height: 6,
-        borderRadius: 10,
-        backgroundColor: 'rgba(255,255,255,0.3)',
-        transform: [{ rotate: '-15deg' }],
-    },
-    bloodType: {
-        color: '#FFFFFF',
-        fontSize: 18,
+    bloodText: {
+        fontSize: 14,
         fontWeight: '900',
-        textShadowColor: 'rgba(0, 0, 0, 0.2)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4,
+        color: '#ffffffff',
     },
-    info: {
+    contentContainer: {
         flex: 1,
-        marginLeft: 14,
+        gap: 0,
+    },
+    nameRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     name: {
-        fontSize: 15,
-        textTransform: 'capitalize',
+        fontSize: 16,
         fontWeight: '800',
-        letterSpacing: -0.2,
-    },
-    locationContainer: {
-        marginTop: 2,
-        gap: 2,
+        textTransform: 'capitalize',
+        flex: 1,
+        marginRight: 6,
     },
     locationRow: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        gap: 4,
     },
     locationText: {
         fontSize: 12,
-        color: '#64748b',
-        textTransform: 'capitalize',
-        marginLeft: 5,
         fontWeight: '600',
+        textTransform: 'capitalize',
         flex: 1,
-    },
-    statusRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 6,
-        gap: 8,
     },
     statusBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 10,
+        paddingVertical: 2,
+        borderRadius: 6,
+        gap: 4,
     },
-    indicator: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        marginRight: 6,
+    statusDot: {
+        width: 5,
+        height: 5,
+        borderRadius: 2.5,
     },
     statusText: {
         fontSize: 10,
         fontWeight: '800',
-        letterSpacing: 0.2,
+        letterSpacing: 0.5,
     },
-    lastDonated: {
-        fontSize: 10,
-        color: '#94a3b8',
-        fontWeight: '600',
+    rightActions: {
+        marginLeft: 10,
     },
-    actions: {
-        marginLeft: 4,
-    },
-    actionBtnWrapper: {
-        shadowColor: '#ef4444',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.25,
-        shadowRadius: 8,
-        elevation: 4,
-    },
-    actionBtn: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        justifyContent: 'center',
+    callBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         alignItems: 'center',
+        justifyContent: 'center',
     },
 });

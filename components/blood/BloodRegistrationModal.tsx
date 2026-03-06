@@ -1,5 +1,5 @@
-import { REGISTER_AS_DONOR } from '@/apis/bloodDonation';
-import { ThemedText } from '@/components/themed-text';
+import { DONOR_QUERY_KEYS, registerAsDonor } from '@/apis/bloodDonation';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -22,8 +22,8 @@ import {
     View,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '../ToastConfig';
-import { SearchableDropdown } from '../common/SearchableDropdown';
+import { SearchableDropdown } from '../common/searchableDropdown';
+import { toastConfig } from '../toastConfig';
 
 interface BloodRegistrationModalProps {
     visible: boolean;
@@ -68,12 +68,10 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
     }, [visible, user]);
 
     const registerMutation = useMutation({
-        mutationFn: REGISTER_AS_DONOR,
+        mutationFn: registerAsDonor,
         onSuccess: (res) => {
             if (res.success) {
-                // Invalidate keys
-                // We might need to invalidate 'donor-status' or similar
-                queryClient.invalidateQueries({ queryKey: ['donor-status'] });
+                queryClient.invalidateQueries({ queryKey: DONOR_QUERY_KEYS.all });
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
@@ -107,6 +105,24 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                 type: 'error',
                 text1: 'City Required',
                 text2: 'Please select your city.',
+            });
+            return;
+        }
+
+        if (!address || address.trim().length === 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Address Required',
+                text2: 'Please enter your address or local area.',
+            });
+            return;
+        }
+
+        if (address.length > 40) {
+            Toast.show({
+                type: 'error',
+                text1: 'Address Too Long',
+                text2: 'Address must be maximum 40 characters.',
             });
             return;
         }
@@ -184,7 +200,14 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
 
                             {/* Address Input */}
                             <View style={styles.inputField}>
-                                <ThemedText style={[styles.label, { color: colors.text }]}>ADDRESS / LOCAL AREA</ThemedText>
+                                <View style={styles.labelRow}>
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                        ADDRESS / LOCAL AREA <ThemedText style={styles.required}>*</ThemedText>
+                                    </ThemedText>
+                                    <ThemedText style={[styles.charCount, address.length > 40 ? { color: '#ef4444' } : { color: colors.icon }]}>
+                                        {address.length}/40
+                                    </ThemedText>
+                                </View>
                                 <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
                                     <Ionicons name="home" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
@@ -194,6 +217,7 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                         value={address}
                                         onChangeText={setAddress}
                                         autoCapitalize="words"
+                                        maxLength={40}
                                     />
                                 </View>
                             </View>
@@ -266,7 +290,7 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                     {registerMutation.isPending ? (
                                         <ActivityIndicator size="small" color="#FFFFFF" />
                                     ) : (
-                                        <ThemedText style={styles.btnText}>REGISTER AS DONOR</ThemedText>
+                                        <ThemedText style={styles.btnText}>REGISTER</ThemedText>
                                     )}
                                 </LinearGradient>
                             </TouchableOpacity>
@@ -380,6 +404,16 @@ const styles = StyleSheet.create({
     },
     required: {
         color: '#EF4444',
+    },
+    labelRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingRight: 4,
+    },
+    charCount: {
+        fontSize: 10,
+        fontWeight: '600',
     },
     inputBox: {
         flexDirection: 'row',

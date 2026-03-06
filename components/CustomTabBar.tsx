@@ -2,17 +2,19 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, LayoutChangeEvent, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
+const isAndroid = Platform.OS === 'android';
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const { theme, isDark } = useTheme(); // Note: Design requested is light floating pill, we can adapt for dark mode but stick to requests for now.
     const insets = useSafeAreaInsets();
-    const primaryColor = Colors[theme].tint;
-    const inactiveColor = '#94a3b8'; // Always light since background is dark
+    const colors = Colors[theme];
+    const primaryColor = colors.tint;
+    const inactiveColor = colors.icon;
 
     const visibleRoutes = state.routes.filter(route => {
         const { options } = descriptors[route.key];
@@ -44,8 +46,8 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     };
 
     return (
-        <View style={[styles.outerContainer, { paddingBottom: insets.bottom + 8 }]}>
-            <View style={[styles.container, { backgroundColor: '#004030' }]} onLayout={onLayout}>
+        <View style={[styles.outerContainer, { paddingBottom: isAndroid ? insets.bottom + 6 : insets.bottom + 8 }]}>
+            <View style={[styles.container, { backgroundColor: colors.primary }]} onLayout={onLayout}>
                 {/* Sliding Indicator */}
                 {tabWidth > 0 && (
                     <Animated.View
@@ -88,7 +90,9 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                     let label = 'Home';
 
                     if (route.name === 'index') { iconName = isFocused ? 'home' : 'home-outline'; label = 'Home'; }
-                    else if (route.name === 'business') { iconName = isFocused ? 'briefcase' : 'briefcase-outline'; label = 'Business'; }
+                    else if (route.name === 'feed') { iconName = isFocused ? 'list' : 'list-outline'; label = 'Feed'; }
+                    else if (route.name === 'business') { iconName = isFocused ? 'search' : 'search-outline'; label = 'Directory'; }
+                    // else if (route.name === 'portal') { iconName = isFocused ? 'briefcase' : 'briefcase-outline'; label = 'Portal'; }
                     else if (route.name === 'blood') { iconName = isFocused ? 'water' : 'water-outline'; label = 'Donors'; }
                     else if (route.name === 'chat') { iconName = isFocused ? 'chatbubbles' : 'chatbubbles-outline'; label = 'Chat'; }
 
@@ -99,9 +103,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                     // Selected: White (as per existing code activeColor)
                     // Unselected: Inactive Color
 
-                    const activeColor = '#FFFFFF';
-                    const inactiveColorCalculated = isDark ? primaryColor : inactiveColor;
-                    const color = isFocused ? activeColor : inactiveColorCalculated;
+                    const color = isFocused ? colors.white : 'rgba(255, 255, 255, 0.6)';
 
                     return (
                         <TouchableOpacity
@@ -121,7 +123,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                                 color={color}
                                 style={{ marginBottom: 2 }}
                             />
-                            <Text style={[styles.label, { color, fontWeight: isFocused ? '600' : '400' }]}>
+                            <Text style={[styles.label, { color, fontWeight: isFocused ? '700' : '500' }]}>
                                 {label}
                             </Text>
                         </TouchableOpacity>
@@ -143,23 +145,22 @@ const styles = StyleSheet.create({
     },
     container: {
         flexDirection: 'row',
-        width: width - 36, // Reduced width (2px more margin each side)
-        height: 60, // Reduced height (64 - 2)
-        borderRadius: 30, // Reduced radius (32 - 1 or match height/2)
+        width: isAndroid ? width - 40 : width - 36, // Increased side margin by 2px on each side for Android
+        height: isAndroid ? 56 : 60, // Reduced height by 2px for Android
+        borderRadius: isAndroid ? 29 : 30, // Adjusted radius to match height/2
         alignItems: 'center',
         justifyContent: 'space-between',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
-        elevation: 5,
         overflow: 'hidden', // Clip the sliding indicator
     },
     indicator: {
         position: 'absolute',
         top: 0,
         left: 0,
-        borderRadius: 30, // Match container radius
+        borderRadius: isAndroid ? 29 : 30, // Match container radius
     },
     tabItem: {
         flex: 1,

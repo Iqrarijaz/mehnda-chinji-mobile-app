@@ -1,5 +1,5 @@
-import { BUSINESS_QUERY_KEYS, REGISTER_BUSINESS, UPDATE_BUSINESS } from '@/apis/business';
-import { ThemedText } from '@/components/themed-text';
+import { BUSINESS_QUERY_KEYS, registerBusiness, updateBusiness } from '@/apis/business';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -19,8 +19,8 @@ import {
     View
 } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { ProfessionPicker } from '../common/ProfessionPicker';
-import { toastConfig } from '../ToastConfig';
+import { ProfessionPicker } from '../common/professionPicker';
+import { toastConfig } from '../toastConfig';
 
 interface BusinessRegistrationModalProps {
     visible: boolean;
@@ -88,7 +88,7 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
     };
 
     const registerMutation = useMutation({
-        mutationFn: REGISTER_BUSINESS,
+        mutationFn: registerBusiness,
         onSuccess: (res) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
@@ -111,7 +111,7 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
     });
 
     const updateMutation = useMutation({
-        mutationFn: UPDATE_BUSINESS,
+        mutationFn: updateBusiness,
         onSuccess: (res) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
@@ -134,12 +134,22 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
     });
 
     const handleRegister = async () => {
-        const { name, category, phone, description, address } = data;
-        if (!name || !category || !phone) {
+        const { name, category, phone, address, description } = data;
+
+        if (!name || !category || !phone || !address || !description) {
             Toast.show({
                 type: 'error',
                 text1: 'Fields Required',
                 text2: 'Please fill in all required fields.',
+            });
+            return;
+        }
+
+        if (phone.length !== 11) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Phone',
+                text2: 'Phone number must be exactly 11 characters.',
             });
             return;
         }
@@ -153,11 +163,29 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
             return;
         }
 
-        if (description.length > 100) {
+        if (address.length > 40) {
+            Toast.show({
+                type: 'error',
+                text1: 'Address Too Long',
+                text2: 'Address cannot exceed 40 characters.',
+            });
+            return;
+        }
+
+        if (description.length < 50) {
+            Toast.show({
+                type: 'error',
+                text1: 'Description Too Short',
+                text2: 'Description must be at least 50 characters.',
+            });
+            return;
+        }
+
+        if (description.length > 200) {
             Toast.show({
                 type: 'error',
                 text1: 'Description Too Long',
-                text2: 'Description cannot exceed 100 characters.',
+                text2: 'Description cannot exceed 200 characters.',
             });
             return;
         }
@@ -215,7 +243,7 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                     <ThemedText style={[styles.label, { color: colors.text }]}>
                                         BUSINESS NAME <ThemedText style={styles.required}>*</ThemedText>
                                     </ThemedText>
-                                    <ThemedText style={[styles.charCount, data.name.length > 30 ? { color: '#ef4444' } : { color: colors.icon }]}>
+                                    <ThemedText style={[styles.charCount, data.name.length > 30 ? { color: '#EF4444' } : { color: colors.icon }]}>
                                         {data.name.length}/30
                                     </ThemedText>
                                 </View>
@@ -253,7 +281,14 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
 
                             {/* Address Input */}
                             <View style={styles.inputField}>
-                                <ThemedText style={[styles.label, { color: colors.text }]}> ADDRESS</ThemedText>
+                                <View style={styles.labelContainer}>
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                        ADDRESS <ThemedText style={styles.required}>*</ThemedText>
+                                    </ThemedText>
+                                    <ThemedText style={[styles.charCount, data.address.length > 40 ? { color: '#EF4444' } : { color: colors.icon }]}>
+                                        {data.address.length}/40
+                                    </ThemedText>
+                                </View>
                                 <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
                                     <Ionicons name="location" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
@@ -263,15 +298,21 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                         value={data.address}
                                         onChangeText={(val) => handleInputChange('address', val)}
                                         autoCapitalize="words"
+                                        maxLength={40}
                                     />
                                 </View>
                             </View>
 
                             {/* Phone Input */}
                             <View style={styles.inputField}>
-                                <ThemedText style={[styles.label, { color: colors.text }]}>
-                                    CONTACT PHONE <ThemedText style={styles.required}>*</ThemedText>
-                                </ThemedText>
+                                <View style={styles.labelContainer}>
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                        CONTACT PHONE <ThemedText style={styles.required}>*</ThemedText>
+                                    </ThemedText>
+                                    <ThemedText style={[styles.charCount, data.phone.length > 0 && data.phone.length !== 11 ? { color: '#EF4444' } : { color: colors.icon }]}>
+                                        {data.phone.length}/11
+                                    </ThemedText>
+                                </View>
                                 <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
                                     <Ionicons name="call" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
@@ -281,16 +322,18 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                         value={data.phone}
                                         onChangeText={(val) => handleInputChange('phone', val)}
                                         keyboardType="phone-pad"
+                                        maxLength={11}
                                     />
                                 </View>
                             </View>
 
-                            {/* Description */}
                             <View style={styles.inputField}>
                                 <View style={styles.labelContainer}>
-                                    <ThemedText style={[styles.label, { color: colors.text }]}>DESCRIPTION / SERVICES</ThemedText>
-                                    <ThemedText style={[styles.charCount, data.description.length > 100 ? { color: '#ef4444' } : { color: colors.icon }]}>
-                                        {data.description.length}/100
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                        DESCRIPTION / SERVICES <ThemedText style={styles.required}>*</ThemedText>
+                                    </ThemedText>
+                                    <ThemedText style={[styles.charCount, (data.description.length > 0 && data.description.length < 50) || data.description.length > 200 ? { color: '#EF4444' } : { color: colors.icon }]}>
+                                        {data.description.length}/200
                                     </ThemedText>
                                 </View>
                                 <View style={[styles.inputBox, styles.textArea, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
@@ -302,7 +345,7 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                         onChangeText={(val) => handleInputChange('description', val)}
                                         multiline
                                         numberOfLines={4}
-                                        maxLength={100}
+                                        maxLength={200}
                                     />
                                 </View>
                             </View>
@@ -313,14 +356,14 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                 disabled={isPending}
                             >
                                 <LinearGradient
-                                    colors={['#004030', '#004030']}
+                                    colors={[colors.primary, colors.primary]}
                                     style={styles.gradientBtn}
                                 >
                                     {isPending ? (
                                         <ActivityIndicator size="small" color="#FFFFFF" />
                                     ) : (
                                         <ThemedText style={styles.btnText}>
-                                            {editData ? 'UPDATE BUSINESS' : 'SUBMIT REGISTRATION'}
+                                            {editData ? 'UPDATE' : 'REGISTER'}
                                         </ThemedText>
                                     )}
                                 </LinearGradient>

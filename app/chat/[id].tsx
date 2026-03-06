@@ -1,7 +1,8 @@
-import { BLOCK_CONVERSATION, GET_CONVERSATION_DETAILS, GET_MESSAGES, MARK_MESSAGES_SEEN, SEND_MESSAGE, UNBLOCK_CONVERSATION } from '@/apis/chat/chat';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { GlassConfirmationModal } from '@/components/ui/GlassConfirmationModal';
+import { blockConversation, getConversationDetails, getMessages, markMessagesSeen, sendMessage, unblockConversation } from '@/apis/chat/chat';
+import { ThemedText } from '@/components/themedText';
+import { ThemedView } from '@/components/themedView';
+import Avatar from '@/components/ui/avatar';
+import { GlassConfirmationModal } from '@/components/ui/glassConfirmationModal';
 import { baseUrl } from '@/configs';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -15,7 +16,6 @@ import {
     ActivityIndicator,
     Alert,
     FlatList,
-    Image,
     KeyboardAvoidingView,
     Platform,
     StyleSheet,
@@ -60,8 +60,10 @@ const MessageItem = React.memo(({ item, currentUserId, isDark, userProfileImage 
             isMyMessage ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }
         ]}>
             {!isMyMessage && (
-                <Image
-                    source={(typeof item.sender === 'object' && item.sender?.profileImage) ? { uri: item.sender.profileImage } : require('../../assets/icons/user-male.png')}
+                <Avatar
+                    uri={(typeof item.sender === 'object' && item.sender?.profileImage) ? item.sender.profileImage : undefined}
+                    name={typeof item.sender === 'object' ? item.sender?.name : undefined}
+                    size={28}
                     style={styles.messageAvatar}
                 />
             )}
@@ -83,8 +85,10 @@ const MessageItem = React.memo(({ item, currentUserId, isDark, userProfileImage 
                 </View>
             </View>
             {isMyMessage && (
-                <Image
-                    source={userProfileImage ? { uri: userProfileImage } : require('../../assets/icons/user-male.png')}
+                <Avatar
+                    uri={userProfileImage}
+                    name="Me"
+                    size={28}
                     style={[styles.messageAvatar, { marginRight: 0, marginLeft: 8 }]}
                 />
             )}
@@ -143,7 +147,7 @@ export default function ChatScreen() {
         queryKey: ['conversationDetails', id],
         queryFn: async () => {
             if (!id) return null;
-            const res = await GET_CONVERSATION_DETAILS(id as string);
+            const res = await getConversationDetails(id as string);
             if (res.success) {
                 const blockedBy = res.data.blockedBy || [];
                 setIsBlocked(blockedBy.length > 0);
@@ -158,7 +162,7 @@ export default function ChatScreen() {
     const { data: messages = [], isLoading } = useQuery({
         queryKey: ['messages', id],
         queryFn: async () => {
-            const res = await GET_MESSAGES(id as string);
+            const res = await getMessages(id as string);
             return res.success ? res.data.reverse() : [];
         },
         enabled: !!id,
@@ -193,7 +197,7 @@ export default function ChatScreen() {
 
                     const senderId = typeof data.message.sender === 'string' ? data.message.sender : data.message.sender._id;
                     if (senderId !== userId) {
-                        MARK_MESSAGES_SEEN(id as string);
+                        markMessagesSeen(id as string);
                     }
                 }
             });
@@ -215,7 +219,7 @@ export default function ChatScreen() {
         }
 
         if (id) {
-            MARK_MESSAGES_SEEN(id as string);
+            markMessagesSeen(id as string);
         }
 
         return () => {
@@ -233,7 +237,7 @@ export default function ChatScreen() {
         setSending(true);
 
         try {
-            const res = await SEND_MESSAGE(id as string, text, 'text');
+            const res = await sendMessage(id as string, text, 'text');
             if (res.success) {
                 queryClient.setQueryData(['messages', id], (oldData: Message[] | undefined) => {
                     if (!oldData) return [res.data];
@@ -266,7 +270,7 @@ export default function ChatScreen() {
                 onConfirm: async () => {
                     setModalVisible(false);
                     try {
-                        const res = await UNBLOCK_CONVERSATION(id as string);
+                        const res = await unblockConversation(id as string);
                         if (res.success) {
                             setBlockedByMe(false);
                             queryClient.invalidateQueries({ queryKey: ['conversationDetails', id] });
@@ -286,7 +290,7 @@ export default function ChatScreen() {
                 onConfirm: async () => {
                     setModalVisible(false);
                     try {
-                        const res = await BLOCK_CONVERSATION(id as string);
+                        const res = await blockConversation(id as string);
                         if (res.success) {
                             setBlockedByMe(true);
                             setIsBlocked(true);
@@ -334,8 +338,10 @@ export default function ChatScreen() {
                             </TouchableOpacity>
 
                             <View style={styles.headerInfo}>
-                                <Image
-                                    source={profileImage ? { uri: profileImage as string } : require('../../assets/icons/user-male.png')}
+                                <Avatar
+                                    uri={profileImage as string}
+                                    name={name as string}
+                                    size={36}
                                     style={styles.headerAvatar}
                                 />
                                 <ThemedText style={styles.headerName} numberOfLines={1}>
@@ -486,7 +492,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
-        elevation: 2,
     },
     receivedBubble: {
         backgroundColor: 'rgba(148, 163, 184, 0.2)',
@@ -497,7 +502,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
         shadowRadius: 2,
-        elevation: 1,
     },
     messageText: {
         fontSize: 16,

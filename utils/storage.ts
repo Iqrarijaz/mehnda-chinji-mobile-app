@@ -1,34 +1,84 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+// import { MMKV } from 'react-native-mmkv';
 
-// Fallback storage implementation
-const createStorage = () => {
+// Check if we can use MMKV (fails in Expo Go)
+const isMMKVAvailable = () => {
+    /*
     try {
-        return new MMKV();
+        const test = new MMKV();
+        return true;
     } catch (e) {
-        console.warn('Failed to initialize MMKV. Using in-memory fallback. IF YOU ARE IN DEV, REBUILD YOUR APP.');
-        return {
-            getString: () => null,
-            set: () => { },
-            delete: () => { },
-            clearAll: () => { },
-            // Add other methods as needed to satisfy interface or usage
-        };
+        return false;
     }
+    */
+    return false;
 };
 
-export const storage = createStorage();
+const mmkv = null; // isMMKVAvailable() ? new MMKV() : null;
 
+if (!mmkv) {
+    // console.warn('MMKV is not available (likely Expo Go). Falling back to AsyncStorage.');
+}
+
+/**
+ * Enhanced clientStorage that works with React Query's persister
+ * and handles the MMKV/AsyncStorage fallback.
+ */
 export const clientStorage = {
-    setItem: (key: string, value: string) => {
-        storage.set(key, value);
-        return Promise.resolve(true);
+    setItem: async (key: string, value: string) => {
+        if (mmkv) {
+            mmkv.set(key, value);
+        } else {
+            await AsyncStorage.setItem(key, value);
+        }
+        return true;
     },
-    getItem: (key: string) => {
-        const value = storage.getString(key);
-        return Promise.resolve(value);
+    getItem: async (key: string) => {
+        if (mmkv) {
+            return mmkv.getString(key) || null;
+        } else {
+            return await AsyncStorage.getItem(key);
+        }
     },
-    removeItem: (key: string) => {
-        storage.delete(key);
-        return Promise.resolve();
+    removeItem: async (key: string) => {
+        if (mmkv) {
+            mmkv.delete(key);
+        } else {
+            await AsyncStorage.removeItem(key);
+        }
+    },
+};
+
+/**
+ * Secure storage for sensitive data like auth tokens.
+ */
+export const secureStorage = {
+    setItem: async (key: string, value: string) => {
+        try {
+            await SecureStore.setItemAsync(key, value);
+            return true;
+        } catch (e) {
+            console.error(`[SecureStorage] Failed to set item: ${key}`, e);
+            return false;
+        }
+    },
+    getItem: async (key: string) => {
+        try {
+            return await SecureStore.getItemAsync(key);
+        } catch (e) {
+            console.error(`[SecureStorage] Failed to get item: ${key}`, e);
+            return null;
+        }
+    },
+    removeItem: async (key: string) => {
+        try {
+            await SecureStore.deleteItemAsync(key);
+            return true;
+        } catch (e) {
+            console.error(`[SecureStorage] Failed to remove item: ${key}`, e);
+            return false;
+        }
     },
 };
 
@@ -36,23 +86,29 @@ export const StorageKeys = {
     CONVERSATIONS: 'conversations_cache',
 };
 
-export const getStorageData = <T>(key: string): T | null => {
+/**
+ * Async helper to get parsed data from storage
+ */
+export const getStorageData = async <T>(key: string): Promise<T | null> => {
     try {
-        const json = storage.getString(key);
-        if (json) {
-            return JSON.parse(json);
+        const value = await clientStorage.getItem(key);
+        if (value) {
+            return JSON.parse(value);
         }
         return null;
     } catch (e) {
-        console.error('Failed to get storage data', e);
+        console.error(`[Storage] Failed to get data for key: ${key}`, e);
         return null;
     }
 };
 
-export const setStorageData = (key: string, value: any) => {
+/**
+ * Async helper to set stringified data in storage
+ */
+export const setStorageData = async (key: string, value: any) => {
     try {
-        storage.set(key, JSON.stringify(value));
+        await clientStorage.setItem(key, JSON.stringify(value));
     } catch (e) {
-        console.error('Failed to set storage data', e);
+        console.error(`[Storage] Failed to set data for key: ${key}`, e);
     }
 };

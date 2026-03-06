@@ -12,7 +12,7 @@ import {
 
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemedText } from '../themed-text';
+import { ThemedText } from '../themedText';
 
 interface Option {
     label: string;

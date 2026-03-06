@@ -1,32 +1,44 @@
 import { AUTH_QUERY_KEYS } from '@/apis/login';
-import { DELETE_PROFILE_IMAGE, UPDATE_PROFILE, UPLOAD_PROFILE_IMAGE } from '@/apis/profile';
-import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
-import { SearchableDropdown } from '@/components/common/SearchableDropdown';
-import { ThemedText } from '@/components/themed-text';
+import { updateProfile, uploadProfileImage, deleteProfileImage } from '@/apis/profile';
+import { SearchableDropdown } from '@/components/common/searchableDropdown';
+import { ProfileProgress } from '@/components/profile/ProfileProgress';
+import { ThemedText } from '@/components/themedText';
+import Avatar from '@/components/ui/avatar';
+import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import citiesData from '@/data/cities.json';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
-    Image,
     KeyboardAvoidingView,
-    Modal,
     Platform,
-    Pressable,
     ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
+import { ErrorBoundary } from '@/components/common/errorBoundary';
+import Animated, {
+
+    FadeInDown,
+    FadeInUp,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 export default function ProfileScreen() {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const { user, updateUser } = useAuth();
     const router = useRouter();
     const insets = useSafeAreaInsets();
@@ -34,39 +46,86 @@ export default function ProfileScreen() {
 
     const [formData, setFormData] = useState({
         name: '',
+        email: '',
         phone: '',
+        gender: '',
         city: '',
         village: '',
+        emailVerified: false,
+        otpVerified: false,
     });
 
     const [cityPickerVisible, setCityPickerVisible] = useState(false);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
+    const [isModified, setIsModified] = useState(false);
+
+    const buttonScale = useSharedValue(1);
 
     useEffect(() => {
         if (user?.user) {
-            setFormData({
+            const initialData = {
                 name: user.user.name || '',
+                email: user.user.email || '',
                 phone: user.user.phone || '',
+                gender: user.user.gender || '',
                 city: user.user.city || '',
                 village: user.user.village || '',
-            });
+                emailVerified: user.user.emailVerified || false,
+                otpVerified: user.user.otpVerified || false,
+            };
+            setFormData(initialData);
         }
     }, [user]);
 
+    // Check for modifications to enable save button
+    useEffect(() => {
+        if (!user?.user) return;
+        const currentData = {
+            name: user.user.name || '',
+            email: user.user.email || '',
+            phone: user.user.phone || '',
+            gender: user.user.gender || '',
+            city: user.user.city || '',
+            village: user.user.village || '',
+            emailVerified: user.user.emailVerified || false,
+            otpVerified: user.user.otpVerified || false,
+        };
+        const hasChanges = JSON.stringify(formData) !== JSON.stringify(currentData);
+        setIsModified(hasChanges);
+    }, [formData, user]);
+
+    const calculatePercentage = () => {
+        let pct = 50;
+        if (formData.gender && formData.gender !== 'N/A') pct += 5;
+        if (formData.city) pct += 5;
+        if (formData.village) pct += 5;
+        if (user?.user?.isBusiness) pct += 25;
+        // Simplified mapping for UI (Donor logic might need backend fetch or flag)
+        if (user?.user?.isDonor) pct += 10;
+        return Math.min(pct, 100);
+    };
+
+    const remainingFields = () => {
+        let count = 0;
+        if (!formData.gender || formData.gender === 'N/A') count++;
+        if (!formData.city) count++;
+        if (!formData.village) count++;
+        return count;
+    };
+
     const profileMutation = useMutation({
-        mutationFn: UPDATE_PROFILE,
+        mutationFn: updateProfile,
         onSuccess: async (response) => {
-            if (response.user) {
-                await updateUser(response.user);
+            if (response) {
+                await updateUser(response);
                 queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success!',
+                    text2: 'Profile updated successfully',
+                });
             }
-            Toast.show({
-                type: 'success',
-                text1: 'Success!',
-                text2: 'Profile updated successfully',
-            });
-            router.back();
         },
         onError: (error: any) => {
             Toast.show({
@@ -78,66 +137,108 @@ export default function ProfileScreen() {
     });
 
     const uploadImageMutation = useMutation({
-        mutationFn: UPLOAD_PROFILE_IMAGE,
+        mutationFn: uploadProfileImage,
         onSuccess: async (response) => {
-            if (response.data?.profileImage) {
-                await updateUser({ profileImage: response.data.profileImage });
+            const newUrl = response?.data?.profileImage;
+            if (newUrl) {
+                await updateUser({ profileImage: newUrl });
                 queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
-                Toast.show({
-                    type: 'success',
-                    text1: 'Success',
-                    text2: 'Profile image updated',
-                });
+                Toast.show({ type: 'success', text1: 'Success', text2: 'Profile image updated' });
             }
         },
         onError: (error: any) => {
-            Toast.show({
-                type: 'error',
-                text1: 'Upload Failed',
-                text2: error?.response?.data?.message || 'Failed to upload image',
-            });
+            Toast.show({ type: 'error', text1: 'Upload Failed', text2: 'Failed to upload image' });
         }
     });
 
+    const pickImage = async () => {
+        // Request media library permissions
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (status !== 'granted') {
+            Toast.show({
+                type: 'error',
+                text1: 'Permission Denied',
+                text2: 'We need gallery permissions to update your profile picture.'
+            });
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: 'images',
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.7,
+        });
+
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+            const asset = result.assets[0];
+            const formData = new FormData();
+
+            // Extract file extension
+            const uriParts = asset.uri.split('.');
+            const fileType = uriParts[uriParts.length - 1];
+
+            const file: any = {
+                uri: asset.uri,
+                name: `profile_${user?.user?.id || Date.now()}.${fileType}`,
+                type: `image/${fileType}`,
+            };
+
+            formData.append('image', file);
+            uploadImageMutation.mutate(formData);
+        }
+    };
+
     const deleteImageMutation = useMutation({
-        mutationFn: DELETE_PROFILE_IMAGE,
+        mutationFn: deleteProfileImage,
         onSuccess: async () => {
             await updateUser({ profileImage: null });
             queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
-            Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Profile image removed',
-            });
+            Toast.show({ type: 'success', text1: 'Success', text2: 'Profile image removed' });
         },
         onError: (error: any) => {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: error?.response?.data?.message || 'Failed to remove image',
+                text2: error.response?.data?.message || 'Failed to remove image'
             });
         }
     });
 
-    const loading = profileMutation.isPending || uploadImageMutation.isPending || deleteImageMutation.isPending;
-
-    const getProfileSource = () => {
-        if (user?.user?.profileImage) {
-            return { uri: user.user.profileImage };
-        }
-        const gender = user?.user?.gender?.toUpperCase();
-        if (gender === 'FEMALE') {
-            return require('@/assets/icons/user-female.png');
-        }
-        return require('@/assets/icons/user-male.png');
-    };
-
     const handleUpdate = () => {
+        buttonScale.value = withSpring(0.9, { damping: 10 }, () => {
+            buttonScale.value = withSpring(1);
+        });
+
         if (!formData.name || !formData.phone || !formData.city) {
+            Toast.show({ type: 'error', text1: 'Required', text2: 'Name, Phone and City are required' });
+            return;
+        }
+
+        // Phone validation logic
+        const cleanPhone = formData.phone.replace(/[^\d+]/g, '');
+        let isValid = false;
+        let errorMsg = '';
+
+        if (cleanPhone.startsWith('03')) {
+            isValid = cleanPhone.length === 11;
+            errorMsg = 'Phone starting with 03 must be 11 digits';
+        } else if (cleanPhone.startsWith('+92')) {
+            isValid = cleanPhone.length === 13;
+            errorMsg = 'Phone starting with +92 must be 13 characters';
+        } else {
+            // Generic international validation
+            const phoneRegex = /^\+(?:[0-9] ?){1,4}[0-9]{4,15}$/;
+            isValid = phoneRegex.test(cleanPhone) && cleanPhone.length >= 8;
+            errorMsg = 'Invalid phone format. Use +[country code][number]';
+        }
+
+        if (!isValid) {
             Toast.show({
                 type: 'error',
-                text1: 'Required Fields',
-                text2: 'Please fill name, phone and city',
+                text1: 'Invalid Phone',
+                text2: errorMsg
             });
             return;
         }
@@ -145,357 +246,253 @@ export default function ProfileScreen() {
         profileMutation.mutate(formData);
     };
 
-    const handleImagePick = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-            Toast.show({
-                type: 'error',
-                text1: 'Permission Required',
-                text2: 'We need camera roll permissions to change profile picture',
-            });
-            return;
-        }
-
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 0.8,
-        });
-
-        if (!result.canceled) {
-            const asset = result.assets[0];
-            const formData = new FormData();
-
-            // @ts-ignore
-            formData.append('image', {
-                uri: asset.uri,
-                type: asset.mimeType || 'image/jpeg',
-                name: asset.fileName || `profile_${Date.now()}.jpg`,
-            });
-
-            uploadImageMutation.mutate(formData);
-        }
+    const handleBack = () => {
+        if (router.canGoBack()) router.back();
+        else router.replace('/(tabs)');
     };
 
-    const handleDeleteImage = () => {
-        setDeleteModalVisible(false);
-        deleteImageMutation.mutate();
-    };
+    const animatedButtonStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: buttonScale.value }]
+    }));
 
     return (
-        <View style={styles.container}>
-            {/* Custom Header */}
-            <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-                <View style={styles.headerContent}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <ThemedText style={styles.headerTitle}>Edit Profile</ThemedText>
-                    <View style={{ width: 24 }} />
-                </View>
-            </View>
+        <ErrorBoundary>
+            <View style={[styles.container, { backgroundColor: theme === 'dark' ? '#0F172A' : '#F5F6FA' }]}>
+                {/* Animated Header */}
+                <Animated.View entering={FadeInUp.duration(600)} style={styles.header}>
+                    <LinearGradient
+                        colors={[colors.primary, '#0D9488']}
+                        style={StyleSheet.absoluteFill}
+                    />
+                    <View style={[styles.headerTop, { paddingTop: insets.top + 10 }]}>
+                        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
+                        <ThemedText style={styles.headerTitle}>Update Profile</ThemedText>
+                        <View style={{ width: 44 }} />
+                    </View>
 
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                style={{ flex: 1 }}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-            >
-                <ScrollView
-                    style={{ flex: 1 }}
-                    contentContainerStyle={styles.scrollContent}
-                    keyboardShouldPersistTaps="handled"
-                    showsVerticalScrollIndicator={false}
-                >
-                    {/* Profile Image Section */}
-                    <View style={styles.avatarSection}>
+                    <View style={styles.avatarContainer}>
                         <View style={styles.imageWrapper}>
                             {uploadImageMutation.isPending ? (
-                                <View style={[styles.profileImage, styles.loaderOverlay]}>
-                                    <ActivityIndicator size="large" color="#004030" />
+                                <View style={styles.loaderOverlay}>
+                                    <ActivityIndicator color="#FFFFFF" />
                                 </View>
                             ) : (
-                                <TouchableOpacity
-                                    activeOpacity={0.9}
-                                    onPress={() => setPreviewVisible(true)}
-                                    disabled={!user?.user?.profileImage}
-                                >
-                                    <Image
-                                        source={getProfileSource()}
-                                        style={styles.profileImage}
-                                        resizeMode="cover"
-                                    />
+                                <TouchableOpacity activeOpacity={0.9} onPress={() => setPreviewVisible(true)}>
+                                    <Avatar uri={user?.user?.profileImage} name={user?.user?.name} size={80} style={styles.avatar} />
                                 </TouchableOpacity>
                             )}
-                            <TouchableOpacity
-                                style={styles.cameraButton}
-                                onPress={handleImagePick}
-                                disabled={loading}
-                            >
-                                <Ionicons name="camera" size={18} color="#FFFFFF" />
+                            <TouchableOpacity style={styles.cameraIcon} onPress={pickImage}>
+                                <Ionicons name="camera" size={16} color="#FFFFFF" />
                             </TouchableOpacity>
 
                             {user?.user?.profileImage && !uploadImageMutation.isPending && (
                                 <TouchableOpacity
-                                    style={styles.deleteButton}
-                                    onPress={() => setDeleteModalVisible(true)}
-                                    disabled={loading}
+                                    style={styles.deleteIcon}
+                                    onPress={() => deleteImageMutation.mutate()}
+                                    disabled={deleteImageMutation.isPending}
                                 >
-                                    <Ionicons name="trash" size={16} color="#FFFFFF" />
+                                    {deleteImageMutation.isPending ? (
+                                        <ActivityIndicator size="small" color="#FFFFFF" />
+                                    ) : (
+                                        <Ionicons name="trash" size={14} color="#FFFFFF" />
+                                    )}
                                 </TouchableOpacity>
                             )}
                         </View>
-                        {/* <ThemedText style={styles.userName}>{user?.user?.name || 'User'}</ThemedText>
-                        <ThemedText style={styles.userEmail}>{user?.user?.email || ''}</ThemedText> */}
                     </View>
+                    <ThemedText style={styles.welcomeText}>Complete Your Profile</ThemedText>
+                    <ThemedText style={styles.subtitleText}>Maintain your profile for better community trust</ThemedText>
+                </Animated.View>
 
-                    {/* Form Fields */}
-                    <View style={styles.form}>
-                        {/* Name */}
-                        <View style={styles.inputGroup}>
-                            <ThemedText style={styles.label}>Full Name</ThemedText>
-                            <View style={styles.inputContainer}>
-                                <Ionicons name="person-outline" size={20} color="#64748B" style={styles.inputIcon} />
-                                <TextInput
-                                    value={formData.name}
-                                    onChangeText={(val) => setFormData(prev => ({ ...prev, name: val }))}
-                                    style={styles.input}
-                                    placeholder="Enter full name"
-                                    placeholderTextColor="#94A3B8"
-                                />
-                            </View>
-                        </View>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+                    keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 0}
+                    style={{ flex: 1 }}
+                >
+                    <ScrollView
+                        contentContainerStyle={[
+                            styles.scrollContent,
+                            { paddingBottom: Platform.OS === 'android' ? 160 : 140 }
+                        ]}
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                    >
 
-                        {/* Phone & Gender Row */}
-                        <View style={styles.row}>
-                            <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
-                                <ThemedText style={styles.label}>Phone</ThemedText>
-                                <View style={[styles.inputContainer, { backgroundColor: '#F1F5F9' }]}>
-                                    <Ionicons name="call-outline" size={20} color="#64748B" style={styles.inputIcon} />
+                        {/* Progress Component */}
+                        <Animated.View entering={FadeInDown.delay(200).duration(600)}>
+                            <ProfileProgress percentage={calculatePercentage()} remainingFields={remainingFields()} />
+                        </Animated.View>
+
+                        {/* Form Sections */}
+                        <View style={styles.formContainer}>
+
+                            {/* Name Field */}
+                            <Animated.View entering={FadeInDown.delay(300)} style={styles.fieldCard}>
+                                <ThemedText style={styles.fieldLabel}>Full Name</ThemedText>
+                                <View style={styles.inputWrapper}>
+                                    <Ionicons name="person-outline" size={20} color="#94A3B8" />
                                     <TextInput
-                                        value={formData.phone}
+                                        value={formData.name}
+                                        onChangeText={(val) => setFormData(p => ({ ...p, name: val }))}
+                                        style={styles.input}
+                                        placeholder="Enter your name"
+                                    />
+                                </View>
+                            </Animated.View>
+
+                            {/* Email Field (ReadOnly) */}
+                            <Animated.View entering={FadeInDown.delay(350)} style={[styles.fieldCard, { backgroundColor: '#F8FAFC' }]}>
+                                <View style={styles.labelRow}>
+                                    <ThemedText style={styles.fieldLabel}>Email Address</ThemedText>
+                                    <View style={[styles.badge, formData.emailVerified ? styles.verifiedBadge : styles.unverifiedBadge]}>
+                                        <Ionicons name={formData.emailVerified ? "checkmark-circle" : "alert-circle"} size={12} color={formData.emailVerified ? "#10B981" : "#F59E0B"} />
+                                        <ThemedText style={[styles.badgeText, { color: formData.emailVerified ? "#10B981" : "#F59E0B" }]}>
+                                            {formData.emailVerified ? "Verified" : "Unverified"}
+                                        </ThemedText>
+                                    </View>
+                                </View>
+                                <View style={styles.inputWrapper}>
+                                    <Ionicons name="mail-outline" size={20} color="#94A3B8" />
+                                    <TextInput
+                                        value={formData.email}
                                         editable={false}
                                         style={[styles.input, { color: '#64748B' }]}
                                     />
+                                    <Ionicons name="lock-closed-outline" size={16} color="#94A3B8" />
                                 </View>
-                            </View>
+                            </Animated.View>
 
-                            <View style={[styles.inputGroup, { flex: 1 }]}>
-                                <ThemedText style={styles.label}>Gender</ThemedText>
-                                <View style={[styles.inputContainer, { backgroundColor: '#F1F5F9' }]}>
-                                    <Ionicons name="male-female-outline" size={20} color="#64748B" style={styles.inputIcon} />
+                            {/* Phone Field */}
+                            <Animated.View entering={FadeInDown.delay(400)} style={styles.fieldCard}>
+                                <View style={styles.labelRow}>
+                                    <ThemedText style={styles.fieldLabel}>Phone Number</ThemedText>
+                                    <View style={[styles.badge, formData.otpVerified ? styles.verifiedBadge : styles.unverifiedBadge]}>
+                                        <Ionicons name={formData.otpVerified ? "checkmark-circle" : "alert-circle"} size={12} color={formData.otpVerified ? "#10B981" : "#F59E0B"} />
+                                        <ThemedText style={[styles.badgeText, { color: formData.otpVerified ? "#10B981" : "#F59E0B" }]}>
+                                            {formData.otpVerified ? "Verified" : "Unverified"}
+                                        </ThemedText>
+                                    </View>
+                                </View>
+                                <View style={styles.inputWrapper}>
+                                    <Ionicons name="call-outline" size={20} color="#94A3B8" />
                                     <TextInput
-                                        value={user?.user?.gender || 'N/A'}
-                                        editable={false}
-                                        style={[styles.input, { textTransform: 'capitalize', color: '#64748B' }]}
+                                        value={formData.phone}
+                                        onChangeText={(val) => setFormData(p => ({ ...p, phone: val }))}
+                                        style={styles.input}
+                                        placeholder="+923001234567"
+                                        keyboardType="phone-pad"
                                     />
                                 </View>
+                            </Animated.View>
+
+                            {/* Gender Selector */}
+                            <Animated.View entering={FadeInDown.delay(450)} style={styles.fieldCard}>
+                                <ThemedText style={styles.fieldLabel}>Gender</ThemedText>
+                                <View style={styles.genderRow}>
+                                    <TouchableOpacity
+                                        onPress={() => setFormData(p => ({ ...p, gender: 'MALE' }))}
+                                        style={[styles.genderPill, formData.gender?.toUpperCase() === 'MALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                                    >
+                                        <Ionicons name="male" size={18} color={formData.gender?.toUpperCase() === 'MALE' ? '#FFF' : '#64748B'} />
+                                        <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'MALE' && { color: '#FFF' }]}>Male</ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => setFormData(p => ({ ...p, gender: 'FEMALE' }))}
+                                        style={[styles.genderPill, formData.gender?.toUpperCase() === 'FEMALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                                    >
+                                        <Ionicons name="female" size={18} color={formData.gender?.toUpperCase() === 'FEMALE' ? '#FFF' : '#64748B'} />
+                                        <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'FEMALE' && { color: '#FFF' }]}>Female</ThemedText>
+                                    </TouchableOpacity>
+                                </View>
+                            </Animated.View>
+
+                            {/* City Picker */}
+                            <Animated.View entering={FadeInDown.delay(500)} style={styles.fieldCard}>
+                                <ThemedText style={styles.fieldLabel}>City</ThemedText>
+                                <TouchableOpacity onPress={() => setCityPickerVisible(true)} style={styles.inputWrapper}>
+                                    <Ionicons name="location-outline" size={20} color="#94A3B8" />
+                                    <ThemedText style={styles.inputText}>{formData.city || "Select your city"}</ThemedText>
+                                    <Ionicons name="chevron-down" size={18} color="#94A3B8" />
+                                </TouchableOpacity>
+                            </Animated.View>
+
+                            {/* Village Field */}
+                            <Animated.View entering={FadeInDown.delay(550)} style={styles.fieldCard}>
+                                <ThemedText style={styles.fieldLabel}>Village / Town</ThemedText>
+                                <View style={styles.inputWrapper}>
+                                    <Ionicons name="business-outline" size={20} color="#94A3B8" />
+                                    <TextInput
+                                        value={formData.village}
+                                        onChangeText={(val) => setFormData(p => ({ ...p, village: val }))}
+                                        style={styles.input}
+                                        placeholder="Enter your village/town"
+                                    />
+                                </View>
+                            </Animated.View>
+
+                            {/* Why complete profile? */}
+                            <View style={styles.infoTip}>
+                                <Ionicons name="information-circle-outline" size={16} color="#64748B" />
+                                <ThemedText style={styles.infoText}>A complete profile helps other community members find you more easily.</ThemedText>
                             </View>
                         </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
 
-                        {/* City */}
-                        <View style={styles.inputGroup}>
-                            <ThemedText style={styles.label}>City</ThemedText>
-                            <TouchableOpacity
-                                onPress={() => setCityPickerVisible(true)}
-                                style={styles.inputContainer}
-                            >
-                                <Ionicons name="location-outline" size={20} color="#64748B" style={styles.inputIcon} />
-                                <ThemedText style={[styles.input, { height: undefined, verticalAlign: 'middle' }]}>
-                                    {formData.city || "Select City"}
-                                </ThemedText>
-                                <Ionicons name="chevron-down" size={20} color="#64748B" style={{ marginRight: 10 }} />
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* Village */}
-                        <View style={styles.inputGroup}>
-                            <ThemedText style={styles.label}>Village (Optional)</ThemedText>
-                            <View style={styles.inputContainer}>
-                                <Ionicons name="home-outline" size={20} color="#64748B" style={styles.inputIcon} />
-                                <TextInput
-                                    value={formData.village}
-                                    onChangeText={(val) => setFormData(prev => ({ ...prev, village: val }))}
-                                    style={styles.input}
-                                    placeholder="Enter village name"
-                                    placeholderTextColor="#94A3B8"
-                                />
-                            </View>
-                        </View>
-
-                        {/* Save Button */}
+                {/* Sticky Footer Button */}
+                <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+                    <Animated.View style={animatedButtonStyle}>
                         <TouchableOpacity
-                            style={[styles.saveButton, loading && { opacity: 0.7 }]}
+                            style={[styles.updateButton, !isModified && { opacity: 0.6 }]}
                             onPress={handleUpdate}
-                            disabled={loading}
+                            disabled={!isModified || profileMutation.isPending}
                         >
-                            {loading ? (
+                            <LinearGradient colors={['#0D9488', '#0F766E']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+                            {profileMutation.isPending ? (
                                 <ActivityIndicator color="#FFFFFF" />
                             ) : (
-                                <ThemedText style={styles.saveButtonText}>Update Profile</ThemedText>
+                                <View style={styles.buttonContent}>
+                                    <ThemedText style={styles.updateButtonText}>Update Profile</ThemedText>
+                                    <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+                                </View>
                             )}
                         </TouchableOpacity>
+                    </Animated.View>
+                </View>
 
-                    </View>
-                </ScrollView>
-            </KeyboardAvoidingView>
-
-            <SearchableDropdown
-                visible={cityPickerVisible}
-                onClose={() => setCityPickerVisible(false)}
-                onSelect={(city) => setFormData(prev => ({ ...prev, city }))}
-                currentValue={formData.city}
-                options={citiesData}
-                title="Select City"
-                placeholder="Search city..."
-            />
-
-            <CleanConfirmationModal
-                visible={deleteModalVisible}
-                onClose={() => setDeleteModalVisible(false)}
-                onConfirm={handleDeleteImage}
-                title="Delete Profile Image"
-                message="Are you sure you want to remove your profile picture? This action cannot be undone."
-                confirmText="Delete"
-                cancelText="Keep it"
-                type="danger"
-                isLoading={deleteImageMutation.isPending}
-            />
-
-            {/* Image Preview Modal */}
-            <Modal
-                visible={previewVisible}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={() => setPreviewVisible(false)}
-            >
-                <Pressable
-                    style={styles.previewOverlay}
-                    onPress={() => setPreviewVisible(false)}
-                >
-                    <View style={styles.previewHeader}>
-                        <TouchableOpacity
-                            style={styles.closePreview}
-                            onPress={() => setPreviewVisible(false)}
-                        >
-                            <Ionicons name="close" size={28} color="#FFFFFF" />
-                        </TouchableOpacity>
-                    </View>
-                    <Pressable style={styles.previewImageContainer} onPress={(e) => e.stopPropagation()}>
-                        <Image
-                            source={getProfileSource()}
-                            style={styles.previewImage}
-                            resizeMode="contain"
-                        />
-                    </Pressable>
-                </Pressable>
-            </Modal>
-        </View>
+                <SearchableDropdown
+                    visible={cityPickerVisible}
+                    onClose={() => setCityPickerVisible(false)}
+                    onSelect={(city) => setFormData(prev => ({ ...prev, city }))}
+                    currentValue={formData.city}
+                    options={citiesData}
+                    title="Select City"
+                    placeholder="Search city..."
+                />
+            </View >
+        </ErrorBoundary>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
     },
     header: {
-        backgroundColor: '#004030',
-        paddingBottom: 24,
+        height: Platform.OS === 'android' ? 260 : 280,
         borderBottomLeftRadius: 32,
         borderBottomRightRadius: 32,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 10,
-        elevation: 5,
-        zIndex: 10,
+        overflow: 'hidden',
     },
-    headerContent: {
+    headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: '700',
-        color: '#FFFFFF',
+        paddingHorizontal: 16,
     },
     backButton: {
-        padding: 8,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        borderRadius: 12,
-    },
-    scrollContent: {
-        paddingBottom: 40,
-    },
-    avatarSection: {
-        alignItems: 'center',
-        marginTop: 24,
-        marginBottom: 32,
-    },
-    imageWrapper: {
-        position: 'relative',
-        marginBottom: 12,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    profileImage: {
-        width: 110,
-        height: 110,
-        borderRadius: 55,
-        borderWidth: 4,
-        borderColor: '#004030',
-    },
-    cameraButton: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        backgroundColor: '#004030',
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 3,
-        borderColor: '#FFFFFF',
-    },
-    deleteButton: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        backgroundColor: '#DC2626',
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#FFFFFF',
-    },
-    loaderOverlay: {
-        backgroundColor: 'rgba(255,255,255,0.7)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    previewOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    previewHeader: {
-        position: 'absolute',
-        top: 50,
-        right: 20,
-        zIndex: 10,
-    },
-    closePreview: {
         width: 44,
         height: 44,
         borderRadius: 22,
@@ -503,77 +500,208 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    previewImageContainer: {
-        width: '100%',
-        height: '80%',
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        textAlign: 'center',
+    },
+    avatarContainer: {
+        alignItems: 'center',
+        marginTop: 4,
+        marginBottom: 4,
+    },
+    imageWrapper: {
+        position: 'relative',
+        padding: 3,
+        borderRadius: 45,
+        backgroundColor: 'rgba(255,255,255,0.3)',
+    },
+    avatar: {
+        borderRadius: 40,
+        borderWidth: 2.5,
+        borderColor: '#FFFFFF',
+    },
+    cameraIcon: {
+        position: 'absolute',
+        bottom: -2,
+        right: -2,
+        backgroundColor: '#0D9488',
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#FFFFFF',
+    },
+    deleteIcon: {
+        position: 'absolute',
+        bottom: -2,
+        left: -2,
+        backgroundColor: '#EF4444',
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#FFFFFF',
+    },
+    loaderOverlay: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: 'rgba(0,0,0,0.3)',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    previewImage: {
-        width: '100%',
-        height: '100%',
+    welcomeText: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        marginTop: 6,
+        marginBottom: 6,
+        textAlign: 'center',
     },
-    userName: {
-        fontSize: 22,
-        fontWeight: '700',
-        color: '#1E293B',
-    },
-    userEmail: {
-        fontSize: 14,
-        color: '#64748B',
+    subtitleText: {
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.8)',
         marginTop: 2,
+        textAlign: 'center',
+        paddingHorizontal: 20,
     },
-    form: {
-        paddingHorizontal: 24,
+    scrollContent: {
+        paddingBottom: 140,
     },
-    inputGroup: {
-        marginBottom: 20,
+    formContainer: {
+        paddingHorizontal: 20,
+        marginTop: 20,
     },
-    label: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#334155',
+    fieldCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        padding: 10,
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+    },
+    fieldLabel: {
+        fontSize: Platform.OS === 'android' ? 11 : 13,
+        fontWeight: '700',
+        color: '#64748B',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    labelRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: 8,
-        marginLeft: 4,
     },
-    inputContainer: {
+    badge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8FAFC',
-        borderWidth: 1,
-        borderColor: '#E2E8F0',
-        borderRadius: 16,
-        height: 52,
-        paddingHorizontal: 16,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        gap: 4,
     },
-    inputIcon: {
-        marginRight: 12,
+    verifiedBadge: {
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    },
+    unverifiedBadge: {
+        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    },
+    badgeText: {
+        fontSize: 10,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+    },
+    inputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: Platform.OS === 'android' ? 44 : 48,
+        gap: 12,
     },
     input: {
         flex: 1,
-        fontSize: 15,
+        fontSize: Platform.OS === 'android' ? 14 : 16,
         color: '#1E293B',
-        height: '100%',
+        fontWeight: '500',
     },
-    row: {
+    inputText: {
+        flex: 1,
+        fontSize: Platform.OS === 'android' ? 14 : 16,
+        color: '#1E293B',
+        fontWeight: '500',
+    },
+    genderRow: {
         flexDirection: 'row',
+        gap: 12,
+        marginTop: 4,
     },
-    saveButton: {
-        backgroundColor: '#004030', // Updated to primary
-        height: 56,
-        borderRadius: 16,
+    genderPill: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: Platform.OS === 'android' ? 42 : 46,
+        borderRadius: 12,
+        borderWidth: 1.5,
+        borderColor: '#E2E8F0',
+        gap: 8,
+    },
+    genderText: {
+        fontSize: Platform.OS === 'android' ? 13 : 15,
+        fontWeight: '600',
+        color: '#64748B',
+    },
+    infoTip: {
+        flexDirection: 'row',
+        gap: 8,
+        paddingHorizontal: 8,
+        marginTop: 4,
+        alignItems: 'center',
+    },
+    infoText: {
+        fontSize: 12,
+        color: '#64748B',
+        flex: 1,
+        lineHeight: 18,
+    },
+    footer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 20,
+        backgroundColor: 'rgba(245, 246, 250, 0.95)',
+        paddingTop: Platform.OS === 'android' ? 10 : 12,
+        paddingBottom: Platform.OS === 'android' ? 10 : 12,
+    },
+    updateButton: {
+        height: Platform.OS === 'android' ? 44 : 48,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 12,
-        shadowColor: '#004030', // Updated shadow to match button
-        shadowOffset: { width: 0, height: 4 },
+        overflow: 'hidden',
+        shadowColor: '#0D9488',
+        shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.25,
         shadowRadius: 10,
-        elevation: 4,
     },
-    saveButtonText: {
-        fontSize: 16,
+    buttonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    updateButtonText: {
+        fontSize: Platform.OS === 'android' ? 14 : 15,
         fontWeight: '700',
         color: '#FFFFFF',
     }
 });
+

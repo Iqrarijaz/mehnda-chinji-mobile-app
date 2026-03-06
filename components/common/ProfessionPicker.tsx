@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     FlatList,
     Modal,
@@ -12,7 +12,7 @@ import {
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import professionsData from '../../data/professions.json';
-import { ThemedText } from '../themed-text';
+import { ThemedText } from '../themedText';
 
 interface Profession {
     name_eng: string;
@@ -121,75 +121,67 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
-        elevation: 10,
+        shadowRadius: 10,
     },
-    modalHeader: {
-        flexDirection: 'row',
+modalHeader: {
+    flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
+            alignItems: 'center',
+                marginBottom: 20,
     },
-    modalTitle: {
-        fontSize: 22,
+modalTitle: {
+    fontSize: 22,
         fontWeight: '800',
-        color: '#1E293B',
-        letterSpacing: -0.5,
+            letterSpacing: -0.5,
     },
-    closeButton: {
-        padding: 4,
-        backgroundColor: '#F1F5F9',
+closeButton: {
+    padding: 4,
         borderRadius: 20,
     },
-    searchBar: {
-        flexDirection: 'row',
+searchBar: {
+    flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8FAFC',
-        height: 52,
-        borderRadius: 14,
-        paddingHorizontal: 16,
-        marginBottom: 20,
-        borderWidth: 1,
-        borderColor: '#E2E8F0',
+            height: 52,
+                borderRadius: 14,
+                    paddingHorizontal: 16,
+                        marginBottom: 20,
+                            borderWidth: 1,
     },
-    searchInput: {
-        flex: 1,
+searchInput: {
+    flex: 1,
         marginLeft: 12,
-        fontSize: 16,
-        color: '#1E293B',
+            fontSize: 16,
     },
-    listContent: {
-        paddingBottom: 40,
+listContent: {
+    paddingBottom: 40,
     },
-    item: {
-        flexDirection: 'row',
+item: {
+    flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F1F5F9',
+            alignItems: 'center',
+                // paddingVertical: 8,
+                borderBottomWidth: 1,
     },
-    labelContainer: {
-        flexDirection: 'row',
+labelContainer: {
+    flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        flex: 1,
-        marginRight: 15,
+            alignItems: 'center',
+                flex: 1,
+                    marginRight: 15,
     },
-    itemTextEng: {
-        fontSize: 16,
-        color: '#334155',
+itemTextEng: {
+    fontSize: 16,
         fontWeight: '600',
-        paddingVertical: 2,
-        textTransform: 'capitalize',
+            paddingVertical: 16,
+                textTransform: 'capitalize',
     },
-    itemTextUr: {
-        fontSize: 18,
+itemTextUr: {
+    fontSize: 14,
         paddingRight: 16,
-        color: '#64748B',
-        fontWeight: '500',
+            paddingVertical: 20,
+                fontWeight: '500',
     },
-    selectedText: {
-        color: '#004030',
-        fontWeight: '700',
+selectedText: {
+    fontWeight: '700',
     },
 });

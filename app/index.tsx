@@ -1,45 +1,47 @@
-import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { updateLocationApi } from '@/apis/profile';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
-import { UPDATE_LOCATION_API } from '../apis/login';
-import CustomSplashScreen from '../components/SplashScreen';
+import { useEffect } from 'react';
+import CustomSplashScreen from '../components/splashScreen';
 import { useAuth } from '../context/AuthContext';
+import { clientStorage } from '@/utils/storage';
 
 export default function SplashScreen() {
     const { loading, isAuthenticated, user } = useAuth();
     const router = useRouter();
-    usePushNotifications(); // Register for push notifications
 
     useEffect(() => {
         if (!loading) {
-            // Give the user a moment to appreciate the premium splash screen
             const timeout = setTimeout(async () => {
-                if (isAuthenticated) {
-                    // Update location in background
-                    try {
-                        let { status } = await Location.requestForegroundPermissionsAsync();
-                        if (status === 'granted') {
-                            let location = await Location.getCurrentPositionAsync({});
-                            if (user?.token) {
-                                await UPDATE_LOCATION_API({
-                                    latitude: location.coords.latitude,
-                                    longitude: location.coords.longitude,
-                                    token: user.token
-                                });
-                            }
-                        }
-                    } catch (error) {
-                        console.log("Error updating location on app open:", error);
+                try {
+                    // For testing: always show onboarding
+                    if (true) { // onboardingCompleted !== 'true'
+                        router.replace('/onboarding' as any);
+                        return;
                     }
 
-                    // @ts-ignore
-                    router.replace('/(tabs)');
-                } else {
-                    // @ts-ignore
+                    if (isAuthenticated) {
+                        try {
+                            let { status } = await Location.requestForegroundPermissionsAsync();
+                            if (status === 'granted') {
+                                let location = await Location.getCurrentPositionAsync({});
+                                await updateLocationApi({
+                                    latitude: location.coords.latitude,
+                                    longitude: location.coords.longitude,
+                                });
+                            }
+                        } catch (error) {
+                            console.log("Error updating location on app open:", error);
+                        }
+                        router.replace('/(tabs)');
+                    } else {
+                        router.replace('/(auth)/login');
+                    }
+                } catch (error) {
+                    console.log("Error checking onboarding status:", error);
                     router.replace('/(auth)/login');
                 }
-            }, 2500); // 2.5 seconds delay
+            }, 1000);
 
             return () => clearTimeout(timeout);
         }

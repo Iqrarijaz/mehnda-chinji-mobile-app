@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
     Animated,
     StyleSheet,
@@ -7,7 +7,7 @@ import {
     View,
 } from 'react-native';
 import { BaseToastProps } from 'react-native-toast-message';
-import { ThemedText } from './themed-text';
+import { ThemedText } from './themedText';
 
 /* ------------------ Animated BG Blob ------------------ */
 const FloatingBlob = ({ color }: { color: string }) => {
@@ -68,7 +68,7 @@ const ToastLayout = ({
             <View style={styles.iconWrapper}>
                 <Ionicons
                     name={isSuccess ? 'checkmark' : 'alert'}
-                    size={22}
+                    size={18}
                     color={isSuccess ? '#10B981' : '#EF4444'}
                 />
             </View>
@@ -101,68 +101,67 @@ export const toastConfig = {
 const styles = StyleSheet.create({
     toast: {
         width: '92%',
-        minHeight: 80,
-        borderRadius: 28,
-        paddingVertical: 16,
-        paddingHorizontal: 18,
+        minHeight: 60,
+        borderRadius: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
         flexDirection: 'row',
         alignItems: 'center',
         overflow: 'hidden',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.15,
-        shadowRadius: 14,
-        elevation: 6,
-        marginTop: 16,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        marginTop: 12,
         zIndex: 9999,
     },
 
-    successBg: {
-        backgroundColor: '#CFFAE3',
+successBg: {
+    backgroundColor: '#CFFAE3',
     },
-    errorBg: {
-        backgroundColor: '#FAD1D1',
-    },
-
-    blob: {
-        position: 'absolute',
-        left: -30,
-        width: 120,
-        height: 120,
-        borderRadius: 60,
+errorBg: {
+    backgroundColor: '#FAD1D1',
     },
 
-    iconWrapper: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: '#FFFFFF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 14,
+blob: {
+    position: 'absolute',
+        left: -20,
+            width: 80,
+                height: 80,
+                    borderRadius: 40,
+    },
+
+iconWrapper: {
+    width: 36,
+        height: 36,
+            borderRadius: 18,
+                backgroundColor: '#FFFFFF',
+                    justifyContent: 'center',
+                        alignItems: 'center',
+                            marginRight: 12,
+                                zIndex: 2,
+    },
+
+textContainer: {
+    flex: 1,
         zIndex: 2,
     },
 
-    textContainer: {
-        flex: 1,
-        zIndex: 2,
-    },
-
-    title: {
-        fontSize: 16,
+title: {
+    fontSize: 14,
         fontWeight: '800',
-        color: '#0F172A',
+            color: '#0F172A',
     },
 
-    subtitle: {
-        fontSize: 14,
+subtitle: {
+    fontSize: 12,
         color: '#334155',
-        marginTop: 4,
-        lineHeight: 20,
+            marginTop: 2,
+                lineHeight: 18,
     },
 
-    closeBtn: {
-        padding: 6,
+closeBtn: {
+    padding: 6,
         zIndex: 2,
     },
 });

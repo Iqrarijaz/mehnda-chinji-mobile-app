@@ -1,27 +1,4 @@
-import { GET_AUTH_HEADER } from "@/utils/token";
-import axios from "axios";
-import { baseUrl } from "../../configs";
-
-const api = axios.create({
-    baseURL: `${baseUrl}/api/user/v1`
-});
-
-async function request<T>(config: any): Promise<T> {
-    try {
-        const headers = await GET_AUTH_HEADER();
-        const response = await api({
-            ...config,
-            headers: {
-                ...headers,
-                ...(config.headers || {})
-            }
-        });
-        return response.data;
-    } catch (error: any) {
-        console.error("API Error:", error);
-        throw error?.response?.data?.message || "Something went wrong";
-    }
-}
+import apiClient from "../client";
 
 export const PLACES_QUERY_KEYS = {
     all: ["places"] as const,
@@ -34,7 +11,7 @@ export const PLACE_SUBMISSION_QUERY_KEYS = {
         ["my-place-requests", params] as const
 };
 
-export function GET_PLACES_LIST(params: {
+export function getPlacesList(params: {
     search?: string;
     category?: string;
     limit?: number;
@@ -42,44 +19,25 @@ export function GET_PLACES_LIST(params: {
     lat?: number;
     lng?: number;
 }) {
-    return request({
-        method: "GET",
-        url: "/get-places",
-        params
-    });
+    return apiClient.get('/api/user/v1/get-places', { params });
 }
 
-export function SUBMIT_PLACE(data: any) {
-    return request({
-        method: "POST",
-        url: "/submit-place",
-        data
-    });
+export function submitPlace(data: any) {
+    return apiClient.post('/api/user/v1/submit-place', data);
 }
 
-export function GET_MY_REQUESTS(params: {
+export function getMyRequests(params: {
     page?: number;
     limit?: number;
     category?: string;
 }) {
-    return request({
-        method: "GET",
-        url: "/get-my-requests",
-        params
-    });
+    return apiClient.get('/api/user/v1/get-my-requests', { params });
 }
 
-export function UPDATE_REQUEST(id: string, data: any) {
-    return request({
-        method: "PUT",
-        url: `/update-request/${id}`,
-        data
-    });
+export function updateRequest(id: string, data: any) {
+    return apiClient.put(`/api/user/v1/update-request/${id}`, data);
 }
 
-export function DELETE_REQUEST(id: string) {
-    return request({
-        method: "DELETE",
-        url: `/delete-request/${id}`
-    });
+export function deleteRequest(id: string) {
+    return apiClient.delete(`/api/user/v1/delete-request/${id}`);
 }

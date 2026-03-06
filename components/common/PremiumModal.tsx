@@ -1,0 +1,145 @@
+import { BlurView } from 'expo-blur';
+import React, { useEffect } from 'react';
+import { Modal, StyleSheet, TouchableOpacity, View, ViewStyle, Platform } from 'react-native';
+import Animated, {
+    FadeInUp,
+    useAnimatedProps,
+    useSharedValue,
+    withTiming,
+} from 'react-native-reanimated';
+
+const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+const isAndroid = Platform.OS === 'android';
+
+export interface PremiumModalProps {
+    visible: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+    type?: 'bottom-sheet' | 'centered' | 'fullscreen';
+    sheetStyle?: ViewStyle;
+    overlayStyle?: ViewStyle;
+}
+
+/**
+ * PremiumModal
+ * A reusable modal component that enforces the app's premium design system:
+ * - Animated Blur (Expo Blur) background
+ * - FadeInUp animations for both backdrop and sheet
+ * - Consistent rounding and elevated sheet design
+ */
+export const PremiumModal: React.FC<PremiumModalProps> = ({
+    visible,
+    onClose,
+    children,
+    type = 'bottom-sheet',
+    sheetStyle,
+    overlayStyle,
+}) => {
+    const blurIntensity = useSharedValue(0);
+
+    useEffect(() => {
+        if (visible) {
+            blurIntensity.value = withTiming(20, { duration: 500 });
+        } else {
+            blurIntensity.value = withTiming(0, { duration: 300 });
+        }
+    }, [visible]);
+
+    const animatedProps = useAnimatedProps(() => ({
+        intensity: blurIntensity.value,
+    } as any));
+
+    return (
+        <Modal
+            visible={visible}
+            transparent
+            animationType="none"
+            onRequestClose={onClose}
+        >
+            <View style={[
+                styles.overlay,
+                type === 'centered' && styles.overlayCentered,
+                type === 'fullscreen' && styles.overlayFullscreen,
+                overlayStyle
+            ]}>
+                {/* 1. Animated Blur Backdrop */}
+                <AnimatedBlurView
+                    tint="dark"
+                    style={StyleSheet.absoluteFill}
+                    animatedProps={animatedProps}
+                />
+
+                {/* 2. Extra Dimming Layer (Animated) */}
+                <Animated.View
+                    entering={FadeInUp.duration(400)}
+                    style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]}
+                />
+
+                {/* 3. Tap-to-close Backdrop Area (Disabled for fullscreen) */}
+                {type !== 'fullscreen' && (
+                    <TouchableOpacity
+                        style={StyleSheet.absoluteFill}
+                        onPress={onClose}
+                        activeOpacity={1}
+                    />
+                )}
+
+                {/* 4. Animated Sheet */}
+                <Animated.View
+                    entering={FadeInUp.duration(500)}
+                    style={[
+                        styles.sheet,
+                        type === 'centered' && styles.sheetCentered,
+                        type === 'fullscreen' && styles.sheetFullscreen,
+                        sheetStyle
+                    ]}
+                >
+                    {children}
+                </Animated.View>
+            </View>
+        </Modal>
+    );
+};
+
+const styles = StyleSheet.create({
+    overlay: {
+        flex: 1,
+        backgroundColor: 'transparent',
+        justifyContent: 'flex-end',
+    },
+    overlayCentered: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
+    },
+    overlayFullscreen: {
+        justifyContent: 'center',
+        alignItems: 'stretch',
+    },
+    sheet: {
+        backgroundColor: '#FFFFFF',
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+        paddingTop: 12,
+        paddingHorizontal: 20,
+        paddingBottom: isAndroid ? 24 : 36,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -10 },
+        shadowOpacity: 0.15,
+        shadowRadius: 24,
+        elevation: 10,
+    },
+    sheetCentered: {
+        width: '100%',
+        borderRadius: 28,
+        paddingTop: 24,
+        paddingBottom: 24,
+    },
+    sheetFullscreen: {
+        flex: 1,
+        borderRadius: 0,
+        paddingTop: 0,
+        paddingHorizontal: 0,
+        paddingBottom: 0,
+    }
+});

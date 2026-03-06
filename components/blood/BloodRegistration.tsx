@@ -5,24 +5,24 @@ import {
     ActivityIndicator,
     ScrollView,
     StyleSheet,
-    Switch,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import {
     DONOR_QUERY_KEYS,
-    GET_DONOR_STATUS,
-    MANAGE_DONOR_STATUS,
-    REMOVE_AS_DONOR
+    getDonorStatus,
+    manageDonorStatus,
+    removeAsDonor
 } from '@/apis/bloodDonation';
-import { ThemedText } from '@/components/themed-text';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { CleanConfirmationModal } from '../common/CleanConfirmationModal';
-import BloodRegistrationModal from './BloodRegistrationModal';
+import { CleanConfirmationModal } from '../common/cleanConfirmationModal';
+import BloodRegistrationModal from './bloodRegistrationModal';
+import MyBloodDonorRegistrationCard from './myBloodDonorRegistrationCard';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -48,7 +48,7 @@ const BloodRegistration = React.memo(() => {
     // Query
     const { data: statusRes, isLoading: loading, refetch } = useQuery({
         queryKey: DONOR_QUERY_KEYS.status(),
-        queryFn: GET_DONOR_STATUS,
+        queryFn: getDonorStatus,
     });
 
     const donorData = statusRes?.data;
@@ -57,7 +57,7 @@ const BloodRegistration = React.memo(() => {
 
     // Mutations
     const removeMutation = useMutation({
-        mutationFn: REMOVE_AS_DONOR,
+        mutationFn: removeAsDonor,
         onSuccess: (res) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: DONOR_QUERY_KEYS.all });
@@ -72,7 +72,7 @@ const BloodRegistration = React.memo(() => {
     });
 
     const manageStatusMutation = useMutation({
-        mutationFn: MANAGE_DONOR_STATUS,
+        mutationFn: manageDonorStatus,
         onSuccess: (res) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: DONOR_QUERY_KEYS.all });
@@ -129,88 +129,18 @@ const BloodRegistration = React.memo(() => {
                         <ThemedText style={[styles.headerTitle, { color: colors.text }]}>Blood Donor Portal</ThemedText>
                         <ThemedText style={[styles.headerSubtitle, { color: colors.icon }]}>Help save lives by donating blood</ThemedText>
                     </View>
-                    {!isRegistered && (
-                        <TouchableOpacity
-                            style={[styles.addButton]}
-                            onPress={handleRegisterOpen}
-                        >
-                            <Ionicons name="add" size={24} color="#FFF" />
-                        </TouchableOpacity>
-                    )}
                 </View>
 
                 {/* Donor Card or Empty State */}
                 {isRegistered ? (
-                    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                        <View style={styles.cardHeader}>
-                            <View style={styles.nameStatusRow}>
-                                <ThemedText style={[styles.bizName, { color: colors.text }]}>{user?.user?.name || "My Donor Profile"}</ThemedText>
-                                <View style={[
-                                    styles.statusBadge,
-                                    { backgroundColor: isAvailable ? '#DCFCE7' : '#FEE2E2' }
-                                ]}>
-                                    <View style={[
-                                        styles.statusDot,
-                                        { backgroundColor: isAvailable ? '#16A34A' : '#DC2626' }
-                                    ]} />
-                                    <ThemedText style={[
-                                        styles.statusText,
-                                        { color: isAvailable ? '#166534' : '#991B1B' }
-                                    ]}>
-                                        {isAvailable ? 'ONLINE' : 'OFFLINE'}
-                                    </ThemedText>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View style={styles.cardBody}>
-                            <View style={styles.categoryRow}>
-                                <View style={styles.catLeft}>
-                                    <Ionicons name="water" size={14} color="#EF4444" />
-                                    <ThemedText style={[styles.bizCategory, { color: '#EF4444' }]}>{donorData.bloodGroup}</ThemedText>
-                                </View>
-                            </View>
-
-                            <View style={styles.bizInfoRow}>
-                                <Ionicons name="location" size={14} color={colors.icon} />
-                                <ThemedText style={[styles.bizInfoText, { color: colors.icon, textTransform: 'capitalize' }]} numberOfLines={1}>
-                                    {(donorData.address || donorData.village || 'N/A').toLowerCase()}
-                                </ThemedText>
-                            </View>
-                        </View>
-
-                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-
-                        <View style={styles.cardFooter}>
-                            <View style={styles.dateContainer}>
-                                <Ionicons name="calendar-outline" size={14} color={colors.icon} />
-                                <ThemedText style={[styles.dateText, { color: colors.icon }]}>
-                                    Last Donated: {donorData.lastDonationDate ? new Date(donorData.lastDonationDate).toLocaleDateString() : 'Never'}
-                                </ThemedText>
-                            </View>
-
-                            <View style={styles.actionButtons}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginRight: 10 }}>
-                                    <ThemedText style={{ fontSize: 10, color: colors.icon }}>Visible</ThemedText>
-                                    <Switch
-                                        value={isAvailable}
-                                        onValueChange={handleToggleAvailability}
-                                        trackColor={{ false: '#ef4444', true: '#10B981' }}
-                                        thumbColor={'#FFFFFF'}
-                                        style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-                                    />
-                                </View>
-
-                                <TouchableOpacity
-                                    style={[styles.actionBtn, { backgroundColor: '#FEE2E2' }]}
-                                    onPress={() => setShowConfirmModal(true)}
-                                    disabled={isProcessing}
-                                >
-                                    <Ionicons name="trash-outline" size={16} color="#EF4444" />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
+                    <MyBloodDonorRegistrationCard
+                        user={user}
+                        donorData={donorData}
+                        isAvailable={isAvailable}
+                        onToggleAvailability={handleToggleAvailability}
+                        onDelete={() => setShowConfirmModal(true)}
+                        isProcessing={isProcessing}
+                    />
                 ) : (
                     <View style={styles.emptyState}>
                         <Ionicons name="water-outline" size={64} color={colors.icon} style={{ opacity: 0.5 }} />
@@ -313,146 +243,54 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
-        elevation: 4,
+        shadowRadius: 8,
     },
-    card: {
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 16,
-        shadowColor: "#64748B",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-        elevation: 3,
-        borderWidth: 1,
-        borderColor: '#F1F5F9',
-    },
-    cardHeader: {
-        marginBottom: 8,
-    },
-    nameStatusRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+actionButtons: {
+    flexDirection: 'row',
         alignItems: 'center',
+            gap: 8,
     },
-    bizName: {
-        fontSize: 16,
-        fontWeight: '700',
-        textTransform: 'capitalize',
-        flex: 1,
-        marginRight: 8,
-    },
-    statusBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-        gap: 6,
-    },
-    statusDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-    },
-    statusText: {
-        fontSize: 10,
-        fontWeight: '800',
-        letterSpacing: 0.5,
-    },
-    cardBody: {
-        gap: 6,
-        marginBottom: 12,
-    },
-    categoryRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    catLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    bizCategory: {
-        fontSize: 14,
-        fontWeight: '700',
-    },
-    bizInfoRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    bizInfoText: {
-        fontSize: 13,
-        fontWeight: '500',
-        flex: 1,
-    },
-    divider: {
-        height: 1,
-        width: '100%',
-        marginBottom: 12,
-    },
-    cardFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    dateContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    dateText: {
-        fontSize: 12,
-        fontWeight: '500',
-    },
-    actionButtons: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    actionBtn: {
-        padding: 6,
+actionBtn: {
+    padding: 6,
         borderRadius: 8,
     },
-    centerContent: {
-        flex: 1,
+centerContent: {
+    flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
+            alignItems: 'center',
     },
-    emptyState: {
-        alignItems: 'center',
+emptyState: {
+    alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 60,
-        gap: 16,
+            paddingVertical: 60,
+                gap: 16,
     },
-    emptyStateText: {
-        fontSize: 16,
+emptyStateText: {
+    fontSize: 16,
         textAlign: 'center',
     },
-    emptyStateBtn: {
-        paddingVertical: 12,
+emptyStateBtn: {
+    paddingVertical: 12,
         paddingHorizontal: 24,
-        borderRadius: 12,
+            borderRadius: 12,
     },
-    tipsSection: {
-        marginTop: 20,
+tipsSection: {
+    marginTop: 20,
         paddingHorizontal: 4,
     },
-    tipsTitle: {
-        fontSize: 15,
+tipsTitle: {
+    fontSize: 15,
         fontWeight: '800',
-        color: '#ef4444',
+            color: '#ef4444',
     },
-    tipItem: {
-        flexDirection: 'row',
+tipItem: {
+    flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 8,
-        gap: 8,
+            marginTop: 8,
+                gap: 8,
     },
-    tipText: {
-        fontSize: 12,
+tipText: {
+    fontSize: 12,
         fontWeight: '500',
     },
 });

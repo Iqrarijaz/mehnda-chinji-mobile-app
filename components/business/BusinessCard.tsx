@@ -1,275 +1,188 @@
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import React, { useMemo, useState } from 'react';
 import {
     Alert,
     Linking,
+    Platform,
     StyleSheet,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themed-text';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
-import { getCategoryColor, getProfessionIcon } from '@/constants/professions';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import BusinessDetailModal from './businessDetailModal';
 
 interface BusinessCardProps {
-    business: {
-        _id: string;
-        name: string;
-        category: {
-            en: string;
-            ur?: string;
-        } | string;
-        description?: string;
-        phone?: string;
-        address?: string;
-        village?: string; // Kept for backward compatibility
-        userId?: string | { _id: string }; // Added userId allowing populated object or string
-    };
+    business: any;
 }
 
+const isAndroid = Platform.OS === 'android';
+
 const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const colors = Colors[theme];
-    const router = useRouter();
+    const insets = useSafeAreaInsets();
     const { user } = useAuth();
 
-    // const handleChat = async () => {
-    //     if (!user) {
-    //         Alert.alert("Login Required", "Please login to start a chat.");
-    //         return;
-    //     }
+    const [modalVisible, setModalVisible] = useState(false);
 
-    //     try {
-    //         const ownerId = typeof business.userId === 'object' ? business.userId._id : business.userId;
+    const cardFontColor = '#000000';
 
-    //         if (!ownerId) {
-    //             console.error("Business owner ID not found");
-    //             return;
-    //         }
+    const capitalize = (str?: string) =>
+        str
+            ? str
+                .toLowerCase()
+                .split(' ')
+                .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(' ')
+            : '';
 
-    //         // Prevent chatting with self
-    //         if (user.user && user.user._id === ownerId) {
-    //             Alert.alert("Action Not Allowed", "You cannot chat with yourself.");
-    //             return;
-    //         }
-
-    //         const res = await CREATE_OR_GET_CONVERSATION(ownerId, ConversationSource.BUSINESS);
-    //         if (res.success && res.data) {
-    //             router.push(`/chat/${res.data._id}` as any);
-    //         }
-    //     } catch (error) {
-    //         console.error("Failed to start chat", error);
-    //         Alert.alert("Error", "Failed to start chat. Please try again.");
-    //     }
-    // };
+    const businessName = useMemo(() => capitalize(business?.name), [business?.name]);
+    const ownerName = useMemo(() => capitalize(business?.userId?.name || 'Owner'), [business?.userId?.name]);
+    const ownerImage = business?.userId?.profileImage;
+    const address = capitalize(business?.address || business?.village || '');
+    const category = capitalize(business?.categoryEn || '');
+    const urduCategory = business?.categoryUr;
 
     const handleCall = () => {
-        if (business.phone) {
+        if (business?.phone) {
             Linking.openURL(`tel:${business.phone}`);
         } else {
-            Alert.alert("No Phone", "Phone number is not available.");
+            Alert.alert('No Phone', 'Phone number not available.');
         }
     };
 
-    const capitalize = (str: string) => {
-        return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    };
-
-    const businessName = capitalize(business.name);
-    const categoryText = typeof business.category === 'string'
-        ? capitalize(business.category)
-        : capitalize(business.category.en);
-
-    const urduCategory = typeof business.category !== 'string' ? business.category.ur : null;
-    const englishCategoryRaw = typeof business.category === 'string' ? business.category : business.category.en;
-
-    const iconName = getProfessionIcon(englishCategoryRaw);
-    const categoryColor = getCategoryColor(englishCategoryRaw);
+    const avatarContent = ownerImage ? (
+        <Image
+            source={{ uri: ownerImage }}
+            style={styles.avatarImage}
+            contentFit="cover"
+            transition={200}
+        />
+    ) : (
+        <ThemedText style={[styles.avatarLetter, { color: cardFontColor }]}>
+            {ownerName?.charAt(0)?.toUpperCase()}
+        </ThemedText>
+    );
 
     return (
-        <View style={[styles.cardContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            {/* Header Section */}
-            <View style={styles.header}>
-                <View style={styles.iconContainer}>
-                    <View style={styles.iconOuter}>
-                        <View style={[styles.iconInner, { backgroundColor: categoryColor + '15' }]}>
-                            <MaterialCommunityIcons name={iconName as any} size={24} color={categoryColor} />
+        <>
+            <TouchableOpacity activeOpacity={0.9} onPress={() => setModalVisible(true)}>
+                <View style={styles.card}>
+                    <View style={styles.row}>
+                        {/* Avatar */}
+                        <View style={styles.avatar}>
+                            {avatarContent}
                         </View>
-                    </View>
-                </View>
 
-                <View style={styles.mainInfo}>
-                    <View style={styles.titleRow}>
-                        <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={1}>{businessName}</ThemedText>
-                    </View>
-                    <View style={styles.subHeader}>
-                        <View style={[styles.categoryBadge, { backgroundColor: colors.background, borderColor: colors.border }]}>
-                            <ThemedText style={[styles.categoryText, { color: colors.icon }]}>{categoryText}</ThemedText>
+                        {/* Content */}
+                        <View style={styles.content}>
+                            <ThemedText style={styles.title} numberOfLines={1}>
+                                {businessName}
+                            </ThemedText>
+
+                            <View style={styles.categoryRow}>
+                                <View style={styles.categoryBadge}>
+                                    <ThemedText style={styles.categoryBadgeText} numberOfLines={1}>
+                                        {category} {urduCategory ? `• ${urduCategory}` : ''}
+                                    </ThemedText>
+                                </View>
+                            </View>
+
+                            {business?.description ? (
+                                <ThemedText style={styles.description} numberOfLines={1}>
+                                    {business.description}
+                                </ThemedText>
+                            ) : null}
+
+                            <View style={styles.locationRow}>
+                                <Ionicons name="location" size={12} color="#64748B" />
+                                <ThemedText style={styles.location} numberOfLines={1}>
+                                    {address}
+                                </ThemedText>
+                            </View>
                         </View>
-                        {urduCategory && (
-                            <ThemedText style={[styles.urduText, { color: colors.icon }]}>{urduCategory}</ThemedText>
-                        )}
+
+                        {/* Quick call button */}
+                        <TouchableOpacity
+                            style={styles.callBtn}
+                            onPress={(e) => { e.stopPropagation(); handleCall(); }}
+                        >
+                            <Ionicons name="call" size={18} color="#FFFFFF" />
+                        </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
 
-            {/* Description Section */}
-            {business.description ? (
-                <View style={styles.descriptionBox}>
-                    <ThemedText style={[styles.description, { color: colors.icon }]} numberOfLines={2}>
-                        {business.description}
-                    </ThemedText>
-                </View>
-            ) : null}
-
-            {/* Footer Section */}
-            <View style={[styles.footer, { borderTopColor: colors.border }]}>
-                <View style={styles.locationContainer}>
-                    <Ionicons name="location" size={14} color={colors.icon} />
-                    <ThemedText style={[styles.locationText, { color: colors.icon }]} numberOfLines={1}>
-                        {business.address || business.village}
-                    </ThemedText>
-                </View>
-
-                <TouchableOpacity
-                    style={styles.callActionButton}
-                    onPress={handleCall}
-                    activeOpacity={0.8}
-                >
-                    <LinearGradient
-                        colors={[colors.primary, colors.primary]}
-                        style={styles.callButtonGradient}
-                    >
-                        <Ionicons name="call" size={16} color="#FFFFFF" />
-                        <ThemedText style={styles.callBtnText}>Call</ThemedText>
-                    </LinearGradient>
-                </TouchableOpacity>
-            </View>
-
-        </View>
+            {/* ── Detail Modal ── */}
+            <BusinessDetailModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                business={business}
+                businessName={businessName}
+                ownerName={ownerName}
+                ownerImage={ownerImage}
+                address={address}
+                category={category}
+                urduCategory={urduCategory}
+            />
+        </>
     );
 });
 
 export default BusinessCard;
 
 const styles = StyleSheet.create({
-    cardContainer: {
-        borderRadius: 20,
-        padding: 16,
-        marginBottom: 16,
-        shadowColor: "#64748B",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-        elevation: 3,
-        borderWidth: 1,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    card: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        paddingHorizontal: 14,
+        paddingVertical: 14,
         marginBottom: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
     },
-    iconContainer: {
-        marginRight: 12,
-    },
-    iconOuter: {
-        width: 48,
-        height: 48,
+    row: { flexDirection: 'row', alignItems: 'center' },
+    avatar: {
+        width: 60,
+        height: 60,
         borderRadius: 14,
+        backgroundColor: '#F1F5F9',
+        alignItems: 'center',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
-    iconInner: {
-        width: 48,
-        height: 48,
-        borderRadius: 14,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    mainInfo: {
-        flex: 1,
-        gap: 4,
-    },
-    titleRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    name: {
-        fontSize: 17,
-        fontWeight: '700',
-        color: '#1E293B',
-        letterSpacing: -0.3,
-    },
-    subHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
-    },
-    categoryBadge: {
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 6,
-        borderWidth: 1,
-    },
-    categoryText: {
-        fontSize: 11,
-        fontWeight: '600',
-        textTransform: 'uppercase',
-        letterSpacing: 0.3,
-    },
-    urduText: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: '#94A3B8',
-    },
-    descriptionBox: {
-        marginBottom: 16,
-    },
-    description: {
-        fontSize: 13,
-        lineHeight: 19,
-    },
-    footer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 12,
-        borderTopWidth: 1,
-        borderTopColor: '#F1F5F9',
-    },
-    locationContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        flex: 1,
-    },
-    locationText: {
-        fontSize: 13,
-        fontWeight: '500',
-        color: '#64748B',
-        textTransform: 'capitalize',
-    },
-    callActionButton: {
-        borderRadius: 12,
+        marginRight: 14,
         overflow: 'hidden',
     },
-    callButtonGradient: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        gap: 6,
+    avatarImage: { width: '100%', height: '100%', borderRadius: 14 },
+    avatarLetter: { fontSize: 24, fontWeight: '800', color: '#94A3B8' },
+    content: { flex: 1, justifyContent: 'center', gap: 2 },
+    title: { fontSize: 16, fontWeight: '800', color: '#0F172A' },
+    categoryRow: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
+    categoryBadge: {
+        backgroundColor: '#F1F5F9',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        alignSelf: 'flex-start',
     },
-    callBtnText: {
-        color: '#FFFFFF',
-        fontSize: 13,
-        fontWeight: '700',
+    categoryBadgeText: { fontSize: 12, fontWeight: '600', color: '#64748B' },
+    description: { fontSize: 13, color: '#64748B', marginTop: 4, lineHeight: 18 },
+    locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+    location: { fontSize: 12, color: '#64748B' },
+    callBtn: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: '#0F172A',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 10,
     },
 });

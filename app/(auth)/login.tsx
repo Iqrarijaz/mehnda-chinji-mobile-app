@@ -1,9 +1,10 @@
+import { ThemedText } from '@/components/themedText';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clientStorage } from '@/utils/storage';
 import * as Device from 'expo-device';
 import * as Location from 'expo-location';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -16,9 +17,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-
-import { LOGIN_API } from '../../apis/login';
-import { ThemedText } from '../../components/themed-text';
+import { loginApi } from '../../apis/login';
 import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -26,6 +25,7 @@ import { useTheme } from '../../context/ThemeContext';
 export default function LoginScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
+    const params = useLocalSearchParams();
     const { login } = useAuth();
     const { theme } = useTheme();
 
@@ -35,7 +35,7 @@ export default function LoginScreen() {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        rememberMe: false,
+        rememberMe: true,
         showPassword: false,
         loading: false,
         googleLoading: false,
@@ -44,7 +44,16 @@ export default function LoginScreen() {
     });
 
     useEffect(() => {
-        loadSavedEmail();
+        if (params.email && params.password) {
+            setFormData(prev => ({
+                ...prev,
+                email: String(params.email),
+                password: String(params.password)
+            }));
+        } else {
+            loadSavedCredentials();
+        }
+
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status === 'granted') {
@@ -58,11 +67,17 @@ export default function LoginScreen() {
         })();
     }, []);
 
-    const loadSavedEmail = async () => {
+    const loadSavedCredentials = async () => {
         try {
-            const savedEmail = await AsyncStorage.getItem('remember_email');
+            const savedEmail = await clientStorage.getItem('remember_email');
+            const savedPassword = await clientStorage.getItem('remember_password');
             if (savedEmail) {
-                setFormData(prev => ({ ...prev, email: savedEmail, rememberMe: true }));
+                setFormData(prev => ({
+                    ...prev,
+                    email: savedEmail,
+                    password: savedPassword || '',
+                    rememberMe: true
+                }));
             }
         } catch (error) {
             Toast.show({
@@ -93,7 +108,7 @@ export default function LoginScreen() {
             const deviceName = Device.modelName || `Unknown ${Platform.OS} Device`;
             const platform = Platform.OS;
 
-            const response = await LOGIN_API({
+            const response = await loginApi({
                 email,
                 password,
                 deviceName,
@@ -102,11 +117,13 @@ export default function LoginScreen() {
                 longitude: formData.longitude,
             });
 
-            // Save or clear email for Remember Me
+            // Save or clear credentials for Remember Me
             if (formData.rememberMe) {
-                await AsyncStorage.setItem('remember_email', email);
+                await clientStorage.setItem('remember_email', email);
+                await clientStorage.setItem('remember_password', password);
             } else {
-                await AsyncStorage.removeItem('remember_email');
+                await clientStorage.removeItem('remember_email');
+                await clientStorage.removeItem('remember_password');
             }
 
             await login(response);
@@ -133,21 +150,22 @@ export default function LoginScreen() {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={[styles.container, { backgroundColor: colors.background }]}
+            style={[styles.container, { backgroundColor: '#FFFFFF' }]}
         >
+            {/* Header / Top Section */}
+            <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={styles.headerContent}>
+                    <ThemedText style={styles.headerTitle}>Sign in to your{"\n"}Account</ThemedText>
+                    <ThemedText style={styles.headerSubtitle}>Welcome back! Please enter your details</ThemedText>
+                </View>
+            </View>
+
             <ScrollView
                 showsVerticalScrollIndicator={false}
+                style={{ backgroundColor: colors.background }}
                 contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.background }}
                 bounces={false}
             >
-                {/* Header / Top Section */}
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#004030' }]}>
-                    <View style={styles.headerContent}>
-                        <ThemedText style={styles.headerTitle}>Sign in to your{"\n"}Account</ThemedText>
-                        <ThemedText style={styles.headerSubtitle}>Welcome back! Please enter your details</ThemedText>
-                    </View>
-                </View>
-
                 {/* Form Card */}
                 <View style={styles.formContainer}>
                     <View style={[styles.formCard, { backgroundColor: colors.card }]}>
@@ -208,13 +226,13 @@ export default function LoginScreen() {
                                 <Ionicons
                                     name={formData.rememberMe ? 'checkbox' : 'square-outline'}
                                     size={20}
-                                    color={formData.rememberMe ? '#004030' : (isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B')}
+                                    color={formData.rememberMe ? '#006666' : (isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B')}
                                 />
                                 <ThemedText style={[styles.optionText, { color: colors.text }]}>Remember me</ThemedText>
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password' as any)}>
-                                <ThemedText style={[styles.forgotText, { color: isDark ? '#FFFFFF' : '#004030' }]}>
+                                <ThemedText style={[styles.forgotText, { color: isDark ? '#FFFFFF' : '#006666' }]}>
                                     Forgot Password?
                                 </ThemedText>
                             </TouchableOpacity>
@@ -222,7 +240,7 @@ export default function LoginScreen() {
 
                         {/* Login Button */}
                         <TouchableOpacity
-                            style={[styles.loginButton, { backgroundColor: '#004030' }]}
+                            style={[styles.loginButton, { backgroundColor: '#006666' }]}
                             onPress={handleLogin}
                             disabled={formData.loading}
                         >
@@ -239,7 +257,7 @@ export default function LoginScreen() {
                                 Don't have an account?{' '}
                             </ThemedText>
                             <TouchableOpacity onPress={() => router.push('/(auth)/register' as any)}>
-                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#004030' }]}>Sign Up</ThemedText>
+                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#006666' }]}>Sign Up</ThemedText>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -287,7 +305,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
-        elevation: 2,
     },
     inputField: {
         marginBottom: 18,
@@ -342,11 +359,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 18,
         overflow: 'hidden',
-        shadowColor: '#004030',
+        shadowColor: '#006666',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
-        elevation: 4,
     },
     loginButtonText: {
         color: '#FFFFFF',

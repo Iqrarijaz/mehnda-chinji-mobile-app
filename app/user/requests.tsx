@@ -1,11 +1,10 @@
-import { DELETE_REQUEST, GET_MY_REQUESTS, PLACE_SUBMISSION_QUERY_KEYS } from '@/apis/places';
-import { ThemedText } from '@/components/themed-text';
+import { deleteRequest, getMyRequests, PLACE_SUBMISSION_QUERY_KEYS } from '@/apis/places';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
-import React from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -31,7 +30,7 @@ const MyRequestsScreen = () => {
         refetch
     } = useInfiniteQuery({
         queryKey: PLACE_SUBMISSION_QUERY_KEYS.myRequests({ page: 1 }), // simplified for now
-        queryFn: ({ pageParam = 1 }) => GET_MY_REQUESTS({ page: pageParam }),
+        queryFn: ({ pageParam = 1 }) => getMyRequests({ page: pageParam }),
         getNextPageParam: (lastPage: any) => {
             const pagination = lastPage?.pagination;
             if (pagination && pagination.page < pagination.pages) {
@@ -43,7 +42,7 @@ const MyRequestsScreen = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: DELETE_REQUEST,
+        mutationFn: deleteRequest,
         onSuccess: () => {
             Alert.alert('Success', 'Request deleted successfully.');
             queryClient.invalidateQueries({ queryKey: ['my-place-requests'] });
@@ -162,35 +161,35 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 4,
-        elevation: 2,
+        shadowRadius: 3,
     },
-    cardHeader: {
-        flexDirection: 'row',
+cardHeader: {
+    flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
+            alignItems: 'center',
+                marginBottom: 8,
     },
-    cardTitle: {
-        fontSize: 16,
+cardTitle: {
+    fontSize: 16,
         fontWeight: 'bold',
-        textTransform: 'capitalize',
+            textTransform: 'capitalize',
     },
-    statusBadge: {
-        paddingHorizontal: 8,
+statusBadge: {
+    paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 8,
+            borderRadius: 8,
     },
-    statusText: {
-        fontSize: 12,
+statusText: {
+    fontSize: 12,
         fontWeight: 'bold',
     },
-    actions: {
-        flexDirection: 'row',
+actions: {
+    flexDirection: 'row',
         justifyContent: 'flex-end',
-        marginTop: 12,
-        gap: 12,
+            marginTop: 12,
+                gap: 12,
     },
-    actionBtn: {
-        padding: 8,
+actionBtn: {
+    padding: 8,
     }
 });

@@ -1,6 +1,7 @@
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -9,13 +10,13 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { REQUEST_PASSWORD_RESET } from '@/apis/forgot-password';
-import { ThemedText } from '@/components/themed-text';
+import { checkAccountDetails, sendOtp } from '@/apis/forgot-password';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -27,13 +28,15 @@ export default function ForgotPasswordScreen() {
 
     const [emailOrPhone, setEmailOrPhone] = useState('');
     const [loading, setLoading] = useState(false);
+    const [step, setStep] = useState(1); // 1: Find Account, 2: Profile Preview
+    const [userProfile, setUserProfile] = useState<any>(null);
 
     const handleSubmit = async () => {
         if (!emailOrPhone.trim()) {
             Toast.show({
                 type: 'error',
                 text1: 'Required',
-                text2: 'Please enter your email or phone number'
+                text2: 'Please enter your email address'
             });
             return;
         }
@@ -41,25 +44,45 @@ export default function ForgotPasswordScreen() {
         setLoading(true);
 
         try {
-            const response = await REQUEST_PASSWORD_RESET(emailOrPhone.trim());
+            const response = await checkAccountDetails(emailOrPhone.trim());
+            setUserProfile(response.data);
+            setStep(2);
+        } catch (error: any) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error.message || 'Account not found'
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    const handleSendOtp = async () => {
+        setLoading(true);
+        try {
+            await sendOtp(emailOrPhone.trim());
             Toast.show({
                 type: 'success',
                 text1: 'Success',
-                text2: response.message || 'Reset code sent successfully'
+                text2: 'Verification code sent successfully'
             });
 
-            // Navigate to reset password screen with email/phone
+            // Navigate to verify otp screen with identifier
             router.push({
-                pathname: '/(auth)/reset-password',
-                params: { emailOrPhone: emailOrPhone.trim() }
+                pathname: '/(auth)/verify-otp',
+                params: {
+                    emailOrPhone: emailOrPhone.trim(),
+                    name: userProfile?.name || '',
+                    profileImage: userProfile?.profileImage || ''
+                }
             } as any);
 
         } catch (error: any) {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: error.message || 'Failed to send reset code'
+                text2: error.message || 'Failed to send verification code'
             });
         } finally {
             setLoading(false);
@@ -71,63 +94,117 @@ export default function ForgotPasswordScreen() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={[styles.container, { backgroundColor: colors.background }]}
         >
+            {/* Header / Top Section */}
+            <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => step === 2 ? setStep(1) : router.back()}
+                >
+                    <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                </TouchableOpacity>
+                <View style={styles.headerContent}>
+                    <ThemedText style={styles.headerTitle}>Forgot{"\n"}Password?</ThemedText>
+                    <ThemedText style={styles.headerSubtitle}>
+                        {step === 1
+                            ? "Enter your registered email to find your account"
+                            : "Is this you? We'll send a code to your registered email"}
+                    </ThemedText>
+                </View>
+            </View>
+
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.background }}
                 bounces={false}
             >
-                {/* Header / Top Section */}
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#004030' }]}>
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() => router.back()}
-                    >
-                        <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <View style={styles.headerContent}>
-                        <ThemedText style={styles.headerTitle}>Forgot{"\n"}Password?</ThemedText>
-                        <ThemedText style={styles.headerSubtitle}>
-                            Enter your email or phone number to receive a reset code
-                        </ThemedText>
-                    </View>
-                </View>
-
                 {/* Form Card */}
                 <View style={styles.formContainer}>
                     <View style={[styles.formCard, { backgroundColor: colors.card }]}>
-                        {/* Email/Phone Input */}
-                        <View style={styles.inputField}>
-                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL OR PHONE <ThemedText style={styles.required}>*</ThemedText></ThemedText>
-                            <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
-                            }]}>
-                                <Ionicons name="mail-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                                <TextInput
-                                    placeholder="Enter your email or phone"
-                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
-                                    value={emailOrPhone}
-                                    onChangeText={setEmailOrPhone}
-                                    style={[styles.input, { color: colors.text }]}
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    editable={!loading}
-                                />
-                            </View>
-                        </View>
+                        {step === 1 ? (
+                            <>
+                                {/* Email/Phone Input */}
+                                <View style={styles.inputField}>
+                                    <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
+                                    <View style={[styles.inputBox, {
+                                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+                                    }]}>
+                                        <Ionicons name="mail-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
+                                        <TextInput
+                                            placeholder="Enter your email address"
+                                            placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
+                                            value={emailOrPhone}
+                                            onChangeText={setEmailOrPhone}
+                                            style={[styles.input, { color: colors.text }]}
+                                            keyboardType="email-address"
+                                            autoCapitalize="none"
+                                            editable={!loading}
+                                        />
+                                    </View>
+                                </View>
 
-                        {/* Submit Button */}
-                        <TouchableOpacity
-                            style={[styles.submitButton, { backgroundColor: '#004030' }]}
-                            onPress={handleSubmit}
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <ActivityIndicator color="#FFFFFF" />
-                            ) : (
-                                <ThemedText style={styles.submitButtonText}>Send Reset Code</ThemedText>
-                            )}
-                        </TouchableOpacity>
+                                {/* Find Account Button */}
+                                <TouchableOpacity
+                                    style={[styles.submitButton, { backgroundColor: '#006666' }]}
+                                    onPress={handleSubmit}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <ActivityIndicator color="#FFFFFF" />
+                                    ) : (
+                                        <ThemedText style={styles.submitButtonText}>Find Account</ThemedText>
+                                    )}
+                                </TouchableOpacity>
+                            </>
+                        ) : (
+                            <View style={styles.profileContainer}>
+                                <View style={styles.profileInfo}>
+                                    {userProfile?.profileImage ? (
+                                        <Image
+                                            source={{ uri: userProfile.profileImage }}
+                                            style={styles.profileAvatar}
+                                            contentFit="cover"
+                                            transition={200}
+                                        />
+                                    ) : (
+                                        <View style={[styles.profileAvatarPlaceholder, { backgroundColor: colors.primary + '20' }]}>
+                                            <Ionicons name="person" size={40} color={colors.primary} />
+                                        </View>
+                                    )}
+                                    <ThemedText style={[styles.profileName, { color: colors.text }]}>
+                                        {userProfile?.name
+                                            ? userProfile.name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
+                                            : ''}
+                                    </ThemedText>
+                                    <ThemedText style={[styles.profileEmail, { color: colors.icon }]}>
+                                        {userProfile?.email}
+                                    </ThemedText>
+                                </View>
+
+                                {/* Send OTP Button */}
+                                <TouchableOpacity
+                                    style={[styles.submitButton, styles.submitButtonHorizontal, { backgroundColor: '#006666', marginTop: 5 }]}
+                                    onPress={handleSendOtp}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <ActivityIndicator color="#FFFFFF" />
+                                    ) : (
+                                        <ThemedText style={styles.submitButtonText}>Send OTP</ThemedText>
+                                    )}
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={styles.notMeButton}
+                                    onPress={() => setStep(1)}
+                                    disabled={loading}
+                                >
+                                    <ThemedText style={[styles.notMeText, { color: colors.primary }]}>
+                                        Not me? Try again
+                                    </ThemedText>
+                                </TouchableOpacity>
+                            </View>
+                        )}
 
                         {/* Footer */}
                         <View style={styles.footer}>
@@ -135,7 +212,7 @@ export default function ForgotPasswordScreen() {
                                 Remember your password?{' '}
                             </ThemedText>
                             <TouchableOpacity onPress={() => router.back()}>
-                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#004030' }]}>Log In</ThemedText>
+                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#006666' }]}>Log In</ThemedText>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -143,6 +220,7 @@ export default function ForgotPasswordScreen() {
             </ScrollView>
         </KeyboardAvoidingView>
     );
+
 }
 
 const styles = StyleSheet.create({
@@ -150,7 +228,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headerSection: {
-        paddingBottom: 40,
+        paddingBottom: 10,
         borderBottomLeftRadius: 36,
         borderBottomRightRadius: 36,
         overflow: 'hidden',
@@ -196,7 +274,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
-        elevation: 2,
     },
     inputField: {
         marginBottom: 22,
@@ -232,11 +309,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 18,
         overflow: 'hidden',
-        shadowColor: '#004030',
+        shadowColor: '#006666',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
-        elevation: 4,
     },
     submitButtonText: {
         color: '#FFFFFF',
@@ -257,5 +333,51 @@ const styles = StyleSheet.create({
     footerLink: {
         fontSize: 14,
         fontWeight: '700',
+    },
+    // Stage 2 Profile Styles
+    profileContainer: {
+        alignItems: 'center',
+        paddingVertical: 5,
+    },
+    profileInfo: {
+        alignItems: 'center',
+        marginBottom: 15,
+    },
+    profileAvatar: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        marginBottom: 10,
+        borderWidth: 2,
+        borderColor: '#00666620',
+    },
+    profileAvatarPlaceholder: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    profileName: {
+        fontSize: 18,
+        fontWeight: '800',
+        marginBottom: 2,
+    },
+    profileEmail: {
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    notMeButton: {
+        marginTop: 10,
+        padding: 5,
+    },
+    notMeText: {
+        fontSize: 14,
+        fontWeight: '700',
+    },
+    submitButtonHorizontal: {
+        paddingHorizontal: 30,
+        alignSelf: 'center',
     },
 });

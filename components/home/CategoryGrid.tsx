@@ -1,20 +1,11 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import Animated, { SlideInLeft } from 'react-native-reanimated';
 
-import { ThemedText } from '@/components/themed-text';
-import { CategoryCard } from './CategoryCard';
-
-const CATEGORIES = [
-    { id: 'education', label: 'Education', icon: 'school', color: '#3B82F6' },
-    { id: 'religious', label: 'Religious', icon: 'book', color: '#10B981' }, // book for Quran/Mosque/Religious
-    { id: 'health', label: 'Health', icon: 'medkit', color: '#EF4444' },
-    { id: 'govt', label: 'Govt Offices', icon: 'business', color: '#6366F1' },
-    { id: 'shops', label: 'Shops', icon: 'cart', color: '#F59E0B' },
-    // { id: 'playgrounds', label: 'Playgrounds', icon: 'football', color: '#8B5CF6' },
-    // { id: 'food', label: 'Food', icon: 'restaurant', color: '#EC4899' },
-    // { id: 'services', label: 'Services', icon: 'construct', color: '#64748B' },
-];
+import { ThemedText } from '@/components/themedText';
+import { CATEGORIES_CONFIG } from '@/constants/categories';
+import { CategoryCard } from './categoryCard';
 
 export function CategoryGrid() {
     const router = useRouter();
@@ -27,15 +18,19 @@ export function CategoryGrid() {
         <View style={styles.container}>
             <ThemedText style={styles.sectionTitle}>Explore Categories</ThemedText>
             <View style={styles.grid}>
-                {CATEGORIES.map((cat) => (
-                    <View key={cat.id} style={styles.gridItem}>
+                {CATEGORIES_CONFIG.map((cat, index) => (
+                    <Animated.View
+                        key={cat.id}
+                        entering={SlideInLeft.delay(100 + index * 80).duration(400)}
+                        style={styles.gridItem}
+                    >
                         <CategoryCard
                             label={cat.label}
                             icon={cat.icon}
                             color={cat.color}
                             onPress={() => handlePress(cat.id)}
                         />
-                    </View>
+                    </Animated.View>
                 ))}
             </View>
         </View>
@@ -44,22 +39,21 @@ export function CategoryGrid() {
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 14, // slightly less to account for card margins
-        paddingTop: 20,
-        paddingBottom: 40,
+        paddingHorizontal: 14,
+        paddingBottom: 8,
     },
     sectionTitle: {
-        fontSize: 18,
+        fontSize: 17,
         fontWeight: '700',
         marginLeft: 6,
-        marginBottom: 16,
-        opacity: 0.9,
+        marginBottom: 14,
+        opacity: 0.85,
     },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
     },
     gridItem: {
-        width: '33.33%', // 3 columns
-    }
+        width: '33.33%',
+    },
 });

@@ -1,7 +1,8 @@
-import { GET_CONVERSATIONS_LINES } from '@/apis/chat/chat';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { GlassCard } from '@/components/ui/GlassCard';
+import { getConversationsLines } from '@/apis/chat/chat';
+import { ThemedText } from '@/components/themedText';
+import { ThemedView } from '@/components/themedView';
+import Avatar from '@/components/ui/avatar';
+import { GlassCard } from '@/components/ui/glassCard';
 import { baseUrl } from '@/configs';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -11,9 +12,11 @@ import { StorageKeys, getStorageData, setStorageData } from '@/utils/storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { ErrorBoundary } from '@/components/common/errorBoundary';
 import { Socket, io } from 'socket.io-client';
+
 
 export default function ChatListScreen() {
     const { theme, isDark } = useTheme();
@@ -26,7 +29,7 @@ export default function ChatListScreen() {
     const { data: conversations = [], isLoading, refetch, isRefetching } = useQuery({
         queryKey: ['conversations'],
         queryFn: async () => {
-            const res = await GET_CONVERSATIONS_LINES();
+            const res = await getConversationsLines();
             if (res.success) {
                 setStorageData(StorageKeys.CONVERSATIONS, res.data);
                 return res.data;
@@ -165,9 +168,10 @@ export default function ChatListScreen() {
             >
                 <GlassCard>
                     <View style={styles.cardContent}>
-                        <Image
-                            source={profileImage ? { uri: profileImage } : require('../../assets/icons/user-male.png')}
-                            style={styles.avatar}
+                        <Avatar
+                            uri={profileImage as string}
+                            name={displayName}
+                            size={50}
                         />
                         <View style={styles.contentContainer}>
                             <View style={styles.headerRow}>
@@ -226,36 +230,38 @@ export default function ChatListScreen() {
     }
 
     return (
-        <ThemedView style={styles.container}>
-            <View style={styles.searchWrapper}>
-                <GlassCard style={{ borderRadius: 12, padding: 0 }}>
-                    <View style={[styles.searchContainer, { backgroundColor: Colors[theme].tint + '20' }]}>
-                        <Ionicons name="search" size={20} color={Colors[theme].tint} style={styles.searchIcon} />
-                        <TextInput
-                            style={[styles.searchInput, { color: Colors[theme].text }]}
-                            placeholder="Search"
-                            placeholderTextColor={Colors[theme].icon}
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                        />
-                    </View>
-                </GlassCard>
-            </View>
-            <FlatList
-                data={filteredConversations}
-                renderItem={renderItem}
-                keyExtractor={item => item._id}
-                onRefresh={onRefresh}
-                refreshing={isRefetching}
-                contentContainerStyle={styles.listContent}
-                ListEmptyComponent={
-                    <View style={styles.emptyContainer}>
-                        <Ionicons name="chatbubbles-outline" size={64} color={Colors[theme].icon} />
-                        <ThemedText style={styles.emptyText}>No conversations yet</ThemedText>
-                    </View>
-                }
-            />
-        </ThemedView>
+        <ErrorBoundary>
+            <ThemedView style={styles.container}>
+                <View style={styles.searchWrapper}>
+                    <GlassCard style={{ borderRadius: 12, padding: 0 }}>
+                        <View style={[styles.searchContainer, { backgroundColor: Colors[theme].tint + '20' }]}>
+                            <Ionicons name="search" size={20} color={Colors[theme].tint} style={styles.searchIcon} />
+                            <TextInput
+                                style={[styles.searchInput, { color: Colors[theme].text }]}
+                                placeholder="Search"
+                                placeholderTextColor={Colors[theme].icon}
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                            />
+                        </View>
+                    </GlassCard>
+                </View>
+                <FlatList
+                    data={filteredConversations}
+                    renderItem={renderItem}
+                    keyExtractor={item => item._id}
+                    onRefresh={onRefresh}
+                    refreshing={isRefetching}
+                    contentContainerStyle={styles.listContent}
+                    ListEmptyComponent={
+                        <View style={styles.emptyContainer}>
+                            <Ionicons name="chatbubbles-outline" size={64} color={Colors[theme].icon} />
+                            <ThemedText style={styles.emptyText}>No conversations yet</ThemedText>
+                        </View>
+                    }
+                />
+            </ThemedView>
+        </ErrorBoundary>
     );
 }
 

@@ -12,8 +12,8 @@ import {
     View
 } from 'react-native';
 
-import { SUBMIT_PLACE, UPDATE_REQUEST } from '@/apis/places';
-import { ThemedText } from '@/components/themed-text';
+import { submitPlace, updateRequest } from '@/apis/places';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -91,9 +91,9 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
     const submitMutation = useMutation({
         mutationFn: async (payload: any) => {
             if (isEditing) {
-                return UPDATE_REQUEST(editData._id, payload);
+                return updateRequest(editData._id, payload);
             }
-            return SUBMIT_PLACE(payload);
+            return submitPlace(payload);
         },
         onSuccess: () => {
             onClose(); // Close first so Toast is visible
@@ -114,14 +114,46 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
         },
     });
 
+    const isHealth = category === 'health';
+    const isEducation = category === 'education';
+
     const handleSubmit = () => {
-        if (!form.name || !form.address) {
+        if (!form.name.trim() || !form.address.trim() || !form.description.trim()) {
             Toast.show({
                 type: 'error',
                 text1: 'Validation Error',
-                text2: 'Name and Address are required.',
+                text2: 'Name, Address and Description are required.',
             });
             return;
+        }
+
+        if (form.description.trim().length < 50) {
+            Toast.show({
+                type: 'error',
+                text1: 'Validation Error',
+                text2: 'Description must be at least 50 characters.',
+            });
+            return;
+        }
+
+        if (isHealth) {
+            if (!form.timing.trim() || !form.services.trim()) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Validation Error',
+                    text2: 'Timing and Services are required for Health category.',
+                });
+                return;
+            }
+
+            if (form.services.trim().length < 50) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Validation Error',
+                    text2: 'Services description must be at least 50 characters.',
+                });
+                return;
+            }
         }
 
         if (!form.contact[0]?.number.trim()) {
@@ -142,8 +174,7 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
         });
     };
 
-    const isHealth = category === 'health';
-    const isEducation = category === 'education';
+
 
     return (
         <Modal
@@ -166,24 +197,36 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
 
                     <ScrollView contentContainerStyle={styles.scrollContent}>
                         <View style={styles.formGroup}>
-                            <ThemedText style={styles.label}>Name <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                            <View style={styles.labelRow}>
+                                <ThemedText style={styles.label}>Name <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                <ThemedText style={[styles.charCount, form.name.length >= 40 && { color: '#EF4444' }]}>
+                                    {form.name.length}/40
+                                </ThemedText>
+                            </View>
                             <TextInput
                                 style={[styles.input, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
                                 placeholder="Enter name"
                                 placeholderTextColor="#94A3B8"
                                 value={form.name}
                                 onChangeText={(text) => handleChange('name', text)}
+                                maxLength={40}
                             />
                         </View>
 
                         <View style={styles.formGroup}>
-                            <ThemedText style={styles.label}>Address <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                            <View style={styles.labelRow}>
+                                <ThemedText style={styles.label}>Address <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                <ThemedText style={[styles.charCount, form.address.length >= 50 && { color: '#EF4444' }]}>
+                                    {form.address.length}/50
+                                </ThemedText>
+                            </View>
                             <TextInput
                                 style={[styles.input, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
                                 placeholder="Enter address"
                                 placeholderTextColor="#94A3B8"
                                 value={form.address}
                                 onChangeText={(text) => handleChange('address', text)}
+                                maxLength={50}
                             />
                         </View>
 
@@ -199,26 +242,28 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
 
                             {form.contact.map((contact, index) => (
                                 <View key={index} style={{ marginBottom: 12 }}>
-                                    <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                                        <TextInput
-                                            style={[styles.input, { flex: 4, backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
-                                            placeholder="Name (e.g. Admin)"
-                                            placeholderTextColor="#94A3B8"
-                                            value={contact.name}
-                                            onChangeText={(text) => handleContactChange(index, 'name', text)}
-                                        />
-                                        <TextInput
-                                            style={[styles.input, { flex: 6, backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
-                                            placeholder="0300 00 00 000"
-                                            placeholderTextColor="#94A3B8"
-                                            value={contact.number}
-                                            onChangeText={(text) => handleContactChange(index, 'number', text)}
-                                            keyboardType="phone-pad"
-                                        />
+                                    <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
+                                        <View style={{ flex: 1, gap: 8 }}>
+                                            <TextInput
+                                                style={[styles.input, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
+                                                placeholder="Contact name (e.g. Admin)"
+                                                placeholderTextColor="#94A3B8"
+                                                value={contact.name}
+                                                onChangeText={(text) => handleContactChange(index, 'name', text)}
+                                            />
+                                            <TextInput
+                                                style={[styles.input, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
+                                                placeholder="Phone number (e.g. 0300 0000000)"
+                                                placeholderTextColor="#94A3B8"
+                                                value={contact.number}
+                                                onChangeText={(text) => handleContactChange(index, 'number', text)}
+                                                keyboardType="phone-pad"
+                                            />
+                                        </View>
                                         {index > 0 && (
                                             <TouchableOpacity
                                                 onPress={() => removeContact(index)}
-                                                style={{ justifyContent: 'center', padding: 4 }}
+                                                style={{ paddingTop: 14 }}
                                             >
                                                 <Ionicons name="trash-outline" size={20} color="#EF4444" />
                                             </TouchableOpacity>
@@ -226,27 +271,37 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
                                     </View>
                                 </View>
                             ))}
+
                         </View>
 
-                        {isEducation && (
-                            <View style={styles.formGroup}>
-                                <ThemedText style={styles.label}>Description</ThemedText>
-                                <TextInput
-                                    style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
-                                    placeholder="Enter details about the institute..."
-                                    placeholderTextColor="#94A3B8"
-                                    value={form.description}
-                                    onChangeText={(text) => handleChange('description', text)}
-                                    multiline
-                                    numberOfLines={3}
-                                />
+                        <View style={styles.formGroup}>
+                            <View style={styles.labelRow}>
+                                <ThemedText style={styles.label}>Description <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                <ThemedText style={[
+                                    styles.charCount,
+                                    (form.description.length < 50 || form.description.length >= 500) && { color: '#EF4444' }
+                                ]}>
+                                    {form.description.length}/500 (Min 50)
+                                </ThemedText>
                             </View>
-                        )}
+                            <TextInput
+                                style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
+                                placeholder="Enter descriptive details (Min 50 chars)..."
+                                placeholderTextColor="#94A3B8"
+                                value={form.description}
+                                onChangeText={(text) => handleChange('description', text)}
+                                multiline
+                                numberOfLines={3}
+                                maxLength={500}
+                            />
+                        </View>
 
                         {isHealth && (
                             <>
                                 <View style={styles.formGroup}>
-                                    <ThemedText style={styles.label}>Timing</ThemedText>
+                                    <View style={styles.labelRow}>
+                                        <ThemedText style={styles.label}>Timing <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                    </View>
                                     <TextInput
                                         style={[styles.input, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
                                         placeholder="e.g., 9:00 AM - 5:00 PM"
@@ -256,19 +311,29 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
                                     />
                                 </View>
                                 <View style={styles.formGroup}>
-                                    <ThemedText style={styles.label}>Services</ThemedText>
+                                    <View style={styles.labelRow}>
+                                        <ThemedText style={styles.label}>Services <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                        <ThemedText style={[
+                                            styles.charCount,
+                                            (form.services.length < 50 || form.services.length >= 500) && { color: '#EF4444' }
+                                        ]}>
+                                            {form.services.length}/500 (Min 50)
+                                        </ThemedText>
+                                    </View>
                                     <TextInput
                                         style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
-                                        placeholder="Enter services offered..."
+                                        placeholder="Enter services offered (Min 50 chars)..."
                                         placeholderTextColor="#94A3B8"
                                         value={form.services}
                                         onChangeText={(text) => handleChange('services', text)}
                                         multiline
                                         numberOfLines={3}
+                                        maxLength={500}
                                     />
                                 </View>
                             </>
                         )}
+
 
                         <TouchableOpacity
                             style={[styles.submitButton, { backgroundColor: colors.primary }]}
@@ -338,6 +403,17 @@ const styles = StyleSheet.create({
     textArea: {
         height: 100,
         textAlignVertical: 'top',
+    },
+    labelRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    charCount: {
+        fontSize: 12,
+        opacity: 0.6,
+        fontWeight: '500',
     },
     submitButton: {
         marginTop: 20,

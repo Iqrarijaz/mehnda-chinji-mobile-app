@@ -11,9 +11,12 @@ import {
     View,
 } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { TintedCard } from '../ui/tintedCard';
+import { ReportModal, ReportModalRef } from '../common/ReportModal';
+import { useRef } from 'react';
 
 interface Contact {
     name: string;
@@ -48,12 +51,17 @@ interface PlaceData {
 
 interface HealthCardProps {
     data: PlaceData;
+    color?: string;
 }
 
-const HealthCard = React.memo(({ data }: HealthCardProps) => {
+const HealthCard = React.memo(({ data, color }: HealthCardProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const [modalVisible, setModalVisible] = useState(false);
+    const primaryColor = color || '#EF4444';
+    const softBorder = primaryColor + '20';
+
+    const reportModalRef = useRef<ReportModalRef>(null);
 
     const handleCall = (phoneNumber: string) => {
         if (phoneNumber) {
@@ -82,7 +90,8 @@ const HealthCard = React.memo(({ data }: HealthCardProps) => {
     }
 
     const capitalize = (str: string) => {
-        return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        const words = str.toLowerCase().split(' ');
+        return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
     const getString = (val: string | { en: string; ur?: string } | undefined) => {
@@ -100,28 +109,34 @@ const HealthCard = React.memo(({ data }: HealthCardProps) => {
     return (
         <>
             <TouchableOpacity
-                activeOpacity={0.7}
+                activeOpacity={0.8}
                 onPress={() => setModalVisible(true)}
-                style={[styles.cardContainer, { backgroundColor: colors.card, borderColor: colors.border }]}
+                style={styles.cardWrapper}
             >
-                <View style={styles.contentRow}>
-                    <View style={[styles.iconContainer, { backgroundColor: '#EF4444' + '15' }]}>
-                        <MaterialCommunityIcons name="medical-bag" size={24} color="#EF4444" />
-                    </View>
-
-                    <View style={[styles.detailsContainer, { marginRight: 12 }]}>
-                        <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={2}>
-                            {placeName}
-                        </ThemedText>
-
-                        <View style={styles.addressRow}>
-                            <ThemedText style={[styles.address, { color: colors.icon }]} numberOfLines={2}>
-                                {address}
-                            </ThemedText>
+                <TintedCard
+                    tintColor={primaryColor}
+                    bgColor="#FFFFFF"
+                    style={styles.cardContainer}
+                >
+                    <View style={styles.contentRow}>
+                        <View style={[styles.iconContainer, { backgroundColor: primaryColor + '15' }]}>
+                            <MaterialCommunityIcons name="medical-bag" size={24} color={primaryColor} />
                         </View>
+
+                        <View style={[styles.detailsContainer, { marginRight: 12 }]}>
+                            <ThemedText style={[styles.name, { color: primaryColor }]} numberOfLines={2}>
+                                {placeName}
+                            </ThemedText>
+
+                            <View style={styles.addressRow}>
+                                <ThemedText style={[styles.address, { color: primaryColor, opacity: 0.7 }]} numberOfLines={2}>
+                                    {address}
+                                </ThemedText>
+                            </View>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color={primaryColor} style={{ opacity: 0.5 }} />
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color={colors.icon} />
-                </View>
+                </TintedCard>
             </TouchableOpacity>
 
             <Modal
@@ -131,16 +146,21 @@ const HealthCard = React.memo(({ data }: HealthCardProps) => {
                 onRequestClose={() => setModalVisible(false)}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0,0,0,0.5)' }]}>
-                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                    <View style={[styles.modalContent, { backgroundColor: '#FFFFFF', borderColor: softBorder, borderWidth: 1 }]}>
 
                         {/* Header */}
                         <View style={styles.modalHeader}>
-                            <ThemedText style={[styles.modalTitle, { color: colors.text }]}>
+                            <ThemedText style={[styles.modalTitle, { color: primaryColor }]}>
                                 {placeName}
                             </ThemedText>
-                            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-                                <Ionicons name="close" size={24} color={colors.text} />
-                            </TouchableOpacity>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                <TouchableOpacity onPress={() => reportModalRef.current?.present()} style={styles.closeButton}>
+                                    <Ionicons name="flag" size={18} color="#EF4444" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                                    <Ionicons name="close" size={24} color={primaryColor} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
 
                         <ScrollView contentContainerStyle={styles.modalScrollContent}>
@@ -220,23 +240,26 @@ const HealthCard = React.memo(({ data }: HealthCardProps) => {
                     </View>
                 </View>
             </Modal>
+
+            <ReportModal
+                ref={reportModalRef}
+                targetId={data._id}
+                targetType="PLACE"
+            />
         </>
     );
 });
 
 export default HealthCard;
 
+const isAndroid = Platform.OS === 'android';
+
 const styles = StyleSheet.create({
+    cardWrapper: {
+        marginBottom: isAndroid ? 10 : 12,
+    },
     cardContainer: {
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 12,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 3,
-        borderWidth: 1,
+        padding: isAndroid ? 10 : 16,
     },
     contentRow: {
         flexDirection: 'row',
@@ -283,7 +306,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
-        elevation: 10,
     },
     modalHeader: {
         flexDirection: 'row',

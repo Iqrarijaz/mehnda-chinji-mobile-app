@@ -2,16 +2,22 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
+import { ThemedText } from '@/components/themedText';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
 interface CategoryCardProps {
     label: string;
-    icon: string; // Ionicons name
+    icon: string;
     onPress: () => void;
-    color?: string; // Optional accent color (not used in new design)
+    color?: string;
 }
 
-export function CategoryCard({ label, icon, color, onPress }: CategoryCardProps) {
+export const CategoryCard = React.memo(({ label, icon, color, onPress }: CategoryCardProps) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+    const accentColor = color || colors.primary;
+
     return (
         <TouchableOpacity
             onPress={onPress}
@@ -19,17 +25,13 @@ export function CategoryCard({ label, icon, color, onPress }: CategoryCardProps)
             style={styles.touchable}
         >
             <View style={styles.card}>
-
-                {/* Icon */}
-                <View style={[styles.iconContainer, { backgroundColor: (color || '#004030') + '15', padding: 8, borderRadius: 12 }]}>
-                    <Ionicons name={icon as any} size={24} color={color || '#004030'} />
+                <View style={[styles.iconContainer, { backgroundColor: accentColor + '12' }]}>
+                    <Ionicons name={icon as any} size={24} color={accentColor} />
                 </View>
-
-                {/* Label */}
                 <ThemedText
-                    style={styles.label}
+                    style={[styles.label, { color: colors.text }]}
                     numberOfLines={2}
-                    adjustsFontSizeToFit={true}
+                    adjustsFontSizeToFit
                     minimumFontScale={0.8}
                 >
                     {String(label)}
@@ -37,37 +39,33 @@ export function CategoryCard({ label, icon, color, onPress }: CategoryCardProps)
             </View>
         </TouchableOpacity>
     );
-}
+});
 
 const styles = StyleSheet.create({
     touchable: {
         flex: 1,
-        margin: 6, // Increased from 4 for more spacing
+        margin: 6,
     },
     card: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)', // Semi-transparent for shadow visibility
-        borderRadius: 8,
-        padding: 8,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        padding: 12,
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: 70,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3, // Reset to reasonable value
-        elevation: 3,
-        borderWidth: 0,
-        overflow: 'hidden',
+        minHeight: 80,
     },
-    // glossOverlay removed
     iconContainer: {
-        marginBottom: 6,
+        width: 44,
+        height: 44,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
     },
     label: {
-        fontSize: 10, // Smaller font
+        fontSize: 11,
         fontWeight: '600',
-        color: '#000000', // Black text
         textAlign: 'center',
-        lineHeight: 12,
+        lineHeight: 14,
     },
 });

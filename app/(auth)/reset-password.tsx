@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -14,8 +14,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { RESET_PASSWORD } from '@/apis/forgot-password';
-import { ThemedText } from '@/components/themed-text';
+import { resetPassword } from '@/apis/forgot-password';
+import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -76,7 +76,7 @@ export default function ResetPasswordScreen() {
         setFormData(prev => ({ ...prev, loading: true }));
 
         try {
-            const response = await RESET_PASSWORD(
+            const response = await resetPassword(
                 emailOrPhone,
                 formData.resetToken.trim(),
                 formData.newPassword
@@ -85,7 +85,7 @@ export default function ResetPasswordScreen() {
             Toast.show({
                 type: 'success',
                 text1: 'Success',
-                text2: response.message || 'Password reset successfully'
+                text2: response?.data?.message || 'Password reset successfully'
             });
 
             // Navigate back to login
@@ -108,50 +108,30 @@ export default function ResetPasswordScreen() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={[styles.container, { backgroundColor: colors.background }]}
         >
+            {/* Header / Top Section */}
+            <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => router.back()}
+                >
+                    <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                </TouchableOpacity>
+                <View style={styles.headerContent}>
+                    <ThemedText style={styles.headerTitle}>Set New{"\n"}Password</ThemedText>
+                    <ThemedText style={styles.headerSubtitle}>
+                        Create a strong password for your account
+                    </ThemedText>
+                </View>
+            </View>
+
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.background }}
                 bounces={false}
             >
-                {/* Header / Top Section */}
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#004030' }]}>
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() => router.back()}
-                    >
-                        <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <View style={styles.headerContent}>
-                        <ThemedText style={styles.headerTitle}>Reset{"\n"}Password</ThemedText>
-                        <ThemedText style={styles.headerSubtitle}>
-                            Enter the code sent to {emailOrPhone}
-                        </ThemedText>
-                    </View>
-                </View>
-
                 {/* Form Card */}
                 <View style={styles.formContainer}>
                     <View style={[styles.formCard, { backgroundColor: colors.card }]}>
-                        {/* Reset Code Input */}
-                        <View style={styles.inputField}>
-                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>RESET CODE</ThemedText>
-                            <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
-                            }]}>
-                                <Ionicons name="key-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                                <TextInput
-                                    placeholder="Enter 6-digit code"
-                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
-                                    value={formData.resetToken}
-                                    onChangeText={(resetToken) => setFormData(prev => ({ ...prev, resetToken }))}
-                                    style={[styles.input, { color: colors.text }]}
-                                    keyboardType="number-pad"
-                                    maxLength={6}
-                                    editable={!formData.loading}
-                                />
-                            </View>
-                        </View>
 
                         {/* New Password Input */}
                         <View style={styles.inputField}>
@@ -204,7 +184,7 @@ export default function ResetPasswordScreen() {
 
                         {/* Submit Button */}
                         <TouchableOpacity
-                            style={[styles.submitButton, { backgroundColor: '#004030' }]}
+                            style={[styles.submitButton, { backgroundColor: '#006666' }]}
                             onPress={handleSubmit}
                             disabled={formData.loading}
                         >
@@ -282,7 +262,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
-        elevation: 2,
     },
     inputField: {
         marginBottom: 18,
@@ -316,11 +295,10 @@ const styles = StyleSheet.create({
         marginTop: 6,
         marginBottom: 18,
         overflow: 'hidden',
-        shadowColor: '#004030',
+        shadowColor: '#006666',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
-        elevation: 4,
     },
     submitButtonText: {
         color: '#FFFFFF',

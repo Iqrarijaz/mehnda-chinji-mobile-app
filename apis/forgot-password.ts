@@ -1,43 +1,37 @@
-import { baseUrl } from "@/configs";
+import apiClient from "./client";
 
 /**
- * Request password reset
+ * Check account details
  */
-export const REQUEST_PASSWORD_RESET = async (emailOrPhone: string) => {
-    const response = await fetch(`${baseUrl}/auth/user/forgot-password`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ emailOrPhone }),
-    });
+export const checkAccountDetails = async (emailOrPhone: string) => {
+    return apiClient.post('/auth/user/check-account-details', { emailOrPhone });
+};
 
-    const data = await response.json();
+/**
+ * Send OTP
+ */
+export const sendOtp = async (emailOrPhone: string, otpCase = "FORGOT_PASSWORD") => {
+    const isEmail = emailOrPhone.includes('@');
+    const body = isEmail ? { email: emailOrPhone, otpCase } : { phone: emailOrPhone, otpCase };
 
-    if (!response.ok) {
-        throw new Error(data.message || 'Failed to request password reset');
-    }
+    return apiClient.post('/auth/user/send-otp', body);
+};
 
-    return data;
+/**
+ * Verify OTP
+ */
+export const verifyOtp = async (emailOrPhone: string, otp: string, otpCase = "FORGOT_PASSWORD") => {
+    const isEmail = emailOrPhone.includes('@');
+    const body = isEmail
+        ? { email: emailOrPhone, otp, otpCase }
+        : { phone: emailOrPhone, otp, otpCase };
+
+    return apiClient.post('/auth/user/verify-otp', body);
 };
 
 /**
  * Reset password with token
  */
-export const RESET_PASSWORD = async (emailOrPhone: string, resetToken: string, newPassword: string) => {
-    const response = await fetch(`${baseUrl}/auth/user/reset-password`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ emailOrPhone, resetToken, newPassword }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.message || 'Failed to reset password');
-    }
-
-    return data;
+export const resetPassword = async (emailOrPhone: string, resetToken: string, newPassword: string) => {
+    return apiClient.post('/auth/user/reset-password', { emailOrPhone, resetToken, newPassword });
 };

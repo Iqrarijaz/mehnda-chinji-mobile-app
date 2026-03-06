@@ -1,7 +1,7 @@
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useSegments } from 'expo-router';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { secureStorage, clientStorage } from '@/utils/storage';
+import { useNotificationStore } from '@/store/notificationStore';
 
 type UserData = {
     token: string;
@@ -31,14 +31,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const segments = useSegments();
+    const { initializePreferences } = useNotificationStore();
 
     useEffect(() => {
         const loadUser = async () => {
             try {
-                const storedUser = await AsyncStorage.getItem('userData');
+                const storedUser = await secureStorage.getItem('userData');
                 if (storedUser) {
-                    setUser(JSON.parse(storedUser));
-
+                    const parsed = JSON.parse(storedUser);
+                    setUser(parsed);
+                    if (parsed.user?.notificationPreferences) {
+                        initializePreferences(parsed.user.notificationPreferences);
+                    }
                 }
             } catch (e) {
                 console.error('Failed to load user', e);
@@ -49,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loadUser();
     }, []);
 
-    const login = async (payload: any) => {
+    const login = useCallback(async (payload: any) => {
         // Handle nested data if present
         const source = payload.data || payload;
         const userData = source.userData || (source.id ? source : null);
@@ -61,27 +65,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const authData = { user: userData, token: source.token || payload.token };
         setUser(authData);
-        await AsyncStorage.setItem('userData', JSON.stringify(authData));
 
+        if (userData.notificationPreferences) {
+            initializePreferences(userData.notificationPreferences);
+        }
 
+        await secureStorage.setItem('userData', JSON.stringify(authData));
 
         // @ts-ignore
-        router.replace('/(tabs)');
-    };
+        router.replace('/(tabs)/');
+    }, [router, initializePreferences]);
 
-    const logout = async () => {
+    const logout = useCallback(async () => {
+        try {
+            // ⭐ Phase 5: Logout Cleanup
+            console.log('🚪 Starting logout cleanup...');
+            await clientStorage.removeItem('push_token');
+            console.log('✅ Logout cleanup completed (Push token cleared).');
+        } catch (error) {
+            console.error('Error during logout cleanup:', error);
+        }
+
         setUser(null);
-        await AsyncStorage.removeItem('userData');
+        await secureStorage.removeItem('userData');
         // @ts-ignore
         router.replace('/(auth)/login');
-    };
+    }, [router]);
 
-    const updateUser = async (newUserData: any) => {
-        if (!user) return;
-        const updatedAuthData = { ...user, user: { ...user.user, ...newUserData } };
-        setUser(updatedAuthData);
-        await AsyncStorage.setItem('userData', JSON.stringify(updatedAuthData));
-    };
+    const updateUser = useCallback(async (newUserData: any) => {
+        setUser(prev => {
+            if (!prev) return prev;
+
+            if (newUserData.notificationPreferences) {
+                initializePreferences(newUserData.notificationPreferences);
+            }
+
+            const updatedAuthData = { ...prev, user: { ...prev.user, ...newUserData } };
+            secureStorage.setItem('userData', JSON.stringify(updatedAuthData));
+            return updatedAuthData;
+        });
+    }, [initializePreferences]);
 
     const isAuthenticated = !!user;
 
@@ -97,12 +120,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             router.replace('/(auth)/login');
         } else if (user && inAuthGroup) {
             // @ts-ignore
-            router.replace('/(tabs)');
+            router.replace('/(tabs)/');
         }
     }, [user, loading, segments]);
 
+    const authValue = useMemo(() => ({
+        user,
+        loading,
+        login,
+        logout,
+        updateUser,
+        isAuthenticated
+    }), [user, loading, login, logout, updateUser, isAuthenticated]);
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, updateUser, isAuthenticated }}>
+        <AuthContext.Provider value={authValue}>
             {children}
         </AuthContext.Provider>
     );

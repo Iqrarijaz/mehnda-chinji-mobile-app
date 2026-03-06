@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TextInput, View, ViewStyle } from 'react-native';
+import { Platform, StyleSheet, TextInput, View, ViewStyle } from 'react-native';
 
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -8,10 +8,13 @@ import { useTheme } from '@/context/ThemeContext';
 interface SearchBarProps {
     placeholder?: string;
     onSearch?: (query: string) => void;
+    onFocus?: () => void;
+    onBlur?: () => void;
     style?: ViewStyle;
 }
 
-export function SearchBar({ placeholder = "Search...", onSearch, style }: SearchBarProps) {
+export function SearchBar({ placeholder = "Search...", onSearch, onFocus, onBlur, style }: SearchBarProps) {
+
     const { theme } = useTheme();
     const colors = Colors[theme];
     const isDark = theme === 'dark';
@@ -19,23 +22,21 @@ export function SearchBar({ placeholder = "Search...", onSearch, style }: Search
     return (
         <View style={[
             styles.container,
-            {
-                backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-            },
             style
         ]}>
             <Ionicons
                 name="search"
                 size={20}
-                color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'}
+                color="#94A3B8"
                 style={styles.icon}
             />
             <TextInput
                 placeholder={placeholder}
-                placeholderTextColor={isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'}
-                style={[styles.input, { color: colors.text }]}
-                onChangeText={onSearch} // Basic implementation, might need debounce for API calls
+                placeholderTextColor="#94A3B8"
+                style={[styles.input, { color: '#0F172A' }]}
+                onChangeText={onSearch}
+                onFocus={onFocus}
+                onBlur={onBlur}
             />
         </View>
     );
@@ -45,17 +46,18 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 16,
+        paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
+        borderRadius: 24,
         borderWidth: 1,
+        backgroundColor: '#FFFFFF',
+        borderColor: 'transparent',
     },
     icon: {
         marginRight: 10,
     },
     input: {
         flex: 1,
-        fontSize: 16,
-        padding: 0, // Reset padding for consistency
+        fontSize: Platform.OS === 'android' ? 13 : 15,
+        padding: 0,
     }
 });

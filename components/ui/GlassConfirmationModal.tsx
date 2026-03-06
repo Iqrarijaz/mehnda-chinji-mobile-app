@@ -1,14 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
-import { Modal, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withSpring,
     withTiming
 } from 'react-native-reanimated';
-import { ThemedText } from '../themed-text';
+import { ThemedText } from '../themedText';
+import { PremiumModal } from '../common/PremiumModal';
 
 interface GlassConfirmationModalProps {
     visible: boolean;
@@ -50,65 +51,58 @@ export const GlassConfirmationModal: React.FC<GlassConfirmationModalProps> = ({
     }));
 
     return (
-        <Modal
-            visible={visible}
-            transparent={true}
-            animationType="none"
-            onRequestClose={onClose}
-        >
-            <Pressable style={styles.overlay} onPress={onClose}>
-                <Animated.View style={[styles.modalContent, animatedStyle]}>
-                    <LinearGradient
-                        colors={['rgba(30, 41, 59, 0.95)', 'rgba(15, 23, 42, 0.98)']}
-                        style={StyleSheet.absoluteFill}
-                    />
+        <PremiumModal visible={visible} onClose={onClose} type="centered">
+            <Animated.View style={[styles.modalContent, animatedStyle]}>
+                <LinearGradient
+                    colors={['rgba(30, 41, 59, 0.95)', 'rgba(15, 23, 42, 0.98)']}
+                    style={StyleSheet.absoluteFill}
+                />
 
-                    {/* Header with Icon */}
-                    <View style={styles.header}>
-                        <View style={[
-                            styles.iconWrapper,
-                            { backgroundColor: type === 'danger' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)' }
-                        ]}>
-                            <Ionicons
-                                name={type === 'danger' ? "alert-circle" : "information-circle"}
-                                size={32}
-                                color={type === 'danger' ? "#ef4444" : "#3b82f6"}
-                            />
-                        </View>
-                        <ThemedText style={styles.title}>{title}</ThemedText>
+                {/* Header with Icon */}
+                <View style={styles.header}>
+                    <View style={[
+                        styles.iconWrapper,
+                        { backgroundColor: type === 'danger' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)' }
+                    ]}>
+                        <Ionicons
+                            name={type === 'danger' ? "alert-circle" : "information-circle"}
+                            size={32}
+                            color={type === 'danger' ? "#ef4444" : "#3b82f6"}
+                        />
                     </View>
+                    <ThemedText style={styles.title}>{title}</ThemedText>
+                </View>
 
-                    {/* Message */}
-                    <ThemedText style={styles.message}>{message}</ThemedText>
+                {/* Message */}
+                <ThemedText style={styles.message}>{message}</ThemedText>
 
-                    {/* Footer Actions */}
-                    <View style={styles.footer}>
-                        <TouchableOpacity
-                            style={styles.cancelBtn}
-                            onPress={onClose}
-                            activeOpacity={0.7}
+                {/* Footer Actions */}
+                <View style={styles.footer}>
+                    <TouchableOpacity
+                        style={styles.cancelBtn}
+                        onPress={onClose}
+                        activeOpacity={0.7}
+                    >
+                        <ThemedText style={styles.cancelText}>{cancelText}</ThemedText>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.confirmBtnWrapper}
+                        onPress={onConfirm}
+                        activeOpacity={0.8}
+                    >
+                        <LinearGradient
+                            colors={type === 'danger' ? ['#ef4444', '#b91c1c'] : ['#3b82f6', '#1d4ed8']}
+                            style={styles.confirmBtn}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
                         >
-                            <ThemedText style={styles.cancelText}>{cancelText}</ThemedText>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.confirmBtnWrapper}
-                            onPress={onConfirm}
-                            activeOpacity={0.8}
-                        >
-                            <LinearGradient
-                                colors={type === 'danger' ? ['#ef4444', '#b91c1c'] : ['#3b82f6', '#1d4ed8']}
-                                style={styles.confirmBtn}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 1 }}
-                            >
-                                <ThemedText style={styles.confirmBtnText}>{confirmText}</ThemedText>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    </View>
-                </Animated.View>
-            </Pressable>
-        </Modal>
+                            <ThemedText style={styles.confirmBtnText}>{confirmText}</ThemedText>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+            </Animated.View>
+        </PremiumModal>
     );
 };
 
@@ -127,7 +121,6 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.15)',
-        elevation: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.3,

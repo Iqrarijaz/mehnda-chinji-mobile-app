@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { clientStorage } from '@/utils/storage';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useColorScheme as _useColorScheme } from 'react-native';
 
 type ColorScheme = 'light' | 'dark';
@@ -24,12 +24,12 @@ const ThemeContext = createContext<ThemeContextType>({
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const systemColorScheme = _useColorScheme() as ColorScheme;
     const [themePreference, setThemePreferenceState] = useState<ThemePreference>('system');
-    const [theme, setTheme] = useState<ColorScheme>(systemColorScheme || 'light');
+    const [theme, setTheme] = useState<ColorScheme>('light');
 
     useEffect(() => {
         const loadTheme = async () => {
             try {
-                const storedTheme = await AsyncStorage.getItem('userTheme');
+                const storedTheme = await clientStorage.getItem('userTheme');
                 if (storedTheme) {
                     setThemePreferenceState(storedTheme as ThemePreference);
                 }
@@ -52,20 +52,28 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         */
     }, [themePreference, systemColorScheme]);
 
-    const setThemePreference = async (pref: ThemePreference) => {
+    const setThemePreference = useCallback(async (pref: ThemePreference) => {
         setThemePreferenceState(pref);
-        await AsyncStorage.setItem('userTheme', pref);
-    };
+        await clientStorage.setItem('userTheme', pref);
+    }, []);
 
-    const toggleTheme = () => {
+    const toggleTheme = useCallback(() => {
         const nextTheme = theme === 'light' ? 'dark' : 'light';
         setThemePreference(nextTheme);
-    };
+    }, [theme, setThemePreference]);
 
     const isDark = theme === 'dark';
 
+    const themeValue = useMemo(() => ({
+        theme,
+        themePreference,
+        setThemePreference,
+        isDark,
+        toggleTheme
+    }), [theme, themePreference, setThemePreference, isDark, toggleTheme]);
+
     return (
-        <ThemeContext.Provider value={{ theme, themePreference, setThemePreference, isDark, toggleTheme }}>
+        <ThemeContext.Provider value={themeValue}>
             {children}
         </ThemeContext.Provider>
     );

@@ -1,10 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions } from '@react-navigation/native';
 import { Tabs, useNavigation } from 'expo-router';
-import React from 'react';
 import { TouchableOpacity } from 'react-native';
 
-import { CustomTabBar } from '@/components/CustomTabBar';
+import { CustomTabBar } from '@/components/customTabBar';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -16,16 +15,6 @@ export default function TabLayout() {
 
 
 
-  const getProfileSource = () => {
-    if (user?.user?.profileImage) {
-      return { uri: user.user.profileImage };
-    }
-    const gender = user?.user?.gender?.toUpperCase();
-    if (gender === 'FEMALE') {
-      return require('../../assets/icons/user-female.png');
-    }
-    return require('../../assets/icons/user-male.png');
-  };
 
   return (
     <>
@@ -54,9 +43,16 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="feed"
+          options={{
+            title: 'Feed',
+            headerShown: false,
+          }}
+        />
+        <Tabs.Screen
           name="business"
           options={{
-            title: 'Business',
+            title: 'Directory',
             headerShown: false,
           }}
         />

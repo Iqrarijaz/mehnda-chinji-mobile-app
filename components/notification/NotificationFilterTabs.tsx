@@ -1,0 +1,76 @@
+import React from 'react';
+import { Platform, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated, { SlideInLeft, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { ThemedText } from '../themedText';
+
+const PRIMARY = '#006666';
+
+const FILTERS = [
+    { label: 'All', value: 'ALL' },
+    { label: 'System', value: 'SYSTEM' },
+    { label: 'Community', value: 'COMMUNITY' },
+    { label: 'Activity', value: 'ACTIVITY' },
+];
+
+interface Props {
+    active: string;
+    onSelect: (v: string) => void;
+}
+
+const FilterChip = React.memo(({ label, value, isActive, onPress }: { label: string; value: string; isActive: boolean; onPress: () => void }) => {
+    const animStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: withSpring(isActive ? 1.04 : 1, { damping: 14 }) }],
+    }));
+    return (
+        <Animated.View style={animStyle}>
+            <TouchableOpacity
+                onPress={onPress}
+                activeOpacity={0.75}
+                style={[styles.chip, isActive && styles.chipActive]}
+            >
+                <ThemedText style={[styles.label, isActive && styles.labelActive]}>{label}</ThemedText>
+            </TouchableOpacity>
+        </Animated.View>
+    );
+});
+
+const NotificationFilterTabs = React.memo(({ active, onSelect }: Props) => (
+    <Animated.View entering={SlideInLeft.delay(180).duration(400)}>
+        <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.scroll}
+            style={styles.bar}
+        >
+            {FILTERS.map(f => (
+                <FilterChip
+                    key={f.value}
+                    label={f.label}
+                    value={f.value}
+                    isActive={active === f.value}
+                    onPress={() => onSelect(f.value)}
+                />
+            ))}
+        </ScrollView>
+    </Animated.View>
+));
+
+export default NotificationFilterTabs;
+
+const styles = StyleSheet.create({
+    bar: { marginTop: 16 },
+    scroll: { paddingHorizontal: 20, gap: 10, paddingBottom: 4 },
+    chip: {
+        paddingHorizontal: 20,
+        paddingVertical: Platform.OS === 'android' ? 7 : 9,
+        borderRadius: 24,
+        backgroundColor: '#FFFFFF',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
+    },
+    chipActive: { backgroundColor: PRIMARY },
+    label: { fontSize: 13, fontWeight: '600', color: '#64748B' },
+    labelActive: { color: '#FFFFFF', fontWeight: '700' },
+});

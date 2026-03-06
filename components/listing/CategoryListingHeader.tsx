@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+import { ThemedText } from '@/components/themedText';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -8,6 +8,8 @@ import {
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Tooltip from 'react-native-walkthrough-tooltip';
+import { useTheme } from '@/context/ThemeContext';
 
 interface CategoryListingHeaderProps {
     categoryTitle: string;
@@ -18,6 +20,9 @@ interface CategoryListingHeaderProps {
     setActiveTab: (tab: 'all' | 'requests') => void;
     onBack: () => void;
     onAdd: () => void;
+    showTooltip?: boolean;
+    onCloseTooltip?: () => void;
+    tooltipMessage?: string;
 }
 
 const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
@@ -29,6 +34,9 @@ const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
     setActiveTab,
     onBack,
     onAdd,
+    showTooltip = false,
+    onCloseTooltip = () => { },
+    tooltipMessage = 'نیا مقام شامل کرنے کے لیے یہاں ٹیپ کریں',
 }) => {
     const insets = useSafeAreaInsets();
 
@@ -39,9 +47,28 @@ const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
                     <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
                 <ThemedText style={styles.headerTitle}>{categoryTitle}</ThemedText>
-                <TouchableOpacity onPress={onAdd} style={styles.iconButton}>
-                    <Ionicons name="add" size={24} color="#FFFFFF" />
-                </TouchableOpacity>
+                <Tooltip
+                    isVisible={showTooltip}
+                    content={
+                        <View style={styles.tooltipPill}>
+                            <ThemedText style={styles.tooltipText}>{tooltipMessage}</ThemedText>
+                            <TouchableOpacity onPress={onCloseTooltip} style={styles.tooltipClose}>
+                                <Ionicons name="close-circle" size={18} color="#64748B" />
+                            </TouchableOpacity>
+                        </View>
+                    }
+                    placement="bottom"
+                    onClose={onCloseTooltip}
+                    contentStyle={styles.tooltipContent}
+                    backgroundColor="rgba(0,0,0,0.2)"
+                >
+                    <TouchableOpacity
+                        onPress={onAdd}
+                        style={styles.iconButton}
+                    >
+                        <Ionicons name="add" size={24} color="#FFFFFF" />
+                    </TouchableOpacity>
+                </Tooltip>
             </View>
 
             {/* Search Bar */}
@@ -73,7 +100,7 @@ const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
                         styles.filterText,
                         activeTab === 'all' && [styles.activeFilterText, { color: headerColor }]
                     ]}>
-                        All Places
+                        All
                     </ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -92,9 +119,38 @@ const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
     );
 };
 
-export default CategoryListingHeader;
+export default React.memo(CategoryListingHeader);
 
 const styles = StyleSheet.create({
+    tooltipContent: {
+        padding: 0,
+        borderRadius: 40,
+        backgroundColor: 'transparent',
+    },
+    tooltipPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 40,
+        backgroundColor: '#FFFFFF',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.05)',
+        gap: 12,
+    },
+    tooltipText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: '#64748B',
+    },
+    tooltipClose: {
+        padding: 4,
+    },
     headerContainer: {
         paddingBottom: 20,
         borderBottomLeftRadius: 24,
@@ -103,7 +159,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
-        elevation: 5,
+        elevation: 10,
         zIndex: 10,
     },
     headerContent: {

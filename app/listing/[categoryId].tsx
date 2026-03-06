@@ -1,18 +1,17 @@
-import { DELETE_REQUEST, GET_MY_REQUESTS, GET_PLACES_LIST, PLACE_SUBMISSION_QUERY_KEYS, PLACES_QUERY_KEYS } from '@/apis/places';
-import BusinessCard from '@/components/business/BusinessCard';
-import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
-import CategoryListingHeader from '@/components/listing/CategoryListingHeader';
-import EducationCard from '@/components/listing/EducationCard';
-import EmptyListingState from '@/components/listing/EmptyListingState';
-import HealthCard from '@/components/listing/HealthCard';
-import MosqueCard from '@/components/listing/MosqueCard';
-import RequestCard from '@/components/places/RequestCard';
+import { deleteRequest, getMyRequests, getPlacesList, PLACE_SUBMISSION_QUERY_KEYS, PLACES_QUERY_KEYS } from '@/apis/places';
+import BusinessCard from '@/components/business/businessCard';
+import { CleanConfirmationModal } from '@/components/common/cleanConfirmationModal';
+import CategoryListingHeader from '@/components/listing/categoryListingHeader';
+import EducationCard from '@/components/listing/educationCard';
+import EmptyListingState from '@/components/listing/emptyListingState';
+import HealthCard from '@/components/listing/healthCard';
+import MosqueCard from '@/components/listing/mosqueCard';
+import RequestCard from '@/components/places/requestCard';
 import { Colors } from '@/constants/colors';
-import { getCategoryColor } from '@/constants/professions';
 import { useTheme } from '@/context/ThemeContext';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Stack, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import { Stack, useLocalSearchParams, useNavigation, useRouter, useFocusEffect } from 'expo-router';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -22,21 +21,12 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-const CATEGORY_LABELS: Record<string, string> = {
-    education: 'Education',
-    religious: 'Religious',
-    health: 'Health',
-    govt: 'Govt Offices',
-    shops: 'Shops',
-    playgrounds: 'Playgrounds',
-    food: 'Food',
-    services: 'Services',
-};
-
-import PlaceSubmissionModal from '@/components/places/PlaceSubmissionModal';
+import PlaceSubmissionModal from '@/components/places/placeSubmissionModal';
+import { ThemedText } from '@/components/themedText';
+import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 
 const CategoryListingScreen = React.memo(() => {
-    const { categoryId } = useLocalSearchParams<{ categoryId: string }>();
+    const { categoryId, tab } = useLocalSearchParams<{ categoryId: string; tab?: string }>();
     const { theme } = useTheme();
     const navigation = useNavigation();
     const router = useRouter();
@@ -47,9 +37,31 @@ const CategoryListingScreen = React.memo(() => {
     const [search, setSearch] = React.useState('');
     const [debouncedSearch, setDebouncedSearch] = React.useState('');
     const [submissionModalVisible, setSubmissionModalVisible] = React.useState(false);
-    const [activeTab, setActiveTab] = useState<'all' | 'requests'>('all');
+    const [activeTab, setActiveTab] = useState<'all' | 'requests'>(tab === 'requests' ? 'requests' : 'all');
     const [editingRequest, setEditingRequest] = useState<any>(null);
     const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+    const [showTooltip, setShowTooltip] = useState(false);
+
+    // Show tooltip on every focus
+    useFocusEffect(
+        useCallback(() => {
+            // Reset state first to ensure it triggers if already false
+            setShowTooltip(false);
+
+            const timer = setTimeout(() => {
+                setShowTooltip(true);
+            }, 1000);
+
+            return () => {
+                clearTimeout(timer);
+                setShowTooltip(false);
+            };
+        }, [])
+    );
+
+    const handleDismissTooltip = () => {
+        setShowTooltip(false);
+    };
 
     // Debounce search
     React.useEffect(() => {
@@ -60,11 +72,22 @@ const CategoryListingScreen = React.memo(() => {
     }, [search]);
 
     const categoryTitle = useMemo(() => {
-        return CATEGORY_LABELS[categoryId || ''] || 'Listing';
+        return PLACE_CATEGORY_MAPPING[categoryId || ''] || 'Listing';
     }, [categoryId]);
 
     const headerColor = useMemo(() => {
-        return getCategoryColor(categoryId || '');
+        return colors.primary;
+    }, [colors.primary]);
+
+    const tooltipMessage = useMemo(() => {
+        switch (categoryId) {
+            case 'religious': return 'نیا مقام (مسجد) شامل کرنے کے لیے یہاں ٹیپ کریں';
+            case 'education': return 'نیا تعلیمی ادارہ شامل کرنے کے لیے یہاں ٹیپ کریں';
+            case 'health': return 'نیا ہسپتال یا کلینک شامل کرنے کے لیے یہاں ٹیپ کریں';
+            case 'emergency': return 'ایمرجنسی سروس شامل کرنے کے لیے یہاں ٹیپ کریں';
+            case 'govt': return 'نیا سرکاری دفتر شامل کرنے کے لیے یہاں ٹیپ کریں';
+            default: return 'نیا مقام شامل کرنے کے لیے یہاں ٹیپ کریں';
+        }
     }, [categoryId]);
 
     // --- Queries ---
@@ -80,7 +103,7 @@ const CategoryListingScreen = React.memo(() => {
         refetch
     } = useInfiniteQuery({
         queryKey: PLACES_QUERY_KEYS.list({ categoryId, search: debouncedSearch }),
-        queryFn: ({ pageParam = 0 }) => GET_PLACES_LIST({
+        queryFn: ({ pageParam = 0 }) => getPlacesList({
             category: categoryId,
             search: debouncedSearch,
             skip: (pageParam as number) * 20,
@@ -89,7 +112,7 @@ const CategoryListingScreen = React.memo(() => {
         getNextPageParam: (lastPage: any) => {
             const pagination = lastPage?.pagination;
             if (pagination && pagination.currentPage < pagination.totalPages) {
-                return pagination.currentPage;
+                return pagination.currentPage + 1;
             }
             return undefined;
         },
@@ -108,7 +131,7 @@ const CategoryListingScreen = React.memo(() => {
         refetch: myRequestsRefetch
     } = useInfiniteQuery({
         queryKey: PLACE_SUBMISSION_QUERY_KEYS.myRequests({ page: 1, category: categoryId }),
-        queryFn: ({ pageParam = 1 }) => GET_MY_REQUESTS({ page: pageParam, category: categoryId }),
+        queryFn: ({ pageParam = 1 }) => getMyRequests({ page: pageParam, category: categoryId }),
         getNextPageParam: (lastPage: any) => {
             const pagination = lastPage?.pagination;
             if (pagination && pagination.page < pagination.pages) {
@@ -123,7 +146,7 @@ const CategoryListingScreen = React.memo(() => {
     // --- Mutations ---
 
     const deleteMutation = useMutation({
-        mutationFn: DELETE_REQUEST,
+        mutationFn: deleteRequest,
         onSuccess: () => {
             Toast.show({
                 type: 'success',
@@ -168,10 +191,10 @@ const CategoryListingScreen = React.memo(() => {
             return <MosqueCard data={item} color={headerColor} />;
         }
         if (categoryId === 'health') {
-            return <HealthCard data={item} />;
+            return <HealthCard data={item} color={headerColor} />;
         }
         if (categoryId === 'education') {
-            return <EducationCard data={item} />;
+            return <EducationCard data={item} color={headerColor} />;
         }
         return <BusinessCard business={item} />;
     }, [categoryId, headerColor]);
@@ -241,8 +264,17 @@ const CategoryListingScreen = React.memo(() => {
                 setSearch={setSearch}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
-                onBack={() => router.back()}
+                onBack={() => {
+                    if (router.canGoBack()) {
+                        router.back();
+                    } else {
+                        router.replace('/(tabs)');
+                    }
+                }}
                 onAdd={() => setSubmissionModalVisible(true)}
+                showTooltip={showTooltip}
+                onCloseTooltip={handleDismissTooltip}
+                tooltipMessage={tooltipMessage}
             />
 
             {/* Content */}
@@ -262,11 +294,33 @@ const CategoryListingScreen = React.memo(() => {
                         onEndReached={handleLoadMore}
                         onEndReachedThreshold={0.5}
                         ListFooterComponent={
-                            (activeTab === 'all' ? isFetchingNextPage : myRequestsFetchingNextPage) ? (
-                                <View style={{ paddingVertical: 20 }}>
-                                    <ActivityIndicator color={colors.primary} />
-                                </View>
-                            ) : null
+                            () => {
+                                const hasMore = activeTab === 'all' ? hasNextPage : myRequestsHasNextPage;
+                                const isFetching = activeTab === 'all' ? isFetchingNextPage : myRequestsFetchingNextPage;
+                                const hasData = dataToRender.length > 0;
+
+                                if (isFetching) {
+                                    return (
+                                        <View style={styles.footerLoader}>
+                                            <ActivityIndicator color={colors.primary} />
+                                        </View>
+                                    );
+                                }
+
+                                if (!hasMore && hasData) {
+                                    return (
+                                        <View style={styles.endOfListContainer}>
+                                            <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
+                                            <ThemedText style={[styles.endOfListText, { color: colors.icon }]}>
+                                                You've reached the end of the list
+                                            </ThemedText>
+                                            <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
+                                        </View>
+                                    );
+                                }
+
+                                return <View style={{ height: 20 }} />;
+                            }
                         }
                         ListEmptyComponent={
                             <EmptyListingState activeTab={activeTab} categoryTitle={categoryTitle} />
@@ -288,15 +342,36 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
     },
-    listContent: {
-        padding: 20,
-        paddingBottom: 40,
-    },
     loaderContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-
-
+    listContent: {
+        padding: 20,
+        paddingBottom: 40,
+    },
+    footerLoader: {
+        paddingVertical: 30,
+        alignItems: 'center',
+    },
+    endOfListContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 40,
+        paddingHorizontal: 20,
+        gap: 15,
+    },
+    endOfListLine: {
+        height: 1,
+        flex: 1,
+        opacity: 0.3,
+    },
+    endOfListText: {
+        fontSize: 13,
+        fontWeight: '600',
+        opacity: 0.6,
+        letterSpacing: 0.5,
+    },
 });

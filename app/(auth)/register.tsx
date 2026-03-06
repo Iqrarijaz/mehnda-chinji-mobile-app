@@ -1,13 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
-    Modal,
     Platform,
-    Pressable,
     ScrollView,
     StyleSheet,
     TextInput,
@@ -17,10 +15,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { SearchableDropdown } from '@/components/common/SearchableDropdown';
-import citiesData from '@/data/cities.json';
-import { SIGNUP } from '../../apis/login';
-import { ThemedText } from '../../components/themed-text';
+import { ThemedText } from '@/components/themedText';
+import { signup } from '../../apis/login';
 import { Colors } from '../../constants/colors';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -36,18 +32,14 @@ export default function RegisterScreen() {
         fullName: '',
         email: '',
         phone: '',
-        city: '',
-        gender: '',
         password: '',
         confirmPassword: '',
         showPassword: false,
         loading: false,
         latitude: 0,
         longitude: 0,
+        ageVerified: false,
     });
-
-    const [cityModalVisible, setCityModalVisible] = useState(false);
-    const [genderModalVisible, setGenderModalVisible] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -70,16 +62,10 @@ export default function RegisterScreen() {
         })();
     }, []);
 
-    const genders = [
-        { label: 'Male', value: 'MALE' },
-        { label: 'Female', value: 'FEMALE' },
-        { label: 'Other', value: 'OTHER' },
-    ];
-
     const handleRegister = async () => {
-        const { fullName, email, phone, city, gender, password, confirmPassword, latitude, longitude } = formData;
+        const { fullName, email, phone, password, confirmPassword, latitude, longitude } = formData;
 
-        if (!fullName || !email || !phone || !city || !gender || !password || !confirmPassword) {
+        if (!fullName || !email || !phone || !password || !confirmPassword) {
             Toast.show({
                 type: 'error',
                 text1: 'Required Fields',
@@ -106,28 +92,36 @@ export default function RegisterScreen() {
             return;
         }
 
+        if (!formData.ageVerified) {
+            Toast.show({
+                type: 'error',
+                text1: 'Age Verification',
+                text2: 'You must be at least 13 years old to register',
+            });
+            return;
+        }
+
         setFormData(prev => ({ ...prev, loading: true }));
 
         try {
-            await SIGNUP({
+            await signup({
                 name: fullName,
                 email,
                 phone,
-                city,
-                gender,
                 password,
                 confirm: confirmPassword,
                 location: {
                     type: "Point",
                     coordinates: [longitude, latitude] // Note: GeoJSON uses [long, lat]
-                }
+                },
+                ageVerified: true
             });
             Toast.show({
                 type: 'success',
                 text1: 'Success!',
                 text2: 'Account created successfully',
             });
-            router.replace('/login' as any);
+            router.replace({ pathname: '/login', params: { email: email.trim(), password } } as any);
         } catch (error: any) {
             Toast.show({
                 type: 'error',
@@ -142,21 +136,22 @@ export default function RegisterScreen() {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={[styles.container, { backgroundColor: colors.background }]}
+            style={[styles.container, { backgroundColor: '#FFFFFF' }]}
         >
+            {/* Header / Top Section */}
+            <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={styles.headerContent}>
+                    <ThemedText style={styles.headerTitle}>Create an{"\n"}Account</ThemedText>
+                    <ThemedText style={styles.headerSubtitle}>Join Rehbar Community today</ThemedText>
+                </View>
+            </View>
+
             <ScrollView
                 showsVerticalScrollIndicator={false}
+                style={{ backgroundColor: colors.background }}
                 contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.background, paddingBottom: 20 }}
                 bounces={false}
             >
-                {/* Header / Top Section */}
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#004030' }]}>
-                    <View style={styles.headerContent}>
-                        <ThemedText style={styles.headerTitle}>Create an{"\n"}Account</ThemedText>
-                        <ThemedText style={styles.headerSubtitle}>Join Mehnda Chinji Community today</ThemedText>
-                    </View>
-                </View>
-
                 {/* Form Card */}
                 <View style={styles.formContainer}>
                     <View style={[styles.formCard, { backgroundColor: colors.card }]}>
@@ -218,47 +213,7 @@ export default function RegisterScreen() {
                             </View>
                         </View>
 
-                        {/* City */}
-                        <View style={styles.inputField}>
-                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>CITY <ThemedText style={styles.required}>*</ThemedText></ThemedText>
-                            <TouchableOpacity
-                                style={[styles.inputBox, {
-                                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
-                                }]}
-                                onPress={() => setCityModalVisible(true)}
-                            >
-                                <Ionicons name="location-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                                <ThemedText style={[styles.pickerText, {
-                                    color: formData.city ? colors.text : (isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'),
-                                    flex: 1
-                                }]}>
-                                    {formData.city || 'Select City'}
-                                </ThemedText>
-                                <Ionicons name="chevron-down" size={18} color={isDark ? 'rgba(255, 255, 255, 0.3)' : '#64748B'} />
-                            </TouchableOpacity>
-                        </View>
 
-                        {/* Gender */}
-                        <View style={styles.inputField}>
-                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>GENDER <ThemedText style={styles.required}>*</ThemedText></ThemedText>
-                            <TouchableOpacity
-                                style={[styles.inputBox, {
-                                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
-                                }]}
-                                onPress={() => setGenderModalVisible(true)}
-                            >
-                                <Ionicons name="people-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                                <ThemedText style={[styles.pickerText, {
-                                    color: formData.gender ? colors.text : (isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'),
-                                    flex: 1
-                                }]}>
-                                    {formData.gender ? genders.find(g => g.value === formData.gender)?.label : 'Select Gender'}
-                                </ThemedText>
-                                <Ionicons name="chevron-down" size={18} color={isDark ? 'rgba(255, 255, 255, 0.3)' : '#64748B'} />
-                            </TouchableOpacity>
-                        </View>
 
                         {/* Password */}
                         <View style={styles.inputField}>
@@ -307,9 +262,23 @@ export default function RegisterScreen() {
                             </View>
                         </View>
 
+                        {/* Age Verification Checkbox */}
+                        <TouchableOpacity
+                            style={styles.ageVerificationContainer}
+                            onPress={() => setFormData(prev => ({ ...prev, ageVerified: !prev.ageVerified }))}
+                            activeOpacity={0.7}
+                        >
+                            <View style={[styles.checkbox, formData.ageVerified && { backgroundColor: '#006666', borderColor: '#006666' }]}>
+                                {formData.ageVerified && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+                            </View>
+                            <ThemedText style={[styles.ageVerificationText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
+                                I confirm that I am at least 13 years old. <ThemedText style={styles.required}>*</ThemedText>
+                            </ThemedText>
+                        </TouchableOpacity>
+
                         {/* Register Button */}
                         <TouchableOpacity
-                            style={[styles.registerButton, { backgroundColor: '#004030' }]}
+                            style={[styles.registerButton, { backgroundColor: '#006666' }]}
                             onPress={handleRegister}
                             disabled={formData.loading}
                         >
@@ -326,59 +295,14 @@ export default function RegisterScreen() {
                                 Already have an account?{' '}
                             </ThemedText>
                             <TouchableOpacity onPress={() => router.push('/login' as any)}>
-                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#004030', fontWeight: 'bold' }]}>Log In</ThemedText>
+                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#006666', fontWeight: 'bold' }]}>Log In</ThemedText>
                             </TouchableOpacity>
                         </View>
                     </View>
                 </View>
             </ScrollView>
 
-            {/* City Selection Modal */}
-            <SearchableDropdown
-                visible={cityModalVisible}
-                onClose={() => setCityModalVisible(false)}
-                onSelect={(city) => setFormData(prev => ({ ...prev, city }))}
-                currentValue={formData.city}
-                options={citiesData}
-                title="Select City"
-                placeholder="Search city..."
-            />
 
-            {/* Gender Selection Modal */}
-            <Modal
-                visible={genderModalVisible}
-                animationType="fade"
-                transparent={true}
-                onRequestClose={() => setGenderModalVisible(false)}
-            >
-                <Pressable
-                    style={styles.modalOverlay}
-                    onPress={() => setGenderModalVisible(false)}
-                >
-                    <View style={[styles.genderModalContent, { backgroundColor: colors.card }]}>
-                        <View style={styles.modalHeader}>
-                            <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Gender</ThemedText>
-                        </View>
-                        {genders.map((g) => (
-                            <TouchableOpacity
-                                key={g.value}
-                                style={[styles.genderItem, {
-                                    borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F5F9'
-                                }]}
-                                onPress={() => {
-                                    setFormData(prev => ({ ...prev, gender: g.value }));
-                                    setGenderModalVisible(false);
-                                }}
-                            >
-                                <ThemedText style={[styles.cityItemText, { color: colors.text }]}>{g.label}</ThemedText>
-                                {formData.gender === g.value && (
-                                    <Ionicons name="checkmark" size={20} color="#004030" />
-                                )}
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </Pressable>
-            </Modal>
         </KeyboardAvoidingView>
     );
 }
@@ -386,6 +310,27 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    ageVerificationContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+        paddingHorizontal: 4,
+    },
+    checkbox: {
+        width: 22,
+        height: 22,
+        borderRadius: 6,
+        borderWidth: 2,
+        borderColor: '#E2E8F0',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    ageVerificationText: {
+        fontSize: 13,
+        flex: 1,
+        lineHeight: 18,
     },
     headerSection: {
         paddingBottom: 40,
@@ -422,10 +367,9 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
-        elevation: 2,
     },
     inputField: {
-        marginBottom: 26,
+        marginBottom: 24,
     },
     label: {
         fontSize: 11,
@@ -463,11 +407,10 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 20,
         overflow: 'hidden',
-        shadowColor: '#004030',
+        shadowColor: '#006666',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
-        elevation: 4,
     },
     registerButtonText: {
         color: '#FFFFFF',
@@ -521,7 +464,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
-        elevation: 8,
     },
     genderItem: {
         flexDirection: 'row',
