@@ -12,6 +12,10 @@ export async function loginApi(data: any) {
     return apiClient.post('/auth/user/login-with-email', data);
 }
 
+export async function checkAccountExistsApi(data: { email?: string, phone?: string }) {
+    return apiClient.post('/auth/user/check-account-exists', data);
+}
+
 export async function googleLoginApi(data: any) {
     return apiClient.post('/auth/user/google-login', data);
 }

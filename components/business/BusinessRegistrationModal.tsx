@@ -1,4 +1,5 @@
 import { BUSINESS_QUERY_KEYS, registerBusiness, updateBusiness } from '@/apis/business';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -16,9 +17,11 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View
+    View,
+    Dimensions
 } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { PremiumModal } from '../common/PremiumModal';
 import { ProfessionPicker } from '../common/professionPicker';
 import { toastConfig } from '../toastConfig';
 
@@ -89,8 +92,9 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
 
     const registerMutation = useMutation({
         mutationFn: registerBusiness,
-        onSuccess: (res) => {
+        onSuccess: (res: any) => {
             if (res.success) {
+                analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_SUCCESS, { action: 'create' });
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
                 Toast.show({
                     type: 'success',
@@ -112,8 +116,9 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
 
     const updateMutation = useMutation({
         mutationFn: updateBusiness,
-        onSuccess: (res) => {
+        onSuccess: (res: any) => {
             if (res.success) {
+                analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_SUCCESS, { action: 'update' });
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
                 Toast.show({
                     type: 'success',
@@ -217,17 +222,15 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
 
 
     return (
-        <Modal
-            animationType="slide"
-            transparent={true}
+        <PremiumModal
             visible={visible}
-            onRequestClose={onClose}
+            onClose={onClose}
         >
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.modalOverlay}
+                style={{ width: '100%' }}
             >
-                <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+                <View style={styles.modalContent}>
                     <View style={styles.header}>
                         <ThemedText style={styles.title}>{editData ? 'Update Business' : 'Register Business'}</ThemedText>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -247,12 +250,12 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                         {data.name.length}/30
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
+                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="business" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
-                                        placeholder="e.g. Chinji Auto Repair"
+                                        placeholder="e.g. Al-Madina Auto Repair"
                                         placeholderTextColor={colors.icon}
-                                        style={[styles.textInput, { color: colors.text }]}
+                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={data.name}
                                         onChangeText={(val) => handleInputChange('name', val)}
                                         maxLength={30}
@@ -266,12 +269,12 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                     PROFESSION <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                                 <TouchableOpacity
-                                    style={[styles.dropdownTrigger, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}
+                                    style={[styles.dropdownTrigger, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
                                     onPress={() => setProfessionModalVisible(true)}
                                 >
                                     <View style={styles.triggerContent}>
                                         <Ionicons name="construct" size={18} color={data.category ? colors.primary : colors.icon} style={{ marginRight: 10 }} />
-                                        <ThemedText style={[styles.triggerText, !data.category ? { color: colors.icon } : { color: colors.text, textTransform: 'capitalize' }]}>
+                                        <ThemedText style={[styles.triggerText, !data.category ? { color: colors.icon } : { color: colors.text, textTransform: 'capitalize' }, { fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
                                             {data.category ? `${data.category.name_eng} - ${data.category.name_ur} ` : 'Select Profession'}
                                         </ThemedText>
                                     </View>
@@ -289,12 +292,12 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                         {data.address.length}/40
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
+                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="location" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         placeholder="Enter address or area"
                                         placeholderTextColor={colors.icon}
-                                        style={[styles.textInput, { color: colors.text }]}
+                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={data.address}
                                         onChangeText={(val) => handleInputChange('address', val)}
                                         autoCapitalize="words"
@@ -313,12 +316,12 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                         {data.phone.length}/11
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
+                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="call" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         placeholder="+92 300 1234567"
                                         placeholderTextColor={colors.icon}
-                                        style={[styles.textInput, { color: colors.text }]}
+                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={data.phone}
                                         onChangeText={(val) => handleInputChange('phone', val)}
                                         keyboardType="phone-pad"
@@ -338,9 +341,9 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                 </View>
                                 <View style={[styles.inputBox, styles.textArea, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
                                     <TextInput
-                                        placeholder="Describe your services..."
+                                        placeholder="اپنے کاروبار کی خدمات اور پیشکش کی تفصیل لکھیں"
                                         placeholderTextColor={colors.icon}
-                                        style={[styles.textInput, { textAlignVertical: 'top', color: colors.text }]}
+                                        style={[styles.textInput, { textAlignVertical: 'top', color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={data.description}
                                         onChangeText={(val) => handleInputChange('description', val)}
                                         multiline
@@ -350,26 +353,33 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                                 </View>
                             </View>
 
-                            <TouchableOpacity
-                                style={[styles.actionBtnWrapper]}
-                                onPress={handleRegister}
-                                disabled={isPending}
-                            >
-                                <LinearGradient
-                                    colors={[colors.primary, colors.primary]}
-                                    style={styles.gradientBtn}
-                                >
-                                    {isPending ? (
-                                        <ActivityIndicator size="small" color="#FFFFFF" />
-                                    ) : (
-                                        <ThemedText style={styles.btnText}>
-                                            {editData ? 'UPDATE' : 'REGISTER'}
-                                        </ThemedText>
-                                    )}
-                                </LinearGradient>
-                            </TouchableOpacity>
                         </View>
                     </ScrollView>
+
+                    <View style={styles.footer}>
+                        <TouchableOpacity
+                            style={[styles.actionBtnWrapper, { flex: 1 }]}
+                            onPress={handleRegister}
+                            disabled={isPending}
+                        >
+                            <LinearGradient
+                                colors={[colors.primary, colors.primary]}
+                                style={[styles.gradientBtn, { height: Platform.OS === 'android' ? 44 : 46 }]}
+                            >
+                                {isPending ? (
+                                    <ActivityIndicator size="small" color="#FFFFFF" />
+                                ) : (
+                                    <ThemedText style={styles.btnText}>
+                                        {editData ? 'UPDATE' : 'REGISTER'}
+                                    </ThemedText>
+                                )}
+                            </LinearGradient>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={onClose} style={styles.cancelBtn} activeOpacity={0.7}>
+                            <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                        </TouchableOpacity>
+                    </View>
                 </View >
             </KeyboardAvoidingView >
 
@@ -382,7 +392,7 @@ const BusinessRegistrationModal = ({ visible, onClose, onSuccess, editData }: Bu
                 }}
             />
             <Toast config={toastConfig} topOffset={50} />
-        </Modal >
+        </PremiumModal >
     );
 };
 
@@ -393,34 +403,37 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalContent: {
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        height: '90%',
-        paddingTop: 20,
-        paddingHorizontal: 20,
+        width: '100%',
+        maxHeight: Dimensions.get('window').height * 0.85,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 14,
     },
     title: {
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: 'bold',
         textTransform: 'capitalize',
+        color: '#0F172A',
     },
     closeButton: {
-        padding: 4,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#F1F5F9',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     scrollContent: {
-        paddingBottom: 40,
+        paddingBottom: 20,
     },
     formSection: {
-        gap: 16,
+        gap: 12,
     },
     inputField: {
-        gap: 8,
+        gap: 4,
     },
     labelContainer: {
         flexDirection: 'row',
@@ -477,12 +490,11 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     actionBtnWrapper: {
-        marginTop: 8,
-        borderRadius: 16,
+        borderRadius: 14,
         overflow: 'hidden',
     },
     gradientBtn: {
-        height: 52,
+        height: Platform.OS === 'android' ? 44 : 46,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -491,6 +503,26 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '700',
         letterSpacing: 0.5,
+    },
+    footer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginTop: 16,
+    },
+    cancelBtn: {
+        flex: 1,
+        height: Platform.OS === 'android' ? 44 : 46,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        borderRadius: 14,
+    },
+    cancelText: {
+        fontSize: 14,
+        color: '#94A3B8',
+        fontWeight: '600',
     },
 });
 

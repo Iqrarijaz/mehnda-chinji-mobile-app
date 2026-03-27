@@ -139,7 +139,7 @@ export default function ChatScreen() {
 
     // Derived State
     const currentUserId = useMemo(() => {
-        return user?.user?._id?.toString() || user?.user?.id?.toString();
+        return user?.user?._id?.toString();
     }, [user]);
 
     // Fetch conversation details
@@ -171,7 +171,7 @@ export default function ChatScreen() {
     // Socket Lifecycle
     useEffect(() => {
         let socket: Socket | null = null;
-        const userId = user?.user?.id || user?.user?._id;
+        const userId = user?.user?._id;
 
         if (userId && id) {
             console.log('Initializing socket for user:', userId);
@@ -255,7 +255,7 @@ export default function ChatScreen() {
     }, [id, inputText, queryClient]);
 
     const handleBack = useCallback(() => {
-        router.push('/(tabs)/chat');
+        router.push('/(drawer)/(tabs)/chat' as any);
     }, [router]);
 
     const handleBlockAction = async () => {

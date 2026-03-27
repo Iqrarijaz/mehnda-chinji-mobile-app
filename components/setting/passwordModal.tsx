@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
+    Easing,
     FadeIn,
     SlideInLeft,
     useAnimatedStyle,
@@ -189,8 +190,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
     const canSubmit = currentPassword.length > 0 && newPassword.length >= 6 && confirmPassword.length > 0;
 
     return (
-        <PremiumModal visible={visible} onClose={resetAndClose}>
-            <View style={styles.handle} />
+        <PremiumModal visible={visible} onClose={resetAndClose} type="centered">
 
             <Animated.View entering={SlideInLeft.delay(60).duration(350)} style={styles.header}>
                 <View>
@@ -205,7 +205,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{ paddingBottom: 20 }}
+                contentContainerStyle={{ paddingBottom: 12 }}
             >
                 {/* Inputs */}
                 <InputField
@@ -248,72 +248,45 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
                 )}
 
                 {/* Buttons */}
-                <Animated.View
-                    entering={SlideInLeft.delay(280).duration(350)}
-                    style={styles.actions}
-                >
-                    <Animated.View style={btnStyle}>
-                        <TouchableOpacity
-                            onPress={handleSubmit}
-                            onPressIn={onPressIn}
-                            onPressOut={onPressOut}
-                            disabled={isLoading || !canSubmit}
-                            activeOpacity={1}
-                            style={[styles.primaryBtn, (!canSubmit || isLoading) && styles.primaryBtnDisabled]}
-                        >
-                            {isLoading ? (
-                                <ActivityIndicator color="#FFFFFF" />
-                            ) : (
-                                <ThemedText style={styles.primaryBtnText}>Update Password</ThemedText>
-                            )}
-                        </TouchableOpacity>
-                    </Animated.View>
+                    <View style={styles.actions}>
+                        <Animated.View style={[btnStyle, { flex: 1 }]}>
+                            <TouchableOpacity
+                                onPress={handleSubmit}
+                                onPressIn={onPressIn}
+                                onPressOut={onPressOut}
+                                disabled={isLoading || !canSubmit}
+                                activeOpacity={1}
+                                style={[styles.primaryBtn, (!canSubmit || isLoading) && styles.primaryBtnDisabled]}
+                            >
+                                {isLoading ? (
+                                    <ActivityIndicator color="#FFFFFF" />
+                                ) : (
+                                    <ThemedText style={styles.primaryBtnText}>Update</ThemedText>
+                                )}
+                            </TouchableOpacity>
+                        </Animated.View>
 
-                    <TouchableOpacity onPress={resetAndClose} style={styles.cancelBtn} activeOpacity={0.7}>
-                        <ThemedText style={styles.cancelText}>Cancel</ThemedText>
-                    </TouchableOpacity>
-                </Animated.View>
+                        <TouchableOpacity onPress={resetAndClose} style={styles.cancelBtn} activeOpacity={0.7}>
+                            <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                        </TouchableOpacity>
+                    </View>
             </ScrollView>
         </PremiumModal>
     );
 });
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'transparent',
-        justifyContent: 'flex-end',
-    },
-    sheet: {
-        backgroundColor: '#FFFFFF',
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        paddingTop: 12,
-        paddingHorizontal: 20,
-        paddingBottom: Platform.OS === 'ios' ? 36 : 24,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -6 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-    },
-    handle: {
-        width: 40,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: '#E2E8F0',
-        alignSelf: 'center',
-        marginBottom: 20,
-    },
+
 
     // Header
     header: {
         flexDirection: 'row',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
-        marginBottom: 24,
+        marginBottom: 16,
     },
     title: {
-        fontSize: Platform.OS === 'android' ? 18 : 20,
+        fontSize: 16,
         fontWeight: '800',
         color: '#0F172A',
         marginBottom: 3,
@@ -333,13 +306,13 @@ const styles = StyleSheet.create({
     },
 
     // Input
-    fieldWrap: { marginBottom: 14 },
+    fieldWrap: { marginBottom: 10 },
     label: {
         fontSize: 10,
         fontWeight: '700',
         color: '#94A3B8',
         letterSpacing: 0.8,
-        marginBottom: 7,
+        marginBottom: 4,
         marginLeft: 2,
     },
     inputRow: {
@@ -350,7 +323,7 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: '#E2E8F0',
         paddingHorizontal: 14,
-        height: 52,
+        height: Platform.OS === 'android' ? 48 : 52,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.03,
@@ -402,14 +375,15 @@ const styles = StyleSheet.create({
     },
 
     // Buttons
-    actions: { marginTop: 8, gap: 10 },
+    actions: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 12 },
     primaryBtn: {
-        backgroundColor: PRIMARY,
-        height: 52,
+        backgroundColor: '#006666', // Standardizing to primary color hex
+        height: Platform.OS === 'android' ? 48 : 52,
         borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: PRIMARY,
+        paddingHorizontal: 20,
+        shadowColor: '#006666',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -422,9 +396,13 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
     cancelBtn: {
-        height: 44,
+        flex: 1,
+        height: Platform.OS === 'android' ? 48 : 52,
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        borderRadius: 14,
     },
     cancelText: {
         fontSize: 14,

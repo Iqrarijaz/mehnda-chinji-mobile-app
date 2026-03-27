@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -14,10 +15,11 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { resetPassword } from '@/apis/forgot-password';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { resetPasswordSchema, getPasswordStrength } from '@/utils/validation';
+import { resetPassword } from '@/apis/login/forgot-password';
 
 export default function ResetPasswordScreen() {
     const router = useRouter();
@@ -25,50 +27,35 @@ export default function ResetPasswordScreen() {
     const insets = useSafeAreaInsets();
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
-
-    const emailOrPhone = params.emailOrPhone as string || '';
-
     const [formData, setFormData] = useState({
-        resetToken: '',
+        resetToken: params.resetToken as string || '',
         newPassword: '',
         confirmPassword: '',
         showPassword: false,
         loading: false
     });
 
+    const strength = getPasswordStrength(formData.newPassword);
+    const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+    const strengthColors = ['', '#EF4444', '#F59E0B', '#10B981', '#059669'];
+
+    const email = params.email as string || '';
+
     const handleSubmit = async () => {
-        if (!formData.resetToken.trim()) {
-            Toast.show({
-                type: 'error',
-                text1: 'Required',
-                text2: 'Please enter the reset code'
+        try {
+            await resetPasswordSchema.validate({
+                password: formData.newPassword,
+                confirmPassword: formData.confirmPassword
             });
-            return;
-        }
 
-        if (!formData.newPassword.trim()) {
+            if (!formData.resetToken) {
+                throw new Error('Invalid reset session. Please try again.');
+            }
+        } catch (error: any) {
             Toast.show({
                 type: 'error',
-                text1: 'Required',
-                text2: 'Please enter a new password'
-            });
-            return;
-        }
-
-        if (formData.newPassword.length < 6) {
-            Toast.show({
-                type: 'error',
-                text1: 'Invalid Password',
-                text2: 'Password must be at least 6 characters long'
-            });
-            return;
-        }
-
-        if (formData.newPassword !== formData.confirmPassword) {
-            Toast.show({
-                type: 'error',
-                text1: 'Password Mismatch',
-                text2: 'Passwords do not match'
+                text1: 'Validation Error',
+                text2: error.message
             });
             return;
         }
@@ -77,7 +64,7 @@ export default function ResetPasswordScreen() {
 
         try {
             const response = await resetPassword(
-                emailOrPhone,
+                email,
                 formData.resetToken.trim(),
                 formData.newPassword
             );
@@ -88,9 +75,12 @@ export default function ResetPasswordScreen() {
                 text2: response?.data?.message || 'Password reset successfully'
             });
 
-            // Navigate back to login
+            // Navigate back to login with auto-fill params
             setTimeout(() => {
-                router.replace('/(auth)/login' as any);
+                router.replace({
+                    pathname: '/(auth)/login',
+                    params: { email: email.trim(), password: formData.newPassword }
+                } as any);
             }, 1500);
 
         } catch (error: any) {
@@ -117,6 +107,11 @@ export default function ResetPasswordScreen() {
                     <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
                 <View style={styles.headerContent}>
+                    <Image
+                        source={require('../../public/icon.svg')}
+                        style={{ width: 48, height: 48, marginBottom: 16 }}
+                        contentFit="contain"
+                    />
                     <ThemedText style={styles.headerTitle}>Set New{"\n"}Password</ThemedText>
                     <ThemedText style={styles.headerSubtitle}>
                         Create a strong password for your account
@@ -160,6 +155,26 @@ export default function ResetPasswordScreen() {
                                     />
                                 </TouchableOpacity>
                             </View>
+
+                            {/* Password Strength Meter */}
+                            {formData.newPassword.length > 0 && (
+                                <View style={styles.strengthContainer}>
+                                    <View style={styles.strengthBarContainer}>
+                                        {[1, 2, 3, 4].map((i) => (
+                                            <View
+                                                key={i}
+                                                style={[
+                                                    styles.strengthBar,
+                                                    i <= strength && { backgroundColor: strengthColors[strength] }
+                                                ]}
+                                            />
+                                        ))}
+                                    </View>
+                                    <ThemedText style={[styles.strengthText, { color: strengthColors[strength] || '#94A3B8' }]}>
+                                        {strengthLabels[strength]}
+                                    </ThemedText>
+                                </View>
+                            )}
                         </View>
 
                         {/* Confirm Password Input */}
@@ -191,19 +206,9 @@ export default function ResetPasswordScreen() {
                             {formData.loading ? (
                                 <ActivityIndicator color="#FFFFFF" />
                             ) : (
-                                <ThemedText style={styles.submitButtonText}>Reset Password</ThemedText>
+                                <ThemedText style={styles.submitButtonText}>Set New Password</ThemedText>
                             )}
                         </TouchableOpacity>
-
-                        {/* Footer */}
-                        <View style={styles.footer}>
-                            <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
-                                Didn't receive code?{' '}
-                            </ThemedText>
-                            <TouchableOpacity onPress={() => router.back()}>
-                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#047857' }]}>Resend</ThemedText>
-                            </TouchableOpacity>
-                        </View>
                     </View>
                 </View>
             </ScrollView>
@@ -257,7 +262,7 @@ const styles = StyleSheet.create({
     },
     formCard: {
         borderRadius: 24,
-        padding: 22,
+        padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -305,6 +310,27 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 0.5,
+    },
+    strengthContainer: {
+        marginTop: 8,
+        paddingHorizontal: 2,
+    },
+    strengthBarContainer: {
+        flexDirection: 'row',
+        height: 4,
+        gap: 4,
+        marginBottom: 4,
+    },
+    strengthBar: {
+        flex: 1,
+        height: '100%',
+        borderRadius: 2,
+        backgroundColor: '#E2E8F0',
+    },
+    strengthText: {
+        fontSize: 11,
+        fontWeight: '600',
+        textAlign: 'right',
     },
     footer: {
         flexDirection: 'row',

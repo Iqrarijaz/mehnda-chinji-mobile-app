@@ -15,7 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { sendOtp, verifyOtp } from '@/apis/forgot-password';
+import { sendOtp, verifyOtp } from '@/apis/login/forgot-password';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -27,13 +27,13 @@ export default function VerifyOtpScreen() {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
-    const emailOrPhone = params.emailOrPhone as string || '';
+    const email = params.email as string || '';
     const name = params.name as string || '';
     const profileImage = params.profileImage as string || '';
 
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
-    const [timer, setTimer] = useState(30);
+    const [timer, setTimer] = useState(120);
     const inputRefs = useRef<Array<TextInput | null>>([]);
 
     useEffect(() => {
@@ -76,7 +76,7 @@ export default function VerifyOtpScreen() {
 
         setLoading(true);
         try {
-            await verifyOtp(emailOrPhone, otpString);
+            await verifyOtp(email, otpString);
             Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -85,7 +85,7 @@ export default function VerifyOtpScreen() {
 
             router.push({
                 pathname: '/(auth)/reset-password',
-                params: { emailOrPhone, resetToken: otpString }
+                params: { email, resetToken: otpString }
             } as any);
 
         } catch (error: any) {
@@ -104,8 +104,8 @@ export default function VerifyOtpScreen() {
 
         setLoading(true);
         try {
-            await sendOtp(emailOrPhone);
-            setTimer(30);
+            await sendOtp(email);
+            setTimer(120);
             Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -136,6 +136,11 @@ export default function VerifyOtpScreen() {
                     <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
                 <View style={styles.headerContent}>
+                    <Image
+                        source={require('../../public/icon.svg')}
+                        style={{ width: 48, height: 48, marginBottom: 16 }}
+                        contentFit="contain"
+                    />
                     <ThemedText style={styles.headerTitle}>Verify Email</ThemedText>
                     <ThemedText style={styles.headerSubtitle}>
                         Please enter the 6-digit verification code
@@ -170,7 +175,7 @@ export default function VerifyOtpScreen() {
                                 <ThemedText style={styles.profileName}>
                                     {name ? name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') : ''}
                                 </ThemedText>
-                                <ThemedText style={styles.profileEmail}>{emailOrPhone}</ThemedText>
+                                <ThemedText style={styles.profileEmail}>{email}</ThemedText>
                             </View>
                         </View>
 
@@ -224,6 +229,15 @@ export default function VerifyOtpScreen() {
                                 </TouchableOpacity>
                             )}
                         </View>
+
+                        <View style={[styles.footer, { marginTop: 15 }]}>
+                            <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
+                                Back to{' '}
+                            </ThemedText>
+                            <TouchableOpacity onPress={() => router.replace('/(auth)/login' as any)}>
+                                <ThemedText style={[styles.footerLink, { color: colors.primary }]}>Login</ThemedText>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </ScrollView>
@@ -274,7 +288,7 @@ const styles = StyleSheet.create({
     },
     formCard: {
         borderRadius: 24,
-        padding: 22,
+        padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,

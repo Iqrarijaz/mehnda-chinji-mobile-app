@@ -7,15 +7,6 @@ import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: true,
-        shouldShowBanner: true,
-        shouldShowList: true,
-    }),
-});
 
 export const usePushNotifications = () => {
     const [pushToken, setPushToken] = useState<string | null>(null);
@@ -24,14 +15,11 @@ export const usePushNotifications = () => {
     const notificationListener = useRef<Notifications.Subscription | undefined>(undefined);
     const responseListener = useRef<Notifications.Subscription | undefined>(undefined);
 
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, updateUser } = useAuth();
 
     const registerForPushNotificationsAsync = async (): Promise<string | undefined> => {
         try {
-            // alert('🚀 Starting push notification registration...');
-
             if (Platform.OS === 'android') {
-                console.log('📱 Setting Android notification channel...');
                 await Notifications.setNotificationChannelAsync('default', {
                     name: 'default',
                     importance: Notifications.AndroidImportance.MAX,
@@ -40,16 +28,12 @@ export const usePushNotifications = () => {
                 });
             }
 
-            // ---- Permissions ----
             const { status: existingStatus, canAskAgain } =
                 await Notifications.getPermissionsAsync();
-
-            console.log('🔐 Existing permission status:', existingStatus);
 
             let finalStatus = existingStatus;
 
             if (existingStatus !== 'granted' && canAskAgain) {
-                console.log('🔔 Requesting notification permissions...');
                 const { status } = await Notifications.requestPermissionsAsync();
                 finalStatus = status;
                 console.log('🔐 New permission status:', finalStatus);
@@ -105,6 +89,7 @@ export const usePushNotifications = () => {
 
             console.log('🌍 Syncing push token with backend...');
             await savePushToken({ pushToken: token });
+            await updateUser({ pushToken: token });
 
             await clientStorage.setItem('push_token', token);
             console.log('✅ Push token synced successfully.');
@@ -128,12 +113,14 @@ export const usePushNotifications = () => {
 
         notificationListener.current =
             Notifications.addNotificationReceivedListener(notification => {
+                if (!isMounted) return;
                 console.log('📩 Notification received:', notification);
                 setNotification(notification);
             });
 
         responseListener.current =
             Notifications.addNotificationResponseReceivedListener(response => {
+                if (!isMounted) return;
                 console.log('👉 Notification interaction:', response);
             });
 

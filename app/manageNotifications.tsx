@@ -87,7 +87,7 @@ export default function ManageNotificationsScreen() {
                 }
             >
                 <NotificationSectionCard title="General Updates">
-                    <NotificationToggleRow
+                    {/* <NotificationToggleRow
                         index={0}
                         icon="newspaper-outline"
                         color="#6366F1" // Indigo
@@ -95,7 +95,7 @@ export default function ManageNotificationsScreen() {
                         description="Stay updated with posts from your community"
                         value={preferences.feed}
                         onValueChange={() => togglePreference('feed')}
-                    />
+                    /> */}
                     <NotificationToggleRow
                         index={1}
                         icon="business-outline"
@@ -104,6 +104,27 @@ export default function ManageNotificationsScreen() {
                         description="New services and business registrations near you"
                         value={preferences.business}
                         onValueChange={() => togglePreference('business')}
+                    />
+                </NotificationSectionCard>
+
+                <NotificationSectionCard title="Prayer & Weather">
+                    <NotificationToggleRow
+                        index={2}
+                        icon="moon-outline"
+                        color="#047857" // Green (Islamic)
+                        label="Prayer Notifications"
+                        description="Receive adhan alerts for your daily prayer times"
+                        value={preferences.prayer}
+                        onValueChange={() => togglePreference('prayer')}
+                    />
+                    <NotificationToggleRow
+                        index={3}
+                        icon="partly-sunny-outline"
+                        color="#3B82F6" // Blue
+                        label="Weather Alerts"
+                        description="Get daily weather updates and storm alerts"
+                        value={preferences.weather}
+                        onValueChange={() => togglePreference('weather')}
                     />
                 </NotificationSectionCard>
 

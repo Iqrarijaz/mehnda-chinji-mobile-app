@@ -7,15 +7,12 @@ import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValu
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
-import { acceptPrivacyPolicy } from '@/apis/profile';
-import { useAuth } from '@/context/AuthContext';
-import Toast from 'react-native-toast-message';
 
 const privacyData = [
     {
         id: '1',
         title: 'Information We Collect',
-        content: 'We collect information you directly provide to us when you register for an account or submit data:\n\n• Personal Profile Data: Your name, phone number, and email address required for account creation.\n• Public Directory Submissions: Information you submit regarding businesses, schools, mosques, or other public places.\n• Blood Donor Information: If you register as a blood donor, we collect your blood type, location, and contact availability.',
+        content: 'We collect information you directly provide to us when you register for an account or submit data:\n\n• Personal Profile Data: Your name, phone number, and email address required for account creation.\n• Manual Location Data: Your city and village name that you set manually in your profile for Azaan and weather updates. We do NOT use GPS or automatic location tracking.\n• Public Directory Submissions: Information you submit regarding businesses, schools, mosques, or other public places.\n• Blood Donor Information: If you register as a blood donor, we collect your blood type and contact availability.',
     },
     {
         id: '2',
@@ -25,8 +22,9 @@ const privacyData = [
     {
         id: '3',
         title: 'Sharing of Information',
-        content: '• Public Sharing: Any business details, mapped places, or blood donor profiles you submit are intended for public consumption and will be visible to other app users.\n• Third Parties: We do not sell, rent, or trade your personal private data to marketing agencies or third parties. Information is only shared when legally required or to protect our platform\'s integrity.',
+        content: '• Public Sharing: Any business details, community places, or blood donor profiles you submit are intended for public consumption and will be visible to other app users.\n• Third Parties: We do not sell, rent, or trade your personal private data to marketing agencies or third parties. Information is only shared when legally required or to protect our platform\'s integrity.',
     },
+
     {
         id: '4',
         title: 'Data Storage & Security',
@@ -87,67 +85,8 @@ export default function PrivacyPolicyScreen() {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
-    const { updateUser } = useAuth();
 
-    const [accepted, setAccepted] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
     const [infoModalVisible, setInfoModalVisible] = useState(false);
-
-    const checkScale = useSharedValue(1);
-
-    const toggleAccept = () => {
-        setAccepted(!accepted);
-        checkScale.value = withSpring(accepted ? 1 : 1.2, {}, () => {
-            checkScale.value = withSpring(1);
-        });
-    };
-
-    const animatedCheckStyle = useAnimatedStyle(() => {
-        return {
-            transform: [{ scale: checkScale.value }],
-            backgroundColor: withTiming(accepted ? colors.primary : '#FFFFFF', { duration: 200 }),
-            borderColor: withTiming(accepted ? colors.primary : '#CBD5E1', { duration: 200 })
-        };
-    });
-
-    const handleAcceptPrivacy = async () => {
-        if (!accepted) return;
-        setSubmitting(true);
-        try {
-            const version = "1.0";
-            const response = await acceptPrivacyPolicy({ version });
-            if (response.data?.success) {
-                // Update local context
-                await updateUser({
-                    privacyPolicyAccepted: true,
-                    privacyPolicyVersionAccepted: version,
-                    privacyPolicyAcceptedAt: new Date().toISOString()
-                });
-
-                Toast.show({
-                    type: 'success',
-                    text1: 'Accepted',
-                    text2: 'Privacy Policy accepted successfully.',
-                });
-
-                setTimeout(() => {
-                    if (router.canGoBack()) {
-                        router.back();
-                    } else {
-                        router.replace('/settings');
-                    }
-                }, 500);
-            }
-        } catch (error: any) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: error.response?.data?.message || 'Failed to accept Privacy Policy. Please try again.',
-            });
-        } finally {
-            setSubmitting(false);
-        }
-    };
 
     return (
         <View style={[styles.container, { backgroundColor: '#F8FAFC' }]}>
@@ -183,7 +122,7 @@ export default function PrivacyPolicyScreen() {
             {/* ── Scrollable Content ──────────────────────────────── */}
             <ScrollView
                 style={styles.scrollView}
-                contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 140 }]} // extra padding for sticky footer
+                contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
                 showsVerticalScrollIndicator={false}
             >
                 <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.card}>
@@ -205,33 +144,6 @@ export default function PrivacyPolicyScreen() {
                 </Animated.View>
             </ScrollView>
 
-            {/* ── Sticky Checkbox & Accept Footer ───────────────────── */}
-            <Animated.View entering={FadeInDown.delay(700).duration(500)} style={[styles.stickyFooter, { paddingBottom: insets.bottom > 0 ? insets.bottom : 20 }]}>
-                <TouchableOpacity style={styles.checkboxRow} onPress={toggleAccept} activeOpacity={0.8}>
-                    <Animated.View style={[styles.checkbox, animatedCheckStyle]}>
-                        {accepted && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
-                    </Animated.View>
-                    <ThemedText style={styles.checkboxText}>
-                        I have read and agree to the Privacy Policy
-                    </ThemedText>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={[styles.acceptButton, { backgroundColor: accepted ? colors.primary : '#E2E8F0' }]}
-                    disabled={!accepted || submitting}
-                    onPress={handleAcceptPrivacy}
-                    activeOpacity={0.8}
-                >
-                    {submitting ? (
-                        <ActivityIndicator color="#FFFFFF" size="small" />
-                    ) : (
-                        <ThemedText style={[styles.acceptButtonText, { color: accepted ? '#FFFFFF' : '#94A3B8' }]}>
-                            Agree & Continue
-                        </ThemedText>
-                    )}
-                </TouchableOpacity>
-            </Animated.View>
-
             {/* ── Info Modal ───────────────────── */}
             <Modal visible={infoModalVisible} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
@@ -240,9 +152,8 @@ export default function PrivacyPolicyScreen() {
                             <Ionicons name="server" size={32} color={colors.primary} />
                         </View>
                         <ThemedText style={styles.modalTitle}>Why we need your data?</ThemedText>
-                        <ThemedText style={styles.modalBody}>
-                            We collect specific data to authenticate your account and accurately display your businesses, mosques, and blood donor listings to the community. Your private data is never sold to third parties.
-                        </ThemedText>
+                            We collect specific data to authenticate your account and display your community listings, such as businesses, mosques, and blood donor details. Your private data is never sold to third parties.
+
                         <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.primary }]} onPress={() => setInfoModalVisible(false)}>
                             <ThemedText style={styles.modalBtnText}>Got it!</ThemedText>
                         </TouchableOpacity>
@@ -338,7 +249,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.04,
         shadowRadius: 16,
-        elevation: 2,
     },
     cardHeader: {
         flexDirection: 'row',
@@ -424,7 +334,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.05,
         shadowRadius: 12,
-        elevation: 10,
         paddingHorizontal: 20,
         paddingTop: 16,
         borderTopLeftRadius: 24,

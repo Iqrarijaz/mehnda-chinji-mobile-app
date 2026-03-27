@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themedText';
+import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -51,28 +52,34 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
 
     const handleCall = () => {
         if (business?.phone) {
+            analyticsService.trackEvent(AnalyticsEvents.BUSINESS_CARD_CLICKED, { businessId: business._id, action: 'call' });
             Linking.openURL(`tel:${business.phone}`);
         } else {
             Alert.alert('No Phone', 'Phone number not available.');
         }
     };
 
-    const avatarContent = ownerImage ? (
+    const businessImage = business?.images?.[0];
+
+    const avatarContent = businessImage ? (
         <Image
-            source={{ uri: ownerImage }}
+            source={{ uri: businessImage }}
             style={styles.avatarImage}
             contentFit="cover"
             transition={200}
         />
     ) : (
         <ThemedText style={[styles.avatarLetter, { color: cardFontColor }]}>
-            {ownerName?.charAt(0)?.toUpperCase()}
+            {businessName?.charAt(0)?.toUpperCase()}
         </ThemedText>
     );
 
     return (
         <>
-            <TouchableOpacity activeOpacity={0.9} onPress={() => setModalVisible(true)}>
+            <TouchableOpacity activeOpacity={0.9} onPress={() => {
+                analyticsService.trackEvent(AnalyticsEvents.BUSINESS_CARD_CLICKED, { businessId: business._id, action: 'view' });
+                setModalVisible(true);
+            }}>
                 <View style={styles.card}>
                     <View style={styles.row}>
                         {/* Avatar */}
@@ -108,13 +115,6 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
                             </View>
                         </View>
 
-                        {/* Quick call button */}
-                        <TouchableOpacity
-                            style={styles.callBtn}
-                            onPress={(e) => { e.stopPropagation(); handleCall(); }}
-                        >
-                            <Ionicons name="call" size={18} color="#FFFFFF" />
-                        </TouchableOpacity>
                     </View>
                 </View>
             </TouchableOpacity>

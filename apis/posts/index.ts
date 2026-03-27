@@ -64,3 +64,30 @@ export const deletePostComment = async (commentId: string) => {
 export const updatePostComment = async (commentId: string, text: string) => {
     return apiClient.post('/api/user/v1/posts/comment/update', { commentId, text });
 };
+
+// Post Management APIs
+export const createPost = async (formData: FormData) => {
+    return apiClient.post('/api/user/v1/posts/add', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+export const updatePost = async (postId: string, formData: FormData) => {
+    // Some APIs might expect postId in query or body, assuming body within FormData or as separate field if not using pure FormData
+    // Common pattern for this app seems to be POST with data
+    return apiClient.post(`/api/user/v1/posts/update`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+export const deletePost = async (postId: string) => {
+    return apiClient.post('/api/user/v1/posts/delete', { postId });
+};
+
+export const deletePostImage = async (postId: string, imageUrl: string) => {
+    return apiClient.post('/api/user/v1/posts/image/delete', { postId, imageUrl });
+};

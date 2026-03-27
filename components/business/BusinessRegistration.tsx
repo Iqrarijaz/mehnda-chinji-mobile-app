@@ -17,6 +17,7 @@ import {
     manageBusinessSearch
 } from '@/apis/business';
 import { ThemedText } from '@/components/themedText';
+import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -124,7 +125,10 @@ const BusinessRegistration = React.memo(() => {
                             { backgroundColor: colors.primary },
                             businesses.length >= 3 && [styles.disabledButton, { backgroundColor: colors.icon }]
                         ]}
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => {
+                            analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_CLICKED);
+                            setModalVisible(true);
+                        }}
                         disabled={businesses.length >= 3}
                     >
                         <Ionicons name="add" size={28} color="#FFF" />
@@ -243,31 +247,31 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         shadowRadius: 4,
     },
-disabledButton: {
-    opacity: 0.7,
+    disabledButton: {
+        opacity: 0.7,
     },
-emptyState: {
-    alignItems: 'center',
+    emptyState: {
+        alignItems: 'center',
         justifyContent: 'center',
-            marginTop: 60,
-                gap: 12,
+        marginTop: 60,
+        gap: 12,
     },
-emptyStateText: {
-    fontSize: 16,
+    emptyStateText: {
+        fontSize: 16,
         fontWeight: '500',
     },
-emptyStateBtn: {
-    paddingHorizontal: 20,
+    emptyStateBtn: {
+        paddingHorizontal: 20,
         paddingVertical: 10,
-            borderRadius: 12,
-                marginTop: 10,
+        borderRadius: 12,
+        marginTop: 10,
     },
-listContainer: {
-    marginTop: 10,
+    listContainer: {
+        marginTop: 10,
     },
-centerContent: {
-    flex: 1,
+    centerContent: {
+        flex: 1,
         justifyContent: 'center',
-            alignItems: 'center',
+        alignItems: 'center',
     },
 });

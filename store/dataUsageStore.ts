@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clientStorage } from '@/utils/storage';
 
 interface DataUsageState {
     total: number;     // total bytes
@@ -68,7 +68,7 @@ export const useDataUsageStore = create<DataUsageState>()(
         }),
         {
             name: 'dataUsage-storage',
-            storage: createJSONStorage(() => AsyncStorage),
+            storage: createJSONStorage(() => clientStorage),
             partialize: (state) => ({
                 total: state.total,
                 wifi: state.wifi,

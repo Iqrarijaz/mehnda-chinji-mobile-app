@@ -1,7 +1,12 @@
 import { AUTH_QUERY_KEYS } from '@/apis/login';
-import { updateProfile, uploadProfileImage, deleteProfileImage } from '@/apis/profile';
+import { uploadProfileImage, deleteProfileImage, updateProfile } from '@/apis/profile';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
+import { profileSchema } from '@/utils/validation';
 import { SearchableDropdown } from '@/components/common/searchableDropdown';
+import { ImageViewerModal } from '@/components/common/ImageViewerModal';
 import { ProfileProgress } from '@/components/profile/ProfileProgress';
+
+import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { ThemedText } from '@/components/themedText';
 import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
@@ -9,11 +14,13 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import citiesData from '@/data/cities.json';
 import { Ionicons } from '@expo/vector-icons';
+import { useBackHandler } from '@/hooks/useBackHandler';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
+
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -44,6 +51,13 @@ export default function ProfileScreen() {
     const insets = useSafeAreaInsets();
     const queryClient = useQueryClient();
 
+    const buttonScale = useSharedValue(1);
+
+    const toTitleCase = useCallback((str: string) => {
+        if (!str) return '';
+        return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+    }, []);
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -58,44 +72,35 @@ export default function ProfileScreen() {
     const [cityPickerVisible, setCityPickerVisible] = useState(false);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
-    const [isModified, setIsModified] = useState(false);
 
-    const buttonScale = useSharedValue(1);
-
-    useEffect(() => {
-        if (user?.user) {
-            const initialData = {
-                name: user.user.name || '',
-                email: user.user.email || '',
-                phone: user.user.phone || '',
-                gender: user.user.gender || '',
-                city: user.user.city || '',
-                village: user.user.village || '',
-                emailVerified: user.user.emailVerified || false,
-                otpVerified: user.user.otpVerified || false,
-            };
-            setFormData(initialData);
-        }
-    }, [user]);
-
-    // Check for modifications to enable save button
-    useEffect(() => {
-        if (!user?.user) return;
-        const currentData = {
-            name: user.user.name || '',
-            email: user.user.email || '',
-            phone: user.user.phone || '',
-            gender: user.user.gender || '',
-            city: user.user.city || '',
-            village: user.user.village || '',
-            emailVerified: user.user.emailVerified || false,
-            otpVerified: user.user.otpVerified || false,
+    // Derive stable baseline data from user object
+    const currentData = useMemo(() => {
+        return {
+            name: toTitleCase(user?.user?.name || ''),
+            email: user?.user?.email || '',
+            phone: user?.user?.phone || '',
+            gender: user?.user?.gender || '',
+            city: user?.user?.city || '',
+            village: toTitleCase(user?.user?.village || ''),
+            emailVerified: user?.user?.emailVerified || false,
+            otpVerified: user?.user?.otpVerified || false,
         };
-        const hasChanges = JSON.stringify(formData) !== JSON.stringify(currentData);
-        setIsModified(hasChanges);
-    }, [formData, user]);
+    }, [user, toTitleCase]);
 
-    const calculatePercentage = () => {
+    // Initialize form only when currentData changes (e.g., initial load or backend refresh)
+    useEffect(() => {
+        setFormData(currentData);
+    }, [currentData]);
+
+    // Derive isModified during render (O(1) superficial check instead of JSON.stringify)
+    const isModified =
+        formData.name !== currentData.name ||
+        formData.phone !== currentData.phone ||
+        formData.gender !== currentData.gender ||
+        formData.city !== currentData.city ||
+        formData.village !== currentData.village;
+
+    const calculatePercentage = useCallback(() => {
         let pct = 50;
         if (formData.gender && formData.gender !== 'N/A') pct += 5;
         if (formData.city) pct += 5;
@@ -104,20 +109,21 @@ export default function ProfileScreen() {
         // Simplified mapping for UI (Donor logic might need backend fetch or flag)
         if (user?.user?.isDonor) pct += 10;
         return Math.min(pct, 100);
-    };
+    }, [formData.gender, formData.city, formData.village, user?.user?.isBusiness, user?.user?.isDonor]);
 
-    const remainingFields = () => {
+    const remainingFields = useCallback(() => {
         let count = 0;
         if (!formData.gender || formData.gender === 'N/A') count++;
         if (!formData.city) count++;
         if (!formData.village) count++;
         return count;
-    };
+    }, [formData.gender, formData.city, formData.village]);
 
     const profileMutation = useMutation({
         mutationFn: updateProfile,
         onSuccess: async (response) => {
             if (response) {
+                analyticsService.trackEvent(AnalyticsEvents.PROFILE_UPDATED);
                 await updateUser(response);
                 queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
                 Toast.show({
@@ -141,6 +147,7 @@ export default function ProfileScreen() {
         onSuccess: async (response) => {
             const newUrl = response?.data?.profileImage;
             if (newUrl) {
+                analyticsService.trackEvent(AnalyticsEvents.AVATAR_CHANGED, { action: 'upload' });
                 await updateUser({ profileImage: newUrl });
                 queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
                 Toast.show({ type: 'success', text1: 'Success', text2: 'Profile image updated' });
@@ -151,7 +158,7 @@ export default function ProfileScreen() {
         }
     });
 
-    const pickImage = async () => {
+    const pickImage = useCallback(async () => {
         // Request media library permissions
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -173,7 +180,7 @@ export default function ProfileScreen() {
 
         if (!result.canceled && result.assets && result.assets.length > 0) {
             const asset = result.assets[0];
-            const formData = new FormData();
+            const uploadFormData = new FormData();
 
             // Extract file extension
             const uriParts = asset.uri.split('.');
@@ -181,18 +188,19 @@ export default function ProfileScreen() {
 
             const file: any = {
                 uri: asset.uri,
-                name: `profile_${user?.user?.id || Date.now()}.${fileType}`,
+                name: `profile_${user?.user?._id || Date.now()}.${fileType}`,
                 type: `image/${fileType}`,
             };
 
-            formData.append('image', file);
-            uploadImageMutation.mutate(formData);
+            uploadFormData.append('image', file);
+            uploadImageMutation.mutate(uploadFormData);
         }
-    };
+    }, [user?.user?._id, uploadImageMutation]);
 
     const deleteImageMutation = useMutation({
         mutationFn: deleteProfileImage,
         onSuccess: async () => {
+            analyticsService.trackEvent(AnalyticsEvents.AVATAR_CHANGED, { action: 'delete' });
             await updateUser({ profileImage: null });
             queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
             Toast.show({ type: 'success', text1: 'Success', text2: 'Profile image removed' });
@@ -206,50 +214,35 @@ export default function ProfileScreen() {
         }
     });
 
-    const handleUpdate = () => {
+
+
+    const handleUpdate = useCallback(async () => {
         buttonScale.value = withSpring(0.9, { damping: 10 }, () => {
             buttonScale.value = withSpring(1);
         });
 
-        if (!formData.name || !formData.phone || !formData.city) {
-            Toast.show({ type: 'error', text1: 'Required', text2: 'Name, Phone and City are required' });
-            return;
-        }
-
-        // Phone validation logic
-        const cleanPhone = formData.phone.replace(/[^\d+]/g, '');
-        let isValid = false;
-        let errorMsg = '';
-
-        if (cleanPhone.startsWith('03')) {
-            isValid = cleanPhone.length === 11;
-            errorMsg = 'Phone starting with 03 must be 11 digits';
-        } else if (cleanPhone.startsWith('+92')) {
-            isValid = cleanPhone.length === 13;
-            errorMsg = 'Phone starting with +92 must be 13 characters';
-        } else {
-            // Generic international validation
-            const phoneRegex = /^\+(?:[0-9] ?){1,4}[0-9]{4,15}$/;
-            isValid = phoneRegex.test(cleanPhone) && cleanPhone.length >= 8;
-            errorMsg = 'Invalid phone format. Use +[country code][number]';
-        }
-
-        if (!isValid) {
+        try {
+            await profileSchema.validate(formData);
+            profileMutation.mutate({
+                ...formData,
+                gender: formData.gender || null
+            });
+        } catch (error: any) {
             Toast.show({
                 type: 'error',
-                text1: 'Invalid Phone',
-                text2: errorMsg
+                text1: 'Validation Error',
+                text2: error.message
             });
-            return;
         }
-
-        profileMutation.mutate(formData);
-    };
+    }, [formData, profileMutation, buttonScale]);
 
     const handleBack = () => {
         if (router.canGoBack()) router.back();
-        else router.replace('/(tabs)');
+        else router.replace('/(drawer)/(tabs)' as any);
+        return true; // Indicate handled
     };
+
+    useBackHandler(handleBack);
 
     const animatedButtonStyle = useAnimatedStyle(() => ({
         transform: [{ scale: buttonScale.value }]
@@ -272,36 +265,15 @@ export default function ProfileScreen() {
                         <View style={{ width: 44 }} />
                     </View>
 
-                    <View style={styles.avatarContainer}>
-                        <View style={styles.imageWrapper}>
-                            {uploadImageMutation.isPending ? (
-                                <View style={styles.loaderOverlay}>
-                                    <ActivityIndicator color="#FFFFFF" />
-                                </View>
-                            ) : (
-                                <TouchableOpacity activeOpacity={0.9} onPress={() => setPreviewVisible(true)}>
-                                    <Avatar uri={user?.user?.profileImage} name={user?.user?.name} size={80} style={styles.avatar} />
-                                </TouchableOpacity>
-                            )}
-                            <TouchableOpacity style={styles.cameraIcon} onPress={pickImage}>
-                                <Ionicons name="camera" size={16} color="#FFFFFF" />
-                            </TouchableOpacity>
-
-                            {user?.user?.profileImage && !uploadImageMutation.isPending && (
-                                <TouchableOpacity
-                                    style={styles.deleteIcon}
-                                    onPress={() => deleteImageMutation.mutate()}
-                                    disabled={deleteImageMutation.isPending}
-                                >
-                                    {deleteImageMutation.isPending ? (
-                                        <ActivityIndicator size="small" color="#FFFFFF" />
-                                    ) : (
-                                        <Ionicons name="trash" size={14} color="#FFFFFF" />
-                                    )}
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                    </View>
+                    <ProfileAvatar
+                        uri={user?.user?.profileImage}
+                        name={user?.user?.name}
+                        isUploading={uploadImageMutation.isPending}
+                        isDeleting={deleteImageMutation.isPending}
+                        onPickImage={pickImage}
+                        onDeleteImage={() => deleteImageMutation.mutate()}
+                        onPreviewOpen={() => setPreviewVisible(true)}
+                    />
                     <ThemedText style={styles.welcomeText}>Complete Your Profile</ThemedText>
                     <ThemedText style={styles.subtitleText}>Maintain your profile for better community trust</ThemedText>
                 </Animated.View>
@@ -321,113 +293,139 @@ export default function ProfileScreen() {
                     >
 
                         {/* Progress Component */}
-                        <Animated.View entering={FadeInDown.delay(200).duration(600)}>
+                        {/* <Animated.View entering={FadeInDown.delay(200).duration(600)}>
                             <ProfileProgress percentage={calculatePercentage()} remainingFields={remainingFields()} />
-                        </Animated.View>
+                        </Animated.View> */}
 
                         {/* Form Sections */}
-                        <View style={styles.formContainer}>
+                        <View style={styles.formSection}>
 
-                            {/* Name Field */}
-                            <Animated.View entering={FadeInDown.delay(300)} style={styles.fieldCard}>
-                                <ThemedText style={styles.fieldLabel}>Full Name</ThemedText>
-                                <View style={styles.inputWrapper}>
-                                    <Ionicons name="person-outline" size={20} color="#94A3B8" />
+                            {/* Full Name */}
+                            <Animated.View entering={FadeInDown.delay(300)} style={styles.inputField}>
+                                <View style={styles.labelContainer}>
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                        FULL NAME <ThemedText style={styles.required}>*</ThemedText>
+                                    </ThemedText>
+                                    <ThemedText style={[styles.charCount, formData.name.length > 30 ? { color: '#EF4444' } : { color: colors.icon }]}>
+                                        {formData.name.length}/30
+                                    </ThemedText>
+                                </View>
+                                <View style={[styles.inputBox, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46 }]}>
+                                    <Ionicons name="person-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
-                                        value={formData.name}
-                                        onChangeText={(val) => setFormData(p => ({ ...p, name: val }))}
-                                        style={styles.input}
                                         placeholder="Enter your name"
+                                        placeholderTextColor={colors.icon}
+                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
+                                        value={formData.name}
+                                        onChangeText={(val) => setFormData(p => ({ ...p, name: toTitleCase(val) }))}
+                                        maxLength={30}
                                     />
                                 </View>
                             </Animated.View>
 
-                            {/* Email Field (ReadOnly) */}
-                            <Animated.View entering={FadeInDown.delay(350)} style={[styles.fieldCard, { backgroundColor: '#F8FAFC' }]}>
-                                <View style={styles.labelRow}>
-                                    <ThemedText style={styles.fieldLabel}>Email Address</ThemedText>
-                                    <View style={[styles.badge, formData.emailVerified ? styles.verifiedBadge : styles.unverifiedBadge]}>
-                                        <Ionicons name={formData.emailVerified ? "checkmark-circle" : "alert-circle"} size={12} color={formData.emailVerified ? "#10B981" : "#F59E0B"} />
-                                        <ThemedText style={[styles.badgeText, { color: formData.emailVerified ? "#10B981" : "#F59E0B" }]}>
-                                            {formData.emailVerified ? "Verified" : "Unverified"}
-                                        </ThemedText>
-                                    </View>
+                            {/* Email Address */}
+                            <Animated.View entering={FadeInDown.delay(350)} style={styles.inputField}>
+                                <View style={styles.labelContainer}>
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                        EMAIL ADDRESS
+                                    </ThemedText>
                                 </View>
-                                <View style={styles.inputWrapper}>
-                                    <Ionicons name="mail-outline" size={20} color="#94A3B8" />
+                                <View style={[styles.inputBox, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46, opacity: 0.8 }]}>
+                                    <Ionicons name="mail-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
+                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={formData.email}
                                         editable={false}
-                                        style={[styles.input, { color: '#64748B' }]}
                                     />
-                                    <Ionicons name="lock-closed-outline" size={16} color="#94A3B8" />
+                                    <Ionicons name="lock-closed-outline" size={16} color={colors.icon} />
                                 </View>
                             </Animated.View>
 
                             {/* Phone Field */}
-                            <Animated.View entering={FadeInDown.delay(400)} style={styles.fieldCard}>
-                                <View style={styles.labelRow}>
-                                    <ThemedText style={styles.fieldLabel}>Phone Number</ThemedText>
-                                    <View style={[styles.badge, formData.otpVerified ? styles.verifiedBadge : styles.unverifiedBadge]}>
-                                        <Ionicons name={formData.otpVerified ? "checkmark-circle" : "alert-circle"} size={12} color={formData.otpVerified ? "#10B981" : "#F59E0B"} />
-                                        <ThemedText style={[styles.badgeText, { color: formData.otpVerified ? "#10B981" : "#F59E0B" }]}>
-                                            {formData.otpVerified ? "Verified" : "Unverified"}
-                                        </ThemedText>
-                                    </View>
+                            <Animated.View entering={FadeInDown.delay(400)} style={styles.inputField}>
+                                <View style={styles.labelContainer}>
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                        PHONE NUMBER <ThemedText style={styles.required}>*</ThemedText>
+                                    </ThemedText>
+                                    <ThemedText style={[styles.charCount, formData.phone.length > 0 && formData.phone.length !== 11 ? { color: '#EF4444' } : { color: colors.icon }]}>
+                                        {formData.phone.length}/11
+                                    </ThemedText>
                                 </View>
-                                <View style={styles.inputWrapper}>
-                                    <Ionicons name="call-outline" size={20} color="#94A3B8" />
+                                <View style={[styles.inputBox, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46 }]}>
+                                    <Ionicons name="call-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
+                                        placeholder="+923001234567"
+                                        placeholderTextColor={colors.icon}
+                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={formData.phone}
                                         onChangeText={(val) => setFormData(p => ({ ...p, phone: val }))}
-                                        style={styles.input}
-                                        placeholder="+923001234567"
                                         keyboardType="phone-pad"
+                                        maxLength={11}
                                     />
                                 </View>
                             </Animated.View>
 
                             {/* Gender Selector */}
-                            <Animated.View entering={FadeInDown.delay(450)} style={styles.fieldCard}>
-                                <ThemedText style={styles.fieldLabel}>Gender</ThemedText>
+                            <Animated.View entering={FadeInDown.delay(450)} style={styles.inputField}>
+                                <ThemedText style={[styles.label, { color: colors.text }]}>GENDER</ThemedText>
                                 <View style={styles.genderRow}>
                                     <TouchableOpacity
                                         onPress={() => setFormData(p => ({ ...p, gender: 'MALE' }))}
                                         style={[styles.genderPill, formData.gender?.toUpperCase() === 'MALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                                     >
-                                        <Ionicons name="male" size={18} color={formData.gender?.toUpperCase() === 'MALE' ? '#FFF' : '#64748B'} />
+                                        <Ionicons name="male" size={16} color={formData.gender?.toUpperCase() === 'MALE' ? '#FFF' : colors.icon} />
                                         <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'MALE' && { color: '#FFF' }]}>Male</ThemedText>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => setFormData(p => ({ ...p, gender: 'FEMALE' }))}
                                         style={[styles.genderPill, formData.gender?.toUpperCase() === 'FEMALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                                     >
-                                        <Ionicons name="female" size={18} color={formData.gender?.toUpperCase() === 'FEMALE' ? '#FFF' : '#64748B'} />
+                                        <Ionicons name="female" size={16} color={formData.gender?.toUpperCase() === 'FEMALE' ? '#FFF' : colors.icon} />
                                         <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'FEMALE' && { color: '#FFF' }]}>Female</ThemedText>
                                     </TouchableOpacity>
                                 </View>
                             </Animated.View>
 
                             {/* City Picker */}
-                            <Animated.View entering={FadeInDown.delay(500)} style={styles.fieldCard}>
-                                <ThemedText style={styles.fieldLabel}>City</ThemedText>
-                                <TouchableOpacity onPress={() => setCityPickerVisible(true)} style={styles.inputWrapper}>
-                                    <Ionicons name="location-outline" size={20} color="#94A3B8" />
-                                    <ThemedText style={styles.inputText}>{formData.city || "Select your city"}</ThemedText>
-                                    <Ionicons name="chevron-down" size={18} color="#94A3B8" />
+                            <Animated.View entering={FadeInDown.delay(500)} style={styles.inputField}>
+                                <View style={styles.labelContainer}>
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                        CITY <ThemedText style={styles.required}>*</ThemedText>
+                                    </ThemedText>
+                                </View>
+                                <TouchableOpacity
+                                    style={[styles.dropdownTrigger, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46 }]}
+                                    onPress={() => setCityPickerVisible(true)}
+                                >
+                                    <View style={styles.triggerContent}>
+                                        <Ionicons name="location-outline" size={18} color={formData.city ? colors.primary : colors.icon} style={{ marginRight: 10 }} />
+                                        <ThemedText style={[styles.triggerText, !formData.city ? { color: colors.icon } : { color: colors.text, textTransform: 'capitalize' }, { fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
+                                            {formData.city || "Select your city"}
+                                        </ThemedText>
+                                    </View>
+                                    <Ionicons name="chevron-down" size={16} color={colors.icon} />
                                 </TouchableOpacity>
                             </Animated.View>
 
                             {/* Village Field */}
-                            <Animated.View entering={FadeInDown.delay(550)} style={styles.fieldCard}>
-                                <ThemedText style={styles.fieldLabel}>Village / Town</ThemedText>
-                                <View style={styles.inputWrapper}>
-                                    <Ionicons name="business-outline" size={20} color="#94A3B8" />
+                            <Animated.View entering={FadeInDown.delay(550)} style={styles.inputField}>
+                                <View style={styles.labelContainer}>
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                        VILLAGE / TOWN <ThemedText style={styles.required}>*</ThemedText>
+                                    </ThemedText>
+                                    <ThemedText style={[styles.charCount, formData.village.length > 40 ? { color: '#EF4444' } : { color: colors.icon }]}>
+                                        {formData.village.length}/40
+                                    </ThemedText>
+                                </View>
+                                <View style={[styles.inputBox, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46 }]}>
+                                    <Ionicons name="business-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
-                                        value={formData.village}
-                                        onChangeText={(val) => setFormData(p => ({ ...p, village: val }))}
-                                        style={styles.input}
                                         placeholder="Enter your village/town"
+                                        placeholderTextColor={colors.icon}
+                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
+                                        value={formData.village}
+                                        onChangeText={(val) => setFormData(p => ({ ...p, village: toTitleCase(val) }))}
+                                        maxLength={40}
                                     />
                                 </View>
                             </Animated.View>
@@ -471,6 +469,13 @@ export default function ProfileScreen() {
                     title="Select City"
                     placeholder="Search city..."
                 />
+
+                <ImageViewerModal
+                    visible={previewVisible}
+                    onClose={() => setPreviewVisible(false)}
+                    uri={user?.user?.profileImage}
+                    name={user?.user?.name}
+                />
             </View >
         </ErrorBoundary>
     );
@@ -506,56 +511,6 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         textAlign: 'center',
     },
-    avatarContainer: {
-        alignItems: 'center',
-        marginTop: 4,
-        marginBottom: 4,
-    },
-    imageWrapper: {
-        position: 'relative',
-        padding: 3,
-        borderRadius: 45,
-        backgroundColor: 'rgba(255,255,255,0.3)',
-    },
-    avatar: {
-        borderRadius: 40,
-        borderWidth: 2.5,
-        borderColor: '#FFFFFF',
-    },
-    cameraIcon: {
-        position: 'absolute',
-        bottom: -2,
-        right: -2,
-        backgroundColor: '#0D9488',
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#FFFFFF',
-    },
-    deleteIcon: {
-        position: 'absolute',
-        bottom: -2,
-        left: -2,
-        backgroundColor: '#EF4444',
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#FFFFFF',
-    },
-    loaderOverlay: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     welcomeText: {
         fontSize: 18,
         fontWeight: '800',
@@ -574,68 +529,57 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingBottom: 140,
     },
-    formContainer: {
+    formSection: {
         paddingHorizontal: 20,
         marginTop: 20,
+        gap: 16,
     },
-    fieldCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 10,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
+    inputField: {
+        gap: 6,
     },
-    fieldLabel: {
-        fontSize: Platform.OS === 'android' ? 11 : 13,
-        fontWeight: '700',
-        color: '#64748B',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
-    labelRow: {
+    labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
+        paddingRight: 4,
     },
-    badge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
-        gap: 4,
+    label: {
+        fontSize: 11,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+        marginLeft: 2,
     },
-    verifiedBadge: {
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    required: {
+        color: '#EF4444',
     },
-    unverifiedBadge: {
-        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-    },
-    badgeText: {
+    charCount: {
         fontSize: 10,
-        fontWeight: '800',
-        textTransform: 'uppercase',
+        fontWeight: '600',
     },
-    inputWrapper: {
+    inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        height: Platform.OS === 'android' ? 44 : 48,
-        gap: 12,
+        borderRadius: 14,
+        paddingHorizontal: 14,
+        borderWidth: 1,
     },
-    input: {
+    textInput: {
         flex: 1,
-        fontSize: Platform.OS === 'android' ? 14 : 16,
-        color: '#1E293B',
         fontWeight: '500',
     },
-    inputText: {
-        flex: 1,
-        fontSize: Platform.OS === 'android' ? 14 : 16,
-        color: '#1E293B',
+    dropdownTrigger: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderRadius: 14,
+        paddingHorizontal: 14,
+        borderWidth: 1,
+    },
+    triggerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    triggerText: {
         fontWeight: '500',
     },
     genderRow: {
@@ -648,11 +592,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        height: Platform.OS === 'android' ? 42 : 46,
-        borderRadius: 12,
-        borderWidth: 1.5,
+        height: Platform.OS === 'android' ? 44 : 46,
+        borderRadius: 14,
+        borderWidth: 1,
         borderColor: '#E2E8F0',
-        gap: 8,
+        gap: 6,
     },
     genderText: {
         fontSize: Platform.OS === 'android' ? 13 : 15,
@@ -702,6 +646,7 @@ const styles = StyleSheet.create({
         fontSize: Platform.OS === 'android' ? 14 : 15,
         fontWeight: '700',
         color: '#FFFFFF',
-    }
+    },
+
 });
 

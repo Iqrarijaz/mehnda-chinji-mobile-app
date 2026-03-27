@@ -1,7 +1,9 @@
 import { useRouter, useSegments } from 'expo-router';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { secureStorage, clientStorage } from '@/utils/storage';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { useNotificationStore } from '@/store/notificationStore';
+import { tokenCache } from '@/lib/tokenCache';
 
 type UserData = {
     token: string;
@@ -39,6 +41,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const storedUser = await secureStorage.getItem('userData');
                 if (storedUser) {
                     const parsed = JSON.parse(storedUser);
+                    // Populate in-memory cache immediately — interceptor uses this from now on
+                    if (parsed.token) tokenCache.set(parsed.token);
                     setUser(parsed);
                     if (parsed.user?.notificationPreferences) {
                         initializePreferences(parsed.user.notificationPreferences);
@@ -64,6 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         const authData = { user: userData, token: source.token || payload.token };
+        // Cache token in memory — interceptor reads from here, no more disk I/O per request
+        if (authData.token) tokenCache.set(authData.token);
         setUser(authData);
 
         if (userData.notificationPreferences) {
@@ -78,29 +84,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const logout = useCallback(async () => {
         try {
-            // ⭐ Phase 5: Logout Cleanup
-            console.log('🚪 Starting logout cleanup...');
+            analyticsService.trackEvent(AnalyticsEvents.LOGOUT);
             await clientStorage.removeItem('push_token');
-            console.log('✅ Logout cleanup completed (Push token cleared).');
         } catch (error) {
             console.error('Error during logout cleanup:', error);
         }
 
+        // Clear in-memory token immediately so in-flight retries don't send a stale token
+        tokenCache.clear();
         setUser(null);
         await secureStorage.removeItem('userData');
         // @ts-ignore
         router.replace('/(auth)/login');
     }, [router]);
 
-    const updateUser = useCallback(async (newUserData: any) => {
+    const updateUser = useCallback(async (payload: any) => {
+        // Extract nested data if present
+        const source = payload.data || payload;
+        const newUserData = source.userData || (source.id ? source : source.user) || source;
+
+        if (!newUserData || typeof newUserData !== 'object') {
+            console.error('Invalid update data:', payload);
+            return;
+        }
+
         setUser(prev => {
             if (!prev) return prev;
 
-            if (newUserData.notificationPreferences) {
-                initializePreferences(newUserData.notificationPreferences);
+            const finalUserData = { ...prev.user, ...newUserData };
+
+            if (finalUserData.notificationPreferences) {
+                initializePreferences(finalUserData.notificationPreferences);
             }
 
-            const updatedAuthData = { ...prev, user: { ...prev.user, ...newUserData } };
+            const updatedAuthData = { ...prev, user: finalUserData };
             secureStorage.setItem('userData', JSON.stringify(updatedAuthData));
             return updatedAuthData;
         });
@@ -112,15 +129,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (loading) return;
 
-        // @ts-ignore
-        const inAuthGroup = segments[0] === '(auth)';
+        const rootSegment = segments[0] as string | undefined;
+        // Whitelist routes that are accessible without authentication
+        const publicRoutes = ['onboarding', 'terms', 'privacy', 'communityGuidelines', 'weather'];
+        const isPublicRoute = !rootSegment || rootSegment === 'index' || publicRoutes.includes(rootSegment);
 
-        if (!user && !inAuthGroup) {
+        const inAuthGroup = rootSegment === '(auth)';
+
+        if (!user && !inAuthGroup && !isPublicRoute) {
+            // Redirect unauthenticated users to login if they try to access protected routes
             // @ts-ignore
             router.replace('/(auth)/login');
         } else if (user && inAuthGroup) {
+            // Redirect authenticated users to the main app if they end up in auth screens
             // @ts-ignore
-            router.replace('/(tabs)/');
+            router.replace('/(drawer)/(tabs)');
         }
     }, [user, loading, segments]);
 

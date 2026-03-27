@@ -11,6 +11,8 @@ export interface NotificationPreferences {
     health: boolean;
     religious: boolean;
     feed: boolean;
+    weather: boolean;
+    prayer: boolean;
 }
 
 interface NotificationState {
@@ -23,14 +25,16 @@ interface NotificationState {
 }
 
 const DEFAULT_PREFERENCES: NotificationPreferences = {
-    blood: true,
-    business: true,
-    education: true,
-    emergency: true,
-    govt: true,
-    health: true,
+    blood: false,
+    business: false,
+    education: false,
+    emergency: false,
+    govt: false,
+    health: false,
     religious: true,
     feed: true,
+    weather: true,
+    prayer: true,
 };
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({

@@ -17,6 +17,7 @@ interface WeatherSearchBarProps {
     onSubmit: () => void;
     onClear: () => void;
     onSelectCity: (city: string) => void;
+    onGPS?: () => void;
 }
 
 const WeatherSearchBar = React.memo(({
@@ -27,6 +28,7 @@ const WeatherSearchBar = React.memo(({
     onSubmit,
     onClear,
     onSelectCity,
+    onGPS,
 }: WeatherSearchBarProps) => (
     <View style={styles.wrapper}>
         {/* Input pill */}
@@ -44,6 +46,11 @@ const WeatherSearchBar = React.memo(({
             {searchInput.length > 0 && (
                 <TouchableOpacity onPress={onClear}>
                     <Ionicons name="close-circle" size={16} color="rgba(255,255,255,0.6)" />
+                </TouchableOpacity>
+            )}
+            {onGPS && searchInput.length === 0 && (
+                <TouchableOpacity onPress={onGPS} style={{ marginLeft: 8 }}>
+                    <Ionicons name="location" size={18} color="rgba(255,255,255,0.8)" />
                 </TouchableOpacity>
             )}
         </BlurView>
@@ -75,8 +82,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 14,
-        height: 42,
-        borderRadius: 21,
+        height: 44,
+        borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.25)',

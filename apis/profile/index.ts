@@ -40,21 +40,5 @@ export async function deleteProfileImage() {
     return apiClient.delete('/api/user/v1/delete-profile-image');
 }
 
-export const updateLocationApi = async (data: { latitude: number; longitude: number }) => {
-    return apiClient.post('/api/user/v1/update-location', {
-        latitude: data.latitude,
-        longitude: data.longitude
-    });
-};
 
-export async function acceptTerms(data: { version: string }) {
-    return apiClient.post('/api/user/v1/accept-terms', data);
-}
 
-export async function acceptPrivacyPolicy(data: { version: string }) {
-    return apiClient.post('/api/user/v1/accept-privacy-policy', data);
-}
-
-export async function acceptCommunityGuidelines(data: { version: string }) {
-    return apiClient.post('/api/user/v1/accept-community-guidelines', data);
-}

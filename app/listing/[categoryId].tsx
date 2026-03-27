@@ -19,11 +19,13 @@ import {
     StyleSheet,
     View,
 } from 'react-native';
+import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import Toast from 'react-native-toast-message';
 
 import PlaceSubmissionModal from '@/components/places/placeSubmissionModal';
 import { ThemedText } from '@/components/themedText';
 import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
+import BankCard from '@/components/listing/bankCard';
 
 const CategoryListingScreen = React.memo(() => {
     const { categoryId, tab } = useLocalSearchParams<{ categoryId: string; tab?: string }>();
@@ -196,6 +198,9 @@ const CategoryListingScreen = React.memo(() => {
         if (categoryId === 'education') {
             return <EducationCard data={item} color={headerColor} />;
         }
+        if (categoryId === 'banks') {
+            return <BankCard business={item} />;
+        }
         return <BusinessCard business={item} />;
     }, [categoryId, headerColor]);
 
@@ -238,8 +243,8 @@ const CategoryListingScreen = React.memo(() => {
                 }}
                 category={categoryId || ''}
                 onSuccess={() => {
-                    if (activeTab === 'requests') myRequestsRefetch();
-                    else refetch();
+                    setActiveTab('requests');
+                    myRequestsRefetch();
                 }}
                 editData={editingRequest}
             />
@@ -268,7 +273,7 @@ const CategoryListingScreen = React.memo(() => {
                     if (router.canGoBack()) {
                         router.back();
                     } else {
-                        router.replace('/(tabs)');
+                        router.replace('/(drawer)/(tabs)' as any);
                     }
                 }}
                 onAdd={() => setSubmissionModalVisible(true)}
@@ -280,8 +285,10 @@ const CategoryListingScreen = React.memo(() => {
             {/* Content */}
             <View style={styles.content}>
                 {loading && dataToRender.length === 0 ? (
-                    <View style={styles.loaderContainer}>
-                        <ActivityIndicator size="large" color={colors.primary} />
+                    <View style={styles.listContent}>
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <BusinessCardSkeleton key={i} />
+                        ))}
                     </View>
                 ) : (
                     <FlatList

@@ -1,52 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-// import { MMKV } from 'react-native-mmkv';
-
-// Check if we can use MMKV (fails in Expo Go)
-const isMMKVAvailable = () => {
-    /*
-    try {
-        const test = new MMKV();
-        return true;
-    } catch (e) {
-        return false;
-    }
-    */
-    return false;
-};
-
-const mmkv = null; // isMMKVAvailable() ? new MMKV() : null;
-
-if (!mmkv) {
-    // console.warn('MMKV is not available (likely Expo Go). Falling back to AsyncStorage.');
-}
 
 /**
- * Enhanced clientStorage that works with React Query's persister
- * and handles the MMKV/AsyncStorage fallback.
+ * Enhanced clientStorage that uses pure AsyncStorage with async wrappers
+ * to maintain compatibility with React Query's async persister and Zustand.
  */
 export const clientStorage = {
-    setItem: async (key: string, value: string) => {
-        if (mmkv) {
-            mmkv.set(key, value);
-        } else {
-            await AsyncStorage.setItem(key, value);
-        }
-        return true;
+    setItem: async (key: string, value: string): Promise<void> => {
+        await AsyncStorage.setItem(key, value);
     },
-    getItem: async (key: string) => {
-        if (mmkv) {
-            return mmkv.getString(key) || null;
-        } else {
-            return await AsyncStorage.getItem(key);
-        }
+    getItem: async (key: string): Promise<string | null> => {
+        return await AsyncStorage.getItem(key);
     },
-    removeItem: async (key: string) => {
-        if (mmkv) {
-            mmkv.delete(key);
-        } else {
-            await AsyncStorage.removeItem(key);
-        }
+    removeItem: async (key: string): Promise<void> => {
+        await AsyncStorage.removeItem(key);
     },
 };
 
@@ -84,6 +51,7 @@ export const secureStorage = {
 
 export const StorageKeys = {
     CONVERSATIONS: 'conversations_cache',
+    LAST_LOCATION_UPDATE: 'last_location_update',
 };
 
 /**

@@ -25,6 +25,7 @@ import NotificationItem from '@/components/notification/NotificationItem';
 import NotificationSection from '@/components/notification/NotificationSection';
 import NotificationSkeleton from '@/components/notification/NotificationSkeleton';
 import { handleNotificationNavigation } from '@/utils/notificationNavigation';
+import { useAuth } from '@/context/AuthContext';
 
 
 
@@ -54,6 +55,7 @@ function groupByDay(items: any[]): { label: string; data: any[] }[] {
 export default function NotificationsScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
+    const { isAuthenticated } = useAuth();
     const queryClient = useQueryClient();
     const [activeFilter, setActiveFilter] = useState('ALL');
     const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -63,6 +65,7 @@ export default function NotificationsScreen() {
     const { data: response, isLoading, isFetching, refetch } = useQuery<any>({
         queryKey: ['notifications', activeFilter],
         queryFn: () => getNotifications({ type: activeFilter }),
+        enabled: isAuthenticated,
     });
 
     const notifications = response?.data || [];
@@ -129,7 +132,7 @@ export default function NotificationsScreen() {
     }, [markAsReadMutation, router]);
 
     const handleBack = useCallback(() => {
-        router.canGoBack() ? router.back() : router.replace('/(tabs)');
+        router.canGoBack() ? router.back() : router.replace('/(drawer)/(tabs)' as any);
     }, [router]);
 
     const sections = useMemo(() => groupByDay(notifications), [notifications]);

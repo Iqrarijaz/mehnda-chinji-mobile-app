@@ -31,7 +31,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
 
         setIsDeleting(true);
         try {
-            const response = await deleteAccount({});
+            const response = await deleteAccount({}) as any;
             if (response.success) {
                 Toast.show({ type: 'success', text1: 'Account Deleted', text2: 'Your account has been successfully deleted.' });
                 resetAndClose();
@@ -53,12 +53,11 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
     };
 
     return (
-        <PremiumModal visible={visible} onClose={resetAndClose}>
-            <View style={styles.handle} />
+        <PremiumModal visible={visible} onClose={resetAndClose} type="centered">
             <View style={styles.modalHeader}>
-                <ThemedText style={[styles.modalTitle, { color: '#ef4444' }]}>Delete Account</ThemedText>
-                <TouchableOpacity onPress={resetAndClose}>
-                    <Ionicons name="close" size={24} color={colors.text} />
+                <ThemedText style={styles.modalTitle}>Delete Account</ThemedText>
+                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                    <Ionicons name="close" size={18} color="#64748B" />
                 </TouchableOpacity>
             </View>
 
@@ -79,20 +78,26 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
                 />
             </View>
 
-            <TouchableOpacity
-                style={[
-                    styles.saveButton,
-                    { backgroundColor: '#ef4444', opacity: deleteConfirmation === 'DELETE MY ACCOUNT' ? 1 : 0.5 }
-                ]}
-                onPress={handleDeleteAccount}
-                disabled={isDeleting || deleteConfirmation !== 'DELETE MY ACCOUNT'}
-            >
-                {isDeleting ? (
-                    <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                    <ThemedText style={styles.saveButtonText}>Delete My Account</ThemedText>
-                )}
-            </TouchableOpacity>
+            <View style={styles.footer}>
+                <TouchableOpacity
+                    onPress={handleDeleteAccount}
+                    disabled={isDeleting || deleteConfirmation !== 'DELETE MY ACCOUNT'}
+                    style={[
+                        styles.saveButton,
+                        { backgroundColor: '#ef4444', opacity: deleteConfirmation === 'DELETE MY ACCOUNT' ? 1 : 0.5, flex: 1, marginTop: 0 }
+                    ]}
+                >
+                    {isDeleting ? (
+                        <ActivityIndicator color="#FFFFFF" />
+                    ) : (
+                        <ThemedText style={styles.saveButtonText}>Delete</ThemedText>
+                    )}
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={onClose} style={styles.cancelBtn} activeOpacity={0.7}>
+                    <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                </TouchableOpacity>
+            </View>
         </PremiumModal>
     );
 };
@@ -110,37 +115,39 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
         shadowRadius: 10,
     },
-    handle: {
-        width: 40,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: '#E2E8F0',
-        alignSelf: 'center',
-        marginBottom: 20,
-    },
+
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: 16,
     },
     modalTitle: {
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: '800',
+        color: '#0F172A',
+    },
+    closeButton: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#F1F5F9',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     inputContainer: {
-        marginBottom: 16,
+        marginBottom: 12,
     },
     inputLabel: {
         fontSize: 11,
         fontWeight: '700',
         color: '#475569',
         letterSpacing: 0.5,
-        marginBottom: 8,
+        marginBottom: 4,
         marginLeft: 2,
     },
     input: {
-        height: 52,
+        height: Platform.OS === 'android' ? 48 : 52,
         borderWidth: 1.5,
         borderRadius: 14,
         paddingHorizontal: 18,
@@ -149,8 +156,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     saveButton: {
-        height: 56,
-        borderRadius: 16,
+        height: Platform.OS === 'android' ? 48 : 52,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 10,
@@ -168,7 +175,27 @@ const styles = StyleSheet.create({
         color: '#ef4444',
         fontSize: 14,
         textAlign: 'center',
-        marginBottom: 16,
+        marginBottom: 12,
         lineHeight: 20,
+    },
+    footer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginTop: 12,
+    },
+    cancelBtn: {
+        flex: 1,
+        height: Platform.OS === 'android' ? 48 : 52,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        borderRadius: 14,
+    },
+    cancelText: {
+        fontSize: 14,
+        color: '#94A3B8',
+        fontWeight: '600',
     },
 });

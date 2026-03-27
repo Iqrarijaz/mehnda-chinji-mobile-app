@@ -162,8 +162,7 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
     });
 
     return (
-        <PremiumModal visible={visible} onClose={onClose}>
-            <View style={styles.handle} />
+        <PremiumModal visible={visible} onClose={onClose} type="centered">
 
             <View style={styles.header}>
                 <View>
@@ -211,14 +210,7 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
 });
 
 const styles = StyleSheet.create({
-    handle: {
-        width: 40,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: '#E2E8F0',
-        alignSelf: 'center',
-        marginBottom: 20,
-    },
+
     header: {
         flexDirection: 'row',
         alignItems: 'flex-start',

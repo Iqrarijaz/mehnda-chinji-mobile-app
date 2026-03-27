@@ -4,7 +4,8 @@ export const PLACE_CATEGORY_MAPPING: Record<string, string> = {
     health: 'Health',
     govt: 'Govt Offices',
     emergency: 'Emergency',
-    // travel: 'Travel',
+    banks: 'Banks',
+    travel: 'Travel',
 };
 
 export interface CategoryInfo {
@@ -20,7 +21,12 @@ export const CATEGORIES_CONFIG: CategoryInfo[] = [
     { id: 'religious', label: 'Religious', icon: 'book', color: '#10B981' },
     { id: 'health', label: 'Health', icon: 'medkit', color: '#EF4444' },
     { id: 'govt', label: 'Govt Offices', icon: 'business', color: '#6366F1' },
-    // { id: 'travel', label: 'Travel', icon: 'bus', color: '#60A5FA' },
+
+];
+
+export const MORE_CATEGORIES_CONFIG: CategoryInfo[] = [
+    { id: 'banks', label: 'Banks', icon: 'card', color: '#F59E0B' },
+    { id: 'travel', label: 'Travel', icon: 'bus', color: '#60A5FA' },
 ];
 
 export const PLACE_CATEGORIES = CATEGORIES_CONFIG.map(cat => ({

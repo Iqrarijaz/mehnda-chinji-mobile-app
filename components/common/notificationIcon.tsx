@@ -2,6 +2,7 @@ import { getNotifications } from '@/apis/notifications';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { useAuth } from '@/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -21,6 +22,7 @@ export function NotificationIcon({
     containerStyle
 }: NotificationIconProps) {
     const { theme } = useTheme();
+    const { isAuthenticated } = useAuth();
     const colors = Colors[theme];
     const router = useRouter();
 
@@ -29,7 +31,7 @@ export function NotificationIcon({
     const { data: notificationsData } = useQuery({
         queryKey: ['notifications-badge'],
         queryFn: () => getNotifications({ limit: 1 }),
-        refetchInterval: 60 * 60 * 1000, // 1 hour auto-refresh
+        enabled: isAuthenticated,
     });
 
     const unreadCount = notificationsData?.unreadCount || 0;

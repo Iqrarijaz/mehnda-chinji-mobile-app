@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     KeyboardAvoidingView,
     Platform,
@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Location from 'expo-location';
+import Toast from 'react-native-toast-message';
 import cities from '../data/cities.json';
 
 import { useWeather } from '@/hooks/useWeather';
@@ -76,6 +78,60 @@ export default function WeatherScreen() {
         setIsRefreshing(false);
     }, [refetch]);
 
+    const handleGPS = useCallback(async () => {
+        try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Permission Denied',
+                    text2: 'Please enable location permissions to use this feature.',
+                });
+                return;
+            }
+
+            setIsRefreshing(true);
+            const location = await Location.getCurrentPositionAsync({});
+            const reverseGeocode = await Location.reverseGeocodeAsync({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+            });
+
+            if (reverseGeocode.length > 0) {
+                const city = reverseGeocode[0].city || reverseGeocode[0].district || reverseGeocode[0].name;
+                if (city) {
+                    setCity(city + ', PK');
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Location Detected',
+                        text2: `Updated weather for ${city}`,
+                    });
+                }
+            }
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to detect location',
+            });
+        } finally {
+            setIsRefreshing(false);
+        }
+    }, [setCity]);
+
+    useEffect(() => {
+        const askPermissionOnce = async () => {
+            const { status, canAskAgain } = await Location.getForegroundPermissionsAsync();
+            if (status !== 'granted' && canAskAgain) {
+                const { status: newStatus } = await Location.requestForegroundPermissionsAsync();
+                if (newStatus === 'granted') {
+                    handleGPS();
+                }
+            }
+        };
+        askPermissionOnce();
+    }, [handleGPS]);
+
     // ── Hourly data ──────────────────────────────────────────────────────────
     const hourlyData = useMemo(() => {
         if (!forecast) return [];
@@ -138,7 +194,7 @@ export default function WeatherScreen() {
                     {/* Top Nav */}
                     <Animated.View entering={SlideInLeft.duration(400)} style={styles.topNav}>
                         <TouchableOpacity
-                            onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')}
+                            onPress={() => router.canGoBack() ? router.back() : router.replace('/(drawer)/(tabs)' as any)}
                             style={styles.backBtn}
                         >
                             <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
@@ -152,6 +208,7 @@ export default function WeatherScreen() {
                             onSubmit={handleSubmit}
                             onClear={handleClear}
                             onSelectCity={handleSelectCity}
+                            onGPS={handleGPS}
                         />
                     </Animated.View>
 
@@ -176,7 +233,6 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         gap: 12,
         zIndex: 1000,
-        elevation: 1000,
     },
     backBtn: {
         width: 42,

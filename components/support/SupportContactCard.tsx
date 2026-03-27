@@ -10,6 +10,7 @@ interface SupportContactCardProps {
     value: string;
     icon: keyof typeof Ionicons.glyphMap;
     color: string;
+    hideValue?: boolean;
 }
 
 const SupportContactCard: React.FC<SupportContactCardProps> = ({
@@ -18,7 +19,8 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
     subtitle,
     value,
     icon,
-    color
+    color,
+    hideValue = false
 }) => {
     const scale = useSharedValue(1);
 
@@ -34,13 +36,17 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
         let url = '';
         if (type === 'whatsapp') {
             const message = 'Hello, I need support with Rehbar app.';
-            url = `whatsapp://send?phone=${value}&text=${encodeURIComponent(message)}`;
+            const cleanNumber = value.replace(/[^0-9]/g, '');
+            // Ensure number starts with country code for wa.me if not already present
+            const formattedNumber = cleanNumber.startsWith('92') ? cleanNumber : `92${cleanNumber.startsWith('0') ? cleanNumber.slice(1) : cleanNumber}`;
+            
+            url = `whatsapp://send?phone=${formattedNumber}&text=${encodeURIComponent(message)}`;
 
             Linking.canOpenURL(url).then(supported => {
                 if (supported) {
                     Linking.openURL(url);
                 } else {
-                    Linking.openURL(`https://wa.me/${value.replace('+', '')}?text=${encodeURIComponent(message)}`);
+                    Linking.openURL(`https://wa.me/${formattedNumber}?text=${encodeURIComponent(message)}`);
                 }
             });
             return;
@@ -66,7 +72,7 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
                 <View style={styles.content}>
                     <Text style={styles.title}>{title}</Text>
                     <Text style={styles.subtitle}>{subtitle}</Text>
-                    <Text style={[styles.value, { color }]}>{value}</Text>
+                    {!hideValue && <Text style={[styles.value, { color }]}>{value}</Text>}
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
             </Animated.View>
@@ -88,7 +94,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.05,
         shadowRadius: 12,
-        elevation: 3,
     },
     iconContainer: {
         width: 52,

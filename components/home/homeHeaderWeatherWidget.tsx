@@ -48,11 +48,37 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
     const humidity = weather?.main?.humidity ?? '--';
     const location = weather?.name ? `${weather.name}, PK` : selectedCity;
 
+    // Format sunrise/sunset
+    const formatTime = (timestamp?: number) => {
+        if (!timestamp) return '--:--';
+        const date = new Date(timestamp * 1000);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const sunrise = formatTime(weather?.sys?.sunrise);
+    const sunset = formatTime(weather?.sys?.sunset);
+
+    // Determine which event to show (next upcoming event)
+    const now = Math.floor(Date.now() / 1000);
+    const apiSunrise = weather?.sys?.sunrise;
+    const apiSunset = weather?.sys?.sunset;
+
+    // Default to 'Sun Up' if data is missing, else determine next event
+    // After midnight but before sunrise -> Sun Up
+    // After sunrise but before sunset -> Sun Down
+    // After sunset -> Sun Up (next day, but we only have today's timestamp, so we'll show sunrise time as a fallback)
+    const isShowingSunrise = apiSunrise && apiSunset ? (now < apiSunrise || now >= apiSunset) : true;
+
+    const timeToShow = isShowingSunrise ? sunrise : sunset;
+    const labelToShow = isShowingSunrise ? 'Sun Up' : 'Sun Down';
+    const iconToShow = isShowingSunrise ? 'sunny-outline' : 'moon-outline';
+    const iconColor = isShowingSunrise ? '#FFD700' : '#E0E0E0';
+
     return (
         <TouchableOpacity
             activeOpacity={0.8}
             onPress={onPress}
-            style={styles.container}
+            style={[styles.container, { paddingVertical: 12, paddingHorizontal: 16 }]}
         >
             <View style={styles.leftSection}>
                 <View style={styles.mainTempRow}>
@@ -73,14 +99,23 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                     <Ionicons name="location" size={14} color="#FFFFFF" style={{ opacity: 0.8 }} />
                     <ThemedText style={styles.locationText} numberOfLines={1}>{location}</ThemedText>
                 </View>
-                <View style={styles.detailsRow}>
+                <View style={[styles.detailsRow, { marginBottom: 8 }]}>
                     <View style={styles.detailItem}>
-                        <ThemedText style={styles.detailLabel}>Feels like</ThemedText>
+                        <Ionicons name="thermometer-outline" size={12} color="#FFFFFF" style={{ opacity: 0.8 }} />
+                        <ThemedText style={styles.detailLabel}>Feels</ThemedText>
                         <ThemedText style={styles.detailValue}>{feelsLike}°</ThemedText>
                     </View>
                     <View style={[styles.detailItem, { marginLeft: 16 }]}>
-                        <ThemedText style={styles.detailLabel}>Humidity</ThemedText>
+                        <Ionicons name="water-outline" size={12} color="#FFFFFF" style={{ opacity: 0.8 }} />
+                        <ThemedText style={styles.detailLabel}>Drops</ThemedText>
                         <ThemedText style={styles.detailValue}>{humidity}%</ThemedText>
+                    </View>
+                </View>
+                <View style={styles.detailsRow}>
+                    <View style={styles.detailItem}>
+                        <Ionicons name={iconToShow} size={12} color={iconColor} style={{ opacity: 0.9 }} />
+                        <ThemedText style={styles.detailLabel}>{labelToShow}</ThemedText>
+                        <ThemedText style={styles.detailValue}>{timeToShow}</ThemedText>
                     </View>
                 </View>
             </View>
@@ -102,7 +137,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     leftSection: {
-        flex: 1,
+        flex: 3,
         justifyContent: 'center',
     },
     mainTempRow: {
@@ -130,7 +165,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 14,
     },
     rightSection: {
-        flex: 1.2,
+        flex: 6.5,
     },
     locationRow: {
         flexDirection: 'row',
@@ -149,18 +184,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     detailItem: {
-        gap: 2,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
     },
     detailLabel: {
         fontSize: 10,
         fontWeight: '600',
         color: '#FFFFFF',
-        opacity: 0.6,
+        opacity: 0.7,
         textTransform: 'uppercase',
     },
     detailValue: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: '700',
         color: '#FFFFFF',
+        marginLeft: 2,
     },
 });

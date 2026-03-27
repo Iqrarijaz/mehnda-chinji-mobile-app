@@ -25,5 +25,5 @@ export const queryClient = new QueryClient({
 
 export const asyncStoragePersister = createAsyncStoragePersister({
     storage: clientStorage,
-    key: 'MEHNDA_CHINJI_QUERY_CACHE',
+    key: 'REHBAR_QUERY_CACHE',
 });

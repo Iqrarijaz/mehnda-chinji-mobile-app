@@ -6,9 +6,9 @@ import {
     Animated,
     Dimensions,
     TouchableOpacity,
-    SafeAreaView,
     Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themedText';
@@ -17,31 +17,34 @@ import { PaginationDots } from '@/components/onboarding/PaginationDots';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { clientStorage } from '@/utils/storage';
+import * as Haptics from 'expo-haptics';
+import { useAuth } from '@/context/AuthContext';
+
 
 const { width, height } = Dimensions.get('window');
 
 const SLIDES = [
     {
         id: '1',
-        title: 'Stay Updated',
-        description: 'Get the latest community news and announcements from local administrators.',
+        title: 'ہر رابطہ، ایک جگہ',
+        description: 'Your complete community directory',
         animation: require('../public/json/onboarding1.json'),
     },
     {
         id: '2',
-        title: 'Save Lives',
-        description: 'Quickly find blood donors and help people in emergencies.',
+        title: 'ایک قطرہ، ایک زندگی',
+        description: 'One drop, one life',
         animation: require('../public/json/onboarding2.json'),
     },
     {
         id: '3',
-        title: 'Support Local Businesses',
-        description: 'Discover and register local businesses in your community directory.',
+        title: 'اپنا کاروبار بڑھائیں، ہمارے ساتھ',
+        description: 'Grow your business with us',
         animation: require('../public/json/onboarding3.json'),
     },
 ];
 
-import * as Haptics from 'expo-haptics';
+
 
 export default function OnboardingScreen() {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -49,6 +52,7 @@ export default function OnboardingScreen() {
     const slidesRef = useRef<FlatList>(null);
     const router = useRouter();
     const { theme } = useTheme();
+    const { isAuthenticated } = useAuth();
     const isDark = theme === 'dark';
     const colors = Colors[theme];
     const buttonScale = useRef(new Animated.Value(1)).current;
@@ -69,6 +73,7 @@ export default function OnboardingScreen() {
                 Haptics.selectionAsync(); // Tactile feedback on snap
                 setCurrentIndex(nextIndex);
             }
+
         }
     }).current;
 
@@ -89,15 +94,22 @@ export default function OnboardingScreen() {
         completeOnboarding();
     };
 
+
+
     const completeOnboarding = async () => {
         try {
             await clientStorage.setItem('onboarding_completed', 'true');
-            router.replace('/(tabs)');
+            if (isAuthenticated) {
+                router.replace('/(drawer)/(tabs)' as any);
+            } else {
+                router.replace('/(auth)/login');
+            }
         } catch (error) {
             console.error('Error saving onboarding status:', error);
-            router.replace('/(tabs)');
+            router.replace('/(auth)/login');
         }
     };
+
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -117,7 +129,14 @@ export default function OnboardingScreen() {
                 <View style={styles.content}>
                     <FlatList
                         data={SLIDES}
-                        renderItem={({ item, index }) => <OnboardingSlide item={item} index={index} scrollX={scrollX} />}
+                        renderItem={({ item, index }) => (
+                            <OnboardingSlide
+                                item={item as any}
+                                index={index}
+                                scrollX={scrollX}
+                            />
+
+                        )}
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         pagingEnabled
@@ -200,7 +219,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.15,
         shadowRadius: 12,
-        elevation: 5,
     },
     buttonText: {
         color: '#FFFFFF',

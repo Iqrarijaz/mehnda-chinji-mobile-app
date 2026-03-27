@@ -15,10 +15,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { checkAccountDetails, sendOtp } from '@/apis/forgot-password';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
+import { forgotPasswordSchema } from '@/utils/validation';
+import * as yup from 'yup';
+import { checkAccountDetails, sendOtp } from '@/apis/login/forgot-password';
 
 export default function ForgotPasswordScreen() {
     const router = useRouter();
@@ -26,17 +28,45 @@ export default function ForgotPasswordScreen() {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
-    const [emailOrPhone, setEmailOrPhone] = useState('');
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(1); // 1: Find Account, 2: Profile Preview
     const [userProfile, setUserProfile] = useState<any>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    const validateField = async (name: string, value: any) => {
+        try {
+            const fieldSchema = yup.reach(forgotPasswordSchema, name) as yup.AnySchema;
+            await fieldSchema.validate(value);
+            setErrors(prev => ({ ...prev, [name]: '' }));
+        } catch (error: any) {
+            setErrors(prev => ({ ...prev, [name]: error.message }));
+        }
+    };
+
+    const handleBlur = (field: string) => {
+        setTouched(prev => ({ ...prev, [field]: true }));
+        validateField(field, email.trim());
+    };
 
     const handleSubmit = async () => {
-        if (!emailOrPhone.trim()) {
+        setErrors({});
+        setTouched({ email: true });
+        try {
+            await forgotPasswordSchema.validate({ email: email.trim() }, { abortEarly: false });
+        } catch (error: any) {
+            if (error.inner) {
+                const newErrors: Record<string, string> = {};
+                error.inner.forEach((err: any) => {
+                    newErrors[err.path] = err.message;
+                });
+                setErrors(newErrors);
+            }
             Toast.show({
                 type: 'error',
-                text1: 'Required',
-                text2: 'Please enter your email address'
+                text1: 'Validation Error',
+                text2: 'Please fix the errors in the form'
             });
             return;
         }
@@ -44,7 +74,7 @@ export default function ForgotPasswordScreen() {
         setLoading(true);
 
         try {
-            const response = await checkAccountDetails(emailOrPhone.trim());
+            const response = await checkAccountDetails(email.trim());
             setUserProfile(response.data);
             setStep(2);
         } catch (error: any) {
@@ -61,7 +91,7 @@ export default function ForgotPasswordScreen() {
     const handleSendOtp = async () => {
         setLoading(true);
         try {
-            await sendOtp(emailOrPhone.trim());
+            await sendOtp(email.trim());
             Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -72,7 +102,7 @@ export default function ForgotPasswordScreen() {
             router.push({
                 pathname: '/(auth)/verify-otp',
                 params: {
-                    emailOrPhone: emailOrPhone.trim(),
+                    email: email.trim(),
                     name: userProfile?.name || '',
                     profileImage: userProfile?.profileImage || ''
                 }
@@ -103,6 +133,11 @@ export default function ForgotPasswordScreen() {
                     <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
                 <View style={styles.headerContent}>
+                    <Image
+                        source={require('../../public/icon.svg')}
+                        style={{ width: 48, height: 48, marginBottom: 16 }}
+                        contentFit="contain"
+                    />
                     <ThemedText style={styles.headerTitle}>Forgot{"\n"}Password?</ThemedText>
                     <ThemedText style={styles.headerSubtitle}>
                         {step === 1
@@ -123,24 +158,34 @@ export default function ForgotPasswordScreen() {
                         {step === 1 ? (
                             <>
                                 {/* Email/Phone Input */}
-                                <View style={styles.inputField}>
+                                 <View style={styles.inputField}>
                                     <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
                                     <View style={[styles.inputBox, {
                                         backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+                                        borderColor: errors.email && touched.email ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0')
                                     }]}>
                                         <Ionicons name="mail-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
                                         <TextInput
-                                            placeholder="Enter your email address"
+                                            placeholder="example@gmail.com"
                                             placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
-                                            value={emailOrPhone}
-                                            onChangeText={setEmailOrPhone}
+                                            value={email}
+                                            onChangeText={(text) => {
+                                                setEmail(text);
+                                                if (errors.email) validateField('email', text.trim());
+                                            }}
+                                            onBlur={() => handleBlur('email')}
                                             style={[styles.input, { color: colors.text }]}
                                             keyboardType="email-address"
                                             autoCapitalize="none"
                                             editable={!loading}
                                         />
+                                        {touched.email && !errors.email && email.length > 0 && (
+                                            <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
+                                        )}
                                     </View>
+                                    {touched.email && errors.email ? (
+                                        <ThemedText style={styles.errorText}>{errors.email}</ThemedText>
+                                    ) : null}
                                 </View>
 
                                 {/* Find Account Button */}
@@ -269,14 +314,21 @@ const styles = StyleSheet.create({
     },
     formCard: {
         borderRadius: 24,
-        padding: 22,
+        padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
     },
     inputField: {
-        marginBottom: 22,
+        marginBottom: 20,
+    },
+    errorText: {
+        color: '#EF4444',
+        fontSize: 12,
+        marginTop: 6,
+        marginLeft: 4,
+        fontWeight: '500',
     },
     label: {
         fontSize: 11,

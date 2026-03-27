@@ -3,7 +3,7 @@ import { ThemedText } from '@/components/themedText';
 import Avatar from '@/components/ui/avatar';
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions } from '@react-navigation/native';
-import React from 'react';
+import React, { useRef } from 'react';
 import { Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface FeedHeaderProps {
@@ -15,6 +15,8 @@ interface FeedHeaderProps {
     setSearchQuery: (query: string) => void;
     selectedType: string | null;
     setSelectedType: (type: string | null) => void;
+    onCreatePost?: () => void;
+    containerStyle?: any;
 }
 
 export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
@@ -25,10 +27,13 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
     searchQuery,
     setSearchQuery,
     selectedType,
-    setSelectedType
+    setSelectedType,
+    onCreatePost,
+    containerStyle,
 }) => {
+    const inputRef = useRef<TextInput>(null);
     return (
-        <View style={[styles.headerContainer, { backgroundColor: colors.primary, paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }]}>
+        <View style={[styles.headerContainer, { backgroundColor: colors.primary, paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }, containerStyle]}>
             <View style={styles.headerTopRow}>
                 <TouchableOpacity
                     onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
@@ -44,6 +49,13 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
                     />
 
                     <TouchableOpacity
+                        onPress={onCreatePost}
+                        style={[styles.iconButton, { marginRight: 12 }]}
+                    >
+                        <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
                         onPress={() => navigation.navigate('profile' as never)}
                         style={styles.profileButton}
                     >
@@ -57,23 +69,25 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
             </View>
 
             {/* Search Bar */}
-            <View style={styles.searchContainer}>
-                <View style={styles.searchBar}>
+            <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => inputRef.current?.focus()}
+                style={styles.searchContainer}
+            >
+                <View style={styles.searchBar} pointerEvents="box-none">
                     <Ionicons name="search" size={20} color="#94A3B8" />
                     <TextInput
+                        ref={inputRef}
                         style={styles.searchInput}
-                        placeholder="Search posts, discussions..."
+                        placeholder="Search posts..."
                         placeholderTextColor="#94A3B8"
                         value={searchQuery}
                         onChangeText={setSearchQuery}
+                        returnKeyType="search"
+                        clearButtonMode="while-editing"
                     />
-                    {searchQuery.length > 0 && (
-                        <TouchableOpacity onPress={() => setSearchQuery('')}>
-                            <Ionicons name="close-circle" size={20} color="#94A3B8" />
-                        </TouchableOpacity>
-                    )}
                 </View>
-            </View>
+            </TouchableOpacity>
 
             {/* Type Filter Chips */}
             <View style={styles.filterContainer}>
@@ -150,12 +164,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         height: Platform.OS === 'android' ? 40 : 48,
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.05)',
     },
     searchInput: {
         flex: 1,
         marginLeft: 8,
         fontSize: Platform.OS === 'android' ? 13 : 15,
         color: '#0F172A',
+        height: '100%',
     },
     filterContainer: {
         flexDirection: 'row',
@@ -163,8 +180,8 @@ const styles = StyleSheet.create({
         gap: Platform.OS === 'android' ? 10 : 12,
     },
     filterChip: {
-        paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        paddingVertical: Platform.OS === 'android' ? 6 : 8,
+        paddingHorizontal: Platform.OS === 'android' ? 12 : 14,
+        paddingVertical: 4,
         borderRadius: 20,
         backgroundColor: 'rgba(255,255,255,0.2)',
         borderWidth: 1,

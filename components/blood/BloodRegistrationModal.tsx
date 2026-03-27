@@ -1,4 +1,5 @@
 import { DONOR_QUERY_KEYS, registerAsDonor } from '@/apis/bloodDonation';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -20,9 +21,11 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    Dimensions
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { SearchableDropdown } from '../common/searchableDropdown';
+import { PremiumModal } from '../common/PremiumModal';
 import { toastConfig } from '../toastConfig';
 
 interface BloodRegistrationModalProps {
@@ -69,8 +72,9 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
 
     const registerMutation = useMutation({
         mutationFn: registerAsDonor,
-        onSuccess: (res) => {
+        onSuccess: (res: any) => {
             if (res.success) {
+                analyticsService.trackEvent(AnalyticsEvents.DONOR_REGISTRATION_SUCCESS);
                 queryClient.invalidateQueries({ queryKey: DONOR_QUERY_KEYS.all });
                 Toast.show({
                     type: 'success',
@@ -144,17 +148,15 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
     };
 
     return (
-        <Modal
-            animationType="slide"
-            transparent={true}
+        <PremiumModal
             visible={visible}
-            onRequestClose={onClose}
+            onClose={onClose}
         >
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.modalOverlay}
+                style={{ width: '100%' }}
             >
-                <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+                <View style={styles.modalContent}>
                     <View style={styles.header}>
                         <ThemedText style={styles.title}>Register as Donor</ThemedText>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -170,11 +172,11 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                     BLOOD GROUP <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                                 <TouchableOpacity
-                                    style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}
+                                    style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
                                     onPress={() => setGroupModalVisible(true)}
                                 >
                                     <Ionicons name="water" size={18} color={selectedGroup ? "#ef4444" : colors.icon} style={{ marginRight: 10 }} />
-                                    <ThemedText style={[styles.textInput, { color: selectedGroup ? colors.text : colors.icon }]}>
+                                    <ThemedText style={[styles.textInput, { color: selectedGroup ? colors.text : colors.icon, fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
                                         {selectedGroup || 'Select Blood Group'}
                                     </ThemedText>
                                     <Ionicons name="chevron-down" size={16} color={colors.icon} />
@@ -187,11 +189,11 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                     CITY <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                                 <TouchableOpacity
-                                    style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}
+                                    style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
                                     onPress={() => setCityModalVisible(true)}
                                 >
                                     <Ionicons name="location" size={18} color={selectedCity ? "#ef4444" : colors.icon} style={{ marginRight: 10 }} />
-                                    <ThemedText style={[styles.textInput, { color: selectedCity ? colors.text : colors.icon }]}>
+                                    <ThemedText style={[styles.textInput, { color: selectedCity ? colors.text : colors.icon, fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
                                         {selectedCity || 'Select City'}
                                     </ThemedText>
                                     <Ionicons name="chevron-down" size={16} color={colors.icon} />
@@ -208,12 +210,12 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                         {address.length}/40
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
+                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="home" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         placeholder="Enter address or area"
                                         placeholderTextColor={colors.icon}
-                                        style={[styles.textInput, { color: colors.text }]}
+                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={address}
                                         onChangeText={setAddress}
                                         autoCapitalize="words"
@@ -226,11 +228,11 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                             <View style={styles.inputField}>
                                 <ThemedText style={[styles.label, { color: colors.text }]}>LAST DONATION DATE</ThemedText>
                                 <TouchableOpacity
-                                    style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}
+                                    style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
                                     onPress={() => setShowDatePicker(true)}
                                 >
                                     <Ionicons name="calendar" size={18} color={lastDonationDate ? "#ef4444" : colors.icon} style={{ marginRight: 10 }} />
-                                    <ThemedText style={[styles.textInput, { color: lastDonationDate ? colors.text : colors.icon }]}>
+                                    <ThemedText style={[styles.textInput, { color: lastDonationDate ? colors.text : colors.icon, fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
                                         {lastDonationDate ? lastDonationDate.toLocaleDateString() : 'Tap to select date'}
                                     </ThemedText>
                                     <Ionicons name="chevron-down" size={16} color={colors.icon} />
@@ -278,27 +280,33 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                 </Modal>
                             </View>
 
-                            <TouchableOpacity
-                                style={[styles.actionBtnWrapper]}
-                                onPress={handleRegister}
-                                disabled={registerMutation.isPending}
-                            >
-                                <LinearGradient
-                                    colors={['#ef4444', '#b91c1c']}
-                                    style={styles.gradientBtn}
-                                >
-                                    {registerMutation.isPending ? (
-                                        <ActivityIndicator size="small" color="#FFFFFF" />
-                                    ) : (
-                                        <ThemedText style={styles.btnText}>REGISTER</ThemedText>
-                                    )}
-                                </LinearGradient>
-                            </TouchableOpacity>
                         </View>
                     </ScrollView>
+
+                    <View style={styles.footer}>
+                        <TouchableOpacity
+                            style={[styles.actionBtnWrapper, { flex: 1 }]}
+                            onPress={handleRegister}
+                            disabled={registerMutation.isPending}
+                        >
+                            <LinearGradient
+                                colors={['#ef4444', '#b91c1c']}
+                                style={[styles.gradientBtn, { height: Platform.OS === 'android' ? 44 : 46 }]}
+                            >
+                                {registerMutation.isPending ? (
+                                    <ActivityIndicator size="small" color="#FFFFFF" />
+                                ) : (
+                                    <ThemedText style={styles.btnText}>REGISTER</ThemedText>
+                                )}
+                            </LinearGradient>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={onClose} style={styles.cancelBtn} activeOpacity={0.7}>
+                            <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </KeyboardAvoidingView>
-
             {/* City Picker Modal */}
             <SearchableDropdown
                 visible={cityModalVisible}
@@ -354,7 +362,7 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
             </Modal>
 
             <Toast config={toastConfig} topOffset={50} />
-        </Modal>
+        </PremiumModal>
     );
 };
 
@@ -367,34 +375,36 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalContent: {
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        height: '90%',
-        paddingTop: 20,
-        paddingHorizontal: 20,
+        width: '100%',
+        maxHeight: Dimensions.get('window').height * 0.85,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
     },
     title: {
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: 'bold',
         textTransform: 'capitalize',
+        color: '#0F172A',
     },
     closeButton: {
-        padding: 4,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#F1F5F9',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     scrollContent: {
         paddingBottom: 40,
     },
     formSection: {
-        gap: 16,
+        gap: 12,
     },
     inputField: {
-        gap: 8,
+        gap: 4,
     },
     label: {
         fontSize: 11,
@@ -430,12 +440,11 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     actionBtnWrapper: {
-        marginTop: 8,
-        borderRadius: 16,
+        borderRadius: 14,
         overflow: 'hidden',
     },
     gradientBtn: {
-        height: 52,
+        height: Platform.OS === 'android' ? 44 : 46,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -445,6 +454,26 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         letterSpacing: 0.5,
     },
+    footer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginTop: 16,
+    },
+    cancelBtn: {
+        flex: 1,
+        height: Platform.OS === 'android' ? 44 : 46,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        borderRadius: 14,
+    },
+    cancelText: {
+        fontSize: 14,
+        color: '#94A3B8',
+        fontWeight: '600',
+    },
     // Date Modal
     dateModalOverlay: {
         flex: 1,
@@ -453,7 +482,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     dateModalContent: {
-        width: '90%',
+        width: '95%',
         borderRadius: 28,
         padding: 24,
         overflow: 'hidden',
@@ -493,8 +522,19 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     // Dropdown Modal
+    modalSheet: {
+        width: '95%',
+        height: '65%',
+        paddingTop: 0,
+        paddingHorizontal: 0,
+        paddingBottom: 16,
+        borderRadius: 24,
+        overflow: 'hidden',
+        backgroundColor: '#FFFFFF',
+    },
+    fieldWrap: { marginBottom: 8 },
     dropdownModalContent: {
-        width: '85%',
+        width: '95%',
         maxHeight: '60%',
         borderRadius: 24,
         padding: 20,

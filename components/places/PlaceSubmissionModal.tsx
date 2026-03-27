@@ -9,10 +9,12 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View
+    View,
+    Dimensions
 } from 'react-native';
 
 import { submitPlace, updateRequest } from '@/apis/places';
+import { PremiumModal } from '../common/PremiumModal';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -167,6 +169,18 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
 
         const validContacts = form.contact.filter(c => c.number.trim() !== '');
 
+        // Validate 11 digits for each contact
+        for (const contact of validContacts) {
+            if (contact.number.trim().length !== 11) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Validation Error',
+                    text2: 'Contact number must be exactly 11 digits.',
+                });
+                return;
+            }
+        }
+
         submitMutation.mutate({
             ...form,
             contact: validContacts,
@@ -177,17 +191,15 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
 
 
     return (
-        <Modal
-            animationType="slide"
-            transparent={true}
+        <PremiumModal
             visible={visible}
-            onRequestClose={onClose}
+            onClose={onClose}
         >
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.modalOverlay}
+                style={{ width: '100%' }}
             >
-                <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+                <View style={styles.modalContent}>
                     <View style={styles.header}>
                         <ThemedText style={styles.title}>{isEditing ? 'Edit' : 'Submit'} {category} Request</ThemedText>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -253,11 +265,12 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
                                             />
                                             <TextInput
                                                 style={[styles.input, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
-                                                placeholder="Phone number (e.g. 0300 0000000)"
+                                                placeholder="Phone number (e.g. 03000000000)"
                                                 placeholderTextColor="#94A3B8"
                                                 value={contact.number}
                                                 onChangeText={(text) => handleContactChange(index, 'number', text)}
                                                 keyboardType="phone-pad"
+                                                maxLength={11}
                                             />
                                         </View>
                                         {index > 0 && (
@@ -286,7 +299,7 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
                             </View>
                             <TextInput
                                 style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
-                                placeholder="Enter descriptive details (Min 50 chars)..."
+                                placeholder="اپنی جگہ کی خدمات اور پیشکش کی تفصیل لکھیں"
                                 placeholderTextColor="#94A3B8"
                                 value={form.description}
                                 onChangeText={(text) => handleChange('description', text)}
@@ -322,7 +335,7 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
                                     </View>
                                     <TextInput
                                         style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? '#1E293B' : '#F1F5F9', color: colors.text }]}
-                                        placeholder="Enter services offered (Min 50 chars)..."
+                                        placeholder="فراہم کردہ خدمات اور پیشکش کی تفصیل لکھیں"
                                         placeholderTextColor="#94A3B8"
                                         value={form.services}
                                         onChangeText={(text) => handleChange('services', text)}
@@ -335,21 +348,27 @@ const PlaceSubmissionModal = ({ visible, onClose, category, onSuccess, editData 
                         )}
 
 
-                        <TouchableOpacity
-                            style={[styles.submitButton, { backgroundColor: colors.primary }]}
-                            onPress={handleSubmit}
-                            disabled={submitMutation.isPending}
-                        >
-                            {submitMutation.isPending ? (
-                                <ActivityIndicator color="#FFF" />
-                            ) : (
-                                <ThemedText style={styles.submitButtonText}>{isEditing ? 'Update Request' : 'Submit Request'}</ThemedText>
-                            )}
-                        </TouchableOpacity>
+                        <View style={styles.footer}>
+                            <TouchableOpacity
+                                style={[styles.submitButton, { flex: 1, marginTop: 0, backgroundColor: colors.primary }]}
+                                onPress={handleSubmit}
+                                disabled={submitMutation.isPending}
+                            >
+                                {submitMutation.isPending ? (
+                                    <ActivityIndicator color="#FFF" />
+                                ) : (
+                                    <ThemedText style={styles.submitButtonText}>{isEditing ? 'Update Request' : 'Submit Request'}</ThemedText>
+                                )}
+                            </TouchableOpacity>
+
+                            <TouchableOpacity onPress={onClose} style={styles.cancelBtn} activeOpacity={0.7}>
+                                <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                            </TouchableOpacity>
+                        </View>
                     </ScrollView>
                 </View>
             </KeyboardAvoidingView>
-        </Modal>
+        </PremiumModal>
     );
 };
 
@@ -362,42 +381,46 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalContent: {
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        height: '80%',
-        paddingTop: 20,
-        paddingHorizontal: 20,
+        width: '100%',
+        maxHeight: Dimensions.get('window').height * 0.8,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 14,
     },
     title: {
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: 'bold',
         textTransform: 'capitalize',
+        color: '#0F172A',
     },
     closeButton: {
-        padding: 4,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#F1F5F9',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     scrollContent: {
-        paddingBottom: 40,
+        paddingBottom: 8,
     },
     formGroup: {
-        marginBottom: 16,
+        marginBottom: 12,
     },
     label: {
         fontSize: 14,
         fontWeight: '600',
-        marginBottom: 8,
+        marginBottom: 4,
         opacity: 0.8,
     },
     input: {
         borderRadius: 12,
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingVertical: Platform.OS === 'android' ? 10 : 12,
+        height: Platform.OS === 'android' ? 44 : 48,
         fontSize: 16,
     },
     textArea: {
@@ -416,15 +439,34 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     submitButton: {
-        marginTop: 20,
-        borderRadius: 12,
-        paddingVertical: 16,
+        borderRadius: 14,
+        height: Platform.OS === 'android' ? 44 : 46,
         alignItems: 'center',
         justifyContent: 'center',
     },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: 'bold',
+    },
+    footer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginTop: 16,
+    },
+    cancelBtn: {
+        flex: 1,
+        height: Platform.OS === 'android' ? 44 : 46,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        borderRadius: 14,
+    },
+    cancelText: {
+        fontSize: 14,
+        color: '#94A3B8',
+        fontWeight: '600',
     },
 });

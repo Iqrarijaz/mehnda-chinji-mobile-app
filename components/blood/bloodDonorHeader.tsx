@@ -5,7 +5,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions } from '@react-navigation/native';
-import React from 'react';
+import React, { useRef } from 'react';
 import {
     Platform,
     StyleSheet,
@@ -41,6 +41,7 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
     showTooltip = false,
     onCloseTooltip = () => { },
 }) => {
+    const inputRef = useRef<TextInput>(null);
     const { theme } = useTheme();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
@@ -84,21 +85,23 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
             {activeTab === 'find' && (
                 <View style={styles.searchSection}>
                     <View style={styles.searchRow}>
-                        <View style={[styles.searchInputContainer, { backgroundColor: '#FFFFFF', borderColor: 'rgba(0,0,0,0.08)' }]}>
+                        <TouchableOpacity
+                            activeOpacity={1}
+                            onPress={() => inputRef.current?.focus()}
+                            style={[styles.searchInputContainer, { backgroundColor: '#FFFFFF', borderColor: 'rgba(0,0,0,0.08)', flex: 1 }]}
+                        >
                             <Ionicons name="search" size={20} color="#94A3B8" style={{ marginRight: 10 }} />
                             <TextInput
-                                placeholder="Search area..."
+                                ref={inputRef}
+                                style={styles.searchInput}
+                                placeholder="Search donors..."
                                 placeholderTextColor="#94A3B8"
-                                style={[styles.searchInput, { color: '#0F172A' }]}
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
+                                returnKeyType="search"
+                                clearButtonMode="while-editing"
                             />
-                            {searchQuery.length > 0 && (
-                                <TouchableOpacity onPress={() => setSearchQuery('')}>
-                                    <Ionicons name="close-circle" size={20} color="#94A3B8" />
-                                </TouchableOpacity>
-                            )}
-                        </View>
+                        </TouchableOpacity>
 
                         <TouchableOpacity
                             style={[styles.bloodGroupButton, { backgroundColor: colors.card, borderColor: colors.border }]}
@@ -216,6 +219,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: Platform.OS === 'android' ? 13 : 15,
         height: '100%',
+        color: '#0F172A',
     },
     bloodGroupButton: {
         flexDirection: 'row',
@@ -273,7 +277,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
-        elevation: 10,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
         gap: 12,

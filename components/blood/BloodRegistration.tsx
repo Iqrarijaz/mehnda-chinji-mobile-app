@@ -17,6 +17,7 @@ import {
     removeAsDonor
 } from '@/apis/bloodDonation';
 import { ThemedText } from '@/components/themedText';
+import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -89,6 +90,7 @@ const BloodRegistration = React.memo(() => {
     const isProcessing = removeMutation.isPending || manageStatusMutation.isPending;
 
     const handleRegisterOpen = () => {
+        analyticsService.trackEvent(AnalyticsEvents.DONOR_REGISTRATION_CLICKED);
         setModalVisible(true);
     };
 
@@ -245,52 +247,52 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         shadowRadius: 8,
     },
-actionButtons: {
-    flexDirection: 'row',
+    actionButtons: {
+        flexDirection: 'row',
         alignItems: 'center',
-            gap: 8,
+        gap: 8,
     },
-actionBtn: {
-    padding: 6,
+    actionBtn: {
+        padding: 6,
         borderRadius: 8,
     },
-centerContent: {
-    flex: 1,
+    centerContent: {
+        flex: 1,
         justifyContent: 'center',
-            alignItems: 'center',
+        alignItems: 'center',
     },
-emptyState: {
-    alignItems: 'center',
+    emptyState: {
+        alignItems: 'center',
         justifyContent: 'center',
-            paddingVertical: 60,
-                gap: 16,
+        paddingVertical: 60,
+        gap: 16,
     },
-emptyStateText: {
-    fontSize: 16,
+    emptyStateText: {
+        fontSize: 16,
         textAlign: 'center',
     },
-emptyStateBtn: {
-    paddingVertical: 12,
+    emptyStateBtn: {
+        paddingVertical: 12,
         paddingHorizontal: 24,
-            borderRadius: 12,
+        borderRadius: 12,
     },
-tipsSection: {
-    marginTop: 20,
+    tipsSection: {
+        marginTop: 20,
         paddingHorizontal: 4,
     },
-tipsTitle: {
-    fontSize: 15,
+    tipsTitle: {
+        fontSize: 15,
         fontWeight: '800',
-            color: '#ef4444',
+        color: '#ef4444',
     },
-tipItem: {
-    flexDirection: 'row',
+    tipItem: {
+        flexDirection: 'row',
         alignItems: 'center',
-            marginTop: 8,
-                gap: 8,
+        marginTop: 8,
+        gap: 8,
     },
-tipText: {
-    fontSize: 12,
+    tipText: {
+        fontSize: 12,
         fontWeight: '500',
     },
 });

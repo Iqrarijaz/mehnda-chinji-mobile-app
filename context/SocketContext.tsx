@@ -1,3 +1,5 @@
+
+
 import { baseUrl } from '@/configs';
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
@@ -16,6 +18,7 @@ const SocketContext = createContext<SocketContextType>({
 export function SocketProvider({ children }: { children: React.ReactNode }) {
     const { user, isAuthenticated } = useAuth();
 
+    // alert(JSON.stringify(user?.user));
     // Store socket in state so consumers re-render when it becomes available
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
@@ -24,7 +27,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     const socketRef = useRef<Socket | null>(null);
 
     useEffect(() => {
-        if (!isAuthenticated || !user?.user?.id) {
+        if (!isAuthenticated || !user?.user?._id) {
             // Disconnect and clear when user logs out
             if (socketRef.current) {
                 socketRef.current.disconnect();
@@ -35,7 +38,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
             return;
         }
 
-        const userId = String(user.user.id);
+        const userId = String(user.user._id);
+        console.log('[Socket] User ID:', userId);
 
         const newSocket = io(baseUrl, {
             transports: ['websocket'],
@@ -67,7 +71,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
             setSocket(null);
             setIsConnected(false);
         };
-    }, [isAuthenticated, user?.user?._id]);
+    }, [isAuthenticated, user?.user?._id]); // ._id is consistent with backend
 
     const socketValue = useMemo(() => ({ socket, isConnected }), [socket, isConnected]);
 

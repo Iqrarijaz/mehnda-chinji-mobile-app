@@ -1,8 +1,10 @@
 import { Colors } from '@/constants/colors';
 import { SocketProvider } from '@/context/SocketContext';
+import * as Notifications from 'expo-notifications';
 import Sentry from '@/lib/sentry';
 import { useSocketNotifications } from '@/hooks/useSocketNotifications';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Drawer } from 'expo-router/drawer';
@@ -12,187 +14,167 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import React, { useState, useEffect } from 'react';
 import CustomDrawerContent from '../components/customDrawerContent';
+import { analyticsService, useScreenTracking, AnalyticsEvents } from '@/analytics';
 import { toastConfig } from '../components/toastConfig';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import { WeatherProvider } from '../context/WeatherContext';
 import { asyncStoragePersister, queryClient } from '../lib/query-client';
 import { ErrorBoundary } from '@/components/common/errorBoundary';
-import NoInternetModal from '@/components/common/NoInternetModal';
-import NetInfo from '@react-native-community/netinfo';
+import NetworkMonitor from '@/components/common/NetworkMonitor';
 import { useDataUsageStore } from '@/store/dataUsageStore';
+import { usePrayerCalendar } from '@/hooks/usePrayerTimes';
+import { usePrayerNotifications } from '@/hooks/usePrayerNotifications';
+import { useWeatherCity } from '@/context/WeatherContext';
+import * as Application from 'expo-application';
+import { fetchAppVersionInfo, AppVersionInfo } from '@/apis/app-info';
+import { checkUpdateStatus } from '@/utils/versioning';
+import { UpdateModal } from '@/components/common/UpdateModal';
+
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { useAppFonts } from '@/hooks/useFonts';
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
 
 function DrawerLayout() {
-  const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
+  const { loading } = useAuth();
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors[theme].background }}>
-      <Drawer
-        drawerContent={(props: any) => <CustomDrawerContent {...props} />}
-        initialRouteName="(tabs)"
-        backBehavior="none"
-        screenOptions={{
-          headerShown: false,
-          swipeEnabled: isAuthenticated, // Secure swipe access
-          drawerType: 'front',
-          drawerStyle: { backgroundColor: Colors[theme].background },
-        }}
-      >
-        <Drawer.Screen
-          name="index"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            swipeEnabled: false,
-          }}
-        />
-        <Drawer.Screen
-          name="onboarding"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            swipeEnabled: false,
+      {loading ? null : (
+        <Stack
+          screenOptions={{
             headerShown: false,
+            animation: 'slide_from_right',
+            gestureEnabled: true,
           }}
-        />
-        <Drawer.Screen
-          name="(auth)"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            swipeEnabled: false, // Disable on auth Screens
-          }}
-        />
-        <Drawer.Screen
-          name="(tabs)"
-          options={{
-            drawerLabel: 'Main App',
-            title: 'Main App',
-            drawerItemStyle: isAuthenticated ? {} : { display: 'none' },
-          }}
-        />
-        <Drawer.Screen
-          name="settings"
-          options={{
-            drawerLabel: 'Settings',
-            title: 'Settings',
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-            headerStyle: {
-              backgroundColor: Colors[theme].background,
-            },
-            headerTintColor: Colors[theme].text,
-          }}
-        />
-        <Drawer.Screen
-          name="profile"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-            swipeEnabled: false,
-          }}
-        />
-        <Drawer.Screen
-          name="listing/[categoryId]"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-          }}
-        />
-        <Drawer.Screen
-          name="notifications"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-            swipeEnabled: false,
-          }}
-        />
-        <Drawer.Screen
-          name="support/index"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-            swipeEnabled: false,
-          }}
-        />
-        <Drawer.Screen
-          name="support/create-ticket"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-            swipeEnabled: false,
-          }}
-        />
-        <Drawer.Screen
-          name="support/tickets"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-            swipeEnabled: false,
-          }}
-        />
-        <Drawer.Screen
-          name="weather"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-            swipeEnabled: false,
-          }}
-        />
-        <Drawer.Screen
-          name="dataUsage"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-            swipeEnabled: false,
-          }}
-        />
-        <Drawer.Screen
-          name="manageNotifications"
-          options={{
-            drawerItemStyle: { display: 'none' },
-            headerShown: false,
-            swipeEnabled: false,
-          }}
-        />
-      </Drawer>
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(drawer)" />
+          <Stack.Screen name="profile" />
+          <Stack.Screen name="settings" />
+          <Stack.Screen name="notifications" />
+          <Stack.Screen name="listing/[categoryId]" />
+          <Stack.Screen name="support/index" />
+          <Stack.Screen name="support/create-ticket" />
+          <Stack.Screen name="support/tickets" />
+          <Stack.Screen name="weather" />
+          <Stack.Screen name="dataUsage" />
+          <Stack.Screen name="manageNotifications" />
+          <Stack.Screen name="terms" />
+          <Stack.Screen name="privacy" />
+          <Stack.Screen name="communityGuidelines" />
+        </Stack>
+      )}
     </View>
   );
 }
 function AppInitializer() {
   usePushNotifications();
   useSocketNotifications();
-  return null;
+  useScreenTracking();
+
+  const { selectedCity } = useWeatherCity();
+  const { calendarData } = usePrayerCalendar(selectedCity);
+  usePrayerNotifications(calendarData, selectedCity);
+
+  useEffect(() => {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+        shouldShowBanner: true,
+
+        shouldShowList: true,
+      }),
+    });
+  }, []);
+
+  const [updateInfo, setUpdateInfo] = useState<{
+    visible: boolean;
+    isMandatory: boolean;
+    latestVersion: string;
+    updateUrl: string;
+    releaseNotes: string;
+  }>({
+    visible: false,
+    isMandatory: false,
+    latestVersion: '',
+    updateUrl: '',
+    releaseNotes: ''
+  });
+
+  useEffect(() => {
+    analyticsService.trackEvent(AnalyticsEvents.APP_OPEN, {
+      version: Application.nativeApplicationVersion,
+      build: Application.nativeBuildVersion,
+      platform: Platform.OS
+    });
+
+    const checkVersion = async () => {
+      try {
+        const info = await fetchAppVersionInfo();
+        const currentVersion = Application.nativeApplicationVersion || '1.0.0';
+
+        const { isMandatory, isOptional } = checkUpdateStatus(
+          currentVersion,
+          info.latestVersion,
+          info.minRequiredVersion
+        );
+
+        if (isMandatory || isOptional) {
+          setUpdateInfo({
+            visible: true,
+            isMandatory,
+            latestVersion: info.latestVersion,
+            updateUrl: Platform.OS === 'ios' ? info.updateUrl.ios : info.updateUrl.android,
+            releaseNotes: info.releaseNotes
+          });
+
+          analyticsService.trackEvent(AnalyticsEvents.UPDATE_AVAILABLE, {
+            currentVersion,
+            latestVersion: info.latestVersion,
+            isMandatory
+          });
+        }
+      } catch (error) {
+        console.error('Version check failed:', error);
+      }
+    };
+
+    checkVersion();
+  }, []);
+
+  return (
+    <UpdateModal
+      visible={updateInfo.visible}
+      isMandatory={updateInfo.isMandatory}
+      latestVersion={updateInfo.latestVersion}
+      updateUrl={updateInfo.updateUrl}
+      releaseNotes={updateInfo.releaseNotes}
+      onClose={() => setUpdateInfo(prev => ({ ...prev, visible: false }))}
+    />
+  );
 }
 
 function RootLayout() {
-  const [isOffline, setIsOffline] = useState(false);
+  const fontsLoaded = useAppFonts();
 
-  // Simple network check placeholder
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(state => {
-      const isConnected = !!state.isConnected && !!state.isInternetReachable !== false;
-      setIsOffline(!isConnected);
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
 
-      // Update data usage store network type
-      const store = useDataUsageStore.getState();
-      if (!isConnected) {
-        store.setNetworkType('none');
-      } else if (state.type === 'wifi') {
-        store.setNetworkType('wifi');
-      } else if (state.type === 'cellular') {
-        store.setNetworkType('cellular');
-      } else {
-        store.setNetworkType('none');
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleRetry = async () => {
-    const state = await NetInfo.refresh();
-    const isConnected = !!state.isConnected && !!state.isInternetReachable !== false;
-    setIsOffline(!isConnected);
-  };
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <PersistQueryClientProvider
@@ -209,10 +191,7 @@ function RootLayout() {
                     <AppInitializer />
                     <StatusBar style="dark" />
                     <DrawerLayout />
-                    <NoInternetModal
-                      visible={isOffline}
-                      onRetry={handleRetry}
-                    />
+                    <NetworkMonitor />
                     <Toast config={toastConfig} topOffset={60} />
                   </SocketProvider>
                 </WeatherProvider>
@@ -225,4 +204,8 @@ function RootLayout() {
   );
 }
 
-export default Sentry.wrap(RootLayout);
+const SentryRootLayout = Sentry.wrap(RootLayout);
+
+export default function AppLayout() {
+  return <SentryRootLayout />;
+}

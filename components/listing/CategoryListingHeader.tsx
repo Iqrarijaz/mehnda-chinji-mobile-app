@@ -138,7 +138,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
-        elevation: 10,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
         gap: 12,
@@ -159,7 +158,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
-        elevation: 10,
         zIndex: 10,
     },
     headerContent: {
@@ -188,12 +186,14 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
     },
     searchBar: {
-        backgroundColor: '#FFFFFF', // Search bar is always white in this design
-        borderRadius: 12,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 24,
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 12,
         height: 44,
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.05)',
     },
     searchInput: {
         flex: 1,
@@ -207,8 +207,8 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     filterChip: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 4,
         borderRadius: 20,
         backgroundColor: 'rgba(255,255,255,0.2)',
         borderWidth: 1,

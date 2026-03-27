@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { clientStorage } from '@/utils/storage';
 
 const WEATHER_CITY_KEY = 'weather_selected_city';
 const DEFAULT_CITY = 'Talagang, PK';
@@ -19,14 +19,14 @@ export function WeatherProvider({ children }: { children: React.ReactNode }) {
 
     // Load persisted city on mount
     useEffect(() => {
-        AsyncStorage.getItem(WEATHER_CITY_KEY).then(value => {
+        clientStorage.getItem(WEATHER_CITY_KEY).then((value: string | null) => {
             if (value) setSelectedCityState(value);
         }).catch(() => { });
     }, []);
 
     const setSelectedCity = useCallback((city: string) => {
         setSelectedCityState(city);
-        AsyncStorage.setItem(WEATHER_CITY_KEY, city).catch(() => { });
+        clientStorage.setItem(WEATHER_CITY_KEY, city).catch(() => { });
     }, []);
 
     const value = useMemo(() => ({ selectedCity, setSelectedCity }), [selectedCity, setSelectedCity]);

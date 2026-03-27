@@ -12,7 +12,6 @@
       "supportsTablet": true,
       "icon": "./public/icon.png",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Allow $(PRODUCT_NAME) to access your location to show weather information and local services.",
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera to take profile and support ticket photos."
       }
     },
@@ -27,8 +26,6 @@
       "permissions": [
         "NOTIFICATIONS",
         "VIBRATE",
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
         "CAMERA"
       ],
       "edgeToEdgeEnabled": true,
@@ -40,7 +37,7 @@
       "favicon": "./public/icon.png"
     },
     "splash": {
-      "image": "./public/icon.png",
+      "image": "./public/logo_with_text.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff",
       "dark": {
@@ -50,6 +47,15 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
+      "@react-native-firebase/app",
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./assets/sounds/azaan.mp3"
+          ]
+        }
+      ],
       [
         "expo-build-properties",
         {

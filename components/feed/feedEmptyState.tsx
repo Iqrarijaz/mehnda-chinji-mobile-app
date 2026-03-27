@@ -1,11 +1,13 @@
 import { ThemedText } from '@/components/themedText';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { PostCardSkeleton } from '../common/CardSkeletons';
 
 interface FeedEmptyStateProps {
     colors: any;
     isLoading: boolean;
+    isRefetching?: boolean;
     isError: boolean;
     error: any;
     refetch: () => void;
@@ -15,16 +17,19 @@ interface FeedEmptyStateProps {
 export const FeedEmptyState: React.FC<FeedEmptyStateProps> = React.memo(({
     colors,
     isLoading,
+    isRefetching,
     isError,
     error,
     refetch,
     postsCount
 }) => {
-    if (isLoading && postsCount === 0) {
+    const loading = isLoading || isRefetching;
+    if (loading && postsCount === 0) {
         return (
-            <View style={styles.loaderContainer}>
-                <ActivityIndicator size="large" color={colors.primary} />
-                <ThemedText style={styles.loadingText}>Loading feed...</ThemedText>
+            <View style={{ paddingTop: 10 }}>
+                {[1, 2, 3].map((i) => (
+                    <PostCardSkeleton key={i} />
+                ))}
             </View>
         );
     }

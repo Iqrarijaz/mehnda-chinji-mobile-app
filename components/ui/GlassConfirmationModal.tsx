@@ -51,7 +51,7 @@ export const GlassConfirmationModal: React.FC<GlassConfirmationModalProps> = ({
     }));
 
     return (
-        <PremiumModal visible={visible} onClose={onClose} type="centered">
+        <PremiumModal visible={visible} onClose={onClose} type="centered" sheetStyle={{ backgroundColor: 'transparent', elevation: 0, paddingHorizontal: 0, paddingBottom: 0, paddingTop: 0 }}>
             <Animated.View style={[styles.modalContent, animatedStyle]}>
                 <LinearGradient
                     colors={['rgba(30, 41, 59, 0.95)', 'rgba(15, 23, 42, 0.98)']}
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     modalContent: {
-        width: '90%',
+        width: '100%',
         borderRadius: 28,
         padding: 24,
         overflow: 'hidden',

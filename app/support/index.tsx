@@ -86,7 +86,7 @@ export default function SupportScreen() {
     });
 
     const handleBack = () => {
-        router.canGoBack() ? router.back() : router.replace('/(tabs)');
+        router.canGoBack() ? router.back() : router.replace('/(drawer)/(tabs)' as any);
     };
 
     const handleRefresh = () => {
@@ -180,15 +180,16 @@ export default function SupportScreen() {
                         type="whatsapp"
                         title="WhatsApp Chat"
                         subtitle="Instant support via chat"
-                        value="+923431511788"
+                        value="03431511788"
                         icon="logo-whatsapp"
                         color="#25D366"
+                        hideValue={true}
                     />
                     <SupportContactCard
                         type="email"
                         title="Email Support"
                         subtitle="Detailed queries & feedback"
-                        value="support@rehbar.com"
+                        value="rehbarmobileapp@gmail.com"
                         icon="mail-outline"
                         color="#6366F1"
                     />
@@ -221,7 +222,6 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 32,
         overflow: 'hidden',
         zIndex: 2,
-        elevation: 10,
     },
     headerTopRow: {
         flexDirection: 'row',
@@ -288,7 +288,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.05,
         shadowRadius: 10,
-        elevation: 3,
     },
     actionIcon: {
         width: 56,

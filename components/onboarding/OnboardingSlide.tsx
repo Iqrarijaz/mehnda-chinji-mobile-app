@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions, Animated } from 'react-native';
+import { View, StyleSheet, Dimensions, Animated, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface OnboardingSlideProps {
     item: {
@@ -13,12 +14,15 @@ interface OnboardingSlideProps {
         title: string;
         description: string;
         animation: any;
+        isPrivacy?: boolean;
     };
     index: number;
     scrollX: Animated.Value;
 }
 
+
 export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, scrollX }) => {
+
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -60,6 +64,10 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
                 <ThemedText style={[styles.description, { color: colors.textSecondary }]}>
                     {item.description}
                 </ThemedText>
+                {item.id === '3' && ( // Placeholder for any other button if needed, but currently removing location
+                    null
+                )}
+
             </Animated.View>
         </View>
     );
@@ -87,17 +95,36 @@ const styles = StyleSheet.create({
         marginTop: 30,
     },
     title: {
-        fontSize: 32,
-        fontWeight: '800',
+        fontSize: 22,
+        fontFamily: 'NotoNastaliqUrdu-Regular',
         textAlign: 'center',
-        marginBottom: 12,
-        lineHeight: 38,
-        letterSpacing: -0.5,
+        paddingTop: 12,
+        paddingBottom: 0,
+        lineHeight: 45,
     },
     description: {
-        fontSize: 17,
+        fontSize: 15,
         textAlign: 'center',
-        lineHeight: 24,
+        lineHeight: 22,
         paddingHorizontal: 10,
+        fontWeight: '500',
+        marginTop: -5,
+    },
+    permissionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 14,
+        marginTop: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+    },
+    permissionButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '700',
     },
 });

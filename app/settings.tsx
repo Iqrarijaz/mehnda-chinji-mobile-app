@@ -107,7 +107,16 @@ export default function SettingsScreen() {
                                 subtitle="Control which alerts you receive"
                                 onPress={() => router.push('/manageNotifications')}
                             />
-                            <SettingRowItem icon="moon-outline" label="Dark Mode" subtitle={isDark ? 'Currently enabled' : 'Currently disabled'} isToggle toggleValue={isDark} onToggleChange={() => toggleTheme()} primaryColor={colors.primary} isLast />
+                            {/* <SettingRowItem
+                                icon="moon-outline"
+                                label="Dark Mode"
+                                subtitle={isDark ? 'Currently enabled' : 'Currently disabled'}
+                                isToggle
+                                toggleValue={isDark}
+                                onToggleChange={() => toggleTheme()}
+                                primaryColor={colors.primary}
+                                isLast
+                            /> */}
                         </SectionCard>
 
                         <SectionCard title="System" delay={200}>
@@ -125,7 +134,7 @@ export default function SettingsScreen() {
                         <SectionCard title="Policies & Guidelines" delay={200}>
                             <SettingRowItem icon="shield-outline" label="Privacy Policy" onPress={() => router.push('/privacy')} />
                             <SettingRowItem icon="document-text-outline" label="Terms & Conditions" onPress={() => router.push('/terms')} />
-                            <SettingRowItem icon="people-outline" label="Community Guidelines" onPress={() => router.push('/community-guidelines')} isLast />
+                            <SettingRowItem icon="people-outline" label="Community Guidelines" onPress={() => router.push('/communityGuidelines')} isLast />
                         </SectionCard>
                     </Animated.View>
                 );
@@ -133,13 +142,13 @@ export default function SettingsScreen() {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: '#F5F6FA' }]}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
 
             {/* ── Header ──────────────────────────────────────────── */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
                     <TouchableOpacity
-                        onPress={() => router.replace('/(tabs)')}
+                        onPress={() => router.replace('/(drawer)/(tabs)' as any)}
                         style={styles.backBtn}
                     >
                         <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
@@ -189,7 +198,7 @@ export default function SettingsScreen() {
 
                 {/* Version */}
                 <Animated.View entering={FadeIn.delay(400).duration(400)} style={styles.versionWrap}>
-                    <ThemedText style={styles.versionText}>Mehnda Chinji v1.0.0</ThemedText>
+                    <ThemedText style={styles.versionText}>Rehbar v1.0.0</ThemedText>
                 </Animated.View>
             </ScrollView>
 

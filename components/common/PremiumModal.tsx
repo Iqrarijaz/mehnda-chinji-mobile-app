@@ -31,7 +31,7 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
     visible,
     onClose,
     children,
-    type = 'bottom-sheet',
+    type = 'centered',
     sheetStyle,
     overlayStyle,
 }) => {
@@ -39,7 +39,7 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
 
     useEffect(() => {
         if (visible) {
-            blurIntensity.value = withTiming(20, { duration: 500 });
+            blurIntensity.value = withTiming(40, { duration: 500 });
         } else {
             blurIntensity.value = withTiming(0, { duration: 300 });
         }
@@ -106,20 +106,23 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'transparent',
         justifyContent: 'flex-end',
+        alignItems: 'center',
+        paddingBottom: isAndroid ? 20 : 30,
     },
     overlayCentered: {
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
+        paddingBottom: 0,
     },
     overlayFullscreen: {
         justifyContent: 'center',
         alignItems: 'stretch',
+        paddingBottom: 0,
     },
     sheet: {
+        width: '95%',
         backgroundColor: '#FFFFFF',
-        borderTopLeftRadius: 28,
-        borderTopRightRadius: 28,
+        borderRadius: 28,
         paddingTop: 12,
         paddingHorizontal: 20,
         paddingBottom: isAndroid ? 24 : 36,
@@ -127,15 +130,15 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: -10 },
         shadowOpacity: 0.15,
         shadowRadius: 24,
-        elevation: 10,
     },
     sheetCentered: {
-        width: '100%',
-        borderRadius: 28,
-        paddingTop: 24,
-        paddingBottom: 24,
+        maxWidth: 500,
+        paddingTop: 14,
+        paddingBottom: 14,
+        maxHeight: '85%',
     },
     sheetFullscreen: {
+        width: '100%',
         flex: 1,
         borderRadius: 0,
         paddingTop: 0,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "672311293362",
+    "project_id": "rehbar-mobile-app",
+    "storage_bucket": "rehbar-mobile-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672311293362:android:922ac1d6d5a7ed2ac820ab",
+        "android_client_info": {
+          "package_name": "com.rehbar.community"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5xjBzHxitiw_v_fedEV0PWvt5DGevGzA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

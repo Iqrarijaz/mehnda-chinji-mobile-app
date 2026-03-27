@@ -3,13 +3,10 @@ import { StyleSheet, View, ScrollView, TouchableOpacity, Platform, ActivityIndic
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withTiming, interpolateColor } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
-import { acceptTerms } from '@/apis/profile';
-import { useAuth } from '@/context/AuthContext';
-import Toast from 'react-native-toast-message';
 
 const termsData = [
     {
@@ -25,8 +22,9 @@ const termsData = [
     {
         id: '3',
         title: 'App Features and User Submissions',
-        content: 'Users on Rehbar are restricted from posting public feeds. General content and feeds are managed exclusively by platform Administrators. However, users are permitted to submit the following information:\n• Business Directory: Users can submit their business details for listing in our directory.\n• Place Submissions: Users can submit locations such as schools, mosques, hospitals, and other community categories to be added to the app map/directory.\n• Moderation: All user submissions are subject to review and approval by Rehbar Administrators.',
+        content: 'Users are permitted to submit information regarding businesses, schools, mosques, hospitals, and other community categories to be added to the app directory. All user submissions are subject to review and approval by Rehbar Administrators.',
     },
+
     {
         id: '4',
         title: 'Blood Donor Registry',
@@ -87,67 +85,8 @@ export default function TermsAndConditionsScreen() {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
-    const { user, updateUser } = useAuth();
 
-    const [accepted, setAccepted] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
     const [infoModalVisible, setInfoModalVisible] = useState(false);
-
-    const checkScale = useSharedValue(1);
-
-    const toggleAccept = () => {
-        setAccepted(!accepted);
-        checkScale.value = withSpring(accepted ? 1 : 1.2, {}, () => {
-            checkScale.value = withSpring(1);
-        });
-    };
-
-    const animatedCheckStyle = useAnimatedStyle(() => {
-        return {
-            transform: [{ scale: checkScale.value }],
-            backgroundColor: withTiming(accepted ? colors.primary : '#FFFFFF', { duration: 200 }),
-            borderColor: withTiming(accepted ? colors.primary : '#CBD5E1', { duration: 200 })
-        };
-    });
-
-    const handleAcceptTerms = async () => {
-        if (!accepted) return;
-        setSubmitting(true);
-        try {
-            const version = "1.0";
-            const response = await acceptTerms({ version });
-            if (response.data?.success) {
-                // Update local context
-                await updateUser({
-                    termsAccepted: true,
-                    termsVersionAccepted: version,
-                    termsAcceptedAt: new Date().toISOString()
-                });
-
-                Toast.show({
-                    type: 'success',
-                    text1: 'Accepted',
-                    text2: 'Terms accepted successfully.',
-                });
-
-                setTimeout(() => {
-                    if (router.canGoBack()) {
-                        router.back();
-                    } else {
-                        router.replace('/settings');
-                    }
-                }, 500);
-            }
-        } catch (error: any) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: error.response?.data?.message || 'Failed to accept terms. Please try again.',
-            });
-        } finally {
-            setSubmitting(false);
-        }
-    };
 
     return (
         <View style={[styles.container, { backgroundColor: '#F8FAFC' }]}>
@@ -183,7 +122,7 @@ export default function TermsAndConditionsScreen() {
             {/* ── Scrollable Content ──────────────────────────────── */}
             <ScrollView
                 style={styles.scrollView}
-                contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 140 }]} // extra padding for sticky footer
+                contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
                 showsVerticalScrollIndicator={false}
             >
                 <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.card}>
@@ -205,33 +144,6 @@ export default function TermsAndConditionsScreen() {
                 </Animated.View>
             </ScrollView>
 
-            {/* ── Sticky Checkbox & Accept Footer ───────────────────── */}
-            <Animated.View entering={FadeInDown.delay(700).duration(500)} style={[styles.stickyFooter, { paddingBottom: insets.bottom > 0 ? insets.bottom : 20 }]}>
-                <TouchableOpacity style={styles.checkboxRow} onPress={toggleAccept} activeOpacity={0.8}>
-                    <Animated.View style={[styles.checkbox, animatedCheckStyle]}>
-                        {accepted && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
-                    </Animated.View>
-                    <ThemedText style={styles.checkboxText}>
-                        I have read and agree to the Terms & Conditions
-                    </ThemedText>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={[styles.acceptButton, { backgroundColor: accepted ? colors.primary : '#E2E8F0' }]}
-                    disabled={!accepted || submitting}
-                    onPress={handleAcceptTerms}
-                    activeOpacity={0.8}
-                >
-                    {submitting ? (
-                        <ActivityIndicator color="#FFFFFF" size="small" />
-                    ) : (
-                        <ThemedText style={[styles.acceptButtonText, { color: accepted ? '#FFFFFF' : '#94A3B8' }]}>
-                            Accept & Continue
-                        </ThemedText>
-                    )}
-                </TouchableOpacity>
-            </Animated.View>
-
             {/* ── Info Modal ───────────────────── */}
             <Modal visible={infoModalVisible} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
@@ -240,9 +152,8 @@ export default function TermsAndConditionsScreen() {
                             <Ionicons name="shield-checkmark" size={32} color={colors.primary} />
                         </View>
                         <ThemedText style={styles.modalTitle}>Why do we need this?</ThemedText>
-                        <ThemedText style={styles.modalBody}>
-                            To maintain a safe and reliable community platform, we require all users to agree to our guidelines. This ensures that submitted places, businesses, and blood requests are genuine and appropriate for everyone.
-                        </ThemedText>
+                            To maintain a safe and reliable community platform, we require all users to agree to our guidelines. This ensures that submitted listings, businesses, and blood requests are genuine and appropriate for everyone.
+
                         <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.primary }]} onPress={() => setInfoModalVisible(false)}>
                             <ThemedText style={styles.modalBtnText}>Got it!</ThemedText>
                         </TouchableOpacity>
@@ -338,7 +249,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.04,
         shadowRadius: 16,
-        elevation: 2,
     },
     cardHeader: {
         flexDirection: 'row',
@@ -424,7 +334,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.05,
         shadowRadius: 12,
-        elevation: 10,
         paddingHorizontal: 20,
         paddingTop: 16,
         borderTopLeftRadius: 24,

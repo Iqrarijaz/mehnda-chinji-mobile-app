@@ -10,7 +10,11 @@ import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Avatar from '../ui/avatar';
 import { NotificationIcon } from '../common/notificationIcon';
 
-export function HomeHeaderTopNav() {
+interface HomeHeaderTopNavProps {
+    onSearchPress?: () => void;
+}
+
+export function HomeHeaderTopNav({ onSearchPress }: HomeHeaderTopNavProps) {
     const { user } = useAuth();
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -29,6 +33,12 @@ export function HomeHeaderTopNav() {
             </View>
 
             <View style={styles.rightActions}>
+                <TouchableOpacity
+                    onPress={onSearchPress}
+                    style={styles.searchBtn}
+                >
+                    <Ionicons name="search-outline" size={20} color="#FFFFFF" />
+                </TouchableOpacity>
                 <NotificationIcon
                     containerStyle={{ marginRight: 12 }}
                     badgeStyle={{ borderColor: colors.primary }}
@@ -72,6 +82,15 @@ const styles = StyleSheet.create({
     rightActions: {
         flexDirection: 'row',
         alignItems: 'center',
+    },
+    searchBtn: {
+        width: 38,
+        height: 38,
+        borderRadius: 11,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
     },
     avatarButton: {
         width: 38,

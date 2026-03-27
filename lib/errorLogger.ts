@@ -2,8 +2,8 @@
  * Centralized Error Logger for the application.
  * Currently logs to console, but can be extended to use services like Sentry or Bugsnag.
  */
-import Sentry from './sentry';
 
+import Sentry from './sentry';
 
 export interface ErrorDetails {
   componentName?: string;

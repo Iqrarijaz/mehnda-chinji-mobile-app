@@ -1,8 +1,11 @@
 export interface SearchNavResult {
     id: string;
     label: string;
-    route: string;
+    subtitle?: string;
+    route?: string;
+    action?: string;  // Special action identifier instead of route navigation
     icon: string;
+    color?: string;
 }
 
 export interface SearchCategoryResult {
@@ -14,11 +17,19 @@ export interface SearchCategoryResult {
 }
 
 export const SEARCH_NAV_ITEMS: SearchNavResult[] = [
-    { id: 'emergency', label: 'Emergency', route: '/listing/emergency', icon: 'alert-circle' },
-    { id: 'blood', label: 'Blood Donors', route: '/(tabs)/blood', icon: 'water' },
-    { id: 'settings', label: 'Settings', route: '/settings', icon: 'settings-outline' },
-    { id: 'profile', label: 'Profile', route: '/profile', icon: 'person-outline' },
-    { id: 'support', label: 'Support & FAQ', route: '/support', icon: 'help-circle-outline' },
+    // Main screens
+    { id: 'emergency', label: 'Emergency', route: '/listing/emergency', icon: 'alert-circle', color: '#EF4444' },
+    { id: 'blood', label: 'Blood Donors', subtitle: 'Find donors near you', route: '/(tabs)/blood', icon: 'water', color: '#EF4444' },
+    { id: 'support', label: 'Support & FAQ', subtitle: 'Get help or report issues', route: '/support', icon: 'help-circle-outline', color: '#8B5CF6' },
+    // Account
+    { id: 'edit-profile', label: 'Edit Profile', subtitle: 'Update your personal info', route: '/profile', icon: 'person-circle-outline', color: '#3B82F6' },
+    { id: 'change-password', label: 'Change Password', subtitle: 'Update your password', action: 'change-password', icon: 'lock-closed-outline', color: '#F59E0B' },
+    // Settings sub-pages
+    { id: 'settings', label: 'Settings', subtitle: 'App preferences', route: '/settings', icon: 'settings-outline', color: '#64748B' },
+    { id: 'notifications-settings', label: 'Notifications', subtitle: 'Manage alert preferences', route: '/manageNotifications', icon: 'notifications-outline', color: '#10B981' },
+    { id: 'data-usage', label: 'Data Usage', subtitle: 'Monitor your data consumption', route: '/dataUsage', icon: 'cellular-outline', color: '#6366F1' },
+    { id: 'privacy-policy', label: 'Privacy Policy', subtitle: 'How we handle your data', route: '/privacy', icon: 'shield-checkmark-outline', color: '#06B6D4' },
+    { id: 'terms', label: 'Terms & Conditions', subtitle: 'App usage terms', route: '/terms', icon: 'document-text-outline', color: '#64748B' },
 ];
 
 export const SEARCH_CATEGORIES_CONFIG: SearchCategoryResult[] = [

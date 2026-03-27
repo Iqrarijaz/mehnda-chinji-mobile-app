@@ -27,10 +27,10 @@ interface MenuItem {
 }
 
 const MENU_ITEMS: MenuItem[] = [
-    { label: 'Home', icon: 'home-outline', route: '/(tabs)', section: 'Main' },
-    { label: 'Community Feed', icon: 'newspaper-outline', route: '/(tabs)/feed', section: 'Main' },
-    { label: 'Blood Donors', icon: 'water-outline', route: '/(tabs)/blood', section: 'Main' },
-    { label: 'Business Directory', icon: 'briefcase-outline', route: '/(tabs)/business', section: 'Main' },
+    { label: 'Home', icon: 'home-outline', route: '/(drawer)/(tabs)', section: 'Main' },
+    // { label: 'Community Feed', icon: 'newspaper-outline', route: '/(drawer)/(tabs)/feed', section: 'Main' },
+    { label: 'Blood Donors', icon: 'water-outline', route: '/(drawer)/(tabs)/blood', section: 'Main' },
+    { label: 'Business Directory', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },
     { label: 'Profile', icon: 'person-outline', route: '/profile', section: 'Account' },
     { label: 'Settings', icon: 'settings-outline', route: '/settings', section: 'Account' },
     { label: 'Support & FAQ', icon: 'help-circle-outline', route: '/support', section: 'Support' },
@@ -159,7 +159,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                     <ThemedText style={styles.logoutText}>Sign Out</ThemedText>
                 </TouchableOpacity>
 
-                <ThemedText style={styles.versionText}>Mehnda Chinji v1.0.0</ThemedText>
+                <ThemedText style={styles.versionText}>Rehbar v1.0.0</ThemedText>
             </View>
         </View>
     );

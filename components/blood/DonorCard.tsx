@@ -1,4 +1,5 @@
 import { ThemedText } from '@/components/themedText';
+import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -45,6 +46,7 @@ const DonorCard = React.memo(({ donor, onReportPress }: DonorCardProps) => {
 
     const handleCall = () => {
         if (donor.userId.phone) {
+            analyticsService.trackEvent(AnalyticsEvents.DONOR_CARD_CLICKED, { donorId: donor._id });
             Linking.openURL(`tel:${donor.userId.phone}`);
         } else {
             Alert.alert("No Phone", "Phone number is not available.");

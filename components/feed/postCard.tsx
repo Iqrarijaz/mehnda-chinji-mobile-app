@@ -1,18 +1,16 @@
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { useAddComment, useDeleteComment, usePostComments, useUpdateComment } from '@/hooks/usePosts';
 import { formatRelativeTime } from '@/utils/dateUtils';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Share, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActionSheetIOS, Animated, Dimensions, FlatList, Modal, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '../themedText';
 import { ThemedView } from '../themedView';
-import Avatar from '../ui/avatar';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = width - 40;
+const CARD_WIDTH = width - 32; // Compact width
 
 export interface PostData {
     _id: string;
@@ -33,26 +31,261 @@ export interface PostData {
 
 interface PostCardProps {
     post: PostData;
-    onLike?: (postId: string) => void;
+    variant?: 'compact' | 'full';
+    showFullContent?: boolean;
     onPress?: (postId: string) => void;
     onViewImage?: (images: string[], index: number) => void;
+    onEdit?: (post: PostData) => void;
+    onDelete?: (postId: string) => void;
 }
 
-export const PostCard: React.FC<PostCardProps> = React.memo(({ post, onLike, onPress, onViewImage }) => {
+// --- Sub-Components ---
+
+const PostHeader = ({ type, createdAt, getTypeIcon, getTypeColor }: any) => {
+    return (
+        <View style={styles.header}>
+            <View style={styles.headerLeft}>
+                <View style={[styles.typeBadge, { backgroundColor: `${getTypeColor()}12` }]}>
+                    <Ionicons name={getTypeIcon() as any} size={11} color={getTypeColor()} />
+                    <ThemedText style={[styles.typeText, { color: getTypeColor() }]}>
+                        {type}
+                    </ThemedText>
+                </View>
+                <ThemedText style={styles.timeText}>
+                    {formatRelativeTime(createdAt)}
+                </ThemedText>
+            </View>
+        </View>
+    );
+};
+
+const PostContent = ({ content, showFullContent, setShowFullContent, colors }: any) => {
+    const isLongContent = content.length > 120;
+    const truncatedContent = isLongContent && !showFullContent
+        ? `${content.substring(0, 120)}...`
+        : content;
+
+    return (
+        <View style={styles.contentContainer}>
+            <ThemedText style={[styles.headline, { color: colors.text }]}>
+                {truncatedContent}
+            </ThemedText>
+            {isLongContent && setShowFullContent && (
+                <TouchableOpacity onPress={() => setShowFullContent(!showFullContent)}>
+                    <ThemedText style={[styles.readMore, { color: colors.primary }]}>
+                        {showFullContent ? 'Read Less' : 'Read More'}
+                    </ThemedText>
+                </TouchableOpacity>
+            )}
+        </View>
+    );
+};
+
+const PostMedia = ({ images, postId, onViewImage, currentImageIndex, onViewableItemsChanged, viewabilityConfig }: any) => {
+    if (!images || images.length === 0) return null;
+
+    return (
+        <View style={styles.imageContainer}>
+            <FlatList
+                data={images}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onViewableItemsChanged={onViewableItemsChanged}
+                viewabilityConfig={viewabilityConfig}
+                keyExtractor={(img, index) => `${postId}-img-${index}`}
+                renderItem={({ item, index }) => (
+                    <TouchableOpacity
+                        activeOpacity={0.95}
+                        onPress={() => onViewImage?.(images, index)}
+                        style={styles.imageWrapper}
+                    >
+                        <Image
+                            source={{ uri: item }}
+                            style={styles.mainImage}
+                            contentFit="cover"
+                            transition={200}
+                            cachePolicy="memory-disk"
+                        />
+                    </TouchableOpacity>
+                )}
+            />
+            {images.length > 1 && (
+                <View style={styles.imageBadge}>
+                    <ThemedText style={styles.imageBadgeText}>{currentImageIndex + 1}/{images.length}</ThemedText>
+                </View>
+            )}
+        </View>
+    );
+};
+
+
+const PostActionMenu = ({ visible, onClose, onEdit, onDelete, colors }: any) => {
+    return (
+        <Modal
+            visible={visible}
+            transparent
+            animationType="fade"
+            onRequestClose={onClose}
+        >
+            <TouchableOpacity
+                style={styles.menuOverlay}
+                activeOpacity={1}
+                onPress={onClose}
+            >
+                <ThemedView style={styles.menuContent}>
+                    <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => { onEdit(); onClose(); }}
+                    >
+                        <Ionicons name="create-outline" size={20} color={colors.text} />
+                        <ThemedText style={styles.menuItemText}>Edit Post</ThemedText>
+                    </TouchableOpacity>
+
+                    <View style={[styles.menuDivider, { backgroundColor: colors.border }]} />
+
+                    <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => { onDelete(); onClose(); }}
+                    >
+                        <Ionicons name="trash-outline" size={20} color="#FF3B30" />
+                        <ThemedText style={[styles.menuItemText, { color: '#FF3B30' }]}>Delete Post</ThemedText>
+                    </TouchableOpacity>
+
+                    <View style={[styles.menuDivider, { backgroundColor: colors.border }]} />
+
+                    <TouchableOpacity
+                        style={[styles.menuItem, { paddingBottom: 0 }]}
+                        onPress={onClose}
+                    >
+                        <ThemedText style={[styles.menuItemText, { textAlign: 'center', width: '100%', opacity: 0.6 }]}>Cancel</ThemedText>
+                    </TouchableOpacity>
+                </ThemedView>
+            </TouchableOpacity>
+        </Modal>
+    );
+};
+
+const CompactLayout = ({ post, getTypeIcon, getTypeColor, onPress, onLongPress, colors }: any) => {
+    console.log(`[PostCard Debug] CompactLayout rendered for ${post._id}. onLongPress present: ${!!onLongPress}`);
+    return (
+        <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={onPress}
+            onLongPress={() => {
+                console.log(`[PostCard Debug] TouchableOpacity onLongPress fired for ${post._id}`);
+                onLongPress?.();
+            }}
+            delayLongPress={500}
+            style={[styles.compactContainer, { backgroundColor: colors.card }]}
+        >
+            {post.images && post.images.length > 0 ? (
+                <Image
+                    source={{ uri: post.images[0] }}
+                    style={styles.compactImage}
+                    contentFit="cover"
+                />
+            ) : (
+                <View style={[styles.compactImage, styles.placeholderImage]}>
+                    <Ionicons name="newspaper-outline" size={32} color={colors.icon} />
+                </View>
+            )}
+
+            <View style={styles.compactContent}>
+                <View style={styles.compactHeader}>
+                    <View style={[styles.typeBadge, { backgroundColor: `${getTypeColor()}12`, paddingHorizontal: 6, paddingVertical: 2 }]}>
+                        <Ionicons name={getTypeIcon() as any} size={9} color={getTypeColor()} />
+                        <ThemedText style={[styles.typeText, { color: getTypeColor(), fontSize: 9 }]}>
+                            {post.type}
+                        </ThemedText>
+                    </View>
+                    <ThemedText style={[styles.timeText, { fontSize: 10 }]}>
+                        {formatRelativeTime(post.createdAt)}
+                    </ThemedText>
+                </View>
+
+                <ThemedText style={styles.compactHeadline} numberOfLines={3}>
+                    {post.content}
+                </ThemedText>
+            </View>
+        </TouchableOpacity>
+    );
+};
+
+export const PostCard: React.FC<PostCardProps> = React.memo(({ post, variant = 'compact', showFullContent: propShowFullContent, onPress, onViewImage, onEdit, onDelete }) => {
     const { theme } = useTheme();
     const { user } = useAuth();
     const colors = Colors[theme];
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [commentText, setCommentText] = useState('');
-    const [showFullContent, setShowFullContent] = useState(false);
+    const [showFullContent, setShowFullContent] = useState(propShowFullContent || false);
+    const [menuVisible, setMenuVisible] = useState(false);
 
-    const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-    const [editingText, setEditingText] = useState('');
+    // Sync prop changes to state if needed
+    useEffect(() => {
+        if (propShowFullContent !== undefined) {
+            setShowFullContent(propShowFullContent);
+        }
+    }, [propShowFullContent]);
+
+    // --- Animations ---
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const translateY = useRef(new Animated.Value(10)).current;
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 400,
+                useNativeDriver: true,
+            }),
+            Animated.timing(translateY, {
+                toValue: 0,
+                duration: 400,
+                useNativeDriver: true,
+            })
+        ]).start();
+    }, []);
+
+    const isOwner = useMemo(() => {
+        const currentUserId = user?.user?._id;
+        const ownerId = typeof post.createdBy === 'string' ? post.createdBy : (post.createdBy as any)?._id;
+        return !!currentUserId && !!ownerId && currentUserId === ownerId;
+    }, [user?.user?._id, post.createdBy]);
+
+    // Debug logs
+    useEffect(() => {
+        const ownerId = typeof post.createdBy === 'string' ? post.createdBy : (post.createdBy as any)?._id;
+        console.log(`[PostCard Debug] Post: ${post._id}`);
+        console.log(`[PostCard Debug] Current User ID: ${user?.user?._id}`);
+        console.log(`[PostCard Debug] Post Owner ID: ${ownerId}`);
+        console.log(`[PostCard Debug] isOwner: ${isOwner}`);
+    }, [user?.user?._id, post.createdBy, isOwner]);
+
+    const handleLongPress = useCallback(() => {
+        // alert("long press")
+        console.log('[PostCard Debug] handleLongPress called');
+        if (isOwner) {
+            console.log('[PostCard Debug] isOwner is true, showing menu');
+            if (Platform.OS === 'ios') {
+                ActionSheetIOS.showActionSheetWithOptions(
+                    {
+                        options: ['Cancel', 'Edit Post', 'Delete Post'],
+                        destructiveButtonIndex: 2,
+                        cancelButtonIndex: 0,
+                    },
+                    (buttonIndex) => {
+                        if (buttonIndex === 1) onEdit?.(post);
+                        else if (buttonIndex === 2) onDelete?.(post._id);
+                    }
+                );
+            } else {
+                setMenuVisible(true);
+            }
+        }
+    }, [isOwner, onEdit, onDelete, post]);
 
     const displayContent = useMemo(() => {
         if (post.type === 'DEATH') {
             const prefix = "إِنَّا لِلّهِ وَإِنَّـا إِلَيْهِ رَاجِعونَ\n\n";
-            // Prepend if not already present
             if (!post.content.startsWith("إِنَّا لِلّهِ وَإِنَّـا إِلَيْهِ رَاجِعونَ")) {
                 return prefix + post.content;
             }
@@ -60,122 +293,11 @@ export const PostCard: React.FC<PostCardProps> = React.memo(({ post, onLike, onP
         return post.content;
     }, [post.content, post.type]);
 
-    const {
-        data: commentsData,
-        isLoading: commentsLoading,
-        refetch: refetchComments
-    } = usePostComments(post._id, null, isExpanded);
-
-    const addCommentMutation = useAddComment();
-    const deleteCommentMutation = useDeleteComment();
-    const updateCommentMutation = useUpdateComment();
-
-    const comments = useMemo(() => {
-        return commentsData?.pages.flatMap((page: any) => page.data) || [];
-    }, [commentsData]);
-
-    const displayComments = useMemo(() => {
-        if (isExpanded) return [...comments].reverse();
-        return [...comments.slice(0, 2)].reverse();
-    }, [comments, isExpanded]);
-
-    const handleCommentToggle = useCallback(() => {
-        setIsExpanded(!isExpanded);
-    }, [isExpanded]);
-
-    const handleDeleteComment = async (commentId: string) => {
-        try {
-            await deleteCommentMutation.mutateAsync(commentId);
-        } catch (error) {
-            console.error('Failed to delete comment:', error);
-        }
-    };
-
-    const handleEditComment = (comment: any) => {
-        setEditingCommentId(comment._id);
-        setEditingText(comment.text);
-    };
-
-    const handleUpdateComment = async () => {
-        if (!editingCommentId || !editingText.trim() || updateCommentMutation.isPending) return;
-        try {
-            await updateCommentMutation.mutateAsync({
-                commentId: editingCommentId,
-                text: editingText.trim()
-            });
-            setEditingCommentId(null);
-            setEditingText('');
-        } catch (error) {
-            console.error('Failed to update comment:', error);
-        }
-    };
-
-    const canEditComment = useCallback((comment: any) => {
-        if (!user?.user) return false;
-        const currentUserId = user.user._id || user.user.id;
-        const commentUserId = comment.userId?._id || comment.userId;
-
-        if (!currentUserId || !commentUserId) return false;
-        if (currentUserId.toString() !== commentUserId.toString()) return false;
-
-        const now = new Date();
-        const commentTime = new Date(comment.createdAt);
-        const diffInMinutes = (now.getTime() - commentTime.getTime()) / (1000 * 60);
-        return diffInMinutes <= 30;
-    }, [user]);
-
-    const canDeleteComment = useCallback((comment: any) => {
-        if (!user?.user) return false;
-        const currentUserId = user.user._id || user.user.id;
-        const commentUserId = comment.userId?._id || comment.userId;
-
-        if (!currentUserId || !commentUserId) return false;
-        if (currentUserId.toString() !== commentUserId.toString()) return false;
-
-        const now = new Date();
-        const commentTime = new Date(comment.createdAt);
-        const diffInMinutes = (now.getTime() - commentTime.getTime()) / (1000 * 60);
-        return diffInMinutes <= 30;
-    }, [user]);
-
-    const handleAddComment = async () => {
-        if (!commentText.trim() || addCommentMutation.isPending) return;
-        try {
-            await addCommentMutation.mutateAsync({
-                postId: post._id,
-                text: commentText.trim()
-            });
-            setCommentText('');
-            if (!isExpanded) setIsExpanded(true);
-        } catch (error) {
-            console.error('Failed to add comment:', error);
-        }
-    };
-
-    const handleShare = async () => {
-        try {
-            let message = post.content;
-
-            if (post.images && post.images.length > 0) {
-                message += `\n\n${post.images[0]}`;
-            }
-
-            message += `\n\nShared from Rehbar App`;
-
-            await Share.share({
-                message,
-                title: 'Share Post'
-            });
-        } catch (error) {
-            console.error('Error sharing post:', error);
-        }
-    };
-
     const getTypeIcon = () => {
         switch (post.type) {
             case 'DEATH': return 'megaphone';
             case 'ACCIDENT': return 'warning';
-            default: return 'megaphone';
+            default: return 'bookmark';
         }
     };
 
@@ -200,304 +322,152 @@ export const PostCard: React.FC<PostCardProps> = React.memo(({ post, onLike, onP
     }).current;
 
     return (
-        <ThemedView style={styles.container}>
-            <TouchableOpacity activeOpacity={0.9} onPress={() => onPress?.(post._id)}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <View style={styles.headerInfo}>
-                        <View style={[styles.typeBadge, { backgroundColor: post.type === 'DEATH' ? 'rgba(0,0,0,0.1)' : `${getTypeColor()}15`, alignSelf: 'flex-start' }]}>
-                            <Ionicons name={getTypeIcon() as any} size={14} color={getTypeColor()} />
-                            <ThemedText style={[styles.typeText, { color: getTypeColor() }]}>{post.type}</ThemedText>
-                        </View>
-                    </View>
-                    <ThemedText style={styles.timeText}>
-                        {formatRelativeTime(post.createdAt)}
-                    </ThemedText>
-                </View>
-
-                {/* Content */}
-                <View style={styles.contentContainer}>
-                    <ThemedText style={styles.content}>
-                        {displayContent.length > 100 && !showFullContent
-                            ? `${displayContent.substring(0, 100)}...`
-                            : displayContent}
-                        {displayContent.length > 100 && (
-                            <ThemedText
-                                style={{ color: colors.primary, fontWeight: '600' }}
-                                onPress={() => setShowFullContent(!showFullContent)}
-                            >
-                                {showFullContent ? ' Show less' : ' Show more'}
-                            </ThemedText>
-                        )}
-                    </ThemedText>
-                </View>
-
-                {/* Images */}
-                {post.images && post.images.length > 0 && (
-                    <View style={styles.imageContainer}>
-                        {post.images.length === 2 ? (
-                            <View style={styles.splitImageContainer}>
-                                <TouchableOpacity
-                                    activeOpacity={0.9}
-                                    style={styles.splitImageWrapper}
-                                    onPress={() => onViewImage?.(post.images, 0)}
-                                >
-                                    <Image
-                                        source={{ uri: post.images[0] }}
-                                        style={styles.splitImage}
-                                        contentFit="cover"
-                                        transition={200}
-                                    />
-                                </TouchableOpacity>
-                                <View style={styles.imageGap} />
-                                <TouchableOpacity
-                                    activeOpacity={0.9}
-                                    style={styles.splitImageWrapper}
-                                    onPress={() => onViewImage?.(post.images, 1)}
-                                >
-                                    <Image
-                                        source={{ uri: post.images[1] }}
-                                        style={styles.splitImage}
-                                        contentFit="cover"
-                                        transition={200}
-                                    />
-                                </TouchableOpacity>
-                            </View>
-                        ) : (
-                            <>
-                                <FlatList
-                                    data={post.images}
-                                    horizontal
-                                    pagingEnabled
-                                    showsHorizontalScrollIndicator={false}
-                                    onViewableItemsChanged={onViewableItemsChanged}
-                                    viewabilityConfig={viewabilityConfig}
-                                    keyExtractor={(img, index) => `${post._id} -img - ${index} `}
-                                    renderItem={({ item, index }) => (
-                                        <TouchableOpacity
-                                            activeOpacity={0.9}
-                                            onPress={() => onViewImage?.(post.images, index)}
-                                            style={{ width: CARD_WIDTH, height: '100%' }}
-                                        >
-                                            <Image
-                                                source={{ uri: item }}
-                                                style={styles.mainImage}
-                                                contentFit="cover"
-                                                transition={200}
-                                                cachePolicy="memory-disk"
-                                            />
-                                        </TouchableOpacity>
-                                    )}
-                                />
-                                {post.images.length > 1 && (
-                                    <View style={styles.imageBadge}>
-                                        <ThemedText style={styles.imageBadgeText}>{currentImageIndex + 1} / {post.images.length}</ThemedText>
-                                    </View>
-                                )}
-                            </>
-                        )}
-                    </View>
-                )}
-
-                {/* Footer */}
-                <View style={styles.footer}>
-                    <TouchableOpacity style={styles.footerAction} onPress={() => onLike?.(post._id)}>
-                        <Ionicons
-                            name={post.isLiked ? "heart" : "heart-outline"}
-                            size={20}
-                            color={post.isLiked ? "#EF4444" : colors.icon}
-                        />
-                        <ThemedText style={[styles.footerText, post.isLiked && { color: "#EF4444" }]}>
-                            {post.likesCount || 0}
-                        </ThemedText>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.footerAction} onPress={handleCommentToggle}>
-                        <Ionicons name="chatbubble-outline" size={18} color={isExpanded ? colors.primary : colors.icon} />
-                        <ThemedText style={[styles.footerText, isExpanded && { color: colors.primary }]}>{post.commentsCount || 0}</ThemedText>
-                    </TouchableOpacity>
-
-                    <View style={{ flex: 1 }} />
-
-                    <TouchableOpacity style={styles.shareAction} onPress={handleShare}>
-                        <Ionicons name="share-social-outline" size={18} color={colors.icon} />
-                    </TouchableOpacity>
-                </View>
-
-                {/* Inline Comments Section */}
-                {(isExpanded || post.commentsCount > 0) && (
-                    <View style={styles.commentsSection}>
-                        {displayComments.map((comment: any) => (
-                            <View key={comment._id} style={styles.commentItem}>
-                                <Avatar
-                                    uri={comment.userId?.profileImage}
-                                    name={comment.userId?.name}
-                                    size={32}
-                                    style={styles.commentAvatar}
-                                />
-                                <View style={styles.commentBubble}>
-                                    <View style={styles.commentHeader}>
-                                        <ThemedText style={styles.commentUser} numberOfLines={1}>
-                                            {comment.userId?.name
-                                                ? comment.userId.name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-                                                : 'Anonymous'}
-                                        </ThemedText>
-                                        <ThemedText style={styles.commentTime}>
-                                            • {formatRelativeTime(comment.createdAt)}
-                                        </ThemedText>
-
-                                        <View style={{ flex: 1 }} />
-
-                                        {canEditComment(comment) && (
-                                            <TouchableOpacity
-                                                style={styles.editButton}
-                                                onPress={() => handleEditComment(comment)}
-                                                disabled={updateCommentMutation.isPending}
-                                            >
-                                                <Ionicons name="create-outline" size={14} color={colors.primary} />
-                                            </TouchableOpacity>
-                                        )}
-
-                                        {canDeleteComment(comment) && (
-                                            <TouchableOpacity
-                                                style={styles.deleteButton}
-                                                onPress={() => handleDeleteComment(comment._id)}
-                                                disabled={deleteCommentMutation.isPending}
-                                            >
-                                                <Ionicons name="trash-outline" size={14} color="#EF4444" />
-                                            </TouchableOpacity>
-                                        )}
-                                    </View>
-                                    {editingCommentId === comment._id ? (
-                                        <View style={styles.editInputContainer}>
-                                            <TextInput
-                                                style={[styles.editInput, { color: colors.text }]}
-                                                value={editingText}
-                                                onChangeText={setEditingText}
-                                                multiline
-                                                autoFocus
-                                            />
-                                            <View style={styles.editActions}>
-                                                <TouchableOpacity onPress={() => setEditingCommentId(null)} style={styles.editCancel}>
-                                                    <ThemedText style={styles.editCancelText}>Cancel</ThemedText>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity
-                                                    onPress={handleUpdateComment}
-                                                    style={[styles.editSave, { backgroundColor: colors.primary }]}
-                                                    disabled={updateCommentMutation.isPending}
-                                                >
-                                                    {updateCommentMutation.isPending ? (
-                                                        <ActivityIndicator size="small" color="#fff" />
-                                                    ) : (
-                                                        <ThemedText style={styles.editSaveText}>Save</ThemedText>
-                                                    )}
-                                                </TouchableOpacity>
-                                            </View>
-                                        </View>
-                                    ) : (
-                                        <ThemedText style={styles.commentText}>{comment.text}</ThemedText>
-                                    )}
-                                </View>
-                            </View>
-                        ))}
-
-                        {post.commentsCount > 3 && (
-                            <TouchableOpacity style={styles.seeMoreButton} onPress={handleCommentToggle}>
-                                <ThemedText style={[styles.seeMoreText, { color: colors.primary }]}>
-                                    {isExpanded ? 'See less' : `See more ${post.commentsCount} comments`}
-                                </ThemedText>
-                            </TouchableOpacity>
-                        )}
-
-                        <View style={styles.inlineInputContainer}>
-                            <Avatar
-                                uri={user?.user?.profileImage}
-                                name={user?.user?.name}
-                                size={28}
-                                style={styles.smallAvatar}
-                            />
-                            <View style={[styles.inputWrapper, { backgroundColor: theme === 'light' ? '#F1F5F9' : '#1E293B' }]}>
-                                <TextInput
-                                    style={[styles.inlineInput, { color: colors.text }]}
-                                    placeholder="Write a comment..."
-                                    placeholderTextColor={colors.icon}
-                                    value={commentText}
-                                    onChangeText={setCommentText}
-                                    onSubmitEditing={handleAddComment}
-                                />
-                                {commentText.length > 0 && (
-                                    <TouchableOpacity onPress={handleAddComment} disabled={addCommentMutation.isPending}>
-                                        {addCommentMutation.isPending ? (
-                                            <ActivityIndicator size="small" color={colors.primary} />
-                                        ) : (
-                                            <Ionicons name="send" size={16} color={colors.primary} />
-                                        )}
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        </View>
-                    </View>
-                )}
-            </TouchableOpacity>
-
-            {/* Image Viewer Moved to FeedScreen */}
-        </ThemedView>
+        <>
+            <CompactLayout
+                post={post}
+                getTypeIcon={getTypeIcon}
+                getTypeColor={getTypeColor}
+                onPress={() => onPress?.(post._id)}
+                onLongPress={handleLongPress}
+                colors={colors}
+            />
+            <PostActionMenu
+                visible={menuVisible}
+                onClose={() => setMenuVisible(false)}
+                onEdit={() => onEdit?.(post)}
+                onDelete={() => onDelete?.(post._id)}
+                colors={colors}
+            />
+        </>
     );
 });
 
 const styles = StyleSheet.create({
     container: {
-        marginHorizontal: 16,
-        marginTop: 12,
-        marginBottom: 4,
-        borderRadius: 16,
-        overflow: 'hidden',
-        backgroundColor: '#FFFFFF',
-        shadowColor: '#000',
+        marginBottom: 12,
+        borderRadius: 18,
+        padding: 12,
+        backgroundColor: '#fff',
+        shadowColor: '#1e293b',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0.12,
         shadowRadius: 10,
+        elevation: 6,
+        // Remove marginHorizontal here, handled by parent padding
+    },
+    compactContainer: {
+        flexDirection: 'row',
+        marginBottom: 8,
+        borderRadius: 14,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
+        overflow: 'hidden', // Ensure image/content doesn't bleed out of rounded card
+    },
+    compactImage: {
+        width: 110,
+        height: 110,
+        // Flush with left of card: match card radius on left only
+        borderTopLeftRadius: 14,
+        borderBottomLeftRadius: 14,
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+    },
+    placeholderImage: {
+        backgroundColor: '#f1f5f9',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    compactContent: {
+        flex: 1,
+        padding: 12, // Content column padding
+        justifyContent: 'space-between',
+    },
+    compactHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 2, // Reduced from 4
+    },
+    compactHeadline: {
+        fontSize: 14,
+        fontWeight: '400', // Changed from 600
+        lineHeight: 18, // Reduced from 20
+        color: '#1e293b',
+    },
+    compactFooter: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 6,
+    },
+    authorText: {
+        fontSize: 11,
+        color: '#64748b',
+        opacity: 0.8,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 12,
-        paddingTop: 12,
-        paddingBottom: 8,
+        paddingTop: 8, // Reduced from 12
+        paddingBottom: 4, // Reduced from 8
     },
-    headerInfo: {
-        flex: 1,
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
-    timeText: {
-        fontSize: 12,
-        opacity: 0.6,
+    headerActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    iconButton: {
+        marginLeft: 12,
+        padding: 4,
     },
     typeBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 20,
         gap: 4,
     },
     typeText: {
-        fontSize: 11,
-        fontWeight: '700',
-        textTransform: 'lowercase',
+        fontSize: 8,
+        fontWeight: '400', // Changed from 700
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    timeText: {
+        fontSize: 12,
+        opacity: 0.5,
+        fontWeight: '500',
     },
     contentContainer: {
-        paddingHorizontal: 16,
-        paddingBottom: 12,
+        paddingHorizontal: 14,
+        paddingBottom: 8, // Reduced from 10
     },
-    content: {
+    headline: {
+        fontSize: 15,
+        lineHeight: 22,
+        fontWeight: '400', // Changed from 600
+    },
+    readMore: {
         fontSize: 14,
-        lineHeight: 20,
+        fontWeight: '700',
     },
     imageContainer: {
         width: '100%',
-        height: width * 0.6,
-        backgroundColor: '#f5f5f5',
-        position: 'relative',
+        aspectRatio: 16 / 9,
+        backgroundColor: '#f8f8f8',
+        marginVertical: 4,
+    },
+    imageWrapper: {
+        width: width - 32,
+        height: '100%',
     },
     mainImage: {
         width: '100%',
@@ -505,127 +475,14 @@ const styles = StyleSheet.create({
     },
     imageBadge: {
         position: 'absolute',
-        bottom: 12,
-        right: 12,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 12,
+        top: 10,
+        right: 10,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 10,
     },
     imageBadgeText: {
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: '700',
-    },
-    footer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 12,
-        paddingTop: 8,
-        borderTopWidth: StyleSheet.hairlineWidth,
-        borderTopColor: 'rgba(0,0,0,0.05)',
-    },
-    footerAction: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginRight: 24,
-        gap: 6,
-    },
-    footerText: {
-        fontSize: 13,
-        fontWeight: '600',
-        opacity: 0.8,
-    },
-    shareAction: {
-        padding: 4,
-    },
-    commentsSection: {
-        paddingHorizontal: 16,
-        paddingBottom: 16,
-        borderTopWidth: StyleSheet.hairlineWidth,
-        borderTopColor: 'rgba(0,0,0,0.05)',
-        paddingTop: 12,
-    },
-    commentItem: {
-        flexDirection: 'row',
-        marginBottom: 12,
-        gap: 10,
-    },
-    commentAvatar: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-    },
-    commentBubble: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.03)',
-        padding: 10,
-        borderRadius: 12,
-    },
-    commentHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 2,
-        gap: 4,
-    },
-    commentUser: {
-        fontSize: 13,
-        fontWeight: '700',
-    },
-    commentTime: {
-        fontSize: 10,
-        opacity: 0.5,
-    },
-    commentText: {
-        fontSize: 13,
-        lineHeight: 18,
-    },
-    seeMoreButton: {
-        paddingVertical: 4,
-        marginBottom: 8,
-    },
-    seeMoreText: {
-        fontSize: 13,
-        fontWeight: '600',
-    },
-    deleteButton: {
-        marginLeft: 8,
-        padding: 4,
-    },
-    editButton: {
-        marginLeft: 8,
-        padding: 4,
-    },
-    editInputContainer: {
-        marginTop: 4,
-    },
-    editInput: {
-        fontSize: 13,
-        padding: 8,
-        borderRadius: 8,
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        minHeight: 40,
-    },
-    editActions: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        marginTop: 8,
-        gap: 8,
-    },
-    editCancel: {
-        paddingHorizontal: 12,
-        paddingVertical: 2,
-    },
-    editCancelText: {
-        fontSize: 12,
-        opacity: 0.6,
-    },
-    editSave: {
-        paddingHorizontal: 12,
-        paddingVertical: 2,
-        borderRadius: 6,
-    },
-    editSaveText: {
         fontSize: 12,
         color: '#fff',
         fontWeight: '700',
@@ -654,53 +511,37 @@ const styles = StyleSheet.create({
         fontSize: 13,
         paddingVertical: 4,
     },
-    splitImageContainer: {
-        flexDirection: 'row',
-        height: '100%',
-    },
-    splitImageWrapper: {
+    menuOverlay: {
         flex: 1,
-        height: '100%',
-    },
-    splitImage: {
-        width: '100%',
-        height: '100%',
-    },
-    imageGap: {
-        width: 2,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-    },
-    viewerContainer: {
-        flex: 1,
-        backgroundColor: '#000',
-    },
-    viewerHeader: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 10,
-        paddingTop: 50,
-        paddingHorizontal: 20,
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-    },
-    closeButton: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(0,0,0,0.4)',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    viewerImageWrapper: {
-        width: width,
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
+    menuContent: {
+        width: width * 0.7,
+        borderRadius: 20,
+        padding: 16,
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
     },
-    fullImage: {
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 14,
+        paddingHorizontal: 8,
+        gap: 12,
+    },
+    menuItemText: {
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    menuDivider: {
+        height: 1,
         width: '100%',
-        height: '100%',
+        opacity: 0.1,
     },
 });
+
