@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, TextInput, Alert, Platform } from 'react-native';
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +8,7 @@ import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { getUserReports, updateReport, deleteReport, ReportPayload } from '@/apis/report';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
@@ -29,7 +31,7 @@ export default function ReportsScreen() {
         queryFn: getUserReports
     });
 
-    const reports = reportsResponse?.data?.data || [];
+    const reports = reportsResponse?.data || [];
 
     const deleteMutation = useMutation({
         mutationFn: deleteReport,
@@ -99,7 +101,7 @@ export default function ReportsScreen() {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: '#F8FAFC' }]}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Header */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
@@ -135,20 +137,20 @@ export default function ReportsScreen() {
                     </View>
                 ) : reports.length === 0 ? (
                     <Animated.View entering={FadeIn.delay(300)} style={styles.emptyWrap}>
-                        <Ionicons name="document-text-outline" size={64} color="#CBD5E1" />
-                        <ThemedText style={styles.emptyTitle}>No reports found</ThemedText>
-                        <ThemedText style={styles.emptySubtitle}>Your submitted reports will appear here.</ThemedText>
+                        <Ionicons name="document-text-outline" size={64} color={theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#CBD5E1'} />
+                        <ThemedText style={[styles.emptyTitle, { color: colors.textSecondary }]}>No reports found</ThemedText>
+                        <ThemedText style={[styles.emptySubtitle, { color: colors.icon }]}>Your submitted reports will appear here.</ThemedText>
                     </Animated.View>
                 ) : (
                     reports.map((report: any, index: number) => (
-                        <Animated.View key={report._id} entering={FadeInDown.delay(100 * index).duration(500)} style={styles.reportCard}>
+                        <Animated.View key={report._id} entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.reportCard, { backgroundColor: colors.card, shadowColor: theme === 'dark' ? '#000' : '#000' }]}>
                             <View style={styles.cardHeader}>
-                                <View style={[styles.targetBadge, { backgroundColor: colors.primary + '10' }]}>
+                                <View style={[styles.targetBadge, { backgroundColor: colors.primary + '15' }]}>
                                     <ThemedText style={[styles.targetText, { color: colors.primary }]}>
                                         {getTargetLabel(report.targetType)}
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(report.status) + '15' }]}>
+                                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(report.status) + '20' }]}>
                                     <View style={[styles.statusDot, { backgroundColor: getStatusColor(report.status) }]} />
                                     <ThemedText style={[styles.statusText, { color: getStatusColor(report.status) }]}>
                                         {report.status}
@@ -156,25 +158,64 @@ export default function ReportsScreen() {
                                 </View>
                             </View>
 
-                            <ThemedText style={styles.reasonText}>{report.reason}</ThemedText>
+                            <ThemedText style={[styles.reasonText, { color: colors.text }]}>{report.reason}</ThemedText>
                             {report.description && (
-                                <ThemedText style={styles.descriptionText} numberOfLines={3}>
+                                <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]} numberOfLines={3}>
                                     {report.description}
                                 </ThemedText>
                             )}
 
-                            <View style={styles.cardFooter}>
-                                <ThemedText style={styles.dateText}>
+                            <View style={[styles.cardFooter, { borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                                <ThemedText style={[styles.dateText, { color: colors.icon }]}>
                                     {format(new Date(report.createdAt), 'MMM dd, yyyy • hh:mm a')}
                                 </ThemedText>
-                                {report.status === 'PENDING' && (
-                                    <View style={styles.actionRow}>
-                                        <TouchableOpacity onPress={() => handleEdit(report)} style={styles.iconBtn}>
-                                            <Ionicons name="create-outline" size={18} color="#64748B" />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => handleDelete(report._id)} style={styles.iconBtn}>
-                                            <Ionicons name="trash-outline" size={18} color="#EF4444" />
-                                        </TouchableOpacity>
+                                 {report.status === 'PENDING' && (
+                                    <View style={{ position: 'relative' }}>
+                                        <Menu>
+                                            <MenuTrigger
+                                                customStyles={{
+                                                    triggerWrapper: styles.moreBtn,
+                                                }}
+                                            >
+                                                <Ionicons name="ellipsis-vertical" size={20} color={colors.textSecondary} />
+                                            </MenuTrigger>
+
+                                            <MenuOptions
+                                                customStyles={{
+                                                    optionsContainer: [
+                                                        styles.menuPopover,
+                                                        {
+                                                            backgroundColor: colors.card,
+                                                            borderColor: colors.border,
+                                                        }
+                                                    ],
+                                                }}
+                                            >
+                                                <MenuOption
+                                                    onSelect={() => handleEdit(report)}
+                                                    customStyles={{
+                                                        optionWrapper: styles.menuItem,
+                                                    }}
+                                                >
+                                                    <View style={[styles.menuIconBox, { backgroundColor: colors.primary + '15' }]}>
+                                                        <Ionicons name="create-outline" size={16} color={colors.primary} />
+                                                    </View>
+                                                    <ThemedText style={[styles.menuItemText, { color: colors.text }]}>Edit</ThemedText>
+                                                </MenuOption>
+
+                                                <MenuOption
+                                                    onSelect={() => handleDelete(report._id)}
+                                                    customStyles={{
+                                                        optionWrapper: styles.menuItem,
+                                                    }}
+                                                >
+                                                    <View style={[styles.menuIconBox, { backgroundColor: '#EF444415' }]}>
+                                                        <Ionicons name="trash-outline" size={16} color="#EF4444" />
+                                                    </View>
+                                                    <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>Delete</ThemedText>
+                                                </MenuOption>
+                                            </MenuOptions>
+                                        </Menu>
                                     </View>
                                 )}
                             </View>
@@ -185,31 +226,31 @@ export default function ReportsScreen() {
 
             {/* Edit Modal */}
             <Modal visible={editModalVisible} transparent animationType="slide">
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
+                <View style={[styles.modalOverlay, { backgroundColor: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)' }]}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
                         <View style={styles.modalHeader}>
-                            <ThemedText style={styles.modalTitle}>Edit Report</ThemedText>
+                            <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Edit Report</ThemedText>
                             <TouchableOpacity onPress={() => setEditModalVisible(false)}>
-                                <Ionicons name="close" size={24} color="#64748B" />
+                                <Ionicons name="close" size={24} color={colors.textSecondary} />
                             </TouchableOpacity>
                         </View>
 
-                        <ThemedText style={styles.inputLabel}>Reason</ThemedText>
+                        <ThemedText style={[styles.inputLabel, { color: colors.textSecondary }]}>Reason</ThemedText>
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, borderWidth: theme === 'dark' ? 1 : 0 }]}
                             value={editReason}
                             onChangeText={setEditReason}
                             placeholder="Enter reason"
-                            placeholderTextColor="#94A3B8"
+                            placeholderTextColor={colors.icon}
                         />
 
-                        <ThemedText style={styles.inputLabel}>Additional Details</ThemedText>
+                        <ThemedText style={[styles.inputLabel, { color: colors.textSecondary }]}>Additional Details</ThemedText>
                         <TextInput
-                            style={[styles.input, styles.textArea]}
+                            style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, borderWidth: theme === 'dark' ? 1 : 0 }]}
                             value={editDescription}
                             onChangeText={setEditDescription}
                             placeholder="Enter description"
-                            placeholderTextColor="#94A3B8"
+                            placeholderTextColor={colors.icon}
                             multiline
                             numberOfLines={4}
                             textAlignVertical="top"
@@ -237,8 +278,8 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     headerWrap: {
         paddingBottom: 24,
-        borderBottomLeftRadius: 32,
-        borderBottomRightRadius: 32,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         zIndex: 2,
     },
     headerTopRow: {
@@ -266,11 +307,10 @@ const styles = StyleSheet.create({
     scrollContent: { paddingHorizontal: 16, paddingTop: 40 },
     loaderWrap: { padding: 40, alignItems: 'center' },
     emptyWrap: { padding: 60, alignItems: 'center', justifyContent: 'center' },
-    emptyTitle: { fontSize: 18, fontWeight: '700', color: '#64748B', marginTop: 16 },
-    emptySubtitle: { fontSize: 14, color: '#94A3B8', marginTop: 8, textAlign: 'center' },
+    emptyTitle: { fontSize: 18, fontWeight: '700', marginTop: 16 },
+    emptySubtitle: { fontSize: 14, marginTop: 8, textAlign: 'center' },
     reportCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         marginBottom: 16,
         shadowColor: '#000',
@@ -279,24 +319,65 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
     },
     cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-    targetBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+    targetBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: Layout.borderRadius },
     targetText: { fontSize: 12, fontWeight: '700' },
-    statusBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+    statusBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 4, borderRadius: Layout.borderRadius },
     statusDot: { width: 6, height: 6, borderRadius: 3, marginRight: 6 },
     statusText: { fontSize: 11, fontWeight: '700' },
-    reasonText: { fontSize: 16, fontWeight: '700', color: '#0F172A', marginBottom: 8 },
-    descriptionText: { fontSize: 14, color: '#64748B', lineHeight: 20, marginBottom: 12 },
-    cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 12 },
-    dateText: { fontSize: 12, color: '#94A3B8' },
-    actionRow: { flexDirection: 'row', gap: 12 },
-    iconBtn: { padding: 4 },
+    reasonText: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
+    descriptionText: { fontSize: 14, lineHeight: 20, marginBottom: 12 },
+    cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, paddingTop: 12 },
+    dateText: { fontSize: 12 },
+    moreBtn: {
+        padding: 4,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    menuPopover: {
+        width: 160,
+        borderRadius: Layout.borderRadius,
+        borderWidth: 1,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.12,
+                shadowRadius: 16,
+            },
+            android: {
+                elevation: 8,
+            },
+        }),
+        paddingHorizontal: 6,
+        paddingVertical: 6,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 8,
+        paddingHorizontal: 8,
+        borderRadius: 8,
+        gap: 10,
+    },
+    menuIconBox: {
+        width: 28,
+        height: 28,
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    menuItemText: {
+        fontSize: 14,
+        fontWeight: '600',
+    },
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 },
-    modalContent: { backgroundColor: '#FFFFFF', borderRadius: 24, padding: 24 },
+    modalContent: { borderRadius: Layout.borderRadius, padding: 24 },
     modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
     modalTitle: { fontSize: 20, fontWeight: '700' },
-    inputLabel: { fontSize: 14, fontWeight: '600', color: '#64748B', marginBottom: 8, marginTop: 16 },
-    input: { backgroundColor: '#F1F5F9', borderRadius: 12, padding: 12, fontSize: 15, color: '#0F172A' },
+    inputLabel: { fontSize: 14, fontWeight: '600', marginBottom: 8, marginTop: 16 },
+    input: { borderRadius: Layout.borderRadius, padding: 12, fontSize: 15 },
     textArea: { height: 100 },
-    saveBtn: { height: 50, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginTop: 24 },
+    saveBtn: { height: 50, borderRadius: Layout.borderRadius, justifyContent: 'center', alignItems: 'center', marginTop: 24 },
     saveBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' }
 });

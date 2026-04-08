@@ -19,7 +19,7 @@ export async function getCategories(type: string = 'SERVICES') {
     return apiClient.get('/api/user/category/list', { params: { type } });
 }
 
-export async function getBusinessesList(params: { search?: string; categoryId?: string; currentPage?: number }) {
+export async function getBusinessesList(params: { text?: string; categoryEn?: string; currentPage?: number }) {
     return apiClient.get('/api/user/v1/get-businesses-list', { params });
 }
 

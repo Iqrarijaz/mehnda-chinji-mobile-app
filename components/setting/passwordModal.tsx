@@ -23,9 +23,12 @@ import Toast from 'react-native-toast-message';
 import { PremiumModal } from '../common/PremiumModal';
 import { changePassword } from '@/apis/profile';
 import { ThemedText } from '@/components/themedText';
+import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
-const PRIMARY = '#006666';
+// PRIMARY will be used from colors.primary inside components
 
 // ── Password strength ─────────────────────────────────────────────────────────
 function getStrength(pw: string): { level: number; label: string; color: string } {
@@ -39,7 +42,7 @@ function getStrength(pw: string): { level: number; label: string; color: string 
     if (score <= 1) return { level: 0.25, label: 'Weak', color: '#EF4444' };
     if (score <= 2) return { level: 0.5, label: 'Fair', color: '#F59E0B' };
     if (score <= 3) return { level: 0.75, label: 'Good', color: '#3B82F6' };
-    return { level: 1, label: 'Strong', color: PRIMARY };
+    return { level: 1, label: 'Strong', color: '#006666' };
 }
 
 // ── Animated Input ────────────────────────────────────────────────────────────
@@ -57,13 +60,15 @@ interface InputFieldProps {
 const InputField = React.memo(({
     label, value, onChangeText, placeholder, inputRef, onSubmit, returnKeyType = 'next', delay = 0
 }: InputFieldProps) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(true);
     const borderColor = useSharedValue(0);
 
     const wrapStyle = useAnimatedStyle(() => ({
         borderColor: withTiming(
-            borderColor.value === 1 ? PRIMARY : '#E2E8F0',
+            borderColor.value === 1 ? colors.primary : (theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0'),
             { duration: 200 }
         ),
         shadowOpacity: withTiming(borderColor.value === 1 ? 0.08 : 0.03, { duration: 200 }),
@@ -79,16 +84,16 @@ const InputField = React.memo(({
                 <Ionicons
                     name="lock-closed-outline"
                     size={18}
-                    color={focused ? PRIMARY : '#94A3B8'}
+                    color={focused ? colors.primary : '#94A3B8'}
                     style={styles.inputIcon}
                 />
                 <TextInput
                     ref={inputRef}
-                    style={styles.input}
+                    style={[styles.input, { color: colors.text }]}
                     value={value}
                     onChangeText={onChangeText}
                     placeholder={placeholder}
-                    placeholderTextColor="#CBD5E1"
+                    placeholderTextColor={theme === 'dark' ? 'rgba(255,255,255,0.3)' : '#CBD5E1'}
                     secureTextEntry={secure}
                     returnKeyType={returnKeyType}
                     onSubmitEditing={onSubmit}
@@ -133,6 +138,8 @@ interface PasswordModalProps {
 }
 
 export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible, onClose }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const { updateUser } = useAuth();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -197,8 +204,8 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
                     <ThemedText style={styles.title}>Change Password</ThemedText>
                     <ThemedText style={styles.subtitle}>Update your account security</ThemedText>
                 </View>
-                <TouchableOpacity style={styles.closeBtn} onPress={resetAndClose} activeOpacity={0.7}>
-                    <Ionicons name="close" size={18} color="#64748B" />
+                <TouchableOpacity style={[styles.closeBtn, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]} onPress={resetAndClose} activeOpacity={0.7}>
+                    <Ionicons name="close" size={18} color={colors.text} style={{ opacity: 0.5 }} />
                 </TouchableOpacity>
             </Animated.View>
 
@@ -266,7 +273,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
                             </TouchableOpacity>
                         </Animated.View>
 
-                        <TouchableOpacity onPress={resetAndClose} style={styles.cancelBtn} activeOpacity={0.7}>
+                        <TouchableOpacity onPress={resetAndClose} style={[styles.cancelBtn, { borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }]} activeOpacity={0.7}>
                             <ThemedText style={styles.cancelText}>Cancel</ThemedText>
                         </TouchableOpacity>
                     </View>
@@ -288,19 +295,16 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#0F172A',
         marginBottom: 3,
     },
     subtitle: {
         fontSize: 13,
-        color: '#94A3B8',
         fontWeight: '500',
     },
     closeBtn: {
         width: 34,
         height: 34,
         borderRadius: 17,
-        backgroundColor: '#F1F5F9',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -318,10 +322,9 @@ const styles = StyleSheet.create({
     inputRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8FAFC',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1.5,
-        borderColor: '#E2E8F0',
+        borderColor: '#E2E8F0', // Overridden in wrapStyle
         paddingHorizontal: 14,
         height: Platform.OS === 'android' ? 48 : 52,
         shadowColor: '#000',
@@ -334,7 +337,6 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: Platform.OS === 'android' ? 14 : 15,
         fontWeight: '500',
-        color: '#0F172A',
     },
     eyeBtn: { padding: 4 },
 
@@ -379,7 +381,7 @@ const styles = StyleSheet.create({
     primaryBtn: {
         backgroundColor: '#006666', // Standardizing to primary color hex
         height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
@@ -401,8 +403,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#E2E8F0',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
     },
     cancelText: {
         fontSize: 14,

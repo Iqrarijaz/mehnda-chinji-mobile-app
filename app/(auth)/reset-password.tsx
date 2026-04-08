@@ -17,9 +17,11 @@ import Toast from 'react-native-toast-message';
 
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { resetPasswordSchema, getPasswordStrength } from '@/utils/validation';
 import { resetPassword } from '@/apis/login/forgot-password';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 export default function ResetPasswordScreen() {
     const router = useRouter();
@@ -75,6 +77,9 @@ export default function ResetPasswordScreen() {
                 text2: response?.data?.message || 'Password reset successfully'
             });
 
+            analyticsService.trackEvent(AnalyticsEvents.RESET_PASSWORD_SUCCESS, { email });
+
+
             // Navigate back to login with auto-fill params
             setTimeout(() => {
                 router.replace({
@@ -99,23 +104,25 @@ export default function ResetPasswordScreen() {
             style={[styles.container, { backgroundColor: colors.background }]}
         >
             {/* Header / Top Section */}
-            <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => router.back()}
-                >
-                    <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-                </TouchableOpacity>
-                <View style={styles.headerContent}>
-                    <Image
-                        source={require('../../public/icon.svg')}
-                        style={{ width: 48, height: 48, marginBottom: 16 }}
-                        contentFit="contain"
-                    />
-                    <ThemedText style={styles.headerTitle}>Set New{"\n"}Password</ThemedText>
-                    <ThemedText style={styles.headerSubtitle}>
-                        Create a strong password for your account
-                    </ThemedText>
+            <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() => router.back()}
+                    >
+                        <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                    </TouchableOpacity>
+                    <View style={styles.headerContent}>
+                        <Image
+                            source={require('../../public/icon.svg')}
+                            style={{ width: 48, height: 48, marginBottom: 16 }}
+                            contentFit="contain"
+                        />
+                        <ThemedText style={styles.headerTitle}>Set New Password</ThemedText>
+                        <ThemedText style={styles.headerSubtitle}>
+                            Create a strong password for your account
+                        </ThemedText>
+                    </View>
                 </View>
             </View>
 
@@ -222,8 +229,8 @@ const styles = StyleSheet.create({
     },
     headerSection: {
         paddingBottom: 38,
-        borderBottomLeftRadius: 36,
-        borderBottomRightRadius: 36,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
     },
     backButton: {
@@ -261,7 +268,7 @@ const styles = StyleSheet.create({
         paddingBottom: 38,
     },
     formCard: {
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -283,7 +290,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
         borderWidth: 1,
     },
@@ -294,7 +301,7 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 6,

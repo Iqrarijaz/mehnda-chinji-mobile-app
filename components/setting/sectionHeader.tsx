@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Layout } from '@/constants/layout';
 
 import { ThemedText } from '@/components/themedText';
 
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
     headerIconBox: {
         width: 32,
         height: 32,
-        borderRadius: 10,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
     },

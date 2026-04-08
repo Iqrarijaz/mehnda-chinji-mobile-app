@@ -1,5 +1,8 @@
 import React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Layout } from '@/constants/layout';
+import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
 
 interface TintedCardProps {
     children: React.ReactNode;
@@ -14,12 +17,19 @@ export const TintedCard = React.memo(({
     bgColor,
     style
 }: TintedCardProps) => {
+    const { theme, isDark } = useTheme();
+    const colors = Colors[theme];
+
     // Fallback light bg if none provided (tintColor at very low opacity)
-    const background = bgColor || tintColor + '10';
+    const background = bgColor || (isDark ? 'rgba(255,255,255,0.03)' : (tintColor + '10'));
 
     return (
         <View style={[
             styles.card,
+            {
+                backgroundColor: background || colors.card,
+                shadowColor: isDark ? 'transparent' : '#000',
+            },
             style
         ]}>
             <View style={styles.content}>
@@ -31,10 +41,8 @@ export const TintedCard = React.memo(({
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 16,
-        backgroundColor: '#FFFFFF',
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.05,
         shadowRadius: 10,

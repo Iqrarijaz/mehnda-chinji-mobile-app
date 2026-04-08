@@ -21,6 +21,7 @@ import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import { CleanConfirmationModal } from '../common/cleanConfirmationModal';
 import BloodRegistrationModal from './bloodRegistrationModal';
 import MyBloodDonorRegistrationCard from './myBloodDonorRegistrationCard';
@@ -59,7 +60,7 @@ const BloodRegistration = React.memo(() => {
     // Mutations
     const removeMutation = useMutation({
         mutationFn: removeAsDonor,
-        onSuccess: (res) => {
+        onSuccess: (res: any) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: DONOR_QUERY_KEYS.all });
                 setShowConfirmModal(false);
@@ -74,7 +75,7 @@ const BloodRegistration = React.memo(() => {
 
     const manageStatusMutation = useMutation({
         mutationFn: manageDonorStatus,
-        onSuccess: (res) => {
+        onSuccess: (res: any) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: DONOR_QUERY_KEYS.all });
                 setShowStatusConfirmModal(false);
@@ -109,7 +110,7 @@ const BloodRegistration = React.memo(() => {
     if (loading && !donorData) {
         return (
             <View style={[styles.container, styles.centerContent]}>
-                <ActivityIndicator size="large" color="#ef4444" />
+                <ActivityIndicator size="large" color={colors.primary} />
             </View>
         );
     }
@@ -160,17 +161,17 @@ const BloodRegistration = React.memo(() => {
 
                 {/* Donation Tips */}
                 <View style={styles.tipsSection}>
-                    <ThemedText style={styles.tipsTitle}>Donation Guidelines</ThemedText>
+                    <ThemedText style={[styles.tipsTitle, { color: colors.primary }]}>Donation Guidelines</ThemedText>
                     <View style={styles.tipItem}>
-                        <Ionicons name="water" size={14} color="#ef4444" />
+                        <Ionicons name="water" size={14} color={colors.primary} />
                         <ThemedText style={[styles.tipText, { color: colors.icon }]}>Stay hydrated before and after.</ThemedText>
                     </View>
                     <View style={styles.tipItem}>
-                        <Ionicons name="restaurant" size={14} color="#ef4444" />
+                        <Ionicons name="restaurant" size={14} color={colors.primary} />
                         <ThemedText style={[styles.tipText, { color: colors.icon }]}>Eat a light, healthy meal before.</ThemedText>
                     </View>
                     <View style={styles.tipItem}>
-                        <Ionicons name="moon" size={14} color="#ef4444" />
+                        <Ionicons name="moon" size={14} color={colors.primary} />
                         <ThemedText style={[styles.tipText, { color: colors.icon }]}>Get a good night's sleep before.</ThemedText>
                     </View>
                 </View>
@@ -245,7 +246,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
-        shadowRadius: 8,
     },
     actionButtons: {
         flexDirection: 'row',
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     },
     actionBtn: {
         padding: 6,
-        borderRadius: 8,
+        borderRadius: Layout.borderRadius,
     },
     centerContent: {
         flex: 1,
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     emptyStateBtn: {
         paddingVertical: 12,
         paddingHorizontal: 24,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
     },
     tipsSection: {
         marginTop: 20,

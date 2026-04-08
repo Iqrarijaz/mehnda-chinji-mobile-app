@@ -1,9 +1,9 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
- * Enhanced clientStorage that uses pure AsyncStorage with async wrappers
- * to maintain compatibility with React Query's async persister and Zustand.
+ * Enhanced clientStorage that uses AsyncStorage.
+ * Methods are kept async to maintain compatibility with React Query and Zustand persistence.
  */
 export const clientStorage = {
     setItem: async (key: string, value: string): Promise<void> => {

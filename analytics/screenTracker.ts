@@ -1,16 +1,16 @@
-// import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
+import { usePathname, useSegments } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { useSegments, usePathname } from 'expo-router';
 
 /**
  * ScreenTracker provides utilities for tracking navigation.
  */
 export const trackScreen = async (screenName: string) => {
     try {
-        // await analytics().logScreenView({
-        //     screen_name: screenName,
-        //     screen_class: screenName,
-        // });
+        await logEvent(getAnalytics(), 'screen_view', {
+            screen_name: screenName,
+            screen_class: screenName,
+        });
 
         if (__DEV__) {
             console.log(`📱 [Analytics] Screen View: ${screenName}`);

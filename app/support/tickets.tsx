@@ -1,6 +1,7 @@
 import { deleteSupportTicket, getSupportTickets } from '@/apis/support';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -164,7 +165,7 @@ export default function TicketListScreen() {
 
             return (
                 <TouchableOpacity
-                    style={[styles.deleteAction, { backgroundColor: '#FFEEED' }]}
+                    style={[styles.deleteAction, { backgroundColor: colors.card }]}
                     onPress={() => handleDelete(item._id)}
                 >
                     <Animated.View style={{ transform: [{ scale }] }}>
@@ -183,7 +184,7 @@ export default function TicketListScreen() {
                 <TouchableOpacity
                     activeOpacity={0.7}
                     onPress={() => router.push(`/support/${item._id}` as any)}
-                    style={[styles.cardContainer, { backgroundColor: theme === 'dark' ? '#1E1E1E' : '#F5F7FA' }]}
+                    style={[styles.cardContainer, { backgroundColor: colors.card }]}
                 >
                     <View style={[styles.accentStrip, { backgroundColor: statusColor }]} />
                     <View style={styles.cardMain}>
@@ -338,7 +339,7 @@ const styles = StyleSheet.create({
     },
     cardContainer: {
         flexDirection: 'row',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         marginBottom: 16,
         overflow: 'hidden',
         shadowColor: '#000',
@@ -346,151 +347,151 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.08,
         shadowRadius: 4,
     },
-accentStrip: {
-    width: 6,
+    accentStrip: {
+        width: 6,
     },
-cardMain: {
-    flex: 1,
+    cardMain: {
+        flex: 1,
         padding: 16,
     },
-cardHeader: {
-    flexDirection: 'row',
+    cardHeader: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
-            alignItems: 'center',
-                marginBottom: 10,
-    },
-ticketId: {
-    fontSize: 11,
-        fontWeight: '600',
-            opacity: 0.5,
-                letterSpacing: 0.5,
-    },
-statusBadge: {
-    flexDirection: 'row',
         alignItems: 'center',
-            paddingHorizontal: 8,
-                paddingVertical: 4,
-                    borderRadius: 8,
+        marginBottom: 10,
     },
-statusDot: {
-    width: 6,
+    ticketId: {
+        fontSize: 11,
+        fontWeight: '600',
+        opacity: 0.5,
+        letterSpacing: 0.5,
+    },
+    statusBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: Layout.borderRadius,
+    },
+    statusDot: {
+        width: 6,
         height: 6,
-            borderRadius: 3,
-                marginRight: 6,
+        borderRadius: 3,
+        marginRight: 6,
     },
-statusText: {
-    fontSize: 10,
+    statusText: {
+        fontSize: 10,
         fontWeight: '800',
     },
-subject: {
-    fontSize: 16,
+    subject: {
+        fontSize: 16,
         fontWeight: '700',
-            marginBottom: 6,
+        marginBottom: 6,
     },
-desc: {
-    fontSize: 13,
+    desc: {
+        fontSize: 13,
         lineHeight: 18,
-            marginBottom: 16,
+        marginBottom: 16,
     },
-cardFooter: {
-    flexDirection: 'row',
+    cardFooter: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
-            alignItems: 'center',
-                paddingTop: 12,
-                    borderTopWidth: StyleSheet.hairlineWidth,
-                        borderTopColor: 'rgba(0,0,0,0.05)',
+        alignItems: 'center',
+        paddingTop: 12,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: 'rgba(0,0,0,0.05)',
     },
-footerItem: {
-    flexDirection: 'row',
+    footerItem: {
+        flexDirection: 'row',
         alignItems: 'center',
     },
-footerText: {
-    fontSize: 12,
+    footerText: {
+        fontSize: 12,
         marginLeft: 6,
-            fontWeight: '500',
+        fontWeight: '500',
     },
-deleteAction: {
-    width: 80,
+    deleteAction: {
+        width: 80,
         height: '92%',
-            borderRadius: 16,
-                justifyContent: 'center',
-                    alignItems: 'center',
-                        marginLeft: 10,
-    },
-emptyContainer: {
-    flex: 1,
+        borderRadius: Layout.borderRadius,
+        justifyContent: 'center',
         alignItems: 'center',
-            justifyContent: 'center',
-                paddingTop: 80,
+        marginLeft: 10,
     },
-emptyIconBg: {
-    width: 140,
+    emptyContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: 80,
+    },
+    emptyIconBg: {
+        width: 140,
         height: 140,
-            borderRadius: 70,
-                justifyContent: 'center',
-                    alignItems: 'center',
-                        marginBottom: 24,
-    },
-emptyTitle: {
-    fontSize: 20,
-        fontWeight: 'bold',
-            marginBottom: 8,
-    },
-emptySubtitle: {
-    fontSize: 14,
-        textAlign: 'center',
-            paddingHorizontal: 40,
-                lineHeight: 20,
-                    marginBottom: 32,
-    },
-createButton: {
-    flexDirection: 'row',
+        borderRadius: 70,
+        justifyContent: 'center',
         alignItems: 'center',
-            paddingHorizontal: 24,
-                paddingVertical: 14,
-                    borderRadius: 30,
+        marginBottom: 24,
+    },
+    emptyTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+    emptySubtitle: {
+        fontSize: 14,
+        textAlign: 'center',
+        paddingHorizontal: 40,
+        lineHeight: 20,
+        marginBottom: 32,
+    },
+    createButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 24,
+        paddingVertical: 14,
+        borderRadius: Layout.borderRadius,
         shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
         shadowRadius: 8,
     },
-createButtonText: {
-    color: '#FFFFFF',
+    createButtonText: {
+        color: '#FFFFFF',
         fontSize: 16,
-            fontWeight: '700',
+        fontWeight: '700',
     },
-skeletonContainer: {
-    paddingHorizontal: 20,
+    skeletonContainer: {
+        paddingHorizontal: 20,
     },
-skeletonCard: {
-    height: 140,
-        borderRadius: 16,
-            padding: 16,
-                marginBottom: 16,
+    skeletonCard: {
+        height: 140,
+        borderRadius: Layout.borderRadius,
+        padding: 16,
+        marginBottom: 16,
     },
-skeletonHeader: {
-    height: 20,
+    skeletonHeader: {
+        height: 20,
         width: '40%',
-            borderRadius: 4,
-                marginBottom: 16,
-    },
-skeletonLine: {
-    height: 14,
         borderRadius: 4,
-            marginBottom: 10,
+        marginBottom: 16,
     },
-errorContainer: {
-    flex: 1,
+    skeletonLine: {
+        height: 14,
+        borderRadius: 4,
+        marginBottom: 10,
+    },
+    errorContainer: {
+        flex: 1,
         justifyContent: 'center',
-            alignItems: 'center',
-                padding: 40,
+        alignItems: 'center',
+        padding: 40,
     },
-errorText: {
-    fontSize: 16,
+    errorText: {
+        fontSize: 16,
         marginTop: 16,
-            marginBottom: 20,
+        marginBottom: 20,
     },
-retryButton: {
-    padding: 10,
+    retryButton: {
+        padding: 10,
     }
 });

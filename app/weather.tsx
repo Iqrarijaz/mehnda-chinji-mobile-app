@@ -13,10 +13,11 @@ import {
 } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Location from 'expo-location';
 import Toast from 'react-native-toast-message';
 import cities from '../data/cities.json';
 
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { useWeather } from '@/hooks/useWeather';
 import { useWeatherCity } from '@/context/WeatherContext';
 import WeatherDaily from '@/components/weather/WeatherDaily';
@@ -30,6 +31,8 @@ import { BG_GRADIENT } from '@/components/weather/weatherUtils';
 export default function WeatherScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
+    const { theme } = useTheme();
+    const colors = Colors[theme];
 
     // 🌐 Shared city — persisted and synced with home widget
     const { selectedCity: city, setSelectedCity: setCity } = useWeatherCity();
@@ -78,59 +81,9 @@ export default function WeatherScreen() {
         setIsRefreshing(false);
     }, [refetch]);
 
-    const handleGPS = useCallback(async () => {
-        try {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Permission Denied',
-                    text2: 'Please enable location permissions to use this feature.',
-                });
-                return;
-            }
 
-            setIsRefreshing(true);
-            const location = await Location.getCurrentPositionAsync({});
-            const reverseGeocode = await Location.reverseGeocodeAsync({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-            });
 
-            if (reverseGeocode.length > 0) {
-                const city = reverseGeocode[0].city || reverseGeocode[0].district || reverseGeocode[0].name;
-                if (city) {
-                    setCity(city + ', PK');
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Location Detected',
-                        text2: `Updated weather for ${city}`,
-                    });
-                }
-            }
-        } catch (error) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to detect location',
-            });
-        } finally {
-            setIsRefreshing(false);
-        }
-    }, [setCity]);
 
-    useEffect(() => {
-        const askPermissionOnce = async () => {
-            const { status, canAskAgain } = await Location.getForegroundPermissionsAsync();
-            if (status !== 'granted' && canAskAgain) {
-                const { status: newStatus } = await Location.requestForegroundPermissionsAsync();
-                if (newStatus === 'granted') {
-                    handleGPS();
-                }
-            }
-        };
-        askPermissionOnce();
-    }, [handleGPS]);
 
     // ── Hourly data ──────────────────────────────────────────────────────────
     const hourlyData = useMemo(() => {
@@ -179,9 +132,14 @@ export default function WeatherScreen() {
         : '--';
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
-            <LinearGradient colors={BG_GRADIENT} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
+            <LinearGradient 
+                colors={theme === 'dark' ? [colors.background, colors.background] : BG_GRADIENT} 
+                style={StyleSheet.absoluteFill} 
+                start={{ x: 0, y: 0 }} 
+                end={{ x: 0, y: 1 }} 
+            />
 
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
                 <ScrollView
@@ -208,7 +166,6 @@ export default function WeatherScreen() {
                             onSubmit={handleSubmit}
                             onClear={handleClear}
                             onSelectCity={handleSelectCity}
-                            onGPS={handleGPS}
                         />
                     </Animated.View>
 

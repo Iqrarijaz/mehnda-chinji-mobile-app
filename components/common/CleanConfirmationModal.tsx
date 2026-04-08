@@ -3,6 +3,7 @@ import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '../themedText';
 import { TintedCard } from '../ui/tintedCard';
+import { Layout } from '@/constants/layout';
 import { PremiumModal } from './PremiumModal';
 
 interface CleanConfirmationModalProps {
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     iconWrapper: {
         width: 72,
         height: 72,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#F8FAFC',
         borderWidth: 1.5,
         borderColor: '#E2E8F0',
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     confirmBtnWrapper: {
         flex: 1,
         height: 50,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',

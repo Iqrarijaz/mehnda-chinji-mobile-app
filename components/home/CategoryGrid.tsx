@@ -1,25 +1,30 @@
-import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, View, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, { SlideInLeft } from 'react-native-reanimated';
 
-import { ThemedText } from '@/components/themedText';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
-import { CATEGORIES_CONFIG, MORE_CATEGORIES_CONFIG } from '@/constants/categories';
-import { CategoryCard } from './categoryCard';
-import { useTheme } from '@/context/ThemeContext';
+import { ThemedText } from '@/components/themedText';
+import { CATEGORIES_CONFIG, MORE_CATEGORIES_CONFIG, PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
+import { useTheme } from '@/context/ThemeContext';
+import { CategoryCard } from './categoryCard';
 
 export function CategoryGrid() {
     const router = useRouter();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const { theme, isDark } = useTheme();
-    const colors = Colors[theme];
+    const colors = (Colors as any)[theme];
 
-    const handlePress = (categoryId: string) => {
-        analyticsService.trackEvent(AnalyticsEvents.CATEGORY_CLICKED, { categoryId });
-        router.push(`/listing/${categoryId}` as any);
+    const handlePress = (category: string) => {
+        const categoryLabel = PLACE_CATEGORY_MAPPING[category] || category;
+        analyticsService.trackEvent(AnalyticsEvents.CATEGORY_CLICKED, {
+            category,
+            categoryLabel
+        });
+        router.push(`/listing/${category}` as any);
     };
 
     return (
@@ -64,7 +69,7 @@ export function CategoryGrid() {
                     <View style={[styles.modalCard, { backgroundColor: colors.background }]}>
                         <View style={styles.modalHeader}>
                             <ThemedText style={styles.modalTitle}>More Categories</ThemedText>
-                            <TouchableOpacity onPress={() => setIsModalVisible(false)} style={[styles.closeButton, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#F3F4F6' }]}>
+                            <TouchableOpacity onPress={() => setIsModalVisible(false)} style={[styles.closeButton, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#F1F5F9' }]}>
                                 <Ionicons name="close" size={24} color={colors.text} />
                             </TouchableOpacity>
                         </View>
@@ -122,7 +127,7 @@ const styles = StyleSheet.create({
     modalCard: {
         width: '95%',
         height: '50%',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -143,7 +148,6 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         padding: 8,
-        backgroundColor: '#F3F4F6',
         borderRadius: 20,
     },
     modalGrid: {

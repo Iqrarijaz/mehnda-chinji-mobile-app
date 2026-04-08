@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 
 const guidelinesData = [
@@ -59,20 +60,23 @@ const AccordionItem = ({ item, index }: { item: any, index: number }) => {
         };
     });
 
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
     return (
-        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={styles.accordionContainer}>
+        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.accordionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <TouchableOpacity onPress={toggleAccordion} style={styles.accordionHeader} activeOpacity={0.7}>
                 <View style={styles.accordionTitleWrap}>
-                    <View style={styles.bulletPoint} />
-                    <ThemedText style={[styles.accordionTitle, expanded && styles.accordionTitleActive]}>{item.title}</ThemedText>
+                    <View style={[styles.bulletPoint, { backgroundColor: colors.border }]} />
+                    <ThemedText style={[styles.accordionTitle, { color: colors.textSecondary }, expanded && { color: colors.text, fontWeight: '700' }]}>{item.title}</ThemedText>
                 </View>
                 <Animated.View style={iconAnimatedStyle}>
-                    <Ionicons name="chevron-down" size={20} color={expanded ? '#0F172A' : '#94A3B8'} />
+                    <Ionicons name="chevron-down" size={20} color={expanded ? colors.text : colors.textSecondary} />
                 </Animated.View>
             </TouchableOpacity>
             <Animated.View style={[styles.accordionContentWrap, animatedStyle]}>
                 <View style={styles.accordionContentInner}>
-                    <ThemedText style={styles.bodyText}>{item.content}</ThemedText>
+                    <ThemedText style={[styles.bodyText, { color: colors.textSecondary }]}>{item.content}</ThemedText>
                 </View>
             </Animated.View>
         </Animated.View>
@@ -88,7 +92,7 @@ export default function CommunityGuidelinesScreen() {
     const [infoModalVisible, setInfoModalVisible] = useState(false);
 
     return (
-        <View style={[styles.container, { backgroundColor: '#F8FAFC' }]}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* ── Header ──────────────────────────────────────── */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
@@ -124,16 +128,16 @@ export default function CommunityGuidelinesScreen() {
                 contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
                 showsVerticalScrollIndicator={false}
             >
-                <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.card}>
+                <Animated.View entering={FadeInUp.delay(300).duration(500)} style={[styles.card, { backgroundColor: colors.card }]}>
                     <View style={styles.cardHeader}>
                         <Ionicons name="shield-checkmark" size={24} color={colors.primary} />
-                        <ThemedText style={styles.cardHeaderText}>Our Code of Conduct</ThemedText>
+                        <ThemedText style={[styles.cardHeaderText, { color: colors.text }]}>Our Code of Conduct</ThemedText>
                     </View>
-                    <ThemedText style={styles.welcomeText}>
+                    <ThemedText style={[styles.welcomeText, { color: colors.textSecondary }]}>
                         Rehbar is a platform built on mutual respect and helpfulness. By following these guidelines, you help us maintain a safe environment for everyone.
                     </ThemedText>
 
-                    <View style={styles.divider} />
+                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
                     {/* Accordion Sections */}
                     {guidelinesData.map((item, index) => (
@@ -145,13 +149,13 @@ export default function CommunityGuidelinesScreen() {
 
             {/* ── Info Modal ───────────────────── */}
             <Modal visible={infoModalVisible} transparent animationType="fade">
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <View style={styles.modalIconWrap}>
+                <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                        <View style={[styles.modalIconWrap, { backgroundColor: colors.background }]}>
                             <Ionicons name="heart" size={32} color={colors.primary} />
                         </View>
-                        <ThemedText style={styles.modalTitle}>Community Trust</ThemedText>
-                        <ThemedText style={styles.modalBody}>
+                        <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Community Trust</ThemedText>
+                        <ThemedText style={[styles.modalBody, { color: colors.textSecondary }]}>
                             These guidelines ensure that every interaction—whether listing a business or requesting blood—is safe, ethical, and helpful for the entire Rehbar community.
                         </ThemedText>
                         <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.primary }]} onPress={() => setInfoModalVisible(false)}>
@@ -168,8 +172,8 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     headerWrap: {
         paddingBottom: 24,
-        borderBottomLeftRadius: 32,
-        borderBottomRightRadius: 32,
+        borderBottomLeftRadius: Layout.borderRadius,
+        borderBottomRightRadius: Layout.borderRadius,
         overflow: 'hidden',
         zIndex: 2,
     },
@@ -218,7 +222,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.15)',
         paddingHorizontal: 14,
         paddingVertical: 6,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         gap: 6
     },
     infoBtnText: {
@@ -237,8 +241,8 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
-        padding: 24,
+        borderRadius: Layout.borderRadius,
+        padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.04,
@@ -268,7 +272,7 @@ const styles = StyleSheet.create({
     accordionContainer: {
         marginBottom: 16,
         backgroundColor: '#F8FAFC',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#F1F5F9'
@@ -351,7 +355,7 @@ const styles = StyleSheet.create({
     },
     acceptButton: {
         height: 52,
-        borderRadius: 26,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
@@ -372,7 +376,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 24,
         width: '100%',
         alignItems: 'center',
@@ -403,7 +407,7 @@ const styles = StyleSheet.create({
     modalBtn: {
         width: '100%',
         height: 50,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
     },

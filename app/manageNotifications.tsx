@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import {
     View,
-    Text,
     StyleSheet,
     ScrollView,
     TouchableOpacity,
@@ -13,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { useNotificationStore, NotificationPreferences } from '@/store/notificationStore';
 import NotificationSectionCard from '@/components/notification/NotificationSectionCard';
@@ -45,7 +45,7 @@ export default function ManageNotificationsScreen() {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: '#F5F6FA' }]}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
             {/* ── Header ──────────────────────────────────────────── */}
@@ -188,9 +188,9 @@ export default function ManageNotificationsScreen() {
                     />
                 </NotificationSectionCard>
 
-                <Text style={styles.footerNote}>
+                <ThemedText style={[styles.footerNote, { color: colors.textSecondary }]}>
                     You can change these settings at any time. Changes are synced with your account across all devices.
-                </Text>
+                </ThemedText>
             </ScrollView>
         </View>
     );
@@ -201,9 +201,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headerWrap: {
-        paddingBottom: 20,
-        borderBottomLeftRadius: 28,
-        borderBottomRightRadius: 28,
+        paddingBottom: 24,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
         zIndex: 2,
     },
@@ -249,7 +249,6 @@ const styles = StyleSheet.create({
     },
     footerNote: {
         fontSize: 13,
-        color: '#B0B8C9',
         textAlign: 'center',
         marginTop: 8,
         lineHeight: 18,

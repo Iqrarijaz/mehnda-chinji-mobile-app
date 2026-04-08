@@ -1,10 +1,8 @@
-import { updateLocationApi } from '@/apis/profile';
-import * as Location from 'expo-location';
+import { clientStorage } from '@/utils/storage';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import CustomSplashScreen from '../components/splashScreen';
 import { useAuth } from '../context/AuthContext';
-import { clientStorage } from '@/utils/storage';
 
 export default function SplashScreen() {
     const { loading, isAuthenticated, user } = useAuth();
@@ -22,7 +20,7 @@ export default function SplashScreen() {
                     setShowSplash(true);
                 }
             } catch (error) {
-                console.log("Error checking onboarding status:", error);
+                if (__DEV__) console.log("Error checking onboarding status:", error);
                 setShowSplash(true); // Fallback to splash
             }
         };

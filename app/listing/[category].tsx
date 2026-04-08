@@ -1,4 +1,4 @@
-import { deleteRequest, getMyRequests, getPlacesList, PLACE_SUBMISSION_QUERY_KEYS, PLACES_QUERY_KEYS } from '@/apis/places';
+import { deleteRequest, getMyRequests, getEssentialsList, ESSENTIAL_SUBMISSION_QUERY_KEYS, ESSENTIALS_QUERY_KEYS } from '@/apis/essentials';
 import BusinessCard from '@/components/business/businessCard';
 import { CleanConfirmationModal } from '@/components/common/cleanConfirmationModal';
 import CategoryListingHeader from '@/components/listing/categoryListingHeader';
@@ -7,46 +7,58 @@ import EmptyListingState from '@/components/listing/emptyListingState';
 import HealthCard from '@/components/listing/healthCard';
 import MosqueCard from '@/components/listing/mosqueCard';
 import RequestCard from '@/components/places/requestCard';
+import EmergencyCard from '@/components/listing/emergencyCard';
+import GovtOfficeCard from '@/components/listing/govtOfficeCard';
+import TravelCard from '@/components/listing/travelCard';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useNavigation, useRouter, useFocusEffect } from 'expo-router';
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import {
     ActivityIndicator,
     Alert,
     FlatList,
     StyleSheet,
     View,
+    Platform,
 } from 'react-native';
 import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import Toast from 'react-native-toast-message';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTooltipStore } from '@/store/tooltipStore';
 
-import PlaceSubmissionModal from '@/components/places/placeSubmissionModal';
+
 import { ThemedText } from '@/components/themedText';
 import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 import BankCard from '@/components/listing/bankCard';
 
 const CategoryListingScreen = React.memo(() => {
-    const { categoryId, tab } = useLocalSearchParams<{ categoryId: string; tab?: string }>();
+    const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();
     const { theme } = useTheme();
     const navigation = useNavigation();
     const router = useRouter();
     const queryClient = useQueryClient();
+    const tooltipStore = useTooltipStore();
 
 
     const colors = Colors[theme];
+    const insets = useSafeAreaInsets();
     const [search, setSearch] = React.useState('');
     const [debouncedSearch, setDebouncedSearch] = React.useState('');
-    const [submissionModalVisible, setSubmissionModalVisible] = React.useState(false);
     const [activeTab, setActiveTab] = useState<'all' | 'requests'>(tab === 'requests' ? 'requests' : 'all');
-    const [editingRequest, setEditingRequest] = useState<any>(null);
     const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
     const [showTooltip, setShowTooltip] = useState(false);
 
-    // Show tooltip on every focus
+    // Show tooltip only if not viewed before
     useFocusEffect(
         useCallback(() => {
+            const tooltipId = `listing-${category}`;
+            if (tooltipStore.viewedTooltips[tooltipId]) {
+                setShowTooltip(false);
+                return;
+            }
+
             // Reset state first to ensure it triggers if already false
             setShowTooltip(false);
 
@@ -58,10 +70,12 @@ const CategoryListingScreen = React.memo(() => {
                 clearTimeout(timer);
                 setShowTooltip(false);
             };
-        }, [])
+        }, [category, tooltipStore.viewedTooltips])
     );
 
     const handleDismissTooltip = () => {
+        const tooltipId = `listing-${category}`;
+        tooltipStore.markAsViewed(tooltipId);
         setShowTooltip(false);
     };
 
@@ -74,15 +88,15 @@ const CategoryListingScreen = React.memo(() => {
     }, [search]);
 
     const categoryTitle = useMemo(() => {
-        return PLACE_CATEGORY_MAPPING[categoryId || ''] || 'Listing';
-    }, [categoryId]);
+        return PLACE_CATEGORY_MAPPING[category || ''] || 'Listing';
+    }, [category]);
 
     const headerColor = useMemo(() => {
         return colors.primary;
     }, [colors.primary]);
 
     const tooltipMessage = useMemo(() => {
-        switch (categoryId) {
+        switch (category) {
             case 'religious': return 'نیا مقام (مسجد) شامل کرنے کے لیے یہاں ٹیپ کریں';
             case 'education': return 'نیا تعلیمی ادارہ شامل کرنے کے لیے یہاں ٹیپ کریں';
             case 'health': return 'نیا ہسپتال یا کلینک شامل کرنے کے لیے یہاں ٹیپ کریں';
@@ -90,7 +104,7 @@ const CategoryListingScreen = React.memo(() => {
             case 'govt': return 'نیا سرکاری دفتر شامل کرنے کے لیے یہاں ٹیپ کریں';
             default: return 'نیا مقام شامل کرنے کے لیے یہاں ٹیپ کریں';
         }
-    }, [categoryId]);
+    }, [category]);
 
     // --- Queries ---
 
@@ -104,9 +118,9 @@ const CategoryListingScreen = React.memo(() => {
         isFetchingNextPage,
         refetch
     } = useInfiniteQuery({
-        queryKey: PLACES_QUERY_KEYS.list({ categoryId, search: debouncedSearch }),
-        queryFn: ({ pageParam = 0 }) => getPlacesList({
-            category: categoryId,
+        queryKey: ESSENTIALS_QUERY_KEYS.list({ category, search: debouncedSearch }),
+        queryFn: ({ pageParam = 0 }) => getEssentialsList({
+            category: category,
             search: debouncedSearch,
             skip: (pageParam as number) * 20,
             limit: 20
@@ -119,7 +133,7 @@ const CategoryListingScreen = React.memo(() => {
             return undefined;
         },
         initialPageParam: 0,
-        enabled: !!categoryId && activeTab === 'all',
+        enabled: !!category && activeTab === 'all',
     });
 
     // 2. My Requests
@@ -132,8 +146,8 @@ const CategoryListingScreen = React.memo(() => {
         isFetchingNextPage: myRequestsFetchingNextPage,
         refetch: myRequestsRefetch
     } = useInfiniteQuery({
-        queryKey: PLACE_SUBMISSION_QUERY_KEYS.myRequests({ page: 1, category: categoryId }),
-        queryFn: ({ pageParam = 1 }) => getMyRequests({ page: pageParam, category: categoryId }),
+        queryKey: ESSENTIAL_SUBMISSION_QUERY_KEYS.myRequests({ page: 1, category: category }),
+        queryFn: ({ pageParam = 1 }) => getMyRequests({ page: pageParam, category: category }),
         getNextPageParam: (lastPage: any) => {
             const pagination = lastPage?.pagination;
             if (pagination && pagination.page < pagination.pages) {
@@ -142,7 +156,7 @@ const CategoryListingScreen = React.memo(() => {
             return undefined;
         },
         initialPageParam: 1,
-        enabled: !!categoryId && activeTab === 'requests',
+        enabled: !!category && activeTab === 'requests',
     });
 
     // --- Mutations ---
@@ -156,7 +170,7 @@ const CategoryListingScreen = React.memo(() => {
                 text2: 'Request deleted successfully.',
             });
             setDeleteTarget(null);
-            queryClient.invalidateQueries({ queryKey: ['my-place-requests'] });
+            queryClient.invalidateQueries({ queryKey: ['my-essential-requests'] });
         },
         onError: (error: any) => {
             Alert.alert('Error', error);
@@ -174,8 +188,10 @@ const CategoryListingScreen = React.memo(() => {
     };
 
     const handleEdit = (item: any) => {
-        setEditingRequest(item);
-        setSubmissionModalVisible(true);
+        router.push({
+            pathname: '/(drawer)/place-submission',
+            params: { category: category, editData: JSON.stringify(item) }
+        });
     };
 
     // --- Data processing ---
@@ -189,20 +205,29 @@ const CategoryListingScreen = React.memo(() => {
     // --- Render Items ---
 
     const renderItem = React.useCallback(({ item }: { item: any }) => {
-        if (categoryId === 'religious') {
+        if (category === 'religious') {
             return <MosqueCard data={item} color={headerColor} />;
         }
-        if (categoryId === 'health') {
+        if (category === 'health') {
             return <HealthCard data={item} color={headerColor} />;
         }
-        if (categoryId === 'education') {
+        if (category === 'education') {
             return <EducationCard data={item} color={headerColor} />;
         }
-        if (categoryId === 'banks') {
+        if (category === 'banks') {
             return <BankCard business={item} />;
         }
+        if (category === 'emergency') {
+            return <EmergencyCard data={item} color={headerColor} />;
+        }
+        if (category === 'govt') {
+            return <GovtOfficeCard data={item} color={headerColor} />;
+        }
+        if (category === 'travel') {
+            return <TravelCard data={item} color={headerColor} />;
+        }
         return <BusinessCard business={item} />;
-    }, [categoryId, headerColor]);
+    }, [category, headerColor]);
 
 
 
@@ -235,20 +260,6 @@ const CategoryListingScreen = React.memo(() => {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false, gestureEnabled: true, gestureDirection: 'horizontal' }} />
 
-            <PlaceSubmissionModal
-                visible={submissionModalVisible}
-                onClose={() => {
-                    setSubmissionModalVisible(false);
-                    setEditingRequest(null);
-                }}
-                category={categoryId || ''}
-                onSuccess={() => {
-                    setActiveTab('requests');
-                    myRequestsRefetch();
-                }}
-                editData={editingRequest}
-            />
-
             <CleanConfirmationModal
                 visible={!!deleteTarget}
                 onClose={() => setDeleteTarget(null)}
@@ -276,7 +287,7 @@ const CategoryListingScreen = React.memo(() => {
                         router.replace('/(drawer)/(tabs)' as any);
                     }
                 }}
-                onAdd={() => setSubmissionModalVisible(true)}
+                onAdd={() => router.push({ pathname: '/(drawer)/place-submission', params: { category: category } })}
                 showTooltip={showTooltip}
                 onCloseTooltip={handleDismissTooltip}
                 tooltipMessage={tooltipMessage}
@@ -295,7 +306,7 @@ const CategoryListingScreen = React.memo(() => {
                         data={dataToRender}
                         renderItem={activeTab === 'all' ? renderItem : renderRequestItem}
                         keyExtractor={keyExtractor}
-                        contentContainerStyle={styles.listContent}
+                        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20 }]}
                         onRefresh={handleRefresh}
                         refreshing={loading && !isFetchingNextPage && !myRequestsFetchingNextPage}
                         onEndReached={handleLoadMore}
@@ -355,7 +366,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     listContent: {
-        padding: 20,
+        padding: 16,
         paddingBottom: 40,
     },
     footerLoader: {
@@ -367,7 +378,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 40,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         gap: 15,
     },
     endOfListLine: {

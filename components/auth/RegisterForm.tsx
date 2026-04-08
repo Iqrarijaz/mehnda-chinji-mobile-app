@@ -9,15 +9,16 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import * as Location from 'expo-location';
 import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
 
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { signup, checkAccountExistsApi } from '@/apis/login';
 import { registerSchema, getPasswordStrength } from '@/utils/validation';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 export function RegisterForm() {
     const router = useRouter();
@@ -35,8 +36,6 @@ export function RegisterForm() {
         showPassword: false,
         showConfirmPassword: false,
         loading: false,
-        latitude: 0,
-        longitude: 0,
         ageVerified: false,
         termsAccepted: false,
         guidelinesAccepted: false,
@@ -114,7 +113,7 @@ export function RegisterForm() {
             return;
         }
 
-        const { fullName, email, phone, password, confirmPassword, latitude, longitude } = formData;
+        const { fullName, email, phone, password, confirmPassword } = formData;
 
         setFormData(prev => ({ ...prev, loading: true }));
 
@@ -127,7 +126,7 @@ export function RegisterForm() {
                 confirm: confirmPassword,
                 location: {
                     type: "Point",
-                    coordinates: [longitude, latitude]
+                    coordinates: [0, 0]
                 },
                 ageVerified: true,
                 termsAccepted: true,
@@ -139,6 +138,9 @@ export function RegisterForm() {
                 text1: 'Success!',
                 text2: 'Account created successfully',
             });
+
+            analyticsService.trackEvent(AnalyticsEvents.SIGN_UP, { method: 'email' });
+
             router.replace({ pathname: '/login', params: { email: email.trim(), password } } as any);
         } catch (error: any) {
             Toast.show({
@@ -352,7 +354,7 @@ export function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, formData.ageVerified && { backgroundColor: '#006666', borderColor: '#006666' }]}>
+                        <View style={[styles.checkbox, formData.ageVerified && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                             {formData.ageVerified && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
                         </View>
                     </TouchableOpacity>
@@ -371,7 +373,7 @@ export function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, formData.termsAccepted && { backgroundColor: '#006666', borderColor: '#006666' }]}>
+                        <View style={[styles.checkbox, formData.termsAccepted && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                             {formData.termsAccepted && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
                         </View>
                     </TouchableOpacity>
@@ -379,14 +381,14 @@ export function RegisterForm() {
                         <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
                             I agree to the {' '}
                             <ThemedText
-                                style={{ color: '#006666', fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
+                                style={{ color: colors.primary, fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
                                 onPress={() => {
                                     router.push('/terms' as any);
                                 }}
                             >Terms & Conditions</ThemedText>
                             {' '} and {' '}
                             <ThemedText
-                                style={{ color: '#006666', fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
+                                style={{ color: colors.primary, fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
                                 onPress={() => {
                                     router.push('/privacy' as any);
                                 }}
@@ -465,7 +467,7 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     formCard: {
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -518,7 +520,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
         borderWidth: 1,
     },
@@ -529,7 +531,7 @@ const styles = StyleSheet.create({
     },
     registerButton: {
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 8,

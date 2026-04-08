@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { ThemedText } from '../themedText';
 import { PremiumModal } from '../common/PremiumModal';
+import { Layout } from '@/constants/layout';
 
 interface GlassConfirmationModalProps {
     visible: boolean;
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '100%',
-        borderRadius: 28,
+        borderRadius: Layout.borderRadius,
         padding: 24,
         overflow: 'hidden',
         borderWidth: 1,
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
         height: 48,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
     confirmBtnWrapper: {
         flex: 1.5,
         height: 48,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
     },
     confirmBtn: {

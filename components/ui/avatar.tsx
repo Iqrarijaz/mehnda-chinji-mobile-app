@@ -34,14 +34,14 @@ const Avatar: React.FC<AvatarProps> = ({ uri, name, size = 40, style }) => {
             width: size,
             height: size,
             borderRadius: size / 2,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#FFFFFF',
             justifyContent: 'center',
             alignItems: 'center',
             borderWidth: 1,
-            borderColor: '#E2E8F0',
+            borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
         }, style]}>
             <Text style={{
-                color: primaryColor,
+                color: theme === 'dark' ? colors.text : primaryColor,
                 fontSize: size * 0.45,
                 fontWeight: 'bold',
             }}>

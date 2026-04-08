@@ -5,6 +5,7 @@ import { errorLogger } from '@/lib/errorLogger';
 import { secureStorage } from '@/utils/storage';
 import { useDataUsageStore } from '@/store/dataUsageStore';
 import { tokenCache } from '@/lib/tokenCache';
+import { getApiUrl } from '@/lib/remoteConfig';
 
 // Standardized Error Class
 export class ApiError extends Error {
@@ -38,6 +39,9 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
     async (config: any) => {
         try {
+            // Set dynamic baseURL from Remote Config
+            config.baseURL = getApiUrl();
+
             // Measure request size approx (avoid stringify if possible)
             let requestSize = 0;
             if (typeof config.data === 'string') {
@@ -107,6 +111,15 @@ apiClient.interceptors.response.use(
         }
 
         const status = error.response?.status;
+        const isLoginRequest = config?.url?.includes('login');
+        
+        // Handle Session Expiration (Unified 401 Handling)
+        if (status === 401 && !isLoginRequest) {
+            tokenCache.setSessionExpired(true);
+            tokenCache.clear();
+            secureStorage.removeItem('userData');
+            // Redirection is now handled reactively by AuthContext via tokenCache listener
+        }
 
         // Retry Logic
         if (status && RETRYABLE_STATUS_CODES.includes(status)) {
@@ -125,7 +138,9 @@ apiClient.interceptors.response.use(
                     delay
                 });
 
-                console.log(`API Client: Retrying ${config.url} (Attempt ${config.retryCount}) in ${delay}ms`);
+                if (__DEV__) {
+                    console.log(`API Client: Retrying ${config.url} (Attempt ${config.retryCount}) in ${delay}ms`);
+                }
 
                 return sleep(delay).then(() => apiClient(config));
             }

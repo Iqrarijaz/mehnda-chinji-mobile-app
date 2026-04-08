@@ -1,7 +1,10 @@
 import React from 'react';
-import { View, Text, Switch, StyleSheet, Platform } from 'react-native';
+import { View, Switch, StyleSheet, Platform } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
+import { ThemedText } from '@/components/themedText';
 
 interface NotificationToggleRowProps {
     label: string;
@@ -22,26 +25,29 @@ const NotificationToggleRow: React.FC<NotificationToggleRowProps> = ({
     onValueChange,
     index,
 }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
     return (
         <Animated.View
             entering={FadeInRight.delay(index * 100).duration(400)}
-            style={styles.container}
+            style={[styles.container, { borderBottomColor: colors.border }]}
         >
-            <View style={[styles.iconContainer, { backgroundColor: `${color}15` }]}>
+            <View style={[styles.iconContainer, { backgroundColor: `${color}18` }]}>
                 <Ionicons name={icon} size={22} color={color} />
             </View>
             <View style={styles.content}>
-                <Text style={styles.label}>{label}</Text>
-                <Text style={styles.descriptionText} numberOfLines={2}>
+                <ThemedText style={[styles.label, { color: colors.text }]}>{label}</ThemedText>
+                <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]} numberOfLines={2}>
                     {description}
-                </Text>
+                </ThemedText>
             </View>
             <Switch
                 value={value}
                 onValueChange={onValueChange}
-                trackColor={{ false: '#e0e0e0', true: `${color}50` }}
-                thumbColor={value ? color : '#f5f5f5'}
-                ios_backgroundColor="#e0e0e0"
+                trackColor={{ false: colors.border, true: `${color}50` }}
+                thumbColor={value ? color : (theme === 'dark' ? colors.card : '#f5f5f5')}
+                ios_backgroundColor={colors.border}
             />
         </Animated.View>
     );
@@ -53,13 +59,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 14,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: '#f0f0f0',
     },
     iconContainer: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#e0f2f1',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 14,
@@ -71,12 +75,10 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#2d3436',
         marginBottom: 2,
     },
     descriptionText: {
         fontSize: 13,
-        color: '#636e72',
         lineHeight: 18,
     },
 });

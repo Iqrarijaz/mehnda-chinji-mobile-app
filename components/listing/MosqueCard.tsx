@@ -4,13 +4,13 @@ import React, { useState } from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import PlacesDetailsModal from './placesDetailsModal';
 
 interface Contact {
     name: string;
@@ -25,6 +25,7 @@ interface MosqueCardProps {
             en: string;
             ur?: string;
         } | string;
+        type?: string;
         description?: string;
         phone?: string;
         village?: string;
@@ -40,73 +41,110 @@ interface MosqueCardProps {
 
 const MosqueCard = React.memo(({ data, color }: MosqueCardProps) => {
     const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const colors = Colors[theme];
-    const [modalVisible, setModalVisible] = useState(false);
+    const router = useRouter();
 
-    // Use passed color or default to Emerald (Religious default)
     const primaryColor = color || '#10B981';
+    const primaryAlpha10 = primaryColor + '1A';
+    const primaryAlpha20 = primaryColor + '33';
 
-    const capitalize = (str: string) => {
-        const words = str.toLowerCase().split(' ');
-        return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    };
+    const capitalize = (str: string) =>
+        str
+            .toLowerCase()
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
 
     const mosqueName = capitalize(data.name);
-    const address = capitalize(data.village || data.address || "Address not available");
+    const address = capitalize(data.village || data.address || 'Address not available');
     const mosqueImage = data.images?.[0];
+
+    const typeLabel = data.type || '';
 
     return (
         <>
-            <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => setModalVisible(true)}
-            >
-                <View style={styles.card}>
-                    <View style={styles.row}>
-                        {/* Image or Icon Container */}
-                        <View style={[styles.imageWrapper, { borderColor: primaryColor + '20' }]}>
-                            {mosqueImage ? (
-                                <Image
-                                    source={{ uri: mosqueImage }}
-                                    style={styles.mosqueImage}
-                                    contentFit="cover"
-                                    transition={200}
+            {/* Wrapper gives us a stacking context outside overflow:hidden */}
+            <View style={styles.wrapper}>
+                <TouchableOpacity
+                    activeOpacity={0.88}
+                    onPress={() => router.push({
+                        pathname: '/place/[id]',
+                        params: {
+                            id: data._id,
+                            placeData: JSON.stringify(data),
+                            color: primaryColor,
+                            category: 'Mosque'
+                        }
+                    })}
+                    style={[
+                        styles.card,
+                        {
+                            backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF',
+                            borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                            shadowColor: isDark ? '#000' : primaryColor,
+                        },
+                    ]}
+                >
+                    {/* ── Left: Image (30%) ── */}
+                    <View style={styles.imageCol}>
+                        {mosqueImage ? (
+                            <Image
+                                source={{ uri: mosqueImage }}
+                                style={styles.image}
+                                contentFit="cover"
+                                transition={250}
+                            />
+                        ) : (
+                            <View style={[styles.imagePlaceholder, { backgroundColor: primaryAlpha10 }]}>
+                                <MaterialCommunityIcons
+                                    name="mosque"
+                                    size={32}
+                                    color={primaryColor}
+                                    style={{ opacity: 0.85 }}
                                 />
-                            ) : (
-                                <View style={[styles.placeholderContainer, { backgroundColor: primaryColor + '10' }]}>
-                                    <MaterialCommunityIcons name="mosque" size={32} color={primaryColor} style={{ opacity: 0.8 }} />
-                                </View>
-                            )}
+                            </View>
+                        )}
+                    </View>
+
+                    {/* ── Right: Content (70%) ── */}
+                    <View style={styles.contentCol}>
+                        {/* Name at top */}
+                        <ThemedText
+                            style={[styles.mosqueName, { color: isDark ? '#F1F5F9' : '#0F172A' }]}
+                            numberOfLines={2}
+                        >
+                            {mosqueName}
+                        </ThemedText>
+
+                        {/* Divider */}
+                        <View style={styles.dividerRow}>
+                            <View style={[styles.dividerAccent, { backgroundColor: primaryColor }]} />
+                            <View style={[styles.dividerLine, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }]} />
                         </View>
 
-                        {/* Text Container */}
-                        <View style={styles.infoContainer}>
-                            <ThemedText style={styles.mosqueName} numberOfLines={2}>
-                                {mosqueName}
-                            </ThemedText>
-                            
-                            <View style={styles.addressRow}>
-                                <Ionicons name="location" size={14} color={primaryColor} style={{ marginTop: 2 }} />
-                                <ThemedText style={styles.addressText} numberOfLines={2}>
-                                    {address}
-                                </ThemedText>
+                        {/* Location */}
+                        <View style={styles.locationRow}>
+                            <View style={[styles.locationIconWrap, { backgroundColor: primaryAlpha10 }]}>
+                                <Ionicons name="location" size={12} color={primaryColor} />
                             </View>
-                        </View>
-                        
-                        <View style={styles.chevronContainer}>
-                            <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
+                            <ThemedText
+                                style={[styles.locationText, { color: isDark ? '#94A3B8' : '#475569' }]}
+                                numberOfLines={2}
+                            >
+                                {address}
+                            </ThemedText>
                         </View>
                     </View>
-                </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
 
-            <PlacesDetailsModal
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                data={data}
-                category="Mosque"
-                color={primaryColor}
-            />
+                {/* Type pill — only shown when data.type exists */}
+                {typeLabel ? (
+                    <View style={[styles.typePill, { backgroundColor: primaryColor }]}>
+                        <ThemedText style={styles.typePillText}>{typeLabel}</ThemedText>
+                    </View>
+                ) : null}
+            </View>
         </>
     );
 });
@@ -114,67 +152,109 @@ const MosqueCard = React.memo(({ data, color }: MosqueCardProps) => {
 export default MosqueCard;
 
 const styles = StyleSheet.create({
+    wrapper: {
+        position: 'relative',
+        marginBottom: 14,
+    },
     card: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 12,
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
-        borderWidth: 1,
-        borderColor: '#F1F5F9',
-    },
-    row: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
-    imageWrapper: {
-        width: 80,
-        height: 80,
-        borderRadius: 12,
+        borderRadius: 16,
         overflow: 'hidden',
         borderWidth: 1,
-        marginRight: 14,
-        position: 'relative',
-        backgroundColor: '#F8FAFC',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 4,
+        height: 100,
     },
-    mosqueImage: {
+
+    // ── Image column ──
+    imageCol: {
+        width: '30%',
+        position: 'relative',
+    },
+    image: {
         width: '100%',
         height: '100%',
     },
-    placeholderContainer: {
+    imagePlaceholder: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    infoContainer: {
+
+    // Education-card style pill — absolute on top-right of the whole card
+    typePill: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 7,
+        paddingVertical: 4,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 6,
+    },
+    typePillText: {
+        color: '#FFFFFF',
+        fontSize: 8,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+        letterSpacing: 0.8,
+    },
+
+    // ── Content column ──
+    contentCol: {
         flex: 1,
+        paddingHorizontal: 12,
+        paddingTop: 12,
+        paddingBottom: 12,
         justifyContent: 'center',
     },
     mosqueName: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '700',
-        color: '#000000', // Explicitly Black
-        marginBottom: 6,
+        letterSpacing: -0.2,
+        lineHeight: 20,
+        marginBottom: 8,
     },
-    addressRow: {
+    dividerRow: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-        gap: 4,
-        paddingRight: 8,
+        alignItems: 'center',
+        gap: 5,
+        marginBottom: 8,
     },
-    addressText: {
+    dividerAccent: {
+        width: 18,
+        height: 2.5,
+        borderRadius: 2,
+    },
+    dividerLine: {
         flex: 1,
-        fontSize: 13,
-        fontWeight: '500',
-        color: '#000000', // Explicitly Black
-        lineHeight: 18,
+        height: 1,
+        borderRadius: 1,
     },
-    chevronContainer: {
-        paddingLeft: 4,
+    locationRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    locationIconWrap: {
+        width: 20,
+        height: 20,
+        borderRadius: 6,
+        alignItems: 'center',
         justifyContent: 'center',
-    }
+        flexShrink: 0,
+    },
+    locationText: {
+        flex: 1,
+        fontSize: 11,
+        fontWeight: '500',
+        lineHeight: 15,
+    },
 });

@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import citiesData from '@/data/cities.json';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -40,6 +41,8 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
     const { user } = useAuth();
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
+    const primaryColor = colors.primary;
+    const bgColor = colors.card;
     const queryClient = useQueryClient();
 
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
@@ -52,10 +55,10 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
     const [cityModalVisible, setCityModalVisible] = useState(false);
     const [groupModalVisible, setGroupModalVisible] = useState(false);
 
-    // Helper to format address
-    const toTitleCase = (str: string) => {
+    // Helper to format text
+    const capitalize = (str: string) => {
         if (!str) return '';
-        return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+        return str.trim().toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
     };
 
     useEffect(() => {
@@ -63,10 +66,10 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
             // Reset form
             setSelectedGroup(null);
             setSelectedCity(user?.user?.city || '');
-            setAddress(toTitleCase(user?.user?.address || user?.user?.village || ''));
+            setAddress(capitalize(user?.user?.address || user?.user?.village || ''));
             setLastDonationDate(null);
         } else {
-            setAddress(toTitleCase(user?.user?.address || user?.user?.village || ''));
+            setAddress(capitalize(user?.user?.address || user?.user?.village || ''));
         }
     }, [visible, user]);
 
@@ -158,9 +161,9 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
             >
                 <View style={styles.modalContent}>
                     <View style={styles.header}>
-                        <ThemedText style={styles.title}>Register as Donor</ThemedText>
+                        <ThemedText style={[styles.title, { color: isDark ? '#FFFFFF' : '#0F172A' }]}>Register as Donor</ThemedText>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                            <Ionicons name="close" size={24} color={colors.text} />
+                            <Ionicons name="close" size={24} color={isDark ? '#FFFFFF' : colors.text} />
                         </TouchableOpacity>
                     </View>
 
@@ -168,7 +171,7 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                         <View style={styles.formSection}>
                             {/* Blood Group Dropdown */}
                             <View style={styles.inputField}>
-                                <ThemedText style={[styles.label, { color: colors.text }]}>
+                                <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>
                                     BLOOD GROUP <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                                 <TouchableOpacity
@@ -176,7 +179,7 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                     onPress={() => setGroupModalVisible(true)}
                                 >
                                     <Ionicons name="water" size={18} color={selectedGroup ? "#ef4444" : colors.icon} style={{ marginRight: 10 }} />
-                                    <ThemedText style={[styles.textInput, { color: selectedGroup ? colors.text : colors.icon, fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
+                                    <ThemedText style={[styles.textInput, { color: selectedGroup ? (isDark ? '#FFFFFF' : colors.text) : colors.icon, fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
                                         {selectedGroup || 'Select Blood Group'}
                                     </ThemedText>
                                     <Ionicons name="chevron-down" size={16} color={colors.icon} />
@@ -185,7 +188,7 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
 
                             {/* City Dropdown */}
                             <View style={styles.inputField}>
-                                <ThemedText style={[styles.label, { color: colors.text }]}>
+                                <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>
                                     CITY <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                                 <TouchableOpacity
@@ -193,8 +196,8 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                     onPress={() => setCityModalVisible(true)}
                                 >
                                     <Ionicons name="location" size={18} color={selectedCity ? "#ef4444" : colors.icon} style={{ marginRight: 10 }} />
-                                    <ThemedText style={[styles.textInput, { color: selectedCity ? colors.text : colors.icon, fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
-                                        {selectedCity || 'Select City'}
+                                    <ThemedText style={[styles.textInput, { color: selectedCity ? (isDark ? '#FFFFFF' : colors.text) : colors.icon, fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
+                                        {selectedCity ? capitalize(selectedCity) : 'Select City'}
                                     </ThemedText>
                                     <Ionicons name="chevron-down" size={16} color={colors.icon} />
                                 </TouchableOpacity>
@@ -203,7 +206,7 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                             {/* Address Input */}
                             <View style={styles.inputField}>
                                 <View style={styles.labelRow}>
-                                    <ThemedText style={[styles.label, { color: colors.text }]}>
+                                    <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>
                                         ADDRESS / LOCAL AREA <ThemedText style={styles.required}>*</ThemedText>
                                     </ThemedText>
                                     <ThemedText style={[styles.charCount, address.length > 40 ? { color: '#ef4444' } : { color: colors.icon }]}>
@@ -214,8 +217,8 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                     <Ionicons name="home" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         placeholder="Enter address or area"
-                                        placeholderTextColor={colors.icon}
-                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
+                                        placeholderTextColor={colors.textSecondary}
+                                        style={[styles.textInput, { color: isDark ? '#FFFFFF' : colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={address}
                                         onChangeText={setAddress}
                                         autoCapitalize="words"
@@ -226,13 +229,13 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
 
                             {/* Last Donation Date */}
                             <View style={styles.inputField}>
-                                <ThemedText style={[styles.label, { color: colors.text }]}>LAST DONATION DATE</ThemedText>
+                                <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>LAST DONATION DATE</ThemedText>
                                 <TouchableOpacity
                                     style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
                                     onPress={() => setShowDatePicker(true)}
                                 >
-                                    <Ionicons name="calendar" size={18} color={lastDonationDate ? "#ef4444" : colors.icon} style={{ marginRight: 10 }} />
-                                    <ThemedText style={[styles.textInput, { color: lastDonationDate ? colors.text : colors.icon, fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
+                                    <Ionicons name="calendar" size={18} color={lastDonationDate ? colors.primary : colors.icon} style={{ marginRight: 10 }} />
+                                    <ThemedText style={[styles.textInput, { color: lastDonationDate ? (isDark ? '#FFFFFF' : colors.text) : colors.textSecondary, fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
                                         {lastDonationDate ? lastDonationDate.toLocaleDateString() : 'Tap to select date'}
                                     </ThemedText>
                                     <Ionicons name="chevron-down" size={16} color={colors.icon} />
@@ -245,9 +248,9 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                     onRequestClose={() => setShowDatePicker(false)}
                                 >
                                     <View style={styles.dateModalOverlay}>
-                                        <View style={[styles.dateModalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                                            <View style={styles.modalHeader}>
-                                                <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Date</ThemedText>
+                                        <View style={[styles.dateModalContent, { backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderColor: colors.border }]}>
+                                            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+                                                <ThemedText style={[styles.modalTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>Select Date</ThemedText>
                                             </View>
 
                                             <View style={[styles.pickerContainer, { backgroundColor: colors.background }]}>
@@ -266,13 +269,13 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                                                     style={styles.modalBtn}
                                                     onPress={() => setShowDatePicker(false)}
                                                 >
-                                                    <ThemedText style={[styles.modalBtnText, { color: colors.icon }]}>Cancel</ThemedText>
+                                                    <ThemedText style={[styles.modalBtnText, { color: isDark ? '#94A3B8' : colors.icon }]}>Cancel</ThemedText>
                                                 </TouchableOpacity>
                                                 <TouchableOpacity
                                                     style={[styles.modalBtn, styles.modalBtnPrimary]}
                                                     onPress={() => setShowDatePicker(false)}
                                                 >
-                                                    <ThemedText style={[styles.modalBtnText, { color: '#FF9B51' }]}>Confirm</ThemedText>
+                                                    <ThemedText style={[styles.modalBtnText, { color: colors.primary }]}>Confirm</ThemedText>
                                                 </TouchableOpacity>
                                             </View>
                                         </View>
@@ -290,7 +293,7 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                             disabled={registerMutation.isPending}
                         >
                             <LinearGradient
-                                colors={['#ef4444', '#b91c1c']}
+                                colors={[colors.primary, colors.primary]}
                                 style={[styles.gradientBtn, { height: Platform.OS === 'android' ? 44 : 46 }]}
                             >
                                 {registerMutation.isPending ? (
@@ -301,8 +304,8 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                             </LinearGradient>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={onClose} style={styles.cancelBtn} activeOpacity={0.7}>
-                            <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                        <TouchableOpacity onPress={onClose} style={[styles.cancelBtn, { borderColor: colors.border }]} activeOpacity={0.7}>
+                            <ThemedText style={[styles.cancelText, { color: isDark ? '#FFFFFF' : colors.textSecondary }]}>Cancel</ThemedText>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -332,14 +335,14 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                     style={styles.dateModalOverlay}
                     onPress={() => setGroupModalVisible(false)}
                 >
-                    <View style={[styles.dropdownModalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                        <View style={styles.modalHeader}>
-                            <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Blood Group</ThemedText>
+                    <View style={[styles.dropdownModalContent, { backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderColor: colors.border }]}>
+                        <View style={[styles.modalHeader, { borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]}>
+                            <ThemedText style={[styles.modalTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>Select Blood Group</ThemedText>
                         </View>
                         {BLOOD_GROUPS.map((group) => (
                             <TouchableOpacity
                                 key={group}
-                                style={[styles.groupItem, { borderBottomColor: colors.border }]}
+                                style={[styles.groupItem, { borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]}
                                 onPress={() => {
                                     setSelectedGroup(group);
                                     setGroupModalVisible(false);
@@ -347,13 +350,13 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                             >
                                 <ThemedText style={[
                                     styles.itemText,
-                                    { color: colors.text },
-                                    selectedGroup === group && styles.selectedItemText
+                                    { color: isDark ? '#FFFFFF' : colors.text },
+                                    selectedGroup === group && { color: isDark ? '#FFFFFF' : colors.primary, fontWeight: '700' }
                                 ]}>
                                     {group}
                                 </ThemedText>
                                 {selectedGroup === group && (
-                                    <Ionicons name="checkmark" size={20} color="#FF9B51" />
+                                    <Ionicons name="checkmark" size={20} color={isDark ? '#FFFFFF' : colors.primary} />
                                 )}
                             </TouchableOpacity>
                         ))}
@@ -430,7 +433,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
         borderWidth: 1,
     },
@@ -440,7 +443,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     actionBtnWrapper: {
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
     },
     gradientBtn: {
@@ -467,7 +470,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: '#E2E8F0',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
     },
     cancelText: {
         fontSize: 14,
@@ -483,7 +486,7 @@ const styles = StyleSheet.create({
     },
     dateModalContent: {
         width: '95%',
-        borderRadius: 28,
+        borderRadius: Layout.borderRadius,
         padding: 24,
         overflow: 'hidden',
         borderWidth: 1,
@@ -512,7 +515,7 @@ const styles = StyleSheet.create({
     modalBtn: {
         paddingVertical: 10,
         paddingHorizontal: 16,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
     },
     modalBtnPrimary: {
         backgroundColor: 'rgba(255, 155, 81, 0.1)',
@@ -528,7 +531,7 @@ const styles = StyleSheet.create({
         paddingTop: 0,
         paddingHorizontal: 0,
         paddingBottom: 16,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
         backgroundColor: '#FFFFFF',
     },
@@ -536,7 +539,7 @@ const styles = StyleSheet.create({
     dropdownModalContent: {
         width: '95%',
         maxHeight: '60%',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 20,
         paddingBottom: 40,
         overflow: 'hidden',

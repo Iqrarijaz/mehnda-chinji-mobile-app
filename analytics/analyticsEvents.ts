@@ -10,6 +10,9 @@ export const AnalyticsEvents = {
     LOGIN: 'login',
     SIGN_UP: 'sign_up',
     LOGOUT: 'logout',
+    FORGOT_PASSWORD_REQUEST: 'forgot_password_request',
+    FORGOT_PASSWORD_VERIFIED: 'forgot_password_verified',
+    RESET_PASSWORD_SUCCESS: 'reset_password_success',
 
     // Feature Specific
     PLACE_ADDED: 'place_added',
@@ -17,6 +20,8 @@ export const AnalyticsEvents = {
     SEARCH_USED: 'search_used',
     SEARCH_RESULTS_VIEWED: 'search_results_viewed',
     NOTIFICATION_OPENED: 'notification_opened',
+    WEATHER_VIEWED: 'weather_viewed',
+    PRAYER_TIMES_VIEWED: 'prayer_times_viewed',
 
     // Community Specific
     DONOR_CARD_CLICKED: 'donor_card_clicked',

@@ -11,6 +11,7 @@ import {
 
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import professionsData from '../../data/professions.json';
 import { ThemedText } from '../themedText';
 
@@ -47,9 +48,21 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                 <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
                     <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Profession</ThemedText>
-                        <TouchableOpacity onPress={onClose} style={[styles.closeButton, { backgroundColor: colors.background }]}>
-                            <Ionicons name="close" size={24} color={colors.text} />
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                            {currentProfession && currentProfession !== 'All' && (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        onSelect({ name_eng: 'All', name_ur: 'تمام' });
+                                        onClose();
+                                    }}
+                                >
+                                    <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Clear</ThemedText>
+                                </TouchableOpacity>
+                            )}
+                            <TouchableOpacity onPress={onClose} style={[styles.closeButton, { backgroundColor: colors.background }]}>
+                                <Ionicons name="close" size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
 
                     <View style={[styles.searchBar, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
@@ -114,13 +127,12 @@ const styles = StyleSheet.create({
     modalContent: {
         height: '80%',
         backgroundColor: '#FFFFFF',
-        borderTopLeftRadius: 28,
-        borderTopRightRadius: 28,
+        borderTopLeftRadius: Layout.borderRadius,
+        borderTopRightRadius: Layout.borderRadius,
         padding: 24,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.1,
-        shadowRadius: 10,
         shadowRadius: 10,
     },
 modalHeader: {
@@ -142,7 +154,7 @@ searchBar: {
     flexDirection: 'row',
         alignItems: 'center',
             height: 52,
-                borderRadius: 14,
+                borderRadius: Layout.borderRadius,
                     paddingHorizontal: 16,
                         marginBottom: 20,
                             borderWidth: 1,

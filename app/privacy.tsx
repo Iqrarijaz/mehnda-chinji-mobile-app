@@ -6,13 +6,14 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 
 const privacyData = [
     {
         id: '1',
         title: 'Information We Collect',
-        content: 'We collect information you directly provide to us when you register for an account or submit data:\n\n• Personal Profile Data: Your name, phone number, and email address required for account creation.\n• Manual Location Data: Your city and village name that you set manually in your profile for Azaan and weather updates. We do NOT use GPS or automatic location tracking.\n• Public Directory Submissions: Information you submit regarding businesses, schools, mosques, or other public places.\n• Blood Donor Information: If you register as a blood donor, we collect your blood type and contact availability.',
+        content: 'We collect information you directly provide to us when you register for an account or submit data:\n\n• Personal Profile Data: Your name, phone number, and email address required for account creation.\n• Manual City Selection: Your city and village name that you set manually in your profile for Azaan and weather updates. The app does NOT request, access, or use your GPS location or any automatic location tracking technology.\n• Public Directory Submissions: Information you submit regarding businesses, schools, mosques, or other public places.\n• Blood Donor Information: If you register as a blood donor, we collect your blood type and contact availability.',
     },
     {
         id: '2',
@@ -27,11 +28,16 @@ const privacyData = [
 
     {
         id: '4',
+        title: 'Analytics and Performance',
+        content: 'We use Firebase Analytics to understand how users interact with our app. This helps us improve the user experience and troubleshoot technical issues. The data collected is pseudonymized and includes app interactions, screen views, and device model information. We do NOT use this data for personalized advertising or cross-app tracking.',
+    },
+    {
+        id: '5',
         title: 'Data Storage & Security',
         content: 'We implement standard security measures to protect your personal information from unauthorized access or disclosure. However, no internet-based service is 100% secure, and we cannot guarantee absolute security.',
     },
     {
-        id: '5',
+        id: '6',
         title: 'Your Rights & Choices',
         content: 'You have the right to access, edit, or delete your personal information at any time.\n• You can opt out of the Blood Donor registry.\n• You can request the deletion of your entire account completely through the App Settings.',
     },
@@ -60,20 +66,23 @@ const AccordionItem = ({ item, index }: { item: any, index: number }) => {
         };
     });
 
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
     return (
-        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={styles.accordionContainer}>
+        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.accordionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <TouchableOpacity onPress={toggleAccordion} style={styles.accordionHeader} activeOpacity={0.7}>
                 <View style={styles.accordionTitleWrap}>
-                    <View style={styles.bulletPoint} />
-                    <ThemedText style={[styles.accordionTitle, expanded && styles.accordionTitleActive]}>{item.title}</ThemedText>
+                    <View style={[styles.bulletPoint, { backgroundColor: colors.border }]} />
+                    <ThemedText style={[styles.accordionTitle, { color: colors.textSecondary }, expanded && { color: colors.text, fontWeight: '700' }]}>{item.title}</ThemedText>
                 </View>
                 <Animated.View style={iconAnimatedStyle}>
-                    <Ionicons name="chevron-down" size={20} color={expanded ? '#0F172A' : '#94A3B8'} />
+                    <Ionicons name="chevron-down" size={20} color={expanded ? colors.text : colors.textSecondary} />
                 </Animated.View>
             </TouchableOpacity>
             <Animated.View style={[styles.accordionContentWrap, animatedStyle]}>
                 <View style={styles.accordionContentInner}>
-                    <ThemedText style={styles.bodyText}>{item.content}</ThemedText>
+                    <ThemedText style={[styles.bodyText, { color: colors.textSecondary }]}>{item.content}</ThemedText>
                 </View>
             </Animated.View>
         </Animated.View>
@@ -89,7 +98,7 @@ export default function PrivacyPolicyScreen() {
     const [infoModalVisible, setInfoModalVisible] = useState(false);
 
     return (
-        <View style={[styles.container, { backgroundColor: '#F8FAFC' }]}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* ── Modern Header ──────────────────────────────────────── */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
@@ -125,16 +134,16 @@ export default function PrivacyPolicyScreen() {
                 contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
                 showsVerticalScrollIndicator={false}
             >
-                <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.card}>
+                <Animated.View entering={FadeInUp.delay(300).duration(500)} style={[styles.card, { backgroundColor: colors.card }]}>
                     <View style={styles.cardHeader}>
                         <Ionicons name="lock-closed" size={24} color={colors.primary} />
-                        <ThemedText style={styles.cardHeaderText}>Summary</ThemedText>
+                        <ThemedText style={[styles.cardHeaderText, { color: colors.text }]}>Summary</ThemedText>
                     </View>
-                    <ThemedText style={styles.welcomeText}>
+                    <ThemedText style={[styles.welcomeText, { color: colors.textSecondary }]}>
                         At Rehbar, protecting your personal data is a top priority. This Privacy Policy explains how we collect, use, and safeguard your information when you use our application.
                     </ThemedText>
 
-                    <View style={styles.divider} />
+                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
                     {/* Accordion Sections */}
                     {privacyData.map((item, index) => (
@@ -146,13 +155,15 @@ export default function PrivacyPolicyScreen() {
 
             {/* ── Info Modal ───────────────────── */}
             <Modal visible={infoModalVisible} transparent animationType="fade">
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <View style={styles.modalIconWrap}>
+                <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                        <View style={[styles.modalIconWrap, { backgroundColor: colors.background }]}>
                             <Ionicons name="server" size={32} color={colors.primary} />
                         </View>
-                        <ThemedText style={styles.modalTitle}>Why we need your data?</ThemedText>
+                        <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Why we need your data?</ThemedText>
+                        <ThemedText style={[styles.modalBody, { color: colors.textSecondary }]}>
                             We collect specific data to authenticate your account and display your community listings, such as businesses, mosques, and blood donor details. Your private data is never sold to third parties.
+                        </ThemedText>
 
                         <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.primary }]} onPress={() => setInfoModalVisible(false)}>
                             <ThemedText style={styles.modalBtnText}>Got it!</ThemedText>
@@ -170,8 +181,8 @@ const styles = StyleSheet.create({
     // Header 
     headerWrap: {
         paddingBottom: 24,
-        borderBottomLeftRadius: 32,
-        borderBottomRightRadius: 32,
+        borderBottomLeftRadius: Layout.borderRadius,
+        borderBottomRightRadius: Layout.borderRadius,
         overflow: 'hidden',
         zIndex: 2,
     },
@@ -220,7 +231,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.15)',
         paddingHorizontal: 14,
         paddingVertical: 6,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         gap: 6
     },
     infoBtnText: {
@@ -243,8 +254,8 @@ const styles = StyleSheet.create({
     // Card Content
     card: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
-        padding: 24,
+        borderRadius: Layout.borderRadius,
+        padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.04,
@@ -276,7 +287,7 @@ const styles = StyleSheet.create({
     accordionContainer: {
         marginBottom: 16,
         backgroundColor: '#F8FAFC',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#F1F5F9'
@@ -361,7 +372,7 @@ const styles = StyleSheet.create({
     },
     acceptButton: {
         height: 52,
-        borderRadius: 26,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
@@ -384,7 +395,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 24,
         width: '100%',
         alignItems: 'center',
@@ -415,7 +426,7 @@ const styles = StyleSheet.create({
     modalBtn: {
         width: '100%',
         height: 50,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
     },

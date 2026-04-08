@@ -3,6 +3,7 @@ import React from 'react';
 import { Platform, StyleSheet, TextInput, View, ViewStyle } from 'react-native';
 
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 
 interface SearchBarProps {
@@ -22,18 +23,19 @@ export function SearchBar({ placeholder = "Search...", onSearch, onFocus, onBlur
     return (
         <View style={[
             styles.container,
+            { backgroundColor: colors.card, borderColor: colors.border },
             style
         ]}>
             <Ionicons
                 name="search"
                 size={20}
-                color="#94A3B8"
+                color={colors.icon}
                 style={styles.icon}
             />
             <TextInput
                 placeholder={placeholder}
-                placeholderTextColor="#94A3B8"
-                style={[styles.input, { color: '#0F172A' }]}
+                placeholderTextColor={colors.textSecondary || "#94A3B8"}
+                style={[styles.input, { color: colors.text }]}
                 onChangeText={onSearch}
                 onFocus={onFocus}
                 onBlur={onBlur}
@@ -47,10 +49,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1,
-        backgroundColor: '#FFFFFF',
-        borderColor: 'transparent',
     },
     icon: {
         marginRight: 10,

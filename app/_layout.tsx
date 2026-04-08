@@ -12,6 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View, Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
+import { MenuProvider } from 'react-native-popup-menu';
 import React, { useState, useEffect } from 'react';
 import CustomDrawerContent from '../components/customDrawerContent';
 import { analyticsService, useScreenTracking, AnalyticsEvents } from '@/analytics';
@@ -34,6 +35,7 @@ import { UpdateModal } from '@/components/common/UpdateModal';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useAppFonts } from '@/hooks/useFonts';
+import { initConfig } from '@/lib/remoteConfig';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -59,7 +61,7 @@ function DrawerLayout() {
           <Stack.Screen name="profile" />
           <Stack.Screen name="settings" />
           <Stack.Screen name="notifications" />
-          <Stack.Screen name="listing/[categoryId]" />
+          <Stack.Screen name="listing/[category]" />
           <Stack.Screen name="support/index" />
           <Stack.Screen name="support/create-ticket" />
           <Stack.Screen name="support/tickets" />
@@ -110,7 +112,11 @@ function AppInitializer() {
     releaseNotes: ''
   });
 
+  const { isAuthenticated } = useAuth();
+
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     analyticsService.trackEvent(AnalyticsEvents.APP_OPEN, {
       version: Application.nativeApplicationVersion,
       build: Application.nativeBuildVersion,
@@ -120,6 +126,10 @@ function AppInitializer() {
     const checkVersion = async () => {
       try {
         const info = await fetchAppVersionInfo();
+        if (!info) {
+          console.warn('Version info is null, skipping version check');
+          return;
+        }
         const currentVersion = Application.nativeApplicationVersion || '1.0.0';
 
         const { isMandatory, isOptional } = checkUpdateStatus(
@@ -149,7 +159,7 @@ function AppInitializer() {
     };
 
     checkVersion();
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <UpdateModal
@@ -165,14 +175,26 @@ function AppInitializer() {
 
 function RootLayout() {
   const fontsLoaded = useAppFonts();
+  const [configLoaded, setConfigLoaded] = useState(false);
 
   useEffect(() => {
-    if (fontsLoaded) {
+    const setupConfig = async () => {
+      try {
+        await initConfig();
+      } finally {
+        setConfigLoaded(true);
+      }
+    };
+    setupConfig();
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded && configLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, configLoaded]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !configLoaded) {
     return null;
   }
 
@@ -188,11 +210,13 @@ function RootLayout() {
               <AuthProvider>
                 <WeatherProvider>
                   <SocketProvider>
-                    <AppInitializer />
-                    <StatusBar style="dark" />
-                    <DrawerLayout />
-                    <NetworkMonitor />
-                    <Toast config={toastConfig} topOffset={60} />
+                    <MenuProvider>
+                      <AppInitializer />
+                      <StatusBar style="dark" />
+                      <DrawerLayout />
+                      <NetworkMonitor />
+                      <Toast config={toastConfig} topOffset={45} />
+                    </MenuProvider>
                   </SocketProvider>
                 </WeatherProvider>
               </AuthProvider>

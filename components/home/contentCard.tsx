@@ -1,9 +1,10 @@
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 
 interface ContentCardProps {
@@ -32,14 +33,14 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             <TouchableOpacity
                 onPress={onPress}
                 activeOpacity={0.7}
-                style={styles.card}
+                style={[styles.card, { backgroundColor: colors.card }]}
             >
                 <View style={[styles.iconWrap, { backgroundColor: accent + '12' }]}>
                     <Ionicons name={icon} size={22} color={accent} />
                 </View>
                 <View style={styles.textWrap}>
-                    <ThemedText style={[styles.title, { color: colors.text }]}>{title}</ThemedText>
-                    <ThemedText style={styles.subtitle}>{subtitle}</ThemedText>
+                    <ThemedText style={styles.title}>{title}</ThemedText>
+                    <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>{subtitle}</ThemedText>
                 </View>
                 <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
             </TouchableOpacity>
@@ -49,9 +50,8 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 18,
-        padding: 16,
+        borderRadius: Layout.borderRadius,
+        padding: Platform.OS === 'android' ? 12 : 16,
         marginHorizontal: 20,
         marginBottom: 12,
         flexDirection: 'row',
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     iconWrap: {
         width: 42,
         height: 42,
-        borderRadius: 13,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 14,
@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 12,
-        color: '#94A3B8',
         fontWeight: '400',
         marginTop: 2,
     },

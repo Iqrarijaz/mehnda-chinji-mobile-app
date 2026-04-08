@@ -2,6 +2,7 @@ import React from 'react';
 import { Platform, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { SlideInLeft, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { ThemedText } from '../themedText';
+import { Layout } from '@/constants/layout';
 
 const PRIMARY = '#006666';
 
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
     chip: {
         paddingHorizontal: 20,
         paddingVertical: Platform.OS === 'android' ? 7 : 9,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

@@ -36,16 +36,16 @@ export const usePushNotifications = () => {
             if (existingStatus !== 'granted' && canAskAgain) {
                 const { status } = await Notifications.requestPermissionsAsync();
                 finalStatus = status;
-                console.log('🔐 New permission status:', finalStatus);
+                if (__DEV__) console.log('🔐 New permission status:', finalStatus);
             }
 
             if (finalStatus !== 'granted') {
-                console.warn('❌ Notification permission not granted:', finalStatus);
+                if (__DEV__) console.warn('❌ Notification permission not granted:', finalStatus);
                 return;
             }
 
             if (!Device.isDevice) {
-                console.warn('❌ Not a physical device. Push tokens require real hardware.');
+                if (__DEV__) console.warn('❌ Not a physical device. Push tokens require real hardware.');
                 return;
             }
 
@@ -54,47 +54,41 @@ export const usePushNotifications = () => {
                 Constants.expoConfig?.extra?.eas?.projectId ??
                 Constants.easConfig?.projectId;
 
-            console.log('🆔 Resolved project ID:', projectId);
+            if (__DEV__) console.log('🆔 Resolved project ID:', projectId);
 
             if (!projectId) {
-                console.error(
-                    '❌ EAS projectId missing. Check app.json → extra.eas.projectId'
-                );
+                if (__DEV__) {
+                    console.error(
+                        '❌ EAS projectId missing. Check app.json → extra.eas.projectId'
+                    );
+                }
                 return;
             }
 
             // ---- Get Token ----
-            console.log('📡 Requesting Expo push token...');
+            if (__DEV__) console.log('📡 Requesting Expo push token...');
             const { data } = await Notifications.getExpoPushTokenAsync({
                 projectId,
             });
 
-            console.log('✅ Expo push token received:', data);
+            if (__DEV__) console.log('✅ Expo push token received:', data);
 
             return data;
         } catch (error) {
-            console.error('🔥 Push registration failed:', error);
+            if (__DEV__) console.error('🔥 Push registration failed:', error);
             return;
         }
     };
 
     const syncTokenWithBackend = useCallback(async (token: string) => {
         try {
-            const storedToken = await clientStorage.getItem('push_token');
-
-            if (storedToken === token) {
-                console.log('ℹ️ Push token already synced. Skipping backend call.');
-                return;
-            }
-
-            console.log('🌍 Syncing push token with backend...');
+            if (__DEV__) console.log('🌍 Syncing push token with backend...');
             await savePushToken({ pushToken: token });
             await updateUser({ pushToken: token });
 
-            await clientStorage.setItem('push_token', token);
-            console.log('✅ Push token synced successfully.');
+            if (__DEV__) console.log('✅ Push token synced successfully.');
         } catch (error) {
-            console.error('❌ Failed to sync push token:', error);
+            if (__DEV__) console.error('❌ Failed to sync push token:', error);
         }
     }, []);
 
@@ -114,14 +108,14 @@ export const usePushNotifications = () => {
         notificationListener.current =
             Notifications.addNotificationReceivedListener(notification => {
                 if (!isMounted) return;
-                console.log('📩 Notification received:', notification);
+                if (__DEV__) console.log('📩 Notification received:', notification);
                 setNotification(notification);
             });
 
         responseListener.current =
             Notifications.addNotificationResponseReceivedListener(response => {
                 if (!isMounted) return;
-                console.log('👉 Notification interaction:', response);
+                if (__DEV__) console.log('👉 Notification interaction:', response);
             });
 
         return () => {

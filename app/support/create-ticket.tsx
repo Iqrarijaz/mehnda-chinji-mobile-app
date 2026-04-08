@@ -1,16 +1,28 @@
-import { Image } from 'expo-image';
 import { createSupportTicket } from '@/apis/support';
+import { SearchableDropdown } from '@/components/common/searchableDropdown';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+
+const PREDEFINED_SUBJECTS = [
+    'Profile Update Issue',
+    'Submit Places Issue',
+    'Blood Donor Issue',
+    'Business Registration Issue',
+    'Authentication / Login Issue',
+    'General Feedback',
+    'UI / UX Bug'
+];
 
 export default function CreateTicketScreen() {
     const router = useRouter();
@@ -30,6 +42,7 @@ export default function CreateTicketScreen() {
     const [subject, setSubject] = useState('');
     const [description, setDescription] = useState('');
     const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+    const [subjectDropdownVisible, setSubjectDropdownVisible] = useState(false);
 
     const createTicketMutation = useMutation({
         mutationFn: async () => {
@@ -130,13 +143,31 @@ export default function CreateTicketScreen() {
                         {subject.length}/40
                     </ThemedText>
                 </View>
-                <TextInput
-                    style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: subject.length > 40 ? '#FF5252' : colors.border }]}
-                    placeholder="Briefly describe the issue"
-                    placeholderTextColor={colors.textSecondary}
-                    value={subject}
-                    onChangeText={setSubject}
-                    maxLength={40}
+                <View style={{ position: 'relative', justifyContent: 'center' }}>
+                    <TextInput
+                        style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: subject.length > 40 ? '#FF5252' : colors.border, paddingRight: 40 }]}
+                        placeholder="Briefly describe the issue"
+                        placeholderTextColor={colors.textSecondary}
+                        value={subject}
+                        onChangeText={setSubject}
+                        maxLength={40}
+                    />
+                    <TouchableOpacity
+                        style={{ position: 'absolute', right: 12 }}
+                        onPress={() => setSubjectDropdownVisible(true)}
+                    >
+                        <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
+                    </TouchableOpacity>
+                </View>
+
+                <SearchableDropdown
+                    visible={subjectDropdownVisible}
+                    onClose={() => setSubjectDropdownVisible(false)}
+                    onSelect={(val) => setSubject(val)}
+                    options={PREDEFINED_SUBJECTS}
+                    title="Select Subject"
+                    placeholder="Search issues..."
+                    currentValue={subject}
                 />
 
                 <View style={styles.labelContainer}>
@@ -244,7 +275,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     input: {
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
         paddingVertical: 12,
         fontSize: 15,
@@ -265,19 +296,19 @@ const styles = StyleSheet.create({
     previewImage: {
         width: 100,
         height: 100,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
     },
     removeIcon: {
         position: 'absolute',
         top: -10,
         right: -10,
         backgroundColor: '#FFFFFF',
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
     },
     uploadButton: {
         width: 100,
         height: 100,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1,
         borderStyle: 'dashed',
         justifyContent: 'center',
@@ -291,17 +322,16 @@ const styles = StyleSheet.create({
     submitButton: {
         marginTop: 32,
         paddingVertical: 16,
-        borderRadius: 30,
+        borderRadius: Layout.borderRadius,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
-        shadowRadius: 4,
     },
-submitButtonText: {
-    color: '#FFFFFF',
+    submitButtonText: {
+        color: '#FFFFFF',
         fontSize: 16,
-            fontWeight: 'bold',
+        fontWeight: 'bold',
     }
 });

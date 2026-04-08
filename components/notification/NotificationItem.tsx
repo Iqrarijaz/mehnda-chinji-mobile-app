@@ -8,6 +8,7 @@ import Animated, {
     withSpring,
 } from 'react-native-reanimated';
 import { ThemedText } from '../themedText';
+import { Layout } from '@/constants/layout';
 
 const PRIMARY = '#006666';
 
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         padding: Platform.OS === 'android' ? 6 : 10,
         marginBottom: 10,
         shadowColor: '#000',
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     iconCircle: {
         width: 40,
         height: 40,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
     },

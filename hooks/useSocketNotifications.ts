@@ -23,29 +23,33 @@ export const useSocketNotifications = () => {
         if (!socket) return;
 
         const handleNewNotification = async (payload: any) => {
-            // 1. Invalidate notification queries to refresh counts and lists
+            // 1. Always refresh notification list & badge
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
             queryClient.invalidateQueries({ queryKey: ['notifications-badge'] });
 
-            // 2. Show UI Toast (Visual)
+            // 2. If place status changed, auto-refresh the My Requests screen
+            if (payload?.type === 'PLACE') {
+                queryClient.invalidateQueries({ queryKey: ['my-place-requests'] });
+            }
+
+            // 3. Show UI Toast
             Toast.show({
-                type: 'success',
+                type: payload?.type === 'PLACE_STATUS' && payload?.body?.includes('منظور') ? 'success' : 'info',
                 text1: payload.title || 'New Notification',
                 text2: payload.body || '',
-                visibilityTime: 3000,
+                visibilityTime: 4000,
             });
 
-            // 3. Trigger Local Notification (for Sound/Vibration)
-            // This relies on the NotificationHandler set in usePushNotifications.ts
+            // 4. Trigger Local Notification (Sound/Vibration)
             try {
                 await Notifications.scheduleNotificationAsync({
                     content: {
                         title: payload.title || 'New Notification',
                         body: payload.body || '',
                         data: payload.data || {},
-                        sound: 'default', // Explicitly request default sound
+                        sound: 'default',
                     },
-                    trigger: null, // Send immediately
+                    trigger: null,
                 });
             } catch (error) {
                 console.warn('[SocketNotifications] Error triggering local notification sound:', error);

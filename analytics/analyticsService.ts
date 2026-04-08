@@ -1,12 +1,11 @@
-// import analytics from '@react-native-firebase/analytics';
-import { AnalyticsEvents, EventName } from './analyticsEvents';
+import { getAnalytics, logEvent, logLogin, logSignUp, setUserId, setUserProperties } from '@react-native-firebase/analytics';
+import { EventName } from './analyticsEvents';
 
 /**
  * AnalyticsService handles the actual communication with Firebase.
  * It includes safety guards and development logging.
  * 
- * NOTE: Firebase native module is currently commented out to allow running in Expo Go.
- * Uncomment the analytics() calls when building the production app or using a Development Build.
+ * NOTE: Firebase native module is currently enabled for production.
  */
 class AnalyticsService {
     /**
@@ -14,7 +13,7 @@ class AnalyticsService {
      */
     async trackEvent(name: EventName | string, params?: Record<string, any>) {
         try {
-            // await analytics().logEvent(name, params);
+            await logEvent(getAnalytics(), name, params);
 
             if (__DEV__) {
                 console.log(`📊 [Analytics] Event: ${name}`, params || '');
@@ -31,7 +30,7 @@ class AnalyticsService {
      */
     async logLogin(method: string = 'email') {
         try {
-            // await analytics().logLogin({ method });
+            await logLogin(getAnalytics(), { method });
             if (__DEV__) console.log('📊 [Analytics] User Logged In');
         } catch (e) { }
     }
@@ -41,7 +40,7 @@ class AnalyticsService {
      */
     async logSignUp(method: string = 'email') {
         try {
-            // await analytics().logSignUp({ method });
+            await logSignUp(getAnalytics(), { method });
             if (__DEV__) console.log('📊 [Analytics] User Signed Up');
         } catch (e) { }
     }
@@ -51,7 +50,7 @@ class AnalyticsService {
      */
     async setUserId(userId: string | null) {
         try {
-            // await analytics().setUserId(userId);
+            await setUserId(getAnalytics(), userId);
         } catch (e) { }
     }
 
@@ -60,7 +59,7 @@ class AnalyticsService {
      */
     async setUserProperties(properties: Record<string, any>) {
         try {
-            // await analytics().setUserProperties(properties);
+            await setUserProperties(getAnalytics(), properties);
         } catch (e) { }
     }
 }

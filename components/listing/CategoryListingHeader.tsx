@@ -6,10 +6,13 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
 
 interface CategoryListingHeaderProps {
     categoryTitle: string;
@@ -39,9 +42,11 @@ const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
     tooltipMessage = 'نیا مقام شامل کرنے کے لیے یہاں ٹیپ کریں',
 }) => {
     const insets = useSafeAreaInsets();
+    const { theme } = useTheme();
+    const colors = Colors[theme];
 
     return (
-        <View style={[styles.headerContainer, { backgroundColor: headerColor, paddingTop: insets.top }]}>
+        <View style={[styles.headerContainer, { backgroundColor: headerColor, paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }]}>
             <View style={styles.headerContent}>
                 <TouchableOpacity onPress={onBack} style={styles.iconButton}>
                     <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
@@ -50,10 +55,10 @@ const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
                 <Tooltip
                     isVisible={showTooltip}
                     content={
-                        <View style={styles.tooltipPill}>
-                            <ThemedText style={styles.tooltipText}>{tooltipMessage}</ThemedText>
+                        <View style={[styles.tooltipPill, { backgroundColor: colors.card }]}>
+                            <ThemedText style={[styles.tooltipText, { color: colors.textSecondary }]}>{tooltipMessage}</ThemedText>
                             <TouchableOpacity onPress={onCloseTooltip} style={styles.tooltipClose}>
-                                <Ionicons name="close-circle" size={18} color="#64748B" />
+                                <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
                             </TouchableOpacity>
                         </View>
                     }
@@ -73,18 +78,18 @@ const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
 
             {/* Search Bar */}
             <View style={styles.searchContainer}>
-                <View style={styles.searchBar}>
-                    <Ionicons name="search" size={20} color="#94A3B8" />
+                <View style={[styles.searchBar, { backgroundColor: colors.card }]}>
+                    <Ionicons name="search" size={20} color={colors.icon} />
                     <TextInput
-                        style={styles.searchInput}
+                        style={[styles.searchInput, { color: colors.text }]}
                         placeholder="Search..."
-                        placeholderTextColor="#94A3B8"
+                        placeholderTextColor={colors.icon}
                         value={search}
                         onChangeText={setSearch}
                     />
                     {search.length > 0 && (
                         <TouchableOpacity onPress={() => setSearch('')}>
-                            <Ionicons name="close-circle" size={20} color="#94A3B8" />
+                            <Ionicons name="close-circle" size={20} color={colors.icon} />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -124,7 +129,7 @@ export default React.memo(CategoryListingHeader);
 const styles = StyleSheet.create({
     tooltipContent: {
         padding: 0,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'transparent',
     },
     tooltipPill: {
@@ -132,7 +137,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 16,
         paddingVertical: 12,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -147,24 +152,24 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#64748B',
     },
-    tooltipClose: {
-        padding: 4,
-    },
     headerContainer: {
-        paddingBottom: 20,
-        borderBottomLeftRadius: 24,
-        borderBottomRightRadius: 24,
+        paddingBottom: Platform.OS === 'android' ? 10 : 6,
+        paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
         zIndex: 10,
     },
+    tooltipClose: {
+        padding: 4,
+    },
     headerContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
         paddingTop: 10,
         marginBottom: 16,
     },
@@ -182,12 +187,11 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     searchContainer: {
-        paddingHorizontal: 20,
         paddingBottom: 16,
     },
     searchBar: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 12,
@@ -203,13 +207,12 @@ const styles = StyleSheet.create({
     },
     filterContainer: {
         flexDirection: 'row',
-        paddingHorizontal: 20,
         gap: 12,
     },
     filterChip: {
         paddingHorizontal: 12,
         paddingVertical: 4,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.3)',

@@ -1,18 +1,19 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
+import { GlobalSearchOverlay } from '@/components/common/GlobalSearchOverlay';
 import { CategoryGrid } from '@/components/home/categoryGrid';
 import { ContentCard } from '@/components/home/contentCard';
 import { HomeHeader } from '@/components/home/homeHeader';
-import { GlobalSearchOverlay } from '@/components/common/GlobalSearchOverlay';
 import { PasswordModal } from '@/components/setting/passwordModal';
 import { ThemedText } from '@/components/themedText';
 import { ThemedView } from '@/components/themedView';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { ScrollView } from 'react-native-gesture-handler';
+import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
@@ -25,7 +26,7 @@ export default function HomeScreen() {
   const [isPasswordModalVisible, setIsPasswordModalVisible] = React.useState(false);
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: '#F5F6FA' }]}>
+    <ThemedView style={styles.container}>
       {/* Header */}
       <HomeHeader
         setIsSearchActive={setIsSearchActive}
@@ -64,20 +65,20 @@ export default function HomeScreen() {
           />
 
           {/* Insight Card */}
-          <Animated.View
+          {/* <Animated.View
             entering={SlideInLeft.delay(600).duration(450)}
-            style={styles.insightCard}
+            style={[styles.insightCard, { backgroundColor: colors.card }]}
           >
             <View style={[styles.insightIconWrap, { backgroundColor: colors.primary + '12' }]}>
               <ThemedText style={styles.insightEmoji}>💡</ThemedText>
             </View>
             <View style={styles.insightTextWrap}>
-              <ThemedText style={[styles.insightTitle, { color: colors.text }]}>Did you know?</ThemedText>
-              <ThemedText style={styles.insightSubtitle}>
+              <ThemedText style={styles.insightTitle}>Did you know?</ThemedText>
+              <ThemedText style={[styles.insightSubtitle, { color: colors.textSecondary }]}>
                 Complete your profile to help community members find and connect with you easily.
               </ThemedText>
             </View>
-          </Animated.View>
+          </Animated.View> */}
         </ScrollView>
 
         {isSearchActive && (
@@ -122,9 +123,8 @@ const styles = StyleSheet.create({
   insightCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 16,
+    borderRadius: Layout.borderRadius,
+    padding: Platform.OS === 'android' ? 12 : 16,
     marginHorizontal: 20,
     marginTop: 8,
     marginBottom: 8,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   insightIconWrap: {
     width: 44,
     height: 44,
-    borderRadius: 14,
+    borderRadius: Layout.borderRadius,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
@@ -150,7 +150,6 @@ const styles = StyleSheet.create({
   },
   insightSubtitle: {
     fontSize: 12,
-    color: '#94A3B8',
     fontWeight: '400',
     lineHeight: 17,
   },

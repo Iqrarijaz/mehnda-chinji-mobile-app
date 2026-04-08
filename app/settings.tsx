@@ -6,11 +6,12 @@ import { SectionCard } from '@/components/setting/sectionCard';
 import { SettingRowItem } from '@/components/setting/settingRow';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -221,21 +222,21 @@ export default function SettingsScreen() {
                             >
                                 <View style={{ alignItems: 'center' }}>
                                     <ThemedText style={styles.modalTitle}>Change Email Address</ThemedText>
-                                    <View style={styles.inputContainer}>
-                                        <Ionicons name="mail-outline" size={20} color="#64748B" style={{ marginRight: 10 }} />
+                                    <View style={[styles.inputContainer, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                                        <Ionicons name="mail-outline" size={20} color={colors.textSecondary} style={{ marginRight: 10 }} />
                                         <TextInput
                                             style={[styles.input, { color: colors.text }]}
                                             value={newEmail}
                                             onChangeText={setNewEmail}
                                             placeholder="New Email Address"
-                                            placeholderTextColor="#94A3B8"
+                                            placeholderTextColor={theme === 'dark' ? 'rgba(255,255,255,0.3)' : '#94A3B8'}
                                             keyboardType="email-address"
                                             autoCapitalize="none"
                                         />
                                     </View>
                                     <View style={styles.modalButtons}>
-                                        <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => setIsEmailModalVisible(false)}>
-                                            <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+                                        <TouchableOpacity style={[styles.modalButton, styles.cancelButton, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]} onPress={() => setIsEmailModalVisible(false)}>
+                                            <ThemedText style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</ThemedText>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.primary }]} onPress={handleUpdateEmail} disabled={isUpdatingEmail}>
                                             {isUpdatingEmail ? <ActivityIndicator color="#FFFFFF" size="small" /> : <ThemedText style={styles.confirmButtonText}>Update</ThemedText>}
@@ -257,8 +258,8 @@ const styles = StyleSheet.create({
     // Header
     headerWrap: {
         paddingBottom: 16,
-        borderBottomLeftRadius: 28,
-        borderBottomRightRadius: 28,
+        borderBottomLeftRadius: Layout.borderRadius,
+        borderBottomRightRadius: Layout.borderRadius,
         overflow: 'hidden',
         zIndex: 2,
     },
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 10,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.1)',
         gap: 6,
     },
@@ -335,21 +336,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
     },
-    modalContent: { width: '100%', borderRadius: 24, padding: 24, alignItems: 'center' },
+    modalContent: { width: '100%', borderRadius: Layout.borderRadius, padding: 24, alignItems: 'center' },
     modalTitle: { fontSize: 20, fontWeight: '700', marginBottom: 20 },
     inputContainer: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F1F5F9',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 15,
         marginBottom: 24,
     },
     input: { flex: 1, height: 50, fontSize: 15 },
     modalButtons: { flexDirection: 'row', width: '100%', gap: 12 },
-    modalButton: { flex: 1, height: 50, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
-    cancelButton: { backgroundColor: '#F1F5F9' },
-    cancelButtonText: { color: '#64748B', fontWeight: '600' },
+    modalButton: { flex: 1, height: 50, borderRadius: Layout.borderRadius, justifyContent: 'center', alignItems: 'center' },
+    cancelButton: {},
+    cancelButtonText: { fontWeight: '600' },
     confirmButtonText: { color: '#FFFFFF', fontWeight: '700' },
 });

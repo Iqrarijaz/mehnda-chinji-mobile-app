@@ -5,6 +5,7 @@ import LottieView from 'lottie-react-native';
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 
 const { width } = Dimensions.get('window');
 
@@ -101,6 +102,7 @@ const styles = StyleSheet.create({
         paddingTop: 12,
         paddingBottom: 0,
         lineHeight: 45,
+        marginBottom: 15,
     },
     description: {
         fontSize: 15,
@@ -108,14 +110,14 @@ const styles = StyleSheet.create({
         lineHeight: 22,
         paddingHorizontal: 10,
         fontWeight: '500',
-        marginTop: -5,
+        marginTop: 5,
     },
     permissionButton: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 24,
         paddingVertical: 12,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         marginTop: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },

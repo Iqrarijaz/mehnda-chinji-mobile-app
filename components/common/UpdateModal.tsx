@@ -9,6 +9,7 @@ import {
     Linking
 } from 'react-native';
 import { ThemedText } from '../themedText';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: '95%',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 24,
         alignItems: 'center',
     },
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     notesContainer: {
         width: '100%',
         padding: 16,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         marginBottom: 24,
     },
     notesTitle: {
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     },
     button: {
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1,

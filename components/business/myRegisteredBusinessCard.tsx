@@ -1,16 +1,26 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import {
+    ActivityIndicator,
     Platform,
     StyleSheet,
     Switch,
     TouchableOpacity,
     View,
 } from 'react-native';
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+} from 'react-native-popup-menu';
 
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
 import { TintedCard } from '../ui/tintedCard';
+import Animated, { FadeIn, FadeOut, ZoomIn, ZoomOut } from 'react-native-reanimated';
 
 interface MyRegisteredBusinessCardProps {
     business: any;
@@ -29,8 +39,10 @@ const MyRegisteredBusinessCard = React.memo(({
     isDeleting,
     isManageSearchPending
 }: MyRegisteredBusinessCardProps) => {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
+    const colors = Colors[theme];
     const isAndroid = Platform.OS === 'android';
+    const [showMenu, setShowMenu] = useState(false);
 
     const status = business.status?.toUpperCase();
 
@@ -40,8 +52,8 @@ const MyRegisteredBusinessCard = React.memo(({
             status === 'REJECTED' ? '#EF4444' :
                 '#F59E0B'; // PENDING
 
-    const primaryColor = "#000000"
-    const softBg = primaryColor + '08';
+    const primaryColor = colors.text;
+    const softBg = isDark ? 'rgba(255,255,255,0.05)' : (primaryColor + '08');
 
 
     const bizName = business.name || 'Business Name';
@@ -53,7 +65,7 @@ const MyRegisteredBusinessCard = React.memo(({
     return (
         <TintedCard
             tintColor={primaryColor}
-            bgColor="#FFFFFF"
+            bgColor={colors.card}
             style={styles.card}
         >
             <View style={styles.cardHeader}>
@@ -108,51 +120,98 @@ const MyRegisteredBusinessCard = React.memo(({
 
             {status !== 'REJECTED' && (
                 <>
-                    <View style={[styles.divider, { backgroundColor: primaryColor + '15' }]} />
+                    <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : (primaryColor + '15') }]} />
 
                     <View style={styles.cardFooter}>
-                        {status === 'APPROVED' && (
-                            <View style={styles.searchToggleContainer}>
-                                <ThemedText style={[styles.searchText, { color: primaryColor, opacity: 0.8 }]}>Directory Search</ThemedText>
-                                <Switch
-                                    value={business.search}
-                                    onValueChange={(val) => onToggleSearch(business._id, business.name, val)}
-                                    trackColor={{ false: '#767577', true: primaryColor + '80' }}
-                                    thumbColor={business.search ? primaryColor : '#f4f3f4'}
-                                    disabled={isManageSearchPending}
-                                />
-                            </View>
-                        )}
+                        <View style={styles.footerLeft}>
+                            <Ionicons name="calendar-outline" size={12} color={primaryColor} style={{ opacity: 0.5 }} />
+                            <ThemedText style={[styles.dateText, { color: primaryColor, opacity: 0.6 }]}>
+                                {new Date(business.createdAt || Date.now()).toLocaleDateString()}
+                            </ThemedText>
+                        </View>
 
-                        <View style={styles.actionButtons}>
+                        <View style={styles.footerRight}>
                             {status === 'APPROVED' && (
-                                <TouchableOpacity
-                                    style={[styles.actionBtn, { backgroundColor: '#EF4444' + '15' }]}
-                                    onPress={() => onDelete(business._id)}
-                                    disabled={isDeleting}
-                                >
-                                    <Ionicons name="trash-outline" size={16} color="#EF4444" />
-                                </TouchableOpacity>
+                                <View style={styles.searchToggleContainer}>
+                                    <ThemedText style={[styles.searchText, { color: primaryColor, opacity: 0.8 }]}>Search</ThemedText>
+                                    <Switch
+                                        value={business.search}
+                                        onValueChange={(val) => onToggleSearch(business._id, business.name, val)}
+                                        trackColor={{ false: '#767577', true: colors.primary + '80' }}
+                                        thumbColor={business.search ? colors.primary : '#f4f3f4'}
+                                        disabled={isManageSearchPending}
+                                        style={{ transform: [{ scaleX: 0.7 }, { scaleY: 0.7 }] }}
+                                    />
+                                </View>
                             )}
 
-                            {status === 'PENDING' && (
-                                <>
-                                    <TouchableOpacity
-                                        style={[styles.actionBtn, { backgroundColor: '#3B82F6' + '15' }]}
-                                        onPress={() => onEdit(business)}
-                                        disabled={isDeleting}
+                            <View style={{ position: 'relative', zIndex: 100 }}>
+                                <Menu opened={showMenu} onBackdropPress={() => setShowMenu(false)}>
+                                    <MenuTrigger
+                                        onPress={() => setShowMenu(true)}
+                                        customStyles={{
+                                            triggerWrapper: styles.moreBtn,
+                                        }}
                                     >
-                                        <Ionicons name="create-outline" size={16} color="#3B82F6" />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={[styles.actionBtn, { backgroundColor: '#EF4444' + '15' }]}
-                                        onPress={() => onDelete(business._id)}
-                                        disabled={isDeleting}
+                                        {isDeleting ? (
+                                            <ActivityIndicator size="small" color="#EF4444" />
+                                        ) : (
+                                            <Ionicons name="ellipsis-horizontal" size={20} color={primaryColor} style={{ opacity: 0.7 }} />
+                                        )}
+                                    </MenuTrigger>
+
+                                    <MenuOptions
+                                        customStyles={{
+                                            optionsContainer: [
+                                                styles.menuPopover,
+                                                {
+                                                    backgroundColor: colors.background,
+                                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                                                }
+                                            ],
+                                        }}
                                     >
-                                        <Ionicons name="trash-outline" size={16} color="#EF4444" />
-                                    </TouchableOpacity>
-                                </>
-                            )}
+                                        {status === 'PENDING' && (
+                                            <MenuOption
+                                                onSelect={() => { setShowMenu(false); onEdit(business); }}
+                                                customStyles={{
+                                                    optionWrapper: styles.menuItem,
+                                                }}
+                                            >
+                                                <View style={[styles.menuIconBox, { backgroundColor: '#3B82F615' }]}>
+                                                    <Ionicons name="create" size={16} color="#3B82F6" />
+                                                </View>
+                                                <ThemedText style={[styles.menuItemText, { color: primaryColor }]}>Edit</ThemedText>
+                                            </MenuOption>
+                                        )}
+
+                                        <MenuOption
+                                            onSelect={() => { setShowMenu(false); onDelete(business._id); }}
+                                            disabled={isDeleting}
+                                            customStyles={{
+                                                optionWrapper: styles.menuItem,
+                                            }}
+                                        >
+                                            <View style={[styles.menuIconBox, { backgroundColor: '#EF444415' }]}>
+                                                <Ionicons name="trash" size={16} color="#EF4444" />
+                                            </View>
+                                            <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>Delete</ThemedText>
+                                        </MenuOption>
+
+                                        <MenuOption
+                                            onSelect={() => { setShowMenu(false); /* report logic if any */ }}
+                                            customStyles={{
+                                                optionWrapper: styles.menuItem,
+                                            }}
+                                        >
+                                            <View style={[styles.menuIconBox, { backgroundColor: '#F59E0B15' }]}>
+                                                <Ionicons name="flag" size={16} color="#F59E0B" />
+                                            </View>
+                                            <ThemedText style={[styles.menuItemText, { color: primaryColor }]}>Report</ThemedText>
+                                        </MenuOption>
+                                    </MenuOptions>
+                                </Menu>
+                            </View>
                         </View>
                     </View>
                 </>
@@ -256,26 +315,73 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginTop: 4,
+    },
+    footerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    footerRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    dateText: {
+        fontSize: 11,
+        fontWeight: '600',
     },
     searchToggleContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: 2,
     },
     searchText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '700',
     },
-    actionButtons: {
-        flexDirection: 'row',
-        gap: 10,
-        marginLeft: 'auto',
-    },
-    actionBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 8,
-        alignItems: 'center',
+    moreBtn: {
+        padding: 4,
+        borderRadius: 20,
         justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'transparent',
+    },
+    menuPopover: {
+        width: 170,
+        borderRadius: Layout.borderRadius,
+        borderWidth: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.12,
+        shadowRadius: 16,
+        elevation: 8,
+        zIndex: 100,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 8,
+        borderRadius: Layout.borderRadius - 4,
+        gap: 10,
+    },
+    menuIconBox: {
+        width: 28,
+        height: 28,
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    menuItemText: {
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    menuSeparator: {
+        height: 1,
+        width: '100%',
+        marginVertical: 4,
     },
 });

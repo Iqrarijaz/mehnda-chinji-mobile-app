@@ -1,0 +1,22 @@
+# EAS Build Exclusions
+# Reduce upload size by excluding files not needed for the cloud build process.
+
+# Dependencies (EAS installs these on the builder)
+node_modules/
+
+# Native build folders (EAS generates these in the cloud)
+ios/
+android/
+
+# Expo artifacts
+.expo/
+dist/
+web-build/
+
+# IDE and environment
+.vscode/
+.env*
+.DS_Store
+
+# Git
+.git/

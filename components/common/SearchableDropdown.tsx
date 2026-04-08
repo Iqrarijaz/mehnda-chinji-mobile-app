@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { ThemedText } from '../themedText';
 
@@ -137,8 +138,8 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         height: '80%',
-        borderTopLeftRadius: 28,
-        borderTopRightRadius: 28,
+        borderTopLeftRadius: Layout.borderRadius,
+        borderTopRightRadius: Layout.borderRadius,
         padding: 24,
         overflow: 'hidden',
         borderWidth: 1,
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.08)',
         height: 52,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
         marginBottom: 20,
         borderWidth: 1,

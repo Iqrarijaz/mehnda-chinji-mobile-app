@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { getTicketById, replyToSupportTicket } from '@/apis/support';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
     metadataContainer: {
         margin: 20,
         padding: 20,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
     },
     subject: {
         fontSize: 20,
@@ -350,7 +351,7 @@ const styles = StyleSheet.create({
     attachmentImage: {
         width: width * 0.4,
         height: 120,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         marginRight: 12,
         backgroundColor: '#eee',
     },
@@ -419,7 +420,7 @@ const styles = StyleSheet.create({
     messageImage: {
         width: 100,
         height: 100,
-        borderRadius: 8,
+        borderRadius: Layout.borderRadius,
         marginRight: 8,
         marginBottom: 8,
     },

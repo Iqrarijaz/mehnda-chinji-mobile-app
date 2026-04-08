@@ -3,6 +3,7 @@ import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Layout } from '@/constants/layout';
 import { HomeHeaderTopNav } from './homeHeaderTopNav';
 import HomeHeaderWeatherWidget from './homeHeaderWeatherWidget';
 import { useRouter } from 'expo-router';
@@ -36,8 +37,8 @@ const styles = StyleSheet.create({
     container: {
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
         paddingBottom: Platform.OS === 'android' ? 4 : 6,
-        borderBottomLeftRadius: 28,
-        borderBottomRightRadius: 28,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         zIndex: 10,
     },
 });

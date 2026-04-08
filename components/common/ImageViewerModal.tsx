@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Avatar from '@/components/ui/avatar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '../themedText';
+import { Layout } from '@/constants/layout';
 
 interface ImageViewerModalProps {
     visible: boolean;
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 15,
+        borderRadius: Layout.borderRadius,
     },
     paginationText: {
         color: '#FFFFFF',

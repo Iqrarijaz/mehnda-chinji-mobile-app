@@ -30,6 +30,9 @@ export const SEARCH_NAV_ITEMS: SearchNavResult[] = [
     { id: 'data-usage', label: 'Data Usage', subtitle: 'Monitor your data consumption', route: '/dataUsage', icon: 'cellular-outline', color: '#6366F1' },
     { id: 'privacy-policy', label: 'Privacy Policy', subtitle: 'How we handle your data', route: '/privacy', icon: 'shield-checkmark-outline', color: '#06B6D4' },
     { id: 'terms', label: 'Terms & Conditions', subtitle: 'App usage terms', route: '/terms', icon: 'document-text-outline', color: '#64748B' },
+    // Category Shortcuts
+    { id: 'nav-travel', label: 'Travel & Transport', subtitle: 'Bus timings and transport', route: '/listing/travel', icon: 'bus-outline', color: '#F59E0B' },
+    { id: 'nav-banks', label: 'Banks & ATMs', subtitle: 'Find nearest bank or ATM', route: '/listing/banks', icon: 'card-outline', color: '#06B6D4' },
 ];
 
 export const SEARCH_CATEGORIES_CONFIG: SearchCategoryResult[] = [
@@ -68,6 +71,20 @@ export const SEARCH_CATEGORIES_CONFIG: SearchCategoryResult[] = [
         color: '#6366F1',
         keywords: ['govt', 'office', 'nadra', 'police station', 'utility', 'bill', 'official']
     },
+    {
+        id: 'travel',
+        label: 'Travel',
+        icon: 'bus',
+        color: '#F59E0B',
+        keywords: ['travel', 'bus', 'transport', 'van', 'timing', 'ticket', 'hiace', 'terminal']
+    },
+    {
+        id: 'banks',
+        label: 'Banks',
+        icon: 'card',
+        color: '#06B6D4',
+        keywords: ['bank', 'atm', 'cash', 'money', 'hbl', 'meezan', 'mcb', 'uabl', 'branch']
+    },
 ];
 
 export const POPULAR_SEARCHES = [
@@ -75,5 +92,7 @@ export const POPULAR_SEARCHES = [
     "Govt School",
     "Masjid Timings",
     "Clinic",
-    "Police Station"
+    "Police Station",
+    "Bus Timings",
+    "ATM"
 ];

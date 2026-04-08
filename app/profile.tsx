@@ -10,6 +10,7 @@ import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { ThemedText } from '@/components/themedText';
 import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import citiesData from '@/data/cities.json';
@@ -250,7 +251,7 @@ export default function ProfileScreen() {
 
     return (
         <ErrorBoundary>
-            <View style={[styles.container, { backgroundColor: theme === 'dark' ? '#0F172A' : '#F5F6FA' }]}>
+            <View style={[styles.container, { backgroundColor: colors.background }]}>
                 {/* Animated Header */}
                 <Animated.View entering={FadeInUp.duration(600)} style={styles.header}>
                     <LinearGradient
@@ -259,9 +260,9 @@ export default function ProfileScreen() {
                     />
                     <View style={[styles.headerTop, { paddingTop: insets.top + 10 }]}>
                         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                            <Ionicons name="arrow-back" size={24} color={theme === 'dark' ? colors.text : '#FFFFFF'} />
                         </TouchableOpacity>
-                        <ThemedText style={styles.headerTitle}>Update Profile</ThemedText>
+                        <ThemedText style={[styles.headerTitle, { color: theme === 'dark' ? colors.text : '#FFFFFF' }]}>Update Profile</ThemedText>
                         <View style={{ width: 44 }} />
                     </View>
 
@@ -274,8 +275,8 @@ export default function ProfileScreen() {
                         onDeleteImage={() => deleteImageMutation.mutate()}
                         onPreviewOpen={() => setPreviewVisible(true)}
                     />
-                    <ThemedText style={styles.welcomeText}>Complete Your Profile</ThemedText>
-                    <ThemedText style={styles.subtitleText}>Maintain your profile for better community trust</ThemedText>
+                    <ThemedText style={[styles.welcomeText, { color: theme === 'dark' ? colors.text : '#FFFFFF' }]}>Complete Your Profile</ThemedText>
+                    <ThemedText style={[styles.subtitleText, { color: theme === 'dark' ? colors.textSecondary : 'rgba(255,255,255,0.8)' }]}>Maintain your profile for better community trust</ThemedText>
                 </Animated.View>
 
                 <KeyboardAvoidingView
@@ -310,7 +311,7 @@ export default function ProfileScreen() {
                                         {formData.name.length}/30
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46 }]}>
+                                <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="person-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         placeholder="Enter your name"
@@ -330,7 +331,7 @@ export default function ProfileScreen() {
                                         EMAIL ADDRESS
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46, opacity: 0.8 }]}>
+                                <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52, opacity: 0.8 }]}>
                                     <Ionicons name="mail-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -351,7 +352,7 @@ export default function ProfileScreen() {
                                         {formData.phone.length}/11
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46 }]}>
+                                <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="call-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         placeholder="+923001234567"
@@ -371,17 +372,17 @@ export default function ProfileScreen() {
                                 <View style={styles.genderRow}>
                                     <TouchableOpacity
                                         onPress={() => setFormData(p => ({ ...p, gender: 'MALE' }))}
-                                        style={[styles.genderPill, formData.gender?.toUpperCase() === 'MALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                                        style={[styles.genderPill, { borderColor: colors.border }, formData.gender?.toUpperCase() === 'MALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                                     >
                                         <Ionicons name="male" size={16} color={formData.gender?.toUpperCase() === 'MALE' ? '#FFF' : colors.icon} />
-                                        <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'MALE' && { color: '#FFF' }]}>Male</ThemedText>
+                                        <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'MALE' && { color: '#FFF' }, theme === 'dark' && { color: colors.textSecondary }]}>Male</ThemedText>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => setFormData(p => ({ ...p, gender: 'FEMALE' }))}
-                                        style={[styles.genderPill, formData.gender?.toUpperCase() === 'FEMALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                                        style={[styles.genderPill, { borderColor: colors.border }, formData.gender?.toUpperCase() === 'FEMALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                                     >
                                         <Ionicons name="female" size={16} color={formData.gender?.toUpperCase() === 'FEMALE' ? '#FFF' : colors.icon} />
-                                        <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'FEMALE' && { color: '#FFF' }]}>Female</ThemedText>
+                                        <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'FEMALE' && { color: '#FFF' }, theme === 'dark' && { color: colors.textSecondary }]}>Female</ThemedText>
                                     </TouchableOpacity>
                                 </View>
                             </Animated.View>
@@ -394,7 +395,7 @@ export default function ProfileScreen() {
                                     </ThemedText>
                                 </View>
                                 <TouchableOpacity
-                                    style={[styles.dropdownTrigger, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46 }]}
+                                    style={[styles.dropdownTrigger, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
                                     onPress={() => setCityPickerVisible(true)}
                                 >
                                     <View style={styles.triggerContent}>
@@ -417,7 +418,7 @@ export default function ProfileScreen() {
                                         {formData.village.length}/40
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 44 : 46 }]}>
+                                <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="business-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         placeholder="Enter your village/town"
@@ -440,7 +441,12 @@ export default function ProfileScreen() {
                 </KeyboardAvoidingView>
 
                 {/* Sticky Footer Button */}
-                <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+                <View style={[styles.footer, { 
+                    backgroundColor: theme === 'dark' ? colors.card : 'rgba(245, 246, 250, 0.95)',
+                    borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                    borderTopWidth: 1,
+                    paddingBottom: Math.max(insets.bottom, 20) 
+                }]}>
                     <Animated.View style={animatedButtonStyle}>
                         <TouchableOpacity
                             style={[styles.updateButton, !isModified && { opacity: 0.6 }]}
@@ -487,8 +493,8 @@ const styles = StyleSheet.create({
     },
     header: {
         height: Platform.OS === 'android' ? 260 : 280,
-        borderBottomLeftRadius: 32,
-        borderBottomRightRadius: 32,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
     },
     headerTop: {
@@ -559,7 +565,7 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
         borderWidth: 1,
     },
@@ -571,7 +577,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
         borderWidth: 1,
     },
@@ -592,8 +598,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        height: Platform.OS === 'android' ? 44 : 46,
-        borderRadius: 14,
+        height: Platform.OS === 'android' ? 48 : 52,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1,
         borderColor: '#E2E8F0',
         gap: 6,
@@ -627,8 +633,8 @@ const styles = StyleSheet.create({
         paddingBottom: Platform.OS === 'android' ? 10 : 12,
     },
     updateButton: {
-        height: Platform.OS === 'android' ? 44 : 48,
-        borderRadius: 12,
+        height: Platform.OS === 'android' ? 48 : 52,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',

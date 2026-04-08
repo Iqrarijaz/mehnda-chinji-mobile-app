@@ -3,6 +3,7 @@ import { View, StyleSheet, ActivityIndicator, TouchableOpacity, Share, Platform,
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/themedText';
+import { Layout } from '@/constants/layout';
 import type { Hadith } from '@/apis/hadith';
 
 interface HadithCardProps {
@@ -38,33 +39,32 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
 
     /** Adaptive font size for long Hadiths */
     const getUrduFontSize = (text: string) => {
-        if (text.length > 300) return 15;
-        if (text.length > 150) return 16;
-        return 18;
+        if (text.length > 300) return 12;
+        if (text.length > 150) return 14;
+        return 16;
     };
 
     if (!hadith && !isLoading && !error) return null;
-
-    const cardBg = isDark ? ['#112119', '#0D1A14'] : ['#FFFFFF', '#F9FBF9'];
+    const cardBg = isDark ? [C.card, C.card] : ['#FFFFFF', '#F9FBF9'];
 
     return (
         <View style={styles.outerContainer}>
             <LinearGradient
                 colors={cardBg as any}
-                style={[styles.hadithCard, { borderColor: C.cardBorder }]}
+                style={[styles.hadithCard, { borderColor: isDark ? 'rgba(255,255,255,0.06)' : C.cardBorder }]}
             >
                 {/* Decorative Motif */}
                 <Ionicons 
                     name="journal-outline" 
                     size={80} 
-                    color={isDark ? 'rgba(5,150,105,0.05)' : 'rgba(4,120,87,0.03)'} 
+                    color={isDark ? 'rgba(255,255,255,0.04)' : 'rgba(4,120,87,0.03)'} 
                     style={styles.motifIcon} 
                 />
 
                 <View style={styles.header}>
                     <View style={styles.headerLeft}>
-                        <View style={[styles.titleBadge, { backgroundColor: C.primaryLight }]}>
-                            <ThemedText style={[styles.titleLabel, { color: C.primary }]}>HADITH OF THE DAY</ThemedText>
+                        <View style={[styles.titleBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : C.primaryLight }]}>
+                            <ThemedText style={[styles.titleLabel, { color: isDark ? '#FFFFFF' : C.primary }]}>HADITH OF THE DAY</ThemedText>
                         </View>
                     </View>
                     
@@ -74,7 +74,7 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
                             style={[styles.iconButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}
                             activeOpacity={0.7}
                         >
-                            <Ionicons name="share-social-outline" size={18} color={C.primary} />
+                            <Ionicons name="share-social-outline" size={18} color={isDark ? '#FFFFFF' : C.primary} />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -92,11 +92,7 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
                         </View>
                     ) : hadith ? (
                         <View style={styles.hadithContent}>
-                            <ScrollView 
-                                style={styles.scrollArea} 
-                                showsVerticalScrollIndicator={false}
-                                contentContainerStyle={styles.scrollContent}
-                            >
+                            <View style={styles.textContainer}>
                                 <ThemedText 
                                     type="urdu" 
                                     style={[
@@ -109,7 +105,7 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
                                 >
                                     {hadith.hadithUrdu}
                                 </ThemedText>
-                            </ScrollView>
+                            </View>
                             
                             <View style={[styles.footer, { borderTopColor: C.divider }]}>
                                 <ThemedText style={[styles.sourceText, { color: C.textSecondary }]}>
@@ -129,12 +125,14 @@ export default HadithCard;
 const styles = StyleSheet.create({
     outerContainer: {
         marginTop: 24,
+        marginBottom: 24,
         paddingHorizontal: 1, // subtle gap
     },
     hadithCard: {
-        borderRadius: 28,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1,
-        padding: 24,
+        paddingVertical: 24,
+        paddingHorizontal: 20,
         minHeight: 220,
         overflow: 'hidden',
         ...Platform.select({
@@ -169,7 +167,7 @@ const styles = StyleSheet.create({
     titleBadge: {
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: Layout.borderRadius,
     },
     titleLabel: {
         fontSize: 10,
@@ -194,15 +192,12 @@ const styles = StyleSheet.create({
     hadithContent: {
         flex: 1,
     },
-    scrollArea: {
-        maxHeight: 350, // Prevent runaway height for mega-Hadiths
-    },
-    scrollContent: {
+    textContainer: {
         paddingVertical: 4,
     },
     urduText: {
         textAlign: 'center',
-        lineHeight: 34,
+        lineHeight: 28,
         paddingHorizontal: 4,
     },
     footer: {

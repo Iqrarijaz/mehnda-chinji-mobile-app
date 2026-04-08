@@ -26,6 +26,7 @@ import NotificationSection from '@/components/notification/NotificationSection';
 import NotificationSkeleton from '@/components/notification/NotificationSkeleton';
 import { handleNotificationNavigation } from '@/utils/notificationNavigation';
 import { useAuth } from '@/context/AuthContext';
+import { useTooltipStore } from '@/store/tooltipStore';
 
 
 
@@ -60,7 +61,7 @@ export default function NotificationsScreen() {
     const [activeFilter, setActiveFilter] = useState('ALL');
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [showSwipeTooltip, setShowSwipeTooltip] = useState(false);
-    const tooltipShownRef = useRef(false);
+    const tooltipStore = useTooltipStore();
 
     const { data: response, isLoading, isFetching, refetch } = useQuery<any>({
         queryKey: ['notifications', activeFilter],
@@ -71,16 +72,20 @@ export default function NotificationsScreen() {
     const notifications = response?.data || [];
     const unreadCount = response?.unreadCount || 0;
 
-    // Show swipe tooltip once when notifications first appear
+    // Show swipe tooltip once when notifications first appear and wasn't viewed before
     useEffect(() => {
-        if (!tooltipShownRef.current && notifications.length > 0) {
-            tooltipShownRef.current = true;
+        const tooltipId = 'notifications-screen';
+        if (!tooltipStore.viewedTooltips[tooltipId] && notifications.length > 0) {
             const timer = setTimeout(() => setShowSwipeTooltip(true), 600);
             return () => clearTimeout(timer);
         }
-    }, [notifications.length]);
+    }, [notifications.length, tooltipStore.viewedTooltips]);
 
-    const closeSwipeTooltip = useCallback(() => setShowSwipeTooltip(false), []);
+    const closeSwipeTooltip = useCallback(() => {
+        const tooltipId = 'notifications-screen';
+        tooltipStore.markAsViewed(tooltipId);
+        setShowSwipeTooltip(false);
+    }, [tooltipStore]);
 
     const markAsReadMutation = useMutation({
         mutationFn: markNotificationAsRead,

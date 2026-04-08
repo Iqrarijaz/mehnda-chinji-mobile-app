@@ -11,8 +11,10 @@ import {
 import Toast from 'react-native-toast-message';
 
 import { deleteAccount } from '@/apis/profile';
+import { clientStorage } from '@/utils/storage';
 import { ThemedText } from '@/components/themedText';
 import { useAuth } from '@/context/AuthContext';
+import { Layout } from '@/constants/layout';
 import { PremiumModal } from '../common/PremiumModal';
 
 interface DeleteAccountModalProps {
@@ -33,6 +35,12 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
         try {
             const response = await deleteAccount({}) as any;
             if (response.success) {
+                try {
+                    await clientStorage.removeItem('remember_email');
+                    await clientStorage.removeItem('remember_password');
+                } catch (e) {
+                    // Ignore storage errors on cleanup
+                }
                 Toast.show({ type: 'success', text1: 'Account Deleted', text2: 'Your account has been successfully deleted.' });
                 resetAndClose();
                 logout();
@@ -149,7 +157,7 @@ const styles = StyleSheet.create({
     input: {
         height: Platform.OS === 'android' ? 48 : 52,
         borderWidth: 1.5,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 18,
         fontSize: 15,
         fontWeight: '500',
@@ -157,7 +165,7 @@ const styles = StyleSheet.create({
     },
     saveButton: {
         height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 10,
@@ -191,7 +199,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: '#E2E8F0',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
     },
     cancelText: {
         fontSize: 14,

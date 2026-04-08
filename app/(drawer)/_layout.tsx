@@ -10,7 +10,7 @@ export default function DrawerLayout() {
     const { theme } = useTheme();
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors[theme].background }}>
+        <View style={{ flex: 1, backgroundColor: theme === 'dark' ? Colors[theme].card : Colors[theme].background }}>
             <Drawer
                 drawerContent={(props: any) => <CustomDrawerContent {...props} />}
                 initialRouteName="(tabs)"
@@ -19,7 +19,7 @@ export default function DrawerLayout() {
                     headerShown: false,
                     swipeEnabled: isAuthenticated,
                     drawerType: 'front',
-                    drawerStyle: { backgroundColor: Colors[theme].background },
+                    drawerStyle: { backgroundColor: theme === 'dark' ? Colors[theme].card : Colors[theme].background },
                 }}
             >
                 <Drawer.Screen

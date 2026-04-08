@@ -18,7 +18,9 @@ import Toast from 'react-native-toast-message';
 import { sendOtp, verifyOtp } from '@/apis/login/forgot-password';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 export default function VerifyOtpScreen() {
     const router = useRouter();
@@ -83,6 +85,9 @@ export default function VerifyOtpScreen() {
                 text2: 'OTP verified successfully'
             });
 
+            analyticsService.trackEvent(AnalyticsEvents.FORGOT_PASSWORD_VERIFIED, { email });
+
+
             router.push({
                 pathname: '/(auth)/reset-password',
                 params: { email, resetToken: otpString }
@@ -128,23 +133,25 @@ export default function VerifyOtpScreen() {
             style={[styles.container, { backgroundColor: colors.background }]}
         >
             {/* Header */}
-            <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => router.back()}
-                >
-                    <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-                </TouchableOpacity>
-                <View style={styles.headerContent}>
-                    <Image
-                        source={require('../../public/icon.svg')}
-                        style={{ width: 48, height: 48, marginBottom: 16 }}
-                        contentFit="contain"
-                    />
-                    <ThemedText style={styles.headerTitle}>Verify Email</ThemedText>
-                    <ThemedText style={styles.headerSubtitle}>
-                        Please enter the 6-digit verification code
-                    </ThemedText>
+            <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() => router.back()}
+                    >
+                        <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                    </TouchableOpacity>
+                    <View style={styles.headerContent}>
+                        <Image
+                            source={require('../../public/icon.svg')}
+                            style={{ width: 48, height: 48, marginBottom: 16 }}
+                            contentFit="contain"
+                        />
+                        <ThemedText style={styles.headerTitle}>Verify Email</ThemedText>
+                        <ThemedText style={styles.headerSubtitle}>
+                            Please enter the 6-digit verification code
+                        </ThemedText>
+                    </View>
                 </View>
             </View>
 
@@ -251,8 +258,8 @@ const styles = StyleSheet.create({
     },
     headerSection: {
         paddingBottom: 10,
-        borderBottomLeftRadius: 36,
-        borderBottomRightRadius: 36,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
     },
     backButton: {
         marginLeft: 22,
@@ -287,7 +294,7 @@ const styles = StyleSheet.create({
         paddingTop: 30,
     },
     formCard: {
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -303,7 +310,7 @@ const styles = StyleSheet.create({
     otpInput: {
         width: 40,
         height: 40,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         textAlign: 'center',
         fontSize: 24,
         fontWeight: '800',
@@ -346,7 +353,7 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#006666',

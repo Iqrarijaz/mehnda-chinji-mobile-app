@@ -1,18 +1,21 @@
 import { DONOR_QUERY_KEYS, getDonorsList } from '@/apis/bloodDonation';
-import BloodRegistration from '@/components/blood/bloodRegistration';
 import { BloodDonorHeader } from '@/components/blood/bloodDonorHeader';
+import BloodRegistration from '@/components/blood/bloodRegistration';
 import DonorCard from '@/components/blood/donorCard';
+import { DonorCardSkeleton } from '@/components/common/CardSkeletons';
+import { ErrorBoundary } from '@/components/common/errorBoundary';
+import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
 import { ThemedText } from '@/components/themedText';
 import { ThemedView } from '@/components/themedView';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
-import { useNavigation, useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useState, useRef } from 'react';
-import { ErrorBoundary } from '@/components/common/errorBoundary';
+import { useFocusEffect, useNavigation } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTooltipStore } from '@/store/tooltipStore';
 import {
     ActivityIndicator,
     FlatList,
@@ -23,12 +26,12 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { DonorCardSkeleton } from '@/components/common/CardSkeletons';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
 export default function BloodScreen() {
     const { theme, isDark } = useTheme();
+    const tooltipStore = useTooltipStore();
     const { user } = useAuth();
     const navigation = useNavigation();
     const colors = Colors[theme];
@@ -36,9 +39,15 @@ export default function BloodScreen() {
     const [activeTab, setActiveTab] = useState<'find' | 'portal'>('find');
     const [showTooltip, setShowTooltip] = useState(false);
 
-    // Show tooltip on every focus
+    // Show tooltip only if not viewed before
     useFocusEffect(
         useCallback(() => {
+            const tooltipId = 'blood-screen';
+            if (tooltipStore.viewedTooltips[tooltipId]) {
+                setShowTooltip(false);
+                return;
+            }
+
             setShowTooltip(false);
             const timer = setTimeout(() => {
                 setShowTooltip(true);
@@ -47,8 +56,14 @@ export default function BloodScreen() {
                 clearTimeout(timer);
                 setShowTooltip(false);
             };
-        }, [])
+        }, [tooltipStore.viewedTooltips])
     );
+
+    const handleDismissTooltip = () => {
+        const tooltipId = 'blood-screen';
+        tooltipStore.markAsViewed(tooltipId);
+        setShowTooltip(false);
+    };
 
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -137,7 +152,7 @@ export default function BloodScreen() {
                     selectedGroup={selectedGroup}
                     onOpenGroupModal={() => setGroupModalVisible(true)}
                     showTooltip={showTooltip}
-                    onCloseTooltip={() => setShowTooltip(false)}
+                    onCloseTooltip={handleDismissTooltip}
                 />
 
 
@@ -200,8 +215,8 @@ export default function BloodScreen() {
                         style={styles.modalOverlay}
                         onPress={() => setGroupModalVisible(false)}
                     >
-                        <View style={[styles.dropdownModalContent, { backgroundColor: colors.card }]}>
-                            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+                        <View style={[styles.dropdownModalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                            <View style={[styles.modalHeader, { borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]}>
                                 <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Filter by Group</ThemedText>
                             </View>
 
@@ -209,20 +224,20 @@ export default function BloodScreen() {
                             <TouchableOpacity
                                 style={[
                                     styles.groupItem,
-                                    { borderBottomColor: colors.border },
-                                    !selectedGroup && { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 64, 48, 0.08)' }
+                                    { borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border },
+                                    !selectedGroup && { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 64, 48, 0.05)' }
                                 ]}
                                 onPress={() => handleGroupSelect(null)}
                             >
                                 <ThemedText style={[
                                     styles.groupItemText,
                                     { color: colors.text },
-                                    !selectedGroup && { color: colors.primary, fontWeight: '700' }
+                                    !selectedGroup && { color: isDark ? '#FFFFFF' : colors.primary, fontWeight: '700' }
                                 ]}>
                                     Any Blood Group
                                 </ThemedText>
                                 {!selectedGroup && (
-                                    <Ionicons name="checkmark" size={20} color={colors.primary} />
+                                    <Ionicons name="checkmark" size={20} color={isDark ? '#FFFFFF' : colors.primary} />
                                 )}
                             </TouchableOpacity>
 
@@ -231,20 +246,20 @@ export default function BloodScreen() {
                                     key={group}
                                     style={[
                                         styles.groupItem,
-                                        { borderBottomColor: colors.border },
-                                        selectedGroup === group && { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 64, 48, 0.08)' }
+                                        { borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border },
+                                        selectedGroup === group && { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 64, 48, 0.05)' }
                                     ]}
                                     onPress={() => handleGroupSelect(group)}
                                 >
                                     <ThemedText style={[
                                         styles.groupItemText,
                                         { color: colors.text },
-                                        selectedGroup === group && { color: colors.primary, fontWeight: '700' }
+                                        selectedGroup === group && { color: isDark ? '#FFFFFF' : colors.primary, fontWeight: '700' }
                                     ]}>
                                         {group}
                                     </ThemedText>
                                     {selectedGroup === group && (
-                                        <Ionicons name="checkmark" size={20} color={colors.primary} />
+                                        <Ionicons name="checkmark" size={20} color={isDark ? '#FFFFFF' : colors.primary} />
                                     )}
                                 </TouchableOpacity>
                             ))}
@@ -294,7 +309,7 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 38,
         height: 38,
-        borderRadius: 11,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -337,7 +352,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         height: Platform.OS === 'android' ? 46 : 48,
         borderWidth: 1,
@@ -353,7 +368,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         height: Platform.OS === 'android' ? 46 : 48,
         gap: 6,
@@ -370,7 +385,7 @@ const styles = StyleSheet.create({
     filterChip: {
         paddingHorizontal: Platform.OS === 'android' ? 12 : 14,
         paddingVertical: 4,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.3)',
@@ -424,7 +439,7 @@ const styles = StyleSheet.create({
     dropdownModalContent: {
         width: '85%',
         maxHeight: '70%',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 20,
         overflow: 'hidden',
         backgroundColor: '#FFFFFF',

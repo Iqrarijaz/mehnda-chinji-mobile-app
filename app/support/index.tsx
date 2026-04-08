@@ -21,6 +21,7 @@ import Toast from 'react-native-toast-message';
 
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createSupportTicket } from '@/apis/support';
@@ -99,7 +100,7 @@ export default function SupportScreen() {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: '#F8FAFC' }]}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
             <StatusBar barStyle="light-content" />
 
@@ -153,8 +154,8 @@ export default function SupportScreen() {
                             style={styles.actionCard}
                             onPress={() => router.push('/support/create-ticket')}
                         >
-                            <View style={[styles.actionIcon, { backgroundColor: '#E0F2F1' }]}>
-                                <Ionicons name="add-circle" size={28} color="#009688" />
+                            <View style={[styles.actionIcon, { backgroundColor: `${colors.primary}15` }]}>
+                                <Ionicons name="add-circle" size={28} color={colors.primary} />
                             </View>
                             <ThemedText style={styles.actionText}>New Ticket</ThemedText>
                         </TouchableOpacity>
@@ -165,8 +166,8 @@ export default function SupportScreen() {
                             style={styles.actionCard}
                             onPress={() => router.push('/support/tickets')}
                         >
-                            <View style={[styles.actionIcon, { backgroundColor: '#E1F5FE' }]}>
-                                <Ionicons name="list" size={28} color="#039BE5" />
+                            <View style={[styles.actionIcon, { backgroundColor: `${colors.primary}10` }]}>
+                                <Ionicons name="list" size={28} color={colors.primary} />
                             </View>
                             <ThemedText style={styles.actionText}>My Tickets</ThemedText>
                         </TouchableOpacity>
@@ -218,8 +219,8 @@ const styles = StyleSheet.create({
     },
     headerWrap: {
         paddingBottom: 24,
-        borderBottomLeftRadius: 32,
-        borderBottomRightRadius: 32,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
         zIndex: 2,
     },
@@ -281,7 +282,7 @@ const styles = StyleSheet.create({
     },
     actionCard: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         alignItems: 'center',
         shadowColor: '#000',
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
     actionIcon: {
         width: 56,
         height: 56,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 10,

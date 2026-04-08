@@ -1,5 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import { useAddPost, useUpdatePost, useDeletePostImage } from '@/hooks/usePosts';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
     postButton: {
         paddingHorizontal: 16,
         paddingVertical: 8,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         minWidth: 70,
         alignItems: 'center',
     },
@@ -303,7 +304,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 12,
         paddingVertical: 8,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1,
     },
     categoryText: {
@@ -315,7 +316,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         minHeight: 120,
         textAlignVertical: 'top',
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         marginBottom: 24,
     },
@@ -329,19 +330,19 @@ const styles = StyleSheet.create({
     previewImage: {
         width: 100,
         height: 100,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
     },
     removeIcon: {
         position: 'absolute',
         top: -8,
         right: -8,
         backgroundColor: '#FFFFFF',
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
     },
     uploadButton: {
         width: 100,
         height: 100,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1,
         borderStyle: 'dashed',
         justifyContent: 'center',

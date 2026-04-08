@@ -1,10 +1,11 @@
-import { useWeather } from '@/hooks/useWeather';
-import { useWeatherCity } from '@/context/WeatherContext';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { useWeatherCity } from '@/context/WeatherContext';
+import { useWeather } from '@/hooks/useWeather';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Layout } from '@/constants/layout';
 import { ThemedText } from '../themedText';
 
 interface HomeHeaderWeatherWidgetProps {
@@ -78,7 +79,12 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
         <TouchableOpacity
             activeOpacity={0.8}
             onPress={onPress}
-            style={[styles.container, { paddingVertical: 12, paddingHorizontal: 16 }]}
+            style={[styles.container, {
+                paddingVertical: 12,
+                paddingHorizontal: 16,
+                backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255, 255, 255, 0.12)',
+                borderColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(255, 255, 255, 0.1)',
+            }]}
         >
             <View style={styles.leftSection}>
                 <View style={styles.mainTempRow}>
@@ -129,12 +135,10 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         padding: 14,
-        borderRadius: 18,
+        borderRadius: Layout.headerBorderRadius,
         marginBottom: 16,
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.12)',
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     leftSection: {
         flex: 3,

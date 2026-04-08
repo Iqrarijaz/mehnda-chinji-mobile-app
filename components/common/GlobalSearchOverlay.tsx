@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themedText';
+import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useGlobalSearch, GlobalSearchResult } from '@/hooks/useGlobalSearch';
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: 48,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',

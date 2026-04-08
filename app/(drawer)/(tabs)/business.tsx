@@ -11,6 +11,7 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { Layout } from '@/constants/layout';
 import { DrawerActions } from '@react-navigation/native';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useLocalSearchParams, useNavigation, useFocusEffect } from 'expo-router';
@@ -25,6 +26,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
+import { useTooltipStore } from '@/store/tooltipStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ErrorBoundary } from '@/components/common/errorBoundary';
 import Tooltip from 'react-native-walkthrough-tooltip';
@@ -32,6 +34,7 @@ import Tooltip from 'react-native-walkthrough-tooltip';
 
 export default function BusinessScreen() {
     const { theme } = useTheme();
+    const tooltipStore = useTooltipStore();
     const { user } = useAuth();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
@@ -42,9 +45,15 @@ export default function BusinessScreen() {
     const [activeTab, setActiveTab] = useState<'find' | 'portal'>(params.tab === 'portal' ? 'portal' : 'find');
     const [showTooltip, setShowTooltip] = useState(false);
 
-    // Show tooltip on every focus
+    // Show tooltip only if not viewed before
     useFocusEffect(
         useCallback(() => {
+            const tooltipId = 'business-screen';
+            if (tooltipStore.viewedTooltips[tooltipId]) {
+                setShowTooltip(false);
+                return;
+            }
+
             setShowTooltip(false);
             const timer = setTimeout(() => {
                 setShowTooltip(true);
@@ -53,8 +62,14 @@ export default function BusinessScreen() {
                 clearTimeout(timer);
                 setShowTooltip(false);
             };
-        }, [])
+        }, [tooltipStore.viewedTooltips])
     );
+
+    const handleDismissTooltip = () => {
+        const tooltipId = 'business-screen';
+        tooltipStore.markAsViewed(tooltipId);
+        setShowTooltip(false);
+    };
 
     useEffect(() => {
         if (params.tab) {
@@ -90,10 +105,10 @@ export default function BusinessScreen() {
         isFetchingNextPage,
         refetch
     } = useInfiniteQuery({
-        queryKey: BUSINESS_QUERY_KEYS.list({ search: debouncedSearch || undefined, categoryId: selectedCategory === 'All' ? undefined : selectedCategory }),
+        queryKey: BUSINESS_QUERY_KEYS.list({ text: debouncedSearch || undefined, categoryEn: selectedCategory === 'All' ? undefined : selectedCategory }),
         queryFn: ({ pageParam = 1 }) => getBusinessesList({
-            search: debouncedSearch || undefined,
-            categoryId: selectedCategory === 'All' ? undefined : selectedCategory,
+            text: debouncedSearch || undefined,
+            categoryEn: selectedCategory === 'All' ? undefined : selectedCategory,
             currentPage: pageParam
         }),
         getNextPageParam: (lastPage: any, allPages: any[]) => {
@@ -188,13 +203,13 @@ export default function BusinessScreen() {
                             content={
                                 <View style={styles.tooltipPill}>
                                     <ThemedText style={styles.tooltipText}>اپنا کاروبار رجسٹر کرنے کے لیے یہاں ٹیپ کریں</ThemedText>
-                                    <TouchableOpacity onPress={() => setShowTooltip(false)} style={styles.tooltipClose}>
+                                    <TouchableOpacity onPress={handleDismissTooltip} style={styles.tooltipClose}>
                                         <Ionicons name="close-circle" size={18} color="#64748B" />
                                     </TouchableOpacity>
                                 </View>
                             }
                             placement="bottom"
-                            onClose={() => setShowTooltip(false)}
+                            onClose={handleDismissTooltip}
                             contentStyle={styles.tooltipContent}
                             backgroundColor="rgba(0,0,0,0.2)"
                             // useInteraction={true}
@@ -309,7 +324,7 @@ export default function BusinessScreen() {
 const styles = StyleSheet.create({
     tooltipContent: {
         padding: 0,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'transparent',
     },
     tooltipPill: {
@@ -317,7 +332,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 16,
         paddingVertical: 10,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -340,8 +355,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8FAFC',
     },
     headerContainer: {
-        borderBottomLeftRadius: 28,
-        borderBottomRightRadius: 28,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.05,
@@ -363,7 +378,7 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 38,
         height: 38,
-        borderRadius: 11,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -386,8 +401,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: Platform.OS === 'android' ? 6 : 8,
         paddingHorizontal: Platform.OS === 'android' ? 12 : 14,
-
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -408,7 +422,7 @@ const styles = StyleSheet.create({
     },
     searchBar: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
@@ -437,7 +451,7 @@ const styles = StyleSheet.create({
     categoryChip: {
         paddingHorizontal: 12,
         paddingVertical: 4,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.3)',

@@ -1,16 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import PlacesDetailsModal from './placesDetailsModal';
 
 interface Contact {
     name: string;
@@ -36,6 +38,7 @@ interface PlaceData {
     };
     contact?: Contact[];
     images?: string[];
+    type?: string;
 }
 
 interface EducationCardProps {
@@ -45,73 +48,185 @@ interface EducationCardProps {
 
 const EducationCard = React.memo(({ data, color }: EducationCardProps) => {
     const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const colors = Colors[theme];
-    const [modalVisible, setModalVisible] = useState(false);
+    const router = useRouter();
     const primaryColor = color || '#3B82F6';
+
+    // Derived light/dark tints from primary color
+    const primaryAlpha10 = primaryColor + '1A';
+    const primaryAlpha20 = primaryColor + '33';
+    const primaryAlpha80 = primaryColor + 'CC';
 
     const capitalize = (str: string) => {
         const words = str.toLowerCase().split(' ');
         return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
+    const getString = (val: any) => {
+        if (!val) return '';
+        if (typeof val === 'string') return val;
+        return val.en;
+    };
+
     const placeName = capitalize(data.name);
-    const address = capitalize(data.village || data.address || "Address not available");
+    const address = capitalize(data.village || data.address || 'Address not available');
+    const description = getString(data.description);
     const eduImage = data.images?.[0];
 
     return (
         <>
             <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => setModalVisible(true)}
+                activeOpacity={0.92}
+                onPress={() => router.push({
+                    pathname: '/place/[id]',
+                    params: {
+                        id: data._id,
+                        placeData: JSON.stringify(data),
+                        color: primaryColor,
+                        category: 'Education'
+                    }
+                })}
+                style={[
+                    styles.card,
+                    {
+                        backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                        shadowColor: isDark ? '#000' : primaryColor,
+                    },
+                ]}
             >
-                <View style={styles.card}>
-                    <View style={styles.row}>
-                        {/* Image or Icon Container */}
-                        <View style={[styles.imageWrapper, { borderColor: primaryColor + '20' }]}>
-                            {eduImage ? (
-                                <Image
-                                    source={{ uri: eduImage }}
-                                    style={styles.eduImage}
-                                    contentFit="cover"
-                                    transition={200}
-                                />
-                            ) : (
-                                <View style={[styles.placeholderContainer, { backgroundColor: primaryColor + '10' }]}>
-                                    <Ionicons name="school" size={32} color={primaryColor} />
-                                </View>
-                            )}
+                {/* ── Hero ── */}
+                <View style={styles.heroSection}>
+                    {eduImage ? (
+                        <Image
+                            source={{ uri: eduImage }}
+                            style={styles.heroImage}
+                            contentFit="cover"
+                            transition={400}
+                        />
+                    ) : (
+                        <LinearGradient
+                            colors={[
+                                isDark ? '#0F1420' : primaryAlpha10,
+                                isDark ? '#1A2035' : '#F8FAFF',
+                            ]}
+                            style={styles.placeholderContainer}
+                        >
+                            {/* Decorative rings behind icon */}
+                            <View style={[styles.ring, styles.ringOuter, { borderColor: primaryAlpha20 }]} />
+                            <View style={[styles.ring, styles.ringInner, { borderColor: primaryAlpha20 }]} />
+                            <View style={[styles.iconCircle, { backgroundColor: primaryAlpha20 }]}>
+                                <Ionicons name="school" size={36} color={primaryColor} />
+                            </View>
+                        </LinearGradient>
+                    )}
 
+                    {/* Bottom fade for text legibility */}
+                    <LinearGradient
+                        colors={['transparent', 'rgba(0,0,0,0.55)']}
+                        style={[StyleSheet.absoluteFillObject, styles.bottomFade]}
+                    />
 
+                    {/* Top actions bar */}
+                    <View style={[styles.topActions, !data.type && { justifyContent: 'flex-end' }]}>
+                        {data.type && (
+                            <View style={[styles.typePill, { backgroundColor: primaryColor }]}>
+                                <Ionicons name="ribbon" size={9} color="#fff" style={{ marginRight: 3 }} />
+                                <ThemedText style={styles.typePillText}>{data.type}</ThemedText>
+                            </View>
+                        )}
+                        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.8}>
+                            <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Bottom-left image label when image exists */}
+                    {eduImage && (
+                        <View style={styles.imageLabel}>
+                            <Ionicons name="images-outline" size={11} color="rgba(255,255,255,0.75)" />
+                            <ThemedText style={styles.imageLabelText}>
+                                {(data.images?.length ?? 0) > 1
+                                    ? `${data.images!.length} Photos`
+                                    : '1 Photo'}
+                            </ThemedText>
+                        </View>
+                    )}
+                </View>
+
+                {/* ── Content ── */}
+                <View
+                    style={[
+                        styles.contentSection,
+                        { backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF' },
+                    ]}
+                >
+                    {/* Name */}
+                    <ThemedText
+                        style={[styles.eduName, { color: isDark ? '#F1F5F9' : '#0F172A' }]}
+                        numberOfLines={2}
+                    >
+                        {placeName}
+                    </ThemedText>
+
+                    {/* Divider strip */}
+                    <View style={styles.dividerRow}>
+                        <View style={[styles.dividerAccent, { backgroundColor: primaryColor }]} />
+                        <View
+                            style={[
+                                styles.dividerLine,
+                                { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' },
+                            ]}
+                        />
+                    </View>
+
+                    {/* Location row */}
+                    <View style={styles.locationRow}>
+                        <View style={[styles.locationIconWrap, { backgroundColor: primaryAlpha10 }]}>
+                            <Ionicons name="location" size={13} color={primaryColor} />
+                        </View>
+                        <ThemedText
+                            style={[styles.locationText, { color: isDark ? '#94A3B8' : '#475569' }]}
+                            numberOfLines={1}
+                        >
+                            {address}
+                        </ThemedText>
+                    </View>
+
+                    {/* Description */}
+                    {description ? (
+                        <ThemedText
+                            style={[styles.description, { color: isDark ? '#64748B' : '#94A3B8' }]}
+                            numberOfLines={2}
+                        >
+                            {description}
+                        </ThemedText>
+                    ) : null}
+
+                    {/* Footer CTA row */}
+                    <View style={styles.footerRow}>
+                        <View style={[styles.detailsPill, { backgroundColor: primaryAlpha10, borderColor: primaryAlpha20 }]}>
+                            <ThemedText style={[styles.detailsPillText, { color: primaryColor }]}>
+                                View Details
+                            </ThemedText>
+                            <Ionicons name="chevron-forward" size={12} color={primaryColor} />
                         </View>
 
-                        {/* Text Container */}
-                        <View style={styles.infoContainer}>
-                            <ThemedText style={styles.eduName} numberOfLines={2}>
-                                {placeName}
-                            </ThemedText>
-
-                            <View style={styles.addressRow}>
-                                <Ionicons name="location" size={14} color={primaryColor} style={{ marginTop: 2 }} />
-                                <ThemedText style={styles.addressText} numberOfLines={2}>
-                                    {address}
+                        {data.phone && (
+                            <View style={[styles.contactChip, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                                <Ionicons
+                                    name="call-outline"
+                                    size={12}
+                                    color={isDark ? '#94A3B8' : '#475569'}
+                                />
+                                <ThemedText style={[styles.contactChipText, { color: isDark ? '#94A3B8' : '#475569' }]}>
+                                    Contact
                                 </ThemedText>
                             </View>
-                        </View>
-
-                        <View style={styles.chevronContainer}>
-                            <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
-                        </View>
+                        )}
                     </View>
                 </View>
             </TouchableOpacity>
-
-            <PlacesDetailsModal
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                data={data}
-                category="Education"
-                color={primaryColor}
-            />
         </>
     );
 });
@@ -120,33 +235,24 @@ export default EducationCard;
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 12,
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
-        borderWidth: 1,
-        borderColor: '#F1F5F9',
-    },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    imageWrapper: {
-        width: 80,
-        height: 80,
-        borderRadius: 12,
+        borderRadius: 20,
+        marginBottom: 16,
         overflow: 'hidden',
         borderWidth: 1,
-        marginRight: 14,
-        position: 'relative',
-        backgroundColor: '#F8FAFC',
+        // Soft lifted shadow
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.12,
+        shadowRadius: 20,
+        elevation: 8,
     },
-    eduImage: {
+
+    // ── Hero ──
+    heroSection: {
+        width: '100%',
+        height: 180,
+        position: 'relative',
+    },
+    heroImage: {
         width: '100%',
         height: '100%',
     },
@@ -155,32 +261,169 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-
-    infoContainer: {
-        flex: 1,
+    ring: {
+        position: 'absolute',
+        borderRadius: 999,
+        borderWidth: 1,
+    },
+    ringOuter: {
+        width: 120,
+        height: 120,
+    },
+    ringInner: {
+        width: 80,
+        height: 80,
+    },
+    iconCircle: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        alignItems: 'center',
         justifyContent: 'center',
+    },
+    bottomFade: {
+        top: '40%',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        position: 'absolute',
+    },
+    topActions: {
+        position: 'absolute',
+        top: 12,
+        left: 12,
+        right: 12,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    typePill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    typePillText: {
+        color: '#FFFFFF',
+        fontSize: 9,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    actionBtn: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: 'rgba(0,0,0,0.38)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: 'rgba(255,255,255,0.25)',
+    },
+    imageLabel: {
+        position: 'absolute',
+        bottom: 10,
+        left: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    imageLabelText: {
+        color: 'rgba(255,255,255,0.75)',
+        fontSize: 11,
+        fontWeight: '600',
+    },
+
+    // ── Content ──
+    contentSection: {
+        paddingHorizontal: 16,
+        paddingTop: 14,
+        paddingBottom: 14,
     },
     eduName: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: '#000000', // Explicitly Black
-        marginBottom: 6,
+        fontSize: 17,
+        fontWeight: '800',
+        letterSpacing: -0.4,
+        lineHeight: 23,
+        marginBottom: 10,
     },
-    addressRow: {
+    dividerRow: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-        gap: 4,
-        paddingRight: 8,
+        alignItems: 'center',
+        marginBottom: 10,
+        gap: 6,
     },
-    addressText: {
+    dividerAccent: {
+        width: 24,
+        height: 3,
+        borderRadius: 2,
+    },
+    dividerLine: {
+        flex: 1,
+        height: 1,
+        borderRadius: 1,
+    },
+    locationRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 7,
+        marginBottom: 8,
+    },
+    locationIconWrap: {
+        width: 24,
+        height: 24,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    locationText: {
         flex: 1,
         fontSize: 13,
-        fontWeight: '500',
-        color: '#000000', // Explicitly Black
-        lineHeight: 18,
+        fontWeight: '600',
+        letterSpacing: 0.1,
     },
-    chevronContainer: {
-        paddingLeft: 4,
-        justifyContent: 'center',
-    }
+    description: {
+        fontSize: 13,
+        lineHeight: 19,
+        fontWeight: '400',
+        marginBottom: 12,
+    },
+    footerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 2,
+    },
+    detailsPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 12,
+        paddingVertical: 7,
+        borderRadius: 10,
+        borderWidth: 1,
+    },
+    detailsPillText: {
+        fontSize: 12,
+        fontWeight: '700',
+        letterSpacing: 0.2,
+    },
+    contactChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 10,
+        paddingVertical: 7,
+        borderRadius: 10,
+    },
+    contactChipText: {
+        fontSize: 12,
+        fontWeight: '600',
+    },
 });

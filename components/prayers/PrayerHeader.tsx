@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { EdgeInsets } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
 import { formatTime12h } from '@/utils/dateUtils';
+import { Layout } from '@/constants/layout';
 
 export interface PrayerHeaderProps {
     nextPrayer: any;
@@ -36,7 +37,7 @@ const HEADER_IMAGE = require('../../assets/images/mosque-banner.jpg');
 
 
 /** Standalone component to isolate 1-second re-renders */
-const PrayerCountdown = ({ targetTime, colors }: { targetTime: string, colors: Record<string, string> }) => {
+const PrayerCountdown = ({ targetTime, colors, isDark }: { targetTime: string, colors: Record<string, string>, isDark?: boolean }) => {
     const [countdown, setCountdown] = useState(0);
 
     useEffect(() => {
@@ -60,7 +61,7 @@ const PrayerCountdown = ({ targetTime, colors }: { targetTime: string, colors: R
     }, [targetTime]);
 
     return (
-        <ThemedText style={[styles.countdownText, { color: colors.primary }]}>
+        <ThemedText style={[styles.countdownText, { color: isDark ? '#FFFFFF' : colors.primary }]}>
             {formatCountdown(countdown)}
         </ThemedText>
     );
@@ -96,11 +97,11 @@ export const PrayerHeader = React.memo(({
             {/* Greeting & Date */}
             <View style={[styles.headerTextWrap, { top: insets.top + 60 }]}>
                 <View style={[styles.pill, { backgroundColor: isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)' }]}>
-                    <ThemedText style={[styles.gregorianDate, { color: C.primary }]}>{gregorianDate}</ThemedText>
+                    <ThemedText style={[styles.gregorianDate, { color: isDark ? '#FFFFFF' : C.primary }]}>{gregorianDate}</ThemedText>
                 </View>
                 {readableHijri ? (
                     <View style={[styles.pill, { backgroundColor: isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)', marginTop: 8 }]}>
-                        <ThemedText style={[styles.hijriText, { color: isDark ? C.gold : '#B8860B' }]}>
+                        <ThemedText style={[styles.hijriText, { color: isDark ? '#FFFFFF' : '#B8860B' }]}>
                             🌙 {readableHijri}
                         </ThemedText>
                     </View>
@@ -109,7 +110,7 @@ export const PrayerHeader = React.memo(({
 
             {/* Next Prayer Card (overlapping the header) */}
             {nextPrayer && (
-                <View style={[styles.nextPrayerCard, { backgroundColor: isDark ? '#0D2B1F' : '#FFFFFF', shadowColor: C.primary }]}>
+                <View style={[styles.nextPrayerCard, { backgroundColor: isDark ? C.card : '#FFFFFF', shadowColor: isDark ? 'rgba(0,0,0,0.3)' : C.primary }]}>
                     <View style={styles.nextPrayerLeft}>
                         <ThemedText style={[styles.nextPrayerLabel, { color: C.textSecondary }]}>NEXT PRAYER</ThemedText>
                         <ThemedText type="urdu" style={[styles.nextPrayerArabic, { color: C.gold, fontSize: 18, marginTop: 4 }]}>
@@ -123,9 +124,9 @@ export const PrayerHeader = React.memo(({
                         >
                             {formatTime12h(nextPrayer.adhan)}
                         </ThemedText>
-                        <View style={[styles.countdownWrap, { backgroundColor: C.primary + '18' }]}>
-                            <Ionicons name="timer-outline" size={12} color={C.primary} style={{ marginRight: 4 }} />
-                            <PrayerCountdown targetTime={nextPrayer.adhan} colors={C} />
+                        <View style={[styles.countdownWrap, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : C.primary + '18' }]}>
+                            <Ionicons name="timer-outline" size={12} color={isDark ? '#FFFFFF' : C.primary} style={{ marginRight: 4 }} />
+                            <PrayerCountdown targetTime={nextPrayer.adhan} colors={C} isDark={isDark} />
                         </View>
                     </View>
                 </View>
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     // Next Prayer card
     nextPrayerCard: {
         position: 'absolute', bottom: -58, left: 16, right: 16,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         paddingVertical: 12, paddingHorizontal: 16,
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
         shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 12,

@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     input: {
         height: 50,
         borderWidth: 1,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
         fontSize: 16,
     },

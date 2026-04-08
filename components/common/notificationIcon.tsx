@@ -1,6 +1,7 @@
 import { getNotifications } from '@/apis/notifications';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 38,
         height: 38,
-        borderRadius: 11,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',

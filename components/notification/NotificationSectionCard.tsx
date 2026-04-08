@@ -1,5 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
+import { ThemedText } from '@/components/themedText';
 
 interface NotificationSectionCardProps {
     title: string;
@@ -7,10 +11,13 @@ interface NotificationSectionCardProps {
 }
 
 const NotificationSectionCard: React.FC<NotificationSectionCardProps> = ({ title, children }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{title}</Text>
-            <View style={styles.card}>
+            <ThemedText style={[styles.title, { color: colors.textSecondary }]}>{title}</ThemedText>
+            <View style={[styles.card, { backgroundColor: colors.card, shadowColor: theme === 'dark' ? 'transparent' : '#000' }]}>
                 {children}
             </View>
         </View>
@@ -24,19 +31,15 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#636e72',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 10,
         marginLeft: 4,
     },
     card: {
-        backgroundColor: '#ffffff',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
-        paddingVertical: 4, // Rows have their own padding
-        // Shadow for premium feel
-        shadowColor: '#000',
+        paddingVertical: 4,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 10,

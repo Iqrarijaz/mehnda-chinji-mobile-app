@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Layout } from '@/constants/layout';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 interface SupportContactCardProps {
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 52,
         height: 52,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,

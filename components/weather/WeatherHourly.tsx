@@ -4,25 +4,39 @@ import { ScrollView, StyleSheet } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { ThemedText } from '../themedText';
 import { getIconName, PRIMARY } from './weatherUtils';
+import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 
 interface HourlyCardProps { time: string; icon: string; temp: number; isNow: boolean; delay: number; }
-const HourlyCard = React.memo(({ time, icon, temp, isNow, delay }: HourlyCardProps) => (
-    <Animated.View
-        entering={SlideInLeft.delay(delay).duration(400)}
-        style={[styles.card, isNow && styles.cardActive]}
-    >
-        <ThemedText style={[styles.time, isNow && styles.timeActive]}>{time}</ThemedText>
-        <Ionicons name={getIconName(icon) as any} size={22} color={isNow ? '#FFFFFF' : '#94A3B8'} />
-        <ThemedText style={[styles.temp, isNow && styles.tempActive]}>{temp}°</ThemedText>
-    </Animated.View>
-));
+const HourlyCard = React.memo(({ time, icon, temp, isNow, delay }: HourlyCardProps) => {
+    const { theme, isDark } = useTheme();
+    const colors = Colors[theme];
+    
+    return (
+        <Animated.View
+            entering={SlideInLeft.delay(delay).duration(400)}
+            style={[
+                styles.card, 
+                { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : colors.background },
+                isNow && { backgroundColor: isDark ? colors.primary : PRIMARY }
+            ]}
+        >
+            <ThemedText style={[styles.time, { color: colors.textSecondary }, isNow && styles.timeActive]}>{time}</ThemedText>
+            <Ionicons name={getIconName(icon) as any} size={22} color={isNow ? '#FFFFFF' : colors.textSecondary} />
+            <ThemedText style={[styles.temp, { color: colors.text }, isNow && styles.tempActive]}>{temp}°</ThemedText>
+        </Animated.View>
+    );
+});
 
 interface WeatherHourlyProps { data: { time: string; icon: string; temp: number }[]; }
 const WeatherHourly = React.memo(({ data }: WeatherHourlyProps) => {
+    const { theme, isDark } = useTheme();
+    const colors = Colors[theme];
     if (!data.length) return null;
     return (
-        <Animated.View entering={SlideInLeft.delay(450).duration(400)} style={styles.wrapper}>
-            <ThemedText style={styles.title}>Hourly Forecast</ThemedText>
+        <Animated.View entering={SlideInLeft.delay(450).duration(400)} style={[styles.wrapper, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
+            <ThemedText style={[styles.title, { color: colors.text }]}>Hourly Forecast</ThemedText>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scroll}>
                 {data.map((h, i) => (
                     <HourlyCard key={i} time={h.time} icon={h.icon} temp={h.temp} isNow={i === 0} delay={i * 40} />
@@ -36,18 +50,17 @@ export default WeatherHourly;
 
 const styles = StyleSheet.create({
     wrapper: {
-        backgroundColor: '#FFFFFF', borderRadius: 20, padding: 18, marginBottom: 14,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12,
+        borderRadius: Layout.borderRadius, padding: 18, marginBottom: 14,
+        shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12,
     },
-    title: { fontSize: 14, fontWeight: '700', color: '#0F172A', letterSpacing: 0.3, marginBottom: 14 },
+    title: { fontSize: 14, fontWeight: '700', letterSpacing: 0.3, marginBottom: 14 },
     scroll: { gap: 10, paddingBottom: 4 },
     card: {
-        backgroundColor: '#F8FAFC', borderRadius: 16, paddingVertical: 12, paddingHorizontal: 14,
+        borderRadius: Layout.borderRadius, paddingVertical: 12, paddingHorizontal: 14,
         alignItems: 'center', gap: 6, minWidth: 62,
     },
-    cardActive: { backgroundColor: PRIMARY },
-    time: { fontSize: 11, color: '#94A3B8', fontWeight: '600' },
+    time: { fontSize: 11, fontWeight: '600' },
     timeActive: { color: 'rgba(255,255,255,0.8)', fontWeight: '700' },
-    temp: { fontSize: 14, fontWeight: '800', color: '#0F172A' },
+    temp: { fontSize: 14, fontWeight: '800' },
     tempActive: { color: '#FFFFFF' },
 });

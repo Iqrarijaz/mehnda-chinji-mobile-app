@@ -1,6 +1,9 @@
+import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
+import { useTheme } from '@/context/ThemeContext';
 import { ThemedText } from '@/components/themedText';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 
 interface SectionCardProps {
@@ -9,19 +12,23 @@ interface SectionCardProps {
     delay?: number;
 }
 
-export const SectionCard: React.FC<SectionCardProps> = ({ title, children, delay = 0 }) => (
-    <Animated.View entering={SlideInLeft.delay(delay).duration(450)} style={styles.sectionCard}>
-        {title ? <ThemedText style={styles.sectionTitle}>{title}</ThemedText> : null}
-        {children}
-    </Animated.View>
-);
+export const SectionCard: React.FC<SectionCardProps> = ({ title, children, delay = 0 }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
+    return (
+        <Animated.View entering={SlideInLeft.delay(delay).duration(450)} style={[styles.sectionCard, { backgroundColor: colors.card }]}>
+            {title ? <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>{title}</ThemedText> : null}
+            {children}
+        </Animated.View>
+    );
+};
 
 const styles = StyleSheet.create({
     sectionCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 4,
-        marginBottom: 16,
+        borderRadius: Layout.borderRadius,
+        padding: Platform.OS === 'android' ? 0 : 4,
+        marginBottom: Platform.OS === 'android' ? 12 : 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.05,
@@ -30,11 +37,10 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 13,
         fontWeight: '700',
-        color: '#94A3B8',
         textTransform: 'uppercase',
         letterSpacing: 0.8,
-        marginLeft: 16,
-        marginTop: 14,
+        marginLeft: Platform.OS === 'android' ? 12 : 16,
+        marginTop: Platform.OS === 'android' ? 10 : 14,
         marginBottom: 6,
     },
 });

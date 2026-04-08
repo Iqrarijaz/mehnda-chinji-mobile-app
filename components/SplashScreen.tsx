@@ -1,16 +1,15 @@
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
-    FadeIn,
     useAnimatedStyle,
     useSharedValue,
     withSpring,
-    withTiming,
+    withTiming
 } from 'react-native-reanimated';
-import { useTheme } from '@/context/ThemeContext';
-import { Colors } from '@/constants/colors';
 
 const { width } = Dimensions.get('window');
 const LOGO_SIZE = width * 0.7;
@@ -62,6 +61,7 @@ const styles = StyleSheet.create({
     },
     logoContainer: {
         alignItems: 'center',
+        paddingHorizontal: 40,
         gap: 20,
     },
     logo: {

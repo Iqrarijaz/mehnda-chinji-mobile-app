@@ -1,22 +1,17 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
-    Alert,
-    Linking,
-    Modal,
-    Platform,
-    ScrollView,
     StyleSheet,
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { TintedCard } from '../ui/tintedCard';
-import { ReportModal, ReportModalRef } from '../common/ReportModal';
-import { useRef } from 'react';
 
 interface Contact {
     name: string;
@@ -39,6 +34,7 @@ interface PlaceData {
     };
     contact?: Contact[];
     images?: string[];
+    type?: string;
     timing?: {
         en: string;
         ur?: string;
@@ -56,343 +52,356 @@ interface HealthCardProps {
 
 const HealthCard = React.memo(({ data, color }: HealthCardProps) => {
     const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const colors = Colors[theme];
-    const [modalVisible, setModalVisible] = useState(false);
+    const router = useRouter();
     const primaryColor = color || '#EF4444';
-    const softBorder = primaryColor + '20';
 
-    const reportModalRef = useRef<ReportModalRef>(null);
-
-    const handleCall = (phoneNumber: string) => {
-        if (phoneNumber) {
-            Linking.openURL(`tel:${phoneNumber}`);
-        } else {
-            Alert.alert("No Phone", "Phone number is not available.");
-        }
-    };
-
-    const handleNavigate = () => {
-        if (data.location?.coordinates) {
-            const [lng, lat] = data.location.coordinates;
-            const url = Platform.select({
-                ios: `maps:0,0?q=${lat},${lng}(${data.name})`,
-                android: `geo:0,0?q=${lat},${lng}(${data.name})`,
-            });
-            if (url) Linking.openURL(url);
-        } else {
-            const query = encodeURIComponent(data.address || data.name);
-            const url = Platform.select({
-                ios: `maps:0,0?q=${query}`,
-                android: `geo:0,0?q=${query}`,
-            });
-            if (url) Linking.openURL(url);
-        }
-    }
+    const primaryAlpha10 = primaryColor + '1A';
+    const primaryAlpha20 = primaryColor + '33';
 
     const capitalize = (str: string) => {
         const words = str.toLowerCase().split(' ');
         return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
-    const getString = (val: string | { en: string; ur?: string } | undefined) => {
-        if (!val) return '';
-        if (typeof val === 'string') return val;
-        return val.en;
-    };
-
     const placeName = capitalize(data.name);
-    const address = data.village || data.address || "Address not available";
-    const contacts = data.contact || (data.phone ? [{ name: 'Primary', number: data.phone }] : []);
-    const timing = getString(data.timing);
-    const services = getString(data.services);
+    const address = capitalize(data.village || data.address || 'Address not available');
+    const healthImage = data.images?.[0];
 
     return (
         <>
             <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => setModalVisible(true)}
-                style={styles.cardWrapper}
+                activeOpacity={0.92}
+                onPress={() => router.push({
+                    pathname: '/place/[id]',
+                    params: {
+                        id: data._id,
+                        placeData: JSON.stringify(data),
+                        color: primaryColor,
+                        category: 'Health'
+                    }
+                })}
+                style={[
+                    styles.card,
+                    {
+                        backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                        shadowColor: isDark ? '#000' : primaryColor,
+                    },
+                ]}
             >
-                <TintedCard
-                    tintColor={primaryColor}
-                    bgColor="#FFFFFF"
-                    style={styles.cardContainer}
+                {/* ── Hero ── */}
+                <View style={styles.heroSection}>
+                    {healthImage ? (
+                        <Image
+                            source={{ uri: healthImage }}
+                            style={styles.heroImage}
+                            contentFit="cover"
+                            transition={400}
+                        />
+                    ) : (
+                        <LinearGradient
+                            colors={[
+                                isDark ? '#0F1420' : primaryAlpha10,
+                                isDark ? '#1A2035' : '#FFF5F5',
+                            ]}
+                            style={styles.placeholderContainer}
+                        >
+                            {/* Decorative rings behind icon */}
+                            <View style={[styles.ring, styles.ringOuter, { borderColor: primaryAlpha20 }]} />
+                            <View style={[styles.ring, styles.ringInner, { borderColor: primaryAlpha20 }]} />
+                            <View style={[styles.iconCircle, { backgroundColor: primaryAlpha20 }]}>
+                                <MaterialCommunityIcons name="medical-bag" size={36} color={primaryColor} />
+                            </View>
+                        </LinearGradient>
+                    )}
+
+                    {/* Bottom fade for text legibility */}
+                    <LinearGradient
+                        colors={['transparent', 'rgba(0,0,0,0.55)']}
+                        style={[StyleSheet.absoluteFillObject, styles.bottomFade]}
+                    />
+
+                    {/* Top actions bar */}
+                    <View style={[styles.topActions, !data.type && { justifyContent: 'flex-end' }]}>
+                        {data.type && (
+                            <View style={[styles.typePill, { backgroundColor: primaryColor }]}>
+                                <MaterialCommunityIcons name="hospital-box-outline" size={9} color="#fff" style={{ marginRight: 3 }} />
+                                <ThemedText style={styles.typePillText}>{data.type}</ThemedText>
+                            </View>
+                        )}
+                        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.8}>
+                            <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Bottom-left image label when image exists */}
+                    {healthImage && (
+                        <View style={styles.imageLabel}>
+                            <Ionicons name="images-outline" size={11} color="rgba(255,255,255,0.75)" />
+                            <ThemedText style={styles.imageLabelText}>
+                                {(data.images?.length ?? 0) > 1
+                                    ? `${data.images!.length} Photos`
+                                    : '1 Photo'}
+                            </ThemedText>
+                        </View>
+                    )}
+                </View>
+
+                {/* ── Content ── */}
+                <View
+                    style={[
+                        styles.contentSection,
+                        { backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF' },
+                    ]}
                 >
-                    <View style={styles.contentRow}>
-                        <View style={[styles.iconContainer, { backgroundColor: primaryColor + '15' }]}>
-                            <MaterialCommunityIcons name="medical-bag" size={24} color={primaryColor} />
+                    {/* Name */}
+                    <ThemedText
+                        style={[styles.healthName, { color: isDark ? '#F1F5F9' : '#0F172A' }]}
+                        numberOfLines={2}
+                    >
+                        {placeName}
+                    </ThemedText>
+
+                    {/* Divider strip */}
+                    <View style={styles.dividerRow}>
+                        <View style={[styles.dividerAccent, { backgroundColor: primaryColor }]} />
+                        <View
+                            style={[
+                                styles.dividerLine,
+                                { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' },
+                            ]}
+                        />
+                    </View>
+
+                    {/* Location row */}
+                    <View style={styles.locationRow}>
+                        <View style={[styles.locationIconWrap, { backgroundColor: primaryAlpha10 }]}>
+                            <Ionicons name="location" size={13} color={primaryColor} />
+                        </View>
+                        <ThemedText
+                            style={[styles.locationText, { color: isDark ? '#94A3B8' : '#475569' }]}
+                            numberOfLines={1}
+                        >
+                            {address}
+                        </ThemedText>
+                    </View>
+
+                    {/* Footer CTA row */}
+                    <View style={styles.footerRow}>
+                        <View style={[styles.detailsPill, { backgroundColor: primaryAlpha10, borderColor: primaryAlpha20 }]}>
+                            <ThemedText style={[styles.detailsPillText, { color: primaryColor }]}>
+                                View Details
+                            </ThemedText>
+                            <Ionicons name="chevron-forward" size={12} color={primaryColor} />
                         </View>
 
-                        <View style={[styles.detailsContainer, { marginRight: 12 }]}>
-                            <ThemedText style={[styles.name, { color: primaryColor }]} numberOfLines={2}>
-                                {placeName}
-                            </ThemedText>
-
-                            <View style={styles.addressRow}>
-                                <ThemedText style={[styles.address, { color: primaryColor, opacity: 0.7 }]} numberOfLines={2}>
-                                    {address}
+                        {data.phone && (
+                            <View style={[styles.contactChip, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                                <Ionicons
+                                    name="call-outline"
+                                    size={12}
+                                    color={isDark ? '#94A3B8' : '#475569'}
+                                />
+                                <ThemedText style={[styles.contactChipText, { color: isDark ? '#94A3B8' : '#475569' }]}>
+                                    Contact
                                 </ThemedText>
                             </View>
-                        </View>
-                        <Ionicons name="chevron-forward" size={20} color={primaryColor} style={{ opacity: 0.5 }} />
-                    </View>
-                </TintedCard>
-            </TouchableOpacity>
-
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0,0,0,0.5)' }]}>
-                    <View style={[styles.modalContent, { backgroundColor: '#FFFFFF', borderColor: softBorder, borderWidth: 1 }]}>
-
-                        {/* Header */}
-                        <View style={styles.modalHeader}>
-                            <ThemedText style={[styles.modalTitle, { color: primaryColor }]}>
-                                {placeName}
-                            </ThemedText>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                <TouchableOpacity onPress={() => reportModalRef.current?.present()} style={styles.closeButton}>
-                                    <Ionicons name="flag" size={18} color="#EF4444" />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-                                    <Ionicons name="close" size={24} color={primaryColor} />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-
-                        <ScrollView contentContainerStyle={styles.modalScrollContent}>
-                            {/* Address Section */}
-                            <View style={styles.sectionContainer}>
-                                <ThemedText style={[styles.sectionTitle, { color: colors.primary }]}>Location</ThemedText>
-                                <View style={styles.modalAddressRow}>
-                                    <Ionicons name="location" size={18} color={colors.primary} />
-                                    <ThemedText style={[styles.modalAddressText, { color: colors.text }]}>
-                                        {address}
-                                    </ThemedText>
-                                </View>
-                                <TouchableOpacity
-                                    style={[styles.navigateButton, { backgroundColor: colors.primary }]}
-                                    onPress={handleNavigate}
-                                >
-                                    <Ionicons name="navigate" size={18} color="#FFF" />
-                                    <ThemedText style={styles.navigateButtonText}>Get Directions</ThemedText>
-                                </TouchableOpacity>
-                            </View>
-
-                            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-
-                            {/* Timing Section */}
-                            {timing ? (
-                                <View style={styles.sectionContainer}>
-                                    <ThemedText style={[styles.sectionTitle, { color: colors.primary }]}>Timing</ThemedText>
-                                    <View style={styles.infoRow}>
-                                        <Ionicons name="time-outline" size={18} color={colors.border} />
-                                        <ThemedText style={[styles.infoText, { color: colors.text }]}>{timing}</ThemedText>
-                                    </View>
-                                    <View style={[styles.divider, { backgroundColor: colors.border, marginTop: 15 }]} />
-                                </View>
-                            ) : null}
-
-                            {/* Services Section */}
-                            {services ? (
-                                <View style={styles.sectionContainer}>
-                                    <ThemedText style={[styles.sectionTitle, { color: colors.primary }]}>Services</ThemedText>
-                                    <View style={styles.infoRow}>
-                                        <MaterialCommunityIcons name="stethoscope" size={18} color={colors.border} />
-                                        <ThemedText style={[styles.infoText, { color: colors.text }]}>{services}</ThemedText>
-                                    </View>
-                                    <View style={[styles.divider, { backgroundColor: colors.border, marginTop: 15 }]} />
-                                </View>
-                            ) : null}
-
-                            {/* Contacts Section */}
-                            {contacts.length > 0 && (
-                                <View style={styles.sectionContainer}>
-                                    <ThemedText style={[styles.sectionTitle, { color: colors.primary }]}>Contacts</ThemedText>
-                                    {contacts.map((contact, index) => (
-                                        <View key={index} style={[styles.contactRow, { borderBottomColor: colors.border, borderBottomWidth: index === contacts.length - 1 ? 0 : 1 }]}>
-                                            <View>
-                                                <ThemedText style={[styles.contactName, { color: colors.text }]}>{capitalize(contact.name || 'Contact')}</ThemedText>
-                                                <ThemedText style={[styles.contactNumber, { color: colors.icon }]}>{contact.number}</ThemedText>
-                                            </View>
-                                            <TouchableOpacity
-                                                style={[styles.callButton, { backgroundColor: colors.primary + '20' }]}
-                                                onPress={() => handleCall(contact.number)}
-                                            >
-                                                <Ionicons name="call" size={20} color={colors.primary} />
-                                            </TouchableOpacity>
-                                        </View>
-                                    ))}
-                                </View>
-                            )}
-
-                            {/* Fallback if no contacts */}
-                            {contacts.length === 0 && (
-                                <View style={styles.sectionContainer}>
-                                    <ThemedText style={{ color: colors.icon, fontStyle: 'italic' }}>No contact information available.</ThemedText>
-                                </View>
-                            )}
-
-                        </ScrollView>
+                        )}
                     </View>
                 </View>
-            </Modal>
-
-            <ReportModal
-                ref={reportModalRef}
-                targetId={data._id}
-                targetType="PLACE"
-            />
+            </TouchableOpacity>
         </>
     );
 });
 
 export default HealthCard;
 
-const isAndroid = Platform.OS === 'android';
-
 const styles = StyleSheet.create({
-    cardWrapper: {
-        marginBottom: isAndroid ? 10 : 12,
+    card: {
+        borderRadius: 20,
+        marginBottom: 16,
+        overflow: 'hidden',
+        borderWidth: 1,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.12,
+        shadowRadius: 20,
+        elevation: 8,
     },
-    cardContainer: {
-        padding: isAndroid ? 10 : 16,
+
+    // ── Hero ──
+    heroSection: {
+        width: '100%',
+        height: 180,
+        position: 'relative',
     },
-    contentRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    heroImage: {
+        width: '100%',
+        height: '100%',
     },
-    iconContainer: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 14,
-    },
-    detailsContainer: {
+    placeholderContainer: {
         flex: 1,
+        alignItems: 'center',
         justifyContent: 'center',
     },
-    name: {
-        fontSize: 16,
-        fontWeight: '700',
-        marginBottom: 4,
-        textTransform: 'capitalize',
+    ring: {
+        position: 'absolute',
+        borderRadius: 999,
+        borderWidth: 1,
     },
-    addressRow: {
+    ringOuter: {
+        width: 120,
+        height: 120,
+    },
+    ringInner: {
+        width: 80,
+        height: 80,
+    },
+    iconCircle: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    bottomFade: {
+        top: '40%',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        position: 'absolute',
+    },
+    topActions: {
+        position: 'absolute',
+        top: 12,
+        left: 12,
+        right: 12,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    typePill: {
         flexDirection: 'row',
         alignItems: 'center',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    typePillText: {
+        color: '#FFFFFF',
+        fontSize: 9,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    actionBtn: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: 'rgba(0,0,0,0.38)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: 'rgba(255,255,255,0.25)',
+    },
+    imageLabel: {
+        position: 'absolute',
+        bottom: 10,
+        left: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    imageLabelText: {
+        color: 'rgba(255,255,255,0.75)',
+        fontSize: 11,
+        fontWeight: '600',
+    },
+
+    // ── Content ──
+    contentSection: {
+        paddingHorizontal: 16,
+        paddingTop: 14,
+        paddingBottom: 14,
+    },
+    healthName: {
+        fontSize: 17,
+        fontWeight: '800',
+        letterSpacing: -0.4,
+        lineHeight: 23,
+        marginBottom: 10,
+    },
+    dividerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
         gap: 6,
     },
-    address: {
-        fontSize: 13,
-        textTransform: 'capitalize',
+    dividerAccent: {
+        width: 24,
+        height: 3,
+        borderRadius: 2,
     },
-    modalOverlay: {
+    dividerLine: {
         flex: 1,
-        justifyContent: 'flex-end',
-    },
-    modalContent: {
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        paddingTop: 20,
-        paddingBottom: 40,
-        maxHeight: '85%',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 24,
-        marginBottom: 20,
-    },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        flex: 1,
-        textTransform: 'capitalize',
-    },
-    closeButton: {
-        padding: 4,
-    },
-    modalScrollContent: {
-        paddingHorizontal: 24,
-    },
-    sectionContainer: {
-        marginBottom: 15,
-    },
-    sectionTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginBottom: 12,
-    },
-    modalAddressRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        gap: 8,
-        marginBottom: 16,
-    },
-    modalAddressText: {
-        flex: 1,
-        fontSize: 15,
-        lineHeight: 22,
-        textTransform: 'capitalize',
-    },
-    navigateButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        borderRadius: 12,
-        gap: 8,
-    },
-    navigateButtonText: {
-        color: '#FFF',
-        fontWeight: '600',
-        fontSize: 15,
-    },
-    divider: {
         height: 1,
-        marginBottom: 5,
-        opacity: 0.5,
+        borderRadius: 1,
     },
-    contactRow: {
+    locationRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 12,
+        gap: 7,
+        marginBottom: 8,
     },
-    contactName: {
-        fontSize: 15,
-        fontWeight: '500',
-        marginBottom: 2,
-    },
-    contactNumber: {
-        fontSize: 13,
-    },
-    callButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+    locationIconWrap: {
+        width: 24,
+        height: 24,
+        borderRadius: 8,
+        alignItems: 'center',
         justifyContent: 'center',
-        alignItems: 'center',
     },
-    infoRow: {
-        flexDirection: 'row',
-        gap: 10,
-        alignItems: 'flex-start'
-    },
-    infoText: {
+    locationText: {
         flex: 1,
-        fontSize: 15,
-        lineHeight: 22
-    }
+        fontSize: 13,
+        fontWeight: '600',
+        letterSpacing: 0.1,
+    },
+    footerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 2,
+    },
+    detailsPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 12,
+        paddingVertical: 7,
+        borderRadius: 10,
+        borderWidth: 1,
+    },
+    detailsPillText: {
+        fontSize: 12,
+        fontWeight: '700',
+        letterSpacing: 0.2,
+    },
+    contactChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 10,
+        paddingVertical: 7,
+        borderRadius: 10,
+    },
+    contactChipText: {
+        fontSize: 12,
+        fontWeight: '600',
+    },
 });

@@ -1,6 +1,7 @@
 import { NotificationIcon } from '@/components/common/notificationIcon';
 import { ThemedText } from '@/components/themedText';
 import Avatar from '@/components/ui/avatar';
+import { Layout } from '@/constants/layout';
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions } from '@react-navigation/native';
 import React, { useRef } from 'react';
@@ -116,8 +117,8 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
 const styles = StyleSheet.create({
     headerContainer: {
         paddingBottom: Platform.OS === 'android' ? 16 : 20,
-        borderBottomLeftRadius: 28,
-        borderBottomRightRadius: 28,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
     },
     searchBar: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,

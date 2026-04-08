@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
+import { Layout } from '../../constants/layout';
 import { useTheme } from '../../context/ThemeContext';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 
@@ -20,18 +21,20 @@ export default function RegisterScreen() {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={[styles.container, { backgroundColor: '#FFFFFF' }]}
+            style={[styles.container, { backgroundColor: colors.background }]}
         >
             {/* Header / Top Section */}
-            <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
-                <View style={styles.headerContent}>
-                    <Image
-                        source={require('../../public/icon.svg')}
-                        style={{ width: 48, height: 48, marginBottom: 16 }}
-                        contentFit="contain"
-                    />
-                    <ThemedText style={styles.headerTitle}>Create an{"\n"}Account</ThemedText>
-                    <ThemedText style={styles.headerSubtitle}>Join Rehbar Community today</ThemedText>
+            <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                    <View style={styles.headerContent}>
+                        <Image
+                            source={require('../../public/icon.svg')}
+                            style={{ width: 48, height: 48, marginBottom: 16 }}
+                            contentFit="contain"
+                        />
+                        <ThemedText style={styles.headerTitle}>Create an Account</ThemedText>
+                        <ThemedText style={styles.headerSubtitle}>Join Rehbar Community today</ThemedText>
+                    </View>
                 </View>
             </View>
 
@@ -53,8 +56,8 @@ const styles = StyleSheet.create({
     },
     headerSection: {
         paddingBottom: 40,
-        borderBottomLeftRadius: 36,
-        borderBottomRightRadius: 36,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
     },
     headerContent: {

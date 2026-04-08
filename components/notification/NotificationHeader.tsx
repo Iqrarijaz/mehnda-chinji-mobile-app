@@ -4,8 +4,11 @@ import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { ThemedText } from '../themedText';
+import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
-const PRIMARY = '#006666';
+// PRIMARY is now accessed via colors.primary inside the component
 
 interface Props {
     onBack: () => void;
@@ -25,61 +28,66 @@ const NotificationHeader = React.memo(({
     paddingTop,
     showTooltip = false,
     onCloseTooltip = () => { },
-}: Props) => (
-    <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: PRIMARY }]}>
+}: Props) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
 
-        {/* Top row */}
-        <View style={[styles.headerTopRow, { paddingTop: paddingTop + 8 }]}>
-            <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-            </TouchableOpacity>
+    return (
+        <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
 
-            <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.headerTitleWrap}>
-                <ThemedText style={styles.headerTitle}>Notifications</ThemedText>
-            </Animated.View>
+            {/* Top row */}
+            <View style={[styles.headerTopRow, { paddingTop: paddingTop + 8 }]}>
+                <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
+                    <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+                </TouchableOpacity>
 
-            {/* Right slot — tooltip anchored here */}
-            <Tooltip
-                isVisible={showTooltip}
-                content={
-                    <View style={styles.tooltipPill}>
-                        <ThemedText style={styles.tooltipText}>← Swipe left to delete Notification</ThemedText>
-                        <TouchableOpacity onPress={onCloseTooltip} style={styles.tooltipClose}>
-                            <Ionicons name="close-circle" size={18} color="#64748B" />
+                <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.headerTitleWrap}>
+                    <ThemedText style={styles.headerTitle}>Notifications</ThemedText>
+                </Animated.View>
+
+                {/* Right slot — tooltip anchored here */}
+                <Tooltip
+                    isVisible={showTooltip}
+                    content={
+                        <View style={styles.tooltipPill}>
+                            <ThemedText style={styles.tooltipText}>← Swipe left to delete Notification</ThemedText>
+                            <TouchableOpacity onPress={onCloseTooltip} style={styles.tooltipClose}>
+                                <Ionicons name="close-circle" size={18} color="#64748B" />
+                            </TouchableOpacity>
+                        </View>
+                    }
+                    placement="bottom"
+                    onClose={onCloseTooltip}
+                    contentStyle={styles.tooltipContent}
+                    backgroundColor="rgba(0,0,0,0.2)"
+                >
+                    {unreadCount > 0 && !isPending ? (
+                        <TouchableOpacity onPress={onMarkAllRead} style={styles.markBtn} activeOpacity={0.7}>
+                            <Ionicons name="checkmark-done" size={15} color="#FFFFFF" />
                         </TouchableOpacity>
-                    </View>
-                }
-                placement="bottom"
-                onClose={onCloseTooltip}
-                contentStyle={styles.tooltipContent}
-                backgroundColor="rgba(0,0,0,0.2)"
-            >
-                {unreadCount > 0 && !isPending ? (
-                    <TouchableOpacity onPress={onMarkAllRead} style={styles.markBtn} activeOpacity={0.7}>
-                        <Ionicons name="checkmark-done" size={15} color="#FFFFFF" />
-                    </TouchableOpacity>
-                ) : (
-                    <View style={styles.rightSpacer} />
-                )}
-            </Tooltip>
-        </View>
+                    ) : (
+                        <View style={styles.rightSpacer} />
+                    )}
+                </Tooltip>
+            </View>
 
-        {/* Subtitle */}
-        <Animated.View entering={FadeIn.delay(400).duration(500)} style={styles.headerSubtitleWrap}>
-            <ThemedText style={styles.headerSubtitle}>
-                {unreadCount > 0 ? `${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}` : 'Stay updated with recent activity'}
-            </ThemedText>
+            {/* Subtitle */}
+            <Animated.View entering={FadeIn.delay(400).duration(500)} style={styles.headerSubtitleWrap}>
+                <ThemedText style={styles.headerSubtitle}>
+                    {unreadCount > 0 ? `${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}` : 'Stay updated with recent activity'}
+                </ThemedText>
+            </Animated.View>
         </Animated.View>
-    </Animated.View>
-));
+    );
+});
 
 export default NotificationHeader;
 
 const styles = StyleSheet.create({
     headerWrap: {
         paddingBottom: 10,
-        borderBottomLeftRadius: 28,
-        borderBottomRightRadius: 28,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
         zIndex: 2,
     },
@@ -103,7 +111,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: Platform.OS === 'android' ? 18 : 20,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: 'rgba(255,255,255,1)',
     },
     markBtn: {
         width: 42,
@@ -126,7 +134,7 @@ const styles = StyleSheet.create({
     // Tooltip styles — identical to categoryListingHeader
     tooltipContent: {
         padding: 0,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'transparent',
     },
     tooltipPill: {
@@ -134,8 +142,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 16,
         paddingVertical: 12,
-        borderRadius: 40,
-        backgroundColor: '#FFFFFF',
+        borderRadius: Layout.borderRadius,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
@@ -147,7 +154,6 @@ const styles = StyleSheet.create({
     tooltipText: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#64748B',
     },
     tooltipClose: {
         padding: 4,

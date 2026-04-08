@@ -24,6 +24,7 @@ import Animated, {
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { ThemedText } from '@/components/themedText';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { submitReport, ReportPayload } from '@/apis/report';
@@ -330,7 +331,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1,
     },
     reasonText: {
@@ -352,7 +353,7 @@ const styles = StyleSheet.create({
     input: {
         height: 120,
         borderWidth: 1,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         fontSize: 15,
     },
@@ -369,7 +370,7 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         height: 46,
-        borderRadius: 23,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',

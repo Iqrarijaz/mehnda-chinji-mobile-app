@@ -17,10 +17,13 @@ import Toast from 'react-native-toast-message';
 
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '../../context/ThemeContext';
 import { forgotPasswordSchema } from '@/utils/validation';
 import * as yup from 'yup';
 import { checkAccountDetails, sendOtp } from '@/apis/login/forgot-password';
+
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 export default function ForgotPasswordScreen() {
     const router = useRouter();
@@ -98,6 +101,9 @@ export default function ForgotPasswordScreen() {
                 text2: 'Verification code sent successfully'
             });
 
+            analyticsService.trackEvent(AnalyticsEvents.FORGOT_PASSWORD_REQUEST, { email: email.trim() });
+
+
             // Navigate to verify otp screen with identifier
             router.push({
                 pathname: '/(auth)/verify-otp',
@@ -125,30 +131,27 @@ export default function ForgotPasswordScreen() {
             style={[styles.container, { backgroundColor: colors.background }]}
         >
             {/* Header / Top Section */}
-            <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => step === 2 ? setStep(1) : router.back()}
-                >
-                    <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-                </TouchableOpacity>
-                <View style={styles.headerContent}>
-                    <Image
-                        source={require('../../public/icon.svg')}
-                        style={{ width: 48, height: 48, marginBottom: 16 }}
-                        contentFit="contain"
-                    />
-                    <ThemedText style={styles.headerTitle}>Forgot{"\n"}Password?</ThemedText>
-                    <ThemedText style={styles.headerSubtitle}>
-                        {step === 1
-                            ? "Enter your registered email to find your account"
-                            : "Is this you? We'll send a code to your registered email"}
-                    </ThemedText>
+            <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                    <View style={styles.headerContent}>
+                        <Image
+                            source={require('../../public/icon.svg')}
+                            style={{ width: 48, height: 48, marginBottom: 16 }}
+                            contentFit="contain"
+                        />
+                        <ThemedText style={styles.headerTitle}>Forgot Password?</ThemedText>
+                        <ThemedText style={styles.headerSubtitle}>
+                            {step === 1
+                                ? "Enter your registered email to find your account"
+                                : "Is this you? We'll send a code to your registered email"}
+                        </ThemedText>
+                    </View>
                 </View>
             </View>
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
+                style={{ backgroundColor: colors.background }}
                 contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.background }}
                 bounces={false}
             >
@@ -273,26 +276,14 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headerSection: {
-        paddingBottom: 10,
-        borderBottomLeftRadius: 36,
-        borderBottomRightRadius: 36,
+        paddingBottom: 38,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-    },
-    backButton: {
-        marginLeft: 22,
-        marginTop: 18,
-        marginBottom: 8, // Added padding bottom as requested
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     headerContent: {
         paddingHorizontal: 22,
-        paddingBottom: 18,
-        // Removed paddingTop: 40 as button now pushes content
+        paddingTop: 38,
     },
     headerTitle: {
         fontSize: 28, // Reduced from 32
@@ -313,7 +304,7 @@ const styles = StyleSheet.create({
         paddingBottom: 38,
     },
     formCard: {
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -345,7 +336,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
         borderWidth: 1,
     },
@@ -356,7 +347,7 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 18,

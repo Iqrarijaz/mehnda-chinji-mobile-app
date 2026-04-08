@@ -18,6 +18,7 @@ import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
 interface MenuItem {
     label: string;
@@ -64,7 +65,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
     }, {});
 
     return (
-        <View style={[styles.container, { backgroundColor: '#F5F6FA' }]}>
+        <View style={[styles.container, { backgroundColor: theme === 'dark' ? colors.card : colors.background }]}>
             {/* Header */}
             <Animated.View entering={FadeIn.duration(400)} style={[styles.header, { paddingTop: insets.top + 16, backgroundColor: colors.primary }]}>
                 <View style={styles.headerContent}>
@@ -78,7 +79,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                             name={user?.user?.name}
                             size={52}
                         />
-                        <View style={styles.onlineBadge} />
+                        <View style={[styles.onlineBadge, { borderColor: theme === 'dark' ? colors.primary : '#FFFFFF' }]} />
                     </TouchableOpacity>
                     <View style={styles.headerTextWrap}>
                         <ThemedText style={styles.headerName}>{userName}</ThemedText>
@@ -101,7 +102,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                         entering={FadeInLeft.delay(200 + sectionIndex * 100).duration(400)}
                         style={styles.section}
                     >
-                        <ThemedText style={styles.sectionLabel}>{sectionName}</ThemedText>
+                        <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>{sectionName}</ThemedText>
                         {items.map((item, index) => {
                             const isFocused =
                                 (item.route === '/(tabs)' && activeRoute === '(tabs)') ||
@@ -119,7 +120,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                                 >
                                     <View style={[
                                         styles.menuIconWrap,
-                                        { backgroundColor: isFocused ? colors.primary + '15' : '#F0F1F5' },
+                                        { backgroundColor: isFocused ? colors.primary + '15' : (theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F0F1F5') },
                                     ]}>
                                         <Ionicons
                                             name={item.icon}
@@ -129,7 +130,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                                     </View>
                                     <ThemedText style={[
                                         styles.menuLabel,
-                                        { color: isFocused ? colors.primary : '#1E293B' },
+                                        { color: isFocused ? colors.primary : colors.text },
                                         isFocused && { fontWeight: '700' },
                                     ]}>
                                         {item.label}
@@ -137,7 +138,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                                     <Ionicons
                                         name="chevron-forward"
                                         size={16}
-                                        color={isFocused ? colors.primary : '#CBD5E1'}
+                                        color={isFocused ? colors.primary : (theme === 'dark' ? 'rgba(255,255,255,0.3)' : '#CBD5E1')}
                                     />
                                 </TouchableOpacity>
                             );
@@ -147,7 +148,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
             </DrawerContentScrollView>
 
             {/* Footer */}
-            <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
+            <View style={[styles.footer, { paddingBottom: insets.bottom + 16, borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }]}>
                 <TouchableOpacity
                     activeOpacity={0.7}
                     onPress={logout}
@@ -159,7 +160,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                     <ThemedText style={styles.logoutText}>Sign Out</ThemedText>
                 </TouchableOpacity>
 
-                <ThemedText style={styles.versionText}>Rehbar v1.0.0</ThemedText>
+                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v1.0.0</ThemedText>
             </View>
         </View>
     );
@@ -174,8 +175,8 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 20,
         paddingBottom: 20,
-        borderBottomLeftRadius: 24,
-        borderBottomRightRadius: 24,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
     },
     headerContent: {
         flexDirection: 'row',
@@ -237,13 +238,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 10,
         paddingHorizontal: 12,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         marginBottom: 4,
     },
     menuIconWrap: {
         width: 36,
         height: 36,
-        borderRadius: 11,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
@@ -259,19 +260,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 12,
         borderTopWidth: StyleSheet.hairlineWidth,
-        borderTopColor: 'rgba(0,0,0,0.06)',
     },
     logoutBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 12,
         paddingHorizontal: 12,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
     },
     logoutIconWrap: {
         width: 36,
         height: 36,
-        borderRadius: 11,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(239, 68, 68, 0.08)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -284,7 +284,6 @@ const styles = StyleSheet.create({
     },
     versionText: {
         fontSize: 11,
-        color: '#B0B8C9',
         fontWeight: '500',
         textAlign: 'center',
         marginTop: 16,

@@ -21,9 +21,12 @@ import Toast from 'react-native-toast-message';
 
 import { getActiveSessions, revokeSession } from '@/apis/profile';
 import { ThemedText } from '@/components/themedText';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import { PremiumModal } from '../common/PremiumModal';
 
-const PRIMARY = '#006666';
+// const PRIMARY is now accessed via colors.primary inside components
 
 // ── Platform icon helper ──────────────────────────────────────────────────────
 function getPlatformIcon(platform: string): string {
@@ -52,9 +55,10 @@ interface SessionCardProps {
     delay: number;
     onRevoke: (id: string) => void;
     isRevoking: boolean;
+    colors: any;
 }
 
-const SessionCard = React.memo(({ session, delay, onRevoke, isRevoking }: SessionCardProps) => {
+const SessionCard = React.memo(({ session, delay, onRevoke, isRevoking, colors }: SessionCardProps) => {
     const scale = useSharedValue(1);
     const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
@@ -63,13 +67,13 @@ const SessionCard = React.memo(({ session, delay, onRevoke, isRevoking }: Sessio
 
     return (
         <Animated.View entering={SlideInLeft.delay(delay).duration(400)} style={animStyle}>
-            <View style={[styles.card, session.isCurrent && styles.cardCurrent]}>
+            <View style={[styles.card, { backgroundColor: colors.background }, session.isCurrent && styles.cardCurrent]}>
                 {/* Left icon */}
                 <View style={[styles.iconCircle, session.isCurrent && styles.iconCircleCurrent]}>
                     <Ionicons
                         name={getPlatformIcon(session.platform) as any}
                         size={22}
-                        color={session.isCurrent ? PRIMARY : '#94A3B8'}
+                        color={session.isCurrent ? colors.primary : colors.textSecondary}
                     />
                 </View>
 
@@ -114,12 +118,18 @@ const SessionCard = React.memo(({ session, delay, onRevoke, isRevoking }: Sessio
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 const SkeletonCard = React.memo(({ delay }: { delay: number }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+    const isDark = theme === 'dark';
+    const skeletonBg = isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0';
+    const subBg = isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9';
+
     return (
-        <Animated.View entering={SlideInLeft.delay(delay).duration(300)} style={[styles.card, { opacity: 0.5 }]}>
-            <View style={[styles.iconCircle, { backgroundColor: '#E2E8F0' }]} />
+        <Animated.View entering={SlideInLeft.delay(delay).duration(300)} style={[styles.card, { backgroundColor: colors.background, opacity: 0.5 }]}>
+            <View style={[styles.iconCircle, { backgroundColor: skeletonBg }]} />
             <View style={styles.info}>
-                <View style={{ width: '60%', height: 13, borderRadius: 6, backgroundColor: '#E2E8F0', marginBottom: 8 }} />
-                <View style={{ width: '40%', height: 11, borderRadius: 5, backgroundColor: '#F1F5F9' }} />
+                <View style={{ width: '60%', height: 13, borderRadius: 6, backgroundColor: skeletonBg, marginBottom: 8 }} />
+                <View style={{ width: '40%', height: 11, borderRadius: 5, backgroundColor: subBg }} />
             </View>
         </Animated.View>
     );
@@ -132,6 +142,8 @@ interface ActiveSessionsModalProps {
 }
 
 export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.memo(({ visible, onClose }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const queryClient = useQueryClient();
 
     const { data: sessionsData, isLoading } = useQuery({
@@ -169,8 +181,8 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
                     <ThemedText style={styles.title}>Active Sessions</ThemedText>
                     <ThemedText style={styles.subtitle}>Manage devices currently logged in</ThemedText>
                 </View>
-                <TouchableOpacity onPress={onClose} style={styles.closeBtn} activeOpacity={0.7}>
-                    <Ionicons name="close" size={18} color="#64748B" />
+                <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]} activeOpacity={0.7}>
+                    <Ionicons name="close" size={18} color={colors.text} style={{ opacity: 0.5 }} />
                 </TouchableOpacity>
             </View>
 
@@ -195,6 +207,7 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
                         <SessionCard
                             key={session._id}
                             session={session}
+                            colors={colors}
                             delay={i * 60}
                             onRevoke={(id) => revokeSessionMutation.mutate(id)}
                             isRevoking={
@@ -220,19 +233,16 @@ const styles = StyleSheet.create({
     title: {
         fontSize: Platform.OS === 'android' ? 18 : 20,
         fontWeight: '800',
-        color: '#0F172A',
         marginBottom: 3,
     },
     subtitle: {
         fontSize: 13,
-        color: '#94A3B8',
         fontWeight: '500',
     },
     closeBtn: {
         width: 34,
         height: 34,
         borderRadius: 17,
-        backgroundColor: '#F1F5F9',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -243,25 +253,24 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8FAFC',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         padding: 14,
         marginBottom: 10,
     },
     cardCurrent: {
-        backgroundColor: `${PRIMARY}08`,
+        backgroundColor: 'rgba(0,102,102,0.08)', // Using alpha for consistent branding
     },
     iconCircle: {
         width: 46,
         height: 46,
-        borderRadius: 14,
-        backgroundColor: '#EEF2FF',
+        borderRadius: Layout.borderRadius,
+        backgroundColor: 'rgba(0,102,102,0.08)',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 14,
     },
     iconCircleCurrent: {
-        backgroundColor: `${PRIMARY}12`,
+        backgroundColor: 'rgba(0,102,102,0.12)',
     },
     info: { flex: 1 },
     nameRow: {
@@ -274,19 +283,18 @@ const styles = StyleSheet.create({
     deviceName: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#0F172A',
         flexShrink: 1,
     },
     badge: {
-        backgroundColor: `${PRIMARY}14`,
+        backgroundColor: 'rgba(0,102,102,0.14)',
         paddingHorizontal: 8,
         paddingVertical: 2,
-        borderRadius: 8,
+        borderRadius: Layout.borderRadius,
     },
     badgeText: {
         fontSize: 10,
         fontWeight: '700',
-        color: PRIMARY,
+        color: '#006666',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
@@ -298,7 +306,7 @@ const styles = StyleSheet.create({
     revokeBtn: {
         width: 36,
         height: 36,
-        borderRadius: 10,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FEF2F2',
         justifyContent: 'center',
         alignItems: 'center',

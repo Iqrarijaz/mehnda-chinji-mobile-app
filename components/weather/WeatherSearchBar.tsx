@@ -8,6 +8,9 @@ import {
     View,
 } from 'react-native';
 import { ThemedText } from '../themedText';
+import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 
 interface WeatherSearchBarProps {
     searchInput: string;
@@ -29,7 +32,11 @@ const WeatherSearchBar = React.memo(({
     onClear,
     onSelectCity,
     onGPS,
-}: WeatherSearchBarProps) => (
+}: WeatherSearchBarProps) => {
+    const { theme, isDark } = useTheme();
+    const colors = Colors[theme];
+    
+    return (
     <View style={styles.wrapper}>
         {/* Input pill */}
         <BlurView intensity={40} tint="light" style={styles.inputBlur}>
@@ -55,24 +62,29 @@ const WeatherSearchBar = React.memo(({
             )}
         </BlurView>
 
-        {/* White dropdown */}
+        {/* Dropdown */}
         {showDropdown && filteredCities.length > 0 && (
-            <View style={styles.dropdown}>
+            <View style={[styles.dropdown, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
                 {filteredCities.map((item, i) => (
                     <TouchableOpacity
                         key={i}
-                        style={[styles.dropItem, i < filteredCities.length - 1 && styles.dropItemBorder]}
+                        style={[
+                            styles.dropItem, 
+                            i < filteredCities.length - 1 && styles.dropItemBorder,
+                            i < filteredCities.length - 1 && { borderBottomColor: colors.border }
+                        ]}
                         onPress={() => onSelectCity(item)}
                         activeOpacity={0.7}
                     >
-                        <Ionicons name="location-outline" size={14} color="#94A3B8" />
-                        <ThemedText style={styles.dropText}>{item}</ThemedText>
+                        <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
+                        <ThemedText style={[styles.dropText, { color: colors.text }]}>{item}</ThemedText>
                     </TouchableOpacity>
                 ))}
             </View>
         )}
     </View>
-));
+    );
+});
 
 export default WeatherSearchBar;
 
@@ -83,7 +95,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 14,
         height: 44,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.25)',
@@ -91,16 +103,14 @@ const styles = StyleSheet.create({
     },
     input: { flex: 1, color: '#FFFFFF', fontSize: 14 },
 
-    // White dropdown
+    // Dropdown
     dropdown: {
         position: 'absolute',
         top: 48,
         left: 0,
         right: 0,
-        borderRadius: 16,
-        backgroundColor: '#FFFFFF',
+        borderRadius: Layout.borderRadius,
         zIndex: 9999,
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.12,
         shadowRadius: 16,
@@ -115,10 +125,8 @@ const styles = StyleSheet.create({
     },
     dropItemBorder: {
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: '#F1F5F9',
     },
     dropText: {
-        color: '#0F172A',
         fontSize: 14,
         fontWeight: '600',
     },

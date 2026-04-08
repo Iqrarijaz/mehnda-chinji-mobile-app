@@ -39,7 +39,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         }
 
         const userId = String(user.user._id);
-        console.log('[Socket] User ID:', userId);
+        if (__DEV__) console.log('[Socket] User ID:', userId);
 
         const newSocket = io(baseUrl, {
             transports: ['websocket'],
@@ -57,12 +57,12 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         });
 
         newSocket.on('disconnect', (reason) => {
-            console.log('[Socket] Disconnected:', reason);
+            if (__DEV__) console.log('[Socket] Disconnected:', reason);
             setIsConnected(false);
         });
 
         newSocket.on('connect_error', (err) => {
-            console.warn('[Socket] Connection error:', err.message);
+            if (__DEV__) console.warn('[Socket] Connection error:', err.message);
         });
 
         return () => {

@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { View, StyleSheet, ActivityIndicator, Animated } from 'react-native';
 import { ThemedText } from '@/components/themedText';
 import { formatTime12h } from '@/utils/dateUtils';
+import { Layout } from '@/constants/layout';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 export interface PrayerTimetableProps {
@@ -48,7 +49,7 @@ const getPrayerTheme = (name: string, isDark: boolean = false) => {
         case 'isha':
             return { bg: isDark ? '#12102A' : '#EAEAF6', accent: isDark ? '#8E44AD' : '#512DA8', icon: '🌌' };
         default:
-            return { bg: isDark ? '#112119' : '#F0FDF4', accent: isDark ? '#059669' : '#047857', icon: 'time' };
+            return { bg: isDark ? '#1E293B' : '#F0FDF4', accent: isDark ? '#004D4D' : '#047857', icon: 'time' };
     }
 };
 
@@ -56,7 +57,7 @@ const getPrayerTheme = (name: string, isDark: boolean = false) => {
 const PrayerRow = memo(({ prayer, isNext, pulseAnim, C, isDark }: PrayerRowProps) => {
     const theme = getPrayerTheme(prayer.name, isDark);
     const rowBg = isNext ? theme.bg : (isDark ? C.card : '#FFFFFF');
-    const borderColor = isNext ? theme.accent : C.cardBorder;
+    const borderColor = isNext ? theme.accent : (isDark ? 'rgba(255,255,255,0.06)' : C.cardBorder);
 
     /** Adaptive font size for micro-tiles */
     const getUrduFontSize = (text: string) => {
@@ -83,14 +84,14 @@ const PrayerRow = memo(({ prayer, isNext, pulseAnim, C, isDark }: PrayerRowProps
                         adjustsFontSizeToFit
                         style={[
                             styles.prayerArabic,
-                            { color: isNext ? theme.accent : C.text, fontSize: getUrduFontSize(prayer.arabic) }
+                            { color: isNext ? (isDark ? '#FFFFFF' : theme.accent) : C.text, fontSize: getUrduFontSize(prayer.arabic) }
                         ]}
                     >
                         {prayer.arabic}
                     </ThemedText>
                 </View>
                 <ThemedText 
-                    style={[styles.adhanText, { color: isNext ? theme.accent : C.textSecondary, textAlign: 'center' }]}
+                    style={[styles.adhanText, { color: isNext ? (isDark ? '#F1F5F9' : theme.accent) : C.textSecondary, textAlign: 'center' }]}
                 >
                     {formatTime12h(prayer.adhan).replace(' ', '')}
                 </ThemedText>
@@ -114,8 +115,8 @@ export const PrayerTimetable = ({
             {/* Section Header */}
             <View style={styles.sectionHeader}>
                 <ThemedText style={[styles.sectionTitle, { color: C.text }]}>Daily Prayers</ThemedText>
-                <View style={[styles.sectionPill, { backgroundColor: C.primaryLight }]}>
-                    <ThemedText style={[styles.sectionPillText, { color: C.primary }]}>
+                <View style={[styles.sectionPill, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : C.primaryLight }]}>
+                    <ThemedText style={[styles.sectionPillText, { color: isDark ? '#FFFFFF' : C.primary }]}>
                         {selectedCity || 'My City'}
                     </ThemedText>
                 </View>
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     gridCard: {
         width: '23.5%', // 4 columns per row
         padding: 6,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1,
         minHeight: 65,
         justifyContent: 'center',

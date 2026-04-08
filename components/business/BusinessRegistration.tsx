@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
     ActivityIndicator,
@@ -21,8 +22,8 @@ import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import { CleanConfirmationModal } from '../common/cleanConfirmationModal';
-import BusinessRegistrationModal from './businessRegistrationModal';
 
 import MyRegisteredBusinessCard from './myRegisteredBusinessCard';
 
@@ -31,10 +32,9 @@ const BusinessRegistration = React.memo(() => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const queryClient = useQueryClient();
+    const router = useRouter();
 
     // UI State
-    const [modalVisible, setModalVisible] = useState(false);
-    const [editData, setEditData] = useState<any>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [businessToDelete, setBusinessToDelete] = useState<string | null>(null);
     const [showVisibilityModal, setShowVisibilityModal] = useState(false);
@@ -51,7 +51,7 @@ const BusinessRegistration = React.memo(() => {
     // Mutations
     const deleteMutation = useMutation({
         mutationFn: deleteBusiness,
-        onSuccess: (res) => {
+        onSuccess: (res: any) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.all });
                 setShowDeleteModal(false);
@@ -68,7 +68,7 @@ const BusinessRegistration = React.memo(() => {
     const manageSearchMutation = useMutation({
         mutationFn: ({ businessId, search }: { businessId: string; search: boolean }) =>
             manageBusinessSearch(businessId, search),
-        onSuccess: (res) => {
+        onSuccess: (res: any) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.all });
                 setShowVisibilityModal(false);
@@ -98,20 +98,20 @@ const BusinessRegistration = React.memo(() => {
         );
     }
 
+    const handleAddBusiness = () => {
+        analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_CLICKED);
+        router.push('/business-registration');
+    };
+
+    const handleEditBusiness = (biz: any) => {
+        router.push({
+            pathname: '/business-registration',
+            params: { editData: JSON.stringify(biz) }
+        });
+    };
+
     return (
         <View style={styles.container}>
-            <BusinessRegistrationModal
-                visible={modalVisible}
-                onClose={() => {
-                    setModalVisible(false);
-                    setEditData(null);
-                }}
-                editData={editData}
-                onSuccess={() => {
-                    refetch();
-                }}
-            />
-
             <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
                 {/* Header with Add Button */}
                 <View style={styles.headerRow}>
@@ -125,10 +125,7 @@ const BusinessRegistration = React.memo(() => {
                             { backgroundColor: colors.primary },
                             businesses.length >= 3 && [styles.disabledButton, { backgroundColor: colors.icon }]
                         ]}
-                        onPress={() => {
-                            analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_CLICKED);
-                            setModalVisible(true);
-                        }}
+                        onPress={handleAddBusiness}
                         disabled={businesses.length >= 3}
                     >
                         <Ionicons name="add" size={28} color="#FFF" />
@@ -141,7 +138,7 @@ const BusinessRegistration = React.memo(() => {
                         <ThemedText style={[styles.emptyStateText, { color: colors.icon }]}>No businesses registered yet.</ThemedText>
                         <TouchableOpacity
                             style={[styles.emptyStateBtn, { backgroundColor: colors.primary }]}
-                            onPress={() => setModalVisible(true)}
+                            onPress={handleAddBusiness}
                         >
                             <ThemedText style={{ color: '#FFF', fontWeight: 'bold' }}>Register Your Business</ThemedText>
                         </TouchableOpacity>
@@ -152,10 +149,7 @@ const BusinessRegistration = React.memo(() => {
                             <MyRegisteredBusinessCard
                                 key={biz._id}
                                 business={biz}
-                                onEdit={(biz) => {
-                                    setEditData(biz);
-                                    setModalVisible(true);
-                                }}
+                                onEdit={handleEditBusiness}
                                 onDelete={(id) => {
                                     setBusinessToDelete(id);
                                     setShowDeleteModal(true);
@@ -245,7 +239,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        shadowRadius: 4,
     },
     disabledButton: {
         opacity: 0.7,
@@ -263,7 +256,7 @@ const styles = StyleSheet.create({
     emptyStateBtn: {
         paddingHorizontal: 20,
         paddingVertical: 10,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         marginTop: 10,
     },
     listContainer: {

@@ -10,6 +10,7 @@ import {
     Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Layout } from '@/constants/layout';
 import Animated, { SlideInLeft, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 interface FeedbackFormProps {
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#F8FAFC',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         borderWidth: 1,
         borderColor: '#F1F5F9',
         marginBottom: 16,
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: '#009688',
         height: 54,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 8,

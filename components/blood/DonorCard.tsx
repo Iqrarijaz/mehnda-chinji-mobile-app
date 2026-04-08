@@ -3,15 +3,24 @@ import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Alert, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+} from 'react-native-popup-menu';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+    FadeOut,
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
+    ZoomIn,
 } from 'react-native-reanimated';
 import { TintedCard } from '../ui/tintedCard';
 
@@ -26,6 +35,7 @@ interface DonorCardProps {
         };
         bloodGroup: string;
         lastDonationDate?: string | null;
+        createdAt?: string;
         city: string;
         address?: string;
         village?: string;
@@ -35,14 +45,15 @@ interface DonorCardProps {
 }
 
 const DonorCard = React.memo(({ donor, onReportPress }: DonorCardProps) => {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const { user } = useAuth();
+    const [showMenu, setShowMenu] = React.useState(false);
 
     const isAvailable = donor.available;
     const location = [donor.address || donor.village, donor.city].filter(Boolean).join(', ');
 
-    const primaryColor = "#000000";
+    const primaryColor = colors.primary;
 
     const handleCall = () => {
         if (donor.userId.phone) {
@@ -103,8 +114,8 @@ const DonorCard = React.memo(({ donor, onReportPress }: DonorCardProps) => {
 
             <GestureDetector gesture={pan}>
                 <Animated.View style={cardStyle}>
-                    <TouchableOpacity activeOpacity={0.9} onPress={handleCall}>
-                        <TintedCard tintColor={primaryColor} bgColor="#FFFFFF" style={styles.cardWrapper}>
+                    <View style={{ flex: 1 }}>
+                        <TintedCard tintColor={primaryColor} bgColor={colors.card} style={styles.cardWrapper}>
                             <View style={styles.cardMain}>
                                 {/* Left: Blood Group */}
                                 <View style={styles.bloodCircle}>
@@ -116,32 +127,83 @@ const DonorCard = React.memo(({ donor, onReportPress }: DonorCardProps) => {
                                 {/* Center: Info */}
                                 <View style={styles.contentContainer}>
                                     <View style={styles.nameRow}>
-                                        <ThemedText style={[styles.name, { color: primaryColor }]} numberOfLines={1}>
+                                        <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={1}>
                                             {donor.userId.name}
                                         </ThemedText>
                                     </View>
 
                                     <View style={styles.locationRow}>
-                                        <Ionicons name="location" size={14} color={primaryColor} style={{ marginTop: 4 }} />
-                                        <ThemedText style={[styles.locationText, { color: primaryColor, opacity: 0.7 }]} numberOfLines={2}>
-                                            {location.toLowerCase()}
+                                        <Ionicons name="location" size={12} color={colors.textSecondary} style={{ marginTop: 5 }} />
+                                        <ThemedText style={[styles.locationText, { color: colors.textSecondary }]} numberOfLines={2}>
+                                            {location}
                                         </ThemedText>
                                     </View>
                                 </View>
+                                <TouchableOpacity
+                                    style={[styles.callBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : primaryColor + '10' }]}
+                                    onPress={handleCall}
+                                    activeOpacity={0.7}
+                                >
+                                    <Ionicons name="call" size={14} color={isDark ? colors.text : primaryColor} />
+                                </TouchableOpacity>
+                            </View>
 
-                                {/* Right: Call ONLY */}
-                                <View style={styles.rightActions}>
-                                    <TouchableOpacity
-                                        style={[styles.callBtn, { backgroundColor: primaryColor + '10' }]}
-                                        onPress={handleCall}
-                                        activeOpacity={0.7}
-                                    >
-                                        <Ionicons name="call" size={14} color={primaryColor} />
-                                    </TouchableOpacity>
+                            <View style={[styles.divider, { backgroundColor: primaryColor + '10' }]} />
+
+                            <View style={styles.cardFooter}>
+                                <View style={styles.footerLeft}>
+                                    <Ionicons name="calendar-outline" size={12} color={colors.textSecondary} />
+                                    <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>
+                                        {new Date(donor.createdAt || donor.lastDonationDate || Date.now()).toLocaleDateString()}
+                                    </ThemedText>
+                                </View>
+
+                                <View style={styles.footerRight}>
+
+
+                                    <View style={{ position: 'relative', zIndex: 100 }}>
+                                        <Menu opened={showMenu} onBackdropPress={() => setShowMenu(false)}>
+                                            <MenuTrigger
+                                                onPress={() => setShowMenu(true)}
+                                                customStyles={{
+                                                    triggerWrapper: styles.moreBtn,
+                                                }}
+                                            >
+                                                <Ionicons name="ellipsis-horizontal" size={20} color={colors.textSecondary} />
+                                            </MenuTrigger>
+
+                                            <MenuOptions
+                                                customStyles={{
+                                                    optionsContainer: [
+                                                        styles.menuPopover,
+                                                        {
+                                                            backgroundColor: colors.background,
+                                                            borderColor: colors.border,
+                                                        }
+                                                    ],
+                                                }}
+                                            >
+                                                <MenuOption
+                                                    onSelect={() => {
+                                                        setShowMenu(false);
+                                                        if (onReportPress) onReportPress(donor._id);
+                                                    }}
+                                                    customStyles={{
+                                                        optionWrapper: styles.menuItem,
+                                                    }}
+                                                >
+                                                    <View style={[styles.menuIconBox, { backgroundColor: '#EF444415' }]}>
+                                                        <Ionicons name="flag" size={16} color="#EF4444" />
+                                                    </View>
+                                                    <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>Report</ThemedText>
+                                                </MenuOption>
+                                            </MenuOptions>
+                                        </Menu>
+                                    </View>
                                 </View>
                             </View>
                         </TintedCard>
-                    </TouchableOpacity>
+                    </View>
                 </Animated.View>
             </GestureDetector>
         </View>
@@ -166,7 +228,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         width: 80,
         backgroundColor: '#EF4444',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -249,13 +311,73 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 0.5,
     },
-    rightActions: {
-        marginLeft: 10,
+    divider: {
+        height: 1,
+        width: '100%',
+        marginVertical: 8,
+    },
+    cardFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    footerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    footerRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    dateText: {
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    moreBtn: {
+        padding: 4,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    menuPopover: {
+        position: 'absolute',
+        width: 170,
+        borderRadius: Layout.borderRadius,
+        borderWidth: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.12,
+        shadowRadius: 16,
+        elevation: 8,
+        zIndex: 100,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 8,
+        borderRadius: Layout.borderRadius - 4,
+        gap: 10,
+    },
+    menuIconBox: {
+        width: 28,
+        height: 28,
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    menuItemText: {
+        fontSize: 14,
+        fontWeight: '600',
     },
     callBtn: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
     },

@@ -12,6 +12,8 @@ import { useDailyHadith } from '@/hooks/useDailyHadith';
 import { PrayerTimetable } from '@/components/prayers/PrayerTimetable';
 import HadithCard from '@/components/prayers/HadithCard';
 import { PrayerHeader } from '@/components/prayers/PrayerHeader';
+import { Colors } from '@/constants/colors';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 
 
@@ -19,32 +21,32 @@ import { PrayerHeader } from '@/components/prayers/PrayerHeader';
 // ─── Theme palette ────────────────────────────────────────────────────────────
 const PALETTE = {
     light: {
-        primary: '#047857',
+        primary: Colors.light.primary,
         primaryLight: '#D1FAE5',
         gold: '#D4AF37',
         goldLight: '#FEF9C3',
-        background: '#FDFBF7',
-        card: '#FFFFFF',
-        cardBorder: '#E5EDE8',
-        text: '#1A2E22',
-        textSecondary: '#5A7A66',
-        divider: '#EAF0EC',
+        background: Colors.light.background,
+        card: Colors.light.card,
+        cardBorder: Colors.light.border,
+        text: Colors.light.text,
+        textSecondary: Colors.light.textSecondary,
+        divider: Colors.light.border,
         headerOverlay: 'rgba(4,60,35,0.55)',
         headerOverlayBottom: 'rgba(3,30,18,0.85)',
     },
     dark: {
-        primary: '#059669',
-        primaryLight: 'rgba(5,150,105,0.18)',
+        primary: Colors.dark.primary,
+        primaryLight: 'rgba(0,102,102,0.15)',
         gold: '#F0C040',
-        goldLight: 'rgba(240,192,64,0.15)',
-        background: '#0B1612',
-        card: '#112119',
-        cardBorder: '#1E3A2A',
-        text: '#E8F5EE',
-        textSecondary: '#7BB892',
-        divider: '#1E3A2A',
-        headerOverlay: 'rgba(3,30,18,0.55)',
-        headerOverlayBottom: 'rgba(2,15,9,0.92)',
+        goldLight: 'rgba(240,192,64,0.12)',
+        background: Colors.dark.background,
+        card: Colors.dark.card,
+        cardBorder: Colors.dark.border,
+        text: Colors.dark.text,
+        textSecondary: Colors.dark.textSecondary,
+        divider: Colors.dark.border,
+        headerOverlay: 'rgba(1,1,1,0.55)',
+        headerOverlayBottom: 'rgba(1,1,1,0.92)',
     },
 };
 
@@ -67,6 +69,10 @@ export default function PrayerTimesScreen() {
     const { selectedCity } = useWeatherCity();
     const { prayerData, isPrayerLoading } = usePrayerTimes(selectedCity);
     const { hadith, isLoading: isHadithLoading, error: hadithError } = useDailyHadith();
+
+    useEffect(() => {
+        analyticsService.trackEvent(AnalyticsEvents.PRAYER_TIMES_VIEWED, { city: selectedCity });
+    }, [selectedCity]);
 
     // ── Prayer schedule ──────────────────────────────────────────────────────
     const prayerSchedule = useMemo(() => {

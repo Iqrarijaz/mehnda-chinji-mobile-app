@@ -57,6 +57,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loadUser();
     }, []);
 
+    // Reactive Session Expiry: Listen for token clearance from API client
+    useEffect(() => {
+        const unsubscribe = tokenCache.onClear(() => {
+            if (tokenCache.isSessionExpired()) {
+                // Clear state immediately to stop the 'ping-pong' redirect loop
+                setUser(null);
+                
+                // Redirect with the 'expired' flag – this bypasses the standard protection effect
+                // which otherwise might redirect without the query param 
+                router.replace('/(auth)/login?expired=true');
+                
+                // Reset the flag for the next session
+                tokenCache.setSessionExpired(false);
+            } else {
+                // Manual or other logout
+                setUser(null);
+            }
+        });
+
+        return () => unsubscribe();
+    }, [router]);
+
     const login = useCallback(async (payload: any) => {
         // Handle nested data if present
         const source = payload.data || payload;
@@ -112,13 +134,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (!prev) return prev;
 
             const finalUserData = { ...prev.user, ...newUserData };
-
-            if (finalUserData.notificationPreferences) {
-                initializePreferences(finalUserData.notificationPreferences);
-            }
-
             const updatedAuthData = { ...prev, user: finalUserData };
-            secureStorage.setItem('userData', JSON.stringify(updatedAuthData));
+
+            // Run side effects outside the synchronous render phase
+            setTimeout(() => {
+                if (finalUserData.notificationPreferences) {
+                    initializePreferences(finalUserData.notificationPreferences);
+                }
+                secureStorage.setItem('userData', JSON.stringify(updatedAuthData)).catch(console.error);
+            }, 0);
+            
             return updatedAuthData;
         });
     }, [initializePreferences]);

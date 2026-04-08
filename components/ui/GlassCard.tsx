@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
 interface GlassCardProps {
     children: React.ReactNode;
@@ -37,11 +38,11 @@ const styles = StyleSheet.create({
     cardWrapper: {
         marginVertical: 4,
         marginBottom: 8,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
     },
     card: {
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 12,
         borderWidth: 1,
         position: 'relative',

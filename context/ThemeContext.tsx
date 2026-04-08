@@ -41,15 +41,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        // TEMPORARY: Force Light Mode for v1 release
+        // Force light mode regardless of preference or system setting
         setTheme('light');
-        /*
-        if (themePreference === 'system') {
-            setTheme(systemColorScheme || 'light');
-        } else {
-            setTheme(themePreference);
-        }
-        */
     }, [themePreference, systemColorScheme]);
 
     const setThemePreference = useCallback(async (pref: ThemePreference) => {
@@ -62,7 +55,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setThemePreference(nextTheme);
     }, [theme, setThemePreference]);
 
-    const isDark = theme === 'dark';
+    const isDark = false; // Force false for light mode
 
     const themeValue = useMemo(() => ({
         theme,

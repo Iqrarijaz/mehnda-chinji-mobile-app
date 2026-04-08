@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 
 const termsData = [
@@ -60,20 +61,23 @@ const AccordionItem = ({ item, index }: { item: any, index: number }) => {
         };
     });
 
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
     return (
-        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={styles.accordionContainer}>
+        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.accordionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <TouchableOpacity onPress={toggleAccordion} style={styles.accordionHeader} activeOpacity={0.7}>
                 <View style={styles.accordionTitleWrap}>
-                    <View style={styles.bulletPoint} />
-                    <ThemedText style={[styles.accordionTitle, expanded && styles.accordionTitleActive]}>{item.title}</ThemedText>
+                    <View style={[styles.bulletPoint, { backgroundColor: colors.border }]} />
+                    <ThemedText style={[styles.accordionTitle, { color: colors.textSecondary }, expanded && { color: colors.text, fontWeight: '700' }]}>{item.title}</ThemedText>
                 </View>
                 <Animated.View style={iconAnimatedStyle}>
-                    <Ionicons name="chevron-down" size={20} color={expanded ? '#0F172A' : '#94A3B8'} />
+                    <Ionicons name="chevron-down" size={20} color={expanded ? colors.text : colors.textSecondary} />
                 </Animated.View>
             </TouchableOpacity>
             <Animated.View style={[styles.accordionContentWrap, animatedStyle]}>
                 <View style={styles.accordionContentInner}>
-                    <ThemedText style={styles.bodyText}>{item.content}</ThemedText>
+                    <ThemedText style={[styles.bodyText, { color: colors.textSecondary }]}>{item.content}</ThemedText>
                 </View>
             </Animated.View>
         </Animated.View>
@@ -89,7 +93,7 @@ export default function TermsAndConditionsScreen() {
     const [infoModalVisible, setInfoModalVisible] = useState(false);
 
     return (
-        <View style={[styles.container, { backgroundColor: '#F8FAFC' }]}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* ── Modern Header ──────────────────────────────────────── */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
@@ -125,16 +129,16 @@ export default function TermsAndConditionsScreen() {
                 contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
                 showsVerticalScrollIndicator={false}
             >
-                <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.card}>
+                <Animated.View entering={FadeInUp.delay(300).duration(500)} style={[styles.card, { backgroundColor: colors.card }]}>
                     <View style={styles.cardHeader}>
                         <Ionicons name="document-text" size={24} color={colors.primary} />
-                        <ThemedText style={styles.cardHeaderText}>Summary</ThemedText>
+                        <ThemedText style={[styles.cardHeaderText, { color: colors.text }]}>Summary</ThemedText>
                     </View>
-                    <ThemedText style={styles.welcomeText}>
+                    <ThemedText style={[styles.welcomeText, { color: colors.textSecondary }]}>
                         Welcome to Rehbar! These community guidelines and terms are established to keep the platform safe and trustworthy for everyone.
                     </ThemedText>
 
-                    <View style={styles.divider} />
+                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
                     {/* Accordion Sections */}
                     {termsData.map((item, index) => (
@@ -146,13 +150,15 @@ export default function TermsAndConditionsScreen() {
 
             {/* ── Info Modal ───────────────────── */}
             <Modal visible={infoModalVisible} transparent animationType="fade">
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <View style={styles.modalIconWrap}>
+                <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                        <View style={[styles.modalIconWrap, { backgroundColor: colors.background }]}>
                             <Ionicons name="shield-checkmark" size={32} color={colors.primary} />
                         </View>
-                        <ThemedText style={styles.modalTitle}>Why do we need this?</ThemedText>
+                        <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Why do we need this?</ThemedText>
+                        <ThemedText style={[styles.modalBody, { color: colors.textSecondary }]}>
                             To maintain a safe and reliable community platform, we require all users to agree to our guidelines. This ensures that submitted listings, businesses, and blood requests are genuine and appropriate for everyone.
+                        </ThemedText>
 
                         <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.primary }]} onPress={() => setInfoModalVisible(false)}>
                             <ThemedText style={styles.modalBtnText}>Got it!</ThemedText>
@@ -170,8 +176,8 @@ const styles = StyleSheet.create({
     // Header 
     headerWrap: {
         paddingBottom: 24,
-        borderBottomLeftRadius: 32,
-        borderBottomRightRadius: 32,
+        borderBottomLeftRadius: Layout.borderRadius,
+        borderBottomRightRadius: Layout.borderRadius,
         overflow: 'hidden',
         zIndex: 2,
     },
@@ -220,7 +226,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.15)',
         paddingHorizontal: 14,
         paddingVertical: 6,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         gap: 6
     },
     infoBtnText: {
@@ -242,9 +248,8 @@ const styles = StyleSheet.create({
 
     // Card Content
     card: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 24,
-        padding: 24,
+        borderRadius: Layout.borderRadius,
+        padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.04,
@@ -259,27 +264,22 @@ const styles = StyleSheet.create({
     cardHeaderText: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#0F172A',
     },
     welcomeText: {
         fontSize: 15,
         lineHeight: 24,
-        color: '#64748B',
     },
     divider: {
         height: 1,
-        backgroundColor: '#F1F5F9',
         marginVertical: 20,
     },
 
     // Accordion
     accordionContainer: {
         marginBottom: 16,
-        backgroundColor: '#F8FAFC',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#F1F5F9'
     },
     accordionHeader: {
         flexDirection: 'row',
@@ -297,17 +297,14 @@ const styles = StyleSheet.create({
         width: 6,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#CBD5E1',
         marginRight: 10,
     },
     accordionTitle: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#334155',
         flex: 1,
     },
     accordionTitleActive: {
-        color: '#0F172A',
         fontWeight: '700',
     },
     accordionContentWrap: {
@@ -320,7 +317,6 @@ const styles = StyleSheet.create({
     bodyText: {
         fontSize: 14,
         lineHeight: 22,
-        color: '#475569',
     },
 
     // Sticky Footer
@@ -329,15 +325,14 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.05,
         shadowRadius: 12,
         paddingHorizontal: 20,
         paddingTop: 16,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        borderTopLeftRadius: Layout.borderRadius,
+        borderTopRightRadius: Layout.borderRadius,
     },
     checkboxRow: {
         flexDirection: 'row',
@@ -356,12 +351,11 @@ const styles = StyleSheet.create({
     checkboxText: {
         fontSize: 14,
         fontWeight: '500',
-        color: '#334155',
         flex: 1,
     },
     acceptButton: {
         height: 52,
-        borderRadius: 26,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
@@ -383,8 +377,7 @@ const styles = StyleSheet.create({
         padding: 24,
     },
     modalContent: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 24,
         width: '100%',
         alignItems: 'center',
@@ -393,7 +386,6 @@ const styles = StyleSheet.create({
         width: 64,
         height: 64,
         borderRadius: 32,
-        backgroundColor: '#F1F5F9',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
@@ -401,21 +393,19 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#0F172A',
         marginBottom: 12,
         textAlign: 'center',
     },
     modalBody: {
         fontSize: 15,
         lineHeight: 24,
-        color: '#475569',
         textAlign: 'center',
         marginBottom: 24,
     },
     modalBtn: {
         width: '100%',
         height: 50,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
     },

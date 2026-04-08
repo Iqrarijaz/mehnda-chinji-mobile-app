@@ -2,6 +2,7 @@ import { NotificationIcon } from '@/components/common/notificationIcon';
 import { ThemedText } from '@/components/themedText';
 import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions } from '@react-navigation/native';
@@ -42,7 +43,7 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
     onCloseTooltip = () => { },
 }) => {
     const inputRef = useRef<TextInput>(null);
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
 
@@ -88,27 +89,27 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
                         <TouchableOpacity
                             activeOpacity={1}
                             onPress={() => inputRef.current?.focus()}
-                            style={[styles.searchInputContainer, { backgroundColor: '#FFFFFF', borderColor: 'rgba(0,0,0,0.08)', flex: 1 }]}
+                            style={[styles.searchInputContainer, { backgroundColor: colors.card, borderColor: colors.border, flex: 1 }]}
                         >
                             <Ionicons name="search" size={20} color="#94A3B8" style={{ marginRight: 10 }} />
-                            <TextInput
-                                ref={inputRef}
-                                style={styles.searchInput}
-                                placeholder="Search donors..."
-                                placeholderTextColor="#94A3B8"
-                                value={searchQuery}
-                                onChangeText={setSearchQuery}
-                                returnKeyType="search"
-                                clearButtonMode="while-editing"
-                            />
+                                <TextInput
+                                    ref={inputRef}
+                                    style={[styles.searchInput, { color: colors.text }]}
+                                    placeholder="Search donors..."
+                                    placeholderTextColor="#94A3B8"
+                                    value={searchQuery}
+                                    onChangeText={setSearchQuery}
+                                    returnKeyType="search"
+                                    clearButtonMode="while-editing"
+                                />
                         </TouchableOpacity>
 
                         <TouchableOpacity
                             style={[styles.bloodGroupButton, { backgroundColor: colors.card, borderColor: colors.border }]}
                             onPress={onOpenGroupModal}
                         >
-                            <Ionicons name="water" size={16} color={colors.primary} />
-                            <ThemedText style={[styles.bloodGroupText, { color: colors.primary }]}>
+                            <Ionicons name="water" size={16} color={isDark ? '#FFFFFF' : colors.primary} />
+                            <ThemedText style={[styles.bloodGroupText, { color: isDark ? '#FFFFFF' : colors.primary }]}>
                                 {selectedGroup || 'Any'}
                             </ThemedText>
                         </TouchableOpacity>
@@ -130,7 +131,7 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
                     isVisible={showTooltip}
                     content={
                         <View style={styles.tooltipPill}>
-                            <ThemedText style={styles.tooltipText}>بطور عطیہ دہندہ رجسٹر کرنے کے لیے یہاں ٹیپ کریں</ThemedText>
+                            <ThemedText style={[styles.tooltipText, { color: colors.textSecondary }]}>بطور عطیہ دہندہ رجسٹر کرنے کے لیے یہاں ٹیپ کریں</ThemedText>
                             <TouchableOpacity onPress={onCloseTooltip} style={styles.tooltipClose}>
                                 <Ionicons name="close-circle" size={18} color="#64748B" />
                             </TouchableOpacity>
@@ -160,8 +161,8 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
 const styles = StyleSheet.create({
     headerContainer: {
         paddingBottom: Platform.OS === 'android' ? 8 : 10,
-        borderBottomLeftRadius: 28,
-        borderBottomRightRadius: 28,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 38,
         height: 38,
-        borderRadius: 11,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         height: Platform.OS === 'android' ? 42 : 48,
         borderWidth: 1,
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         height: Platform.OS === 'android' ? 42 : 48,
         gap: 6,
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: Platform.OS === 'android' ? 6 : 8,
         paddingHorizontal: Platform.OS === 'android' ? 12 : 14,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -263,7 +264,7 @@ const styles = StyleSheet.create({
     },
     tooltipContent: {
         padding: 0,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'transparent',
     },
     tooltipPill: {
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 16,
         paddingVertical: 10,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },

@@ -20,6 +20,7 @@ import Animated, {
 import { PremiumModal } from '../common/PremiumModal';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 
 interface LocationPromptModalProps {
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     iconBox: {
         width: 38,
         height: 38,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
     primaryBtn: {
         height: Platform.OS === 'android' ? 48 : 52,
         paddingHorizontal: 16,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: '#E2E8F0',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
     },
     cancelText: {
         fontSize: 14,

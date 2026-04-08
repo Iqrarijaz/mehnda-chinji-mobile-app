@@ -9,6 +9,7 @@ import Animated, {
     FadeOut
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { Layout } from '@/constants/layout';
 
 interface FAQItemProps {
     question: string;
@@ -72,7 +73,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onToggle })
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         marginBottom: 12,
         overflow: 'hidden',
         // Shadow for premium feel

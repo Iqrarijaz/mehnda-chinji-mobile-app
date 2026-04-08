@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,7 +27,7 @@ export function HomeHeaderTopNav({ onSearchPress }: HomeHeaderTopNavProps) {
             <View style={styles.leftRow}>
                 <TouchableOpacity
                     onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-                    style={styles.menuBtn}
+                    style={[styles.menuBtn, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.2)' }]}
                 >
                     <Ionicons name="grid-outline" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
@@ -35,13 +36,13 @@ export function HomeHeaderTopNav({ onSearchPress }: HomeHeaderTopNavProps) {
             <View style={styles.rightActions}>
                 <TouchableOpacity
                     onPress={onSearchPress}
-                    style={styles.searchBtn}
+                    style={[styles.searchBtn, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.2)' }]}
                 >
                     <Ionicons name="search-outline" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
                 <NotificationIcon
                     containerStyle={{ marginRight: 12 }}
-                    badgeStyle={{ borderColor: colors.primary }}
+                    badgeStyle={{ borderColor: theme === 'dark' ? '#111827' : colors.primary }}
                 />
                 <TouchableOpacity
                     onPress={() => router.push('/profile')}
@@ -51,6 +52,7 @@ export function HomeHeaderTopNav({ onSearchPress }: HomeHeaderTopNavProps) {
                         uri={user?.user?.profileImage}
                         name={user?.user?.name}
                         size={34}
+                        style={{ borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}
                     />
                 </TouchableOpacity>
             </View>
@@ -73,7 +75,7 @@ const styles = StyleSheet.create({
     menuBtn: {
         width: 38,
         height: 38,
-        borderRadius: 11,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -86,7 +88,7 @@ const styles = StyleSheet.create({
     searchBtn: {
         width: 38,
         height: 38,
-        borderRadius: 11,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -95,9 +97,6 @@ const styles = StyleSheet.create({
     avatarButton: {
         width: 38,
         height: 38,
-        borderRadius: 19,
-        borderWidth: 2,
-        borderColor: 'rgba(255,255,255,0.4)',
         justifyContent: 'center',
         alignItems: 'center',
     },

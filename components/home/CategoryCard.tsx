@@ -5,6 +5,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
 interface CategoryCardProps {
     label: string;
@@ -24,7 +25,7 @@ export const CategoryCard = React.memo(({ label, icon, color, onPress }: Categor
             activeOpacity={0.7}
             style={styles.touchable}
         >
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: colors.card }]}>
                 <View style={[styles.iconContainer, { backgroundColor: accentColor + '12' }]}>
                     <Ionicons name={icon as any} size={24} color={accentColor} />
                 </View>
@@ -47,8 +48,7 @@ const styles = StyleSheet.create({
         margin: 6,
     },
     card: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         padding: 12,
         alignItems: 'center',
         justifyContent: 'center',
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 44,
         height: 44,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8,

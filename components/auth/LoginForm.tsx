@@ -10,12 +10,12 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Device from 'expo-device';
-import * as Location from 'expo-location';
-import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
+import Toast from 'react-native-toast-message';
 
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { loginApi } from '@/apis/login';
@@ -39,8 +39,6 @@ export function LoginForm() {
         showPassword: false,
         loading: false,
         googleLoading: false,
-        latitude: 0,
-        longitude: 0,
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -124,8 +122,8 @@ export function LoginForm() {
                 password,
                 deviceName,
                 platform,
-                latitude: formData.latitude,
-                longitude: formData.longitude,
+                latitude: 0,
+                longitude: 0,
             });
 
             // Save or clear credentials for Remember Me
@@ -241,13 +239,13 @@ export function LoginForm() {
                         <Ionicons
                             name={formData.rememberMe ? 'checkbox' : 'square-outline'}
                             size={20}
-                            color={formData.rememberMe ? '#006666' : (isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B')}
+                            color={formData.rememberMe ? colors.primary : (isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B')}
                         />
                         <ThemedText style={[styles.optionText, { color: colors.text }]}>Remember me</ThemedText>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password' as any)}>
-                        <ThemedText style={[styles.forgotText, { color: isDark ? '#FFFFFF' : '#006666' }]}>
+                        <ThemedText style={[styles.forgotText, { color: isDark ? colors.text : colors.primary }]}>
                             Forgot Password?
                         </ThemedText>
                     </TouchableOpacity>
@@ -255,7 +253,7 @@ export function LoginForm() {
 
                 {/* Login Button */}
                 <TouchableOpacity
-                    style={[styles.loginButton, { backgroundColor: '#006666' }]}
+                    style={[styles.loginButton, { backgroundColor: colors.primary, shadowColor: colors.primary }]}
                     onPress={handleLogin}
                     disabled={formData.loading}
                 >
@@ -272,7 +270,7 @@ export function LoginForm() {
                         Don't have an account?{' '}
                     </ThemedText>
                     <TouchableOpacity onPress={() => router.push('/(auth)/register' as any)}>
-                        <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#006666' }]}>Sign Up</ThemedText>
+                        <ThemedText style={[styles.footerLink, { color: isDark ? colors.text : colors.primary }]}>Sign Up</ThemedText>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -287,7 +285,7 @@ const styles = StyleSheet.create({
         paddingTop: 30,
     },
     formCard: {
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -319,7 +317,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
         borderWidth: 1,
     },
@@ -349,12 +347,11 @@ const styles = StyleSheet.create({
     },
     loginButton: {
         height: 52,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 18,
         overflow: 'hidden',
-        shadowColor: '#006666',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,

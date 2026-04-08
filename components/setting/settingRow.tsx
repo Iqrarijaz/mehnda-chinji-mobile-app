@@ -1,7 +1,10 @@
+import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
+import { useTheme } from '@/context/ThemeContext';
 import { ThemedText } from '@/components/themedText';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -33,16 +36,19 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = ({
     label,
     subtitle,
     onPress,
-    color = '#1E293B',
+    color,
     iconColor = '#006666',
     iconBg = 'rgba(0, 150, 136, 0.08)',
     showChevron = true,
     isToggle = false,
     toggleValue = false,
     onToggleChange,
-    primaryColor = '#006666',
+    primaryColor,
     isLast = false,
 }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+    const textColor = color || colors.text;
     const scale = useSharedValue(1);
 
     const animatedContainer = useAnimatedStyle(() => ({
@@ -61,7 +67,7 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = ({
         <AnimatedTouchable
             style={[
                 styles.settingRow,
-                !isLast && styles.settingRowBorder,
+                !isLast && [styles.settingRowBorder, { borderBottomColor: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' }],
                 animatedContainer,
             ]}
             activeOpacity={1}
@@ -75,14 +81,14 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = ({
                     <Ionicons name={icon} size={20} color={iconColor} />
                 </View>
                 <View style={styles.settingTextWrap}>
-                    <ThemedText style={[styles.settingLabel, { color }]}>{label}</ThemedText>
+                    <ThemedText style={[styles.settingLabel, { color: textColor }]}>{label}</ThemedText>
                     {subtitle ? (
-                        <ThemedText style={styles.settingSubtitle}>{subtitle}</ThemedText>
+                        <ThemedText style={[styles.settingSubtitle, { color: colors.textSecondary }]}>{subtitle}</ThemedText>
                     ) : null}
                 </View>
             </View>
             {isToggle && onToggleChange ? (
-                <AnimatedToggle value={toggleValue} onValueChange={onToggleChange} primaryColor={primaryColor} />
+                <AnimatedToggle value={toggleValue} onValueChange={onToggleChange} primaryColor={primaryColor || colors.primary} />
             ) : showChevron ? (
                 <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
             ) : null}
@@ -95,13 +101,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 13,
+        paddingVertical: Platform.OS === 'android' ? 10 : 13,
         paddingHorizontal: 14,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
     },
     settingRowBorder: {
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(0,0,0,0.04)',
         marginHorizontal: 4,
     },
     settingRowLeft: {
@@ -112,7 +117,7 @@ const styles = StyleSheet.create({
     settingIconWrap: {
         width: 38,
         height: 38,
-        borderRadius: 11,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 14,
@@ -127,7 +132,6 @@ const styles = StyleSheet.create({
     },
     settingSubtitle: {
         fontSize: 12,
-        color: '#94A3B8',
         fontWeight: '400',
         marginTop: 1,
     },

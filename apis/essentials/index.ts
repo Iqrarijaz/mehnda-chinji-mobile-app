@@ -1,17 +1,17 @@
 import apiClient from "../client";
 
-export const PLACES_QUERY_KEYS = {
-    all: ["places"] as const,
+export const ESSENTIALS_QUERY_KEYS = {
+    all: ["essentials"] as const,
     list: (filters: Record<string, any>) =>
-        [...PLACES_QUERY_KEYS.all, "infinite-list", filters] as const
+        [...ESSENTIALS_QUERY_KEYS.all, "infinite-list", filters] as const
 };
 
-export const PLACE_SUBMISSION_QUERY_KEYS = {
+export const ESSENTIAL_SUBMISSION_QUERY_KEYS = {
     myRequests: (params: { page: number; category?: string }) =>
-        ["my-place-requests", params] as const
+        ["my-essential-requests", params] as const
 };
 
-export function getPlacesList(params: {
+export function getEssentialsList(params: {
     search?: string;
     category?: string;
     limit?: number;
@@ -19,11 +19,11 @@ export function getPlacesList(params: {
     lat?: number;
     lng?: number;
 }) {
-    return apiClient.get('/api/user/v1/get-places', { params });
+    return apiClient.get('/api/user/v1/get-essentials', { params });
 }
 
-export function submitPlace(data: any) {
-    return apiClient.post('/api/user/v1/submit-place', data);
+export function submitEssential(data: any) {
+    return apiClient.post('/api/user/v1/submit-essential', data);
 }
 
 export function getMyRequests(params: {
@@ -40,4 +40,12 @@ export function updateRequest(id: string, data: any) {
 
 export function deleteRequest(id: string) {
     return apiClient.delete(`/api/user/v1/delete-request/${id}`);
+}
+
+export function uploadUserImage(formData: FormData) {
+    return apiClient.post('/api/user/v1/upload-user-image', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
 }

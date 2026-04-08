@@ -8,6 +8,10 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 
+import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
+import { useTheme } from '@/context/ThemeContext';
+
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 const isAndroid = Platform.OS === 'android';
 
@@ -35,6 +39,8 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
     sheetStyle,
     overlayStyle,
 }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const blurIntensity = useSharedValue(0);
 
     useEffect(() => {
@@ -64,7 +70,7 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
             ]}>
                 {/* 1. Animated Blur Backdrop */}
                 <AnimatedBlurView
-                    tint="dark"
+                    tint={theme === 'dark' ? 'dark' : 'light'}
                     style={StyleSheet.absoluteFill}
                     animatedProps={animatedProps}
                 />
@@ -89,6 +95,7 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
                     entering={FadeInUp.duration(500)}
                     style={[
                         styles.sheet,
+                        { backgroundColor: colors.card },
                         type === 'centered' && styles.sheetCentered,
                         type === 'fullscreen' && styles.sheetFullscreen,
                         sheetStyle
@@ -121,8 +128,7 @@ const styles = StyleSheet.create({
     },
     sheet: {
         width: '95%',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 28,
+        borderRadius: Layout.borderRadius,
         paddingTop: 12,
         paddingHorizontal: 20,
         paddingBottom: isAndroid ? 24 : 36,
