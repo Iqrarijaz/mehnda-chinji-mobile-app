@@ -1,0 +1,155 @@
+import { Ionicons } from '@expo/vector-icons';
+import { Layout } from '@/constants/layout';
+import { Image } from 'expo-image';
+import React, { useMemo, useState } from 'react';
+import {
+    Alert,
+    Linking,
+    Platform,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+
+import { ThemedText } from '@/components/themedText';
+import { AnalyticsEvents, analyticsService } from '@/analytics';
+import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
+
+interface BankCardProps {
+    business: any;
+}
+
+const BankCard = React.memo(({ business }: BankCardProps) => {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+    const colors = Colors[theme];
+    const router = useRouter();
+
+    const capitalize = (str?: string) =>
+        str
+            ? str
+                .toLowerCase()
+                .split(' ')
+                .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(' ')
+            : '';
+
+    const businessName = useMemo(() => capitalize(business?.name), [business?.name]);
+    const ownerName = useMemo(() => {
+        // Support both data shapes: business.userId.name and business.contact[0].name
+        const name = business?.userId?.name || business?.contact?.[0]?.name || 'Owner';
+        return capitalize(name);
+    }, [business?.userId?.name, business?.contact]);
+    const ownerImage = business?.userId?.profileImage;
+    const address = capitalize(business?.address || business?.village || '');
+    const category = capitalize(business?.categoryEn || business?.category || '');
+    const urduCategory = business?.categoryUr;
+    const bankImage = business?.images?.[0];
+
+    return (
+        <>
+            <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => {
+                    analyticsService.trackEvent(AnalyticsEvents.BUSINESS_CARD_CLICKED, { businessId: business._id, action: 'view' });
+                    router.push({
+                        pathname: '/place/[id]',
+                        params: {
+                            id: business._id,
+                            placeData: JSON.stringify(business),
+                            color: '#0F172A',
+                            category: category
+                        }
+                    });
+                }}
+            >
+                <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                    {/* Bank Image */}
+                    <View style={styles.imageContainer}>
+                        {bankImage ? (
+                            <Image
+                                source={{ uri: bankImage }}
+                                style={styles.bankImage}
+                                contentFit="contain"
+                                transition={200}
+                            />
+                        ) : (
+                            <View style={styles.placeholderContainer}>
+                                <ThemedText style={[styles.placeholderLetter, { color: isDark ? '#FFFFFF' : '#94A3B8' }]}>
+                                    {businessName?.charAt(0)?.toUpperCase()}
+                                </ThemedText>
+                            </View>
+                        )}
+                    </View>
+
+                    {/* Bank Info */}
+                    <View style={styles.infoContainer}>
+                        <ThemedText style={[styles.bankName, { color: isDark ? '#FFFFFF' : colors.text }]} numberOfLines={1}>
+                            {businessName}
+                        </ThemedText>
+                        <ThemedText style={[styles.addressText, { color: isDark ? '#FFFFFF' : colors.textSecondary }]} numberOfLines={1}>
+                            {address}
+                        </ThemedText>
+                    </View>
+                </View>
+            </TouchableOpacity>
+        </>
+    );
+});
+
+export default BankCard;
+
+const styles = StyleSheet.create({
+    card: {
+        borderRadius: Layout.borderRadius,
+        padding: 14,
+        marginBottom: 12,
+        alignItems: 'center',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.04,
+        shadowRadius: 10,
+        elevation: 2,
+        borderWidth: 1,
+    },
+    imageContainer: {
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        marginBottom: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+        borderWidth: 1,
+    },
+    bankImage: {
+        width: '80%',
+        height: '80%',
+    },
+    placeholderContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    placeholderLetter: {
+        fontSize: 32,
+        fontWeight: '800',
+        color: '#94A3B8',
+    },
+    infoContainer: {
+        alignItems: 'center',
+        width: '100%',
+    },
+    bankName: {
+        fontSize: 18,
+        fontWeight: '800',
+        textAlign: 'center',
+        marginBottom: 4,
+    },
+    addressText: {
+        fontSize: 14,
+        fontWeight: '500',
+        textAlign: 'center',
+    },
+});
