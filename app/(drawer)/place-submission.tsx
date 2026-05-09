@@ -314,9 +314,11 @@ const PlaceSubmissionScreen = () => {
 
     const isHealth = category === 'health';
     const isEducation = category === 'education';
-    const isReligious = category?.toLowerCase() === 'religious';
+    const isReligious = category?.toLowerCase() === 'religious' || category?.toLowerCase() === 'mosque';
+    const isGovt = category?.toLowerCase() === 'govt' || category?.toLowerCase() === 'govt office';
     const isTravel = category?.toLowerCase() === 'travel';
     const isEmergency = category?.toLowerCase() === 'emergency';
+    const isNoPhotoCategory = isReligious || isGovt;
 
     const handleSubmit = () => {
         if (isUploading) {
@@ -486,7 +488,7 @@ const PlaceSubmissionScreen = () => {
                     </TouchableOpacity>
                     <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.headerTitleWrap}>
                         <View style={styles.headerTitleRow}>
-                            {!isEmergency && selectedImage && (
+                            {!isEmergency && !isNoPhotoCategory && selectedImage && (
                                 <Image
                                     source={{ uri: selectedImage }}
                                     style={styles.headerThumbnail}
@@ -514,7 +516,7 @@ const PlaceSubmissionScreen = () => {
                         keyboardShouldPersistTaps="handled"
                     >
                         {/* Image Section */}
-                        {!isEmergency && (
+                        {!isEmergency && !isNoPhotoCategory && (
                             <View style={styles.imageSection}>
                                 {selectedImage ? (
                                     <View style={styles.imageHeaderWrapper}>
@@ -595,7 +597,8 @@ const PlaceSubmissionScreen = () => {
                                         key={t.key}
                                         onPress={() => {
                                             handleChange('type', t.key);
-                                            if (t.icon && typeof t.icon === 'string') {
+                                            // Auto-set image from config for religious/govt listings
+                                            if (isNoPhotoCategory && t.icon && typeof t.icon === 'string') {
                                                 setUploadedImage(t.icon);
                                                 setForm(prev => ({ ...prev, images: [t.icon] }));
                                                 setSelectedImage(t.icon);

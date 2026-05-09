@@ -19,12 +19,11 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { loginApi, googleLoginApi, facebookLoginApi } from '@/apis/login';
+import { loginApi, googleLoginApi } from '@/apis/login';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { loginSchema } from '@/utils/validation';
 import { clientStorage } from '@/utils/storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-// Facebook SDK is lazy-loaded in handleFacebookLogin to prevent splash screen freeze
 
 // Removed global configuration
 
@@ -44,7 +43,6 @@ export function LoginForm() {
         showPassword: false,
         loading: false,
         googleLoading: false,
-        facebookLoading: false,
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -214,77 +212,6 @@ export function LoginForm() {
         }
     };
 
-    const handleFacebookLogin = async () => {
-        setFormData(prev => ({ ...prev, facebookLoading: true }));
-        try {
-            let LoginManager: any;
-            let AccessToken: any;
-            try {
-                const fbsdk = require('react-native-fbsdk-next');
-                LoginManager = fbsdk.LoginManager;
-                AccessToken = fbsdk.AccessToken;
-            } catch (e) {
-                throw new Error('Facebook SDK is not available. Please use a development build.');
-            }
-
-            if (!LoginManager || !AccessToken) {
-                throw new Error('Facebook SDK is not available. Please use a development build.');
-            }
-
-            // Force web-based login to avoid native dialog hang on some Android devices
-            if (Platform.OS === 'android') {
-                LoginManager.setLoginBehavior('web_only');
-            }
-
-            console.log('[FB Login] Starting logInWithPermissions...');
-            const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
-            console.log('[FB Login] Permission result:', JSON.stringify(result));
-
-            if (result.isCancelled) {
-                throw new Error('User cancelled the login process');
-            }
-
-            console.log('[FB Login] Getting access token...');
-            const data = await AccessToken.getCurrentAccessToken();
-            console.log('[FB Login] Access token received:', !!data);
-
-            if (!data) {
-                throw new Error('Something went wrong obtaining access token');
-            }
-
-            const deviceName = Device.modelName || `Unknown ${Platform.OS} Device`;
-            const platform = Platform.OS;
-
-            console.log('[FB Login] Calling backend API...');
-            const response = await facebookLoginApi({
-                accessToken: data.accessToken.toString(),
-                deviceName,
-                platform,
-            });
-            console.log('[FB Login] Backend response received:', !!response);
-
-            await login(response);
-            analyticsService.trackEvent(AnalyticsEvents.LOGIN, { method: 'facebook' });
-            Toast.show({
-                type: 'success',
-                text1: 'Welcome!',
-                text2: 'Logged in with Facebook',
-            });
-        } catch (error: any) {
-            console.log('[FB Login] Error:', error?.message);
-            const message =
-                error?.response?.data?.message ||
-                error?.message ||
-                'Facebook Login failed';
-            Toast.show({
-                type: 'error',
-                text1: 'Login Failed',
-                text2: message,
-            });
-        } finally {
-            setFormData(prev => ({ ...prev, facebookLoading: false }));
-        }
-    };
 
 
     return (
@@ -341,8 +268,6 @@ export function LoginForm() {
                             style={[styles.input, { color: colors.text }]}
                             secureTextEntry={!formData.showPassword}
                             editable={!formData.loading}
-                            keyboardType="numeric"
-                            maxLength={6}
                         />
                         {touched.password && !errors.password && formData.password.length > 0 && (
                             <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
@@ -406,27 +331,12 @@ export function LoginForm() {
                         <ActivityIndicator color="#000000" />
                     ) : (
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('@/assets/icons/google.png')} style={{ width: 20, height: 20, marginRight: 8 }} />
+                            <Image source={require('../../assets/icons/google.png')} style={{ width: 20, height: 20, marginRight: 8 }} />
                             <ThemedText style={[styles.loginButtonText, { color: '#000000' }]}>Sign in with Google</ThemedText>
                         </View>
                     )}
                 </TouchableOpacity>
 
-                {/* Facebook Login Button - temporarily disabled
-                <TouchableOpacity
-                    style={[styles.loginButton, { backgroundColor: '#1877F2', shadowColor: 'rgba(24, 119, 242, 0.3)', marginBottom: 24 }]}
-                    onPress={handleFacebookLogin}
-                    disabled={formData.facebookLoading}
-                >
-                    {formData.facebookLoading ? (
-                        <ActivityIndicator color="#FFFFFF" />
-                    ) : (
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('@/assets/icons/facebook.png')} style={{ width: 20, height: 20, marginRight: 8, tintColor: '#FFFFFF' }} />
-                            <ThemedText style={styles.loginButtonText}>Sign in with Facebook</ThemedText>
-                        </View>
-                    )}
-                </TouchableOpacity> */}
 
 
                 {/* Footer */}

@@ -9,18 +9,18 @@ export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
  * Regex for password:
  * - Exactly 6 digits
  */
-export const passwordRegex = /^\d{6}$/;
+export const passwordRegex = /^.{6,}$/;
 
 export const loginSchema = yup.object().shape({
     email: yup.string().matches(emailRegex, 'Invalid email format').required('Email or phone is required'),
-    password: yup.string().matches(passwordRegex, 'Password must be exactly 6 digits').required('Password is required'),
+    password: yup.string().matches(passwordRegex, 'Password must be at least 6 characters').required('Password is required'),
 });
 
 export const registerSchema = yup.object().shape({
     fullName: yup.string().min(3, 'Name must be at least 3 characters').required('Full Name is required'),
     email: yup.string().matches(emailRegex, 'Invalid email format').required('Email is required'),
     phone: yup.string().length(11, 'Phone must be exactly 11 digits').matches(/^[0-9]+$/, 'Phone must contain only numbers').required('Phone is required'),
-    password: yup.string().matches(passwordRegex, 'Password must be exactly 6 digits').required('Password is required'),
+    password: yup.string().matches(passwordRegex, 'Password must be at least 6 characters').required('Password is required'),
     confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Confirm Password is required'),
     ageVerified: yup.boolean().oneOf([true], 'You must be at least 13 years old'),
     termsAccepted: yup.boolean().oneOf([true], 'You must accept the Terms & Conditions'),
@@ -40,24 +40,22 @@ export const forgotPasswordSchema = yup.object().shape({
 });
 
 export const resetPasswordSchema = yup.object().shape({
-    password: yup.string().matches(passwordRegex, 'Password must be exactly 6 digits').required('Password is required'),
+    password: yup.string().matches(passwordRegex, 'Password must be at least 6 characters').required('Password is required'),
     confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Confirm Password is required'),
 });
 
 /**
- * Calculates password strength on a scale of 0 to 4:
- * 0: Empty/Very Week
- * 1: Weak (length Only)
- * 2: Fair (length + casing)
- * 3: Good (length + casing + numbers)
- * 4: Strong (all requirements met)
+ * Calculates password strength on a scale of 0 to 4 based on length:
+ * 0: Empty
+ * 1: Weak (< 6)
+ * 2: Fair (6-7)
+ * 3: Good (8-9)
+ * 4: Strong (10+)
  */
 export const getPasswordStrength = (password: string): number => {
     if (!password) return 0;
-    if (passwordRegex.test(password)) return 4;
-    if (/^\d+$/.test(password)) {
-        if (password.length < 6) return 1;
-        if (password.length > 6) return 1;
-    }
-    return 0;
+    if (password.length < 6) return 1;
+    if (password.length < 8) return 2;
+    if (password.length < 10) return 3;
+    return 4;
 };

@@ -20,6 +20,3 @@ export async function googleLoginApi(data: any) {
     return apiClient.post('/auth/user/google-login', data);
 }
 
-export async function facebookLoginApi(data: any) {
-    return apiClient.post('/auth/user/facebook-login', data);
-}

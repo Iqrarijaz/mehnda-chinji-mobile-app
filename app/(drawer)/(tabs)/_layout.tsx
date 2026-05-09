@@ -21,13 +21,13 @@ export default function TabLayout() {
 
   const checkProfile = React.useCallback(() => {
     if (user?.user && (!user.user.city || !user.user.phone) && !hasShownPrompt.current) {
-      // Small delay to ensure layout is ready
+      // Show prompt with 30 second delay as requested
       const timer = setTimeout(() => {
         if (!hasShownPrompt.current) {
           setModalVisible(true);
           hasShownPrompt.current = true;
         }
-      }, 2000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
     return () => { };

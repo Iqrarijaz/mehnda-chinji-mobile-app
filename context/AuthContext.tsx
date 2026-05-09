@@ -4,7 +4,6 @@ import { secureStorage, clientStorage } from '@/utils/storage';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { useNotificationStore } from '@/store/notificationStore';
 import { tokenCache } from '@/lib/tokenCache';
-// import { LoginManager } from 'react-native-fbsdk-next';
 
 type UserData = {
     token: string;
@@ -109,8 +108,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             analyticsService.trackEvent(AnalyticsEvents.LOGOUT);
             await clientStorage.removeItem('push_token');
-            // Ensure Facebook session is cleared
-            // LoginManager.logOut();
         } catch (error) {
             console.error('Error during logout cleanup:', error);
         }

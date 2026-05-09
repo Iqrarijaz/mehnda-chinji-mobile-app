@@ -33,15 +33,9 @@ import { Layout } from '@/constants/layout';
 // ── Password strength ─────────────────────────────────────────────────────────
 function getStrength(pw: string): { level: number; label: string; color: string } {
     if (!pw) return { level: 0, label: '', color: '#E2E8F0' };
-    let score = 0;
-    if (pw.length >= 6) score++;
-    if (pw.length >= 10) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    if (score <= 1) return { level: 0.25, label: 'Weak', color: '#EF4444' };
-    if (score <= 2) return { level: 0.5, label: 'Fair', color: '#F59E0B' };
-    if (score <= 3) return { level: 0.75, label: 'Good', color: '#3B82F6' };
+    if (pw.length < 6) return { level: 0.25, label: 'Weak', color: '#EF4444' };
+    if (pw.length < 8) return { level: 0.5, label: 'Fair', color: '#F59E0B' };
+    if (pw.length < 10) return { level: 0.75, label: 'Good', color: '#3B82F6' };
     return { level: 1, label: 'Strong', color: '#006666' };
 }
 

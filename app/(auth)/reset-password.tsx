@@ -19,7 +19,7 @@ import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import { resetPasswordSchema, getPasswordStrength } from '@/utils/validation';
+import { resetPasswordSchema } from '@/utils/validation';
 import { resetPassword } from '@/apis/login/forgot-password';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 
@@ -37,9 +37,6 @@ export default function ResetPasswordScreen() {
         loading: false
     });
 
-    const strength = getPasswordStrength(formData.newPassword);
-    const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-    const strengthColors = ['', '#EF4444', '#F59E0B', '#10B981', '#059669'];
 
     const email = params.email as string || '';
 
@@ -120,7 +117,7 @@ export default function ResetPasswordScreen() {
                         />
                         <ThemedText style={styles.headerTitle}>Set New Password</ThemedText>
                         <ThemedText style={styles.headerSubtitle}>
-                            Create a strong password for your account
+                            Create a new password for your account
                         </ThemedText>
                     </View>
                 </View>
@@ -153,8 +150,6 @@ export default function ResetPasswordScreen() {
                                     style={[styles.input, { color: colors.text }]}
                                     secureTextEntry={!formData.showPassword}
                                     editable={!formData.loading}
-                                    keyboardType="numeric"
-                                    maxLength={6}
                                 />
                                 <TouchableOpacity
                                     onPress={() => setFormData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
@@ -186,8 +181,6 @@ export default function ResetPasswordScreen() {
                                     style={[styles.input, { color: colors.text }]}
                                     secureTextEntry={!formData.showPassword}
                                     editable={!formData.loading}
-                                    keyboardType="numeric"
-                                    maxLength={6}
                                 />
                             </View>
                         </View>

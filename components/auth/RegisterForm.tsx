@@ -48,7 +48,6 @@ export function RegisterForm() {
         termsAccepted: false,
         guidelinesAccepted: false,
         googleLoading: false,
-        facebookLoading: false,
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -331,8 +330,6 @@ export function RegisterForm() {
                             onBlur={() => handleBlur('password')}
                             style={[styles.input, { color: colors.text }]}
                             secureTextEntry={!formData.showPassword}
-                            keyboardType="numeric"
-                            maxLength={6}
                         />
                         {renderValidationIcon('password')}
                         <TouchableOpacity
@@ -370,8 +367,6 @@ export function RegisterForm() {
                             onBlur={() => handleBlur('confirmPassword')}
                             style={[styles.input, { color: colors.text }]}
                             secureTextEntry={!formData.showConfirmPassword}
-                            keyboardType="numeric"
-                            maxLength={6}
                         />
                         {renderValidationIcon('confirmPassword')}
                         <TouchableOpacity
@@ -500,7 +495,7 @@ export function RegisterForm() {
                         <ActivityIndicator color="#000000" />
                     ) : (
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('@/assets/icons/google.png')} style={{ width: 20, height: 20, marginRight: 8 }} />
+                            <Image source={require('../../assets/icons/google.png')} style={{ width: 20, height: 20, marginRight: 8 }} />
                             <ThemedText style={[styles.registerButtonText, { color: '#000000' }]}>Sign up with Google</ThemedText>
                         </View>
                     )}
