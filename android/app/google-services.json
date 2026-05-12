@@ -14,12 +14,32 @@
       },
       "oauth_client": [
         {
+          "client_id": "672311293362-n0pg5108468vfjtga0h93614t1m1b7ul.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rehbar.community",
+            "certificate_hash": "1ebc6f9aebbf2a8424bd67933c14570fec27c24c"
+          }
+        },
+        {
           "client_id": "672311293362-p4d2vmjf8gtqc56qilviooho1n52jvmv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.rehbar.community",
             "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
+        },
+        {
+          "client_id": "672311293362-14651ksmde3i4n94buq84m9eu76dsdjm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rehbar.community",
+            "certificate_hash": "ce94ff4b561e99e7ba1cb4174646bd64080b3197"
+          }
+        },
+        {
+          "client_id": "672311293362-dfgu9rtfc0ucfb1j3nmnu4snv2ss4b8r.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -29,7 +49,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "672311293362-dfgu9rtfc0ucfb1j3nmnu4snv2ss4b8r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rehbar",
     "slug": "rehbar",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./public/icon.png",
     "scheme": "rehbarcommunityapp",
@@ -19,7 +19,7 @@
     },
     "android": {
       "package": "com.rehbar.community",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./public/icon.png",
         "backgroundImage": "./public/icon.png",

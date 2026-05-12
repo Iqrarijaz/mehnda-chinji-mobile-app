@@ -4,7 +4,6 @@ import {
     DrawerContentScrollView,
 } from '@react-navigation/drawer';
 import { useRouter } from 'expo-router';
-import React from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
@@ -160,7 +159,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                     <ThemedText style={styles.logoutText}>Sign Out</ThemedText>
                 </TouchableOpacity>
 
-                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v1.0.0</ThemedText>
+                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.0.3'}</ThemedText>
             </View>
         </View>
     );
