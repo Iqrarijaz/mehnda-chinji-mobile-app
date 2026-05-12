@@ -30,6 +30,7 @@ interface PostModalProps {
 
 const CATEGORIES = [
     { label: 'General', value: 'GENERAL', icon: 'newspaper-outline', color: '#007AFF' },
+    { label: 'Sports', value: 'SPORTS', icon: 'football-outline', color: '#4CD964' },
     { label: 'Death', value: 'DEATH', icon: 'ribbon-outline', color: '#333333' },
     { label: 'Accident', value: 'ACCIDENT', icon: 'warning-outline', color: '#FF3B30' },
 ];

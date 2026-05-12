@@ -49,12 +49,14 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
                         badgeStyle={{ borderColor: colors.primary }}
                     />
 
-                    <TouchableOpacity
-                        onPress={onCreatePost}
-                        style={[styles.iconButton, { marginRight: 12 }]}
-                    >
-                        <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
+                    {user?.user?.role === 'APP_ADMIN' && (
+                        <TouchableOpacity
+                            onPress={onCreatePost}
+                            style={[styles.iconButton, { marginRight: 12 }]}
+                        >
+                            <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
+                    )}
 
                     <TouchableOpacity
                         onPress={() => navigation.navigate('profile' as never)}
@@ -92,7 +94,7 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
 
             {/* Type Filter Chips */}
             <View style={styles.filterContainer}>
-                {['ALL', 'GENERAL', 'DEATH', 'ACCIDENT'].map((type) => (
+                {['ALL', 'GENERAL', 'SPORTS', 'DEATH', 'ACCIDENT'].map((type) => (
                     <TouchableOpacity
                         key={type}
                         style={[

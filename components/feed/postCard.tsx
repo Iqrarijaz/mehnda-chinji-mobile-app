@@ -16,7 +16,7 @@ export interface PostData {
     _id: string;
     content: string;
     images: string[];
-    type: 'GENERAL' | 'DEATH' | 'ACCIDENT';
+    type: 'GENERAL' | 'DEATH' | 'ACCIDENT' | 'SPORTS' | 'SPONSORED';
     likesCount: number;
     commentsCount: number;
     isLiked?: boolean;
@@ -263,8 +263,8 @@ export const PostCard: React.FC<PostCardProps> = React.memo(({ post, variant = '
     const handleLongPress = useCallback(() => {
         // alert("long press")
         console.log('[PostCard Debug] handleLongPress called');
-        if (isOwner) {
-            console.log('[PostCard Debug] isOwner is true, showing menu');
+        if (user?.user?.role === 'APP_ADMIN') {
+            console.log('[PostCard Debug] User is APP_ADMIN, showing menu');
             if (Platform.OS === 'ios') {
                 ActionSheetIOS.showActionSheetWithOptions(
                     {
@@ -281,7 +281,7 @@ export const PostCard: React.FC<PostCardProps> = React.memo(({ post, variant = '
                 setMenuVisible(true);
             }
         }
-    }, [isOwner, onEdit, onDelete, post]);
+    }, [user?.user?.role, onEdit, onDelete, post]);
 
     const displayContent = useMemo(() => {
         if (post.type === 'DEATH') {
@@ -297,6 +297,7 @@ export const PostCard: React.FC<PostCardProps> = React.memo(({ post, variant = '
         switch (post.type) {
             case 'DEATH': return 'megaphone';
             case 'ACCIDENT': return 'warning';
+            case 'SPORTS': return 'football';
             default: return 'bookmark';
         }
     };
@@ -305,6 +306,7 @@ export const PostCard: React.FC<PostCardProps> = React.memo(({ post, variant = '
         switch (post.type) {
             case 'DEATH': return '#000000';
             case 'ACCIDENT': return '#EF4444';
+            case 'SPORTS': return '#4CD964';
             default: return colors.primary;
         }
     };

@@ -8,6 +8,7 @@ import React, { useMemo, useState } from 'react';
 import { Dimensions, FlatList, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '../themedText';
 import { ThemedView } from '../themedView';
+import { useAuth } from '@/context/AuthContext';
 import { PostData } from './postCard';
 
 const { width } = Dimensions.get('window');
@@ -28,6 +29,7 @@ export const PostDetail: React.FC<PostDetailProps> = ({
     isOwner 
 }) => {
     const { theme } = useTheme();
+    const { user } = useAuth();
     const colors = Colors[theme];
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -45,6 +47,7 @@ export const PostDetail: React.FC<PostDetailProps> = ({
         switch (post.type) {
             case 'DEATH': return 'megaphone';
             case 'ACCIDENT': return 'warning';
+            case 'SPORTS': return 'football';
             default: return 'bookmark';
         }
     };
@@ -53,6 +56,7 @@ export const PostDetail: React.FC<PostDetailProps> = ({
         switch (post.type) {
             case 'DEATH': return '#000000';
             case 'ACCIDENT': return '#EF4444';
+            case 'SPORTS': return '#4CD964';
             default: return colors.primary;
         }
     };
@@ -138,7 +142,7 @@ export const PostDetail: React.FC<PostDetailProps> = ({
                     </View>
                 </View>
 
-                {isOwner && (
+                {user?.user?.role === 'APP_ADMIN' && (
                     <View style={styles.actionRow}>
                         <TouchableOpacity 
                             style={[styles.actionButton, { backgroundColor: colors.primary + '15' }]}

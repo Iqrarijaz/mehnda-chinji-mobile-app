@@ -9,6 +9,8 @@ import { getApiUrl } from '@/lib/remoteConfig';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
+import * as Application from 'expo-application';
+import { Platform } from 'react-native';
 
 // Standardized Error Class
 export class ApiError extends Error {
@@ -51,7 +53,7 @@ apiClient.interceptors.request.use(
                 requestSize = config.data.length;
             } else if (config.data && !(config.data instanceof FormData)) {
                 // Warning: Can still be slow for very large POST payloads
-                try { requestSize = JSON.stringify(config.data).length; } catch(e) {}
+                try { requestSize = JSON.stringify(config.data).length; } catch (e) { }
             }
             config.metadata = { requestSize };
 
@@ -78,18 +80,34 @@ apiClient.interceptors.request.use(
             const platform = Device.osName;
             const deviceModel = Device.modelName;
             const osVersion = Device.osVersion;
-            
+
             config.headers['x-app-version'] = appVersion;
             config.headers['x-platform'] = platform;
             config.headers['x-device-model'] = deviceModel;
             config.headers['x-os-version'] = osVersion;
-            
-            // Get Local IP (Async)
+            config.headers['x-channel'] = 'mobile_app';
+            config.headers['x-timezone'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            // Get Unique Device ID
+            let deviceId = 'unknown';
             try {
+                if (Platform.OS === 'ios') {
+                    deviceId = await Application.getIosIdForVendorAsync() || 'unknown';
+                } else if (Platform.OS === 'android') {
+                    deviceId = (Application as any).androidId || 'unknown';
+                }
+            } catch (e) {}
+            config.headers['x-device-id'] = deviceId;
+
+            // Get Network Info (Async)
+            try {
+                const networkState = await Network.getNetworkStateAsync();
+                config.headers['x-net-type'] = networkState.type || 'unknown';
+                
                 const ip = await Network.getIpAddressAsync();
                 if (ip) config.headers['x-local-ip'] = ip;
             } catch (e) {
-                // Silently fail for IP to avoid blocking requests if network info fails
+                // Silently fail for network info to avoid blocking requests
             }
         } catch (error) {
             console.error('API Client: Error attaching token', error);
@@ -107,7 +125,7 @@ apiClient.interceptors.response.use(
             const requestSize = response.config.metadata?.requestSize || 0;
             const contentLengthStr = response.headers?.['content-length'];
             // Fallback to 0 instead of stringifying to avoid blocking the JS thread
-            const responseSize = contentLengthStr ? parseInt(contentLengthStr, 10) : 0;
+            const responseSize = contentLengthStr ? parseInt(contentLengthStr as string, 10) : 0;
             const totalBytes = requestSize + responseSize;
 
             if (totalBytes > 0) {
@@ -127,14 +145,14 @@ apiClient.interceptors.response.use(
             try {
                 const requestSize = config?.metadata?.requestSize || 0;
                 const contentLengthStr = error.response.headers?.['content-length'];
-                const responseSize = contentLengthStr ? parseInt(contentLengthStr, 10) : 0;
+                const responseSize = contentLengthStr ? parseInt(contentLengthStr as string, 10) : 0;
                 useDataUsageStore.getState().trackUsage(requestSize + responseSize);
             } catch (e) { }
         }
 
         const status = error.response?.status;
         const isLoginRequest = config?.url?.includes('login');
-        
+
         // Handle Session Expiration (Unified 401 Handling)
         if (status === 401 && !isLoginRequest) {
             tokenCache.setSessionExpired(true);

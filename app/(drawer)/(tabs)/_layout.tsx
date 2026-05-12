@@ -100,13 +100,13 @@ export default function TabLayout() {
             headerShown: false,
           }}
         />
-        {/* <Tabs.Screen
+        <Tabs.Screen
           name="feed"
           options={{
             title: 'Feed',
             headerShown: false,
           }}
-        /> */}
+        />
         <Tabs.Screen
           name="business"
           options={{
