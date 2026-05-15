@@ -1,15 +1,28 @@
 import { Colors } from '@/constants/colors';
-import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { formatRelativeTime } from '@/utils/dateUtils';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import React, { useMemo, useState } from 'react';
-import { Dimensions, FlatList, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import {
+    Dimensions,
+    FlatList,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+    ViewToken,
+    Share,
+    Linking
+} from 'react-native';
+
+import { useAuth } from '@/context/AuthContext';
+import { useLikePost } from '@/hooks/usePosts';
+import { PostData } from './postCard';
 import { ThemedText } from '../themedText';
 import { ThemedView } from '../themedView';
-import { useAuth } from '@/context/AuthContext';
-import { PostData } from './postCard';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 const { width } = Dimensions.get('window');
 
@@ -18,267 +31,760 @@ interface PostDetailProps {
     onViewImage?: (images: string[], index: number) => void;
     onEdit?: (post: PostData) => void;
     onDelete?: (postId: string) => void;
+    onReport?: () => void;
     isOwner?: boolean;
 }
 
-export const PostDetail: React.FC<PostDetailProps> = ({ 
-    post, 
-    onViewImage, 
-    onEdit, 
-    onDelete,
-    isOwner 
-}) => {
-    const { theme } = useTheme();
-    const { user } = useAuth();
-    const colors = Colors[theme];
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+interface AvatarProps {
+    name?: string;
+    image?: string;
+    colors: any;
+    size?: number;
+}
 
-    const displayContent = useMemo(() => {
-        if (post.type === 'DEATH') {
-            const prefix = "إِنَّا لِلّهِ وَإِنَّـا إِلَيْهِ رَاجِعونَ\n\n";
-            if (!post.content.startsWith("إِنَّا لِلّهِ وَإِنَّـا إِلَيْهِ رَاجِعونَ")) {
-                return prefix + post.content;
-            }
-        }
-        return post.content;
-    }, [post.content, post.type]);
+interface LikeButtonProps {
+    postId: string;
+    initialLiked: boolean;
+    initialLikes: number;
+    colors: any;
+}
 
-    const getTypeIcon = () => {
-        switch (post.type) {
-            case 'DEATH': return 'megaphone';
-            case 'ACCIDENT': return 'warning';
-            case 'SPORTS': return 'football';
-            default: return 'bookmark';
-        }
-    };
+/* -------------------------------------------------------------------------- */
+/*                                   Avatar                                   */
+/* -------------------------------------------------------------------------- */
 
-    const getTypeColor = () => {
-        switch (post.type) {
-            case 'DEATH': return '#000000';
-            case 'ACCIDENT': return '#EF4444';
-            case 'SPORTS': return '#4CD964';
-            default: return colors.primary;
-        }
-    };
+const Avatar = memo(({ name, image, colors, size = 44 }: AvatarProps) => {
+    const initial = name?.charAt(0).toUpperCase() || '?';
 
-    const onViewableItemsChanged = React.useRef(({ viewableItems }: any) => {
-        if (viewableItems.length > 0) {
-            setCurrentImageIndex(viewableItems[0].index || 0);
-        }
-    }).current;
-
-    const viewabilityConfig = React.useRef({
-        itemVisiblePercentThreshold: 50
-    }).current;
+    if (image) {
+        return (
+            <Image
+                source={{ uri: image }}
+                style={[
+                    styles.avatar,
+                    {
+                        width: size,
+                        height: size,
+                        borderRadius: size / 2,
+                    },
+                ]}
+            />
+        );
+    }
 
     return (
-        <ScrollView 
-            style={[styles.container, { backgroundColor: colors.background }]}
-            contentContainerStyle={styles.content}
-            showsVerticalScrollIndicator={false}
+        <View
+            style={[
+                styles.avatarPlaceholder,
+                {
+                    width: size,
+                    height: size,
+                    borderRadius: size / 2,
+                    backgroundColor: colors.primary + '15',
+                },
+            ]}
         >
-            <View style={styles.header}>
-                <View style={styles.headerLeft}>
-                    <View style={[styles.typeBadge, { backgroundColor: `${getTypeColor()}12` }]}>
-                        <Ionicons name={getTypeIcon() as any} size={14} color={getTypeColor()} />
-                        <ThemedText style={[styles.typeText, { color: getTypeColor() }]}>
-                            {post.type}
+            <ThemedText
+                style={[
+                    styles.avatarInitial,
+                    {
+                        color: colors.primary,
+                        fontSize: size * 0.4,
+                    },
+                ]}
+            >
+                {initial}
+            </ThemedText>
+        </View>
+    );
+});
+
+Avatar.displayName = 'Avatar';
+
+/* -------------------------------------------------------------------------- */
+/*                                Like Button                                 */
+/* -------------------------------------------------------------------------- */
+
+const LikeButton = memo(
+    ({
+        postId,
+        initialLiked,
+        initialLikes,
+        colors,
+    }: LikeButtonProps) => {
+        const [isLiked, setIsLiked] = useState(initialLiked);
+        const [likesCount, setLikesCount] = useState(initialLikes);
+
+        const likePostMutation = useLikePost();
+
+        const handleLike = useCallback(() => {
+            setIsLiked(prevLiked => {
+                const nextLiked = !prevLiked;
+
+                setLikesCount(prevCount =>
+                    nextLiked
+                        ? prevCount + 1
+                        : Math.max(prevCount - 1, 0)
+                );
+
+                if (nextLiked) {
+                    analyticsService.trackEvent(AnalyticsEvents.POST_LIKED, { postId });
+                }
+
+                return nextLiked;
+            });
+
+            likePostMutation.mutate(postId);
+        }, [likePostMutation, postId]);
+
+        return (
+            <TouchableOpacity
+                onPress={handleLike}
+                style={styles.interactionButton}
+                activeOpacity={0.7}
+            >
+                <Ionicons
+                    name={isLiked ? 'heart' : 'heart-outline'}
+                    size={22}
+                    color={isLiked ? '#FF3B30' : colors.text + '80'}
+                />
+
+                <ThemedText
+                    style={[
+                        styles.interactionText,
+                        {
+                            color: isLiked
+                                ? '#FF3B30'
+                                : colors.text + '80',
+                        },
+                    ]}
+                >
+                    {likesCount} Likes
+                </ThemedText>
+            </TouchableOpacity>
+        );
+    }
+);
+
+LikeButton.displayName = 'LikeButton';
+
+/* -------------------------------------------------------------------------- */
+/*                                Post Detail                                 */
+/* -------------------------------------------------------------------------- */
+
+export const PostDetail: React.FC<PostDetailProps> = memo(
+    ({
+        post,
+        onViewImage,
+        onEdit,
+        onDelete,
+        onReport,
+        isOwner,
+    }) => {
+        const { theme } = useTheme();
+        const { user } = useAuth();
+
+        const colors = Colors[theme];
+
+        const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+        const displayContent = useMemo(() => {
+            if (post.type === 'DEATH') {
+                const prefix =
+                    'إِنَّا لِلّهِ وَإِنَّـا إِلَيْهِ رَاجِعونَ\n\n';
+
+                if (
+                    !post.content.startsWith(
+                        'إِنَّا لِلّهِ وَإِنَّـا إِلَيْهِ رَاجِعونَ'
+                    )
+                ) {
+                    return prefix + post.content;
+                }
+            }
+
+            return post.content;
+        }, [post.content, post.type]);
+
+        const getTypeIcon = useCallback(() => {
+            switch (post.type) {
+                case 'DEATH':
+                    return 'megaphone';
+
+                case 'ACCIDENT':
+                    return 'warning';
+
+                case 'SPORTS':
+                    return 'football';
+
+                default:
+                    return 'bookmark';
+            }
+        }, [post.type]);
+
+        const getTypeColor = useCallback(() => {
+            switch (post.type) {
+                case 'DEATH':
+                    return '#000000';
+
+                case 'ACCIDENT':
+                    return '#EF4444';
+
+                case 'SPORTS':
+                    return '#4CD964';
+
+                default:
+                    return colors.primary;
+            }
+        }, [post.type, colors.primary]);
+
+        const onViewableItemsChanged = useRef(
+            ({
+                viewableItems,
+            }: {
+                viewableItems: ViewToken[];
+            }) => {
+                if (viewableItems.length > 0) {
+                    setCurrentImageIndex(
+                        viewableItems[0]?.index || 0
+                    );
+                }
+            }
+        ).current;
+
+        const viewabilityConfig = useRef({
+            itemVisiblePercentThreshold: 50,
+        }).current;
+
+        const canManage =
+            isOwner || user?.user?.role === 'APP_ADMIN';
+
+        const renderImage = useCallback(
+            ({
+                item,
+                index,
+            }: {
+                item: string;
+                index: number;
+            }) => (
+                <TouchableOpacity
+                    activeOpacity={0.95}
+                    onPress={() =>
+                        onViewImage?.(post.images, index)
+                    }
+                    style={styles.imageWrapper}
+                >
+                    <Image
+                        source={{ uri: item }}
+                        style={styles.image}
+                        contentFit="cover"
+                        transition={300}
+                    />
+                </TouchableOpacity>
+            ),
+            [onViewImage, post.images]
+        );
+
+        const handleShare = async () => {
+            try {
+                const shareUrl = `https://api.rehbarapp.com/post/${post._id}`;
+                const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.rehbar.community';
+                
+                await Share.share({
+                    title: 'Check out this post on Rehbar',
+                    message: `Check out this post on Rehbar: ${shareUrl}\n\nDon't have the app? Get it here: ${playStoreUrl}`,
+                    url: shareUrl,
+                });
+                
+                analyticsService.trackEvent(AnalyticsEvents.POST_SHARED, { postId: post._id });
+            } catch (error) {
+                console.error('Error sharing post:', error);
+            }
+        };
+
+        return (
+            <ThemedView
+                style={{
+                    flex: 1,
+                    backgroundColor: colors.background,
+                }}
+            >
+                <ScrollView
+                    style={styles.container}
+                    contentContainerStyle={styles.content}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <View
+                            style={[
+                                styles.typeBadge,
+                                {
+                                    backgroundColor:
+                                        getTypeColor() + '12',
+                                },
+                            ]}
+                        >
+                            <Ionicons
+                                name={getTypeIcon() as any}
+                                size={14}
+                                color={getTypeColor()}
+                            />
+
+                            <ThemedText
+                                style={[
+                                    styles.typeText,
+                                    {
+                                        color: getTypeColor(),
+                                    },
+                                ]}
+                            >
+                                {post.type}
+                            </ThemedText>
+                        </View>
+
+                        <ThemedText style={styles.timeText}>
+                            {formatRelativeTime(post.createdAt)}
                         </ThemedText>
                     </View>
-                    <ThemedText style={styles.timeText}>
-                        {formatRelativeTime(post.createdAt)}
-                    </ThemedText>
-                </View>
-            </View>
 
-            <View style={styles.body}>
-                <ThemedText style={styles.contentBody}>{displayContent}</ThemedText>
-            </View>
+                    {/* Content */}
+                    <View style={styles.body}>
+                        <ThemedText
+                            style={[
+                                styles.contentBody,
+                                {
+                                    color: colors.text,
+                                },
+                            ]}
+                        >
+                            {displayContent}
+                        </ThemedText>
+                    </View>
 
-            {post.images && post.images.length > 0 && (
-                <View style={styles.mediaContainer}>
-                    <FlatList
-                        data={post.images}
-                        horizontal
-                        pagingEnabled
-                        showsHorizontalScrollIndicator={false}
-                        onViewableItemsChanged={onViewableItemsChanged}
-                        viewabilityConfig={viewabilityConfig}
-                        keyExtractor={(_, index) => `detail-img-${index}`}
-                        renderItem={({ item, index }) => (
+                    {/* Media */}
+                    {!!post.images?.length && (
+                        <View style={styles.mediaContainer}>
+                            <FlatList
+                                data={post.images}
+                                horizontal
+                                pagingEnabled
+                                showsHorizontalScrollIndicator={false}
+                                onViewableItemsChanged={
+                                    onViewableItemsChanged
+                                }
+                                viewabilityConfig={
+                                    viewabilityConfig
+                                }
+                                keyExtractor={(_, index) =>
+                                    `detail-img-${index}`
+                                }
+                                renderItem={renderImage}
+                                removeClippedSubviews
+                                initialNumToRender={1}
+                                maxToRenderPerBatch={2}
+                                windowSize={3}
+                            />
+
+                            {post.images.length > 1 && (
+                                <View style={styles.imageBadge}>
+                                    <ThemedText
+                                        style={
+                                            styles.imageBadgeText
+                                        }
+                                    >
+                                        {currentImageIndex + 1} /{' '}
+                                        {post.images.length}
+                                    </ThemedText>
+                                </View>
+                            )}
+                        </View>
+                    )}
+
+                    {/* Interactions */}
+                    <View
+                        style={[
+                            styles.interactions,
+                            {
+                                borderColor:
+                                    colors.border + '40',
+                            },
+                        ]}
+                    >
+                        <LikeButton
+                            postId={post._id}
+                            initialLiked={
+                                post.isLiked || false
+                            }
+                            initialLikes={
+                                post.likesCount || 0
+                            }
+                            colors={colors}
+                        />
+
+                        <View style={{ flex: 1 }} />
+
+                        <TouchableOpacity
+                            style={styles.interactionButton}
+                            onPress={handleShare}
+                        >
+                            <Ionicons
+                                name="share-outline"
+                                size={20}
+                                color={colors.text + '80'}
+                            />
+                        </TouchableOpacity>
+
+                        {onReport && (
                             <TouchableOpacity
-                                activeOpacity={0.9}
-                                onPress={() => onViewImage?.(post.images, index)}
-                                style={styles.imageWrapper}
+                                style={styles.interactionButton}
+                                onPress={onReport}
                             >
-                                <Image
-                                    source={{ uri: item }}
-                                    style={styles.image}
-                                    contentFit="contain"
-                                    transition={200}
+                                <Ionicons
+                                    name="flag-outline"
+                                    size={20}
+                                    color="#FF9500"
                                 />
                             </TouchableOpacity>
                         )}
-                    />
-                    {post.images.length > 1 && (
-                        <View style={styles.imageBadge}>
-                            <ThemedText style={styles.imageBadgeText}>
-                                {currentImageIndex + 1} / {post.images.length}
-                            </ThemedText>
+                    </View>
+
+                    {/* Contributor */}
+                    <View
+                        style={[
+                            styles.contributorCard,
+                            {
+                                backgroundColor:
+                                    colors.card,
+                                borderColor:
+                                    colors.border + '40',
+                            },
+                        ]}
+                    >
+                        <View style={styles.contributorInfo}>
+                            <Avatar
+                                name={post.createdBy?.name}
+                                image={
+                                    post.createdBy
+                                        ?.profileImage
+                                }
+                                colors={colors}
+                                size={48}
+                            />
+
+                            <View
+                                style={
+                                    styles.contributorTextContainer
+                                }
+                            >
+                                <ThemedText
+                                    style={
+                                        styles.contributorName
+                                    }
+                                >
+                                    {post.createdBy?.name}
+                                </ThemedText>
+
+                                <ThemedText
+                                    style={
+                                        styles.contributorLabel
+                                    }
+                                >
+                                    Verified Contributor
+                                </ThemedText>
+                            </View>
                         </View>
-                    )}
-                </View>
-            )}
 
-            <View style={styles.footer}>
-                <View style={styles.authorSection}>
-                    <Image 
-                        source={{ uri: post.createdBy?.profileImage }} 
-                        style={styles.avatar}
-                    />
-                    <View>
-                        <ThemedText style={styles.authorName}>{post.createdBy?.name}</ThemedText>
-                        <ThemedText style={styles.authorRole}>Contributor</ThemedText>
-                    </View>
-                </View>
+                        {canManage && (
+                            <View
+                                style={
+                                    styles.managementActions
+                                }
+                            >
+                                <View
+                                    style={[
+                                        styles.divider,
+                                        {
+                                            backgroundColor:
+                                                colors.border +
+                                                '20',
+                                        },
+                                    ]}
+                                />
 
-                {user?.user?.role === 'APP_ADMIN' && (
-                    <View style={styles.actionRow}>
-                        <TouchableOpacity 
-                            style={[styles.actionButton, { backgroundColor: colors.primary + '15' }]}
-                            onPress={() => onEdit?.(post)}
-                        >
-                            <Ionicons name="create-outline" size={20} color={colors.primary} />
-                            <ThemedText style={[styles.actionButtonText, { color: colors.primary }]}>Edit</ThemedText>
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={[styles.actionButton, { backgroundColor: '#FF3B3015' }]}
-                            onPress={() => onDelete?.(post._id)}
-                        >
-                            <Ionicons name="trash-outline" size={20} color="#FF3B30" />
-                            <ThemedText style={[styles.actionButtonText, { color: '#FF3B30' }]}>Delete</ThemedText>
-                        </TouchableOpacity>
+                                <View style={styles.actionRow}>
+                                    <TouchableOpacity
+                                        style={[
+                                            styles.actionButton,
+                                            {
+                                                backgroundColor:
+                                                    colors.primary +
+                                                    '10',
+                                            },
+                                        ]}
+                                        onPress={() =>
+                                            onEdit?.(post)
+                                        }
+                                    >
+                                        <Ionicons
+                                            name="create-outline"
+                                            size={18}
+                                            color={
+                                                colors.primary
+                                            }
+                                        />
+
+                                        <ThemedText
+                                            style={[
+                                                styles.actionButtonText,
+                                                {
+                                                    color:
+                                                        colors.primary,
+                                                },
+                                            ]}
+                                        >
+                                            Edit Post
+                                        </ThemedText>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        style={[
+                                            styles.actionButton,
+                                            {
+                                                backgroundColor:
+                                                    '#FF3B3010',
+                                            },
+                                        ]}
+                                        onPress={() =>
+                                            onDelete?.(post._id)
+                                        }
+                                    >
+                                        <Ionicons
+                                            name="trash-outline"
+                                            size={18}
+                                            color="#FF3B30"
+                                        />
+
+                                        <ThemedText
+                                            style={[
+                                                styles.actionButtonText,
+                                                {
+                                                    color:
+                                                        '#FF3B30',
+                                                },
+                                            ]}
+                                        >
+                                            Delete
+                                        </ThemedText>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        )}
                     </View>
-                )}
-            </View>
-        </ScrollView>
-    );
-};
+                </ScrollView>
+            </ThemedView>
+        );
+    }
+);
+
+PostDetail.displayName = 'PostDetail';
+
+/* -------------------------------------------------------------------------- */
+/*                                   Styles                                   */
+/* -------------------------------------------------------------------------- */
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+
     content: {
-        paddingBottom: 40,
+        paddingBottom: 20,
     },
+
     header: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 20,
-        paddingVertical: 15,
+        paddingTop: 16,
+        paddingBottom: 12,
     },
-    headerLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
+
     typeBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 10,
-        paddingVertical: 4,
+        paddingVertical: 5,
         borderRadius: 20,
         gap: 6,
     },
+
     typeText: {
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: 11,
+        fontWeight: '800',
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
+
     timeText: {
-        fontSize: 13,
-        opacity: 0.6,
-        fontWeight: '500',
+        fontSize: 12,
+        opacity: 0.5,
+        fontWeight: '600',
     },
+
     body: {
         paddingHorizontal: 20,
-        paddingBottom: 20,
+        paddingBottom: 16,
     },
+
     contentBody: {
-        fontSize: 17,
-        lineHeight: 26,
+        fontSize: 16,
+        lineHeight: 24,
         fontWeight: '400',
+        letterSpacing: 0.2,
     },
+
     mediaContainer: {
         width: '100%',
-        aspectRatio: 1, // Square for details
-        backgroundColor: '#f8f8f8',
-        marginVertical: 10,
+        aspectRatio: 1.2,
+        paddingHorizontal: 20,
+        marginBottom: 16,
     },
+
     imageWrapper: {
-        width: width,
+        width: width - 40,
         height: '100%',
+        borderRadius: 16,
+        overflow: 'hidden',
     },
+
     image: {
         width: '100%',
         height: '100%',
     },
+
     imageBadge: {
         position: 'absolute',
-        bottom: 20,
-        right: 20,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 20,
+        bottom: 16,
+        right: 16,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 12,
     },
+
     imageBadgeText: {
         color: '#fff',
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '700',
     },
-    footer: {
-        padding: 20,
-        borderTopWidth: StyleSheet.hairlineWidth,
-        borderTopColor: '#eee',
-        marginTop: 10,
-    },
-    authorSection: {
+
+    interactions: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
-        marginBottom: 20,
+        marginHorizontal: 20,
+        paddingVertical: 12,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderBottomWidth: StyleSheet.hairlineWidth,
     },
-    avatar: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: '#f1f5f9',
+
+    interactionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        paddingVertical: 6,
+        paddingHorizontal: 4,
     },
-    authorName: {
-        fontSize: 16,
+
+    interactionText: {
+        fontSize: 14,
         fontWeight: '600',
     },
-    authorRole: {
+
+    contributorCard: {
+        margin: 20,
+        padding: 16,
+        borderRadius: 20,
+        borderWidth: StyleSheet.hairlineWidth,
+
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 4,
+                },
+                shadowOpacity: 0.05,
+                shadowRadius: 10,
+            },
+
+            android: {
+                elevation: 2,
+            },
+        }),
+    },
+
+    contributorInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 14,
+    },
+
+    avatar: {
+        backgroundColor: '#f1f5f9',
+    },
+
+    avatarPlaceholder: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    avatarInitial: {
+        fontWeight: '700',
+    },
+
+    contributorTextContainer: {
+        flex: 1,
+    },
+
+    contributorName: {
+        fontSize: 16,
+        fontWeight: '700',
+        marginBottom: 2,
+    },
+
+    contributorLabel: {
         fontSize: 12,
         opacity: 0.5,
+        fontWeight: '500',
     },
+
+    managementActions: {
+        marginTop: 16,
+    },
+
+    divider: {
+        height: 1,
+        marginBottom: 16,
+    },
+
     actionRow: {
         flexDirection: 'row',
         gap: 12,
     },
+
     actionButton: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 12,
-        borderRadius: Layout.borderRadius,
+        paddingVertical: 10,
+        borderRadius: 12,
         gap: 8,
     },
+
     actionButtonText: {
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '700',
     },
 });

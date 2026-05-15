@@ -4,7 +4,7 @@ export interface PostData {
     _id: string;
     content: string;
     images: string[];
-    type: 'GENERAL' | 'DEATH' | 'ACCIDENT';
+    type: 'GENERAL' | 'DEATH' | 'ACCIDENT' | 'SPORTS' | 'SPONSORED';
     likesCount: number;
     commentsCount: number;
     isLiked?: boolean;
@@ -34,6 +34,7 @@ export interface CommentData {
 export const POST_QUERY_KEYS = {
     all: ['posts'] as const,
     list: (filters: any) => [...POST_QUERY_KEYS.all, 'infinite-list', filters] as const,
+    detail: (postId: string) => [...POST_QUERY_KEYS.all, 'detail', postId] as const,
     comments: (postId: string, parentCommentId: string | null) => [...POST_QUERY_KEYS.all, 'comments', postId, parentCommentId] as const,
 };
 
@@ -42,6 +43,10 @@ export const getPostsList = async (params: { page?: number; limit?: number; type
     const response: any = await apiClient.get('/api/user/v1/posts/list', { params });
     console.log('Posts response received:', { success: response?.success, count: response?.data?.length });
     return response;
+};
+
+export const getPostDetail = async (postId: string) => {
+    return apiClient.get('/api/user/v1/posts/detail', { params: { postId } });
 };
 
 export const toggleLikePost = async (postId: string) => {
@@ -75,8 +80,10 @@ export const createPost = async (formData: FormData) => {
 };
 
 export const updatePost = async (postId: string, formData: FormData) => {
-    // Some APIs might expect postId in query or body, assuming body within FormData or as separate field if not using pure FormData
-    // Common pattern for this app seems to be POST with data
+    // Ensure postId is included in the formData for the backend to identify the post
+    if (!formData.has('postId')) {
+        formData.append('postId', postId);
+    }
     return apiClient.post(`/api/user/v1/posts/update`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',

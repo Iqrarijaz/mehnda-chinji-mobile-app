@@ -39,9 +39,10 @@ interface MosqueCardProps {
         images?: string[];
     };
     color?: string;
+    onReport?: () => void;
 }
 
-const MosqueCard = React.memo(({ data, color }: MosqueCardProps) => {
+const MosqueCard = React.memo(({ data, color, onReport }: MosqueCardProps) => {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const colors = Colors[theme];
@@ -309,6 +310,18 @@ const MosqueCard = React.memo(({ data, color }: MosqueCardProps) => {
                         >
                             {address}
                         </ThemedText>
+
+                        {onReport && (
+                            <TouchableOpacity
+                                onPress={(e) => {
+                                    e.stopPropagation();
+                                    onReport();
+                                }}
+                                style={styles.reportButton}
+                            >
+                                <Ionicons name="flag-outline" size={14} color="#EF4444" />
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
             </TouchableOpacity>
@@ -467,5 +480,14 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: '500',
         lineHeight: 15,
+    },
+    reportButton: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: 'rgba(239, 68, 68, 0.08)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 8,
     },
 });

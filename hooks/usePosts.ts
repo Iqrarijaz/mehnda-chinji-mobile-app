@@ -4,6 +4,7 @@ import {
     deletePost,
     deletePostComment,
     getPostComments,
+    getPostDetail,
     getPostsList,
     POST_QUERY_KEYS,
     PostData,
@@ -13,7 +14,7 @@ import {
     deletePostImage
 } from '@/apis/posts';
 
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const usePosts = (filters: { type?: string | null; searchQuery?: string } = {}) => {
     return useInfiniteQuery({
@@ -36,6 +37,15 @@ export const usePosts = (filters: { type?: string | null; searchQuery?: string }
     });
 };
 
+export const usePostDetail = (postId: string) => {
+    return useQuery({
+        queryKey: POST_QUERY_KEYS.detail(postId),
+        queryFn: () => getPostDetail(postId),
+        enabled: !!postId,
+        staleTime: 60 * 1000,
+    });
+};
+
 export const useLikePost = () => {
     const queryClient = useQueryClient();
 
@@ -44,11 +54,12 @@ export const useLikePost = () => {
         onMutate: async (postId) => {
             // Cancel any outgoing refetches
             await queryClient.cancelQueries({ queryKey: POST_QUERY_KEYS.all });
+            await queryClient.cancelQueries({ queryKey: POST_QUERY_KEYS.detail(postId) });
 
             // Snapshot the previous value
             const previousPosts = queryClient.getQueryData(POST_QUERY_KEYS.all);
 
-            // Optimistically update
+            // Optimistically update list queries
             queryClient.setQueriesData({ queryKey: POST_QUERY_KEYS.all }, (old: any) => {
                 if (!old) return old;
                 return {
@@ -68,12 +79,25 @@ export const useLikePost = () => {
                     })
                 };
             });
+            // Optimistically update detail query if present
+            queryClient.setQueryData(POST_QUERY_KEYS.detail(postId), (oldDetail: any) => {
+                if (!oldDetail) return oldDetail;
+                return {
+                    ...oldDetail,
+                    isLiked: !oldDetail.isLiked,
+                    likesCount: oldDetail.isLiked ? (oldDetail.likesCount || 1) - 1 : (oldDetail.likesCount || 0) + 1
+                };
+            });
 
             return { previousPosts };
         },
         onError: (err, postId, context: any) => {
             queryClient.setQueriesData({ queryKey: POST_QUERY_KEYS.all }, context.previousPosts);
         },
+        onSuccess: (data, postId) => {
+            // Also invalidate the detail query for this post to ensure consistency
+            queryClient.invalidateQueries({ queryKey: POST_QUERY_KEYS.detail(postId) });
+        }
     });
 };
 
@@ -142,6 +166,7 @@ export const useAddPost = () => {
     return useMutation({
         mutationFn: createPost,
         onSuccess: () => {
+            // Invalidate all post-related queries
             queryClient.invalidateQueries({ queryKey: POST_QUERY_KEYS.all });
         },
     });

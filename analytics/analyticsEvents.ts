@@ -22,6 +22,9 @@ export const AnalyticsEvents = {
     NOTIFICATION_OPENED: 'notification_opened',
     WEATHER_VIEWED: 'weather_viewed',
     PRAYER_TIMES_VIEWED: 'prayer_times_viewed',
+    POST_LIKED: 'post_liked',
+    POST_COMMENTED: 'post_commented',
+    POST_SHARED: 'post_shared',
 
     // Community Specific
     DONOR_CARD_CLICKED: 'donor_card_clicked',
@@ -41,6 +44,17 @@ export const AnalyticsEvents = {
     API_ERROR: 'api_error',
     CLIENT_ERROR: 'client_error',
     API_RETRY: 'api_retry',
+    SLOW_API_RESPONSE: 'slow_api_response',
+
+    // Ads
+    AD_MANAGER_INIT: 'ad_manager_init',
+    AD_LOADED: 'ad_loaded',
+    AD_SHOWN: 'ad_shown',
+    AD_CLOSED: 'ad_closed',
+    AD_FAILED: 'ad_failed',
+    AD_REWARD_EARNED: 'ad_reward_earned',
+    BANNER_CLICK_ATTEMPT: 'banner_click_attempt',
+    AD_LOAD_TIME: 'ad_load_time',
 
     // Updates
     UPDATE_AVAILABLE: 'update_available',

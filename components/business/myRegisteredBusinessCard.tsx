@@ -198,17 +198,7 @@ const MyRegisteredBusinessCard = React.memo(({
                                             <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>Delete</ThemedText>
                                         </MenuOption>
 
-                                        <MenuOption
-                                            onSelect={() => { setShowMenu(false); /* report logic if any */ }}
-                                            customStyles={{
-                                                optionWrapper: styles.menuItem,
-                                            }}
-                                        >
-                                            <View style={[styles.menuIconBox, { backgroundColor: '#F59E0B15' }]}>
-                                                <Ionicons name="flag" size={16} color="#F59E0B" />
-                                            </View>
-                                            <ThemedText style={[styles.menuItemText, { color: primaryColor }]}>Report</ThemedText>
-                                        </MenuOption>
+
                                     </MenuOptions>
                                 </Menu>
                             </View>

@@ -26,7 +26,7 @@ import { CleanConfirmationModal } from '../common/CleanConfirmationModal';
 import BloodRegistrationModal from './BloodRegistrationModal';
 import MyBloodDonorRegistrationCard from './MyBloodDonorRegistrationCard';
 
-const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
 
 const BloodRegistration = React.memo(() => {
     const { user } = useAuth();
@@ -34,16 +34,8 @@ const BloodRegistration = React.memo(() => {
     const colors = Colors[theme];
     const queryClient = useQueryClient();
 
-    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-    const [selectedCity, setSelectedCity] = useState<string>(user?.user?.city || '');
-    const [address, setAddress] = useState<string>(user?.user?.address || user?.user?.village || '');
-    const [lastDonationDate, setLastDonationDate] = useState<Date | null>(null);
-
     // UI State
     const [modalVisible, setModalVisible] = useState(false);
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [cityModalVisible, setCityModalVisible] = useState(false);
-    const [groupModalVisible, setGroupModalVisible] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showStatusConfirmModal, setShowStatusConfirmModal] = useState(false);
 

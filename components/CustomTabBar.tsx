@@ -20,7 +20,6 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
         const { options } = descriptors[route.key];
         // Hide chat tab for now as requested
         if (route.name === 'chat') return false;
-        if (route.name === 'feed') return false;
         return (options as any).href !== null;
     });
 

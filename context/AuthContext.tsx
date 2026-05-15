@@ -4,6 +4,7 @@ import { secureStorage, clientStorage } from '@/utils/storage';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { useNotificationStore } from '@/store/notificationStore';
 import { tokenCache } from '@/lib/tokenCache';
+import { useAdsStore } from '@/store/ads.store';
 
 type UserData = {
     token: string;
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const segments = useSegments();
     const { initializePreferences } = useNotificationStore();
+    const setUserRole = useAdsStore(state => state.setUserRole);
 
     useEffect(() => {
         const loadUser = async () => {
@@ -44,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     // Populate in-memory cache immediately — interceptor uses this from now on
                     if (parsed.token) tokenCache.set(parsed.token);
                     setUser(parsed);
+                    setUserRole(parsed.user?.role || null);
                     if (parsed.user?.notificationPreferences) {
                         initializePreferences(parsed.user.notificationPreferences);
                     }
@@ -55,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
         };
         loadUser();
-    }, []);
+    }, [setUserRole]);
 
     // Reactive Session Expiry: Listen for token clearance from API client
     useEffect(() => {
@@ -93,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Cache token in memory — interceptor reads from here, no more disk I/O per request
         if (authData.token) tokenCache.set(authData.token);
         setUser(authData);
+        setUserRole(userData.role || null);
 
         if (userData.notificationPreferences) {
             initializePreferences(userData.notificationPreferences);
@@ -115,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Clear in-memory token immediately so in-flight retries don't send a stale token
         tokenCache.clear();
         setUser(null);
+        setUserRole(null);
         await secureStorage.removeItem('userData');
         // @ts-ignore
         router.replace('/(auth)/login');
@@ -141,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (finalUserData.notificationPreferences) {
                     initializePreferences(finalUserData.notificationPreferences);
                 }
+                setUserRole(finalUserData.role || null);
                 secureStorage.setItem('userData', JSON.stringify(updatedAuthData)).catch(console.error);
             }, 0);
             

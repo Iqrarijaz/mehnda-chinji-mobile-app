@@ -19,6 +19,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useNavigation, useRouter, useFocusEffect } from 'expo-router';
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import NativeAd from '@/ads/components/NativeAd';
 import {
     ActivityIndicator,
     Alert,
@@ -33,6 +34,7 @@ import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTooltipStore } from '@/store/tooltipStore';
+import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
 
 
 import { ThemedText } from '@/components/themedText';
@@ -56,6 +58,15 @@ const CategoryListingScreen = React.memo(() => {
     const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
     const [showTooltip, setShowTooltip] = useState(false);
     const [selectedType, setSelectedType] = useState<string>('');
+    
+    // Reporting state
+    const reportModalRef = React.useRef<ReportModalRef>(null);
+    const [reportTarget, setReportTarget] = useState<{ id: string; type: 'PLACE' | 'POST' } | null>(null);
+
+    const handleReport = useCallback((id: string) => {
+        setReportTarget({ id, type: 'PLACE' });
+        reportModalRef.current?.present();
+    }, []);
 
     // Fetch configuration for categories/types
     const { data: essentialsConfig } = useQuery({
@@ -241,34 +252,63 @@ const CategoryListingScreen = React.memo(() => {
     const myRequests = (myRequestsData as any)?.pages?.flatMap((page: any) => page.data || []) || [];
 
     const loading = activeTab === 'all' ? (queryLoading || isRefetching) : (myRequestsLoading || myRequestsRefetching);
-    const dataToRender = activeTab === 'all' ? businesses : myRequests;
+    const rawData = activeTab === 'all' ? businesses : myRequests;
+
+    const AD_SUPPORTED_CATEGORIES = ['education', 'health', 'govt', 'banks', 'travel'];
+    // --- Ad Injection Logic ---
+    const listData = useMemo(() => {
+        if (activeTab !== 'all' || rawData.length === 0 || !AD_SUPPORTED_CATEGORIES.includes(category || '')) return rawData;
+
+        const processed: any[] = [];
+        const adInterval = 4; // Show ad after every 4 items
+
+        rawData.forEach((item: any, index: number) => {
+            processed.push(item);
+            // Inject ad after every 6th item, but not at the very end
+            if ((index + 1) % adInterval === 0 && index !== rawData.length - 1) {
+                processed.push({ _id: `ad-${index}`, isAd: true });
+            }
+        });
+
+        return processed;
+    }, [rawData, activeTab]);
 
     // --- Render Items ---
 
     const renderItem = React.useCallback(({ item }: { item: any }) => {
+        if (item.isAd) {
+            return <NativeAd placement={`listing-${category}`} />;
+        }
+
+        const commonProps = {
+            data: item,
+            color: headerColor,
+            onReport: () => handleReport(item._id)
+        };
+
         if (category === 'religious') {
-            return <MosqueCard data={item} color={headerColor} />;
+            return <MosqueCard {...commonProps} />;
         }
         if (category === 'health') {
-            return <HealthCard data={item} color={headerColor} />;
+            return <HealthCard {...commonProps} />;
         }
         if (category === 'education') {
-            return <EducationCard data={item} color={headerColor} />;
+            return <EducationCard {...commonProps} />;
         }
         if (category === 'banks') {
-            return <BankCard business={item} />;
+            return <BankCard business={item} onReport={() => handleReport(item._id)} />;
         }
         if (category === 'emergency') {
-            return <EmergencyCard data={item} color={headerColor} />;
+            return <EmergencyCard {...commonProps} />;
         }
         if (category === 'govt') {
-            return <GovtOfficeCard data={item} color={headerColor} />;
+            return <GovtOfficeCard {...commonProps} />;
         }
         if (category === 'travel') {
-            return <TravelCard data={item} color={headerColor} />;
+            return <TravelCard {...commonProps} />;
         }
-        return <BusinessCard business={item} />;
-    }, [category, headerColor]);
+        return <BusinessCard business={item} onReport={() => handleReport(item._id)} />;
+    }, [category, headerColor, handleReport]);
 
 
 
@@ -320,7 +360,16 @@ const CategoryListingScreen = React.memo(() => {
                 search={search}
                 setSearch={setSearch}
                 activeTab={activeTab}
-                setActiveTab={setActiveTab}
+                setActiveTab={(tab) => {
+                    if (tab === 'requests') {
+                        router.push({
+                            pathname: '/user/requests',
+                            params: { category: category }
+                        });
+                    } else {
+                        setActiveTab(tab);
+                    }
+                }}
                 onBack={() => {
                     if (router.canGoBack()) {
                         router.back();
@@ -385,7 +434,7 @@ const CategoryListingScreen = React.memo(() => {
 
             {/* Content */}
             <View style={styles.content}>
-                {loading && dataToRender.length === 0 ? (
+                {loading && rawData.length === 0 ? (
                     <View style={styles.listContent}>
                         {[1, 2, 3, 4, 5].map((i) => (
                             <BusinessCardSkeleton key={i} />
@@ -394,7 +443,7 @@ const CategoryListingScreen = React.memo(() => {
                 ) : (
                     <>
                         <FlatList
-                            data={dataToRender}
+                            data={listData}
                             renderItem={activeTab === 'all' ? renderItem : renderRequestItem}
                             keyExtractor={keyExtractor}
                             contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20 }]}
@@ -406,7 +455,7 @@ const CategoryListingScreen = React.memo(() => {
                                 () => {
                                     const hasMore = activeTab === 'all' ? hasNextPage : myRequestsHasNextPage;
                                     const isFetching = activeTab === 'all' ? isFetchingNextPage : myRequestsFetchingNextPage;
-                                    const hasData = dataToRender.length > 0;
+                                    const hasData = listData.length > 0;
 
                                     if (isFetching) {
                                         return (
@@ -438,6 +487,12 @@ const CategoryListingScreen = React.memo(() => {
                     </>
                 )}
             </View>
+
+            <ReportModal
+                ref={reportModalRef}
+                targetId={reportTarget?.id || ''}
+                targetType={reportTarget?.type || 'PLACE'}
+            />
         </View>
     );
 });

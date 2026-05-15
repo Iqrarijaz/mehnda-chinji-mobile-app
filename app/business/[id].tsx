@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useRef, useMemo } from 'react';
+import React, { useCallback, useRef, useMemo, useEffect } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -21,6 +21,8 @@ import { useTheme } from '@/context/ThemeContext';
 import { ReportModal } from '@/components/common/ReportModal';
 import { ThemedText } from '@/components/themedText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import BannerAd from '@/ads/components/BannerAd';
+import InterstitialService from '@/ads/interstitial.service';
 
 const BusinessDetailScreen = () => {
     const { id, businessData } = useLocalSearchParams<{ id: string; businessData?: string }>();
@@ -29,6 +31,18 @@ const BusinessDetailScreen = () => {
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
     const reportModalRef = useRef<any>(null);
+
+    // Preload Interstitial Ad
+    useEffect(() => {
+        InterstitialService.getInstance().load();
+
+        // Optionally show after a short delay to ensure it's ready
+        const adTimer = setTimeout(() => {
+            InterstitialService.getInstance().show();
+        }, 1000);
+
+        return () => clearTimeout(adTimer);
+    }, []);
 
     const business = useMemo(() => {
         try {
@@ -88,7 +102,7 @@ const BusinessDetailScreen = () => {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            {/* Solid Header like Settings */}
+            {/* Solid Header */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
                     <TouchableOpacity
@@ -114,7 +128,7 @@ const BusinessDetailScreen = () => {
                 style={styles.scrollView}
                 contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
             >
-                {/* Image Header if available */}
+                {/* Image Header */}
                 {business.images && business.images.length > 0 && (
                     <View style={styles.imageHeaderWrapper}>
                         <Image
@@ -127,12 +141,14 @@ const BusinessDetailScreen = () => {
                     </View>
                 )}
 
-                {/* Hero Section */}
+                {/* Info Container */}
                 <View style={styles.heroContainer}>
+                    {/* 1. Name */}
                     <ThemedText style={[styles.businessName, { color: colors.text }]}>
                         {businessName}
                     </ThemedText>
 
+                    {/* 2. Category */}
                     <View style={styles.chipRow}>
                         <View style={[styles.categoryChip, { backgroundColor: primaryColor + '12', borderColor: primaryColor + '20' }]}>
                             <Ionicons name="pricetag" size={12} color={primaryColor} />
@@ -140,7 +156,7 @@ const BusinessDetailScreen = () => {
                                 {category}
                             </ThemedText>
                         </View>
-                        
+
                         {urduCategory && (
                             <View style={[styles.categoryChip, { backgroundColor: primaryColor + '12', borderColor: primaryColor + '20' }]}>
                                 <ThemedText style={[styles.categoryChipUrduText, { color: primaryColor }]}>
@@ -150,6 +166,7 @@ const BusinessDetailScreen = () => {
                         )}
                     </View>
 
+                    {/* 3. Report button */}
                     <TouchableOpacity
                         style={styles.reportButton}
                         onPress={() => reportModalRef.current?.present()}
@@ -162,7 +179,12 @@ const BusinessDetailScreen = () => {
                     </TouchableOpacity>
                 </View>
 
-                {/* Consolidated Details Card */}
+                {/* 4. Banner Ad */}
+                <View style={styles.adContainer}>
+                    <BannerAd />
+                </View>
+
+                {/* 5. Rest of the info */}
                 <View style={[styles.card, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#FFFFFF' }]}>
                     {/* Location Section */}
                     <View style={styles.locationInfo}>
@@ -186,17 +208,31 @@ const BusinessDetailScreen = () => {
                             </View>
 
                             {business.phone && (
-                                <View style={styles.contactRow}>
+                                <TouchableOpacity
+                                    style={styles.contactRow}
+                                    onPress={handleCall}
+                                    activeOpacity={0.7}
+                                >
                                     <Ionicons name="call-outline" size={16} color={colors.textSecondary} />
                                     <ThemedText style={[styles.contactText, { color: colors.text, fontWeight: '600' }]}>{business.phone}</ThemedText>
-                                </View>
+                                    <View style={[styles.callIconBadge, { backgroundColor: colors.primary + '15' }]}>
+                                        <Ionicons name="call" size={14} color={colors.primary} />
+                                    </View>
+                                </TouchableOpacity>
                             )}
-                            
+
                             {business.phone2 && (
-                                <View style={styles.contactRow}>
+                                <TouchableOpacity
+                                    style={styles.contactRow}
+                                    onPress={() => Linking.openURL(`tel:${business.phone2}`)}
+                                    activeOpacity={0.7}
+                                >
                                     <Ionicons name="call-outline" size={16} color={colors.textSecondary} />
                                     <ThemedText style={[styles.contactText, { color: colors.text }]}>{business.phone2}</ThemedText>
-                                </View>
+                                    <View style={[styles.callIconBadge, { backgroundColor: colors.primary + '15' }]}>
+                                        <Ionicons name="call" size={14} color={colors.primary} />
+                                    </View>
+                                </TouchableOpacity>
                             )}
                         </View>
                     </View>
@@ -277,7 +313,7 @@ const styles = StyleSheet.create({
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
     },
     headerBackBtn: {
         width: 42,
@@ -310,9 +346,22 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     heroContainer: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         paddingTop: 24,
-        paddingBottom: 24,
+        paddingBottom: 10,
+    },
+    businessName: {
+        fontSize: 26,
+        fontWeight: '900',
+        lineHeight: 32,
+        marginBottom: 10,
+        letterSpacing: -0.5,
+    },
+    chipRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+        marginBottom: 16,
     },
     categoryChip: {
         flexDirection: 'row',
@@ -333,37 +382,29 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '700',
     },
-    chipRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-        marginBottom: 16,
-    },
-    businessName: {
-        fontSize: 26,
-        fontWeight: '900',
-        lineHeight: 32,
-        marginBottom: 10,
-        letterSpacing: -0.5,
-    },
     reportButton: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        paddingVertical: 5,
-        paddingHorizontal: 10,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
         borderRadius: 20,
         backgroundColor: '#FEF2F2',
         alignSelf: 'flex-start',
     },
     reportButtonText: {
         fontSize: 12,
-        fontWeight: '600',
+        fontWeight: '700',
         color: '#EF4444',
     },
+    adContainer: {
+        paddingHorizontal: 10,
+        marginBottom: 10,
+        alignItems: 'center',
+    },
     card: {
-        marginHorizontal: 20,
-        marginBottom: 16,
+        marginHorizontal: 10,
+        marginBottom: 10,
         borderRadius: 16,
         padding: 16,
         ...Platform.select({
@@ -377,17 +418,6 @@ const styles = StyleSheet.create({
             },
         }),
     },
-    cardHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 14,
-    },
-    cardTitle: {
-        fontSize: 16,
-        fontWeight: '700',
-        letterSpacing: -0.2,
-    },
     sectionSeparator: {
         marginTop: 16,
     },
@@ -396,26 +426,6 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 16,
         opacity: 0.5,
-    },
-    contactInfo: {
-        gap: 12,
-    },
-    contactRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-        paddingVertical: 4,
-    },
-    contactText: {
-        fontSize: 15,
-        flex: 1,
-    },
-    callBadge: {
-        width: 26,
-        height: 26,
-        borderRadius: 13,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     locationInfo: {
         flexDirection: 'row',
@@ -433,6 +443,26 @@ const styles = StyleSheet.create({
     areaText: {
         fontSize: 13,
         opacity: 0.7,
+    },
+    contactInfo: {
+        gap: 12,
+    },
+    contactRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingVertical: 4,
+    },
+    contactText: {
+        fontSize: 15,
+        flex: 1,
+    },
+    callIconBadge: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     descriptionText: {
         fontSize: 14,
@@ -459,8 +489,8 @@ const styles = StyleSheet.create({
     fab: {
         position: 'absolute',
         bottom: 16,
-        left: 20,
-        right: 20,
+        left: 10,
+        right: 10,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',

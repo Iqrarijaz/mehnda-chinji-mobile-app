@@ -15,6 +15,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import BannerAd from '@/ads/components/BannerAd';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -31,6 +32,8 @@ export default function HomeScreen() {
       <HomeHeader
         setIsSearchActive={setIsSearchActive}
       />
+
+      <BannerAd placement="home" />
 
       <View style={{ flex: 1 }}>
         <ScrollView

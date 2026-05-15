@@ -4,6 +4,7 @@ export const CONFIG_QUERY_KEYS = {
     cities: ['configuration', 'CITIES'] as const,
     villages: ['configuration', 'VILLAGES'] as const,
     professions: ['configuration', 'PROFESSIONS'] as const,
+    postCategories: ['configuration', 'POST_CATEGORIES'] as const,
 };
 
 /**

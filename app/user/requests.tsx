@@ -6,7 +6,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -14,15 +14,20 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
+    Platform,
 } from 'react-native';
+import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RequestCard from '@/components/places/RequestCard';
+import { RequestCardSkeleton } from '@/components/common/CardSkeletons';
 
 const MyRequestsScreen = () => {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const queryClient = useQueryClient();
-    const { placeId: highlightId } = useLocalSearchParams<{ placeId?: string }>();
+    const { placeId: highlightId, category } = useLocalSearchParams<{ placeId?: string; category?: string }>();
     const flatListRef = useRef<FlatList>(null);
 
     const {
@@ -34,8 +39,8 @@ const MyRequestsScreen = () => {
         isFetchingNextPage,
         refetch
     } = useInfiniteQuery({
-        queryKey: ESSENTIAL_SUBMISSION_QUERY_KEYS.myRequests({ page: 1 }), // simplified for now
-        queryFn: ({ pageParam = 1 }) => getMyRequests({ page: pageParam }),
+        queryKey: ESSENTIAL_SUBMISSION_QUERY_KEYS.myRequests({ page: 1, category }),
+        queryFn: ({ pageParam = 1 }) => getMyRequests({ page: pageParam, category }),
         getNextPageParam: (lastPage: any) => {
             const pagination = lastPage?.pagination;
             if (pagination && pagination.page < pagination.pages) {
@@ -57,10 +62,10 @@ const MyRequestsScreen = () => {
         }
     });
 
-    const handleDelete = (id: string, name: string) => {
+    const handleDelete = useCallback((id: string, name: string) => {
         Alert.alert(
             'Delete Request',
-            `Are you sure you want to delete "${name}"?`,
+            `Are you sure you want to delete "${name}"? This action cannot be undone.`,
             [
                 { text: 'Cancel', style: 'cancel' },
                 {
@@ -70,9 +75,9 @@ const MyRequestsScreen = () => {
                 },
             ]
         );
-    };
+    }, [deleteMutation]);
 
-    const handleEdit = (item: any) => {
+    const handleEdit = useCallback((item: any) => {
         router.push({
             pathname: '/(drawer)/place-submission',
             params: {
@@ -80,17 +85,20 @@ const MyRequestsScreen = () => {
                 editData: JSON.stringify(item),
             },
         });
-    };
+    }, [router]);
 
-    const handleManage = (item: any) => {
-        router.push({
-            pathname: '/user/manage-essential/[id]',
-            params: { id: item._id, name: item.name, category: item.category }
-        });
-    };
+    const handleManage = useCallback((item: any) => {
+        const catSlug = item.category?.en || item.category;
+        if (catSlug === 'education') {
+            router.push({
+                pathname: '/user/manage-essential/[id]',
+                params: { id: item._id, name: item.name, category: catSlug }
+            });
+        }
+    }, [router]);
 
     const requests = (data as any)?.pages?.flatMap((page: any) => page.data || []) || [];
-    const loading = isLoading || isRefetching;
+    const loading = isLoading && !isRefetching;
 
     // Scroll to and highlight the place that triggered the notification
     useEffect(() => {
@@ -103,31 +111,77 @@ const MyRequestsScreen = () => {
         }
     }, [highlightId, requests.length]);
 
-    const renderItem = ({ item }: { item: any }) => {
+    const renderItem = useCallback(({ item }: { item: any }) => (
+        <RequestCard
+            item={item}
+            categoryColor={colors.primary}
+            isDeleting={deleteMutation.isPending && deleteMutation.variables === item._id}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onManage={handleManage}
+        />
+    ), [colors.primary, deleteMutation.isPending, deleteMutation.variables, handleEdit, handleDelete, handleManage]);
+
+    const renderEmpty = () => (
+        <Animated.View entering={FadeIn.duration(400)} style={styles.emptyContainer}>
+            <View style={[styles.emptyIconCircle, { backgroundColor: colors.primary + '10' }]}>
+                <Ionicons name="document-text-outline" size={48} color={colors.primary} />
+            </View>
+            <ThemedText style={styles.emptyTitle}>No requests yet</ThemedText>
+            <ThemedText style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                Your submitted places and updates will appear here.
+            </ThemedText>
+            <TouchableOpacity 
+                style={[styles.emptyBtn, { backgroundColor: colors.primary }]}
+                onPress={() => router.push('/(drawer)/place-submission')}
+            >
+                <ThemedText style={styles.emptyBtnText}>Submit a Place</ThemedText>
+                <Ionicons name="add" size={20} color="#FFF" />
+            </TouchableOpacity>
+        </Animated.View>
+    );
+
+    const renderFooter = () => {
+        if (!isFetchingNextPage) return <View style={{ height: insets.bottom + 20 }} />;
         return (
-            <RequestCard
-                item={item}
-                categoryColor={colors.primary}
-                isDeleting={deleteMutation.isPending && deleteMutation.variables === item._id}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onManage={handleManage}
-            />
+            <View style={styles.footerLoader}>
+                <ActivityIndicator size="small" color={colors.primary} />
+            </View>
         );
     };
+
+    const displayTitle = category ? `${category.charAt(0).toUpperCase() + category.slice(1)} Requests` : 'My Requests';
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{
-                headerShown: true,
-                title: 'My Requests',
-                headerStyle: { backgroundColor: colors.background },
-                headerTintColor: colors.text,
+                headerShown: false,
             }} />
 
-            {loading && requests.length === 0 ? (
-                <View style={styles.center}>
-                    <ActivityIndicator size="large" color={colors.primary} />
+            {/* Header Design matching Place Submission / Essentials */}
+            <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
+                <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                        style={styles.backBtn}
+                    >
+                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+                    </TouchableOpacity>
+                    <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.headerTitleWrap}>
+                        <ThemedText style={styles.headerTitle} numberOfLines={1}>
+                            {displayTitle}
+                        </ThemedText>
+                    </Animated.View>
+                    <View style={{ width: 42 }} />
+                </View>
+            </Animated.View>
+
+            {loading ? (
+                <View style={styles.skeletonContainer}>
+                    <View style={{ height: 20 }} />
+                    {[...Array(5)].map((_, i) => (
+                        <RequestCardSkeleton key={i} />
+                    ))}
                 </View>
             ) : (
                 <FlatList
@@ -135,18 +189,20 @@ const MyRequestsScreen = () => {
                     data={requests}
                     renderItem={renderItem}
                     keyExtractor={(item) => item._id}
-                    contentContainerStyle={styles.listContent}
+                    ListHeaderComponent={() => <View style={{ height: 20 }} />}
+                    ListEmptyComponent={renderEmpty}
+                    ListFooterComponent={renderFooter}
                     onRefresh={refetch}
-                    refreshing={loading && !isFetchingNextPage}
+                    refreshing={isRefetching && !isFetchingNextPage}
                     onEndReached={() => {
                         if (hasNextPage && !isFetchingNextPage) fetchNextPage();
                     }}
-                    onScrollToIndexFailed={() => {}}
-                    ListEmptyComponent={
-                        <View style={styles.center}>
-                            <ThemedText>No requests found.</ThemedText>
-                        </View>
-                    }
+                    onEndReachedThreshold={0.5}
+                    removeClippedSubviews={Platform.OS === 'android'}
+                    maxToRenderPerBatch={10}
+                    windowSize={10}
+                    initialNumToRender={7}
+                    showsVerticalScrollIndicator={false}
                 />
             )}
         </View>
@@ -157,66 +213,103 @@ export default MyRequestsScreen;
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    listContent: { padding: 16 },
-    card: {
-        borderRadius: Layout.borderRadius,
-        marginBottom: 12,
-        borderWidth: 1,
+    headerWrap: {
+        paddingBottom: 16,
+        borderBottomLeftRadius: Layout.headerBorderRadius,
+        borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
+        zIndex: 10,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 12,
+            },
+            android: {
+                elevation: 8,
+            }
+        }),
     },
-    cardContent: {
-        padding: 16,
-    },
-    cardImage: {
-        width: '100%',
-        height: 120,
-    },
-    cardHeader: {
+    headerTopRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
+        paddingHorizontal: 20,
     },
-    cardTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
+    backBtn: {
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        backgroundColor: 'rgba(255,255,255,0.18)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    headerTitleWrap: {
+        flex: 1,
+        alignItems: 'center',
+        paddingHorizontal: 10,
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#FFFFFF',
         textTransform: 'capitalize',
     },
-    statusBadge: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: Layout.borderRadius,
+    skeletonContainer: {
+        flex: 1,
     },
-    statusText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    emptyContainer: {
+        flex: 1,
         alignItems: 'center',
-        marginTop: 12,
+        justifyContent: 'center',
+        paddingTop: 60,
+        paddingHorizontal: 40,
     },
-    dateContainer: {
+    emptyIconCircle: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 24,
+    },
+    emptyTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        marginBottom: 8,
+    },
+    emptySubtitle: {
+        fontSize: 15,
+        textAlign: 'center',
+        lineHeight: 22,
+        marginBottom: 32,
+    },
+    emptyBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-    },
-    dateText: {
-        fontSize: 11,
-        color: '#94A3B8',
-        fontWeight: '600',
-    },
-    actions: {
-        flexDirection: 'row',
+        paddingHorizontal: 24,
+        paddingVertical: 14,
+        borderRadius: 16,
         gap: 8,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 6,
+            }
+        }),
     },
-    actionBtn: {
-        padding: 4,
-    }
+    emptyBtnText: {
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    footerLoader: {
+        paddingVertical: 20,
+        alignItems: 'center',
+    },
 });

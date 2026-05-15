@@ -27,6 +27,7 @@ import { ThemedText } from '@/components/themedText';
 import { getCategoryTypes } from '@/constants/categoryTypes';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
+import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
 
@@ -38,6 +39,7 @@ const PlaceSubmissionScreen = () => {
     const colors = Colors[theme];
     const isDark = theme === 'dark';
     const queryClient = useQueryClient();
+    const { user } = useAuth();
 
     const editData = editDataParam ? JSON.parse(editDataParam) : null;
     const isEditing = !!editData;
@@ -116,6 +118,11 @@ const PlaceSubmissionScreen = () => {
 
     // Initial state setup
     useEffect(() => {
+        if (!isEditing && user?.user?.role !== 'APP_ADMIN') {
+            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                InterstitialService.getInstance().load();
+            });
+        }
         if (editData) {
             const images = Array.isArray(editData.images) ? editData.images : [];
             setForm({
@@ -301,7 +308,18 @@ const PlaceSubmissionScreen = () => {
                 text2: isEditing ? 'Request updated successfully.' : 'Request submitted successfully pending approval.',
             });
             queryClient.invalidateQueries({ queryKey: ['my-essential-requests'] });
-            handleGoBack();
+            if (!isEditing) {
+                router.replace('/user/requests');
+            } else {
+                handleGoBack();
+            }
+            if (!isEditing && user?.user?.role !== 'APP_ADMIN') {
+                setTimeout(() => {
+                    import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                        InterstitialService.getInstance().show(true);
+                    });
+                }, 2000);
+            }
         },
         onError: (error: any) => {
             Toast.show({

@@ -4,6 +4,7 @@ import * as Notifications from 'expo-notifications';
 import Sentry from '@/lib/sentry';
 import { useSocketNotifications } from '@/hooks/useSocketNotifications';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useAppOpenAd } from '@/ads/hooks/useAppOpenAd';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -31,11 +32,16 @@ import * as Application from 'expo-application';
 import { fetchAppVersionInfo, AppVersionInfo } from '@/apis/app-info';
 import { checkUpdateStatus } from '@/utils/versioning';
 import { UpdateModal } from '@/components/common/UpdateModal';
+import { RatingModal } from '@/components/common/RatingModal';
+import { ReviewService } from '@/utils/review';
 
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useAppFonts } from '@/hooks/useFonts';
 import { initConfig } from '@/lib/remoteConfig';
+import AdManager from '@/ads/adManager.service';
+
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -80,6 +86,7 @@ function AppInitializer() {
   usePushNotifications();
   useSocketNotifications();
   useScreenTracking();
+  useAppOpenAd();
 
   const { selectedCity } = useWeatherCity();
   const { calendarData } = usePrayerCalendar(selectedCity);
@@ -159,17 +166,43 @@ function AppInitializer() {
     // };
 
     // checkVersion();
+    // checkVersion();
   }, [isAuthenticated]);
 
+  const [showRating, setShowRating] = useState(false);
+
+  useEffect(() => {
+    const checkRating = async () => {
+      // Treat app open as a positive action
+      const shouldShow = await ReviewService.recordPositiveAction();
+      if (shouldShow) {
+        setShowRating(true);
+      }
+    };
+    
+    // Slight delay so it doesn't interrupt the immediate startup flow
+    const timer = setTimeout(() => {
+      checkRating();
+    }, 5000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <UpdateModal
-      visible={updateInfo.visible}
-      isMandatory={updateInfo.isMandatory}
-      latestVersion={updateInfo.latestVersion}
-      updateUrl={updateInfo.updateUrl}
-      releaseNotes={updateInfo.releaseNotes}
-      onClose={() => setUpdateInfo(prev => ({ ...prev, visible: false }))}
-    />
+    <>
+      <UpdateModal
+        visible={updateInfo.visible}
+        isMandatory={updateInfo.isMandatory}
+        latestVersion={updateInfo.latestVersion}
+        updateUrl={updateInfo.updateUrl}
+        releaseNotes={updateInfo.releaseNotes}
+        onClose={() => setUpdateInfo(prev => ({ ...prev, visible: false }))}
+      />
+      <RatingModal 
+        visible={showRating} 
+        onClose={() => setShowRating(false)} 
+      />
+    </>
   );
 }
 
@@ -181,6 +214,7 @@ function RootLayout() {
     const setupConfig = async () => {
       try {
         await initConfig();
+        await AdManager.init();
       } finally {
         setConfigLoaded(true);
       }
@@ -215,11 +249,11 @@ function RootLayout() {
                       <StatusBar style="dark" />
                       <DrawerLayout />
                       <NetworkMonitor />
-                      <Toast config={toastConfig} topOffset={45} />
                     </MenuProvider>
                   </SocketProvider>
                 </WeatherProvider>
               </AuthProvider>
+              <Toast config={toastConfig} topOffset={45} />
             </BottomSheetModalProvider>
           </ThemeProvider>
         </ErrorBoundary>

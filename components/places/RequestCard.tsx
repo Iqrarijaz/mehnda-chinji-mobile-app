@@ -2,13 +2,21 @@ import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import {
     ActivityIndicator,
     StyleSheet,
     TouchableOpacity,
     View,
+    Platform,
 } from 'react-native';
+import { Image } from 'expo-image';
+import Animated, { 
+    FadeIn, 
+    useAnimatedStyle, 
+    useSharedValue, 
+    withSpring 
+} from 'react-native-reanimated';
 import {
     Menu,
     MenuOptions,
@@ -26,15 +34,21 @@ interface RequestCardProps {
     onManage?: (item: any) => void;
 }
 
-const getStatusColor = (status: string) => {
+const getStatusConfig = (status: string) => {
     switch (status) {
-        case 'APPROVED': return '#10B981';
-        case 'REJECTED': return '#EF4444';
-        default: return '#F59E0B';
+        case 'APPROVED':
+            return { color: '#10B981', icon: 'checkmark-circle' as const, label: 'Approved' };
+        case 'REJECTED':
+            return { color: '#EF4444', icon: 'close-circle' as const, label: 'Rejected' };
+        case 'UNDER_REVIEW':
+            return { color: '#3B82F6', icon: 'eye' as const, label: 'Reviewing' };
+        default:
+            return { color: '#F59E0B', icon: 'time' as const, label: 'Pending' };
     }
 };
 
 const formatDateTime = (dateStr: string) => {
+    if (!dateStr) return 'N/A';
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-US', {
         day: 'numeric',
@@ -51,175 +65,143 @@ const RequestCard: React.FC<RequestCardProps> = ({
     onDelete,
     onManage
 }) => {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
-    const statusColor = getStatusColor(item.status);
+    const statusConfig = getStatusConfig(item.status);
     const isPending = item.status === 'PENDING';
+    const isApproved = item.status === 'APPROVED';
+    const isEducation = (item.category?.en || item.category) === 'education';
+    const canManage = isEducation && isApproved;
+    const hasActions = canManage || isPending || !isApproved;
+    
+    // Animation Shared Values
+    const scale = useSharedValue(1);
 
-    const [showMenu, setShowMenu] = useState(false);
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }]
+    }));
+
+    const onPressIn = () => {
+        scale.value = withSpring(0.99);
+    };
+
+    const onPressOut = () => {
+        scale.value = withSpring(1);
+    };
+
+    const mainImage = item.images?.[0] || item.image;
 
     return (
-        <View style={[
-            styles.card,
-            {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderLeftColor: categoryColor,
-            }
-        ]}>
-            {/* HEADER */}
-            <View style={styles.header}>
-                <View style={styles.titleContainer}>
-                    <ThemedText
-                        style={[styles.title, { color: colors.text }]}
-                        numberOfLines={2}
-                    >
-                        {item.name}
-                    </ThemedText>
-
-                    {item.type && (
-                        <View style={[
-                            styles.typeBadge,
-                            { backgroundColor: categoryColor + '15' }
-                        ]}>
-                            <ThemedText style={[
-                                styles.typeText,
-                                { color: categoryColor }
-                            ]}>
-                                {item.type.toUpperCase()}
+        <Animated.View 
+            entering={FadeIn.duration(300)}
+            style={[animatedStyle]}
+        >
+            <TouchableOpacity
+                activeOpacity={1}
+                onPressIn={onPressIn}
+                onPressOut={onPressOut}
+                disabled={true} // Tap function removed as per request
+                style={[
+                    styles.card,
+                    {
+                        backgroundColor: colors.card,
+                        shadowColor: '#000',
+                        shadowOpacity: isDark ? 0.3 : 0.05,
+                    }
+                ]}
+            >
+                <View style={styles.cardInner}>
+                    {/* Left: Image */}
+                    <View style={styles.imageContainer}>
+                        {mainImage ? (
+                            <Image
+                                source={{ uri: mainImage }}
+                                style={styles.image}
+                                contentFit="cover"
+                                transition={200}
+                            />
+                        ) : (
+                            <View style={[styles.placeholderImage, { backgroundColor: categoryColor + '15' }]}>
+                                <Ionicons name="location" size={28} color={categoryColor} />
+                            </View>
+                        )}
+                        
+                        {/* Category Chip Overlay */}
+                        <View style={[styles.categoryBadge, { backgroundColor: categoryColor }]}>
+                            <ThemedText style={styles.categoryText} numberOfLines={1}>
+                                {(item.category?.en || item.category || 'Place').split(' ')[0]}
                             </ThemedText>
                         </View>
-                    )}
-                </View>
-
-                <View style={[
-                    styles.statusBadge,
-                    { backgroundColor: statusColor + '18' }
-                ]}>
-                    <View style={[
-                        styles.statusDot,
-                        { backgroundColor: statusColor }
-                    ]} />
-                    <ThemedText style={[
-                        styles.statusText,
-                        { color: statusColor }
-                    ]}>
-                        {item.status}
-                    </ThemedText>
-                </View>
-            </View>
-
-            {/* CONTENT */}
-            <View style={styles.content}>
-                {item.address && (
-                    <View style={styles.infoSection}>
-                        <ThemedText style={[styles.infoLabel, { color: colors.text }]}>Address</ThemedText>
-                        <ThemedText style={[styles.infoText, { color: colors.textSecondary }]}>
-                            {item.address}
-                        </ThemedText>
                     </View>
-                )}
 
-                {item.description && (
-                    <View style={styles.infoSection}>
-                        <ThemedText style={[styles.infoLabel, { color: colors.text }]}>Description</ThemedText>
-                        <ThemedText style={[styles.infoText, { color: colors.textSecondary }]} numberOfLines={3}>
-                            {item.description}
-                        </ThemedText>
-                    </View>
-                )}
-
-                {item.contact && item.contact.length > 0 && (
-                    <View style={styles.infoSection}>
-                        <ThemedText style={[styles.infoLabel, { color: colors.text }]}>Contact</ThemedText>
-                        {item.contact.map((contact: any, index: number) => (
-                            contact.number && (
-                                <ThemedText
-                                    key={index}
-                                    style={[styles.infoText, { color: colors.textSecondary, marginBottom: 2 }]}
-                                    numberOfLines={1}
-                                >
-                                    {contact.name ? `${contact.name}: ` : ''}
-                                    {contact.number}
+                    {/* Right: Content */}
+                    <View style={styles.content}>
+                        <View style={styles.headerRow}>
+                            <ThemedText style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+                                {item.name}
+                            </ThemedText>
+                            
+                            {/* Status Pill */}
+                            <View style={[styles.statusPill, { backgroundColor: statusConfig.color + '15' }]}>
+                                <Ionicons name={statusConfig.icon} size={12} color={statusConfig.color} />
+                                <ThemedText style={[styles.statusLabel, { color: statusConfig.color }]}>
+                                    {statusConfig.label}
                                 </ThemedText>
-                            )
-                        ))}
-                    </View>
-                )}
-            </View>
+                            </View>
+                        </View>
 
-            {/* FOOTER */}
-            <View style={[
-                styles.footer,
-                { borderTopColor: colors.border }
-            ]}>
-                <View style={styles.timeContainer}>
-                    <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
-                    <ThemedText style={[styles.timeText, { color: colors.textSecondary }]}>
-                        {formatDateTime(item.createdAt)}
-                    </ThemedText>
-                </View>
+                        <ThemedText style={[styles.address, { color: colors.textSecondary }]} numberOfLines={1}>
+                            {item.address || item.village || 'No address provided'}
+                        </ThemedText>
 
-                {isPending && (
-                    <View>
-                        <Menu opened={showMenu} onBackdropPress={() => setShowMenu(false)}>
-                            <MenuTrigger
-                                onPress={() => setShowMenu(true)}
-                                customStyles={{
-                                    triggerWrapper: styles.moreBtn,
-                                }}
-                            >
-                                {isDeleting ? (
-                                    <ActivityIndicator size="small" color="#EF4444" />
-                                ) : (
-                                    <Ionicons name="ellipsis-horizontal" size={20} color={colors.textSecondary} />
+                        <View style={styles.footerRow}>
+                            <View style={styles.metaInfo}>
+                                <Ionicons name="calendar-outline" size={12} color={colors.textSecondary} />
+                                <ThemedText style={[styles.metaText, { color: colors.textSecondary }]}>
+                                    {formatDateTime(item.createdAt)}
+                                </ThemedText>
+                            </View>
+
+                            {/* Action Menu */}
+                            <View style={styles.actions}>
+                                {hasActions && (
+                                    <Menu>
+                                        <MenuTrigger customStyles={{ triggerWrapper: styles.menuBtn }}>
+                                            {isDeleting ? (
+                                                <ActivityIndicator size="small" color="#EF4444" />
+                                            ) : (
+                                                <Ionicons name="ellipsis-horizontal-circle" size={26} color={colors.textSecondary} />
+                                            )}
+                                        </MenuTrigger>
+                                        <MenuOptions customStyles={{ optionsContainer: [styles.menuOptions, { backgroundColor: colors.card, borderColor: colors.border }] }}>
+                                            {canManage && (
+                                                <MenuOption onSelect={() => onManage?.(item)} style={styles.menuItem}>
+                                                    <Ionicons name="settings-outline" size={18} color={colors.primary} />
+                                                    <ThemedText style={styles.menuText}>Manage Toppers/Events</ThemedText>
+                                                </MenuOption>
+                                            )}
+                                            {isPending && (
+                                                <MenuOption onSelect={() => onEdit(item)} style={styles.menuItem}>
+                                                    <Ionicons name="create-outline" size={18} color="#3B82F6" />
+                                                    <ThemedText style={styles.menuText}>Edit Request</ThemedText>
+                                                </MenuOption>
+                                            )}
+                                            {!isApproved && (
+                                                <MenuOption onSelect={() => onDelete(item._id, item.name)} style={styles.menuItem}>
+                                                    <Ionicons name="trash-outline" size={18} color="#EF4444" />
+                                                    <ThemedText style={[styles.menuText, { color: '#EF4444' }]}>Delete Request</ThemedText>
+                                                </MenuOption>
+                                            )}
+                                        </MenuOptions>
+                                    </Menu>
                                 )}
-                            </MenuTrigger>
-
-                            <MenuOptions
-                                customStyles={{
-                                    optionsContainer: [
-                                        styles.menu,
-                                        {
-                                            backgroundColor: colors.background,
-                                            borderColor: colors.border,
-                                        }
-                                    ],
-                                }}
-                            >
-                                <MenuOption
-                                    onSelect={() => {
-                                        setShowMenu(false);
-                                        onEdit(item);
-                                    }}
-                                    customStyles={{
-                                        optionWrapper: styles.menuItem,
-                                    }}
-                                >
-                                    <Ionicons name="create-outline" size={16} color="#3B82F6" />
-                                    <ThemedText style={{ color: colors.text }}>Edit</ThemedText>
-                                </MenuOption>
-
-                                <MenuOption
-                                    onSelect={() => {
-                                        setShowMenu(false);
-                                        onDelete(item._id, item.name);
-                                    }}
-                                    disabled={isDeleting}
-                                    customStyles={{
-                                        optionWrapper: styles.menuItem,
-                                    }}
-                                >
-                                    <Ionicons name="trash-outline" size={16} color="#EF4444" />
-                                    <ThemedText style={{ color: '#EF4444' }}>Delete</ThemedText>
-                                </MenuOption>
-                            </MenuOptions>
-                        </Menu>
+                            </View>
+                        </View>
                     </View>
-                )}
-            </View>
-        </View>
+                </View>
+            </TouchableOpacity>
+        </Animated.View>
     );
 };
 
@@ -227,48 +209,75 @@ export default React.memo(RequestCard);
 
 const styles = StyleSheet.create({
     card: {
-        marginBottom: 12,
-        borderRadius: Layout.borderRadius,
-        borderWidth: 1,
-        borderLeftWidth: 4,
-        padding: 14,
-        elevation: 2,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        borderRadius: 20,
+        ...Platform.select({
+            ios: {
+                shadowOffset: { width: 0, height: 8 },
+                shadowRadius: 12,
+            },
+            android: {
+                elevation: 4,
+            }
+        }),
     },
-
-    header: {
+    cardInner: {
+        flexDirection: 'row',
+        padding: 12,
+    },
+    imageContainer: {
+        position: 'relative',
+        width: 86,
+        height: 86,
+        borderRadius: 16,
+        overflow: 'hidden',
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+    },
+    placeholderImage: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    categoryBadge: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingVertical: 2,
+        alignItems: 'center',
+        opacity: 0.9,
+    },
+    categoryText: {
+        color: '#FFFFFF',
+        fontSize: 9,
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    content: {
+        flex: 1,
+        marginLeft: 14,
+        justifyContent: 'space-between',
+        paddingVertical: 2,
+    },
+    headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: 10,
     },
-
-    titleContainer: {
-        flex: 1,
-        marginRight: 10,
-    },
-
     title: {
         fontSize: 16,
         fontWeight: '800',
-        lineHeight: 22,
+        flex: 1,
+        marginRight: 8,
         textTransform: 'capitalize',
     },
-
-    typeBadge: {
-        alignSelf: 'flex-start',
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 6,
-        marginTop: 6,
-    },
-
-    typeText: {
-        fontSize: 10,
-        fontWeight: '700',
-        letterSpacing: 0.6,
-    },
-
-    statusBadge: {
+    statusPill: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 8,
@@ -276,73 +285,63 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         gap: 4,
     },
-
-    statusDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-    },
-
-    statusText: {
+    statusLabel: {
         fontSize: 10,
-        fontWeight: '800',
+        fontWeight: '900',
+        textTransform: 'uppercase',
     },
-
-    content: {
-        marginBottom: 10,
-    },
-
-    infoSection: {
-        marginBottom: 8,
-    },
-    infoLabel: {
-        fontWeight: 'bold',
+    address: {
         fontSize: 13,
+        fontWeight: '500',
+        marginTop: -4,
     },
-    infoText: {
-        fontSize: 13,
-        flex: 1,
-        textTransform: 'capitalize',
-    },
-
-    footer: {
+    footerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderTopWidth: 1,
-        paddingTop: 10,
     },
-
-    timeContainer: {
+    metaInfo: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 4,
     },
-
-    timeText: {
-        fontSize: 12,
+    metaText: {
+        fontSize: 11,
+        fontWeight: '600',
     },
-
-    moreBtn: {
-        padding: 6,
+    actions: {
+        flexDirection: 'row',
     },
-
-    overlay: {
-        flex: 1,
+    menuBtn: {
+        padding: 4,
+        marginRight: -4,
     },
-
-    menu: {
-        width: 150,
-        borderRadius: 10,
+    menuOptions: {
+        width: 200,
+        borderRadius: 14,
         borderWidth: 1,
         padding: 8,
-        elevation: 6,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 10,
+            },
+            android: {
+                elevation: 10,
+            }
+        }),
     },
-
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        paddingVertical: 8,
+        gap: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 8,
     },
+    menuText: {
+        fontSize: 14,
+        fontWeight: '600',
+    }
 });

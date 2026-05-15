@@ -70,6 +70,12 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
             setLastDonationDate(null);
         } else {
             setAddress(capitalize(user?.user?.address || user?.user?.village || ''));
+            // Preload interstitial ad
+            if (user?.user?.role !== 'APP_ADMIN') {
+                import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                    InterstitialService.getInstance().load();
+                });
+            }
         }
     }, [visible, user]);
 
@@ -86,6 +92,14 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                 });
                 onSuccess();
                 onClose();
+
+                if (user?.user?.role !== 'APP_ADMIN') {
+                    setTimeout(() => {
+                        import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                            InterstitialService.getInstance().show(true);
+                        });
+                    }, 2000);
+                }
             }
         },
         onError: (error: any) => {

@@ -1,0 +1,32 @@
+MONETIZATION INVENTORY
+
+FORMAT: [Location] -> [Ad Type] (Implementation Details)
+
+1. GLOBAL / LIFECYCLE
+   - App Open Ad: Shown on app resume/foregrounding.
+     * Suppression Policy: Disabled on (auth), onboarding, terms, privacy, and weather screens.
+   - Interstitial Ad: Preloaded globally.
+     * Usage: Manual triggers during high-value transitions.
+
+2. HOME SCREEN
+   - Banner Ad: Anchored Adaptive Banner.
+     * Placement: Positioned directly under the HomeHeader (full-width, no padding).
+
+3. WEATHER SCREEN (Quiet Monetization Policy)
+   - Native Ad Card: Medium Rectangle (300x250).
+     * Placement: Injected between WeatherHero (Current) and WeatherStats.
+   - Banner Ad: Anchored Adaptive Banner.
+     * Placement: Positioned at the bottom of the ScrollView (full-width).
+   - App Open Ad: SUPPRESSED (Utility focus).
+
+4. CATEGORY LISTING SCREEN
+   - Native Ad Card: Medium Rectangle (300x250).
+     * Placement: Injected into the FlatList every 6 items (All tab only).
+
+5. DRAWER / NAVIGATION
+   - Rewarded Ad: High-value video ad.
+     * Trigger: "Watch Ad" menu item in the CustomDrawerContent.
+
+6. CORE COMPONENTS (ads/components)
+   - BannerAd.tsx: Handles loading state, adaptive sizing, and themed placeholders.
+   - NativeAd.tsx: Handles loading state, "Sponsored" branding, and themed card styling.

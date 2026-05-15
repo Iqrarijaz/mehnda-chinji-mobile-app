@@ -93,14 +93,18 @@ const PlaceDetailScreen = () => {
 
     const handleShare = useCallback(async () => {
         try {
+            const shareUrl = `https://api.rehbarapp.com/place/${id}`;
+            const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.rehbar.community';
+
             await Share.share({
-                message: `Check out ${placeName} on Rehbar!\n📍 ${address}\n📞 ${place?.phone || 'Contact for details'}`,
-                title: placeName,
+                title: `Check out ${placeName} on Rehbar`,
+                message: `Check out ${placeName} on Rehbar!\n\n📍 ${address}\n\nView details: ${shareUrl}\n\nDon't have the app? Get it here: ${playStoreUrl}`,
+                url: shareUrl,
             });
         } catch (error: any) {
             Alert.alert(error.message);
         }
-    }, [placeName, address, place?.phone]);
+    }, [id, placeName, address]);
 
     const handleNavigate = useCallback(() => {
         if (coordinates) {

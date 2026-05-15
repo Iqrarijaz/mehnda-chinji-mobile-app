@@ -28,8 +28,6 @@ import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 const BusinessRegistrationScreen = () => {
     const router = useRouter();
     const { editData: editDataParam } = useLocalSearchParams<{ editData?: string }>();
@@ -50,6 +48,7 @@ const BusinessRegistrationScreen = () => {
     });
 
     const [professionModalVisible, setProfessionModalVisible] = useState(false);
+    const [descriptionError, setDescriptionError] = useState('');
 
     const handleGoBack = () => {
         router.replace('/(drawer)/(tabs)/business');
@@ -72,6 +71,11 @@ const BusinessRegistrationScreen = () => {
 
     // Initial state setup
     useEffect(() => {
+        if (!editData && user?.user?.role !== 'APP_ADMIN') {
+            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                InterstitialService.getInstance().load();
+            });
+        }
         if (editData) {
             setForm({
                 name: editData.name || '',
@@ -106,6 +110,13 @@ const BusinessRegistrationScreen = () => {
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
                 Toast.show({ type: 'success', text1: 'Success', text2: 'Business registered!' });
                 handleGoBack();
+                if (user?.user?.role !== 'APP_ADMIN') {
+                    setTimeout(() => {
+                        import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                            InterstitialService.getInstance().show(true);
+                        });
+                    }, 2000);
+                }
             }
         },
         onError: (err: any) => {
@@ -131,10 +142,21 @@ const BusinessRegistrationScreen = () => {
     const handleSubmit = () => {
         const { name, category, phone, address, description } = form;
 
-        if (!name || !category || !phone || !address || !description) {
+        let hasError = false;
+
+        if (!name || !category || !phone || !address) {
             Toast.show({ type: 'error', text1: 'Fields Required', text2: 'Please fill all fields marked with *' });
-            return;
+            hasError = true;
         }
+
+        if (description && description.length > 0 && description.length < 100) {
+            setDescriptionError('Description must be at least 100 characters long if provided.');
+            hasError = true;
+        } else {
+            setDescriptionError('');
+        }
+
+        if (hasError) return;
 
         const payload = {
             name,
@@ -199,7 +221,7 @@ const BusinessRegistrationScreen = () => {
                             <TextInput
                                 style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
                                 placeholder="Your business name"
-                                placeholderTextColor={colors.icon}
+                                placeholderTextColor="#9CA3AF"
                                 value={form.name}
                                 onChangeText={(text) => setForm(prev => ({ ...prev, name: text }))}
                             />
@@ -212,7 +234,7 @@ const BusinessRegistrationScreen = () => {
                                 style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', borderColor: colors.border, justifyContent: 'center' }]}
                                 onPress={() => setProfessionModalVisible(true)}
                             >
-                                <ThemedText style={{ color: form.category ? colors.text : colors.icon, fontSize: 13, fontWeight: '600' }}>
+                                <ThemedText style={{ color: form.category ? colors.text : '#9CA3AF', fontSize: 13, fontWeight: '600' }}>
                                     {form.category ? `${form.category.name_eng} - ${form.category.name_ur}` : 'Select Category'}
                                 </ThemedText>
                             </TouchableOpacity>
@@ -224,7 +246,7 @@ const BusinessRegistrationScreen = () => {
                             <TextInput
                                 style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
                                 placeholder="Shop #, Street, Area"
-                                placeholderTextColor={colors.icon}
+                                placeholderTextColor="#9CA3AF"
                                 value={form.address}
                                 onChangeText={(text) => setForm(prev => ({ ...prev, address: text }))}
                             />
@@ -236,7 +258,7 @@ const BusinessRegistrationScreen = () => {
                             <TextInput
                                 style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
                                 placeholder="e.g. 03xx xxxxxxx"
-                                placeholderTextColor={colors.icon}
+                                placeholderTextColor="#9CA3AF"
                                 value={form.phone}
                                 onChangeText={(text) => setForm(prev => ({ ...prev, phone: text }))}
                                 keyboardType="phone-pad"
@@ -245,16 +267,29 @@ const BusinessRegistrationScreen = () => {
 
                         {/* Description */}
                         <View style={styles.field}>
-                            <ThemedText style={styles.label}>Description <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <ThemedText style={styles.label}>Description</ThemedText>
+                                <ThemedText style={{ fontSize: 12, color: (form.description.length > 0 && form.description.length < 100) ? '#EF4444' : colors.textSecondary, marginBottom: 6 }}>
+                                    {form.description.length}/100 min
+                                </ThemedText>
+                            </View>
                             <TextInput
-                                style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
+                                style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: descriptionError ? '#EF4444' : colors.border }]}
                                 placeholder="Tell us about your services..."
-                                placeholderTextColor={colors.icon}
+                                placeholderTextColor="#9CA3AF"
                                 value={form.description}
-                                onChangeText={(text) => setForm(prev => ({ ...prev, description: text }))}
+                                onChangeText={(text) => {
+                                    setForm(prev => ({ ...prev, description: text }));
+                                    if (text.length === 0 || text.length >= 100) setDescriptionError('');
+                                }}
                                 multiline
                                 numberOfLines={4}
                             />
+                            {!!descriptionError && (
+                                <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>
+                                    {descriptionError}
+                                </ThemedText>
+                            )}
                         </View>
 
                         {/* Footer Actions */}

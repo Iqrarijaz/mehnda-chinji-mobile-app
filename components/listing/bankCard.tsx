@@ -19,9 +19,10 @@ import { Colors } from '@/constants/colors';
 
 interface BankCardProps {
     business: any;
+    onReport?: () => void;
 }
 
-const BankCard = React.memo(({ business }: BankCardProps) => {
+const BankCard = React.memo(({ business, onReport }: BankCardProps) => {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const colors = Colors[theme];
@@ -92,6 +93,19 @@ const BankCard = React.memo(({ business }: BankCardProps) => {
                         <ThemedText style={[styles.addressText, { color: isDark ? '#FFFFFF' : colors.textSecondary }]} numberOfLines={1}>
                             {address}
                         </ThemedText>
+                        
+                        {onReport && (
+                            <TouchableOpacity 
+                                style={styles.reportBtn} 
+                                onPress={(e) => {
+                                    e.stopPropagation();
+                                    onReport();
+                                }}
+                            >
+                                <Ionicons name="flag-outline" size={12} color="#EF4444" />
+                                <ThemedText style={styles.reportText}>Report</ThemedText>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
             </TouchableOpacity>
@@ -151,5 +165,20 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
         textAlign: 'center',
+    },
+    reportBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        marginTop: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+        backgroundColor: 'rgba(239, 68, 68, 0.08)',
+    },
+    reportText: {
+        fontSize: 11,
+        fontWeight: '600',
+        color: '#EF4444',
     },
 });

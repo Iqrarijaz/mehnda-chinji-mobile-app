@@ -28,11 +28,12 @@ import { useRouter } from 'expo-router';
 
 interface BusinessCardProps {
     business: any;
+    onReport?: () => void;
 }
 
 const isAndroid = Platform.OS === 'android';
 
-const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
+const BusinessCard = React.memo(({ business, onReport }: BusinessCardProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
@@ -147,8 +148,7 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
                                                 <MenuOption
                                                     onSelect={() => {
                                                         setShowMenu(false);
-                                                        // Report logic
-                                                        Alert.alert("Report", "Reporting functionality coming soon.");
+                                                        onReport?.();
                                                     }}
                                                     customStyles={{
                                                         optionWrapper: styles.menuItem,
@@ -190,16 +190,7 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
                     ) : null}
 
                     <View style={[styles.footer, { borderTopColor: colors.border + '30' }]}>
-                        {business?.phone ? (
-                            <TouchableOpacity
-                                style={[styles.actionBtn, { backgroundColor: colors.primary }]}
-                                activeOpacity={0.7}
-                                onPress={handleCall}
-                            >
-                                <Ionicons name="call" size={14} color="#FFFFFF" />
-                                <ThemedText style={styles.actionBtnText}>Call Business</ThemedText>
-                            </TouchableOpacity>
-                        ) : null}
+
                         
                         <TouchableOpacity
                             style={[styles.viewBtn, { borderColor: colors.primary + '30' }]}

@@ -2,6 +2,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { useAddPost, useUpdatePost, useDeletePostImage } from '@/hooks/usePosts';
+import { usePostCategories } from '@/hooks/useConfiguration';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
@@ -28,12 +29,7 @@ interface PostModalProps {
     editingPost?: any; // If provided, we are in edit mode
 }
 
-const CATEGORIES = [
-    { label: 'General', value: 'GENERAL', icon: 'newspaper-outline', color: '#007AFF' },
-    { label: 'Sports', value: 'SPORTS', icon: 'football-outline', color: '#4CD964' },
-    { label: 'Death', value: 'DEATH', icon: 'ribbon-outline', color: '#333333' },
-    { label: 'Accident', value: 'ACCIDENT', icon: 'warning-outline', color: '#FF3B30' },
-];
+
 
 export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => {
     const { theme } = useTheme();
@@ -41,9 +37,14 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
     const insets = useSafeAreaInsets();
 
     const [content, setContent] = useState('');
-    const [type, setType] = useState('GENERAL');
+    const [type, setType] = useState('General');
     const [images, setImages] = useState<any[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+    const { data: categoriesData, isLoading: categoriesLoading } = usePostCategories();
+    // The array is nested inside categoriesData.data.data based on the backend response format
+    const categories = categoriesData?.data?.data || [];
 
     const addPostMutation = useAddPost();
     const updatePostMutation = useUpdatePost();
@@ -52,15 +53,25 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
     useEffect(() => {
         if (editingPost) {
             setContent(editingPost.content || '');
-            setType(editingPost.type || 'GENERAL');
-            // For images, we might need to handle them differently if they are URLs vs assets
+            setType(editingPost.type || 'General');
             setImages(editingPost.images || []);
         } else {
             setContent('');
-            setType('GENERAL');
+            setType('General');
             setImages([]);
         }
     }, [editingPost, visible]);
+
+    useEffect(() => {
+        if (!editingPost && categories.length > 0 && type === 'General') {
+            const hasGeneral = categories.some((c: any) => c.name === 'General');
+            if (!hasGeneral) {
+                setType(categories[0].name);
+            }
+        }
+    }, [categories, editingPost, visible]);
+
+    const selectedCategory = categories.find((c: any) => c.name === type);
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -77,13 +88,13 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
 
     const removeImage = async (index: number) => {
         const image = images[index];
-        
+
         // If it's an existing image (string URL), delete it from backend
         if (typeof image === 'string' && editingPost) {
             try {
-                await deleteImageMutation.mutateAsync({ 
-                    postId: editingPost._id, 
-                    imageUrl: image 
+                await deleteImageMutation.mutateAsync({
+                    postId: editingPost._id,
+                    imageUrl: image
                 });
                 Toast.show({ type: 'success', text1: 'Image removed' });
             } catch (error: any) {
@@ -91,7 +102,7 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
                 return;
             }
         }
-        
+
         setImages(images.filter((_, i) => i !== index));
     };
 
@@ -151,55 +162,93 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
                         <Ionicons name="close" size={24} color={colors.text} />
                     </TouchableOpacity>
                     <ThemedText style={styles.headerTitle}>{editingPost ? 'Edit Post' : 'Create News Post'}</ThemedText>
-                    <TouchableOpacity 
-                        onPress={handleSubmit} 
-                        disabled={isSubmitting} 
-                        style={[styles.postButton, { backgroundColor: content.trim() ? colors.primary : colors.border }]}
-                    >
-                        {isSubmitting ? (
-                            <ActivityIndicator size="small" color="#fff" />
-                        ) : (
-                            <ThemedText style={styles.postButtonText}>{editingPost ? 'Update' : 'Post'}</ThemedText>
-                        )}
-                    </TouchableOpacity>
+                    <View style={{ width: 32 }} />
                 </View>
 
-                <KeyboardAvoidingView 
+                <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={{ flex: 1 }}
                 >
                     <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-                        {/* Category Selection */}
-                        <ThemedText style={styles.sectionLabel}>Select Category</ThemedText>
-                        <View style={styles.categoryContainer}>
-                            {CATEGORIES.map((cat) => (
-                                <TouchableOpacity
-                                    key={cat.value}
-                                    onPress={() => setType(cat.value)}
-                                    style={[
-                                        styles.categoryItem,
-                                        { 
-                                            borderColor: type === cat.value ? cat.color : colors.border,
-                                            backgroundColor: type === cat.value ? `${cat.color}15` : 'transparent'
-                                        }
-                                    ]}
-                                >
-                                    <Ionicons 
-                                        name={cat.icon as any} 
-                                        size={18} 
-                                        color={type === cat.value ? cat.color : colors.textSecondary} 
-                                    />
-                                    <ThemedText 
-                                        style={[
-                                            styles.categoryText, 
-                                            { color: type === cat.value ? cat.color : colors.textSecondary }
-                                        ]}
-                                    >
-                                        {cat.label}
-                                    </ThemedText>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                        {/* Category Selection Dropdown */}
+                        <ThemedText style={styles.sectionLabel}>News Category</ThemedText>
+                        <TouchableOpacity 
+                            style={[styles.dropdownTrigger, { borderColor: colors.border, backgroundColor: colors.card }]}
+                            onPress={() => setIsDropdownVisible(true)}
+                        >
+                            <View style={styles.dropdownValue}>
+                                {selectedCategory ? (
+                                    <>
+                                        <View style={styles.categoryIconColumn}>
+                                            <Image 
+                                                source={{ uri: selectedCategory.icon }} 
+                                                style={styles.categoryIcon}
+                                                contentFit="contain"
+                                            />
+                                        </View>
+                                        <ThemedText style={styles.dropdownText}>{selectedCategory.name}</ThemedText>
+                                    </>
+                                ) : (
+                                    <ThemedText style={[styles.dropdownText, { color: colors.textSecondary }]}>Select Category</ThemedText>
+                                )}
+                            </View>
+                            <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
+                        </TouchableOpacity>
+
+                        {/* Category Modal */}
+                        <Modal
+                            visible={isDropdownVisible}
+                            transparent={true}
+                            animationType="fade"
+                            onRequestClose={() => setIsDropdownVisible(false)}
+                        >
+                            <TouchableOpacity 
+                                style={styles.modalOverlay} 
+                                activeOpacity={1} 
+                                onPress={() => setIsDropdownVisible(false)}
+                            >
+                                <View style={[styles.dropdownMenu, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                                    <View style={styles.menuHeader}>
+                                        <ThemedText style={styles.menuTitle}>Select Category</ThemedText>
+                                        <TouchableOpacity onPress={() => setIsDropdownVisible(false)}>
+                                            <Ionicons name="close" size={24} color={colors.text} />
+                                        </TouchableOpacity>
+                                    </View>
+                                    {categoriesLoading ? (
+                                        <ActivityIndicator size="small" color={colors.primary} style={{ margin: 20 }} />
+                                    ) : (
+                                        <ScrollView bounces={false} style={{ maxHeight: 350 }}>
+                                            {categories.map((cat: any) => (
+                                                <TouchableOpacity
+                                                    key={cat.name}
+                                                    style={[
+                                                        styles.menuItem,
+                                                        type === cat.name && { backgroundColor: colors.primary + '10' }
+                                                    ]}
+                                                    onPress={() => {
+                                                        setType(cat.name);
+                                                        setIsDropdownVisible(false);
+                                                    }}
+                                                >
+                                                    <View style={styles.categoryIconColumn}>
+                                                        <Image source={{ uri: cat.icon }} style={styles.categoryIcon} contentFit="contain" />
+                                                    </View>
+                                                    <ThemedText style={[
+                                                        styles.menuItemText,
+                                                        type === cat.name && { color: colors.primary, fontWeight: '700' }
+                                                    ]}>
+                                                        {cat.name}
+                                                    </ThemedText>
+                                                    {type === cat.name && (
+                                                        <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                                                    )}
+                                                </TouchableOpacity>
+                                            ))}
+                                        </ScrollView>
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+                        </Modal>
 
                         {/* Content Input */}
                         <TextInput
@@ -215,7 +264,11 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
                         {/* Image Selection */}
                         <ThemedText style={styles.sectionLabel}>Media</ThemedText>
                         <View style={styles.imageSection}>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={{ paddingRight: 20, paddingTop: 10, paddingLeft: 4 }}
+                            >
                                 {images.map((img, index) => (
                                     <View key={index} style={styles.imageWrapper}>
                                         <Image
@@ -243,6 +296,29 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
                             </ScrollView>
                         </View>
                     </ScrollView>
+
+                    {/* Fixed Footer with Post Button */}
+                    <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+                        <TouchableOpacity
+                            onPress={handleSubmit}
+                            disabled={isSubmitting || !content.trim()}
+                            style={[
+                                styles.mainPostButton,
+                                { backgroundColor: content.trim() ? colors.primary : colors.border }
+                            ]}
+                        >
+                            {isSubmitting ? (
+                                <ActivityIndicator size="small" color="#fff" />
+                            ) : (
+                                <View style={styles.buttonContent}>
+                                    <Ionicons name={editingPost ? "save-outline" : "send"} size={20} color="#fff" style={{ marginRight: 8 }} />
+                                    <ThemedText style={styles.mainPostButtonText}>
+                                        {editingPost ? 'Update News' : 'Share News Now'}
+                                    </ThemedText>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+                    </View>
                 </KeyboardAvoidingView>
             </ThemedView>
         </Modal>
@@ -285,6 +361,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 16,
+        paddingBottom: 40,
     },
     sectionLabel: {
         fontSize: 14,
@@ -294,24 +371,81 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
-    categoryContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginBottom: 24,
-        gap: 10,
-    },
-    categoryItem: {
+    dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
+        justifyContent: 'space-between',
+        height: 56,
         borderRadius: Layout.borderRadius,
         borderWidth: 1,
+        paddingHorizontal: 12,
+        marginBottom: 24,
+    },
+    dropdownValue: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    dropdownText: {
+        fontSize: 15,
+        fontWeight: '600',
+        marginLeft: 8,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
+    },
+    dropdownMenu: {
+        width: '100%',
+        borderRadius: Layout.borderRadius,
+        borderWidth: 1,
+        paddingVertical: 12,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+    },
+    menuHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingBottom: 12,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: 'rgba(0,0,0,0.1)',
+        marginBottom: 8,
+    },
+    menuTitle: {
+        fontSize: 16,
+        fontWeight: '800',
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+    },
+    menuItemText: {
+        flex: 1,
+        fontSize: 15,
+        marginLeft: 12,
+    },
+    categoryIconColumn: {
+        width: 32,
+        height: 32,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    categoryIcon: {
+        width: 28,
+        height: 28,
     },
     categoryText: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: '600',
-        marginLeft: 6,
     },
     input: {
         fontSize: 17,
@@ -325,25 +459,33 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     imageWrapper: {
-        marginRight: 12,
+        marginRight: 20,
+        marginTop: 10,
         position: 'relative',
     },
     previewImage: {
-        width: 100,
-        height: 100,
-        borderRadius: Layout.borderRadius,
+        width: 110,
+        height: 110,
+        borderRadius: 14,
     },
     removeIcon: {
         position: 'absolute',
-        top: -8,
-        right: -8,
+        top: -10,
+        right: -10,
         backgroundColor: '#FFFFFF',
-        borderRadius: Layout.borderRadius,
+        borderRadius: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        elevation: 4,
+        zIndex: 10,
     },
     uploadButton: {
-        width: 100,
-        height: 100,
-        borderRadius: Layout.borderRadius,
+        width: 110,
+        height: 110,
+        marginTop: 10,
+        borderRadius: 14,
         borderWidth: 1,
         borderStyle: 'dashed',
         justifyContent: 'center',
@@ -354,5 +496,31 @@ const styles = StyleSheet.create({
         marginTop: 4,
         opacity: 0.7,
         fontWeight: '600',
+    },
+    footer: {
+        padding: 16,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: 'rgba(0,0,0,0.1)',
+        backgroundColor: 'transparent',
+    },
+    mainPostButton: {
+        height: 56,
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 5,
+    },
+    buttonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    mainPostButtonText: {
+        color: '#FFFFFF',
+        fontWeight: '700',
+        fontSize: 16,
     },
 });

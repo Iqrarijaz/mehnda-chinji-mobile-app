@@ -2,7 +2,7 @@ import apiClient from '../client';
 
 export interface ReportPayload {
     targetId: string;
-    targetType: 'BUSINESS' | 'DONOR' | 'PLACE';
+    targetType: 'BUSINESS' | 'DONOR' | 'PLACE' | 'POST';
     reason: string;
     description?: string;
 }

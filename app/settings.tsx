@@ -12,6 +12,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
+import { ReviewService } from '@/utils/review';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -107,6 +108,12 @@ export default function SettingsScreen() {
                                 label="Push Notifications"
                                 subtitle="Control which alerts you receive"
                                 onPress={() => router.push('/manageNotifications')}
+                            />
+                            <SettingRowItem
+                                icon="star-outline"
+                                label="Rate App"
+                                subtitle="Enjoying Rehbar? Let us know!"
+                                onPress={() => ReviewService.openStore()}
                             />
                             {/* <SettingRowItem
                                 icon="moon-outline"

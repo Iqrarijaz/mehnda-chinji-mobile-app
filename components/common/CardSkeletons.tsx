@@ -96,6 +96,34 @@ export const ChatCardSkeleton = () => {
     );
 };
 
+/**
+ * RequestCardSkeleton matches the layout of components/places/RequestCard.tsx
+ */
+export const RequestCardSkeleton = () => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+    return (
+        <View style={[styles.requestCard, { backgroundColor: colors.card }]}>
+            <View style={styles.row}>
+                <Skeleton width={80} height={80} borderRadius={16} />
+                <View style={styles.content}>
+                    <View style={[styles.row, { justifyContent: 'space-between', marginBottom: 8, alignItems: 'flex-start' }]}>
+                        <Skeleton width="60%" height={18} borderRadius={4} />
+                        <Skeleton width={75} height={24} borderRadius={12} />
+                    </View>
+                    <Skeleton width="40%" height={14} borderRadius={4} style={{ marginBottom: 12 }} />
+                    <View style={styles.row}>
+                        <Skeleton width={100} height={12} borderRadius={4} />
+                        <View style={{ flex: 1 }} />
+                        <Skeleton width={24} height={24} borderRadius={12} />
+                        <Skeleton width={24} height={24} borderRadius={12} style={{ marginLeft: 8 }} />
+                    </View>
+                </View>
+            </View>
+        </View>
+    );
+};
+
 const styles = StyleSheet.create({
     businessCard: {
         borderRadius: 16,
@@ -145,5 +173,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 8,
         borderTopWidth: StyleSheet.hairlineWidth,
+    },
+    requestCard: {
+        borderRadius: 20,
+        padding: 12,
+        marginBottom: 16,
+        marginHorizontal: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 2,
     },
 });

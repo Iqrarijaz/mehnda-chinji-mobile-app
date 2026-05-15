@@ -23,6 +23,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
+import { toastConfig } from '../toastConfig';
 import { ThemedText } from '@/components/themedText';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -93,7 +94,14 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
         }, [ref]);
 
         const handleSubmit = async () => {
-            if (!selectedReason) return;
+            if (!selectedReason) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Reason Required',
+                    text2: 'Please select a reason for reporting.'
+                });
+                return;
+            }
 
             setIsSubmitting(true);
             try {
@@ -135,39 +143,6 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
             []
         );
 
-        const renderFooter = useCallback(
-            (props: any) => (
-                <BottomSheetFooter {...props} bottomInset={0}>
-                    <View style={[styles.footer, {
-                        paddingBottom: isAndroid ? (keyboardHeight > 0 ? 20 : 16) : 28,
-                        marginBottom: isAndroid ? keyboardHeight : 0,
-                        backgroundColor: colors.background,
-                        borderTopWidth: 1,
-                        borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
-                    }]}>
-                        <TouchableOpacity
-                            style={[
-                                styles.submitButton,
-                                {
-                                    backgroundColor: selectedReason && !isSubmitting ? colors.primary : colors.icon,
-                                    shadowOpacity: selectedReason ? 0.3 : 0.05
-                                }
-                            ]}
-                            onPress={handleSubmit}
-                            disabled={!selectedReason || isSubmitting}
-                            activeOpacity={0.8}
-                        >
-                            {isSubmitting ? (
-                                <ActivityIndicator color="#FFFFFF" />
-                            ) : (
-                                <ThemedText style={styles.submitButtonText}>Submit Report</ThemedText>
-                            )}
-                        </TouchableOpacity>
-                    </View>
-                </BottomSheetFooter>
-            ),
-            [selectedReason, isSubmitting, colors, isDark, handleSubmit]
-        );
 
         return (
             <BottomSheetModal
@@ -175,7 +150,6 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                 index={0}
                 snapPoints={snapPoints}
                 backdropComponent={renderBackdrop}
-                footerComponent={renderFooter}
                 backgroundStyle={{ backgroundColor: colors.background }}
                 handleIndicatorStyle={{ backgroundColor: colors.icon }}
                 enablePanDownToClose={!isSubmitting}
@@ -183,95 +157,117 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                 keyboardBlurBehavior="restore"
                 android_keyboardInputMode="adjustResize"
             >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View style={styles.container}>
-                        {/* Header Section */}
-                        <View style={styles.header}>
-                            <View style={styles.headerLeft}>
-                                <Ionicons name="warning-outline" size={24} color="#EF4444" style={styles.headerIcon} />
-                                <View>
-                                    <ThemedText style={styles.title}>Report</ThemedText>
-                                    <ThemedText style={styles.subtitle}>Help us understand the issue</ThemedText>
-                                </View>
+                <BottomSheetScrollView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={[
+                        styles.scrollContent,
+                        isAndroid && { paddingBottom: 90 + keyboardHeight }
+                    ]}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    {/* Header Section */}
+                    <View style={styles.header}>
+                        <View style={styles.headerLeft}>
+                            <Ionicons name="warning-outline" size={24} color="#EF4444" style={styles.headerIcon} />
+                            <View>
+                                <ThemedText style={styles.title}>Report</ThemedText>
+                                <ThemedText style={styles.subtitle}>Help us understand the issue</ThemedText>
                             </View>
-                            <TouchableOpacity onPress={handleCloseModalPress} disabled={isSubmitting} style={styles.closeButton}>
-                                <Ionicons name="close" size={24} color={colors.icon} />
-                            </TouchableOpacity>
                         </View>
-                        <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]} />
+                        <TouchableOpacity onPress={handleCloseModalPress} disabled={isSubmitting} style={styles.closeButton}>
+                            <Ionicons name="close" size={24} color={colors.icon} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]} />
 
-                        <BottomSheetScrollView
-                            style={{ flex: 1 }}
-                            contentContainerStyle={[
-                                styles.scrollContent,
-                                isAndroid && { paddingBottom: 80 + keyboardHeight }
-                            ]}
-                            showsVerticalScrollIndicator={false}
-                            keyboardShouldPersistTaps="handled"
-                        >
-                            {/* Reason Selection */}
-                            <ThemedText style={styles.sectionTitle}>Select a Reason</ThemedText>
-                            <View style={styles.reasonsContainer}>
-                                {REPORT_REASONS.map((reason) => {
-                                    const isSelected = selectedReason === reason;
-                                    return (
-                                        <TouchableOpacity
-                                            key={reason}
-                                            activeOpacity={0.7}
-                                            onPress={() => setSelectedReason(reason)}
-                                            style={[
-                                                styles.reasonCard,
-                                                {
-                                                    borderColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'),
-                                                    backgroundColor: isSelected ? `${colors.primary}10` : (isDark ? 'rgba(255,255,255,0.03)' : '#FFFFFF')
-                                                }
-                                            ]}
-                                        >
-                                            <ThemedText style={[
-                                                styles.reasonText,
-                                                { color: isSelected ? colors.primary : colors.text, fontWeight: isSelected ? '600' : '400' }
-                                            ]}>
-                                                {reason}
-                                            </ThemedText>
-                                            {isSelected && (
-                                                <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-                                            )}
-                                        </TouchableOpacity>
-                                    );
-                                })}
-                            </View>
-
-                            {/* Additional Details */}
-                            <View style={styles.detailsContainer}>
-                                <View style={styles.detailsHeader}>
-                                    <ThemedText style={styles.sectionTitle}>Additional Details (Optional)</ThemedText>
-                                    <ThemedText style={styles.charCount}>{description.length}/300</ThemedText>
-                                </View>
-                                <TextInput
+                    {/* Reason Selection */}
+                    <ThemedText style={[styles.sectionTitle, { marginTop: 20 }]}>Select a Reason</ThemedText>
+                    <View style={styles.reasonsContainer}>
+                        {REPORT_REASONS.map((reason) => {
+                            const isSelected = selectedReason === reason;
+                            return (
+                                <TouchableOpacity
+                                    key={reason}
+                                    activeOpacity={0.7}
+                                    onPress={() => setSelectedReason(reason)}
                                     style={[
-                                        styles.input,
+                                        styles.reasonCard,
                                         {
-                                            color: colors.text,
-                                            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
-                                            borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'
+                                            borderColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'),
+                                            backgroundColor: isSelected ? `${colors.primary}10` : (isDark ? 'rgba(255,255,255,0.03)' : '#FFFFFF')
                                         }
                                     ]}
-                                    placeholder="Please provide any extra context..."
-                                    placeholderTextColor={colors.icon}
-                                    multiline
-                                    maxLength={300}
-                                    value={description}
-                                    onChangeText={setDescription}
-                                    textAlignVertical="top"
-                                />
-                            </View>
-
-                            <ThemedText style={styles.anonymousText}>
-                                <Ionicons name="shield-checkmark-outline" size={14} /> Your report is anonymous.
-                            </ThemedText>
-                        </BottomSheetScrollView>
+                                >
+                                    <ThemedText style={[
+                                        styles.reasonText,
+                                        { color: isSelected ? colors.primary : colors.text, fontWeight: isSelected ? '600' : '400' }
+                                    ]}>
+                                        {reason}
+                                    </ThemedText>
+                                    {isSelected && (
+                                        <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                                    )}
+                                </TouchableOpacity>
+                            );
+                        })}
                     </View>
-                </TouchableWithoutFeedback>
+
+                    {/* Additional Details */}
+                    <View style={styles.detailsContainer}>
+                        <View style={styles.detailsHeader}>
+                            <ThemedText style={styles.sectionTitle}>Additional Details (Optional)</ThemedText>
+                            <ThemedText style={styles.charCount}>{description.length}/300</ThemedText>
+                        </View>
+                        <TextInput
+                            style={[
+                                styles.input,
+                                {
+                                    color: colors.text,
+                                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
+                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'
+                                }
+                            ]}
+                            placeholder="Please provide any extra context..."
+                            placeholderTextColor={colors.icon}
+                            multiline
+                            maxLength={300}
+                            value={description}
+                            onChangeText={setDescription}
+                            textAlignVertical="top"
+                        />
+                    </View>
+
+                    <ThemedText style={styles.anonymousText}>
+                        <Ionicons name="shield-checkmark-outline" size={14} /> Your report is anonymous.
+                    </ThemedText>
+
+                    {/* Submit Button */}
+                    <TouchableOpacity
+                        style={[
+                            styles.submitButton,
+                            {
+                                backgroundColor: colors.primary,
+                                shadowOpacity: selectedReason ? 0.3 : 0.05,
+                                marginTop: 10,
+                                marginBottom: 30,
+                                opacity: isSubmitting ? 0.6 : 1
+                            }
+                        ]}
+                        onPress={handleSubmit}
+                        disabled={isSubmitting}
+                        activeOpacity={0.8}
+                    >
+                        {isSubmitting ? (
+                            <ActivityIndicator color="#FFFFFF" />
+                        ) : (
+                            <ThemedText style={styles.submitButtonText}>Submit Report</ThemedText>
+                        )}
+                    </TouchableOpacity>
+                </BottomSheetScrollView>
+                <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 99999 }}>
+                    <Toast config={toastConfig} topOffset={10} />
+                </View>
             </BottomSheetModal>
         );
     }
@@ -314,7 +310,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 20,
-        paddingBottom: isAndroid ? 100 : 60,
+        paddingBottom: isAndroid ? 110 : 70,
     },
     sectionTitle: {
         fontSize: 14,

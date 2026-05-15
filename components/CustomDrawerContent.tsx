@@ -18,6 +18,8 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
+import { useRewardedAd } from '@/ads/hooks/useAds';
+
 
 interface MenuItem {
     label: string;
@@ -28,12 +30,14 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
     { label: 'Home', icon: 'home-outline', route: '/(drawer)/(tabs)', section: 'Main' },
-    // { label: 'Community Feed', icon: 'newspaper-outline', route: '/(drawer)/(tabs)/feed', section: 'Main' },
+    { label: 'Community Feed', icon: 'newspaper-outline', route: '/(drawer)/(tabs)/feed', section: 'Main' },
     { label: 'Blood Donors', icon: 'water-outline', route: '/(drawer)/(tabs)/blood', section: 'Main' },
     { label: 'Business Directory', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },
+    { label: 'My Requests', icon: 'list-outline', route: '/user/requests', section: 'Main' },
     { label: 'Profile', icon: 'person-outline', route: '/profile', section: 'Account' },
     { label: 'Settings', icon: 'settings-outline', route: '/settings', section: 'Account' },
     { label: 'Support & FAQ', icon: 'help-circle-outline', route: '/support', section: 'Support' },
+    // { label: 'Watch Ad', icon: 'play-circle-outline', route: 'REWARDED_AD', section: 'Support' },
 ];
 
 export default function CustomDrawerContent(props: DrawerContentComponentProps) {
@@ -42,10 +46,17 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
     const colors = Colors[theme];
     const router = useRouter();
     const insets = useSafeAreaInsets();
+    const { showAd, isAdLoaded } = useRewardedAd();
 
     const activeRoute = props.state.routes[props.state.index].name;
 
     const handleNavigation = (route: string) => {
+        if (route === 'REWARDED_AD') {
+            showAd(() => {
+                console.log('Reward earned from drawer!');
+            });
+            return;
+        }
         router.navigate(route as any);
     };
 
@@ -107,13 +118,17 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                                 (item.route === '/(tabs)' && activeRoute === '(tabs)') ||
                                 item.route === `/${activeRoute}`;
 
+                            const isDisabled = item.route === 'REWARDED_AD' && !isAdLoaded;
+
                             return (
                                 <TouchableOpacity
                                     key={index}
                                     activeOpacity={0.7}
+                                    disabled={isDisabled}
                                     style={[
                                         styles.menuItem,
                                         isFocused && { backgroundColor: colors.primary + '10' },
+                                        isDisabled && { opacity: 0.5 },
                                     ]}
                                     onPress={() => handleNavigation(item.route)}
                                 >

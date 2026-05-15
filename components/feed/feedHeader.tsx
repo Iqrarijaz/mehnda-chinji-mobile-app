@@ -4,8 +4,10 @@ import Avatar from '@/components/ui/avatar';
 import { Layout } from '@/constants/layout';
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions } from '@react-navigation/native';
+import { Image } from 'expo-image';
 import React, { useRef } from 'react';
-import { Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { usePostCategories } from '@/hooks/useConfiguration';
 
 interface FeedHeaderProps {
     colors: any;
@@ -18,6 +20,8 @@ interface FeedHeaderProps {
     setSelectedType: (type: string | null) => void;
     onCreatePost?: () => void;
     containerStyle?: any;
+    onSearch?: (query: string) => void;
+    onFilterChange?: (type: string | null) => void;
 }
 
 export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
@@ -31,8 +35,13 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
     setSelectedType,
     onCreatePost,
     containerStyle,
+    onSearch,
+    onFilterChange,
 }) => {
     const inputRef = useRef<TextInput>(null);
+    const { data: categoriesData } = usePostCategories();
+    const categories = categoriesData?.data?.data || [];
+    
     return (
         <View style={[styles.headerContainer, { backgroundColor: colors.primary, paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }, containerStyle]}>
             <View style={styles.headerTopRow}>
@@ -86,6 +95,7 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
                         placeholderTextColor="#94A3B8"
                         value={searchQuery}
                         onChangeText={setSearchQuery}
+                        onSubmitEditing={() => onSearch?.(searchQuery)}
                         returnKeyType="search"
                         clearButtonMode="while-editing"
                     />
@@ -93,24 +103,71 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
             </TouchableOpacity>
 
             {/* Type Filter Chips */}
-            <View style={styles.filterContainer}>
-                {['ALL', 'GENERAL', 'SPORTS', 'DEATH', 'ACCIDENT'].map((type) => (
+            <View style={styles.filterWrapper}>
+                <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false} 
+                    contentContainerStyle={styles.filterScrollContent}
+                >
+                    {/* All Chip */}
                     <TouchableOpacity
-                        key={type}
                         style={[
                             styles.filterChip,
-                            (selectedType === type || (!selectedType && type === 'ALL')) && styles.activeFilterChip
+                            !selectedType && styles.activeFilterChip
                         ]}
-                        onPress={() => setSelectedType(type === 'ALL' ? null : type)}
+                        onPress={() => {
+                            setSelectedType(null);
+                            onFilterChange?.(null);
+                        }}
                     >
-                        <ThemedText style={[
-                            styles.filterText,
-                            (selectedType === type || (!selectedType && type === 'ALL')) && [styles.activeFilterText, { color: colors.primary }]
-                        ]}>
-                            {type.charAt(0) + type.slice(1).toLowerCase()}
-                        </ThemedText>
+                        <View style={styles.chipIconColumn}>
+                            <Ionicons 
+                                name="apps-outline" 
+                                size={18} 
+                                color={!selectedType ? colors.primary : "#FFFFFF"} 
+                            />
+                        </View>
+                        <View style={styles.chipTextColumn}>
+                            <ThemedText style={[
+                                styles.filterText,
+                                !selectedType && [styles.activeFilterText, { color: colors.primary }]
+                            ]}>
+                                All
+                            </ThemedText>
+                        </View>
                     </TouchableOpacity>
-                ))}
+
+                    {/* Dynamic Category Chips */}
+                    {categories.map((cat: any) => (
+                        <TouchableOpacity
+                            key={cat.name}
+                            style={[
+                                styles.filterChip,
+                                selectedType === cat.name && styles.activeFilterChip
+                            ]}
+                            onPress={() => {
+                                setSelectedType(cat.name);
+                                onFilterChange?.(cat.name);
+                            }}
+                        >
+                            <View style={styles.chipIconColumn}>
+                                <Image 
+                                    source={{ uri: cat.icon }} 
+                                    style={styles.chipIcon}
+                                    contentFit="contain"
+                                />
+                            </View>
+                            <View style={styles.chipTextColumn}>
+                                <ThemedText style={[
+                                    styles.filterText,
+                                    selectedType === cat.name && [styles.activeFilterText, { color: colors.primary }]
+                                ]}>
+                                    {cat.name}
+                                </ThemedText>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
             </View>
         </View>
     );
@@ -177,26 +234,48 @@ const styles = StyleSheet.create({
         color: '#0F172A',
         height: '100%',
     },
-    filterContainer: {
-        flexDirection: 'row',
+    filterWrapper: {
+        marginTop: 4,
+    },
+    filterScrollContent: {
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-        gap: Platform.OS === 'android' ? 10 : 12,
+        gap: 10,
     },
     filterChip: {
-        paddingHorizontal: Platform.OS === 'android' ? 12 : 14,
-        paddingVertical: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 38,
         borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: 'rgba(255,255,255,0.15)',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.3)',
+        borderColor: 'rgba(255,255,255,0.25)',
+        overflow: 'hidden',
+        marginRight: 2,
     },
     activeFilterChip: {
         backgroundColor: '#FFFFFF',
         borderColor: '#FFFFFF',
     },
+    chipIconColumn: {
+        width: 30,
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+    },
+    chipIcon: {
+        width: 22,
+        height: 22,
+    },
+    chipTextColumn: {
+        paddingRight: 14,
+        paddingLeft: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     filterText: {
         color: '#FFFFFF',
-        fontSize: Platform.OS === 'android' ? 11 : 13,
+        fontSize: 12,
         fontWeight: '600',
     },
     activeFilterText: {

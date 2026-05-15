@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
+    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     RefreshControl,
@@ -11,15 +12,13 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
+import Animated, { FadeInDown, SlideInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+
 import cities from '../data/cities.json';
 
-import { Colors } from '@/constants/colors';
-import { useTheme } from '@/context/ThemeContext';
-import { useWeather } from '@/hooks/useWeather';
-import { useWeatherCity } from '@/context/WeatherContext';
+import BannerAd from '@/ads/components/BannerAd';
+import NativeAd from '@/ads/components/NativeAd';
 import WeatherDaily from '@/components/weather/WeatherDaily';
 import WeatherHero from '@/components/weather/WeatherHero';
 import WeatherHourly from '@/components/weather/WeatherHourly';
@@ -28,14 +27,20 @@ import WeatherStats from '@/components/weather/WeatherStats';
 import WeatherSunrise from '@/components/weather/WeatherSunrise';
 import { BG_GRADIENT } from '@/components/weather/weatherUtils';
 
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
+import { useWeatherCity } from '@/context/WeatherContext';
+import { useWeather } from '@/hooks/useWeather';
+
 export default function WeatherScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
+
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    // 🌐 Shared city — persisted and synced with home widget
     const { selectedCity: city, setSelectedCity: setCity } = useWeatherCity();
+
     const [searchInput, setSearchInput] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
     const [filteredCities, setFilteredCities] = useState<string[]>([]);
@@ -43,31 +48,43 @@ export default function WeatherScreen() {
 
     const { weather, forecast, isLoading, refetch } = useWeather(city);
 
-    const handleSubmit = useCallback(() => {
-        if (searchInput.trim()) {
-            setCity(searchInput.trim());
-            setSearchInput('');
-            setShowDropdown(false);
-        }
-    }, [searchInput]);
+    // ─────────────────────────────────────────────────────────────
+    // Search
+    // ─────────────────────────────────────────────────────────────
 
-    const handleSelectCity = useCallback((selectedCity: string) => {
-        setCity(selectedCity + ', PK');
+    const handleSubmit = useCallback(() => {
+        if (!searchInput.trim()) return;
+
+        setCity(searchInput.trim());
         setSearchInput('');
         setShowDropdown(false);
-    }, []);
+    }, [searchInput, setCity]);
+
+    const handleSelectCity = useCallback(
+        (selectedCity: string) => {
+            setCity(`${selectedCity}, PK`);
+            setSearchInput('');
+            setShowDropdown(false);
+        },
+        [setCity]
+    );
 
     const handleChangeText = useCallback((text: string) => {
         setSearchInput(text);
-        if (text.trim().length > 0) {
-            const filtered = (cities as string[])
-                .filter(c => c.toLowerCase().includes(text.toLowerCase()))
-                .slice(0, 8);
-            setFilteredCities(filtered);
-            setShowDropdown(filtered.length > 0);
-        } else {
+
+        if (!text.trim()) {
             setShowDropdown(false);
+            return;
         }
+
+        const filtered = (cities as string[])
+            .filter(city =>
+                city.toLowerCase().includes(text.toLowerCase())
+            )
+            .slice(0, 8);
+
+        setFilteredCities(filtered);
+        setShowDropdown(filtered.length > 0);
     }, []);
 
     const handleClear = useCallback(() => {
@@ -75,107 +92,252 @@ export default function WeatherScreen() {
         setShowDropdown(false);
     }, []);
 
+    // ─────────────────────────────────────────────────────────────
+    // Refresh
+    // ─────────────────────────────────────────────────────────────
+
     const handleRefresh = useCallback(async () => {
-        setIsRefreshing(true);
-        await refetch();
-        setIsRefreshing(false);
+        try {
+            setIsRefreshing(true);
+            await refetch();
+        } finally {
+            setIsRefreshing(false);
+        }
     }, [refetch]);
 
+    // ─────────────────────────────────────────────────────────────
+    // Hourly Forecast
+    // ─────────────────────────────────────────────────────────────
 
-
-
-
-    // ── Hourly data ──────────────────────────────────────────────────────────
     const hourlyData = useMemo(() => {
         if (!forecast) return [];
+
         return forecast.list.slice(0, 8).map((item: any) => {
             const date = new Date(item.dt * 1000);
+
             const hours = date.getHours();
             const ampm = hours >= 12 ? 'PM' : 'AM';
-            const h = hours % 12 || 12;
-            return { time: `${h}${ampm}`, icon: item.weather[0].icon, temp: Math.round(item.main.temp) };
-        });
-    }, [forecast]);
+            const hour = hours % 12 || 12;
 
-    // ── Daily data ───────────────────────────────────────────────────────────
-    const dailyData = useMemo(() => {
-        if (!forecast) return [];
-        const todayStr = new Date().toISOString().split('T')[0];
-        const dayGroups: { [key: string]: any[] } = {};
-        forecast.list.forEach((item: any) => {
-            const dateStr = new Date(item.dt * 1000).toISOString().split('T')[0];
-            if (dateStr !== todayStr) {
-                if (!dayGroups[dateStr]) dayGroups[dateStr] = [];
-                dayGroups[dateStr].push(item);
-            }
-        });
-        return Object.keys(dayGroups).sort().slice(0, 7).map(dateKey => {
-            const entries = dayGroups[dateKey];
-            const noon = entries.find((e: any) => (e.dt_txt || '').includes('12:00:00')) || entries[Math.floor(entries.length / 2)];
-            const temps = entries.map((e: any) => Math.round(e.main.temp));
             return {
-                day: new Date(noon.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' }),
-                date: new Date(noon.dt * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                icon: noon.weather[0].icon,
-                high: Math.max(...temps),
-                low: Math.min(...temps),
-                pop: Math.round((noon.pop || 0) * 100),
+                time: `${hour}${ampm}`,
+                icon: item.weather[0].icon,
+                temp: Math.round(item.main.temp),
             };
         });
     }, [forecast]);
 
-    // ── Sunrise / Sunset ─────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // Daily Forecast
+    // ─────────────────────────────────────────────────────────────
+
+    const dailyData = useMemo(() => {
+        if (!forecast) return [];
+
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        const groupedDays: Record<string, any[]> = {};
+
+        forecast.list.forEach((item: any) => {
+            const dateStr = new Date(item.dt * 1000)
+                .toISOString()
+                .split('T')[0];
+
+            if (dateStr === todayStr) return;
+
+            if (!groupedDays[dateStr]) {
+                groupedDays[dateStr] = [];
+            }
+
+            groupedDays[dateStr].push(item);
+        });
+
+        return Object.keys(groupedDays)
+            .sort()
+            .slice(0, 7)
+            .map(dateKey => {
+                const entries = groupedDays[dateKey];
+
+                const representative =
+                    entries.find((e: any) =>
+                        (e.dt_txt || '').includes('12:00:00')
+                    ) || entries[Math.floor(entries.length / 2)];
+
+                const temps = entries.map((e: any) =>
+                    Math.round(e.main.temp)
+                );
+
+                return {
+                    day: new Date(
+                        representative.dt * 1000
+                    ).toLocaleDateString('en-US', {
+                        weekday: 'short',
+                    }),
+
+                    date: new Date(
+                        representative.dt * 1000
+                    ).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                    }),
+
+                    icon: representative.weather[0].icon,
+                    high: Math.max(...temps),
+                    low: Math.min(...temps),
+                    pop: Math.round(
+                        (representative.pop || 0) * 100
+                    ),
+                };
+            });
+    }, [forecast]);
+
+    // ─────────────────────────────────────────────────────────────
+    // Sunrise / Sunset
+    // ─────────────────────────────────────────────────────────────
+
     const sunrise = weather?.sys?.sunrise
-        ? new Date(weather.sys.sunrise * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+        ? new Date(weather.sys.sunrise * 1000).toLocaleTimeString(
+            'en-US',
+            {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+            }
+        )
         : '--';
+
     const sunset = weather?.sys?.sunset
-        ? new Date(weather.sys.sunset * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+        ? new Date(weather.sys.sunset * 1000).toLocaleTimeString(
+            'en-US',
+            {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+            }
+        )
         : '--';
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View
+            style={[
+                styles.container,
+                { backgroundColor: colors.background },
+            ]}
+        >
             <Stack.Screen options={{ headerShown: false }} />
-            <LinearGradient 
-                colors={theme === 'dark' ? [colors.background, colors.background] : BG_GRADIENT} 
-                style={StyleSheet.absoluteFill} 
-                start={{ x: 0, y: 0 }} 
-                end={{ x: 0, y: 1 }} 
+
+            <LinearGradient
+                colors={
+                    theme === 'dark'
+                        ? [colors.background, colors.background]
+                        : BG_GRADIENT
+                }
+                style={StyleSheet.absoluteFill}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
             />
 
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+            <KeyboardAvoidingView
+                style={styles.flex}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
                 <ScrollView
-                    contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 40 }]}
+                    contentContainerStyle={[
+                        styles.scrollContent,
+                        {
+                            paddingTop: insets.top + 16,
+                            paddingBottom: insets.bottom + 40,
+                        },
+                    ]}
+                    keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                     refreshControl={
-                        <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor="#FFFFFF" />
+                        <RefreshControl
+                            refreshing={isRefreshing}
+                            onRefresh={handleRefresh}
+                            tintColor="#FFFFFF"
+                        />
                     }
                 >
-                    {/* Top Nav */}
-                    <Animated.View entering={SlideInLeft.duration(400)} style={styles.topNav}>
+                    {/* Header */}
+                    <Animated.View
+                        entering={SlideInLeft.duration(350)}
+                        style={styles.topNav}
+                    >
                         <TouchableOpacity
-                            onPress={() => router.canGoBack() ? router.back() : router.replace('/(drawer)/(tabs)' as any)}
+                            activeOpacity={0.8}
                             style={styles.backBtn}
+                            onPress={() =>
+                                router.canGoBack()
+                                    ? router.back()
+                                    : router.replace('/(drawer)/(tabs)' as any)
+                            }
                         >
-                            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+                            <Ionicons
+                                name="arrow-back"
+                                size={22}
+                                color="#FFFFFF"
+                            />
                         </TouchableOpacity>
 
-                        <WeatherSearchBar
-                            searchInput={searchInput}
-                            filteredCities={filteredCities}
-                            showDropdown={showDropdown}
-                            onChangeText={handleChangeText}
-                            onSubmit={handleSubmit}
-                            onClear={handleClear}
-                            onSelectCity={handleSelectCity}
+                        <View style={styles.searchWrapper}>
+                            <WeatherSearchBar
+                                searchInput={searchInput}
+                                filteredCities={filteredCities}
+                                showDropdown={showDropdown}
+                                onChangeText={handleChangeText}
+                                onSubmit={handleSubmit}
+                                onClear={handleClear}
+                                onSelectCity={handleSelectCity}
+                            />
+                        </View>
+                    </Animated.View>
+
+                    {/* Hero */}
+                    <Animated.View entering={FadeInDown.delay(100)}>
+                        <WeatherHero
+                            weather={weather}
+                            isLoading={isLoading}
                         />
                     </Animated.View>
 
-                    {/* Sections */}
-                    <WeatherHero weather={weather} isLoading={isLoading} />
-                    <WeatherStats weather={weather} forecast={forecast} />
-                    <WeatherHourly data={hourlyData} />
-                    <WeatherDaily data={dailyData} />
-                    {weather && <WeatherSunrise sunrise={sunrise} sunset={sunset} />}
+                    {/* Stats */}
+                    <Animated.View entering={FadeInDown.delay(150)}>
+                        <WeatherStats
+                            weather={weather}
+                            forecast={forecast}
+                        />
+                    </Animated.View>
+
+                    <Animated.View entering={FadeInDown.delay(200)}>
+                        <NativeAd placement="weather" />
+                    </Animated.View>
+
+                    {/* Hourly */}
+                    <Animated.View entering={FadeInDown.delay(250)}>
+                        <WeatherHourly data={hourlyData} />
+                    </Animated.View>
+
+                    {/* Daily */}
+                    <Animated.View entering={FadeInDown.delay(300)}>
+                        <WeatherDaily data={dailyData} />
+                    </Animated.View>
+
+                    {/* Sunrise */}
+                    {weather && (
+                        <Animated.View
+                            entering={FadeInDown.delay(350)}
+                        >
+                            <WeatherSunrise
+                                sunrise={sunrise}
+                                sunset={sunset}
+                            />
+                        </Animated.View>
+                    )}
+                    {/* Banner */}
+                    <View style={styles.bannerContainer}>
+                        <BannerAd placement="weather" />
+                    </View>
                 </ScrollView>
             </KeyboardAvoidingView>
         </View>
@@ -183,21 +345,52 @@ export default function WeatherScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
-    scroll: { paddingHorizontal: 20 },
+    flex: {
+        flex: 1,
+    },
+
+    container: {
+        flex: 1,
+    },
+
+    scrollContent: {
+        paddingHorizontal: 20,
+        flexGrow: 1,
+    },
+
     topNav: {
         flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 24,
+        alignItems: 'flex-start',
         gap: 12,
-        zIndex: 1000,
+        marginBottom: 24,
+
+        zIndex: 9999,
+        elevation: 9999,
+
+        overflow: 'visible',
     },
+
     backBtn: {
-        width: 42,
-        height: 42,
-        borderRadius: 21,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+
         justifyContent: 'center',
         alignItems: 'center',
+
+        backgroundColor: 'rgba(255,255,255,0.18)',
+    },
+
+    searchWrapper: {
+        flex: 1,
+        zIndex: 9999,
+        elevation: 9999,
+        overflow: 'visible',
+    },
+
+    bannerContainer: {
+        marginTop: 24,
+        justifyContent: 'center',
+        minHeight: 60,
     },
 });

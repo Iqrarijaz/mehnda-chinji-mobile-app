@@ -16,10 +16,13 @@ import { useFeed } from '@/hooks/useFeed';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Stack, useNavigation } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useMemo } from 'react';
 import { Dimensions, FlatList, Modal, Platform, RefreshControl, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import NativeAd from '@/ads/components/NativeAd';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
 
 
 const { width } = Dimensions.get('window');
@@ -43,6 +46,15 @@ export default function FeedScreen() {
     const [detailPost, setDetailPost] = useState<PostData | null>(null);
 
     const deletePostMutation = useDeletePost();
+
+    // Reporting state
+    const reportModalRef = useRef<ReportModalRef>(null);
+    const [reportTarget, setReportTarget] = useState<{ id: string; type: 'PLACE' | 'POST' } | null>(null);
+
+    const handleReportPost = useCallback((postId: string) => {
+        setReportTarget({ id: postId, type: 'POST' });
+        reportModalRef.current?.present();
+    }, []);
 
     const {
         posts,
@@ -90,50 +102,50 @@ export default function FeedScreen() {
     // Optimization: Viewability-aware socket subscriptions
     const onViewableItemsChanged = useCallback(({ viewableItems, changed }: any) => {
         const joinIds = changed
-            .filter((item: any) => item.isViewable)
+            .filter((item: any) => item.isViewable && !item.item.isAd)
             .map((item: any) => item.item._id);
         const leaveIds = changed
-            .filter((item: any) => !item.isViewable)
+            .filter((item: any) => !item.isViewable && !item.item.isAd)
             .map((item: any) => item.item._id);
 
-        if (joinIds.length > 0) subscribeToPosts(joinIds);
+        if (joinIds.length > 0) {
+            subscribeToPosts(joinIds);
+            // Track view event for each visible post
+            joinIds.forEach((id: string) => {
+                analyticsService.trackEvent(AnalyticsEvents.POST_VIEWED, { postId: id });
+            });
+        }
         if (leaveIds.length > 0) unsubscribeFromPosts(leaveIds);
-    }, [subscribeToPosts, unsubscribeFromPosts]);
+    }, [subscribeToPosts, unsubscribeFromPosts, posts]);
 
     const viewabilityConfig = useRef({
         itemVisiblePercentThreshold: 50,
         minimumViewTime: 300,
     }).current;
 
-    const renderItem = useCallback(({ item }: { item: PostData }) => (
-        <PostCard
-            post={item}
-            variant="compact"
-            onViewImage={handleViewImage}
-            onEdit={handleEditPost}
-            onDelete={handleDeletePost}
-            onPress={() => {
-                setDetailPost(item);
-                setDetailModalVisible(true);
-            }}
-        />
-    ), [handleViewImage, handleEditPost, handleDeletePost, user?.user?._id]);
+    const renderItem = useCallback(({ item }: { item: any }) => {
+        if (item.isAd) {
+            return <NativeAd placement="feed" />;
+        }
+        return (
+            <PostCard
+                post={item}
+                variant="compact"
+                onViewImage={handleViewImage}
+                onEdit={handleEditPost}
+                onDelete={handleDeletePost}
+                onReport={() => handleReportPost(item._id)}
+                onPress={() => {
+                    setDetailPost(item);
+                    setDetailModalVisible(true);
+                }}
+            />
+        );
+    }, [handleViewImage, handleEditPost, handleDeletePost, user?.user?._id]);
 
-    const keyExtractor = useCallback((item: PostData) => item._id, []);
+    const keyExtractor = useCallback((item: any) => item._id, []);
 
-    // Optimization: Approximate height for smoother scrolling
-    const getItemLayout = useCallback((data: any, index: number) => {
-        const item = data[index];
-        // Base height (header + footer + content padding) ~ 150
-        // Image height ~ width * 0.6
-        const hasImages = item?.images && item.images.length > 0;
-        const height = 150 + (hasImages ? width * 0.6 : 0);
-        return {
-            length: height,
-            offset: height * index,
-            index,
-        };
-    }, []);
+
 
 
     const listEmpty = useCallback(() => (
@@ -157,6 +169,18 @@ export default function FeedScreen() {
         />
     ), [colors, isFetchingNextPage, hasNextPage, posts.length]);
 
+    const dataWithAds = useMemo(() => {
+        const result = [];
+        for (let i = 0; i < posts.length; i++) {
+            result.push(posts[i]);
+            // Show ad every 4 posts
+            if ((i + 1) % 4 === 0) {
+                result.push({ _id: `ad-${i}`, isAd: true });
+            }
+        }
+        return result;
+    }, [posts]);
+
     return (
         <ErrorBoundary>
             <ThemedView style={styles.container}>
@@ -174,14 +198,21 @@ export default function FeedScreen() {
                     setSelectedType={setSelectedType}
                     onCreatePost={handleCreatePost}
                     containerStyle={{ marginBottom: 16 }}
+                    onSearch={(query) => {
+                        if (query.trim().length > 2) {
+                            analyticsService.trackEvent(AnalyticsEvents.SEARCH_USED, { query });
+                        }
+                    }}
+                    onFilterChange={(type) => {
+                        analyticsService.trackEvent(AnalyticsEvents.CATEGORY_CLICKED, { category: type });
+                    }}
                 />
 
                 {/* Scrolling list only */}
                 <FlatList
-                    data={posts}
+                    data={dataWithAds}
                     renderItem={renderItem}
                     keyExtractor={keyExtractor}
-                    getItemLayout={getItemLayout}
                     ListEmptyComponent={listEmpty}
                     ListFooterComponent={listFooter}
                     contentContainerStyle={styles.listContent}
@@ -249,12 +280,26 @@ export default function FeedScreen() {
                                         setDetailModalVisible(false);
                                         handleDeletePost(id);
                                     }}
-                                    isOwner={user?.user?._id === detailPost.createdBy?._id}
+                                    onReport={() => {
+                                        setDetailModalVisible(false);
+                                        handleReportPost(detailPost._id);
+                                    }}
+                                    isOwner={
+                                        !!user?.user?._id &&
+                                        !!detailPost.createdBy?._id &&
+                                        String(user?.user?._id) === String(detailPost.createdBy._id)
+                                    }
                                 />
                             )}
                         </ScrollView>
                     </ThemedView>
                 </Modal>
+
+                <ReportModal
+                    ref={reportModalRef}
+                    targetId={reportTarget?.id || ''}
+                    targetType={reportTarget?.type || 'POST'}
+                />
             </ThemedView>
         </ErrorBoundary>
     );

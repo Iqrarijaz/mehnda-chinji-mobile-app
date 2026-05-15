@@ -46,9 +46,10 @@ interface PlaceData {
 interface EducationCardProps {
     data: PlaceData;
     color?: string;
+    onReport?: () => void;
 }
 
-const EducationCard = React.memo(({ data, color }: EducationCardProps) => {
+const EducationCard = React.memo(({ data, color, onReport }: EducationCardProps) => {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const colors = Colors[theme];
@@ -144,9 +145,23 @@ const EducationCard = React.memo(({ data, color }: EducationCardProps) => {
                                 <ThemedText style={styles.typePillText}>{data.type}</ThemedText>
                             </View>
                         )}
-                        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.8}>
-                            <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', gap: 8 }}>
+                            <TouchableOpacity style={styles.actionBtn} activeOpacity={0.8}>
+                                <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
+                            </TouchableOpacity>
+                            {onReport && (
+                                <TouchableOpacity 
+                                    style={[styles.actionBtn, { backgroundColor: 'rgba(239,68,68,0.4)' }]} 
+                                    activeOpacity={0.8}
+                                    onPress={(e) => {
+                                        e.stopPropagation();
+                                        onReport();
+                                    }}
+                                >
+                                    <Ionicons name="flag" size={15} color="#FFFFFF" />
+                                </TouchableOpacity>
+                            )}
+                        </View>
                     </View>
 
                     {/* Bottom-left image label when image exists */}

@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 8,
         marginTop: 12,
-        zIndex: 9999,
+        zIndex: 99999,
     },
 
 successBg: {

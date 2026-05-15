@@ -55,7 +55,10 @@ apiClient.interceptors.request.use(
                 // Warning: Can still be slow for very large POST payloads
                 try { requestSize = JSON.stringify(config.data).length; } catch (e) { }
             }
-            config.metadata = { requestSize };
+            config.metadata = { 
+                requestSize,
+                startTime: Date.now()
+            };
 
             // 1. Read from in-memory cache — synchronous, zero I/O
             let token = tokenCache.get();
@@ -131,6 +134,19 @@ apiClient.interceptors.response.use(
             if (totalBytes > 0) {
                 useDataUsageStore.getState().trackUsage(totalBytes);
             }
+
+            // Performance Tracking: SLOW_API_RESPONSE
+            const startTime = response.config.metadata?.startTime;
+            if (startTime) {
+                const duration = Date.now() - startTime;
+                if (duration > 3000) {
+                    analyticsService.trackEvent(AnalyticsEvents.SLOW_API_RESPONSE, {
+                        endpoint: response.config.url,
+                        duration,
+                        method: response.config.method
+                    });
+                }
+            }
         } catch (e) {
             console.warn('Data Usage Tracking Error:', e);
         }
@@ -200,6 +216,20 @@ apiClient.interceptors.response.use(
             method: config?.method,
             message: message.slice(0, 100), // Cap length
         });
+
+        // Performance Tracking: SLOW_API_RESPONSE (even on error)
+        const startTime = config?.metadata?.startTime;
+        if (startTime) {
+            const duration = Date.now() - startTime;
+            if (duration > 3000) {
+                analyticsService.trackEvent(AnalyticsEvents.SLOW_API_RESPONSE, {
+                    endpoint: config?.url,
+                    duration,
+                    method: config?.method,
+                    status
+                });
+            }
+        }
 
         return Promise.reject(apiError);
     }
