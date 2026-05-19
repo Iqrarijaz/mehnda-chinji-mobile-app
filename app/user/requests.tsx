@@ -20,6 +20,9 @@ import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RequestCard from '@/components/places/RequestCard';
 import { RequestCardSkeleton } from '@/components/common/CardSkeletons';
+import { CATEGORIES_CONFIG, MORE_CATEGORIES_CONFIG } from '@/constants/categories';
+
+const ALL_CATEGORIES = [...CATEGORIES_CONFIG, ...MORE_CATEGORIES_CONFIG];
 
 const MyRequestsScreen = () => {
     const { theme, isDark } = useTheme();
@@ -131,13 +134,35 @@ const MyRequestsScreen = () => {
             <ThemedText style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
                 Your submitted places and updates will appear here.
             </ThemedText>
-            <TouchableOpacity 
-                style={[styles.emptyBtn, { backgroundColor: colors.primary }]}
-                onPress={() => router.push('/(drawer)/place-submission')}
-            >
-                <ThemedText style={styles.emptyBtnText}>Submit a Place</ThemedText>
-                <Ionicons name="add" size={20} color="#FFF" />
-            </TouchableOpacity>
+            {category ? (
+                <TouchableOpacity 
+                    style={[styles.emptyBtn, { backgroundColor: colors.primary }]}
+                    onPress={() => router.push({ pathname: '/(drawer)/place-submission', params: { category } })}
+                >
+                    <ThemedText style={styles.emptyBtnText}>Submit a Place</ThemedText>
+                    <Ionicons name="add" size={20} color="#FFF" />
+                </TouchableOpacity>
+            ) : (
+                <View style={{ width: '100%', alignItems: 'center' }}>
+                    <ThemedText style={{ marginBottom: 16, fontWeight: '600', color: colors.textSecondary }}>
+                        Select a category to submit:
+                    </ThemedText>
+                    <View style={styles.categoryGrid}>
+                        {ALL_CATEGORIES.map(cat => (
+                            <TouchableOpacity
+                                key={cat.id}
+                                style={[styles.catBtn, { backgroundColor: cat.color + '15', borderColor: cat.color + '40' }]}
+                                onPress={() => router.push({ pathname: '/(drawer)/place-submission', params: { category: cat.id } })}
+                            >
+                                <Ionicons name={cat.icon as any} size={16} color={cat.color} />
+                                <ThemedText style={{ fontSize: 13, color: cat.color, fontWeight: '700' }}>
+                                    {cat.label}
+                                </ThemedText>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
+            )}
         </Animated.View>
     );
 
@@ -311,5 +336,21 @@ const styles = StyleSheet.create({
     footerLoader: {
         paddingVertical: 20,
         alignItems: 'center',
+    },
+    categoryGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: 10,
+        width: '100%',
+    },
+    catBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        borderRadius: 20,
+        borderWidth: 1,
+        gap: 6,
     },
 });

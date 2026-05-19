@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { ThemedText } from '../themedText';
@@ -61,13 +61,22 @@ const NotificationHeader = React.memo(({
                     contentStyle={styles.tooltipContent}
                     backgroundColor="rgba(0,0,0,0.2)"
                 >
-                    {unreadCount > 0 && !isPending ? (
-                        <TouchableOpacity onPress={onMarkAllRead} style={styles.markBtn} activeOpacity={0.7}>
-                            <Ionicons name="checkmark-done" size={15} color="#FFFFFF" />
-                        </TouchableOpacity>
-                    ) : (
-                        <View style={styles.rightSpacer} />
-                    )}
+                    <TouchableOpacity 
+                        onPress={onMarkAllRead} 
+                        style={styles.markBtn} 
+                        activeOpacity={0.7}
+                        disabled={isPending || unreadCount === 0}
+                    >
+                        {isPending ? (
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                        ) : (
+                            <Ionicons 
+                                name="checkmark-done" 
+                                size={18} 
+                                color={unreadCount > 0 ? "#FFFFFF" : "rgba(255,255,255,0.4)"} 
+                            />
+                        )}
+                    </TouchableOpacity>
                 </Tooltip>
             </View>
 
