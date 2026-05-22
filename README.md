@@ -48,3 +48,15 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Mera Pind - Share Banner
+The **Share Banner** is a dynamic, premium UI component designed for the Mera Pind (Village Pride & Achievers Hall) module. It allows users to generate viral social media share cards for village heroes, deceased pioneers, and living legends.
+
+### Features
+- Dynamic QR code pointing directly to the app profile deep link (`rehbar://pride/[id]`).
+- Clean, responsive glassmorphism and gradient background using `#009688`.
+- Integrates with `useShareBanner` hook for capturing the view, saving to the device gallery, and sharing via the native OS share sheet.
+- RTL/Urdu typography support for specific memorial text.
+
+### Usage
+In `app/pride/[id].tsx`, tapping the "Share Banner" button triggers a modal overlay showing a preview. The underlying view is captured using `react-native-view-shot` and the resulting image URI is managed by the `useShareBanner` hook, which provides seamless `save()` and `share()` methods.

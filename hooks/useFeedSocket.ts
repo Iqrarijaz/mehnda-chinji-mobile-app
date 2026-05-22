@@ -27,27 +27,44 @@ export const useFeedSocket = () => {
         queryClient.setQueriesData({ queryKey: POST_QUERY_KEYS.all }, (old: any) => {
             if (!old) return old;
 
-            let cacheChanged = false;
-            const newPages = old.pages.map((page: any) => {
-                let pageChanged = false;
-                const newData = (page.data || []).map((post: PostData) => {
-                    const update = updates.get(post._id);
-                    if (update) {
-                        pageChanged = true;
-                        cacheChanged = true;
-                        return {
-                            ...post,
-                            likesCount: update.likesCount !== undefined ? update.likesCount : post.likesCount,
-                            commentsCount: update.commentsCount !== undefined ? update.commentsCount : post.commentsCount,
-                        };
-                    }
-                    return post;
+            // 1. Handle Infinite Query Cache (List View)
+            if (old.pages && Array.isArray(old.pages)) {
+                let cacheChanged = false;
+                const newPages = old.pages.map((page: any) => {
+                    let pageChanged = false;
+                    const newData = (page.data || []).map((post: PostData) => {
+                        const update = updates.get(post._id);
+                        if (update) {
+                            pageChanged = true;
+                            cacheChanged = true;
+                            return {
+                                ...post,
+                                likesCount: update.likesCount !== undefined ? update.likesCount : post.likesCount,
+                                commentsCount: update.commentsCount !== undefined ? update.commentsCount : post.commentsCount,
+                            };
+                        }
+                        return post;
+                    });
+
+                    return pageChanged ? { ...page, data: newData } : page;
                 });
 
-                return pageChanged ? { ...page, data: newData } : page;
-            });
+                return cacheChanged ? { ...old, pages: newPages } : old;
+            }
 
-            return cacheChanged ? { ...old, pages: newPages } : old;
+            // 2. Handle Singular Post Cache (Detail View)
+            if (old._id) {
+                const update = updates.get(old._id);
+                if (update) {
+                    return {
+                        ...old,
+                        likesCount: update.likesCount !== undefined ? update.likesCount : old.likesCount,
+                        commentsCount: update.commentsCount !== undefined ? update.commentsCount : old.commentsCount,
+                    };
+                }
+            }
+
+            return old;
         });
 
         throttleTimer.current = null;

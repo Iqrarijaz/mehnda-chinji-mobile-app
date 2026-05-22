@@ -185,9 +185,12 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                         <View style={styles.formSection}>
                             {/* Blood Group Dropdown */}
                             <View style={styles.inputField}>
-                                <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>
-                                    BLOOD GROUP <ThemedText style={styles.required}>*</ThemedText>
-                                </ThemedText>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>
+                                        BLOOD GROUP
+                                    </ThemedText>
+                                    <ThemedText style={[styles.label, styles.required]}> *</ThemedText>
+                                </View>
                                 <TouchableOpacity
                                     style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
                                     onPress={() => setGroupModalVisible(true)}
@@ -202,9 +205,12 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
 
                             {/* City Dropdown */}
                             <View style={styles.inputField}>
-                                <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>
-                                    CITY <ThemedText style={styles.required}>*</ThemedText>
-                                </ThemedText>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>
+                                        CITY
+                                    </ThemedText>
+                                    <ThemedText style={[styles.label, styles.required]}> *</ThemedText>
+                                </View>
                                 <TouchableOpacity
                                     style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
                                     onPress={() => setCityModalVisible(true)}
@@ -220,9 +226,12 @@ const BloodRegistrationModal = ({ visible, onClose, onSuccess }: BloodRegistrati
                             {/* Address Input */}
                             <View style={styles.inputField}>
                                 <View style={styles.labelRow}>
-                                    <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>
-                                        ADDRESS / LOCAL AREA <ThemedText style={styles.required}>*</ThemedText>
-                                    </ThemedText>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <ThemedText style={[styles.label, { color: isDark ? '#FFFFFF' : colors.text }]}>
+                                            ADDRESS / LOCAL AREA
+                                        </ThemedText>
+                                        <ThemedText style={[styles.label, styles.required]}> *</ThemedText>
+                                    </View>
                                     <ThemedText style={[styles.charCount, address.length > 40 ? { color: '#ef4444' } : { color: colors.icon }]}>
                                         {address.length}/40
                                     </ThemedText>

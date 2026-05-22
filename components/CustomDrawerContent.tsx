@@ -31,6 +31,7 @@ interface MenuItem {
 const MENU_ITEMS: MenuItem[] = [
     { label: 'Home', icon: 'home-outline', route: '/(drawer)/(tabs)', section: 'Main' },
     { label: 'Community Feed', icon: 'newspaper-outline', route: '/(drawer)/(tabs)/feed', section: 'Main' },
+    { label: 'Village Pride', icon: 'ribbon-outline', route: '/(drawer)/pride', section: 'Main' },
     { label: 'Blood Donors', icon: 'water-outline', route: '/(drawer)/(tabs)/blood', section: 'Main' },
     { label: 'Business Directory', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },
     { label: 'My Requests', icon: 'list-outline', route: '/user/requests', section: 'Main' },
@@ -159,23 +160,23 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                         })}
                     </Animated.View>
                 ))}
+
+                {/* Footer */}
+                <View style={[styles.footer, { paddingBottom: insets.bottom + 16, borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', marginTop: 20 }]}>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={logout}
+                        style={styles.logoutBtn}
+                    >
+                        <View style={styles.logoutIconWrap}>
+                            <Ionicons name="log-out-outline" size={20} color="#EF4444" />
+                        </View>
+                        <ThemedText style={styles.logoutText}>Sign Out</ThemedText>
+                    </TouchableOpacity>
+
+                    <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.0.3'}</ThemedText>
+                </View>
             </DrawerContentScrollView>
-
-            {/* Footer */}
-            <View style={[styles.footer, { paddingBottom: insets.bottom + 16, borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }]}>
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={logout}
-                    style={styles.logoutBtn}
-                >
-                    <View style={styles.logoutIconWrap}>
-                        <Ionicons name="log-out-outline" size={20} color="#EF4444" />
-                    </View>
-                    <ThemedText style={styles.logoutText}>Sign Out</ThemedText>
-                </TouchableOpacity>
-
-                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.0.3'}</ThemedText>
-            </View>
         </View>
     );
 }

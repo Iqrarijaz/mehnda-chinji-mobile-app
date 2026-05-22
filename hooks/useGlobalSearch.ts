@@ -35,7 +35,7 @@ export const useGlobalSearch = (query: string) => {
         try {
             // Concurrent fetching from all sources
             const [businessRes, postsRes, donorsRes] = await Promise.all([
-                getBusinessesList({ search: normalizedQuery, currentPage: 1 }).catch(() => null),
+                getBusinessesList({ text: normalizedQuery, currentPage: 1 }).catch(() => null),
                 getPostsList({ search: normalizedQuery, page: 1 }).catch(() => null),
                 getDonorsList({ name: normalizedQuery, currentPage: 1 }).catch(() => null),
             ]);

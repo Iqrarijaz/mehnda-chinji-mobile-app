@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { useAdsStore, selectCanShowNative } from '../../store/ads.store';
@@ -15,7 +15,7 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
   const canShow = useAdsStore(selectCanShowNative);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [startTime] = useState(Date.now());
+  const startTimeRef = useRef(Date.now());
 
   // Show immediately to avoid confusion, but handle loading state gracefully
   useEffect(() => {
@@ -46,12 +46,9 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
         <BannerAd
           unitId={AD_UNIT_IDS.NATIVE}
           size={BannerAdSize.MEDIUM_RECTANGLE}
-          requestOptions={{
-            requestNonPersonalizedAdsOnly: true,
-          }}
           onAdLoaded={() => {
             setIsLoaded(true);
-            const duration = Date.now() - startTime;
+            const duration = Date.now() - startTimeRef.current;
             analyticsService.trackEvent(AnalyticsEvents.AD_LOADED, { type: 'native', placement });
             analyticsService.trackEvent(AnalyticsEvents.AD_LOAD_TIME, { type: 'native', placement, duration });
           }}

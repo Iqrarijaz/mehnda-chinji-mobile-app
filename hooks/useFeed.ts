@@ -14,6 +14,10 @@ export const useFeed = () => {
 
     // Debounce search
     useEffect(() => {
+        if (searchQuery === '') {
+            setDebouncedSearch('');
+            return;
+        }
         const timer = setTimeout(() => {
             setDebouncedSearch(searchQuery);
         }, 500);
@@ -21,7 +25,7 @@ export const useFeed = () => {
     }, [searchQuery]);
 
     const queryKey = useMemo(() =>
-        POST_QUERY_KEYS.list({ type: selectedType || undefined, search: debouncedSearch || undefined }),
+        POST_QUERY_KEYS.list({ category: 'FEED', type: selectedType || undefined, search: debouncedSearch || undefined }),
         [selectedType, debouncedSearch]);
 
     const {
@@ -37,9 +41,11 @@ export const useFeed = () => {
     } = useInfiniteQuery({
         queryKey,
         queryFn: ({ pageParam = 1 }) => getPostsList({
+            category: 'FEED',
             type: selectedType || undefined,
             search: debouncedSearch || undefined,
-            page: pageParam
+            page: pageParam,
+            limit: 10
         }),
         getNextPageParam: (lastPage: any) => {
             const pagination = lastPage?.pagination;

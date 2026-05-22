@@ -10,8 +10,12 @@ import {
     TouchableOpacity,
     View,
     Dimensions,
+    Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import BannerAd from '@/ads/components/BannerAd';
+import { useAdsStore, selectCanShowBanner } from '@/store/ads.store';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -63,6 +67,9 @@ const ManageEssentialDashboard = () => {
     const colors = Colors[theme];
     const isDark = theme === 'dark';
     const queryClient = useQueryClient();
+
+    const canShowBanner = useAdsStore(selectCanShowBanner);
+    const bottomInset = Math.max(insets.bottom, Platform.OS === 'android' ? 12 : 0);
 
     const [activeTab, setActiveTab] = useState<'toppers' | 'events'>('toppers');
     const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'topper' | 'event'; name: string } | null>(null);
@@ -262,7 +269,10 @@ const ManageEssentialDashboard = () => {
 
             <ScrollView
                 style={styles.content}
-                contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 100 }}
+                contentContainerStyle={{ 
+                    padding: 20, 
+                    paddingBottom: canShowBanner ? bottomInset + 150 : insets.bottom + 100 
+                }}
                 refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
             >
                 {activeTab === 'toppers' ? (
@@ -281,7 +291,13 @@ const ManageEssentialDashboard = () => {
             </ScrollView>
 
             <TouchableOpacity
-                style={[styles.floatingAdd, { backgroundColor: colors.primary, bottom: insets.bottom + 20 }]}
+                style={[
+                    styles.floatingAdd, 
+                    { 
+                        backgroundColor: colors.primary, 
+                        bottom: canShowBanner ? bottomInset + 70 : insets.bottom + 20 
+                    }
+                ]}
                 onPress={() => {
                     if (activeTab === 'toppers') {
                         router.push({ pathname: '/user/manage-essential/topper-form', params: { essentialId: id } });
@@ -292,6 +308,12 @@ const ManageEssentialDashboard = () => {
             >
                 <Ionicons name="add" size={30} color="#FFF" />
             </TouchableOpacity>
+
+            {canShowBanner && (
+                <View style={[styles.bannerContainer, { paddingBottom: bottomInset }]}>
+                    <BannerAd placement="essential-details" />
+                </View>
+            )}
         </View>
     );
 };
@@ -540,5 +562,10 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.3,
         shadowRadius: 5,
+    },
+    bannerContainer: {
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
     }
 });

@@ -30,3 +30,14 @@ FORMAT: [Location] -> [Ad Type] (Implementation Details)
 6. CORE COMPONENTS (ads/components)
    - BannerAd.tsx: Handles loading state, adaptive sizing, and themed placeholders.
    - NativeAd.tsx: Handles loading state, "Sponsored" branding, and themed card styling.
+
+7. DONOR & BUSINESS / PLACE SUBMISSIONS
+   - Interstitial Ad: Shown after successful blood donor registration, and after business or place submission.
+     * Usage: Triggered in BloodRegistrationModal and after submit actions in relevant forms.
+     * Suppression: None beyond standard global enabled flag.
+
+8. ESSENTIALS DETAILS SCREEN
+   - Banner Ad: Anchored Adaptive Banner (Fixed Bottom).
+     * Placement: Positioned at the bottom of the screen (sticky/fixed).
+     * Behavior: Independently scrollable screen content, safe area handled dynamically on Android and iOS.
+

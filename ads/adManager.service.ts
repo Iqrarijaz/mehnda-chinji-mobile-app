@@ -40,21 +40,20 @@ class AdManager {
   }
 
   /**
-   * Preloads all ad formats to ensure they are ready
-   * Uses staggered loading to prioritize UX and reduce network/battery impact
+   * Preloads critical startup ad formats to ensure they are ready.
+   * Staggers loads to prioritize user experience and reduce network/CPU congestion.
+   * Rewarded ads are excluded from startup preloading to conserve memory and network resources
+   * on lower-end devices; they are instead loaded reactively when entering relevant screens.
    */
   public preloadAll() {
-    // Interstitials are high priority for transition points
+    // 1. Interstitials: High-priority for early transitions
     InterstitialService.getInstance().load();
     
-    // Staggered loading to avoid network congestion
-    setTimeout(() => {
-      RewardedService.getInstance().load();
-    }, 1500);
-
+    // 2. App Open Ads: Staggered preload (1.5s delay) to prioritize boot performance
+    // and ensure fill readiness for subsequent app foreground events.
     setTimeout(() => {
       AppOpenService.getInstance().load();
-    }, 3000);
+    }, 1500);
   }
 }
 

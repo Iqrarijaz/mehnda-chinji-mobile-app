@@ -4,7 +4,8 @@ export interface PostData {
     _id: string;
     content: string;
     images: string[];
-    type: 'GENERAL' | 'DEATH' | 'ACCIDENT' | 'SPORTS' | 'SPONSORED';
+    type: string;
+    category?: 'FEED' | 'PRIDE';
     likesCount: number;
     commentsCount: number;
     isLiked?: boolean;
@@ -38,7 +39,7 @@ export const POST_QUERY_KEYS = {
     comments: (postId: string, parentCommentId: string | null) => [...POST_QUERY_KEYS.all, 'comments', postId, parentCommentId] as const,
 };
 
-export const getPostsList = async (params: { page?: number; limit?: number; type?: string | null; search?: string } = {}) => {
+export const getPostsList = async (params: { page?: number; limit?: number; category?: string; type?: string | null; search?: string } = {}) => {
     console.log('Fetching posts with params:', params);
     const response: any = await apiClient.get('/api/user/v1/posts/list', { params });
     console.log('Posts response received:', { success: response?.success, count: response?.data?.length });

@@ -16,10 +16,11 @@ import {
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export const usePosts = (filters: { type?: string | null; searchQuery?: string } = {}) => {
+export const usePosts = (filters: { category?: string; type?: string | null; searchQuery?: string } = {}) => {
     return useInfiniteQuery({
-        queryKey: POST_QUERY_KEYS.list({ type: filters.type, search: filters.searchQuery }),
+        queryKey: POST_QUERY_KEYS.list({ category: filters.category, type: filters.type, search: filters.searchQuery }),
         queryFn: ({ pageParam = 1 }) => getPostsList({
+            category: filters.category,
             type: filters.type,
             search: filters.searchQuery,
             page: pageParam
@@ -61,7 +62,7 @@ export const useLikePost = () => {
 
             // Optimistically update list queries
             queryClient.setQueriesData({ queryKey: POST_QUERY_KEYS.all }, (old: any) => {
-                if (!old) return old;
+                if (!old || !old.pages) return old;
                 return {
                     ...old,
                     pages: old.pages.map((page: any) => {
@@ -82,6 +83,16 @@ export const useLikePost = () => {
             // Optimistically update detail query if present
             queryClient.setQueryData(POST_QUERY_KEYS.detail(postId), (oldDetail: any) => {
                 if (!oldDetail) return oldDetail;
+                if (oldDetail.data) {
+                    return {
+                        ...oldDetail,
+                        data: {
+                            ...oldDetail.data,
+                            isLiked: !oldDetail.data.isLiked,
+                            likesCount: oldDetail.data.isLiked ? (oldDetail.data.likesCount || 1) - 1 : (oldDetail.data.likesCount || 0) + 1
+                        }
+                    };
+                }
                 return {
                     ...oldDetail,
                     isLiked: !oldDetail.isLiked,

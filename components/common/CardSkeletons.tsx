@@ -132,10 +132,9 @@ const styles = StyleSheet.create({
     },
     postCard: {
         borderRadius: 16,
-        padding: 12,
-        marginTop: 12,
-        marginHorizontal: 16,
-        marginBottom: 4,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        marginBottom: 16,
     },
     donorCard: {
         borderRadius: 16,

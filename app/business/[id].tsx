@@ -181,7 +181,7 @@ const BusinessDetailScreen = () => {
 
                 {/* 4. Banner Ad */}
                 <View style={styles.adContainer}>
-                    <BannerAd />
+                    <BannerAd placement="business_detail" />
                 </View>
 
                 {/* 5. Rest of the info */}
@@ -272,17 +272,7 @@ const BusinessDetailScreen = () => {
                 </View>
             </ScrollView>
 
-            {/* Floating Action Button */}
-            {business.phone && (
-                <TouchableOpacity
-                    style={[styles.fab, { backgroundColor: primaryColor, bottom: insets.bottom + 16 }]}
-                    onPress={handleCall}
-                    activeOpacity={0.8}
-                >
-                    <Ionicons name="call" size={24} color="#FFF" />
-                    <ThemedText style={styles.fabText}>Call Now</ThemedText>
-                </TouchableOpacity>
-            )}
+
 
             <ReportModal
                 ref={reportModalRef}
@@ -485,34 +475,5 @@ const styles = StyleSheet.create({
     infoValue: {
         fontSize: 14,
         fontWeight: '500',
-    },
-    fab: {
-        position: 'absolute',
-        bottom: 16,
-        left: 10,
-        right: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 10,
-        paddingVertical: 14,
-        borderRadius: 14,
-        ...Platform.select({
-            ios: {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.2,
-                shadowRadius: 10,
-            },
-            android: {
-                elevation: 6,
-            },
-        }),
-    },
-    fabText: {
-        color: '#FFF',
-        fontSize: 16,
-        fontWeight: '700',
-        letterSpacing: 0.3,
     },
 });

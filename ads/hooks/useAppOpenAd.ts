@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { useSegments } from 'expo-router';
 import AppOpenService from '../appOpen.service';
+import AdMobService from '../admob.service';
 import { useAdsStore } from '../../store/ads.store';
 
 /**
@@ -30,6 +31,11 @@ export const useAppOpenAd = () => {
         appState.current.match(/inactive|background/) &&
         nextAppState === 'active'
       ) {
+        // 1. Fetch fresh Remote Config on every app resume (Foreground transition)
+        AdMobService.refreshConfig(true).catch(err => {
+          console.error('[useAppOpenAd] Failed to refresh Remote Config:', err);
+        });
+
         // Additional safety: Don't show if app is loading something critical
         const { isLoading } = useAdsStore.getState();
         

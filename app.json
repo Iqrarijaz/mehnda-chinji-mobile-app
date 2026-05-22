@@ -59,9 +59,9 @@
     "splash": {
       "image": "./public/logo_with_text.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
+      "backgroundColor": "#F8FAFC",
       "dark": {
-        "backgroundColor": "#000000"
+        "backgroundColor": "#0F172A"
       }
     },
     "plugins": [
@@ -80,7 +80,19 @@
         "expo-build-properties",
         {
           "ios": {
-            "useFrameworks": "static"
+            "useFrameworks": "static",
+            "extraPods": [
+              { "name": "GoogleMobileAdsMediationAppLovin", "version": "13.0.1.0" },
+              { "name": "GoogleMobileAdsMediationFacebook", "version": "6.15.2.0" },
+              { "name": "GoogleMobileAdsMediationUnity", "version": "4.12.3.0" }
+            ]
+          },
+          "android": {
+            "dependencies": [
+              "com.google.ads.mediation:applovin:13.1.0.0",
+              "com.google.ads.mediation:facebook:6.19.0.0",
+              "com.google.ads.mediation:unity:4.13.2.0"
+            ]
           }
         }
       ],

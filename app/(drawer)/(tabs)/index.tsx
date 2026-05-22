@@ -16,6 +16,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BannerAd from '@/ads/components/BannerAd';
+import { FeaturedPrideCard } from '@/components/home/FeaturedPrideCard';
+import { usePosts } from '@/hooks/usePosts';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -25,6 +27,11 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isSearchActive, setIsSearchActive] = React.useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = React.useState(false);
+
+  // Fetch live village pride posts to see if a spotlight hero exists
+  const { data: prideData } = usePosts({ category: 'PRIDE' });
+  const livePosts = prideData?.pages?.flatMap(page => page.data) || [];
+  const featuredHero = livePosts[0];
 
   return (
     <ThemedView style={styles.container}>
@@ -43,6 +50,9 @@ export default function HomeScreen() {
         >
           {/* Categories */}
           <CategoryGrid />
+
+          {/* Featured Village Pride Spotlight */}
+          {featuredHero ? <FeaturedPrideCard /> : null}
 
           {/* Quick Access Section */}
           <Animated.View entering={SlideInLeft.delay(500).duration(400)} style={styles.sectionHeader}>

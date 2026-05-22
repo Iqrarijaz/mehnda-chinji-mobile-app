@@ -29,6 +29,17 @@ interface PostModalProps {
     editingPost?: any; // If provided, we are in edit mode
 }
 
+type PostFormState = {
+    content: string;
+    type: string;
+    subType: 'YOUTH_PRIDE' | 'LIVING_LEGEND' | 'DECEASED';
+    fullName: string;
+    profileTitle: string;
+    dateOfBirth: string;
+    dateOfDeath: string;
+    achievementsText: string;
+};
+
 
 
 export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => {
@@ -36,11 +47,23 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
 
-    const [content, setContent] = useState('');
-    const [type, setType] = useState('General');
+    const [form, setForm] = useState<PostFormState>({
+        content: '',
+        type: 'General',
+        subType: 'LIVING_LEGEND',
+        fullName: '',
+        profileTitle: '',
+        dateOfBirth: '',
+        dateOfDeath: '',
+        achievementsText: '',
+    });
     const [images, setImages] = useState<any[]>([]);
+    const [profileImage, setProfileImage] = useState<any | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+    const updateForm = <K extends keyof PostFormState>(key: K, value: PostFormState[K]) => {
+        setForm((prev) => ({ ...prev, [key]: value }));
+    };
 
     const { data: categoriesData, isLoading: categoriesLoading } = usePostCategories();
     // The array is nested inside categoriesData.data.data based on the backend response format
@@ -52,26 +75,60 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
 
     useEffect(() => {
         if (editingPost) {
-            setContent(editingPost.content || '');
-            setType(editingPost.type || 'General');
+            const isPride = editingPost.category === 'PRIDE' || editingPost.type === 'VILLAGE_PRIDE';
+            setForm({
+                content: editingPost.content || '',
+                type: isPride ? 'VILLAGE_PRIDE' : (editingPost.type || 'General'),
+                subType: (isPride ? (editingPost.type !== 'VILLAGE_PRIDE' ? editingPost.type : editingPost.metadata?.subType) : 'LIVING_LEGEND') || 'LIVING_LEGEND',
+                fullName: editingPost.metadata?.fullName || '',
+                profileTitle: editingPost.metadata?.title || '',
+                dateOfBirth: editingPost.metadata?.dateOfBirth || '',
+                dateOfDeath: editingPost.metadata?.dateOfDeath || '',
+                achievementsText: (editingPost.metadata?.achievements || []).join('\n'),
+            });
             setImages(editingPost.images || []);
+            setProfileImage(editingPost.metadata?.profileImage || null);
         } else {
-            setContent('');
-            setType('General');
+            setForm({
+                content: '',
+                type: 'General',
+                subType: 'LIVING_LEGEND',
+                fullName: '',
+                profileTitle: '',
+                dateOfBirth: '',
+                dateOfDeath: '',
+                achievementsText: '',
+            });
             setImages([]);
+            setProfileImage(null);
         }
     }, [editingPost, visible]);
 
     useEffect(() => {
-        if (!editingPost && categories.length > 0 && type === 'General') {
+        if (!editingPost && categories.length > 0 && form.type === 'General') {
             const hasGeneral = categories.some((c: any) => c.name === 'General');
             if (!hasGeneral) {
-                setType(categories[0].name);
+                updateForm('type', categories[0].name);
             }
         }
-    }, [categories, editingPost, visible]);
+    }, [categories, editingPost, form.type, visible]);
 
-    const selectedCategory = categories.find((c: any) => c.name === type);
+    const selectedCategory = categories.find((c: any) => c.name === form.type);
+    const isVillagePride = form.type === 'VILLAGE_PRIDE';
+
+    const pickProfileImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsMultipleSelection: false,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.7,
+        });
+
+        if (!result.canceled && result.assets?.[0]) {
+            setProfileImage(result.assets[0]);
+        }
+    };
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -107,15 +164,77 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
     };
 
     const handleSubmit = async () => {
-        if (!content.trim()) {
+        if (!form.content.trim()) {
             Toast.show({ type: 'error', text1: 'Content Required', text2: 'Please enter something for the post.' });
             return;
+        }
+        if (isVillagePride) {
+            if (!form.fullName.trim() || !form.profileTitle.trim()) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Missing fields',
+                    text2: 'Please provide full name and title for Village Pride.',
+                });
+                return;
+            }
+            if (form.subType === 'DECEASED' && !form.dateOfDeath.trim()) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Date of death required',
+                    text2: 'Please add date of death for In Memoriam.',
+                });
+                return;
+            }
+            if (!profileImage) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Profile Image Required',
+                    text2: 'Please add a profile image for the Pride card.',
+                });
+                return;
+            }
         }
 
         setIsSubmitting(true);
         const formData = new FormData();
-        formData.append('content', content);
-        formData.append('type', type);
+        formData.append('content', form.content);
+        
+        const category = isVillagePride ? 'PRIDE' : 'FEED';
+        const postType = isVillagePride ? form.subType : form.type;
+        
+        formData.append('category', category);
+        formData.append('type', postType);
+
+        if (isVillagePride) {
+            formData.append('metadata[fullName]', form.fullName.trim());
+            formData.append('metadata[title]', form.profileTitle.trim());
+            if (form.dateOfBirth.trim()) {
+                formData.append('metadata[dateOfBirth]', form.dateOfBirth.trim());
+            }
+            if (form.subType === 'DECEASED' && form.dateOfDeath.trim()) {
+                formData.append('metadata[dateOfDeath]', form.dateOfDeath.trim());
+            }
+            form.achievementsText
+                .split('\n')
+                .map((line) => line.trim())
+                .filter(Boolean)
+                .forEach((line, idx) => {
+                    formData.append(`metadata[achievements][${idx}]`, line);
+                });
+            
+            if (profileImage?.uri) {
+                const uriParts = profileImage.uri.split('.');
+                const fileType = uriParts[uriParts.length - 1];
+                const file: any = {
+                    uri: profileImage.uri,
+                    name: `profileImage.${fileType}`,
+                    type: `image/${fileType}`
+                };
+                formData.append('profileImage', file);
+            } else if (typeof profileImage === 'string') {
+                formData.append('metadata[profileImage]', profileImage);
+            }
+        }
 
         images.forEach((image, index) => {
             if (image.uri) {
@@ -223,10 +342,10 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
                                                     key={cat.name}
                                                     style={[
                                                         styles.menuItem,
-                                                        type === cat.name && { backgroundColor: colors.primary + '10' }
+                                                        form.type === cat.name && { backgroundColor: colors.primary + '10' }
                                                     ]}
                                                     onPress={() => {
-                                                        setType(cat.name);
+                                                        updateForm('type', cat.name);
                                                         setIsDropdownVisible(false);
                                                     }}
                                                 >
@@ -235,11 +354,11 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
                                                     </View>
                                                     <ThemedText style={[
                                                         styles.menuItemText,
-                                                        type === cat.name && { color: colors.primary, fontWeight: '700' }
+                                                        form.type === cat.name && { color: colors.primary, fontWeight: '700' }
                                                     ]}>
                                                         {cat.name}
                                                     </ThemedText>
-                                                    {type === cat.name && (
+                                                    {form.type === cat.name && (
                                                         <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
                                                     )}
                                                 </TouchableOpacity>
@@ -256,10 +375,110 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
                             placeholder="What's the news?"
                             placeholderTextColor={colors.textSecondary}
                             multiline
-                            value={content}
-                            onChangeText={setContent}
+                            value={form.content}
+                            onChangeText={(value) => updateForm('content', value)}
                             autoFocus={!editingPost}
                         />
+
+                        {isVillagePride && (
+                            <View style={styles.prideFieldsContainer}>
+                                <ThemedText style={styles.sectionLabel}>Pride Metadata</ThemedText>
+                                
+                                {/* Profile Image Picker at the start */}
+                                <View style={styles.profileImageContainer}>
+                                    <View style={styles.profileImageInner}>
+                                        <TouchableOpacity
+                                            onPress={profileImage ? undefined : pickProfileImage}
+                                            style={[styles.profileImageWrapper, { 
+                                                borderColor: colors.border, 
+                                                backgroundColor: colors.card,
+                                                borderStyle: profileImage ? 'solid' : 'dashed' 
+                                            }]}
+                                            activeOpacity={profileImage ? 1 : 0.8}
+                                        >
+                                            {profileImage ? (
+                                                <Image source={{ uri: profileImage.uri || profileImage }} style={styles.profilePreviewImage} contentFit="cover" />
+                                            ) : (
+                                                <View style={styles.profileUploadPlaceholder}>
+                                                    <Ionicons name="person-add-outline" size={26} color={colors.primary} />
+                                                    <ThemedText style={[styles.profileUploadText, { color: colors.textSecondary }]}>
+                                                        Upload Photo
+                                                    </ThemedText>
+                                                </View>
+                                            )}
+                                        </TouchableOpacity>
+                                        {profileImage && (
+                                            <TouchableOpacity 
+                                                style={[styles.profileRemoveIcon, { zIndex: 99 }]} 
+                                                onPress={() => setProfileImage(null)}
+                                            >
+                                                <Ionicons name="trash" size={16} color="#FFFFFF" />
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+                                    <ThemedText style={[styles.fieldLabelText, { textAlign: 'center', marginTop: 8 }]}>
+                                        Profile Hero Image <ThemedText style={{ color: '#FF5252' }}>*</ThemedText>
+                                    </ThemedText>
+                                </View>
+                                <View style={[styles.segmented, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                                    {(['LIVING_LEGEND', 'DECEASED'] as const).map((option) => {
+                                        const active = option === form.subType;
+                                        const label = option === 'DECEASED' ? 'In Memoriam' : 'Our Pride Legends';
+                                        return (
+                                            <TouchableOpacity
+                                                key={option}
+                                                style={[styles.segmentBtn, active && { backgroundColor: colors.primary }]}
+                                                onPress={() => updateForm('subType', option)}
+                                            >
+                                                <ThemedText style={[styles.segmentBtnText, { color: active ? '#FFFFFF' : colors.textSecondary }]}>
+                                                    {label}
+                                                </ThemedText>
+                                            </TouchableOpacity>
+                                        );
+                                    })}
+                                </View>
+
+                                <TextInput
+                                    style={[styles.metaInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.card }]}
+                                    placeholder="Full name"
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={form.fullName}
+                                    onChangeText={(value) => updateForm('fullName', value)}
+                                />
+                                <TextInput
+                                    style={[styles.metaInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.card }]}
+                                    placeholder="Title / designation"
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={form.profileTitle}
+                                    onChangeText={(value) => updateForm('profileTitle', value)}
+                                />
+                                <TextInput
+                                    style={[styles.metaInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.card }]}
+                                    placeholder="Date of birth (YYYY-MM-DD)"
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={form.dateOfBirth}
+                                    onChangeText={(value) => updateForm('dateOfBirth', value)}
+                                />
+                                {form.subType === 'DECEASED' && (
+                                    <TextInput
+                                        style={[styles.metaInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.card }]}
+                                        placeholder="Date of death (YYYY-MM-DD)"
+                                        placeholderTextColor={colors.textSecondary}
+                                        value={form.dateOfDeath}
+                                        onChangeText={(value) => updateForm('dateOfDeath', value)}
+                                    />
+                                )}
+                                <TextInput
+                                    style={[styles.metaTextArea, { color: colors.text, borderColor: colors.border, backgroundColor: colors.card }]}
+                                    placeholder="Key achievements (one per line)"
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={form.achievementsText}
+                                    onChangeText={(value) => updateForm('achievementsText', value)}
+                                    multiline
+                                    textAlignVertical="top"
+                                />
+                            </View>
+                        )}
 
                         {/* Image Selection */}
                         <ThemedText style={styles.sectionLabel}>Media</ThemedText>
@@ -301,10 +520,10 @@ export const PostModal = ({ visible, onClose, editingPost }: PostModalProps) => 
                     <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
                         <TouchableOpacity
                             onPress={handleSubmit}
-                            disabled={isSubmitting || !content.trim()}
+                            disabled={isSubmitting || !form.content.trim()}
                             style={[
                                 styles.mainPostButton,
-                                { backgroundColor: content.trim() ? colors.primary : colors.border }
+                                { backgroundColor: form.content.trim() ? colors.primary : colors.border }
                             ]}
                         >
                             {isSubmitting ? (
@@ -455,6 +674,44 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 24,
     },
+    prideFieldsContainer: {
+        marginBottom: 20,
+    },
+    segmented: {
+        borderWidth: 1,
+        borderRadius: Layout.borderRadius + 6,
+        padding: 4,
+        flexDirection: 'row',
+        marginBottom: 10,
+    },
+    segmentBtn: {
+        flex: 1,
+        minHeight: 40,
+        borderRadius: Layout.borderRadius + 3,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 8,
+    },
+    segmentBtnText: {
+        fontSize: 12.5,
+        fontWeight: '700',
+    },
+    metaInput: {
+        minHeight: 44,
+        borderWidth: 1,
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 12,
+        fontSize: 14,
+        marginBottom: 10,
+    },
+    metaTextArea: {
+        minHeight: 84,
+        borderWidth: 1,
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 12,
+        paddingTop: 10,
+        fontSize: 13,
+    },
     imageSection: {
         flexDirection: 'row',
     },
@@ -522,5 +779,63 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontWeight: '700',
         fontSize: 16,
+    },
+    profileImageContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 16,
+    },
+    profileImageInner: {
+        width: 100,
+        height: 100,
+        position: 'relative',
+    },
+    profileImageWrapper: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+    },
+    profilePreviewImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 50,
+    },
+    profileUploadPlaceholder: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+        borderRadius: 50,
+    },
+    profileUploadText: {
+        fontSize: 10.5,
+        fontWeight: '700',
+        marginTop: 4,
+    },
+    profileRemoveIcon: {
+        position: 'absolute',
+        top: -4,
+        right: -4,
+        backgroundColor: '#FF5252',
+        borderRadius: 16,
+        width: 32,
+        height: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.5,
+        elevation: 5,
+    },
+    fieldLabelText: {
+        fontSize: 12.5,
+        fontWeight: '700',
+        marginBottom: 6,
+        opacity: 0.85,
     },
 });

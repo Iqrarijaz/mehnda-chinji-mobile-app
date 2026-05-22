@@ -46,6 +46,19 @@ import AdManager from '@/ads/adManager.service';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+// Disable global font scaling to prevent UI breakage on devices with large accessibility fonts
+import { Text, TextInput } from 'react-native';
+
+if (!(Text as any).defaultProps) {
+  (Text as any).defaultProps = {};
+}
+(Text as any).defaultProps.allowFontScaling = false;
+
+if (!(TextInput as any).defaultProps) {
+  (TextInput as any).defaultProps = {};
+}
+(TextInput as any).defaultProps.allowFontScaling = false;
+
 function DrawerLayout() {
   const { theme } = useTheme();
   const { loading } = useAuth();
@@ -179,12 +192,12 @@ function AppInitializer() {
         setShowRating(true);
       }
     };
-    
+
     // Slight delay so it doesn't interrupt the immediate startup flow
     const timer = setTimeout(() => {
       checkRating();
     }, 5000);
-    
+
     return () => clearTimeout(timer);
   }, []);
 
@@ -198,9 +211,9 @@ function AppInitializer() {
         releaseNotes={updateInfo.releaseNotes}
         onClose={() => setUpdateInfo(prev => ({ ...prev, visible: false }))}
       />
-      <RatingModal 
-        visible={showRating} 
-        onClose={() => setShowRating(false)} 
+      <RatingModal
+        visible={showRating}
+        onClose={() => setShowRating(false)}
       />
     </>
   );

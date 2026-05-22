@@ -28,8 +28,8 @@ export default function RegisterScreen() {
                 <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
                     <View style={styles.headerContent}>
                         <Image
-                            source={require('../../public/icon.svg')}
-                            style={{ width: 48, height: 48, marginBottom: 16 }}
+                            source={require('../../public/white_logo.svg')}
+                            style={{ width: 200, height: 50, marginBottom: 12 }}
                             contentFit="contain"
                         />
                         <ThemedText style={styles.headerTitle}>Create an Account</ThemedText>

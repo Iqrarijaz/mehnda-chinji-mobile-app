@@ -25,6 +25,8 @@ export const AnalyticsEvents = {
     POST_LIKED: 'post_liked',
     POST_COMMENTED: 'post_commented',
     POST_SHARED: 'post_shared',
+    BANNER_GENERATED: 'banner_generated',
+    BANNER_SAVED: 'banner_saved',
 
     // Community Specific
     DONOR_CARD_CLICKED: 'donor_card_clicked',
@@ -55,6 +57,7 @@ export const AnalyticsEvents = {
     AD_REWARD_EARNED: 'ad_reward_earned',
     BANNER_CLICK_ATTEMPT: 'banner_click_attempt',
     AD_LOAD_TIME: 'ad_load_time',
+    AD_REVENUE: 'ad_revenue',
 
     // Updates
     UPDATE_AVAILABLE: 'update_available',

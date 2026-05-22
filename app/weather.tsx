@@ -301,6 +301,7 @@ export default function WeatherScreen() {
                         />
                     </Animated.View>
 
+
                     {/* Stats */}
                     <Animated.View entering={FadeInDown.delay(150)}>
                         <WeatherStats
@@ -309,9 +310,8 @@ export default function WeatherScreen() {
                         />
                     </Animated.View>
 
-                    <Animated.View entering={FadeInDown.delay(200)}>
-                        <NativeAd placement="weather" />
-                    </Animated.View>
+                    <NativeAd placement="weather" />
+
 
                     {/* Hourly */}
                     <Animated.View entering={FadeInDown.delay(250)}>
@@ -334,11 +334,13 @@ export default function WeatherScreen() {
                             />
                         </Animated.View>
                     )}
-                    {/* Banner */}
-                    <View style={styles.bannerContainer}>
-                        <BannerAd placement="weather" />
-                    </View>
+
+
                 </ScrollView>
+
+                <View style={styles.bannerContainer}>
+                    <BannerAd placement="weather" />
+                </View>
             </KeyboardAvoidingView>
         </View>
     );
@@ -389,8 +391,8 @@ const styles = StyleSheet.create({
     },
 
     bannerContainer: {
-        marginTop: 24,
         justifyContent: 'center',
-        minHeight: 60,
+        // minHeight: 60,
+        marginBottom: 26,
     },
 });

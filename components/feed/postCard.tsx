@@ -45,12 +45,7 @@ export interface PostData {
     _id: string;
     content: string;
     images: string[];
-    type:
-    | 'GENERAL'
-    | 'DEATH'
-    | 'ACCIDENT'
-    | 'SPORTS'
-    | 'SPONSORED';
+    type: string;
 
     likesCount: number;
     commentsCount: number;
@@ -84,6 +79,53 @@ interface PostCardProps {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                            Like Button Custom Hook                         */
+/* -------------------------------------------------------------------------- */
+
+export const useLikeButtonState = (
+    postId: string,
+    initialLiked: boolean,
+    initialLikes: number
+) => {
+    const [isLiked, setIsLiked] = useState(initialLiked);
+    const [likesCount, setLikesCount] = useState(initialLikes);
+    const likePostMutation = useLikePost();
+
+    // Synchronize local state with fresh props from query/websocket updates
+    useEffect(() => {
+        setIsLiked(initialLiked);
+    }, [initialLiked]);
+
+    useEffect(() => {
+        setLikesCount(initialLikes);
+    }, [initialLikes]);
+
+    const handleLike = useCallback(() => {
+        setIsLiked(prevLiked => {
+            const nextLiked = !prevLiked;
+            setLikesCount(prevCount =>
+                nextLiked
+                    ? prevCount + 1
+                    : Math.max(prevCount - 1, 0)
+            );
+
+            if (nextLiked) {
+                analyticsService.trackEvent(AnalyticsEvents.POST_LIKED, { postId });
+            }
+            return nextLiked;
+        });
+
+        likePostMutation.mutate(postId);
+    }, [postId, likePostMutation]);
+
+    return {
+        isLiked,
+        likesCount,
+        handleLike,
+    };
+};
+
+/* -------------------------------------------------------------------------- */
 /*                              Like Button Memo                              */
 /* -------------------------------------------------------------------------- */
 
@@ -97,33 +139,11 @@ const LikeButton = memo(
         initialLiked: boolean;
         initialLikes: number;
     }) => {
-        const [isLiked, setIsLiked] =
-            useState(initialLiked);
-
-        const [likesCount, setLikesCount] =
-            useState(initialLikes);
-
-        const likePostMutation = useLikePost();
-
-        const handleLike = useCallback(() => {
-            setIsLiked(prevLiked => {
-                const nextLiked = !prevLiked;
-
-                setLikesCount(prevCount =>
-                    nextLiked
-                        ? prevCount + 1
-                        : Math.max(prevCount - 1, 0)
-                );
-
-                if (nextLiked) {
-                    analyticsService.trackEvent(AnalyticsEvents.POST_LIKED, { postId });
-                }
-
-                return nextLiked;
-            });
-
-            likePostMutation.mutate(postId);
-        }, [postId, likePostMutation]);
+        const { isLiked, likesCount, handleLike } = useLikeButtonState(
+            postId,
+            initialLiked,
+            initialLikes
+        );
 
         return (
             <TouchableOpacity

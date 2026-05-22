@@ -30,10 +30,10 @@ export interface AdsState {
 export const DEFAULT_ADS_CONFIG: AdsConfig = {
   enabled: false,
   banner: true,
-  native: false,
+  native: true,
   interstitial: true,
   rewarded: true,
-  appOpen: false,
+  appOpen: true,
   interstitial_interval: 3,
   rewarded_retry_delay: 5000,
 };

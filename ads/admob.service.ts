@@ -9,7 +9,7 @@ class AdMobService {
   private static instance: AdMobService;
   private isInitialized = false;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): AdMobService {
     if (!AdMobService.instance) {
@@ -31,11 +31,11 @@ class AdMobService {
       // 2. Initialize AdMob SDK
       const adapterStatuses = await mobileAds().initialize();
       console.log('[AdMobService] SDK Initialized', adapterStatuses);
-      
+
       this.isInitialized = true;
 
-      // 3. Setup Remote Config
-      await this.setupRemoteConfig();
+      // 3. Setup Remote Config (Force fresh fetch on startup/boot)
+      await this.setupRemoteConfig(true);
 
     } catch (error) {
       console.error('[AdMobService] Initialization failed:', error);
@@ -59,7 +59,7 @@ class AdMobService {
     }
   }
 
-  private async setupRemoteConfig() {
+  private async setupRemoteConfig(force = false) {
     const { setAdsConfig, setLoading, setLastFetchedAt, lastFetchedAt } = useAdsStore.getState();
 
     try {
@@ -67,7 +67,7 @@ class AdMobService {
       const rc = getRemoteConfig();
 
       await setConfigSettings(rc, {
-        minimumFetchIntervalMillis: FETCH_INTERVAL_MS,
+        minimumFetchIntervalMillis: force ? 0 : FETCH_INTERVAL_MS,
       });
 
       const configStr = JSON.stringify(DEFAULT_ADS_CONFIG);
@@ -77,23 +77,29 @@ class AdMobService {
       });
 
       const now = Date.now();
-      const shouldFetch = !lastFetchedAt || (now - lastFetchedAt > FETCH_INTERVAL_MS);
+      const shouldFetch = force || !lastFetchedAt || (now - lastFetchedAt > FETCH_INTERVAL_MS);
 
       if (shouldFetch) {
         await fetchAndActivate(rc);
         setLastFetchedAt(now);
+        console.log('[AdMobService] Remote Config fetched and activated successfully.');
       }
 
       const configKey = __DEV__ ? 'test_ads' : 'prod_ads';
       const adsJson = getValue(rc, configKey).asString();
       const config = this.parseConfig(adsJson);
-      
+
       setAdsConfig(config);
     } catch (error) {
       console.error('[AdMobService] Remote Config error:', error);
     } finally {
       setLoading(false);
     }
+  }
+
+  public async refreshConfig(force = false): Promise<void> {
+    // Re-fetch remote config and update ads configuration
+    await this.setupRemoteConfig(force);
   }
 
   private parseConfig(json: string): AdsConfig {

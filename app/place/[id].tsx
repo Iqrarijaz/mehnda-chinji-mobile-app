@@ -24,6 +24,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopperCard from '@/components/places/TopperCard';
 import EventCard from '@/components/places/EventCard';
 import { useAuth } from '@/context/AuthContext';
+import BannerAd from '@/ads/components/BannerAd';
 
 const PlaceDetailScreen = () => {
     const { id, placeData, color, category: categoryParam } = useLocalSearchParams<{
@@ -485,6 +486,10 @@ const PlaceDetailScreen = () => {
                 )}
             </ScrollView>
 
+            <View style={styles.bannerContainer}>
+                <BannerAd placement="essential" />
+            </View>
+
             <ReportModal
                 ref={reportModalRef}
                 targetId={place._id}
@@ -831,5 +836,9 @@ const styles = StyleSheet.create({
     eduEmptyText: {
         fontSize: 13,
         fontWeight: '500',
+    },
+    bannerContainer: {
+        justifyContent: 'center',
+        minHeight: 60,
     },
 });

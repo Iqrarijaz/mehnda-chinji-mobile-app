@@ -249,9 +249,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     bloodCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         backgroundColor: '#a91111ff',
         alignItems: 'center',
         justifyContent: 'center',
@@ -262,9 +262,12 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     bloodText: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '900',
         color: '#ffffffff',
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        includeFontPadding: false,
     },
     contentContainer: {
         flex: 1,

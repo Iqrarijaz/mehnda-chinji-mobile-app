@@ -1,23 +1,23 @@
 import apiClient from '../client';
 import { ConversationSource } from '../../types/chat';
 
-export const createOrGetConversation = async (receiverId: string, source: ConversationSource | null = ConversationSource.NONE) => {
+export const createOrGetConversation = async (receiverId: string, source: ConversationSource | null = ConversationSource.NONE): Promise<any> => {
     return apiClient.post('/api/user/chat/conversation', { receiverId, source });
 };
 
-export const getConversationsLines = async () => {
+export const getConversationsLines = async (): Promise<any> => {
     return apiClient.get('/api/user/chat/conversations');
 };
 
-export const sendMessage = async (conversationId: string, text: string, type: 'text' | 'image' | 'file' = 'text') => {
+export const sendMessage = async (conversationId: string, text: string, type: 'text' | 'image' | 'file' = 'text'): Promise<any> => {
     return apiClient.post(`/api/user/chat/message/${conversationId}`, { text, type });
 };
 
-export const getMessages = async (conversationId: string, page = 1) => {
+export const getMessages = async (conversationId: string, page = 1): Promise<any> => {
     return apiClient.get(`/api/user/chat/messages/${conversationId}?page=${page}`);
 };
 
-export const markMessagesSeen = async (conversationId: string) => {
+export const markMessagesSeen = async (conversationId: string): Promise<boolean> => {
     try {
         await apiClient.put(`/api/user/chat/seen/${conversationId}`, {});
         return true;
@@ -28,14 +28,14 @@ export const markMessagesSeen = async (conversationId: string) => {
     }
 };
 
-export const getConversationDetails = async (conversationId: string) => {
+export const getConversationDetails = async (conversationId: string): Promise<any> => {
     return apiClient.get(`/api/user/chat/details/${conversationId}`);
 };
 
-export const blockConversation = async (conversationId: string) => {
+export const blockConversation = async (conversationId: string): Promise<any> => {
     return apiClient.put(`/api/user/chat/block/${conversationId}`, {});
 };
 
-export const unblockConversation = async (conversationId: string) => {
+export const unblockConversation = async (conversationId: string): Promise<any> => {
     return apiClient.put(`/api/user/chat/unblock/${conversationId}`, {});
 };
