@@ -19,6 +19,7 @@ import { Colors } from '@/constants/colors';
 import { clientStorage } from '@/utils/storage';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '@/context/AuthContext';
+import BannerAd from '@/ads/components/BannerAd';
 
 
 const { width, height } = Dimensions.get('window');
@@ -173,6 +174,7 @@ export default function OnboardingScreen() {
                     </Animated.View>
                 </View>
             </SafeAreaView>
+            <BannerAd placement="onboarding" style={styles.bannerAd} />
         </View>
     );
 }
@@ -224,5 +226,10 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
+    },
+    bannerAd: {
+        alignSelf: 'center',
+        width: '100%',
+        marginTop: 10,
     },
 });

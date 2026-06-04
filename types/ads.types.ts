@@ -28,7 +28,7 @@ export interface AdsState {
 }
 
 export const DEFAULT_ADS_CONFIG: AdsConfig = {
-  enabled: false,
+  enabled: true,
   banner: true,
   native: true,
   interstitial: true,

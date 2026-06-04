@@ -41,3 +41,8 @@ FORMAT: [Location] -> [Ad Type] (Implementation Details)
      * Placement: Positioned at the bottom of the screen (sticky/fixed).
      * Behavior: Independently scrollable screen content, safe area handled dynamically on Android and iOS.
 
+9. ONBOARDING SCREEN
+   - Banner Ad: Anchored Adaptive Banner.
+     * Placement: Positioned at the absolute bottom of the Onboarding screen (full-width, below safe area).
+     * Behavior: Placed below the pagination and Next buttons to keep slide contents fully readable.
+

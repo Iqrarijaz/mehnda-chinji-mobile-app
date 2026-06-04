@@ -216,7 +216,7 @@ const ExpensesTab = React.memo(({
             ) : (
                 <FlatList
                     data={expenses}
-                    keyExtractor={(item) => item._id}
+                    keyExtractor={(item, index) => `${item._id || ''}-${index}`}
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                     contentContainerStyle={{ paddingBottom: 80 }}

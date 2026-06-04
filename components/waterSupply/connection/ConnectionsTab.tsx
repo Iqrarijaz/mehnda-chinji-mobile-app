@@ -237,7 +237,7 @@ const ConnectionsTab = React.memo(({
             ) : (
                 <FlatList
                     data={connections}
-                    keyExtractor={(item) => item._id}
+                    keyExtractor={(item, index) => `${item._id || ''}-${index}`}
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                     contentContainerStyle={{ paddingBottom: 80 }}

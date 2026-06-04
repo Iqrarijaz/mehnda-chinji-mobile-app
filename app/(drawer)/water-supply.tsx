@@ -91,6 +91,7 @@ export default function WaterSupplyScreen() {
     const [expenseSearch, setExpenseSearch] = useState('');
 
     const [reportMonths, setReportMonths] = useState(6);
+    const [reportMonthFilter, setReportMonthFilter] = useState(new Date().toISOString().substring(0, 7)); // YYYY-MM
 
     // ----------------------------------------------------
     // REACT QUERY HOOKS
@@ -211,7 +212,8 @@ export default function WaterSupplyScreen() {
 
     // Report Query
     const reportFilters = {
-        months: reportMonths
+        months: reportMonths,
+        reportMonth: reportMonthFilter || undefined
     };
     const {
         data: reportRes,
@@ -764,6 +766,8 @@ export default function WaterSupplyScreen() {
                         reportData={reportData}
                         reportMonths={reportMonths}
                         setReportMonths={setReportMonths}
+                        reportMonthFilter={reportMonthFilter}
+                        setReportMonthFilter={setReportMonthFilter}
                         loading={loadingReport}
                         isDark={isDark}
                         colors={colors}
@@ -773,7 +777,7 @@ export default function WaterSupplyScreen() {
 
             {/* Connection Add/Edit Modal */}
             <ConnectionModal
-                key={connModalOpen ? (editingConn?._id ? `edit-${editingConn._id}` : 'add') : 'closed'}
+                key={connModalOpen ? (editingConn?._id ? `edit-${editingConn._id}` : 'add') : 'closed-conn'}
                 visible={connModalOpen}
                 onClose={() => setConnModalOpen(false)}
                 mode={connModalMode}
@@ -785,7 +789,7 @@ export default function WaterSupplyScreen() {
 
             {/* Bill Add/Edit Modal */}
             <BillModal
-                key={billModalOpen ? (editingBill?._id ? `edit-${editingBill._id}` : 'add') : 'closed'}
+                key={billModalOpen ? (editingBill?._id ? `edit-${editingBill._id}` : 'add') : 'closed-bill'}
                 visible={billModalOpen}
                 onClose={() => setBillModalOpen(false)}
                 mode={billModalMode}
@@ -798,7 +802,7 @@ export default function WaterSupplyScreen() {
 
             {/* Bulk Bill Modal */}
             <BulkBillModal
-                key={bulkBillModalOpen ? 'open' : 'closed'}
+                key={bulkBillModalOpen ? 'open' : 'closed-bulk'}
                 visible={bulkBillModalOpen}
                 onClose={() => setBulkBillModalOpen(false)}
                 onSubmit={handleBulkBillSubmit}
@@ -808,7 +812,7 @@ export default function WaterSupplyScreen() {
 
             {/* Pay Bill Modal */}
             <PayBillModal
-                key={payBillModalOpen ? `pay-${payingBillId}` : 'closed'}
+                key={payBillModalOpen ? `pay-${payingBillId}` : 'closed-pay'}
                 visible={payBillModalOpen}
                 onClose={() => setPayBillModalOpen(false)}
                 onSubmit={handlePayBillSubmit}
@@ -818,7 +822,7 @@ export default function WaterSupplyScreen() {
 
             {/* Expense Modal */}
             <ExpenseModal
-                key={expenseModalOpen ? (editingExpense?._id ? `edit-${editingExpense._id}` : 'add') : 'closed'}
+                key={expenseModalOpen ? (editingExpense?._id ? `edit-${editingExpense._id}` : 'add') : 'closed-expense'}
                 visible={expenseModalOpen}
                 onClose={() => setExpenseModalOpen(false)}
                 mode={expenseModalMode}

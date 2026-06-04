@@ -13,6 +13,7 @@ interface BannerAdProps {
 const BannerAd: React.FC<BannerAdProps> = ({ style, placement }) => {
   const canShow = useAdsStore(selectCanShowBanner);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const startTimeRef = useRef(Date.now());
 
@@ -22,7 +23,7 @@ const BannerAd: React.FC<BannerAdProps> = ({ style, placement }) => {
     }
   }, [canShow]);
 
-  if (!canShow || !isMounted) {
+  if (!canShow || !isMounted || loadFailed) {
     return null;
   }
 
@@ -45,6 +46,7 @@ const BannerAd: React.FC<BannerAdProps> = ({ style, placement }) => {
         onAdFailedToLoad={(error) => {
           console.error('[BannerAd] Failed to load:', error);
           setIsLoaded(false);
+          setLoadFailed(true);
           analyticsService.trackEvent(AnalyticsEvents.AD_FAILED, { type: 'banner', placement, error: error.message });
         }}
         onAdOpened={() => {

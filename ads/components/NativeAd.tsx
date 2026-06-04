@@ -14,6 +14,7 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
   const colors = Colors[theme];
   const canShow = useAdsStore(selectCanShowNative);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const startTimeRef = useRef(Date.now());
 
@@ -24,7 +25,7 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
     }
   }, [canShow]);
 
-  if (!canShow || !isMounted) {
+  if (!canShow || !isMounted || loadFailed) {
     return null;
   }
 
@@ -55,6 +56,7 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
           onAdFailedToLoad={(error) => {
             console.error('[NativeAd] Failed to load:', error);
             setIsLoaded(false);
+            setLoadFailed(true);
             analyticsService.trackEvent(AnalyticsEvents.AD_FAILED, { type: 'native', placement, error: error.message });
           }}
           onAdOpened={() => {
