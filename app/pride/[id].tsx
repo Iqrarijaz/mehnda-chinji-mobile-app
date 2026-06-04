@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // Removed duplicate useRef import; added utilities
 import { Modal, ActivityIndicator, TouchableOpacity, View, Share, Dimensions, KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { useShareBanner } from '@/hooks/useShareBanner';
+import * as Linking from 'expo-linking';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +16,7 @@ import { usePostDetail, useLikePost, usePostComments, useAddComment } from '@/ho
 import Avatar from '@/components/ui/avatar';
 import { Image } from 'expo-image';
 import ShareBanner from '@/components/shareBanner/shareBanner';
+import NativeAd from '@/ads/components/NativeAd';
 import { analyticsService } from '@/analytics/analyticsService';
 import { AnalyticsEvents } from '@/analytics/analyticsEvents';
 
@@ -143,6 +145,24 @@ export default function PrideDetailsScreen() {
         setTimeout(() => {
             capture();
         }, 300);
+    };
+
+    const handleShareLink = async () => {
+        try {
+            // Use the https domain specified in app.json intentFilters to ensure it's clickable in WhatsApp
+            // Android App Links will intercept this and open the app directly if installed.
+            const playStoreLink = `https://play.google.com/store/apps/details?id=com.rehbar.community`;
+
+            const message = `Check out this inspiring story on Rehbar\n\nDon't have the app? Get it here:\n${playStoreLink}`;
+
+            await Share.share({
+                message,
+                title: 'Share Profile'
+            });
+            setModalVisible(false);
+        } catch (error) {
+            console.error('Error sharing link:', error);
+        }
     };
 
     return (
@@ -281,6 +301,10 @@ export default function PrideDetailsScreen() {
                     </Animated.View>
                 )}
 
+                {/* 3.2. Organic Ad Placement */}
+                <Animated.View entering={FadeInLeft.delay(380).duration(450)} style={{ paddingHorizontal: 20, marginVertical: 10 }}>
+                    <NativeAd placement="pride_details" />
+                </Animated.View>
 
                 {/* 3.5. Gallery Section */}
                 {postData.images && postData.images.length > 0 && (
@@ -321,7 +345,10 @@ export default function PrideDetailsScreen() {
                         <TouchableOpacity onPress={async () => { if (bannerUri) { await save(); setModalVisible(false); } }} style={{ paddingVertical: 12, paddingHorizontal: 24, backgroundColor: colors.primary, borderRadius: 8 }}><ThemedText style={{ color: '#fff', fontWeight: '700' }}>Save to Gallery</ThemedText></TouchableOpacity>
                         <TouchableOpacity onPress={async () => { if (bannerUri) { await share(); setModalVisible(false); } }} style={{ paddingVertical: 12, paddingHorizontal: 24, backgroundColor: colors.secondary, borderRadius: 8 }}><ThemedText style={{ color: '#fff', fontWeight: '700' }}>Share Banner</ThemedText></TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={() => setModalVisible(false)} style={{ marginTop: 24, paddingVertical: 10, paddingHorizontal: 20, borderWidth: 1, borderColor: '#fff', borderRadius: 8 }}><ThemedText style={{ color: '#fff' }}>Cancel</ThemedText></TouchableOpacity>
+                    <TouchableOpacity onPress={handleShareLink} style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 24, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 8, width: '80%', alignItems: 'center' }}>
+                        <ThemedText style={{ color: '#fff', fontWeight: '700' }}>🔗 Share Profile Link</ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setModalVisible(false)} style={{ marginTop: 20, paddingVertical: 10, paddingHorizontal: 20, borderWidth: 1, borderColor: '#fff', borderRadius: 8 }}><ThemedText style={{ color: '#fff' }}>Cancel</ThemedText></TouchableOpacity>
                 </View>
             </Modal>
         </KeyboardAvoidingView>

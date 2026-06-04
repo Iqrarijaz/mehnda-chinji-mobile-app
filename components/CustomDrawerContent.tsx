@@ -34,6 +34,7 @@ const MENU_ITEMS: MenuItem[] = [
     { label: 'Village Pride', icon: 'ribbon-outline', route: '/(drawer)/pride', section: 'Main' },
     { label: 'Blood Donors', icon: 'water-outline', route: '/(drawer)/(tabs)/blood', section: 'Main' },
     { label: 'Business Directory', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },
+    { label: 'Water Supply', icon: 'water-outline', route: '/(drawer)/water-supply', section: 'Main' },
     { label: 'My Requests', icon: 'list-outline', route: '/user/requests', section: 'Main' },
     { label: 'Profile', icon: 'person-outline', route: '/profile', section: 'Account' },
     { label: 'Settings', icon: 'settings-outline', route: '/settings', section: 'Account' },
@@ -67,8 +68,16 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
 
     const userEmail = user?.user?.email || '';
 
+    // Filter MENU_ITEMS based on user role
+    const filteredMenuItems = MENU_ITEMS.filter(item => {
+        if (item.route === '/(drawer)/water-supply') {
+            return user?.user?.role === 'WATER_SUPPLY_ADMIN'
+        }
+        return true;
+    });
+
     // Group items by section
-    const sections = MENU_ITEMS.reduce<Record<string, MenuItem[]>>((acc, item) => {
+    const sections = filteredMenuItems.reduce<Record<string, MenuItem[]>>((acc, item) => {
         const section = item.section || 'Other';
         if (!acc[section]) acc[section] = [];
         acc[section].push(item);

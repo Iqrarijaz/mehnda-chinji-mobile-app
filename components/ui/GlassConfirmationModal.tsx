@@ -1,13 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect } from 'react';
-import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming
-} from 'react-native-reanimated';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '../themedText';
 import { PremiumModal } from '../common/PremiumModal';
 import { Layout } from '@/constants/layout';
@@ -33,29 +27,11 @@ export const GlassConfirmationModal: React.FC<GlassConfirmationModalProps> = ({
     cancelText = 'Cancel',
     type = 'info'
 }) => {
-    const scale = useSharedValue(0.9);
-    const opacity = useSharedValue(0);
-
-    useEffect(() => {
-        if (visible) {
-            scale.value = withSpring(1, { damping: 15, stiffness: 100 });
-            opacity.value = withTiming(1, { duration: 300 });
-        } else {
-            scale.value = withTiming(0.9, { duration: 200 });
-            opacity.value = withTiming(0, { duration: 200 });
-        }
-    }, [visible]);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: opacity.value,
-    }));
-
     return (
         <PremiumModal visible={visible} onClose={onClose} type="centered" sheetStyle={{ backgroundColor: 'transparent', elevation: 0, paddingHorizontal: 0, paddingBottom: 0, paddingTop: 0 }}>
-            <Animated.View style={[styles.modalContent, animatedStyle]}>
+            <View style={styles.modalContent}>
                 <LinearGradient
-                    colors={['rgba(30, 41, 59, 0.95)', 'rgba(15, 23, 42, 0.98)']}
+                    colors={['rgba(255, 255, 255, 0.98)', 'rgba(241, 245, 249, 0.99)']}
                     style={StyleSheet.absoluteFill}
                 />
 
@@ -102,7 +78,7 @@ export const GlassConfirmationModal: React.FC<GlassConfirmationModalProps> = ({
                         </LinearGradient>
                     </TouchableOpacity>
                 </View>
-            </Animated.View>
+            </View>
         </PremiumModal>
     );
 };
@@ -121,10 +97,10 @@ const styles = StyleSheet.create({
         padding: 24,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.15)',
+        borderColor: 'rgba(0, 0, 0, 0.08)',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.1,
         shadowRadius: 20,
     },
     header: {
@@ -142,12 +118,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#0f172a',
         textAlign: 'center',
     },
     message: {
         fontSize: 15,
-        color: 'rgba(255, 255, 255, 0.7)',
+        color: '#475569',
         textAlign: 'center',
         lineHeight: 22,
         marginBottom: 28,
@@ -163,14 +139,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        backgroundColor: 'rgba(0, 0, 0, 0.03)',
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: 'rgba(0, 0, 0, 0.08)',
     },
     cancelText: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#94a3b8',
+        color: '#64748b',
     },
     confirmBtnWrapper: {
         flex: 1.5,
