@@ -203,16 +203,7 @@ export default function PrideDetailsScreen() {
                         styles.profileCard, 
                         { 
                             backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', 
-                            borderColor: colors.border, 
                             marginTop: -37 
-                        },
-                        subType === 'DECEASED' && {
-                            borderWidth: 0,
-                            borderColor: 'transparent',
-                            elevation: 0,
-                            shadowOpacity: 0,
-                            shadowRadius: 0,
-                            shadowOffset: { width: 0, height: 0 }
                         }
                     ]}
                 >
@@ -302,15 +293,6 @@ export default function PrideDetailsScreen() {
                         styles.storyCard, 
                         { 
                             backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', 
-                            borderColor: colors.border 
-                        },
-                        subType === 'DECEASED' && {
-                            borderWidth: 0,
-                            borderColor: 'transparent',
-                            elevation: 0,
-                            shadowOpacity: 0,
-                            shadowRadius: 0,
-                            shadowOffset: { width: 0, height: 0 }
                         }
                     ]}>
                         <ThemedText style={[styles.storyText, { color: colors.text }]}>
@@ -326,15 +308,6 @@ export default function PrideDetailsScreen() {
                             styles.milestonesCard, 
                             { 
                                 backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', 
-                                borderColor: colors.border 
-                            },
-                            subType === 'DECEASED' && {
-                                borderWidth: 0,
-                                borderColor: 'transparent',
-                                elevation: 0,
-                                shadowOpacity: 0,
-                                shadowRadius: 0,
-                                shadowOffset: { width: 0, height: 0 }
                             }
                         ]}>
                             {achievements.map((achievement: string, idx: number) => (
@@ -364,18 +337,7 @@ export default function PrideDetailsScreen() {
                             {postData.images.map((img: string, idx: number) => (
                                 <View 
                                     key={idx} 
-                                    style={[
-                                        styles.galleryImageWrap, 
-                                        { borderColor: colors.border },
-                                        subType === 'DECEASED' && {
-                                            borderWidth: 0,
-                                            borderColor: 'transparent',
-                                            elevation: 0,
-                                            shadowOpacity: 0,
-                                            shadowRadius: 0,
-                                            shadowOffset: { width: 0, height: 0 }
-                                        }
-                                    ]}
+                                    style={styles.galleryImageWrap}
                                 >
                                     <Image
                                         source={{ uri: img }}
@@ -474,7 +436,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingBottom: 12,
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: 0,
         marginTop: -40,
     },
     avatarWrap: {
@@ -555,7 +517,7 @@ const styles = StyleSheet.create({
     },
     storyCard: {
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
+        borderWidth: 0,
         padding: 12,
     },
     storyText: {
@@ -565,7 +527,7 @@ const styles = StyleSheet.create({
     },
     milestonesCard: {
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
+        borderWidth: 0,
         padding: 12,
         gap: 8,
     },
@@ -624,7 +586,7 @@ const styles = StyleSheet.create({
     },
     commentCard: {
         borderRadius: Layout.borderRadius - 2,
-        borderWidth: 1,
+        borderWidth: 0,
         padding: 12,
     },
     commentHeader: {
@@ -653,7 +615,7 @@ const styles = StyleSheet.create({
         width: 140,
         height: 140,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
+        borderWidth: 0,
         overflow: 'hidden',
     },
     galleryImage: {

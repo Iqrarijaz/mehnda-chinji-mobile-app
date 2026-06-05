@@ -110,15 +110,6 @@ export default function VillagePrideScreen() {
                         styles.card,
                         {
                             backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF',
-                            borderColor: colors.border
-                        },
-                        subType === 'DECEASED' && {
-                            borderWidth: 0,
-                            borderColor: 'transparent',
-                            elevation: 0,
-                            shadowOpacity: 0,
-                            shadowRadius: 0,
-                            shadowOffset: { width: 0, height: 0 }
                         }
                     ]}
                 >
@@ -207,7 +198,7 @@ export default function VillagePrideScreen() {
             <Stack.Screen options={{ headerShown: false }} />
 
             <PrideHeader
-                title="Mera Pind Pride"
+                title="Mehnda Chinji"
                 searchVal={searchVal}
                 onChangeSearch={setSearchVal}
                 onClearSearch={() => setSearchVal('')}
@@ -274,7 +265,7 @@ const styles = StyleSheet.create({
     },
     card: {
         borderRadius: LayoutConst.borderRadius + 2,
-        borderWidth: 1,
+        borderWidth: 0,
         padding: 10,
     },
     cardHeader: {

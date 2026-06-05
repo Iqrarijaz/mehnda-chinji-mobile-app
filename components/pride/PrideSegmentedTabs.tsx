@@ -79,22 +79,11 @@ const styles = StyleSheet.create({
     wrapper: {
         flexDirection: 'row',
         borderRadius: LayoutConst.borderRadius + 8,
-        borderWidth: 1,
+        borderWidth: 0,
         padding: 4,
         marginHorizontal: 16,
         marginTop: 12,
         marginBottom: 10,
-        ...Platform.select({
-            ios: {
-                shadowColor: '#000000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.05,
-                shadowRadius: 10,
-            },
-            android: {
-                elevation: 2,
-            },
-        }),
     },
     tabButton: {
         flex: 1,
