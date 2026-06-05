@@ -336,18 +336,18 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     profileName: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '800',
         color: '#006666',
         marginBottom: 2,
     },
     profileEmail: {
-        fontSize: 13,
+        fontSize: 11,
         opacity: 0.6,
     },
     instructionText: {
-        fontSize: 14,
-        lineHeight: 20,
+        fontSize: 12,
+        lineHeight: 18,
         textAlign: 'center',
         marginBottom: 25,
         paddingHorizontal: 10,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
@@ -375,11 +375,11 @@ const styles = StyleSheet.create({
         marginTop: 25,
     },
     footerText: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
     },
     footerLink: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '700',
     },
 });

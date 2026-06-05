@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontWeight: 'bold',
+        fontWeight: '800',
         color: '#FFFFFF',
     },
     searchContainer: {
@@ -191,8 +191,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 12,
         height: 44,
-        borderWidth: 1,
-        borderColor: 'rgba(0,0,0,0.05)',
     },
     searchInput: {
         flex: 1,

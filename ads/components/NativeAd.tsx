@@ -30,7 +30,7 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View style={[styles.container, { backgroundColor: colors.card }]}>
       <View style={styles.adHeader}>
         <View style={[styles.adBadge, { backgroundColor: colors.primary }]}>
           <ThemedText style={styles.adBadgeText}>Ad</ThemedText>
@@ -72,22 +72,10 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 14,
     borderRadius: Layout.borderRadius,
-    borderWidth: 1,
     overflow: 'hidden',
     padding: 8,
     // Reserved height for Medium Rectangle (250) + Header (approx 40)
     minHeight: 300,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
   },
   adHeader: {
     flexDirection: 'row',

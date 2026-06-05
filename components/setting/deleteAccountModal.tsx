@@ -131,8 +131,8 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     modalTitle: {
-        fontSize: 16,
-        fontWeight: '800',
+        fontSize: 18,
+        fontWeight: '700',
         color: '#0F172A',
     },
     closeButton: {
@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     inputLabel: {
-        fontSize: 11,
-        fontWeight: '700',
+        fontSize: 13,
+        fontWeight: '600',
         color: '#475569',
         letterSpacing: 0.5,
         marginBottom: 4,

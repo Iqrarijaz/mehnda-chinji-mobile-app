@@ -59,8 +59,8 @@ export default function PayBillModal({
                     </View>
 
                     <ThemedText style={styles.fieldLabel}>Select Payment Mode *</ThemedText>
-                    <View style={{ flexDirection: 'row', gap: 10, marginVertical: 16 }}>
-                        {['CASH', 'BANK_TRANSFER', 'APP'].map((mode) => (
+                    <View style={{ flexDirection: 'row', gap: 10, marginVertical: 16, justifyContent: 'center' }}>
+                        {['CASH', 'BANK_TRANSFER'].map((mode) => (
                             <TouchableOpacity
                                 key={mode}
                                 onPress={() => setPaymentMode(mode)}
@@ -70,7 +70,7 @@ export default function PayBillModal({
                                     {
                                         backgroundColor: paymentMode === mode ? colors.primary : (isDark ? '#334155' : '#FFF'),
                                         borderColor: colors.border,
-                                        flex: 1
+                                        paddingHorizontal: 16
                                     }
                                 ]}
                             >
@@ -126,12 +126,12 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
     },
     modalTitle: {
-        fontSize: 16,
-        fontWeight: '800',
+        fontSize: 18,
+        fontWeight: '700',
     },
     fieldLabel: {
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: 13,
+        fontWeight: '600',
         marginBottom: 6,
     },
     payModeBtn: {

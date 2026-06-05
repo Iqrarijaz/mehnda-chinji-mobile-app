@@ -94,7 +94,7 @@ export default NotificationHeader;
 
 const styles = StyleSheet.create({
     headerWrap: {
-        paddingBottom: 10,
+        paddingBottom: 8,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
@@ -106,9 +106,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     backBtn: {
-        width: 42,
-        height: 42,
-        borderRadius: 21,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -118,25 +118,25 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: Platform.OS === 'android' ? 18 : 20,
-        fontWeight: '700',
+        fontSize: 20,
+        fontWeight: '800',
         color: 'rgba(255,255,255,1)',
     },
     markBtn: {
-        width: 42,
-        height: 42,
-        borderRadius: 21,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    rightSpacer: { width: 42, height: 42 },
+    rightSpacer: { width: 32, height: 32 },
     headerSubtitleWrap: {
         alignItems: 'center',
-        marginTop: 8,
+        marginTop: 4,
     },
     headerSubtitle: {
-        fontSize: Platform.OS === 'android' ? 13 : 14,
+        fontSize: 11,
         color: 'rgba(255,255,255,0.75)',
         fontWeight: '500',
     },

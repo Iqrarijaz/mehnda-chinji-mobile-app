@@ -73,7 +73,7 @@ const BillCard = React.memo(({
     const connId = item.connection?.connectionId || item.connectionId?.connectionId || '-';
 
     return (
-        <View style={[styles.dataCard, { backgroundColor: isDark ? '#1e293b' : '#FFF', borderColor: colors.border }]}>
+        <View style={[styles.dataCard, { backgroundColor: isDark ? '#1e293b' : '#FFF' }]}>
             <View style={styles.cardHeader}>
                 <View>
                     <ThemedText style={styles.cardTitle}>{connName}</ThemedText>
@@ -436,7 +436,6 @@ const styles = StyleSheet.create({
     },
     dataCard: {
         borderRadius: 12,
-        borderWidth: 2,
         padding: 10,
         marginBottom: 12,
     },
@@ -447,10 +446,11 @@ const styles = StyleSheet.create({
     },
     cardTitle: {
         fontSize: 14,
-        fontWeight: '700',
+        fontWeight: '800',
     },
     cardSubtitle: {
         fontSize: 11,
+        fontWeight: '600',
         marginTop: 2,
     },
     statusBadge: {
@@ -469,6 +469,7 @@ const styles = StyleSheet.create({
     },
     infoValue: {
         fontSize: 11,
+        fontWeight: '600',
     },
     cardActions: {
         flexDirection: 'row',
@@ -494,7 +495,7 @@ const styles = StyleSheet.create({
     },
     smallActionBtnText: {
         fontSize: 11,
-        fontWeight: '600',
+        fontWeight: '700',
     },
     markPaidPill: {
         borderRadius: 12,
@@ -526,8 +527,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalTitle: {
-        fontSize: 16,
-        fontWeight: '800',
+        fontSize: 18,
+        fontWeight: '700',
     },
     pickerContainer: {
         alignItems: 'center',

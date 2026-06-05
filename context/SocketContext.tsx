@@ -2,6 +2,7 @@
 
 import { getApiUrl } from '@/lib/remoteConfig';
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
@@ -79,6 +80,30 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
             setIsConnected(false);
         };
     }, [isAuthenticated, user?.user?._id]); // ._id is consistent with backend
+
+    useEffect(() => {
+        const handleAppStateChange = (nextAppState: AppStateStatus) => {
+            if (!socketRef.current) return;
+
+            if (nextAppState === 'active') {
+                console.log('[Socket] App came to foreground. Connecting...');
+                if (!socketRef.current.connected) {
+                    socketRef.current.connect();
+                }
+            } else if (nextAppState.match(/inactive|background/)) {
+                console.log('[Socket] App went to background. Disconnecting...');
+                if (socketRef.current.connected) {
+                    socketRef.current.disconnect();
+                }
+            }
+        };
+
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
 
     const socketValue = useMemo(() => ({ socket, isConnected }), [socket, isConnected]);
 

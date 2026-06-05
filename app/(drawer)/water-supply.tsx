@@ -5,17 +5,20 @@ import {
     TouchableOpacity,
     Alert,
     Platform,
-    ScrollView
+    ScrollView,
+    ActivityIndicator
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
-import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
+import { getApiUrl } from '@/lib/remoteConfig';
+import { useAuth } from '@/context/AuthContext';
 
 // API client methods
 import {
@@ -63,6 +66,47 @@ export default function WaterSupplyScreen() {
     const colors = Colors[theme];
     const isDark = theme === 'dark';
     const insets = useSafeAreaInsets();
+
+    const { user } = useAuth();
+    const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+
+    const handleGenerateReport = async (month: string) => {
+        if (isGeneratingReport) return;
+        setIsGeneratingReport(true);
+        try {
+            const token = user?.token;
+            if (!token) {
+                Alert.alert('Error', 'Session token not found. Please log in again.');
+                return;
+            }
+
+            const filename = `Water_Supply_Report_${month}.pdf`;
+            const localUri = `${FileSystem.documentDirectory}${filename}`;
+            const baseUrl = getApiUrl();
+            const apiUrl = `${baseUrl}/api/user/v1/water-supply/generate-monthly-report?billingMonth=${month}`;
+
+            const { uri } = await FileSystem.downloadAsync(apiUrl, localUri, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(uri, {
+                    mimeType: 'application/pdf',
+                    dialogTitle: `Water Supply Report - ${month}`,
+                    UTI: 'com.adobe.pdf'
+                });
+            } else {
+                Alert.alert("Success", "Report downloaded successfully.");
+            }
+        } catch (err: any) {
+            console.error('Failed to generate PDF:', err);
+            Alert.alert('Error', 'Failed to generate and download PDF report: ' + (err.message || err));
+        } finally {
+            setIsGeneratingReport(false);
+        }
+    };
 
     const handleBack = () => {
         if (router.canGoBack()) {
@@ -240,7 +284,7 @@ export default function WaterSupplyScreen() {
             await queryClient.cancelQueries({ queryKey: ['water-supply', 'connections'] });
             const previousData = queryClient.getQueryData(['water-supply', 'connections']);
             queryClient.setQueriesData({ queryKey: ['water-supply', 'connections'] }, (old: any) => {
-                if (!old) return old;
+                if (!old || !old.pages) return old;
                 return {
                     ...old,
                     pages: old.pages.map((page: any) => ({
@@ -268,7 +312,7 @@ export default function WaterSupplyScreen() {
             await queryClient.cancelQueries({ queryKey: ['water-supply', 'bills'] });
             const previousData = queryClient.getQueryData(['water-supply', 'bills']);
             queryClient.setQueriesData({ queryKey: ['water-supply', 'bills'] }, (old: any) => {
-                if (!old) return old;
+                if (!old || !old.pages) return old;
                 return {
                     ...old,
                     pages: old.pages.map((page: any) => ({
@@ -298,7 +342,7 @@ export default function WaterSupplyScreen() {
             await queryClient.cancelQueries({ queryKey: ['water-supply', 'bills'] });
             const previousData = queryClient.getQueryData(['water-supply', 'bills']);
             queryClient.setQueriesData({ queryKey: ['water-supply', 'bills'] }, (old: any) => {
-                if (!old) return old;
+                if (!old || !old.pages) return old;
                 return {
                     ...old,
                     pages: old.pages.map((page: any) => ({
@@ -331,7 +375,7 @@ export default function WaterSupplyScreen() {
             await queryClient.cancelQueries({ queryKey: ['water-supply', 'expenses'] });
             const previousData = queryClient.getQueryData(['water-supply', 'expenses']);
             queryClient.setQueriesData({ queryKey: ['water-supply', 'expenses'] }, (old: any) => {
-                if (!old) return old;
+                if (!old || !old.pages) return old;
                 return {
                     ...old,
                     pages: old.pages.map((page: any) => ({
@@ -383,7 +427,7 @@ export default function WaterSupplyScreen() {
         title: '',
         message: '',
         type: 'info',
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
 
     // ----------------------------------------------------
@@ -771,6 +815,8 @@ export default function WaterSupplyScreen() {
                         loading={loadingReport}
                         isDark={isDark}
                         colors={colors}
+                        onGenerateReport={handleGenerateReport}
+                        isGeneratingReport={isGeneratingReport}
                     />
                 )}
             </View>

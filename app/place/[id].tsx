@@ -401,6 +401,11 @@ const PlaceDetailScreen = () => {
                     )}
                 </View>
 
+                {/* Banner Ad */}
+                <View style={styles.bannerContainer}>
+                    <BannerAd placement="essential" />
+                </View>
+
                 {/* Education: Toppers & Events — Separate Card */}
                 {category.toLowerCase() === 'education' && (sortedToppers.length > 0 || sortedEvents.length > 0) && (
                     <View style={[styles.card, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#FFFFFF' }]}>
@@ -486,10 +491,6 @@ const PlaceDetailScreen = () => {
                 )}
             </ScrollView>
 
-            <View style={styles.bannerContainer}>
-                <BannerAd placement="essential" />
-            </View>
-
             <ReportModal
                 ref={reportModalRef}
                 targetId={place._id}
@@ -511,7 +512,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerWrap: {
-        paddingBottom: 16,
+        paddingBottom: 8,
         borderBottomLeftRadius: Layout.borderRadius,
         borderBottomRightRadius: Layout.borderRadius,
         zIndex: 10,
@@ -519,12 +520,12 @@ const styles = StyleSheet.create({
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
     },
     headerBackBtn: {
-        width: 42,
-        height: 42,
-        borderRadius: 21,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -534,8 +535,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: 19,
-        fontWeight: '700',
+        fontSize: 20,
+        fontWeight: '800',
         color: '#FFFFFF',
     },
     scrollView: {
@@ -552,22 +553,22 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     heroContainer: {
-        paddingHorizontal: 20,
-        paddingTop: 24,
-        paddingBottom: 24,
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 12,
     },
     placeName: {
-        fontSize: 26,
+        fontSize: 14,
         fontWeight: '900',
-        lineHeight: 32,
-        marginBottom: 10,
+        lineHeight: 18,
+        marginBottom: 6,
         letterSpacing: -0.5,
     },
     chipRow: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 8,
-        marginBottom: 16,
+        marginBottom: 12,
     },
     categoryChip: {
         flexDirection: 'row',
@@ -595,15 +596,15 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
     },
     reportButtonText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600',
         color: '#EF4444',
     },
     card: {
-        marginHorizontal: 20,
-        marginBottom: 16,
-        borderRadius: 16,
-        padding: 16,
+        marginHorizontal: 16,
+        marginBottom: 12,
+        borderRadius: 12,
+        padding: 10,
         ...Platform.select({
             ios: {
                 shadowOffset: { width: 0, height: 2 },
@@ -619,18 +620,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        marginBottom: 14,
+        marginBottom: 10,
     },
     cardTitle: {
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '700',
         letterSpacing: -0.2,
     },
     sectionSeparator: {
-        marginTop: 16,
+        marginTop: 10,
     },
     eduStatsContainer: {
-        gap: 16,
+        gap: 10,
     },
     principalBox: {
         flexDirection: 'row',
@@ -656,51 +657,51 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     statLabel: {
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 1,
     },
     statValue: {
-        fontSize: 14,
+        fontSize: 11,
         fontWeight: '700',
     },
     divider: {
         height: 1,
         width: '100%',
-        marginBottom: 16,
+        marginBottom: 10,
         opacity: 0.5,
     },
     locationInfo: {
         flexDirection: 'row',
         gap: 10,
-        marginBottom: 16,
+        marginBottom: 10,
     },
     locationTextContainer: {
         flex: 1,
         gap: 2,
     },
     addressText: {
-        fontSize: 15,
+        fontSize: 11,
         fontWeight: '500',
-        lineHeight: 20,
+        lineHeight: 16,
     },
     areaText: {
-        fontSize: 13,
+        fontSize: 11,
         opacity: 0.7,
     },
     navigationBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 10,
+        paddingVertical: 6,
         borderRadius: 10,
         gap: 8,
     },
     navigationBtnText: {
         color: '#FFF',
-        fontSize: 14,
+        fontSize: 11,
         fontWeight: '700',
     },
     contactList: {
@@ -710,18 +711,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 10,
+        paddingVertical: 6,
     },
     contactInfo: {
         flex: 1,
     },
     contactName: {
-        fontSize: 14,
+        fontSize: 11,
         fontWeight: '700',
         marginBottom: 2,
     },
     contactNumber: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600',
     },
     callIconBtn: {
@@ -732,8 +733,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     descriptionText: {
-        fontSize: 14,
-        lineHeight: 22,
+        fontSize: 11,
+        lineHeight: 16,
         letterSpacing: 0.1,
     },
     headerTitleRow: {
@@ -773,15 +774,15 @@ const styles = StyleSheet.create({
     },
     routeInfo: {
         flex: 1,
-        paddingBottom: 20,
+        paddingBottom: 12,
     },
     routeCity: {
-        fontSize: 16,
+        fontSize: 11,
         fontWeight: '700',
         marginBottom: 2,
     },
     routeTime: {
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '500',
     },
     // ── Education Tabs ──
@@ -789,7 +790,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderRadius: 12,
         padding: 4,
-        marginBottom: 16,
+        marginBottom: 10,
         borderWidth: 1,
     },
     eduTab: {
@@ -797,7 +798,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 10,
+        paddingVertical: 6,
         borderRadius: 10,
         gap: 6,
     },
@@ -816,7 +817,7 @@ const styles = StyleSheet.create({
         }),
     },
     eduTabText: {
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '600',
     },
     eduContentWrap: {
@@ -834,11 +835,12 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     eduEmptyText: {
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '500',
     },
     bannerContainer: {
         justifyContent: 'center',
         minHeight: 60,
+        marginVertical: 10,
     },
 });

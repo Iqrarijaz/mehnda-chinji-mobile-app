@@ -78,9 +78,8 @@ const EducationCard = React.memo(({ data, color, onReport }: EducationCardProps)
         return val.en;
     };
 
-    const placeName = capitalize(data.name);
-    const address = capitalize(data.village || data.address || 'Address not available');
-    const description = getString(data.description);
+    const placeName = capitalize(getString(data.name));
+    const address = capitalize(getString(data.village) || getString(data.address) || 'Address not available');
     const eduImage = data.images?.[0];
 
     return (
@@ -99,9 +98,7 @@ const EducationCard = React.memo(({ data, color, onReport }: EducationCardProps)
                 style={[
                     styles.card,
                     {
-                        backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF',
-                        borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-                        shadowColor: isDark ? '#000' : primaryColor,
+                        backgroundColor: colors.card,
                     },
                 ]}
             >
@@ -150,8 +147,8 @@ const EducationCard = React.memo(({ data, color, onReport }: EducationCardProps)
                                 <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
                             </TouchableOpacity>
                             {onReport && (
-                                <TouchableOpacity 
-                                    style={[styles.actionBtn, { backgroundColor: 'rgba(239,68,68,0.4)' }]} 
+                                <TouchableOpacity
+                                    style={[styles.actionBtn, { backgroundColor: 'rgba(239,68,68,0.4)' }]}
                                     activeOpacity={0.8}
                                     onPress={(e) => {
                                         e.stopPropagation();
@@ -181,12 +178,12 @@ const EducationCard = React.memo(({ data, color, onReport }: EducationCardProps)
                 <View
                     style={[
                         styles.contentSection,
-                        { backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF' },
+                        { backgroundColor: colors.card },
                     ]}
                 >
                     {/* Name */}
                     <ThemedText
-                        style={[styles.eduName, { color: isDark ? '#F1F5F9' : '#0F172A' }]}
+                        style={[styles.eduName, { color: colors.text }]}
                         numberOfLines={2}
                     >
                         {placeName}
@@ -209,40 +206,23 @@ const EducationCard = React.memo(({ data, color, onReport }: EducationCardProps)
                             <Ionicons name="location" size={13} color={primaryColor} />
                         </View>
                         <ThemedText
-                            style={[styles.locationText, { color: isDark ? '#94A3B8' : '#475569' }]}
+                            style={[styles.locationText, { color: colors.textSecondary }]}
                             numberOfLines={1}
                         >
                             {address}
                         </ThemedText>
                     </View>
 
-                    {/* Description */}
-                    {description ? (
-                        <ThemedText
-                            style={[styles.description, { color: isDark ? '#64748B' : '#94A3B8' }]}
-                            numberOfLines={2}
-                        >
-                            {description}
-                        </ThemedText>
-                    ) : null}
-
                     {/* Footer CTA row */}
                     <View style={styles.footerRow}>
-                        <View style={[styles.detailsPill, { backgroundColor: primaryAlpha10, borderColor: primaryAlpha20 }]}>
-                            <ThemedText style={[styles.detailsPillText, { color: primaryColor }]}>
-                                View Details
-                            </ThemedText>
-                            <Ionicons name="chevron-forward" size={12} color={primaryColor} />
-                        </View>
-
                         {data.phone && (
                             <View style={[styles.contactChip, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
                                 <Ionicons
                                     name="call-outline"
                                     size={12}
-                                    color={isDark ? '#94A3B8' : '#475569'}
+                                    color={colors.textSecondary}
                                 />
-                                <ThemedText style={[styles.contactChipText, { color: isDark ? '#94A3B8' : '#475569' }]}>
+                                <ThemedText style={[styles.contactChipText, { color: colors.textSecondary }]}>
                                     Contact
                                 </ThemedText>
                             </View>
@@ -275,21 +255,15 @@ export default EducationCard;
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 20,
+        borderRadius: 12,
         marginBottom: 16,
         overflow: 'hidden',
-        borderWidth: 1,
-        // Soft lifted shadow
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.12,
-        shadowRadius: 20,
-        elevation: 8,
     },
 
     // ── Hero ──
     heroSection: {
         width: '100%',
-        height: 180,
+        height: 120,
         position: 'relative',
     },
     heroImage: {
@@ -382,16 +356,16 @@ const styles = StyleSheet.create({
 
     // ── Content ──
     contentSection: {
-        paddingHorizontal: 16,
-        paddingTop: 14,
-        paddingBottom: 14,
+        paddingHorizontal: 10,
+        paddingTop: 10,
+        paddingBottom: 10,
     },
     eduName: {
-        fontSize: 17,
+        fontSize: 14,
         fontWeight: '800',
         letterSpacing: -0.4,
-        lineHeight: 23,
-        marginBottom: 10,
+        lineHeight: 20,
+        marginBottom: 6,
     },
     dividerRow: {
         flexDirection: 'row',
@@ -424,15 +398,9 @@ const styles = StyleSheet.create({
     },
     locationText: {
         flex: 1,
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '600',
         letterSpacing: 0.1,
-    },
-    description: {
-        fontSize: 13,
-        lineHeight: 19,
-        fontWeight: '400',
-        marginBottom: 12,
     },
     footerRow: {
         flexDirection: 'row',
@@ -440,30 +408,16 @@ const styles = StyleSheet.create({
         gap: 8,
         marginTop: 2,
     },
-    detailsPill: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        paddingHorizontal: 12,
-        paddingVertical: 7,
-        borderRadius: 10,
-        borderWidth: 1,
-    },
-    detailsPillText: {
-        fontSize: 12,
-        fontWeight: '700',
-        letterSpacing: 0.2,
-    },
     contactChip: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
         paddingHorizontal: 10,
-        paddingVertical: 7,
+        paddingVertical: 4,
         borderRadius: 10,
     },
     contactChipText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600',
     },
     managePill: {
@@ -471,12 +425,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 4,
         paddingHorizontal: 12,
-        paddingVertical: 7,
+        paddingVertical: 4,
         borderRadius: 10,
         marginLeft: 'auto',
     },
     managePillText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '700',
         color: '#FFFFFF',
     },

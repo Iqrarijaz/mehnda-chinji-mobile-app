@@ -5,7 +5,9 @@ import {
     TouchableOpacity,
     FlatList,
     TextInput,
-    ActivityIndicator
+    ActivityIndicator,
+    Linking,
+    Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themedText';
@@ -54,7 +56,7 @@ const ConnectionCard = React.memo(({
     }, [item.name]);
 
     return (
-        <View style={[styles.dataCard, { backgroundColor: isDark ? '#1e293b' : '#FFF', borderColor: colors.border }]}>
+        <View style={[styles.dataCard, { backgroundColor: isDark ? '#1e293b' : '#FFF' }]}>
             <View style={styles.cardHeader}>
                 <View>
                     <ThemedText style={styles.cardTitle}>{capitalizedName}</ThemedText>
@@ -68,10 +70,17 @@ const ConnectionCard = React.memo(({
             <View style={styles.cardBody}>
                 <View style={styles.infoRow}>
                     {item.phoneNumber ? (
-                        <View style={styles.infoLine}>
-                            <Ionicons name="call-outline" size={13} color={colors.textSecondary} />
-                            <ThemedText style={styles.infoValue}>{item.phoneNumber}</ThemedText>
-                        </View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                Linking.openURL(`tel:${item.phoneNumber}`).catch(() => {
+                                    Alert.alert('Error', 'Unable to open dialer');
+                                });
+                            }}
+                            style={styles.infoLine}
+                        >
+                            <Ionicons name="call-outline" size={13} color={colors.primary} />
+                            <ThemedText style={[styles.infoValue, { color: colors.primary }]}>{item.phoneNumber}</ThemedText>
+                        </TouchableOpacity>
                     ) : null}
                     <View style={styles.infoLine}>
                         <Ionicons name="calendar-outline" size={13} color={colors.textSecondary} />
@@ -337,7 +346,6 @@ const styles = StyleSheet.create({
     },
     dataCard: {
         borderRadius: 12,
-        borderWidth: 2,
         padding: 10,
         marginBottom: 12,
     },
@@ -348,10 +356,11 @@ const styles = StyleSheet.create({
     },
     cardTitle: {
         fontSize: 14,
-        fontWeight: '700',
+        fontWeight: '800',
     },
     cardSubtitle: {
         fontSize: 11,
+        fontWeight: '600',
         marginTop: 2,
     },
     statusBadge: {
@@ -375,6 +384,7 @@ const styles = StyleSheet.create({
     },
     infoValue: {
         fontSize: 11,
+        fontWeight: '600',
     },
     cardActions: {
         flexDirection: 'row',
@@ -408,6 +418,6 @@ const styles = StyleSheet.create({
     },
     smallActionBtnText: {
         fontSize: 11,
-        fontWeight: '600',
+        fontWeight: '700',
     },
 });

@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius,
         padding: 14,
-        marginBottom: 12,
+        marginBottom: 16,
         alignItems: 'center',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.04,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     placeholderLetter: {
-        fontSize: 32,
+        fontSize: 22,
         fontWeight: '800',
         color: '#94A3B8',
     },
@@ -156,13 +156,13 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     bankName: {
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: '800',
         textAlign: 'center',
         marginBottom: 4,
     },
     addressText: {
-        fontSize: 14,
+        fontSize: 11,
         fontWeight: '500',
         textAlign: 'center',
     },

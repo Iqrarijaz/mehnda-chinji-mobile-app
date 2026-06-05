@@ -195,15 +195,9 @@ const MosqueCard = React.memo(({ data, color, onReport }: MosqueCardProps) => {
                 style={[
                     styles.card,
                     {
-                        backgroundColor: isDark
-                            ? '#1A1F2E'
-                            : '#FFFFFF',
-                        borderColor: isDark
-                            ? 'rgba(255,255,255,0.06)'
-                            : 'rgba(0,0,0,0.06)',
-                        shadowColor: isDark
-                            ? '#000'
-                            : primaryColor,
+                        backgroundColor: colors.card,
+                        shadowColor: 'transparent',
+                        elevation: 0,
                     },
                 ]}
             >
@@ -212,8 +206,7 @@ const MosqueCard = React.memo(({ data, color, onReport }: MosqueCardProps) => {
                     style={[
                         styles.imageCol,
                         {
-                            backgroundColor:
-                                primaryColor + '10',
+                            backgroundColor: colors.card,
                         },
                     ]}
                 >
@@ -242,14 +235,7 @@ const MosqueCard = React.memo(({ data, color, onReport }: MosqueCardProps) => {
                 {/* Content Section */}
                 <View style={styles.contentCol}>
                     <ThemedText
-                        style={[
-                            styles.mosqueName,
-                            {
-                                color: isDark
-                                    ? '#F1F5F9'
-                                    : '#0F172A',
-                            },
-                        ]}
+                        style={[styles.mosqueName, { color: isDark ? '#F1F5F9' : '#0F172A' }]}
                         numberOfLines={2}
                     >
                         {mosqueName}
@@ -263,7 +249,7 @@ const MosqueCard = React.memo(({ data, color, onReport }: MosqueCardProps) => {
                                 {
                                     backgroundColor:
                                         primaryColor,
-                                },
+                                }
                             ]}
                         />
 
@@ -298,30 +284,11 @@ const MosqueCard = React.memo(({ data, color, onReport }: MosqueCardProps) => {
                         </View>
 
                         <ThemedText
-                            style={[
-                                styles.locationText,
-                                {
-                                    color: isDark
-                                        ? '#94A3B8'
-                                        : '#475569',
-                                },
-                            ]}
+                            style={[styles.locationText, { color: isDark ? '#94A3B8' : '#475569' }]}
                             numberOfLines={2}
                         >
                             {address}
                         </ThemedText>
-
-                        {onReport && (
-                            <TouchableOpacity
-                                onPress={(e) => {
-                                    e.stopPropagation();
-                                    onReport();
-                                }}
-                                style={styles.reportButton}
-                            >
-                                <Ionicons name="flag-outline" size={14} color="#EF4444" />
-                            </TouchableOpacity>
-                        )}
                     </View>
                 </View>
             </TouchableOpacity>
@@ -353,22 +320,14 @@ export default MosqueCard;
 const styles = StyleSheet.create({
     wrapper: {
         position: 'relative',
-        marginBottom: 14,
+        marginBottom: 16,
     },
 
     card: {
         flexDirection: 'row',
-        borderRadius: 16,
+        borderRadius: 12,
         overflow: 'hidden',
-        borderWidth: 1,
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-        elevation: 4,
-        height: 100,
+        height: 80,
     },
 
     /**
@@ -383,7 +342,7 @@ const styles = StyleSheet.create({
     image: {
         width: '100%',
         height: '100%',
-        borderRadius: 12,
+        borderRadius: 8,
     },
 
     imagePlaceholder: {
@@ -397,26 +356,18 @@ const styles = StyleSheet.create({
      */
     typePill: {
         position: 'absolute',
-        top: 8,
-        right: 8,
+        top: 6,
+        right: 6,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 7,
-        paddingVertical: 4,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 6,
+        paddingHorizontal: 6,
+        paddingVertical: 2.5,
+        borderRadius: 6,
     },
 
     typePillText: {
         color: '#FFFFFF',
-        fontSize: 8,
+        fontSize: 7,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.8,
@@ -427,25 +378,25 @@ const styles = StyleSheet.create({
      */
     contentCol: {
         flex: 1,
-        paddingHorizontal: 12,
-        paddingTop: 12,
-        paddingBottom: 12,
+        paddingHorizontal: 8,
+        paddingTop: 8,
+        paddingBottom: 8,
         justifyContent: 'center',
     },
 
     mosqueName: {
         fontSize: 14,
-        fontWeight: '700',
+        fontWeight: '800',
         letterSpacing: -0.2,
         lineHeight: 20,
-        marginBottom: 8,
+        marginBottom: 4,
     },
 
     dividerRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
-        marginBottom: 8,
+        marginBottom: 4,
     },
 
     dividerAccent: {
@@ -478,16 +429,7 @@ const styles = StyleSheet.create({
     locationText: {
         flex: 1,
         fontSize: 11,
-        fontWeight: '500',
+        fontWeight: '600',
         lineHeight: 15,
-    },
-    reportButton: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: 'rgba(239, 68, 68, 0.08)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginLeft: 8,
     },
 });

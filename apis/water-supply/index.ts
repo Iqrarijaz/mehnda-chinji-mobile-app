@@ -119,3 +119,12 @@ export function getFinancialReport(params?: {
 }) {
     return apiClient.get('/api/user/v1/water-supply/reports', { params });
 }
+
+export function generateMonthlyReport(params: {
+    billingMonth: string;
+}) {
+    return apiClient.get('/api/user/v1/water-supply/generate-monthly-report', {
+        params,
+        responseType: 'blob'
+    });
+}

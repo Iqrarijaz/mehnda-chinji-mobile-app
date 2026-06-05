@@ -11,9 +11,17 @@ import {
     TouchableOpacity,
     View,
     Platform,
+    Dimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
-import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    useAnimatedScrollHandler,
+    interpolate,
+    Extrapolate,
+    FadeInDown,
+} from 'react-native-reanimated';
 
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -24,6 +32,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BannerAd from '@/ads/components/BannerAd';
 import InterstitialService from '@/ads/interstitial.service';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const HEADER_IMAGE_HEIGHT = 200;
+
 const BusinessDetailScreen = () => {
     const { id, businessData } = useLocalSearchParams<{ id: string; businessData?: string }>();
     const router = useRouter();
@@ -32,15 +43,14 @@ const BusinessDetailScreen = () => {
     const insets = useSafeAreaInsets();
     const reportModalRef = useRef<any>(null);
 
+    const scrollY = useSharedValue(0);
+
     // Preload Interstitial Ad
     useEffect(() => {
         InterstitialService.getInstance().load();
-
-        // Optionally show after a short delay to ensure it's ready
         const adTimer = setTimeout(() => {
             InterstitialService.getInstance().show();
         }, 1000);
-
         return () => clearTimeout(adTimer);
     }, []);
 
@@ -89,6 +99,43 @@ const BusinessDetailScreen = () => {
         }
     }, [businessName, address, business?.phone]);
 
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            scrollY.value = event.contentOffset.y;
+        },
+    });
+
+    const headerAnimatedStyle = useAnimatedStyle(() => {
+        const opacity = interpolate(
+            scrollY.value,
+            [0, HEADER_IMAGE_HEIGHT - 80],
+            [0, 1],
+            Extrapolate.CLAMP
+        );
+        return {
+            opacity,
+            backgroundColor: colors.primary,
+        };
+    });
+
+    const imageAnimatedStyle = useAnimatedStyle(() => {
+        const scale = interpolate(
+            scrollY.value,
+            [-HEADER_IMAGE_HEIGHT, 0],
+            [2, 1],
+            Extrapolate.CLAMP
+        );
+        const translateY = interpolate(
+            scrollY.value,
+            [-HEADER_IMAGE_HEIGHT, 0, HEADER_IMAGE_HEIGHT],
+            [-HEADER_IMAGE_HEIGHT / 2, 0, HEADER_IMAGE_HEIGHT * 0.4],
+            Extrapolate.CLAMP
+        );
+        return {
+            transform: [{ scale }, { translateY }],
+        };
+    });
+
     if (!business) {
         return (
             <View style={[styles.loaderContainer, { backgroundColor: colors.background }]}>
@@ -98,181 +145,219 @@ const BusinessDetailScreen = () => {
         );
     }
 
+    const businessImage = (business.images && business.images.length > 0 ? business.images[0] : null) || business.logo || null;
+
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            {/* Solid Header */}
-            <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
-                <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
+            {/* Custom Dynamic Header */}
+            <View style={[styles.headerContainer, { height: insets.top + 48 }]}>
+                <Animated.View style={[StyleSheet.absoluteFillObject, headerAnimatedStyle]} />
+                <View style={[styles.headerContent, { paddingTop: insets.top }]}>
                     <TouchableOpacity
                         onPress={() => router.back()}
-                        style={styles.headerBackBtn}
+                        style={[styles.headerBtn, { backgroundColor: isDark ? 'rgba(15,23,42,0.6)' : 'rgba(0,0,0,0.4)' }]}
                     >
-                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+                        <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
                     </TouchableOpacity>
-                    <View style={styles.headerTitleWrap}>
-                        <ThemedText style={styles.headerTitle}>Business Details</ThemedText>
+
+                    <View style={styles.headerTitleContainer}>
+                        <ThemedText style={styles.headerTitleText} numberOfLines={1}>
+                            {businessName}
+                        </ThemedText>
                     </View>
+
                     <TouchableOpacity
                         onPress={handleShare}
-                        style={styles.headerBackBtn}
+                        style={[styles.headerBtn, { backgroundColor: isDark ? 'rgba(15,23,42,0.6)' : 'rgba(0,0,0,0.4)' }]}
                     >
-                        <Ionicons name="share-outline" size={22} color="#FFFFFF" />
+                        <Ionicons name="share-outline" size={20} color="#FFFFFF" />
                     </TouchableOpacity>
                 </View>
-            </Animated.View>
+            </View>
 
-            <ScrollView
+            <Animated.ScrollView
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
                 showsVerticalScrollIndicator={false}
-                style={styles.scrollView}
-                contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+                style={[styles.scrollView, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 40 }}
             >
-                {/* Image Header */}
-                {business.images && business.images.length > 0 && (
-                    <View style={styles.imageHeaderWrapper}>
-                        <Image
-                            source={{ uri: business.images[0] }}
-                            style={styles.headerImage}
-                            contentFit="cover"
-                            transition={300}
-                        />
-                        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.2)' }]} />
-                    </View>
-                )}
+                {/* Hero Cover Banner */}
+                <View style={styles.bannerWrapper}>
+                    {businessImage ? (
+                        <Animated.View style={[styles.imageContainer, imageAnimatedStyle]}>
+                            <Image
+                                source={{ uri: businessImage }}
+                                style={StyleSheet.absoluteFillObject}
+                                contentFit="cover"
+                            />
+                            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.2)' }]} />
+                        </Animated.View>
+                    ) : (
+                        <Animated.View style={[styles.fallbackBanner, { backgroundColor: colors.primary }, imageAnimatedStyle]}>
+                            <Ionicons name="business" size={64} color="rgba(255,255,255,0.4)" />
+                        </Animated.View>
+                    )}
+                </View>
 
-                {/* Info Container */}
-                <View style={styles.heroContainer}>
-                    {/* 1. Name */}
-                    <ThemedText style={[styles.businessName, { color: colors.text }]}>
-                        {businessName}
-                    </ThemedText>
+                {/* Overlapping Detail Card Container */}
+                <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', flex: 1 }]}>
 
-                    {/* 2. Category */}
-                    <View style={styles.chipRow}>
-                        <View style={[styles.categoryChip, { backgroundColor: primaryColor + '12', borderColor: primaryColor + '20' }]}>
-                            <Ionicons name="pricetag" size={12} color={primaryColor} />
-                            <ThemedText style={[styles.categoryChipText, { color: primaryColor }]}>
-                                {category}
-                            </ThemedText>
-                        </View>
-
-                        {urduCategory && (
-                            <View style={[styles.categoryChip, { backgroundColor: primaryColor + '12', borderColor: primaryColor + '20' }]}>
-                                <ThemedText style={[styles.categoryChipUrduText, { color: primaryColor }]}>
-                                    {urduCategory}
+                    {/* Header info */}
+                    <View style={styles.cardHeader}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                            <View style={{ flex: 1 }}>
+                                <ThemedText style={[styles.businessTitle, { color: colors.text }]} numberOfLines={2}>
+                                    {businessName}
                                 </ThemedText>
+
+                                {/* Combined Categories list */}
+                                <View style={styles.categoryRow}>
+                                    <View style={[styles.tag, { backgroundColor: colors.primary + '10' }]}>
+                                        <Ionicons name="pricetag-outline" size={10} color={colors.primary} />
+                                        <ThemedText style={[styles.tagText, { color: colors.primary }]}>
+                                            {category} {urduCategory ? `| ${urduCategory}` : ''}
+                                        </ThemedText>
+                                    </View>
+                                </View>
                             </View>
-                        )}
-                    </View>
 
-                    {/* 3. Report button */}
-                    <TouchableOpacity
-                        style={styles.reportButton}
-                        onPress={() => reportModalRef.current?.present()}
-                        activeOpacity={0.7}
-                    >
-                        <Ionicons name="flag-outline" size={14} color="#EF4444" />
-                        <ThemedText style={styles.reportButtonText}>
-                            Report Listing
-                        </ThemedText>
-                    </TouchableOpacity>
-                </View>
-
-                {/* 4. Banner Ad */}
-                <View style={styles.adContainer}>
-                    <BannerAd placement="business_detail" />
-                </View>
-
-                {/* 5. Rest of the info */}
-                <View style={[styles.card, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#FFFFFF' }]}>
-                    {/* Location Section */}
-                    <View style={styles.locationInfo}>
-                        <View style={styles.locationTextContainer}>
-                            <ThemedText style={[styles.addressText, { color: colors.text }]}>{address}</ThemedText>
-                            {(business.village || business.city) && (
-                                <ThemedText style={[styles.areaText, { color: colors.textSecondary }]}>
-                                    {[business.village, business.city].filter(Boolean).join(', ')}
-                                </ThemedText>
+                            {(business.logo || (business.images && business.images.length > 0)) && (
+                                <Image
+                                    source={{ uri: business.logo || business.images[0] }}
+                                    style={[styles.detailLogo, { borderColor: isDark ? '#334155' : 'rgba(0,0,0,0.08)' }]}
+                                    contentFit="cover"
+                                />
                             )}
                         </View>
                     </View>
 
-                    {/* Contact Section */}
-                    <View style={styles.sectionSeparator}>
-                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                        <View style={styles.contactInfo}>
-                            <View style={styles.contactRow}>
-                                <Ionicons name="person-outline" size={16} color={colors.textSecondary} />
-                                <ThemedText style={[styles.contactText, { color: colors.text }]}>{ownerName}</ThemedText>
+                    {/* Quick Interactive Actions Row */}
+                    <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
+                        {business.phone ? (
+                            <TouchableOpacity
+                                style={[styles.actionBtnPrimary, { backgroundColor: colors.primary }]}
+                                onPress={handleCall}
+                                activeOpacity={0.8}
+                            >
+                                <Ionicons name="call" size={16} color="#FFFFFF" />
+                                <ThemedText style={styles.actionBtnTextPrimary}>Call Business</ThemedText>
+                            </TouchableOpacity>
+                        ) : (
+                            <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
+                                <Ionicons name="call-outline" size={16} color={colors.textSecondary} />
+                                <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Phone</ThemedText>
+                            </View>
+                        )}
+
+                        <TouchableOpacity
+                            style={[styles.actionBtnSec, { backgroundColor: isDark ? '#334155' : '#f1f5f9' }]}
+                            onPress={() => reportModalRef.current?.present()}
+                            activeOpacity={0.8}
+                        >
+                            <Ionicons name="flag-outline" size={14} color="#EF4444" />
+                            <ThemedText style={[styles.actionBtnTextSec, { color: '#EF4444' }]}>Report</ThemedText>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Banner Ad */}
+                    <View style={styles.detailAdWrapper}>
+                        <BannerAd placement="business_detail" />
+                    </View>
+
+                    {/* Details Sections */}
+                    <View style={styles.sectionsContainer}>
+
+                        {/* Section: Description/About */}
+                        {business.description && (
+                            <View style={styles.detailSection}>
+                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                    About Business
+                                </ThemedText>
+                                <ThemedText style={[styles.descriptionText, { color: colors.text }]}>
+                                    {business.description}
+                                </ThemedText>
+                            </View>
+                        )}
+
+                        {/* Section: Info Details */}
+                        <View style={styles.detailSection}>
+                            <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                Contact & Location
+                            </ThemedText>
+
+                            <View style={styles.infoListItem}>
+                                <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
+                                    <Ionicons name="person" size={12} color={colors.primary} />
+                                </View>
+                                <View style={styles.infoListContent}>
+                                    <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Owner Name</ThemedText>
+                                    <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{ownerName}</ThemedText>
+                                </View>
+                            </View>
+
+                            <View style={styles.infoListItem}>
+                                <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
+                                    <Ionicons name="location" size={12} color={colors.primary} />
+                                </View>
+                                <View style={styles.infoListContent}>
+                                    <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Address</ThemedText>
+                                    <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{address}</ThemedText>
+                                    {(business.village || business.city) && (
+                                        <ThemedText style={[styles.infoListSub, { color: colors.textSecondary }]}>
+                                            {[business.village, business.city].filter(Boolean).join(', ')}
+                                        </ThemedText>
+                                    )}
+                                </View>
                             </View>
 
                             {business.phone && (
-                                <TouchableOpacity
-                                    style={styles.contactRow}
-                                    onPress={handleCall}
-                                    activeOpacity={0.7}
-                                >
-                                    <Ionicons name="call-outline" size={16} color={colors.textSecondary} />
-                                    <ThemedText style={[styles.contactText, { color: colors.text, fontWeight: '600' }]}>{business.phone}</ThemedText>
-                                    <View style={[styles.callIconBadge, { backgroundColor: colors.primary + '15' }]}>
-                                        <Ionicons name="call" size={14} color={colors.primary} />
+                                <TouchableOpacity style={styles.infoListItem} onPress={handleCall} activeOpacity={0.7}>
+                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
+                                        <Ionicons name="call" size={12} color={colors.primary} />
+                                    </View>
+                                    <View style={styles.infoListContent}>
+                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Primary Contact</ThemedText>
+                                        <ThemedText style={[styles.infoListVal, { color: colors.text, fontWeight: '600' }]}>{business.phone}</ThemedText>
                                     </View>
                                 </TouchableOpacity>
                             )}
 
                             {business.phone2 && (
-                                <TouchableOpacity
-                                    style={styles.contactRow}
-                                    onPress={() => Linking.openURL(`tel:${business.phone2}`)}
-                                    activeOpacity={0.7}
-                                >
-                                    <Ionicons name="call-outline" size={16} color={colors.textSecondary} />
-                                    <ThemedText style={[styles.contactText, { color: colors.text }]}>{business.phone2}</ThemedText>
-                                    <View style={[styles.callIconBadge, { backgroundColor: colors.primary + '15' }]}>
-                                        <Ionicons name="call" size={14} color={colors.primary} />
+                                <TouchableOpacity style={styles.infoListItem} onPress={() => Linking.openURL(`tel:${business.phone2}`)} activeOpacity={0.7}>
+                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
+                                        <Ionicons name="call" size={12} color={colors.primary} />
+                                    </View>
+                                    <View style={styles.infoListContent}>
+                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Secondary Contact</ThemedText>
+                                        <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{business.phone2}</ThemedText>
                                     </View>
                                 </TouchableOpacity>
                             )}
-                        </View>
-                    </View>
 
-                    {/* About Section */}
-                    {business.description && (
-                        <View style={styles.sectionSeparator}>
-                            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                            <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]}>
-                                {business.description}
-                            </ThemedText>
-                        </View>
-                    )}
-
-                    {/* Additional Information */}
-                    <View style={styles.sectionSeparator}>
-                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                        <View style={styles.infoGrid}>
-                            <View style={styles.infoItem}>
-                                <ThemedText style={[styles.infoLabel, { color: colors.textSecondary }]}>Category</ThemedText>
-                                <ThemedText style={[styles.infoValue, { color: colors.text }]}>{category}</ThemedText>
-                            </View>
                             {business.createdAt && (
-                                <View style={styles.infoItem}>
-                                    <ThemedText style={[styles.infoLabel, { color: colors.textSecondary }]}>Listed On</ThemedText>
-                                    <ThemedText style={[styles.infoValue, { color: colors.text }]}>
-                                        {new Date(business.createdAt).toLocaleDateString(undefined, {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
-                                    </ThemedText>
+                                <View style={styles.infoListItem}>
+                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
+                                        <Ionicons name="calendar" size={12} color={colors.primary} />
+                                    </View>
+                                    <View style={styles.infoListContent}>
+                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Listed On</ThemedText>
+                                        <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
+                                            {new Date(business.createdAt).toLocaleDateString(undefined, {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}
+                                        </ThemedText>
+                                    </View>
                                 </View>
                             )}
                         </View>
                     </View>
                 </View>
-            </ScrollView>
-
-
+            </Animated.ScrollView>
 
             <ReportModal
                 ref={reportModalRef}
@@ -294,186 +379,179 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    headerWrap: {
-        paddingBottom: 16,
-        borderBottomLeftRadius: Layout.borderRadius,
-        borderBottomRightRadius: Layout.borderRadius,
-        zIndex: 10,
+    headerContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
     },
-    headerTopRow: {
+    headerContent: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 10,
+        justifyContent: 'space-between',
+        paddingHorizontal: 12,
     },
-    headerBackBtn: {
-        width: 42,
-        height: 42,
-        borderRadius: 21,
-        backgroundColor: 'rgba(255,255,255,0.18)',
+    headerBtn: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    headerTitleWrap: {
+    headerTitleContainer: {
         flex: 1,
+        marginHorizontal: 16,
         alignItems: 'center',
     },
-    headerTitle: {
-        fontSize: 19,
+    headerTitleText: {
+        fontSize: 15,
         fontWeight: '700',
         color: '#FFFFFF',
     },
     scrollView: {
         flex: 1,
-        marginTop: -10,
     },
-    imageHeaderWrapper: {
+    bannerWrapper: {
+        height: HEADER_IMAGE_HEIGHT,
         width: '100%',
-        height: 240,
-        position: 'relative',
+        overflow: 'hidden',
     },
-    headerImage: {
+    imageContainer: {
         width: '100%',
         height: '100%',
     },
-    heroContainer: {
-        paddingHorizontal: 10,
-        paddingTop: 24,
-        paddingBottom: 10,
-    },
-    businessName: {
-        fontSize: 26,
-        fontWeight: '900',
-        lineHeight: 32,
-        marginBottom: 10,
-        letterSpacing: -0.5,
-    },
-    chipRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-        marginBottom: 16,
-    },
-    categoryChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 20,
-        borderWidth: 1,
-    },
-    categoryChipText: {
-        fontSize: 11,
-        fontWeight: '800',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
-    categoryChipUrduText: {
-        fontSize: 13,
-        fontWeight: '700',
-    },
-    reportButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 20,
-        backgroundColor: '#FEF2F2',
-        alignSelf: 'flex-start',
-    },
-    reportButtonText: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: '#EF4444',
-    },
-    adContainer: {
-        paddingHorizontal: 10,
-        marginBottom: 10,
-        alignItems: 'center',
-    },
-    card: {
-        marginHorizontal: 10,
-        marginBottom: 10,
-        borderRadius: 16,
-        padding: 16,
-        ...Platform.select({
-            ios: {
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.08,
-                shadowRadius: 10,
-            },
-            android: {
-                elevation: 2,
-            },
-        }),
-    },
-    sectionSeparator: {
-        marginTop: 16,
-    },
-    divider: {
-        height: 1,
+    fallbackBanner: {
         width: '100%',
-        marginBottom: 16,
-        opacity: 0.5,
-    },
-    locationInfo: {
-        flexDirection: 'row',
-        gap: 10,
-    },
-    locationTextContainer: {
-        flex: 1,
-        gap: 2,
-    },
-    addressText: {
-        fontSize: 15,
-        fontWeight: '500',
-        lineHeight: 20,
-    },
-    areaText: {
-        fontSize: 13,
-        opacity: 0.7,
-    },
-    contactInfo: {
-        gap: 12,
-    },
-    contactRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-        paddingVertical: 4,
-    },
-    contactText: {
-        fontSize: 15,
-        flex: 1,
-    },
-    callIconBadge: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
+        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    descriptionText: {
-        fontSize: 14,
-        lineHeight: 22,
-        letterSpacing: 0.1,
+    detailsCard: {
+        marginTop: -20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        paddingHorizontal: 16,
+        paddingTop: 20,
+        flex: 1,
     },
-    infoGrid: {
-        gap: 14,
+    cardHeader: {
+        marginBottom: 12,
     },
-    infoItem: {
+    businessTitle: {
+        fontSize: 18,
+        fontWeight: '800',
+        lineHeight: 24,
+        marginBottom: 6,
+    },
+    categoryRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    tag: {
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 6,
     },
-    infoLabel: {
-        fontSize: 11,
+    tagText: {
+        fontSize: 10,
+        fontWeight: '700',
+    },
+    actionRow: {
+        flexDirection: 'row',
+        gap: 8,
+        paddingBottom: 16,
+        borderBottomWidth: 1,
+        marginBottom: 16,
+    },
+    actionBtnPrimary: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        height: 38,
+        borderRadius: 10,
+    },
+    actionBtnTextPrimary: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    actionBtnSec: {
+        paddingHorizontal: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+        height: 38,
+        borderRadius: 10,
+    },
+    actionBtnTextSec: {
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    detailAdWrapper: {
+        marginBottom: 16,
+        alignItems: 'center',
+    },
+    sectionsContainer: {
+        gap: 16,
+    },
+    detailSection: {
+        gap: 6,
+    },
+    sectionHeading: {
+        fontSize: 10,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+        letterSpacing: 0.8,
+        marginBottom: 4,
+    },
+    descriptionText: {
+        fontSize: 12,
+        lineHeight: 18,
+    },
+    infoListItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 8,
+        gap: 12,
+    },
+    infoListIcon: {
+        width: 26,
+        height: 26,
+        borderRadius: 13,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    infoListContent: {
+        flex: 1,
+    },
+    infoListLabel: {
+        fontSize: 9,
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
-        opacity: 0.6,
+        marginBottom: 1,
     },
-    infoValue: {
-        fontSize: 14,
+    infoListVal: {
+        fontSize: 12,
         fontWeight: '500',
+    },
+    infoListSub: {
+        fontSize: 11,
+        marginTop: 1,
+    },
+    detailLogo: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: 'rgba(0,0,0,0.05)',
+        borderWidth: 1,
     },
 });

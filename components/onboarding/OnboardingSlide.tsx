@@ -59,7 +59,7 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
                 />
             </Animated.View>
             <Animated.View style={[styles.textContainer, { opacity, transform: [{ translateY }] }]}>
-                <ThemedText type="defaultSemiBold" style={[styles.title, { color: colors.text }]}>
+                <ThemedText type="defaultSemiBold" numberOfLines={1} style={[styles.title, { color: colors.text }]}>
                     {item.title}
                 </ThemedText>
                 <ThemedText style={[styles.description, { color: colors.textSecondary }]}>
@@ -96,20 +96,20 @@ const styles = StyleSheet.create({
         marginTop: 30,
     },
     title: {
-        fontSize: 22,
-        fontFamily: 'NotoNastaliqUrdu-Regular',
+        fontSize: 20,
+        fontWeight: '800',
         textAlign: 'center',
         paddingTop: 12,
         paddingBottom: 0,
-        lineHeight: 45,
+        lineHeight: 28,
         marginBottom: 15,
     },
     description: {
-        fontSize: 15,
+        fontSize: 16,
         textAlign: 'center',
-        lineHeight: 22,
+        lineHeight: 24,
         paddingHorizontal: 10,
-        fontWeight: '500',
+        fontWeight: '600',
         marginTop: 5,
     },
     permissionButton: {

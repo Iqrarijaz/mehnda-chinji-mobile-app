@@ -37,13 +37,13 @@ const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 12,
     },
     topRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 12,
     },
     backBtn: {
         width: 40,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     resetText: {
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '700',
         color: '#009688',
     },
@@ -71,12 +71,12 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     title: {
-        fontSize: 28,
-        fontWeight: '900',
+        fontSize: 20,
+        fontWeight: '800',
         color: '#0F172A',
     },
     subtitle: {
-        fontSize: 14,
+        fontSize: 11,
         color: '#64748B',
         fontWeight: '500',
     },

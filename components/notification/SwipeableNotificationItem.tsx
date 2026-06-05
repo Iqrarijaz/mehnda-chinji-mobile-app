@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 0,
         top: 0,
-        bottom: 10,
+        bottom: 8,
         width: MAX_SWIPE * -1,
         backgroundColor: DELETE_RED,
         borderRadius: 18,

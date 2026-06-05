@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
     },
     submitButton: {
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
@@ -327,11 +327,11 @@ const styles = StyleSheet.create({
         marginTop: 6,
     },
     footerText: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
     },
     footerLink: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '700',
     },
 });

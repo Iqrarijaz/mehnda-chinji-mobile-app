@@ -69,21 +69,21 @@ export const NetworkBreakdownCard = ({ wifi, mobile, total }: { wifi: number, mo
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
-        marginBottom: 24,
+        marginBottom: 12,
     },
     sectionTitle: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '800',
         color: '#94A3B8',
         textTransform: 'uppercase',
         letterSpacing: 1,
-        marginBottom: 12,
+        marginBottom: 8,
         marginLeft: 4,
     },
     card: {
         backgroundColor: '#FFFFFF',
         borderRadius: 22,
-        padding: 16,
+        padding: 12,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.05,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 12,
+        paddingVertical: 8,
         gap: 16,
     },
     iconBox: {
@@ -113,12 +113,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     rowLabel: {
-        fontSize: 15,
+        fontSize: 12,
         fontWeight: '700',
         color: '#1E293B',
     },
     rowValue: {
-        fontSize: 14,
+        fontSize: 11,
         fontWeight: '800',
         color: '#0F172A',
     },

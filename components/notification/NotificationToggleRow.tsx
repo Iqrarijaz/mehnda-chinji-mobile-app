@@ -75,13 +75,13 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     label: {
-        fontSize: 16,
+        fontSize: 13,
         fontWeight: '600',
         marginBottom: 2,
     },
     descriptionText: {
-        fontSize: 13,
-        lineHeight: 18,
+        fontSize: 11,
+        lineHeight: 16,
     },
 });
 

@@ -269,9 +269,9 @@ const ManageEssentialDashboard = () => {
 
             <ScrollView
                 style={styles.content}
-                contentContainerStyle={{ 
-                    padding: 20, 
-                    paddingBottom: canShowBanner ? bottomInset + 150 : insets.bottom + 100 
+                contentContainerStyle={{
+                    padding: 20,
+                    paddingBottom: canShowBanner ? bottomInset + 150 : insets.bottom + 100
                 }}
                 refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
             >
@@ -292,10 +292,10 @@ const ManageEssentialDashboard = () => {
 
             <TouchableOpacity
                 style={[
-                    styles.floatingAdd, 
-                    { 
-                        backgroundColor: colors.primary, 
-                        bottom: canShowBanner ? bottomInset + 70 : insets.bottom + 20 
+                    styles.floatingAdd,
+                    {
+                        backgroundColor: colors.primary,
+                        bottom: canShowBanner ? bottomInset + 70 : insets.bottom + 20
                     }
                 ]}
                 onPress={() => {

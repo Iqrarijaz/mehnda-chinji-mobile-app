@@ -197,9 +197,27 @@ export default function PrideDetailsScreen() {
                 </View>
 
                 {/* 2. Floating profile overview card */}
-                <Animated.View entering={FadeInUp.delay(200).duration(500)} style={[styles.profileCard, { backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', borderColor: colors.border, marginTop: -35 }]}>
+                <Animated.View 
+                    entering={FadeInUp.delay(200).duration(500)} 
+                    style={[
+                        styles.profileCard, 
+                        { 
+                            backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', 
+                            borderColor: colors.border, 
+                            marginTop: -37 
+                        },
+                        subType === 'DECEASED' && {
+                            borderWidth: 0,
+                            borderColor: 'transparent',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            shadowRadius: 0,
+                            shadowOffset: { width: 0, height: 0 }
+                        }
+                    ]}
+                >
                     <View style={[styles.avatarWrap, { borderColor: meta.accentColor }]}>
-                        <Avatar uri={postData.metadata?.profileImage || postData.images?.[0]} name={fullName} size={86} />
+                        <Avatar uri={postData.metadata?.profileImage || postData.images?.[0]} name={fullName} size={66} />
                     </View>
 
                     <ThemedText style={styles.fullName}>{fullName}</ThemedText>
@@ -280,7 +298,21 @@ export default function PrideDetailsScreen() {
                 {/* 3. Biography Content */}
                 <Animated.View entering={FadeInLeft.delay(350).duration(450)} style={styles.section}>
                     <ThemedText style={styles.sectionHeader}>The Inspiring Story</ThemedText>
-                    <View style={[styles.storyCard, { backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', borderColor: colors.border }]}>
+                    <View style={[
+                        styles.storyCard, 
+                        { 
+                            backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', 
+                            borderColor: colors.border 
+                        },
+                        subType === 'DECEASED' && {
+                            borderWidth: 0,
+                            borderColor: 'transparent',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            shadowRadius: 0,
+                            shadowOffset: { width: 0, height: 0 }
+                        }
+                    ]}>
                         <ThemedText style={[styles.storyText, { color: colors.text }]}>
                             {postData.content}
                         </ThemedText>
@@ -290,7 +322,21 @@ export default function PrideDetailsScreen() {
                 {achievements.length > 0 && (
                     <Animated.View entering={FadeInLeft.delay(450).duration(450)} style={styles.section}>
                         <ThemedText style={styles.sectionHeader}>Key Contributions</ThemedText>
-                        <View style={[styles.milestonesCard, { backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', borderColor: colors.border }]}>
+                        <View style={[
+                            styles.milestonesCard, 
+                            { 
+                                backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', 
+                                borderColor: colors.border 
+                            },
+                            subType === 'DECEASED' && {
+                                borderWidth: 0,
+                                borderColor: 'transparent',
+                                elevation: 0,
+                                shadowOpacity: 0,
+                                shadowRadius: 0,
+                                shadowOffset: { width: 0, height: 0 }
+                            }
+                        ]}>
                             {achievements.map((achievement: string, idx: number) => (
                                 <View key={idx} style={styles.milestoneRow}>
                                     <View style={[styles.bulletPoint, { backgroundColor: meta.accentColor }]} />
@@ -316,7 +362,21 @@ export default function PrideDetailsScreen() {
                             contentContainerStyle={styles.galleryScroll}
                         >
                             {postData.images.map((img: string, idx: number) => (
-                                <View key={idx} style={[styles.galleryImageWrap, { borderColor: colors.border }]}>
+                                <View 
+                                    key={idx} 
+                                    style={[
+                                        styles.galleryImageWrap, 
+                                        { borderColor: colors.border },
+                                        subType === 'DECEASED' && {
+                                            borderWidth: 0,
+                                            borderColor: 'transparent',
+                                            elevation: 0,
+                                            shadowOpacity: 0,
+                                            shadowRadius: 0,
+                                            shadowOffset: { width: 0, height: 0 }
+                                        }
+                                    ]}
+                                >
                                     <Image
                                         source={{ uri: img }}
                                         style={styles.galleryImage}
@@ -409,32 +469,32 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     profileCard: {
-        marginHorizontal: 20,
+        marginHorizontal: 16,
         borderRadius: Layout.borderRadius + 4,
-        paddingHorizontal: 20,
-        paddingBottom: 20,
+        paddingHorizontal: 12,
+        paddingBottom: 12,
         alignItems: 'center',
         borderWidth: 1,
-        marginTop: -50,
+        marginTop: -40,
     },
     avatarWrap: {
-        width: 94,
-        height: 94,
-        borderRadius: 47,
-        borderWidth: 4,
+        width: 74,
+        height: 74,
+        borderRadius: 37,
+        borderWidth: 3,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: -47,
-        marginBottom: 10,
+        marginTop: -37,
+        marginBottom: 8,
         backgroundColor: '#FFFFFF',
     },
     fullName: {
-        fontSize: 20,
+        fontSize: 14,
         fontWeight: '700',
         textAlign: 'center',
     },
     titleTag: {
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '600',
         marginTop: 4,
         textAlign: 'center',
@@ -443,21 +503,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        marginTop: 10,
+        marginTop: 6,
     },
     dateText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600',
     },
     profileActions: {
         flexDirection: 'row',
         gap: 12,
-        marginTop: 18,
+        marginTop: 12,
         width: '100%',
     },
     actionBtn: {
         flex: 1.2,
-        height: 40,
+        height: 34,
         borderRadius: Layout.borderRadius,
         flexDirection: 'row',
         justifyContent: 'center',
@@ -466,12 +526,12 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     actionText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '900',
     },
     shareAction: {
         flex: 1,
-        height: 40,
+        height: 34,
         borderRadius: Layout.borderRadius,
         borderWidth: 1,
         flexDirection: 'row',
@@ -480,15 +540,15 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     shareActionText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '700',
     },
     section: {
-        marginTop: 20,
-        paddingHorizontal: 20,
+        marginTop: 12,
+        paddingHorizontal: 16,
     },
     sectionHeader: {
-        fontSize: 15,
+        fontSize: 12,
         fontWeight: '800',
         marginBottom: 10,
         opacity: 0.85,
@@ -496,18 +556,18 @@ const styles = StyleSheet.create({
     storyCard: {
         borderRadius: Layout.borderRadius,
         borderWidth: 1,
-        padding: 16,
+        padding: 12,
     },
     storyText: {
-        fontSize: 14,
-        lineHeight: 22,
+        fontSize: 11,
+        lineHeight: 16,
         fontWeight: '400',
     },
     milestonesCard: {
         borderRadius: Layout.borderRadius,
         borderWidth: 1,
-        padding: 16,
-        gap: 12,
+        padding: 12,
+        gap: 8,
     },
     milestoneRow: {
         flexDirection: 'row',
@@ -522,8 +582,8 @@ const styles = StyleSheet.create({
     },
     milestoneText: {
         flex: 1,
-        fontSize: 13,
-        lineHeight: 18,
+        fontSize: 11,
+        lineHeight: 16,
         fontWeight: '500',
     },
     commentsTitleRow: {
@@ -533,7 +593,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     commentCount: {
-        fontSize: 14,
+        fontSize: 11,
         fontWeight: '600',
     },
     inputBox: {
@@ -547,7 +607,7 @@ const styles = StyleSheet.create({
     },
     commentInput: {
         flex: 1,
-        fontSize: 13,
+        fontSize: 11,
         height: 38,
         textAlignVertical: 'center',
         paddingHorizontal: 6,
@@ -574,15 +634,15 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     commentUser: {
-        fontSize: 12.5,
+        fontSize: 11,
         fontWeight: '700',
     },
     commentTime: {
         fontSize: 11,
     },
     commentBody: {
-        fontSize: 13,
-        lineHeight: 18,
+        fontSize: 11,
+        lineHeight: 16,
     },
     galleryScroll: {
         gap: 12,
@@ -601,12 +661,12 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     arabicVerse: {
-        fontSize: 18,
+        fontSize: 15,
         fontFamily: Platform.OS === 'ios' ? 'System' : 'serif',
         textAlign: 'center',
         marginTop: 10,
         fontWeight: '700',
         opacity: 0.85,
-        lineHeight: 26,
+        lineHeight: 22,
     },
 });

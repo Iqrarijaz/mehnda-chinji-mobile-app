@@ -123,7 +123,7 @@ export default EventCard;
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 14,
+        paddingVertical: 10,
     },
     headerRow: {
         flexDirection: 'row',
@@ -160,13 +160,13 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     name: {
-        fontSize: 15,
+        fontSize: 13,
         fontWeight: '700',
         marginBottom: 4,
     },
     desc: {
-        fontSize: 13,
-        lineHeight: 18,
+        fontSize: 11,
+        lineHeight: 16,
         marginBottom: 12,
         opacity: 0.8,
     },
@@ -182,8 +182,8 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     imageThumb: {
-        width: 120,
-        height: 80,
+        width: 90,
+        height: 60,
         borderRadius: 10,
         backgroundColor: '#f0f0f0',
     },
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     },
     imageCountText: {
         color: '#FFF',
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '800',
     },
 });

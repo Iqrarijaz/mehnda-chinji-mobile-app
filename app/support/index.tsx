@@ -242,10 +242,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: '800',
         color: '#FFFFFF',
-        letterSpacing: -0.5,
     },
     historyBtn: {
         width: 44,

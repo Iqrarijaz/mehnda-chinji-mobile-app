@@ -57,8 +57,8 @@ export const UpdateModal = ({
                     <View style={[styles.iconContainer, { backgroundColor: isMandatory ? '#FEF2F2' : '#EFF6FF' }]}>
                         <Ionicons
                             name={isMandatory ? "alert-circle" : "cloud-download-outline"}
-                            size={40}
-                            color={isMandatory ? "#EF4444" : "#3B82F6"}
+                            size={32}
+                            color={isMandatory ? "#EF4444" : "#006666"}
                         />
                     </View>
 
@@ -82,7 +82,7 @@ export const UpdateModal = ({
                     <View style={styles.buttonContainer}>
                         {!isMandatory && (
                             <TouchableOpacity
-                                style={[styles.button, styles.secondaryButton]}
+                                style={[styles.button, styles.secondaryButton, { borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0' }]}
                                 onPress={onClose}
                             >
                                 <ThemedText style={[styles.buttonText, { color: '#64748B' }]}>Later</ThemedText>
@@ -109,52 +109,56 @@ export const UpdateModal = ({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backgroundColor: 'rgba(15, 23, 42, 0.6)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     modalContainer: {
-        width: '95%',
+        width: '88%',
         borderRadius: Layout.borderRadius,
-        padding: 24,
+        padding: 20,
         alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.1,
+        shadowRadius: 16,
     },
     iconContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: 64,
+        height: 64,
+        borderRadius: 32,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 16,
     },
     title: {
-        fontSize: 22,
+        fontSize: 14,
         fontWeight: '800',
-        marginBottom: 12,
+        marginBottom: 8,
         textAlign: 'center',
     },
     subtitle: {
-        fontSize: 15,
-        lineHeight: 22,
+        fontSize: 11,
+        lineHeight: 16,
         textAlign: 'center',
-        marginBottom: 24,
+        marginBottom: 20,
     },
     notesContainer: {
         width: '100%',
-        padding: 16,
+        padding: 12,
         borderRadius: Layout.borderRadius,
-        marginBottom: 24,
+        marginBottom: 20,
     },
     notesTitle: {
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '700',
         marginBottom: 4,
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     notesText: {
-        fontSize: 14,
-        lineHeight: 20,
+        fontSize: 11,
+        lineHeight: 16,
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -162,7 +166,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     button: {
-        height: 52,
+        height: Platform.OS === 'android' ? 44 : 48,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
@@ -176,10 +180,9 @@ const styles = StyleSheet.create({
     },
     secondaryButton: {
         borderWidth: 1,
-        borderColor: '#E2E8F0',
     },
     buttonText: {
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '700',
     },
 });

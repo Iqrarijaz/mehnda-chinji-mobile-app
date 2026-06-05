@@ -18,8 +18,8 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
     const visibleRoutes = state.routes.filter(route => {
         const { options } = descriptors[route.key];
-        // Hide chat tab for now as requested
-        if (route.name === 'chat') return false;
+        // Hide chat and feed tabs as requested
+        if (route.name === 'chat' || route.name === 'feed') return false;
         return (options as any).href !== null;
     });
 

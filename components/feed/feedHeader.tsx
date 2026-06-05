@@ -41,7 +41,7 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
     const inputRef = useRef<TextInput>(null);
     const { data: categoriesData } = usePostCategories();
     const categories = categoriesData?.data?.data || [];
-    
+
     return (
         <View style={[styles.headerContainer, { backgroundColor: colors.primary, paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }, containerStyle]}>
             <View style={styles.headerTopRow}>
@@ -104,9 +104,9 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
 
             {/* Type Filter Chips */}
             <View style={styles.filterWrapper}>
-                <ScrollView 
-                    horizontal 
-                    showsHorizontalScrollIndicator={false} 
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.filterScrollContent}
                 >
                     {/* All Chip */}
@@ -121,10 +121,10 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
                         }}
                     >
                         <View style={styles.chipIconColumn}>
-                            <Ionicons 
-                                name="apps-outline" 
-                                size={18} 
-                                color={!selectedType ? colors.primary : "#FFFFFF"} 
+                            <Ionicons
+                                name="apps-outline"
+                                size={18}
+                                color={!selectedType ? colors.primary : "#FFFFFF"}
                             />
                         </View>
                         <View style={styles.chipTextColumn}>
@@ -151,8 +151,8 @@ export const FeedHeader: React.FC<FeedHeaderProps> = React.memo(({
                             }}
                         >
                             <View style={styles.chipIconColumn}>
-                                <Image 
-                                    source={{ uri: cat.icon }} 
+                                <Image
+                                    source={{ uri: cat.icon }}
                                     style={styles.chipIcon}
                                     contentFit="contain"
                                 />

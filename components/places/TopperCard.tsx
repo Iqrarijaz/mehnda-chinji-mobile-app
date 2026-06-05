@@ -127,24 +127,24 @@ export default TopperCard;
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 12,
+        paddingVertical: 8,
     },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     avatarWrap: {
-        marginRight: 14,
+        marginRight: 10,
     },
     avatar: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+        width: 34,
+        height: 34,
+        borderRadius: 17,
     },
     avatarPlaceholder: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+        width: 34,
+        height: 34,
+        borderRadius: 17,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
     pct: {
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '800',
     },
     marks: {

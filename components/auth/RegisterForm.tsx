@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
     },
     registerButton: {
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     },
     registerButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
@@ -611,11 +611,11 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     footerText: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
     },
     footerLink: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '700',
     },
     checkboxContainer: {
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     checkboxText: {
-        fontSize: 13,
+        fontSize: 12,
         flex: 1,
         lineHeight: 18,
     },

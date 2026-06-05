@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     title: {
-        fontSize: 14,
+        fontSize: 11,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 1,

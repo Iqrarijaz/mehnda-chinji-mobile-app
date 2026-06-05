@@ -25,6 +25,7 @@ interface PlaceData {
         en: string;
         ur?: string;
     } | string;
+    type?: string;
     description?: string;
     phone?: string;
     village?: string;
@@ -59,6 +60,7 @@ const GovtOfficeCard = React.memo(({ data, color }: GovtOfficeCardProps) => {
     const placeName = capitalize(data.name);
     const address = capitalize(data.village || data.address || "Address not available");
     const image = data.images?.[0];
+    const typeLabel = data.type ? capitalize(data.type) : '';
 
     return (
         <>
@@ -74,9 +76,9 @@ const GovtOfficeCard = React.memo(({ data, color }: GovtOfficeCardProps) => {
                     }
                 })}
             >
-                <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <View style={[styles.card, { backgroundColor: colors.card }]}>
                     <View style={styles.row}>
-                        <View style={[styles.imageWrapper, { borderColor: primaryColor + '20' }]}>
+                        <View style={styles.imageWrapper}>
                             {image ? (
                                 <Image
                                     source={{ uri: image }}
@@ -85,27 +87,32 @@ const GovtOfficeCard = React.memo(({ data, color }: GovtOfficeCardProps) => {
                                     transition={200}
                                 />
                             ) : (
-                                <View style={[styles.placeholderContainer, { backgroundColor: primaryColor + '10' }]}>
-                                    <Ionicons name="business" size={32} color={isDark ? '#FFFFFF' : primaryColor} />
+                                <View style={[styles.placeholderContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                                    <Ionicons name="business" size={22} color={isDark ? '#94A3B8' : primaryColor} />
                                 </View>
                             )}
                         </View>
 
                         <View style={styles.infoContainer}>
-                            <ThemedText style={[styles.placeName, { color: isDark ? '#FFFFFF' : colors.text }]} numberOfLines={2}>
-                                {placeName}
-                            </ThemedText>
+                            <View style={styles.headerTitleRow}>
+                                <ThemedText style={[styles.placeName, { color: isDark ? '#F1F5F9' : '#0F172A' }]} numberOfLines={1}>
+                                    {placeName}
+                                </ThemedText>
+                                {typeLabel ? (
+                                    <View style={[styles.badge, { backgroundColor: primaryColor + '20' }]}>
+                                        <ThemedText style={[styles.badgeText, { color: primaryColor }]}>
+                                            {typeLabel}
+                                        </ThemedText>
+                                    </View>
+                                ) : null}
+                            </View>
                             
                             <View style={styles.addressRow}>
                                 <Ionicons name="location" size={14} color={isDark ? '#FFFFFF' : primaryColor} style={{ marginTop: 2 }} />
-                                <ThemedText style={[styles.addressText, { color: isDark ? '#FFFFFF' : colors.textSecondary }]} numberOfLines={2}>
+                                <ThemedText style={[styles.addressText, { color: isDark ? '#94A3B8' : '#475569' }]} numberOfLines={2}>
                                     {address}
                                 </ThemedText>
                             </View>
-                        </View>
-                        
-                        <View style={styles.chevronContainer}>
-                            <Ionicons name="chevron-forward" size={20} color={isDark ? '#FFFFFF' : colors.border} />
                         </View>
                     </View>
                 </View>
@@ -119,26 +126,19 @@ export default GovtOfficeCard;
 const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius,
-        padding: 12,
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
-        borderWidth: 1,
+        padding: 10,
+        marginBottom: 16,
     },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     imageWrapper: {
-        width: 80,
-        height: 80,
+        width: 60,
+        height: 60,
         borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        borderWidth: 1,
-        marginRight: 14,
+        marginRight: 10,
         position: 'relative',
     },
     cardImage: {
@@ -154,10 +154,27 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
+    headerTitleRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
     placeName: {
-        fontSize: 16,
+        fontSize: 14,
+        fontWeight: '800',
+        flex: 1,
+        marginRight: 8,
+    },
+    badge: {
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 10,
+    },
+    badgeText: {
+        fontSize: 9,
         fontWeight: '700',
-        marginBottom: 6,
+        textTransform: 'uppercase',
     },
     addressRow: {
         flexDirection: 'row',
@@ -167,12 +184,8 @@ const styles = StyleSheet.create({
     },
     addressText: {
         flex: 1,
-        fontSize: 13,
-        fontWeight: '500',
-        lineHeight: 18,
+        fontSize: 11,
+        fontWeight: '600',
+        lineHeight: 16,
     },
-    chevronContainer: {
-        paddingLeft: 4,
-        justifyContent: 'center',
-    }
 });

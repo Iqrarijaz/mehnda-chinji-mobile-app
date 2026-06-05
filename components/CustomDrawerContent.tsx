@@ -30,7 +30,7 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
     { label: 'Home', icon: 'home-outline', route: '/(drawer)/(tabs)', section: 'Main' },
-    { label: 'Community Feed', icon: 'newspaper-outline', route: '/(drawer)/(tabs)/feed', section: 'Main' },
+    // { label: 'Community Feed', icon: 'newspaper-outline', route: '/(drawer)/(tabs)/feed', section: 'Main' },
     { label: 'Village Pride', icon: 'ribbon-outline', route: '/(drawer)/pride', section: 'Main' },
     { label: 'Blood Donors', icon: 'water-outline', route: '/(drawer)/(tabs)/blood', section: 'Main' },
     { label: 'Business Directory', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },

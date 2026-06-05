@@ -196,7 +196,6 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
             <Animated.View entering={SlideInLeft.delay(60).duration(350)} style={styles.header}>
                 <View>
                     <ThemedText style={styles.title}>Change Password</ThemedText>
-                    <ThemedText style={styles.subtitle}>Update your account security</ThemedText>
                 </View>
                 <TouchableOpacity style={[styles.closeBtn, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]} onPress={resetAndClose} activeOpacity={0.7}>
                     <Ionicons name="close" size={18} color={colors.text} style={{ opacity: 0.5 }} />
@@ -249,28 +248,28 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
                 )}
 
                 {/* Buttons */}
-                    <View style={styles.actions}>
-                        <Animated.View style={[btnStyle, { flex: 1 }]}>
-                            <TouchableOpacity
-                                onPress={handleSubmit}
-                                onPressIn={onPressIn}
-                                onPressOut={onPressOut}
-                                disabled={isLoading || !canSubmit}
-                                activeOpacity={1}
-                                style={[styles.primaryBtn, (!canSubmit || isLoading) && styles.primaryBtnDisabled]}
-                            >
-                                {isLoading ? (
-                                    <ActivityIndicator color="#FFFFFF" />
-                                ) : (
-                                    <ThemedText style={styles.primaryBtnText}>Update</ThemedText>
-                                )}
-                            </TouchableOpacity>
-                        </Animated.View>
-
-                        <TouchableOpacity onPress={resetAndClose} style={[styles.cancelBtn, { borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }]} activeOpacity={0.7}>
-                            <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                <View style={styles.actions}>
+                    <Animated.View style={[btnStyle, { flex: 1 }]}>
+                        <TouchableOpacity
+                            onPress={handleSubmit}
+                            onPressIn={onPressIn}
+                            onPressOut={onPressOut}
+                            disabled={isLoading || !canSubmit}
+                            activeOpacity={1}
+                            style={[styles.primaryBtn, (!canSubmit || isLoading) && styles.primaryBtnDisabled]}
+                        >
+                            {isLoading ? (
+                                <ActivityIndicator color="#FFFFFF" />
+                            ) : (
+                                <ThemedText style={styles.primaryBtnText}>Update</ThemedText>
+                            )}
                         </TouchableOpacity>
-                    </View>
+                    </Animated.View>
+
+                    <TouchableOpacity onPress={resetAndClose} style={[styles.cancelBtn, { borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }]} activeOpacity={0.7}>
+                        <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                    </TouchableOpacity>
+                </View>
             </ScrollView>
         </PremiumModal>
     );
@@ -287,18 +286,18 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     title: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '800',
         marginBottom: 3,
     },
     subtitle: {
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '500',
     },
     closeBtn: {
-        width: 34,
-        height: 34,
-        borderRadius: 17,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -306,7 +305,7 @@ const styles = StyleSheet.create({
     // Input
     fieldWrap: { marginBottom: 10 },
     label: {
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '700',
         color: '#94A3B8',
         letterSpacing: 0.8,
@@ -320,7 +319,7 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: '#E2E8F0', // Overridden in wrapStyle
         paddingHorizontal: 14,
-        height: Platform.OS === 'android' ? 48 : 52,
+        height: Platform.OS === 'android' ? 44 : 48,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.03,
@@ -329,7 +328,7 @@ const styles = StyleSheet.create({
     inputIcon: { marginRight: 10 },
     input: {
         flex: 1,
-        fontSize: Platform.OS === 'android' ? 14 : 15,
+        fontSize: 11,
         fontWeight: '500',
     },
     eyeBtn: { padding: 4 },
@@ -362,7 +361,7 @@ const styles = StyleSheet.create({
 
     // Mismatch
     mismatch: {
-        fontSize: 12,
+        fontSize: 11,
         color: '#EF4444',
         fontWeight: '600',
         marginTop: -8,
@@ -374,7 +373,7 @@ const styles = StyleSheet.create({
     actions: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 12 },
     primaryBtn: {
         backgroundColor: '#006666', // Standardizing to primary color hex
-        height: Platform.OS === 'android' ? 48 : 52,
+        height: Platform.OS === 'android' ? 44 : 48,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
@@ -387,20 +386,20 @@ const styles = StyleSheet.create({
     primaryBtnDisabled: { opacity: 0.45 },
     primaryBtnText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.3,
     },
     cancelBtn: {
         flex: 1,
-        height: Platform.OS === 'android' ? 48 : 52,
+        height: Platform.OS === 'android' ? 44 : 48,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
         borderRadius: Layout.borderRadius,
     },
     cancelText: {
-        fontSize: 14,
+        fontSize: 11,
         color: '#94A3B8',
         fontWeight: '600',
     },

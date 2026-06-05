@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         marginLeft: 10,
-        fontSize: 16,
+        fontSize: Platform.OS === 'android' ? 13 : 15,
         fontWeight: '500',
     },
     cancelButton: {

@@ -36,14 +36,14 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     title: {
-        fontSize: 20,
+        fontSize: 14,
         fontWeight: '800',
         color: '#475569',
         textAlign: 'center',
         marginBottom: 8,
     },
     subtitle: {
-        fontSize: 14,
+        fontSize: 11,
         color: '#94A3B8',
         textAlign: 'center',
         lineHeight: 22,

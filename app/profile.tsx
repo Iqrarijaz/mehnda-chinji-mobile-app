@@ -335,7 +335,7 @@ export default function ProfileScreen() {
                                     <TextInput
                                         placeholder="Enter your name"
                                         placeholderTextColor={colors.icon + '70'}
-                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
+                                        style={[styles.textInput, { color: colors.text, fontSize: 12 }]}
                                         value={formData.name}
                                         onChangeText={(val) => setFormData(p => ({ ...p, name: toTitleCase(val) }))}
                                         maxLength={30}
@@ -353,7 +353,7 @@ export default function ProfileScreen() {
                                 <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52, opacity: 0.8 }]}>
                                     <Ionicons name="mail-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
-                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
+                                        style={[styles.textInput, { color: colors.text, fontSize: 12 }]}
                                         value={formData.email}
                                         editable={false}
                                     />
@@ -376,7 +376,7 @@ export default function ProfileScreen() {
                                     <TextInput
                                         placeholder="03*********"
                                         placeholderTextColor={colors.icon + '70'}
-                                        style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
+                                        style={[styles.textInput, { color: colors.text, fontSize: 12 }]}
                                         value={formData.phone}
                                         onChangeText={(val) => setFormData(p => ({ ...p, phone: val }))}
                                         keyboardType="phone-pad"
@@ -419,7 +419,7 @@ export default function ProfileScreen() {
                                 >
                                     <View style={styles.triggerContent}>
                                         <Ionicons name="location-outline" size={18} color={formData.city ? colors.primary : colors.icon} style={{ marginRight: 10 }} />
-                                        <ThemedText style={[styles.triggerText, !formData.city ? { color: colors.icon + '70' } : { color: colors.text, textTransform: 'capitalize' }, { fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
+                                        <ThemedText style={[styles.triggerText, !formData.city ? { color: colors.icon + '70' } : { color: colors.text, textTransform: 'capitalize' }, { fontSize: 12 }]}>
                                             {formData.city || "Select your city"}
                                         </ThemedText>
                                     </View>
@@ -440,7 +440,7 @@ export default function ProfileScreen() {
                                 >
                                     <View style={styles.triggerContent}>
                                         <Ionicons name="business-outline" size={18} color={formData.village ? colors.primary : colors.icon} style={{ marginRight: 10 }} />
-                                        <ThemedText style={[styles.triggerText, !formData.village ? { color: colors.icon + '70' } : { color: colors.text, textTransform: 'capitalize' }, { fontSize: Platform.OS === 'android' ? 13 : 14 }]}>
+                                        <ThemedText style={[styles.triggerText, !formData.village ? { color: colors.icon + '70' } : { color: colors.text, textTransform: 'capitalize' }, { fontSize: 12 }]}>
                                             {formData.village || "Select your village/town"}
                                         </ThemedText>
                                     </View>
@@ -532,13 +532,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 20,
+        fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
     },
     welcomeText: {
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: '800',
         color: '#FFFFFF',
         marginTop: 6,
@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     subtitleText: {
-        fontSize: 12,
+        fontSize: 11,
         color: 'rgba(255,255,255,0.8)',
         marginTop: 2,
         textAlign: 'center',
@@ -625,7 +625,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     genderText: {
-        fontSize: Platform.OS === 'android' ? 13 : 15,
+        fontSize: 12,
         fontWeight: '600',
         color: '#64748B',
     },
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     infoText: {
-        fontSize: 12,
+        fontSize: 11,
         color: '#64748B',
         flex: 1,
         lineHeight: 18,
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     updateButtonText: {
-        fontSize: Platform.OS === 'android' ? 14 : 15,
+        fontSize: 12,
         fontWeight: '700',
         color: '#FFFFFF',
     },

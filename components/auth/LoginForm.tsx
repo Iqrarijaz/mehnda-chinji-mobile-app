@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
     },
     optionsRow: {
@@ -413,11 +413,11 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     optionText: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
     },
     forgotText: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '600',
     },
     loginButton: {
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     },
     loginButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
@@ -444,11 +444,11 @@ const styles = StyleSheet.create({
         marginTop: 6,
     },
     footerText: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
     },
     footerLink: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '700',
     },
 });

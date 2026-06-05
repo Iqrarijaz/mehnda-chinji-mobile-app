@@ -371,6 +371,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
         marginBottom: Platform.OS === 'android' ? 18 : 20,
     },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#FFFFFF',
+    },
     rightActions: {
         flexDirection: 'row',
         alignItems: 'center',

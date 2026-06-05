@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     bizName: {
-        fontSize: isAndroid ? 14 : 16,
+        fontSize: 14,
         fontWeight: '800',
         textTransform: 'capitalize',
         flex: 1,
@@ -268,11 +268,11 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     bizCategory: {
-        fontSize: isAndroid ? 12 : 14,
+        fontSize: 10,
         fontWeight: '600',
     },
     urduCat: {
-        fontSize: 14,
+        fontSize: 11,
     },
     descriptionRow: {
         flexDirection: 'row',
@@ -280,10 +280,10 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     descriptionText: {
-        fontSize: 13,
+        fontSize: 11,
         fontStyle: 'italic',
         flex: 1,
-        lineHeight: 18,
+        lineHeight: 16,
     },
     bizInfoRow: {
         flexDirection: 'row',
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     bizInfoText: {
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '500',
         flex: 1,
     },

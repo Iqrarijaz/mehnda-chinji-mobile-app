@@ -8,6 +8,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
+    RefreshControl,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -41,7 +42,7 @@ const BusinessRegistration = React.memo(() => {
     const [visibilityTarget, setVisibilityTarget] = useState<{ id: string; name: string; nextValue: boolean } | null>(null);
 
     // Queries
-    const { data: statusRes, isLoading: loading, refetch } = useQuery({
+    const { data: statusRes, isLoading: loading, refetch, isRefetching } = useQuery({
         queryKey: BUSINESS_QUERY_KEYS.myBusiness(),
         queryFn: getBusinessStatus,
     });
@@ -112,7 +113,18 @@ const BusinessRegistration = React.memo(() => {
 
     return (
         <View style={styles.container}>
-            <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+            <ScrollView 
+                style={styles.container} 
+                contentContainerStyle={styles.scrollContent}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isRefetching}
+                        onRefresh={refetch}
+                        colors={[colors.primary]}
+                        tintColor={colors.primary}
+                    />
+                }
+            >
                 {/* Header with Add Button */}
                 <View style={styles.headerRow}>
                     <View style={styles.headerBox}>
@@ -128,7 +140,7 @@ const BusinessRegistration = React.memo(() => {
                         onPress={handleAddBusiness}
                         disabled={businesses.length >= 3}
                     >
-                        <Ionicons name="add" size={28} color="#FFF" />
+                        <Ionicons name="add" size={20} color="#FFF" />
                     </TouchableOpacity>
                 </View>
 
@@ -219,20 +231,20 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headerTitle: {
-        fontSize: 22,
+        fontSize: 18,
         fontWeight: '800',
         paddingBottom: 2,
-        letterSpacing: -0.5,
+        letterSpacing: -0.3,
     },
     headerSubtitle: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
-        marginTop: 4,
+        marginTop: 2,
     },
     addButton: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: "#000",
@@ -250,7 +262,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     emptyStateText: {
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '500',
     },
     emptyStateBtn: {

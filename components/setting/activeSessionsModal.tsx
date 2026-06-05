@@ -223,26 +223,25 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
 });
 
 const styles = StyleSheet.create({
-
     header: {
         flexDirection: 'row',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: 12,
     },
     title: {
-        fontSize: Platform.OS === 'android' ? 18 : 20,
+        fontSize: 14,
         fontWeight: '800',
         marginBottom: 3,
     },
     subtitle: {
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '500',
     },
     closeBtn: {
-        width: 34,
-        height: 34,
-        borderRadius: 17,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -254,20 +253,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        padding: 14,
-        marginBottom: 10,
+        padding: 10,
+        marginBottom: 8,
     },
     cardCurrent: {
         backgroundColor: 'rgba(0,102,102,0.08)', // Using alpha for consistent branding
     },
     iconCircle: {
-        width: 46,
-        height: 46,
+        width: 38,
+        height: 38,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0,102,102,0.08)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 14,
+        marginRight: 12,
     },
     iconCircleCurrent: {
         backgroundColor: 'rgba(0,102,102,0.12)',
@@ -277,11 +276,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        marginBottom: 4,
+        marginBottom: 2,
         flexWrap: 'wrap',
     },
     deviceName: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '700',
         flexShrink: 1,
     },
@@ -299,13 +298,13 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     meta: {
-        fontSize: 12,
+        fontSize: 11,
         color: '#94A3B8',
         fontWeight: '500',
     },
     revokeBtn: {
-        width: 36,
-        height: 36,
+        width: 30,
+        height: 30,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FEF2F2',
         justifyContent: 'center',
@@ -320,7 +319,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     emptyText: {
-        fontSize: 14,
+        fontSize: 11,
         color: '#94A3B8',
         fontWeight: '500',
     },

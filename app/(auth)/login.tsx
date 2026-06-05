@@ -146,8 +146,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     modalTitle: {
-        fontSize: 22,
-        fontWeight: '800',
+        fontSize: 18,
+        fontWeight: '700',
         color: '#0F172A',
         marginBottom: 12,
         textAlign: 'center',

@@ -5,11 +5,17 @@ import {
     ScrollView,
     TouchableOpacity,
     ActivityIndicator,
-    Modal
+    Modal,
+    FlatList
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import { ThemedText } from '@/components/themedText';
+import Animated, {
+    useSharedValue,
+    useAnimatedScrollHandler,
+    useAnimatedStyle,
+} from 'react-native-reanimated';
 
 interface ReportTabProps {
     reportData: any;
@@ -20,6 +26,8 @@ interface ReportTabProps {
     loading: boolean;
     isDark: boolean;
     colors: any;
+    onGenerateReport: (month: string) => void;
+    isGeneratingReport?: boolean;
 }
 
 const MONTHS = [
@@ -37,6 +45,148 @@ const MONTHS = [
     { name: 'Dec', value: '12' }
 ];
 
+interface MonthDetailCardProps {
+    item: any;
+    isDark: boolean;
+    colors: any;
+}
+
+const MonthDetailCard = React.memo(({ item, isDark, colors }: MonthDetailCardProps) => {
+    const isProfit = (item.net || 0) >= 0;
+    return (
+        <View style={[styles.reportRowCard, { backgroundColor: isDark ? '#1e293b' : '#FFF' }]}>
+            <View style={styles.reportRowHeader}>
+                <ThemedText style={styles.reportRowMonth}>{item.month}</ThemedText>
+                <View style={[styles.netBadge, { backgroundColor: (isProfit ? '#10b981' : '#ef4444') + '20' }]}>
+                    <ThemedText style={{ color: isProfit ? '#10b981' : '#ef4444', fontWeight: '700', fontSize: 11 }}>
+                        Net: PKR {item.net}
+                    </ThemedText>
+                </View>
+            </View>
+
+            <View style={styles.reportRowDetail}>
+                <View style={styles.reportDetailItem}>
+                    <ThemedText style={styles.reportItemLabel}>Income</ThemedText>
+                    <ThemedText style={[styles.reportItemVal, { color: '#10b981' }]}>+PKR {item.income || 0}</ThemedText>
+                </View>
+                <View style={styles.reportDetailItem}>
+                    <ThemedText style={styles.reportItemLabel}>Expense</ThemedText>
+                    <ThemedText style={[styles.reportItemVal, { color: '#ef4444' }]}>-PKR {item.expense || 0}</ThemedText>
+                </View>
+            </View>
+        </View>
+    );
+});
+
+interface ReportTabHeaderProps {
+    reportMonths: number;
+    summary: { totalIncome: number; totalExpense: number; netProfit: number };
+    isDark: boolean;
+    colors: any;
+    setReportMonths: (months: number) => void;
+}
+
+const ReportTabHeader = React.memo(({
+    reportMonths,
+    summary,
+    isDark,
+    colors,
+    setReportMonths,
+}: ReportTabHeaderProps) => {
+    const [contentWidth, setContentWidth] = React.useState(1);
+    const [layoutWidth, setLayoutWidth] = React.useState(1);
+
+    const scrollX = useSharedValue(0);
+
+    const handleScroll = useAnimatedScrollHandler((event) => {
+        scrollX.value = event.contentOffset.x;
+    });
+
+    const animatedIndicatorStyle = useAnimatedStyle(() => {
+        const maxScroll = contentWidth - layoutWidth;
+        const translateX = maxScroll > 0 ? (scrollX.value / maxScroll) * 25 : 0;
+        return {
+            transform: [{ translateX }],
+        };
+    });
+
+    return (
+        <View>
+            {/* Financial Summary Card */}
+            <View style={[styles.reportSummaryCard, { backgroundColor: isDark ? '#1e293b' : '#FFF' }]}>
+                <ThemedText style={styles.reportSummaryTitle}>Financial Overview ({reportMonths} Months)</ThemedText>
+
+                <View style={styles.summaryGrid}>
+                    <View style={styles.summaryCol}>
+                        <ThemedText style={styles.summaryLabel}>Total Income</ThemedText>
+                        <ThemedText style={[styles.summaryValText, { color: '#10b981' }]}>PKR {summary.totalIncome}</ThemedText>
+                    </View>
+                    <View style={styles.summaryCol}>
+                        <ThemedText style={styles.summaryLabel}>Total Expenses</ThemedText>
+                        <ThemedText style={[styles.summaryValText, { color: '#ef4444' }]}>PKR {summary.totalExpense}</ThemedText>
+                    </View>
+                </View>
+
+                <View style={[styles.netProfitContainer, { borderTopColor: colors.border }]}>
+                    <ThemedText style={styles.summaryLabel}>Net Profit/Loss</ThemedText>
+                    <ThemedText style={[styles.netProfitVal, { color: summary.netProfit >= 0 ? '#10b981' : '#ef4444' }]}>
+                        PKR {summary.netProfit}
+                    </ThemedText>
+                </View>
+            </View>
+
+            {/* Filter / Months Selection */}
+            <View style={styles.monthSelectRow}>
+                <ThemedText style={styles.trendDurationHeading}>Trend Duration</ThemedText>
+                <Animated.ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.monthBtnsScroll}
+                    style={styles.monthScrollStyle}
+                    onScroll={handleScroll}
+                    scrollEventThrottle={16}
+                    onContentSizeChange={(w) => setContentWidth(w)}
+                    onLayout={(e) => setLayoutWidth(e.nativeEvent.layout.width)}
+                >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => (
+                        <TouchableOpacity
+                            key={m}
+                            onPress={() => setReportMonths(m)}
+                            style={[
+                                styles.monthBtn,
+                                {
+                                    backgroundColor: reportMonths === m ? colors.primary : (isDark ? '#334155' : '#FFF'),
+                                    borderColor: reportMonths === m ? colors.primary : colors.border
+                                }
+                            ]}
+                        >
+                            <ThemedText style={{ color: reportMonths === m ? '#FFF' : colors.text, fontSize: 11, fontWeight: '700' }}>
+                                {m} {m === 1 ? 'Month' : 'Months'}
+                            </ThemedText>
+                        </TouchableOpacity>
+                    ))}
+                </Animated.ScrollView>
+                {contentWidth > layoutWidth && (
+                    <View style={[styles.scrollTrack, { backgroundColor: isDark ? '#334155' : '#e2e8f0' }]}>
+                        <Animated.View
+                            style={[
+                                styles.scrollIndicator,
+                                {
+                                    backgroundColor: colors.primary,
+                                },
+                                animatedIndicatorStyle,
+                            ]}
+                        />
+                    </View>
+                )}
+            </View>
+
+            {/* Monthly Breakdowns */}
+            <ThemedText style={styles.sectionHeader}>Monthly Breakdowns</ThemedText>
+        </View>
+    );
+});
+
 const ReportTab = React.memo(({
     reportData,
     reportMonths,
@@ -45,12 +195,10 @@ const ReportTab = React.memo(({
     setReportMonthFilter,
     loading,
     isDark,
-    colors
+    colors,
+    onGenerateReport,
+    isGeneratingReport = false
 }: ReportTabProps) => {
-    const [scrollPercent, setScrollPercent] = React.useState(0);
-    const [contentWidth, setContentWidth] = React.useState(1);
-    const [layoutWidth, setLayoutWidth] = React.useState(1);
-
     const [showDatePicker, setShowDatePicker] = React.useState(false);
     const [pickerYear, setPickerYear] = React.useState(moment(reportMonthFilter || undefined).year());
 
@@ -73,13 +221,24 @@ const ReportTab = React.memo(({
         return reportData?.monthlyDetails || [];
     }, [reportData?.monthlyDetails]);
 
-    const handleScroll = React.useCallback((event: any) => {
-        const x = event.nativeEvent.contentOffset.x;
-        const maxScroll = contentWidth - layoutWidth;
-        if (maxScroll > 0) {
-            setScrollPercent(Math.min(Math.max(x / maxScroll, 0), 1));
-        }
-    }, [contentWidth, layoutWidth]);
+    const handleClearFilter = React.useCallback((e: any) => {
+        e.stopPropagation();
+        setReportMonthFilter('');
+    }, [setReportMonthFilter]);
+
+    const renderItem = React.useCallback(({ item }: { item: any }) => (
+        <MonthDetailCard item={item} isDark={isDark} colors={colors} />
+    ), [isDark, colors]);
+
+    const listHeader = React.useMemo(() => (
+        <ReportTabHeader
+            reportMonths={reportMonths}
+            summary={summary}
+            isDark={isDark}
+            colors={colors}
+            setReportMonths={setReportMonths}
+        />
+    ), [reportMonths, summary, isDark, colors, setReportMonths]);
 
     if (loading) {
         return (
@@ -100,118 +259,40 @@ const ReportTab = React.memo(({
                 >
                     <Ionicons name="calendar-outline" size={18} color={colors.textSecondary} />
                     <ThemedText style={[styles.searchInputText, { color: reportMonthFilter ? colors.text : colors.textSecondary }]}>
-                        {reportMonthFilter ? moment(reportMonthFilter, 'YYYY-MM').format('MMMM YYYY') : 'Select Start Month'}
+                        {reportMonthFilter ? moment(reportMonthFilter, 'YYYY-MM').format('MMMM YYYY') : 'Select Month'}
                     </ThemedText>
                     {reportMonthFilter ? (
-                        <TouchableOpacity onPress={(e) => {
-                            e.stopPropagation();
-                            setReportMonthFilter('');
-                        }}>
+                        <TouchableOpacity onPress={handleClearFilter}>
                             <Ionicons name="close-circle" size={16} color={colors.textSecondary} />
                         </TouchableOpacity>
                     ) : null}
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                    onPress={() => onGenerateReport(reportMonthFilter || moment().format('YYYY-MM'))}
+                    disabled={isGeneratingReport}
+                    activeOpacity={0.8}
+                    style={[styles.generateBtn, { backgroundColor: colors.primary }]}
+                >
+                    {isGeneratingReport ? (
+                        <ActivityIndicator size="small" color="#FFF" />
+                    ) : (
+                        <>
+                            <Ionicons name="download-outline" size={18} color="#FFF" />
+                            <ThemedText style={styles.generateBtnText}>PDF</ThemedText>
+                        </>
+                    )}
+                </TouchableOpacity>
             </View>
 
-            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
-                {/* Financial Summary Card */}
-                <View style={[styles.reportSummaryCard, { backgroundColor: isDark ? '#1e293b' : '#FFF', borderColor: colors.border }]}>
-                    <ThemedText style={styles.reportSummaryTitle}>Financial Overview ({reportMonths} Months)</ThemedText>
-
-                    <View style={styles.summaryGrid}>
-                        <View style={styles.summaryCol}>
-                            <ThemedText style={styles.summaryLabel}>Total Income</ThemedText>
-                            <ThemedText style={[styles.summaryValText, { color: '#10b981' }]}>PKR {summary.totalIncome}</ThemedText>
-                        </View>
-                        <View style={styles.summaryCol}>
-                            <ThemedText style={styles.summaryLabel}>Total Expenses</ThemedText>
-                            <ThemedText style={[styles.summaryValText, { color: '#ef4444' }]}>PKR {summary.totalExpense}</ThemedText>
-                        </View>
-                    </View>
-
-                    <View style={[styles.netProfitContainer, { borderTopColor: colors.border }]}>
-                        <ThemedText style={styles.summaryLabel}>Net Profit/Loss</ThemedText>
-                        <ThemedText style={[styles.netProfitVal, { color: summary.netProfit >= 0 ? '#10b981' : '#ef4444' }]}>
-                            PKR {summary.netProfit}
-                        </ThemedText>
-                    </View>
-                </View>
-
-                {/* Filter / Months Selection */}
-                <View style={styles.monthSelectRow}>
-                    <ThemedText style={styles.trendDurationHeading}>Trend Duration</ThemedText>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.monthBtnsScroll}
-                        style={styles.monthScrollStyle}
-                        onScroll={handleScroll}
-                        scrollEventThrottle={16}
-                        onContentSizeChange={(w) => setContentWidth(w)}
-                        onLayout={(e) => setLayoutWidth(e.nativeEvent.layout.width)}
-                    >
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => (
-                            <TouchableOpacity
-                                key={m}
-                                onPress={() => setReportMonths(m)}
-                                style={[
-                                    styles.monthBtn,
-                                    {
-                                        backgroundColor: reportMonths === m ? colors.primary : (isDark ? '#334155' : '#FFF'),
-                                        borderColor: reportMonths === m ? colors.primary : colors.border
-                                    }
-                                ]}
-                            >
-                                <ThemedText style={{ color: reportMonths === m ? '#FFF' : colors.text, fontSize: 11, fontWeight: '700' }}>
-                                    {m} {m === 1 ? 'Month' : 'Months'}
-                                </ThemedText>
-                            </TouchableOpacity>
-                        ))}
-                    </ScrollView>
-                    {contentWidth > layoutWidth && (
-                        <View style={[styles.scrollTrack, { backgroundColor: isDark ? '#334155' : '#e2e8f0' }]}>
-                            <View
-                                style={[
-                                    styles.scrollIndicator,
-                                    {
-                                        backgroundColor: colors.primary,
-                                        transform: [{ translateX: scrollPercent * 25 }]
-                                    }
-                                ]}
-                            />
-                        </View>
-                    )}
-                </View>
-
-                {/* Monthly Breakdowns */}
-                <ThemedText style={styles.sectionHeader}>Monthly Breakdowns</ThemedText>
-                {details.map((dt: any, i: number) => {
-                    const isProfit = (dt.net || 0) >= 0;
-                    return (
-                        <View key={i} style={[styles.reportRowCard, { backgroundColor: isDark ? '#1e293b' : '#FFF', borderColor: colors.border }]}>
-                            <View style={styles.reportRowHeader}>
-                                <ThemedText style={styles.reportRowMonth}>{dt.month}</ThemedText>
-                                <View style={[styles.netBadge, { backgroundColor: (isProfit ? '#10b981' : '#ef4444') + '20' }]}>
-                                    <ThemedText style={{ color: isProfit ? '#10b981' : '#ef4444', fontWeight: '700', fontSize: 11 }}>
-                                        Net: PKR {dt.net}
-                                    </ThemedText>
-                                </View>
-                            </View>
-
-                            <View style={styles.reportRowDetail}>
-                                <View style={styles.reportDetailItem}>
-                                    <ThemedText style={styles.reportItemLabel}>Income</ThemedText>
-                                    <ThemedText style={[styles.reportItemVal, { color: '#10b981' }]}>+PKR {dt.income || 0}</ThemedText>
-                                </View>
-                                <View style={styles.reportDetailItem}>
-                                    <ThemedText style={styles.reportItemLabel}>Expense</ThemedText>
-                                    <ThemedText style={[styles.reportItemVal, { color: '#ef4444' }]}>-PKR {dt.expense || 0}</ThemedText>
-                                </View>
-                            </View>
-                        </View>
-                    );
-                })}
-            </ScrollView>
+            <FlatList
+                data={details}
+                keyExtractor={(item, index) => item.month || index.toString()}
+                renderItem={renderItem}
+                ListHeaderComponent={listHeader}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 80 }}
+            />
 
             {/* Custom Month Picker Modal */}
             <Modal
@@ -287,13 +368,12 @@ const styles = StyleSheet.create({
     },
     reportSummaryCard: {
         borderRadius: 12,
-        borderWidth: 2,
         padding: 10,
         marginBottom: 12,
     },
     reportSummaryTitle: {
         fontSize: 12,
-        fontWeight: '700',
+        fontWeight: '800',
         marginBottom: 8,
     },
     summaryGrid: {
@@ -331,7 +411,7 @@ const styles = StyleSheet.create({
     },
     trendDurationHeading: {
         fontSize: 12,
-        fontWeight: '700',
+        fontWeight: '800',
     },
     monthBtnsScroll: {
         gap: 6,
@@ -369,7 +449,6 @@ const styles = StyleSheet.create({
     },
     reportRowCard: {
         borderRadius: 14,
-        borderWidth: 2,
         padding: 14,
         marginBottom: 12,
     },
@@ -381,7 +460,7 @@ const styles = StyleSheet.create({
     },
     reportRowMonth: {
         fontSize: 14,
-        fontWeight: '700',
+        fontWeight: '800',
     },
     netBadge: {
         paddingHorizontal: 8,
@@ -439,8 +518,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalTitle: {
-        fontSize: 16,
-        fontWeight: '800',
+        fontSize: 18,
+        fontWeight: '700',
     },
     modalFooter: {
         flexDirection: 'row',
@@ -491,5 +570,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginVertical: 2,
+    },
+    generateBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        height: 38,
+        gap: 6,
+    },
+    generateBtnText: {
+        color: '#FFF',
+        fontSize: 12,
+        fontWeight: '700',
     },
 });

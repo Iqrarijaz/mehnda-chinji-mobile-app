@@ -64,6 +64,7 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
                     <Ionicons name="grid-outline" size={20} color={colors.white} />
                 </TouchableOpacity>
 
+
                 <View style={styles.rightActions}>
                     <NotificationIcon
                         containerStyle={{ marginRight: 12 }}
@@ -175,6 +176,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
         marginBottom: Platform.OS === 'android' ? 18 : 20,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#FFFFFF',
     },
     iconButton: {
         width: 38,

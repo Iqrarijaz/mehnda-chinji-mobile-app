@@ -59,7 +59,7 @@ const ExpenseCard = React.memo(({
     onDeletePress: (expenseId: string) => void;
 }) => {
     return (
-        <View style={[styles.dataCard, { backgroundColor: isDark ? '#1e293b' : '#FFF', borderColor: colors.border }]}>
+        <View style={[styles.dataCard, { backgroundColor: isDark ? '#1e293b' : '#FFF' }]}>
             <View style={styles.cardHeader}>
                 <View style={{ flex: 1 }}>
                     <ThemedText style={styles.cardTitle}>{item.title}</ThemedText>
@@ -367,7 +367,6 @@ const styles = StyleSheet.create({
     },
     dataCard: {
         borderRadius: 10,
-        borderWidth: 2,
         padding: 10,
         marginBottom: 12,
     },
@@ -378,10 +377,11 @@ const styles = StyleSheet.create({
     },
     cardTitle: {
         fontSize: 14,
-        fontWeight: '700',
+        fontWeight: '800',
     },
     cardSubtitle: {
         fontSize: 11,
+        fontWeight: '600',
         marginTop: 2,
     },
     cardActions: {
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     },
     smallActionBtnText: {
         fontSize: 11,
-        fontWeight: '600',
+        fontWeight: '700',
     },
     dateModalOverlay: {
         flex: 1,
@@ -423,8 +423,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalTitle: {
-        fontSize: 16,
-        fontWeight: '800',
+        fontSize: 18,
+        fontWeight: '700',
     },
     modalFooter: {
         flexDirection: 'row',

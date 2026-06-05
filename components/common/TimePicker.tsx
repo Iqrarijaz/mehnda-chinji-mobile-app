@@ -171,9 +171,8 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     modalTitle: {
-        fontSize: 20,
-        fontWeight: '800',
-        letterSpacing: 0.5,
+        fontSize: 18,
+        fontWeight: '700',
     },
     closeBtn: {
         width: 32,

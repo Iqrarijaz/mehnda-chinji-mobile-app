@@ -73,7 +73,7 @@ const NotificationItem = React.memo(({ item, onPress, delay = 0 }: Props) => {
                 {/* Left: Icon */}
                 <View style={styles.iconWrap}>
                     <View style={[styles.iconCircle, { backgroundColor: `${PRIMARY}14` }]}>
-                        <Ionicons name={icon as any} size={22} color={color} />
+                        <Ionicons name={icon as any} size={18} color={color} />
                     </View>
                     {!item.isRead && <View style={styles.badge} />}
                 </View>
@@ -106,8 +106,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: Platform.OS === 'android' ? 6 : 10,
-        marginBottom: 10,
+        padding: 6,
+        marginBottom: 8,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.06,
@@ -116,10 +116,10 @@ const styles = StyleSheet.create({
     cardUnread: {
         backgroundColor: `${PRIMARY}08`,
     },
-    iconWrap: { position: 'relative', marginRight: 14 },
+    iconWrap: { position: 'relative', marginRight: 10 },
     iconCircle: {
-        width: 40,
-        height: 40,
+        width: 34,
+        height: 34,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
@@ -137,9 +137,9 @@ const styles = StyleSheet.create({
     },
     content: { flex: 1 },
     titleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-    title: { fontSize: Platform.OS === 'android' ? 14 : 15, fontWeight: '600', color: '#0F172A', flex: 1 },
+    title: { fontSize: 12, fontWeight: '600', color: '#0F172A', flex: 1 },
     titleUnread: { fontWeight: '800' },
     dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: PRIMARY, marginLeft: 6 },
-    body: { fontSize: 13, color: '#64748B', lineHeight: 19, marginBottom: 4 },
+    body: { fontSize: 11, color: '#64748B', lineHeight: 16, marginBottom: 4 },
     time: { fontSize: 11, color: '#94A3B8', fontWeight: '500' },
 });

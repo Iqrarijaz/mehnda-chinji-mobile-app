@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: Platform.OS === 'android' ? 19 : 21,
+        fontSize: 16,
         fontWeight: '700',
         color: '#FFFFFF',
     },
@@ -213,12 +213,12 @@ const styles = StyleSheet.create({
         marginTop: 12,
     },
     headerSubtitle: {
-        fontSize: 15,
+        fontSize: 11,
         color: '#FFFFFF',
         fontWeight: '600',
     },
     headerDate: {
-        fontSize: 12,
+        fontSize: 10,
         color: 'rgba(255,255,255,0.7)',
         marginTop: 4,
         fontWeight: '500',
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     },
     infoBtnText: {
         color: 'rgba(255,255,255,0.9)',
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600'
     },
 
@@ -268,13 +268,13 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     cardHeaderText: {
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: '700',
         color: '#0F172A',
     },
     welcomeText: {
-        fontSize: 15,
-        lineHeight: 24,
+        fontSize: 12,
+        lineHeight: 18,
         color: '#64748B',
     },
     divider: {
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     accordionTitle: {
-        fontSize: 15,
+        fontSize: 12,
         fontWeight: '600',
         color: '#334155',
         flex: 1,
@@ -329,8 +329,8 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
     },
     bodyText: {
-        fontSize: 14,
-        lineHeight: 22,
+        fontSize: 11,
+        lineHeight: 18,
         color: '#475569',
     },
 
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     checkboxText: {
-        fontSize: 14,
+        fontSize: 11,
         fontWeight: '500',
         color: '#334155',
         flex: 1,
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
     },
     acceptButtonText: {
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '700',
     },
 
@@ -410,15 +410,15 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     modalTitle: {
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: '700',
         color: '#0F172A',
         marginBottom: 12,
         textAlign: 'center',
     },
     modalBody: {
-        fontSize: 15,
-        lineHeight: 24,
+        fontSize: 11,
+        lineHeight: 18,
         color: '#475569',
         textAlign: 'center',
         marginBottom: 24,
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     },
     modalBtnText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: '700',
     }
 });

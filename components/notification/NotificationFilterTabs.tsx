@@ -59,11 +59,11 @@ const NotificationFilterTabs = React.memo(({ active, onSelect }: Props) => (
 export default NotificationFilterTabs;
 
 const styles = StyleSheet.create({
-    bar: { marginTop: 16 },
-    scroll: { paddingHorizontal: 20, gap: 10, paddingBottom: 4 },
+    bar: { marginTop: 10 },
+    scroll: { paddingHorizontal: 16, gap: 10, paddingBottom: 4 },
     chip: {
-        paddingHorizontal: 20,
-        paddingVertical: Platform.OS === 'android' ? 7 : 9,
+        paddingHorizontal: 12,
+        paddingVertical: Platform.OS === 'android' ? 5 : 6,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         shadowColor: '#000',
@@ -72,6 +72,6 @@ const styles = StyleSheet.create({
         shadowRadius: 6,
     },
     chipActive: { backgroundColor: PRIMARY },
-    label: { fontSize: 13, fontWeight: '600', color: '#64748B' },
+    label: { fontSize: 11, fontWeight: '600', color: '#64748B' },
     labelActive: { color: '#FFFFFF', fontWeight: '700' },
 });

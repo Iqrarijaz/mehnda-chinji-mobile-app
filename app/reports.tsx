@@ -297,8 +297,8 @@ const styles = StyleSheet.create({
     },
     headerTitleWrap: { flex: 1, alignItems: 'center' },
     headerTitle: {
-        fontSize: Platform.OS === 'android' ? 19 : 21,
-        fontWeight: '700',
+        fontSize: 20,
+        fontWeight: '800',
         color: '#FFFFFF'
     },
     headerSubtitleWrap: { alignItems: 'center', marginTop: 12 },

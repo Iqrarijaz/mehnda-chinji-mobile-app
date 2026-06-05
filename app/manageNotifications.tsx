@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontWeight: '700',
+        fontWeight: '800',
         color: '#FFFFFF',
     },
     headerSubtitleWrap: {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     headerSubtitle: {
-        fontSize: 14,
+        fontSize: 11,
         color: 'rgba(255,255,255,0.75)',
         fontWeight: '500',
     },
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
         paddingTop: 46,
     },
     footerNote: {
-        fontSize: 13,
+        fontSize: 11,
         textAlign: 'center',
         marginTop: 8,
         lineHeight: 18,

@@ -90,64 +90,63 @@ const EmergencyCard = React.memo(({ data, color }: EmergencyCardProps) => {
 
 
     return (
-        <>
-            <TouchableOpacity
-                activeOpacity={0.9}
-                onPress={() => router.push({
-                    pathname: '/place/[id]',
-                    params: {
-                        id: data._id,
-                        placeData: JSON.stringify(data),
-                        color: primaryColor,
-                        category: 'Emergency'
-                    }
-                })}
-                style={styles.cardWrapper}
-            >
-                <View style={[styles.cardContainer, {
-                    backgroundColor: colors.card,
-                    borderColor: 'transparent',
-                    borderLeftColor: primaryColor,
-                }]}>
-                    <View style={styles.cardContentRow}>
-                        <View style={[styles.imageCol, { backgroundColor: primaryColor + '10' }]}>
-                            {data.images?.[0] || fallbackImage ? (
-                                <Image
-                                    source={{ uri: data.images?.[0] || fallbackImage }}
-                                    style={styles.fullImage}
-                                    contentFit="cover"
-                                    transition={200}
-                                />
-                            ) : (
-                                <View style={styles.placeholderCol}>
-                                    <MaterialCommunityIcons name="ambulance" size={28} color={isDark ? '#FFFFFF' : primaryColor} />
-                                </View>
-                            )}
+        <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => router.push({
+                pathname: '/place/[id]',
+                params: {
+                    id: data._id,
+                    placeData: JSON.stringify(data),
+                    color: primaryColor,
+                    category: 'Emergency'
+                }
+            })}
+            style={styles.cardWrapper}
+        >
+            <View style={[styles.cardContainer, {
+                backgroundColor: colors.card,
+            }]}>
+                <View style={styles.cardContentRow}>
+                    <View style={[styles.imageCol, { backgroundColor: colors.card }]}>
+                        {data.images?.[0] || fallbackImage ? (
+                            <Image
+                                source={{ uri: data.images?.[0] || fallbackImage }}
+                                style={styles.fullImage}
+                                contentFit="cover"
+                                transition={200}
+                            />
+                        ) : (
+                            <View style={styles.placeholderCol}>
+                                <MaterialCommunityIcons name="ambulance" size={28} color={colors.textSecondary} />
+                            </View>
+                        )}
+                    </View>
+
+                    <View style={styles.detailsCol}>
+                        <View style={styles.headerTitleRow}>
+                            <ThemedText style={[styles.name, { color: isDark ? '#FFFFFF' : colors.text }]} numberOfLines={1}>
+                                {placeName}
+                            </ThemedText>
+                            <View style={[styles.badge, { backgroundColor: primaryColor + '20' }]}>
+                                <ThemedText style={[styles.badgeText, { color: primaryColor }]}>
+                                    {capitalize(data.type || 'Emergency')}
+                                </ThemedText>
+                            </View>
                         </View>
 
-                        <View style={styles.detailsCol}>
-                            <View style={styles.headerTitleRow}>
-                                <ThemedText style={[styles.name, { color: isDark ? '#FFFFFF' : colors.text }]} numberOfLines={1}>
-                                    {placeName}
-                                </ThemedText>
-                                <View style={[styles.badge, { backgroundColor: primaryColor + '20' }]}>
-                                    <ThemedText style={[styles.badgeText, { color: isDark ? '#FFFFFF' : primaryColor }]}>
-                                        {capitalize(data.type || 'Emergency')}
-                                    </ThemedText>
-                                </View>
-                            </View>
-
-                            <View style={styles.addressRow}>
-                                <Ionicons name="location" size={12} color={isDark ? '#FFFFFF' : colors.textSecondary} style={{ marginTop: 2 }} />
-                                <ThemedText style={[styles.address, { color: isDark ? '#FFFFFF' : colors.textSecondary }]} numberOfLines={1}>
-                                    {address}
-                                </ThemedText>
-                            </View>
+                        <View style={styles.addressRow}>
+                            <Ionicons name="location" size={12} color={colors.textSecondary} style={{ marginTop: 2 }} />
+                            <ThemedText
+                                style={[styles.address, { color: isDark ? '#FFFFFF' : colors.textSecondary }]}
+                                numberOfLines={2}
+                            >
+                                {address}
+                            </ThemedText>
                         </View>
                     </View>
                 </View>
-            </TouchableOpacity>
-        </>
+            </View>
+        </TouchableOpacity>
     );
 });
 
@@ -157,32 +156,25 @@ const isAndroid = Platform.OS === 'android';
 
 const styles = StyleSheet.create({
     cardWrapper: {
-        marginBottom: isAndroid ? 10 : 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.06,
-        shadowRadius: 10,
-        elevation: 3,
+        marginBottom: 16,
     },
     cardContainer: {
-        borderRadius: 16,
+        borderRadius: 12,
         overflow: 'hidden',
-        borderWidth: 1,
-        borderLeftWidth: 4,
     },
     cardContentRow: {
         flexDirection: 'row',
-        height: 90,
+        alignItems: 'center',
     },
     imageCol: {
-        width: '28%',
-        height: '100%',
+        width: 76,
+        height: 76,
         padding: 4,
     },
     fullImage: {
         width: '100%',
         height: '100%',
-        borderRadius: 12,
+        borderRadius: 8,
     },
     placeholderCol: {
         flex: 1,
@@ -191,17 +183,17 @@ const styles = StyleSheet.create({
     },
     detailsCol: {
         flex: 1,
-        padding: 12,
+        padding: 8,
         justifyContent: 'center',
     },
     headerTitleRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 6,
+        marginBottom: 4,
     },
     name: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '800',
         flex: 1,
         marginRight: 8,
@@ -218,11 +210,12 @@ const styles = StyleSheet.create({
     },
     addressRow: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         gap: 4,
     },
     address: {
-        fontSize: 12,
+        fontSize: 11,
+        fontWeight: '600',
         flex: 1,
     },
 });

@@ -206,7 +206,7 @@ export default function SettingsScreen() {
 
                 {/* Version */}
                 <Animated.View entering={FadeIn.delay(400).duration(400)} style={styles.versionWrap}>
-                    <ThemedText style={styles.versionText}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.0.3'}</ThemedText>
+                    <ThemedText style={styles.versionText}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.0.6'}</ThemedText>
                 </Animated.View>
             </ScrollView>
 
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontWeight: '700',
+        fontWeight: '800',
         color: '#FFFFFF',
     },
     tabContainer: {

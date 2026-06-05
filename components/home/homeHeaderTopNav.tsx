@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { ThemedText } from '../themedText';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -70,7 +71,11 @@ const styles = StyleSheet.create({
     leftRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        flex: 1,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#FFFFFF',
     },
     menuBtn: {
         width: 38,

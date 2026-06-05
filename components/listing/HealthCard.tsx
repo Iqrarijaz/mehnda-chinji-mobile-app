@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { TintedCard } from '@/components/ui/tintedCard';
 
 interface Contact {
     name: string;
@@ -72,28 +73,27 @@ const HealthCard = React.memo(({ data, color, onReport }: HealthCardProps) => {
     const healthImage = data.images?.[0];
 
     return (
-        <>
-            <TouchableOpacity
-                activeOpacity={0.92}
-                onPress={() => router.push({
-                    pathname: '/place/[id]',
-                    params: {
-                        id: data._id,
-                        placeData: JSON.stringify(data),
-                        color: primaryColor,
-                        category: 'Health'
-                    }
-                })}
-                style={[
-                    styles.card,
-                    {
-                        backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF',
-                        borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-                        shadowColor: isDark ? '#000' : primaryColor,
-                    },
-                ]}
-            >
-                {/* ── Hero ── */}
+        <TouchableOpacity
+            activeOpacity={0.92}
+            onPress={() => router.push({
+                pathname: '/place/[id]',
+                params: {
+                    id: data._id,
+                    placeData: JSON.stringify(data),
+                    color: primaryColor,
+                    category: 'Health'
+                }
+            })}
+            style={[
+                styles.card,
+                {
+                    backgroundColor: colors.card,
+                    shadowColor: 'transparent',
+                    elevation: 0,
+                }
+            ]}
+        >
+            {/* ── Hero ── */}
                 <View style={styles.heroSection}>
                     {healthImage ? (
                         <Image
@@ -138,8 +138,8 @@ const HealthCard = React.memo(({ data, color, onReport }: HealthCardProps) => {
                                 <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
                             </TouchableOpacity>
                             {onReport && (
-                                <TouchableOpacity 
-                                    style={[styles.actionBtn, { backgroundColor: 'rgba(239,68,68,0.4)' }]} 
+                                <TouchableOpacity
+                                    style={[styles.actionBtn, { backgroundColor: 'rgba(239,68,68,0.4)' }]}
                                     activeOpacity={0.8}
                                     onPress={(e) => {
                                         e.stopPropagation();
@@ -169,7 +169,7 @@ const HealthCard = React.memo(({ data, color, onReport }: HealthCardProps) => {
                 <View
                     style={[
                         styles.contentSection,
-                        { backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF' },
+                        { backgroundColor: colors.card },
                     ]}
                 >
                     {/* Name */}
@@ -198,7 +198,6 @@ const HealthCard = React.memo(({ data, color, onReport }: HealthCardProps) => {
                         </View>
                         <ThemedText
                             style={[styles.locationText, { color: isDark ? '#94A3B8' : '#475569' }]}
-                            numberOfLines={1}
                         >
                             {address}
                         </ThemedText>
@@ -206,13 +205,6 @@ const HealthCard = React.memo(({ data, color, onReport }: HealthCardProps) => {
 
                     {/* Footer CTA row */}
                     <View style={styles.footerRow}>
-                        <View style={[styles.detailsPill, { backgroundColor: primaryAlpha10, borderColor: primaryAlpha20 }]}>
-                            <ThemedText style={[styles.detailsPillText, { color: primaryColor }]}>
-                                View Details
-                            </ThemedText>
-                            <Ionicons name="chevron-forward" size={12} color={primaryColor} />
-                        </View>
-
                         {data.phone && (
                             <View style={[styles.contactChip, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
                                 <Ionicons
@@ -220,15 +212,16 @@ const HealthCard = React.memo(({ data, color, onReport }: HealthCardProps) => {
                                     size={12}
                                     color={isDark ? '#94A3B8' : '#475569'}
                                 />
-                                <ThemedText style={[styles.contactChipText, { color: isDark ? '#94A3B8' : '#475569' }]}>
+                                <ThemedText
+                                    style={[styles.contactChipText, { color: isDark ? '#94A3B8' : '#475569' }]}
+                                >
                                     Contact
                                 </ThemedText>
                             </View>
                         )}
                     </View>
                 </View>
-            </TouchableOpacity>
-        </>
+        </TouchableOpacity>
     );
 });
 
@@ -236,20 +229,15 @@ export default HealthCard;
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 20,
-        marginBottom: 16,
+        borderRadius: 12,
         overflow: 'hidden',
-        borderWidth: 1,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.12,
-        shadowRadius: 20,
-        elevation: 8,
+        marginBottom: 16,
     },
 
     // ── Hero ──
     heroSection: {
         width: '100%',
-        height: 180,
+        height: 120,
         position: 'relative',
     },
     heroImage: {
@@ -342,16 +330,16 @@ const styles = StyleSheet.create({
 
     // ── Content ──
     contentSection: {
-        paddingHorizontal: 16,
-        paddingTop: 14,
-        paddingBottom: 14,
+        paddingHorizontal: 10,
+        paddingTop: 10,
+        paddingBottom: 10,
     },
     healthName: {
-        fontSize: 17,
+        fontSize: 14,
         fontWeight: '800',
         letterSpacing: -0.4,
-        lineHeight: 23,
-        marginBottom: 10,
+        lineHeight: 20,
+        marginBottom: 6,
     },
     dividerRow: {
         flexDirection: 'row',
@@ -371,7 +359,7 @@ const styles = StyleSheet.create({
     },
     locationRow: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         gap: 7,
         marginBottom: 8,
     },
@@ -384,7 +372,7 @@ const styles = StyleSheet.create({
     },
     locationText: {
         flex: 1,
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: '600',
         letterSpacing: 0.1,
     },
@@ -399,12 +387,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 4,
         paddingHorizontal: 12,
-        paddingVertical: 7,
+        paddingVertical: 4,
         borderRadius: 10,
         borderWidth: 1,
     },
     detailsPillText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.2,
     },
@@ -413,11 +401,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 4,
         paddingHorizontal: 10,
-        paddingVertical: 7,
+        paddingVertical: 4,
         borderRadius: 10,
     },
     contactChipText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600',
     },
 });

@@ -157,7 +157,7 @@ const isAndroid = Platform.OS === 'android';
 
 const styles = StyleSheet.create({
     cardWrapper: {
-        marginBottom: isAndroid ? 10 : 12,
+        marginBottom: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.06,
@@ -165,14 +165,14 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     cardContainer: {
-        borderRadius: 16,
+        borderRadius: 12,
         overflow: 'hidden',
         borderWidth: 1,
         borderLeftWidth: 4,
     },
     cardContentRow: {
         flexDirection: 'row',
-        height: 90,
+        height: 70,
     },
     imageCol: {
         width: '28%',
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     fullImage: {
         width: '100%',
         height: '100%',
-        borderRadius: 12,
+        borderRadius: 8,
     },
     placeholderCol: {
         flex: 1,
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     },
     detailsCol: {
         flex: 1,
-        padding: 12,
+        padding: 8,
     },
     detailsInner: {
         flex: 1,
@@ -201,10 +201,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 6,
+        marginBottom: 4,
     },
     name: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '800',
         flex: 1,
         marginRight: 8,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     address: {
-        fontSize: 12,
+        fontSize: 11,
         flex: 1,
     },
 });

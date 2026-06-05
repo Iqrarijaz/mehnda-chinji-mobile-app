@@ -111,6 +111,14 @@ export default function VillagePrideScreen() {
                         {
                             backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF',
                             borderColor: colors.border
+                        },
+                        subType === 'DECEASED' && {
+                            borderWidth: 0,
+                            borderColor: 'transparent',
+                            elevation: 0,
+                            shadowOpacity: 0,
+                            shadowRadius: 0,
+                            shadowOffset: { width: 0, height: 0 }
                         }
                     ]}
                 >
@@ -131,7 +139,7 @@ export default function VillagePrideScreen() {
 
                     <View style={styles.cardHeroInfo}>
                         <View style={[styles.avatarBorder, { borderColor: meta.accent + '30' }]}>
-                            <Avatar uri={item.metadata?.profileImage || item.images?.[0]} name={fullName} size={54} />
+                            <Avatar uri={item.metadata?.profileImage || item.images?.[0]} name={fullName} size={44} />
                         </View>
                         <View style={styles.heroTextWrap}>
                             <ThemedText style={styles.heroName} numberOfLines={1}>
@@ -262,12 +270,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
     },
     cardWrapper: {
-        marginBottom: 14,
+        marginBottom: 10,
     },
     card: {
         borderRadius: LayoutConst.borderRadius + 2,
         borderWidth: 1,
-        padding: 14,
+        padding: 10,
     },
     cardHeader: {
         flexDirection: 'row',
@@ -283,12 +291,12 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     tabBadgeText: {
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: '800',
         letterSpacing: 0.5,
     },
     deceasedDate: {
-        fontSize: 10.5,
+        fontSize: 11,
         fontWeight: '700',
     },
     cardHeroInfo: {
@@ -299,24 +307,24 @@ const styles = StyleSheet.create({
     },
     avatarBorder: {
         borderWidth: 2,
-        borderRadius: 31,
+        borderRadius: 25,
         padding: 1.5,
     },
     heroTextWrap: {
         flex: 1,
     },
     heroName: {
-        fontSize: 15.5,
+        fontSize: 13,
         fontWeight: '700',
     },
     heroTitle: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '500',
         marginTop: 1,
     },
     cardExcerpt: {
-        fontSize: 13,
-        lineHeight: 19.5,
+        fontSize: 11,
+        lineHeight: 16,
         opacity: 0.85,
         marginBottom: 12,
     },
@@ -336,7 +344,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     statText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600',
     },
     readMoreCTA: {
@@ -345,7 +353,7 @@ const styles = StyleSheet.create({
         gap: 2,
     },
     readMoreText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '700',
     },
     emptyWrap: {
@@ -355,7 +363,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     emptyText: {
-        fontSize: 13.5,
+        fontSize: 11,
         fontWeight: '500',
         textAlign: 'center',
         paddingHorizontal: 40,

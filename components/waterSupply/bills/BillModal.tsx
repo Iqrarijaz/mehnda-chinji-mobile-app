@@ -228,8 +228,8 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
     },
     modalTitle: {
-        fontSize: 16,
-        fontWeight: '800',
+        fontSize: 18,
+        fontWeight: '700',
     },
     modalForm: {
         marginVertical: 10,
@@ -238,8 +238,8 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     fieldLabel: {
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: 13,
+        fontWeight: '600',
         marginBottom: 6,
     },
     modalInput: {

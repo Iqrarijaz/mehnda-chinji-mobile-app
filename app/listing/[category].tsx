@@ -43,7 +43,7 @@ import BankCard from '@/components/listing/bankCard';
 
 const CategoryListingScreen = React.memo(() => {
     const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const navigation = useNavigation();
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -58,7 +58,7 @@ const CategoryListingScreen = React.memo(() => {
     const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
     const [showTooltip, setShowTooltip] = useState(false);
     const [selectedType, setSelectedType] = useState<string>('');
-    
+
     // Reporting state
     const reportModalRef = React.useRef<ReportModalRef>(null);
     const [reportTarget, setReportTarget] = useState<{ id: string; type: 'PLACE' | 'POST' } | null>(null);
@@ -406,20 +406,22 @@ const CategoryListingScreen = React.memo(() => {
                                         {t.icon && typeof t.icon === 'string' && t.key !== '' ? (
                                             <Image
                                                 source={{ uri: t.icon }}
-                                                style={{ width: '100%', height: '100%' }}
-                                                contentFit="cover"
+                                                style={{ width: 14, height: 14 }}
+                                                contentFit="contain"
+                                                tintColor={selectedType === t.key ? headerColor : undefined}
                                             />
                                         ) : (
                                             <Ionicons
-                                                name={t.key === '' ? "apps" : "layers"}
-                                                size={18}
-                                                color={selectedType === t.key ? '#000000' : '#FFFFFF'}
+                                                name={t.key === '' ? "apps-outline" : "layers-outline"}
+                                                size={14}
+                                                color={selectedType === t.key ? headerColor : '#FFFFFF'}
                                             />
                                         )}
                                     </View>
                                     <View style={styles.headerTypeTextContainer}>
                                         <ThemedText style={[
                                             styles.headerTypeChipText,
+                                            selectedType === t.key && { color: headerColor },
                                             selectedType === t.key && styles.headerTypeChipTextActive
                                         ]} numberOfLines={1}>
                                             {t.label}
@@ -550,52 +552,50 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     headerTypesContainer: {
-        paddingVertical: 6,
-        marginTop: 2,
+        paddingVertical: 10,
+        marginTop: 4,
     },
     headerTypesScrollContent: {
         paddingHorizontal: 0,
         gap: 8,
     },
     headerTypeChip: {
-        flexDirection: 'column',
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 4,
-        paddingVertical: 4,
-        minWidth: 60,
-        height: 64,
-        marginRight: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.08)',
+        height: 36,
+        marginRight: 8,
+    },
+    headerTypeChipActive: {
+        backgroundColor: '#FFFFFF',
+        borderColor: '#FFFFFF',
     },
     headerTypeIconContainer: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
+        width: 20,
+        height: 20,
+        borderRadius: 6,
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',
-        marginBottom: 4,
-        paddingTop: 4,
     },
     headerTypeIconContainerActive: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'transparent',
     },
     headerTypeTextContainer: {
-        width: '100%',
-        alignItems: 'center',
+        marginLeft: 6,
         justifyContent: 'center',
     },
-    headerTypeChipActive: {
-        // No background/border for the chip itself
-    },
     headerTypeChipText: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: '700',
-        color: 'rgba(255,255,255,0.8)',
-        textAlign: 'center',
+        color: 'rgba(255,255,255,0.9)',
     },
     headerTypeChipTextActive: {
-        color: '#FFFFFF',
         fontWeight: '800',
     },
     typeChip: {

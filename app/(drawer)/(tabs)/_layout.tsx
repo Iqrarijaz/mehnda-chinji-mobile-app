@@ -105,6 +105,7 @@ export default function TabLayout() {
           options={{
             title: 'Feed',
             headerShown: false,
+            href: null,
           }}
         />
         <Tabs.Screen
