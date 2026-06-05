@@ -106,8 +106,6 @@ const RequestCard: React.FC<RequestCardProps> = ({
                     styles.card,
                     {
                         backgroundColor: colors.card,
-                        shadowColor: '#000',
-                        shadowOpacity: isDark ? 0.3 : 0.05,
                     }
                 ]}
             >
@@ -212,15 +210,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 16,
         marginBottom: 16,
         borderRadius: 20,
-        ...Platform.select({
-            ios: {
-                shadowOffset: { width: 0, height: 8 },
-                shadowRadius: 12,
-            },
-            android: {
-                elevation: 4,
-            }
-        }),
     },
     cardInner: {
         flexDirection: 'row',

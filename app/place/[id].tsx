@@ -5,15 +5,23 @@ import {
     ActivityIndicator,
     Alert,
     Linking,
-    ScrollView,
     Share,
     StyleSheet,
     TouchableOpacity,
     View,
     Platform,
+    Dimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
-import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    useAnimatedScrollHandler,
+    interpolate,
+    Extrapolate,
+    FadeIn,
+    FadeInUp,
+} from 'react-native-reanimated';
 
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -25,6 +33,9 @@ import TopperCard from '@/components/places/TopperCard';
 import EventCard from '@/components/places/EventCard';
 import { useAuth } from '@/context/AuthContext';
 import BannerAd from '@/ads/components/BannerAd';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const HEADER_IMAGE_HEIGHT = 200;
 
 const PlaceDetailScreen = () => {
     const { id, placeData, color, category: categoryParam } = useLocalSearchParams<{
@@ -43,6 +54,7 @@ const PlaceDetailScreen = () => {
     const [eduTab, setEduTab] = useState<'toppers' | 'events'>('toppers');
 
     const currentUserId = authData?.user?._id;
+    const scrollY = useSharedValue(0);
 
     const place = useMemo(() => {
         try {
@@ -64,6 +76,86 @@ const PlaceDetailScreen = () => {
                 .join(' ')
             : '';
 
+    const renderFormattedText = useCallback((text?: string) => {
+        if (!text) return null;
+        return text.split('\n').map((line, index) => {
+            const trimmed = line.trim();
+
+            // Match Heading 2 first because ## starts with #
+            const h2Match = trimmed.match(/^##\s*(.+)/);
+            if (h2Match) {
+                return (
+                    <ThemedText
+                        key={index}
+                        style={[
+                            styles.descriptionText,
+                            {
+                                color: colors.text,
+                                fontSize: 13,
+                                fontWeight: '700',
+                                marginTop: index > 0 ? 10 : 4,
+                                marginBottom: 4,
+                                lineHeight: 18,
+                            },
+                        ]}
+                    >
+                        {h2Match[1]}
+                    </ThemedText>
+                );
+            }
+
+            const h1Match = trimmed.match(/^#\s*(.+)/);
+            if (h1Match) {
+                return (
+                    <ThemedText
+                        key={index}
+                        style={[
+                            styles.descriptionText,
+                            {
+                                color: colors.text,
+                                fontSize: 15,
+                                fontWeight: '800',
+                                marginTop: index > 0 ? 12 : 4,
+                                marginBottom: 6,
+                                lineHeight: 20,
+                            },
+                        ]}
+                    >
+                        {h1Match[1]}
+                    </ThemedText>
+                );
+            }
+
+            const bulletMatch = trimmed.match(/^[*•-]\s*(.+)/);
+            if (bulletMatch) {
+                return (
+                    <View key={index} style={{ flexDirection: 'row', alignItems: 'flex-start', marginLeft: 8, marginVertical: 3 }}>
+                        <ThemedText style={[styles.descriptionText, { color: colors.textSecondary, marginRight: 8, fontSize: 12 }]}>•</ThemedText>
+                        <ThemedText style={[styles.descriptionText, { color: colors.textSecondary, flex: 1, lineHeight: 18 }]}>
+                            {bulletMatch[1]}
+                        </ThemedText>
+                    </View>
+                );
+            }
+
+            return (
+                <ThemedText
+                    key={index}
+                    style={[
+                        styles.descriptionText,
+                        {
+                            color: colors.textSecondary,
+                            lineHeight: 18,
+                            marginBottom: trimmed === '' ? 8 : 4,
+                        },
+                    ]}
+                >
+                    {line}
+                </ThemedText>
+            );
+        });
+    }, [colors]);
+
     const sortedToppers = useMemo(() => {
         if (!place?.toppers?.length) return [];
         return [...place.toppers].sort((a: any, b: any) => parseInt(b.passingYear) - parseInt(a.passingYear));
@@ -82,7 +174,6 @@ const PlaceDetailScreen = () => {
     const category = categoryParam || capitalize(place?.category?.en || place?.category || '');
     const coordinates = place?.location?.coordinates;
     const hasValidCoordinates = coordinates && (coordinates[0] !== 0 || coordinates[1] !== 0);
-
 
     const handleCall = useCallback((phoneNumber: string) => {
         if (phoneNumber) {
@@ -135,280 +226,372 @@ const PlaceDetailScreen = () => {
         });
     }, [place, router]);
 
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            scrollY.value = event.contentOffset.y;
+        },
+    });
+
+    const headerAnimatedStyle = useAnimatedStyle(() => {
+        const opacity = interpolate(
+            scrollY.value,
+            [0, HEADER_IMAGE_HEIGHT - 80],
+            [0, 1],
+            Extrapolate.CLAMP
+        );
+        return {
+            opacity,
+            backgroundColor: primaryColor,
+        };
+    });
+
+    const imageAnimatedStyle = useAnimatedStyle(() => {
+        const scale = interpolate(
+            scrollY.value,
+            [-HEADER_IMAGE_HEIGHT, 0],
+            [2, 1],
+            Extrapolate.CLAMP
+        );
+        const translateY = interpolate(
+            scrollY.value,
+            [-HEADER_IMAGE_HEIGHT, 0, HEADER_IMAGE_HEIGHT],
+            [-HEADER_IMAGE_HEIGHT / 2, 0, HEADER_IMAGE_HEIGHT * 0.4],
+            Extrapolate.CLAMP
+        );
+        return {
+            transform: [{ scale }, { translateY }],
+        };
+    });
+
     const isOwner = currentUserId && place.createdBy === currentUserId;
 
     if (!place) {
         return (
             <View style={[styles.loaderContainer, { backgroundColor: colors.background }]}>
+                <Stack.Screen options={{ title: 'Loading...', headerShown: false }} />
                 <ActivityIndicator size="large" color={primaryColor} />
             </View>
         );
     }
 
     const contacts = place.contact || (place.phone ? [{ name: 'Primary', number: place.phone }] : []);
+    const placeImage = place.images && place.images.length > 0 ? place.images[0] : null;
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            {/* Solid Header like Settings */}
-            <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
-                <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
+        <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
+            <Stack.Screen options={{ headerShown: false }} />
+
+            {/* Custom Dynamic Header */}
+            <View style={[styles.headerContainer, { height: insets.top + 48 }]}>
+                <Animated.View style={[StyleSheet.absoluteFillObject, headerAnimatedStyle]} />
+                <View style={[styles.headerContent, { paddingTop: insets.top }]}>
                     <TouchableOpacity
                         onPress={() => router.back()}
-                        style={styles.headerBackBtn}
+                        style={[styles.headerBtn, { backgroundColor: isDark ? 'rgba(15,23,42,0.6)' : 'rgba(0,0,0,0.4)' }]}
                     >
-                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+                        <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
                     </TouchableOpacity>
-                    <View style={styles.headerTitleWrap}>
-                        <View style={styles.headerTitleRow}>
-                            {place.images && place.images.length > 0 && (
-                                <Image
-                                    source={{ uri: place.images[0] }}
-                                    style={styles.headerThumbnail}
-                                />
-                            )}
-                            <ThemedText style={styles.headerTitle}>Details</ThemedText>
-                        </View>
+
+                    <View style={styles.headerTitleContainer}>
+                        <ThemedText style={styles.headerTitleText} numberOfLines={1}>
+                            {placeName}
+                        </ThemedText>
                     </View>
+
                     <View style={{ flexDirection: 'row', gap: 8 }}>
                         {isOwner && (
                             <TouchableOpacity
                                 onPress={handleEdit}
-                                style={styles.headerBackBtn}
+                                style={[styles.headerBtn, { backgroundColor: isDark ? 'rgba(15,23,42,0.6)' : 'rgba(0,0,0,0.4)' }]}
                             >
-                                <Ionicons name="pencil" size={20} color="#FFFFFF" />
+                                <Ionicons name="pencil" size={18} color="#FFFFFF" />
                             </TouchableOpacity>
                         )}
                         <TouchableOpacity
                             onPress={handleShare}
-                            style={styles.headerBackBtn}
+                            style={[styles.headerBtn, { backgroundColor: isDark ? 'rgba(15,23,42,0.6)' : 'rgba(0,0,0,0.4)' }]}
                         >
-                            <Ionicons name="share-outline" size={22} color="#FFFFFF" />
+                            <Ionicons name="share-outline" size={20} color="#FFFFFF" />
                         </TouchableOpacity>
                     </View>
                 </View>
-            </Animated.View>
+            </View>
 
-            <ScrollView
+            <Animated.ScrollView
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
                 showsVerticalScrollIndicator={false}
-                style={styles.scrollView}
-                contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+                style={[styles.scrollView, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 40 }}
             >
-                {/* Image Header if available */}
-                {place.images && place.images.length > 0 && (
-                    <View style={styles.imageHeaderWrapper}>
-                        <Image
-                            source={{ uri: place.images[0] }}
-                            style={styles.headerImage}
-                            contentFit="cover"
-                            transition={300}
-                        />
-                        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.2)' }]} />
-                    </View>
-                )}
+                {/* Hero Cover Banner */}
+                <View style={styles.bannerWrapper}>
+                    {placeImage ? (
+                        <Animated.View style={[styles.imageContainer, imageAnimatedStyle]}>
+                            <Image
+                                source={{ uri: placeImage }}
+                                style={StyleSheet.absoluteFillObject}
+                                contentFit="cover"
+                            />
+                            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.2)' }]} />
+                        </Animated.View>
+                    ) : (
+                        <Animated.View style={[styles.fallbackBanner, { backgroundColor: primaryColor }, imageAnimatedStyle]}>
+                            <Ionicons name="location" size={64} color="rgba(255,255,255,0.4)" />
+                        </Animated.View>
+                    )}
+                </View>
 
-                {/* Hero Section */}
-                <View style={styles.heroContainer}>
-                    <ThemedText style={[styles.placeName, { color: colors.text }]}>
-                        {placeName}
-                    </ThemedText>
+                {/* Overlapping Detail Card Container */}
+                <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', flex: 1 }]}>
 
-                    <View style={styles.chipRow}>
-                        <View style={[styles.categoryChip, { backgroundColor: primaryColor + '12', borderColor: primaryColor + '20' }]}>
-                            <Ionicons name="pricetag" size={12} color={primaryColor} />
-                            <ThemedText style={[styles.categoryChipText, { color: primaryColor }]}>
-                                {category}
-                            </ThemedText>
-                        </View>
-
-                        {place.type && (
-                            <View style={[styles.categoryChip, { backgroundColor: primaryColor + '12', borderColor: primaryColor + '20' }]}>
-                                <ThemedText style={[styles.categoryChipText, { color: primaryColor }]}>
-                                    {capitalize(place.type)}
+                    {/* Header info */}
+                    <View style={styles.cardHeader}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                            <View style={{ flex: 1 }}>
+                                <ThemedText style={[styles.businessTitle, { color: colors.text }]} numberOfLines={2}>
+                                    {placeName}
                                 </ThemedText>
+
+                                {/* Categories Tags */}
+                                <View style={styles.categoryRow}>
+                                    <View style={[styles.tag, { backgroundColor: primaryColor + '10' }]}>
+                                        <Ionicons name="pricetag-outline" size={10} color={primaryColor} />
+                                        <ThemedText style={[styles.tagText, { color: primaryColor }]}>
+                                            {category}
+                                        </ThemedText>
+                                    </View>
+                                    {place.type && (
+                                        <View style={[styles.tag, { backgroundColor: primaryColor + '10' }]}>
+                                            <ThemedText style={[styles.tagText, { color: primaryColor }]}>
+                                                {capitalize(place.type)}
+                                            </ThemedText>
+                                        </View>
+                                    )}
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Quick Interactive Actions Row */}
+                    <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
+                        {hasValidCoordinates ? (
+                            <TouchableOpacity
+                                style={[styles.actionBtnPrimary, { backgroundColor: primaryColor }]}
+                                onPress={handleNavigate}
+                                activeOpacity={0.8}
+                            >
+                                <Ionicons name="navigate" size={16} color="#FFFFFF" />
+                                <ThemedText style={styles.actionBtnTextPrimary}>Get Directions</ThemedText>
+                            </TouchableOpacity>
+                        ) : (
+                            <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
+                                <Ionicons name="navigate-outline" size={16} color={colors.textSecondary} />
+                                <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Directions</ThemedText>
                             </View>
                         )}
-                    </View>
 
-                    <TouchableOpacity
-                        style={styles.reportButton}
-                        onPress={() => reportModalRef.current?.present()}
-                        activeOpacity={0.7}
-                    >
-                        <Ionicons name="flag-outline" size={14} color="#EF4444" />
-                        <ThemedText style={styles.reportButtonText}>
-                            Report Listing
-                        </ThemedText>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Consolidated Details Card */}
-                <View style={[styles.card, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#FFFFFF' }]}>
-                    {/* Location Section */}
-                    <View style={styles.locationInfo}>
-                        <View style={styles.locationTextContainer}>
-                            <ThemedText style={[styles.addressText, { color: colors.text }]}>{address}</ThemedText>
-                            {(place.village || place.city) && (
-                                <ThemedText style={[styles.areaText, { color: colors.textSecondary }]}>
-                                    {[place.village, place.city].filter(Boolean).join(', ')}
-                                </ThemedText>
-                            )}
-                        </View>
-                    </View>
-
-                    {hasValidCoordinates && (
                         <TouchableOpacity
-                            style={[styles.navigationBtn, { backgroundColor: primaryColor }]}
-                            onPress={handleNavigate}
+                            style={[styles.actionBtnSec, { backgroundColor: isDark ? '#334155' : '#f1f5f9' }]}
+                            onPress={() => reportModalRef.current?.present()}
                             activeOpacity={0.8}
                         >
-                            <Ionicons name="navigate" size={18} color="#FFF" />
-                            <ThemedText style={styles.navigationBtnText}>Get Directions</ThemedText>
+                            <Ionicons name="flag-outline" size={14} color="#EF4444" />
+                            <ThemedText style={[styles.actionBtnTextSec, { color: '#EF4444' }]}>Report</ThemedText>
                         </TouchableOpacity>
-                    )}
+                    </View>
 
-                    {/* About Section */}
-                    {place.description && (
-                        <View style={styles.sectionSeparator}>
-                            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                            <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]}>
-                                {place.description}
+                    {/* Banner Ad */}
+                    <View style={styles.detailAdWrapper}>
+                        <BannerAd placement="essential" />
+                    </View>
+
+                    {/* Details Sections */}
+                    <View style={styles.sectionsContainer}>
+
+                        {/* Section: Description/About */}
+                        {place.description && (
+                            <View style={styles.detailSection}>
+                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                    About Place
+                                </ThemedText>
+                                <View style={{ gap: 4 }}>
+                                    {renderFormattedText(place.description)}
+                                </View>
+                            </View>
+                        )}
+
+                        {/* Education Specific Metadata */}
+                        {category.toLowerCase() === 'education' && (place.metadata?.principalName || place.metadata?.totalStudents || place.metadata?.totalTeachers) && (
+                            <View style={styles.detailSection}>
+                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                    Institution Stats
+                                </ThemedText>
+                                <View style={styles.sectionsContainer}>
+                                    {place.metadata?.principalName && (
+                                        <View style={styles.infoListItem}>
+                                            <View style={[styles.infoListIcon, { backgroundColor: primaryColor + '10' }]}>
+                                                <MaterialCommunityIcons name="account-tie" size={12} color={primaryColor} />
+                                            </View>
+                                            <View style={styles.infoListContent}>
+                                                <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Principal</ThemedText>
+                                                <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
+                                                    {capitalize(place.metadata.principalName)}
+                                                </ThemedText>
+                                            </View>
+                                        </View>
+                                    )}
+
+                                    {place.metadata?.totalStudents && (
+                                        <View style={styles.infoListItem}>
+                                            <View style={[styles.infoListIcon, { backgroundColor: '#10B98110' }]}>
+                                                <Ionicons name="people" size={12} color="#10B981" />
+                                            </View>
+                                            <View style={styles.infoListContent}>
+                                                <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Total Students</ThemedText>
+                                                <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
+                                                    {place.metadata.totalStudents}
+                                                </ThemedText>
+                                            </View>
+                                        </View>
+                                    )}
+
+                                    {place.metadata?.totalTeachers && (
+                                        <View style={styles.infoListItem}>
+                                            <View style={[styles.infoListIcon, { backgroundColor: '#F59E0B10' }]}>
+                                                <MaterialCommunityIcons name="human-male-board" size={12} color="#F59E0B" />
+                                            </View>
+                                            <View style={styles.infoListContent}>
+                                                <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Total Teachers</ThemedText>
+                                                <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
+                                                    {place.metadata.totalTeachers}
+                                                </ThemedText>
+                                            </View>
+                                        </View>
+                                    )}
+                                </View>
+                            </View>
+                        )}
+
+                        {/* Travel Specific Fields */}
+                        {category.toLowerCase() === 'travel' && Array.isArray(place.route) && place.route.length > 0 && (
+                            <View style={styles.detailSection}>
+                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                    Travel Route
+                                </ThemedText>
+                                <View style={styles.routeContainer}>
+                                    {place.route.map((r: any, idx: number) => (
+                                        <View key={idx} style={styles.routeItem}>
+                                            <View style={styles.routeDotContainer}>
+                                                <View style={[styles.routeDot, { backgroundColor: primaryColor }]} />
+                                                {idx !== place.route.length - 1 && <View style={[styles.routeLine, { backgroundColor: colors.border }]} />}
+                                            </View>
+                                            <View style={styles.routeInfo}>
+                                                <ThemedText style={[styles.routeCity, { color: colors.text }]}>{capitalize(r.city)}</ThemedText>
+                                                <ThemedText style={[styles.routeTime, { color: colors.textSecondary }]}>{r.time}</ThemedText>
+                                            </View>
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
+                        )}
+
+                        {/* Section: Timing Info */}
+                        {place.timing && (
+                            <View style={styles.detailSection}>
+                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                    Timing Info
+                                </ThemedText>
+                                <View style={styles.infoListItem}>
+                                    <View style={[styles.infoListIcon, { backgroundColor: primaryColor + '10' }]}>
+                                        <Ionicons name="time" size={12} color={primaryColor} />
+                                    </View>
+                                    <View style={styles.infoListContent}>
+                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Operational Hours</ThemedText>
+                                        <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{place.timing}</ThemedText>
+                                    </View>
+                                </View>
+                            </View>
+                        )}
+
+                        {/* Section: Services */}
+                        {place.services && (
+                            <View style={styles.detailSection}>
+                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                    Services Offered
+                                </ThemedText>
+                                <View style={{ gap: 4 }}>
+                                    {renderFormattedText(place.services)}
+                                </View>
+                            </View>
+                        )}
+
+                        {/* Section: Contact & Location */}
+                        <View style={styles.detailSection}>
+                            <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                Contact & Location
                             </ThemedText>
-                        </View>
-                    )}
 
-                    {/* Education Specific Metadata */}
-                    {category.toLowerCase() === 'education' && (place.metadata?.principalName || place.metadata?.totalStudents || place.metadata?.totalTeachers) && (
-                        <View style={styles.sectionSeparator}>
-                            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                            <View style={styles.eduStatsContainer}>
-                                {place.metadata?.principalName ? (
-                                    <View style={styles.principalBox}>
-                                        <View style={[styles.statIconCircle, { backgroundColor: primaryColor + '12' }]}>
-                                            <MaterialCommunityIcons name="account-tie" size={18} color={primaryColor} />
-                                        </View>
-                                        <View>
-                                            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Principal</ThemedText>
-                                            <ThemedText style={[styles.statValue, { color: colors.text }]}>{capitalize(place.metadata.principalName)}</ThemedText>
-                                        </View>
-                                    </View>
-                                ) : null}
-
-                                <View style={styles.statsGrid}>
-                                    {place.metadata?.totalStudents ? (
-                                        <View style={styles.statBox}>
-                                            <View style={[styles.statIconCircle, { backgroundColor: '#10B98112' }]}>
-                                                <Ionicons name="people" size={16} color="#10B981" />
-                                            </View>
-                                            <View>
-                                                <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Students</ThemedText>
-                                                <ThemedText style={[styles.statValue, { color: colors.text }]}>{place.metadata.totalStudents}</ThemedText>
-                                            </View>
-                                        </View>
-                                    ) : null}
-                                    {place.metadata?.totalTeachers ? (
-                                        <View style={styles.statBox}>
-                                            <View style={[styles.statIconCircle, { backgroundColor: '#F59E0B12' }]}>
-                                                <MaterialCommunityIcons name="human-male-board" size={16} color="#F59E0B" />
-                                            </View>
-                                            <View>
-                                                <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Teachers</ThemedText>
-                                                <ThemedText style={[styles.statValue, { color: colors.text }]}>{place.metadata.totalTeachers}</ThemedText>
-                                            </View>
-                                        </View>
-                                    ) : null}
+                            <View style={styles.infoListItem}>
+                                <View style={[styles.infoListIcon, { backgroundColor: primaryColor + '10' }]}>
+                                    <Ionicons name="location" size={12} color={primaryColor} />
+                                </View>
+                                <View style={styles.infoListContent}>
+                                    <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Address</ThemedText>
+                                    <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{address}</ThemedText>
+                                    {(place.village || place.city) && (
+                                        <ThemedText style={[styles.infoListSub, { color: colors.textSecondary }]}>
+                                            {[place.village, place.city].filter(Boolean).join(', ')}
+                                        </ThemedText>
+                                    )}
                                 </View>
                             </View>
-                        </View>
-                    )}
 
-                    {/* Travel Specific Fields */}
-                    {category.toLowerCase() === 'travel' && (
-                        <View>
-                            {Array.isArray(place.route) && place.route.length > 0 && (
-                                <View style={styles.sectionSeparator}>
-                                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                                    <View style={styles.cardHeader}>
-                                        <Ionicons name="git-branch-outline" size={20} color={primaryColor} />
-                                        <ThemedText style={[styles.cardTitle, { color: colors.text }]}>Travel Route</ThemedText>
+                            {contacts.map((contact: any, index: number) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.infoListItem}
+                                    onPress={() => handleCall(contact.number)}
+                                    activeOpacity={0.7}
+                                >
+                                    <View style={[styles.infoListIcon, { backgroundColor: primaryColor + '10' }]}>
+                                        <Ionicons name="call" size={12} color={primaryColor} />
                                     </View>
-                                    <View style={styles.routeContainer}>
-                                        {place.route.map((r: any, idx: number) => (
-                                            <View key={idx} style={styles.routeItem}>
-                                                <View style={styles.routeDotContainer}>
-                                                    <View style={[styles.routeDot, { backgroundColor: primaryColor }]} />
-                                                    {idx !== place.route.length - 1 && <View style={[styles.routeLine, { backgroundColor: colors.border }]} />}
-                                                </View>
-                                                <View style={styles.routeInfo}>
-                                                    <ThemedText style={[styles.routeCity, { color: colors.text }]}>{capitalize(r.city)}</ThemedText>
-                                                    <ThemedText style={[styles.routeTime, { color: colors.textSecondary }]}>{r.time}</ThemedText>
-                                                </View>
-                                            </View>
-                                        ))}
+                                    <View style={styles.infoListContent}>
+                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>
+                                            {capitalize(contact.name || 'Contact')}
+                                        </ThemedText>
+                                        <ThemedText style={[styles.infoListVal, { color: colors.text, fontWeight: '600' }]}>
+                                            {contact.number}
+                                        </ThemedText>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+
+                            {place.createdAt && (
+                                <View style={styles.infoListItem}>
+                                    <View style={[styles.infoListIcon, { backgroundColor: primaryColor + '10' }]}>
+                                        <Ionicons name="calendar" size={12} color={primaryColor} />
+                                    </View>
+                                    <View style={styles.infoListContent}>
+                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Listed On</ThemedText>
+                                        <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
+                                            {new Date(place.createdAt).toLocaleDateString(undefined, {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}
+                                        </ThemedText>
                                     </View>
                                 </View>
                             )}
-
-                            {place.timing && (
-                                <View style={styles.sectionSeparator}>
-                                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                                    <View style={styles.cardHeader}>
-                                        <Ionicons name="time-outline" size={20} color={primaryColor} />
-                                        <ThemedText style={[styles.cardTitle, { color: colors.text }]}>Timing Info</ThemedText>
-                                    </View>
-                                    <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]}>
-                                        {place.timing}
-                                    </ThemedText>
-                                </View>
-                            )}
-
-                            {place.services && (
-                                <View style={styles.sectionSeparator}>
-                                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                                    <View style={styles.cardHeader}>
-                                        <Ionicons name="cog-outline" size={20} color={primaryColor} />
-                                        <ThemedText style={[styles.cardTitle, { color: colors.text }]}>Services</ThemedText>
-                                    </View>
-                                    <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]}>
-                                        {place.services}
-                                    </ThemedText>
-                                </View>
-                            )}
                         </View>
-                    )}
-
-
-                    {/* Contacts Section */}
-                    {contacts.length > 0 && (
-                        <View style={styles.sectionSeparator}>
-                            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                            <View style={styles.contactList}>
-                                {contacts.map((contact: any, index: number) => (
-                                    <View key={index} style={[styles.contactRow, index !== contacts.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
-                                        <View style={styles.contactInfo}>
-                                            <ThemedText style={[styles.contactName, { color: colors.text }]}>{capitalize(contact.name || 'Contact')}</ThemedText>
-                                            <ThemedText style={[styles.contactNumber, { color: colors.textSecondary }]}>{contact.number}</ThemedText>
-                                        </View>
-                                        <TouchableOpacity
-                                            style={[styles.callIconBtn, { backgroundColor: primaryColor + '15' }]}
-                                            onPress={() => handleCall(contact.number)}
-                                        >
-                                            <Ionicons name="call" size={18} color={primaryColor} />
-                                        </TouchableOpacity>
-                                    </View>
-                                ))}
-                            </View>
-                        </View>
-                    )}
-                </View>
-
-                {/* Banner Ad */}
-                <View style={styles.bannerContainer}>
-                    <BannerAd placement="essential" />
+                    </View>
                 </View>
 
                 {/* Education: Toppers & Events — Separate Card */}
                 {category.toLowerCase() === 'education' && (sortedToppers.length > 0 || sortedEvents.length > 0) && (
-                    <View style={[styles.card, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#FFFFFF' }]}>
+                    <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', marginTop: 12, borderTopLeftRadius: 0, borderTopRightRadius: 0, paddingVertical: 16, flex: 0 }]}>
 
                         {/* Tab Switcher */}
                         <View style={[styles.eduTabContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9', borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#E2E8F0' }]}>
@@ -489,7 +672,7 @@ const PlaceDetailScreen = () => {
                         )}
                     </View>
                 )}
-            </ScrollView>
+            </Animated.ScrollView>
 
             <ReportModal
                 ref={reportModalRef}
@@ -511,243 +694,174 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    headerWrap: {
-        paddingBottom: 8,
-        borderBottomLeftRadius: Layout.borderRadius,
-        borderBottomRightRadius: Layout.borderRadius,
-        zIndex: 10,
+    headerContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
     },
-    headerTopRow: {
+    headerContent: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        justifyContent: 'space-between',
+        paddingHorizontal: 12,
     },
-    headerBackBtn: {
+    headerBtn: {
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    headerTitleWrap: {
+    headerTitleContainer: {
         flex: 1,
+        marginHorizontal: 16,
         alignItems: 'center',
     },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: '800',
+    headerTitleText: {
+        fontSize: 15,
+        fontWeight: '700',
         color: '#FFFFFF',
     },
     scrollView: {
         flex: 1,
-        marginTop: -10,
     },
-    imageHeaderWrapper: {
+    bannerWrapper: {
+        height: HEADER_IMAGE_HEIGHT,
         width: '100%',
-        height: 240,
-        position: 'relative',
+        overflow: 'hidden',
     },
-    headerImage: {
+    imageContainer: {
         width: '100%',
         height: '100%',
     },
-    heroContainer: {
-        paddingHorizontal: 16,
-        paddingTop: 12,
-        paddingBottom: 12,
-    },
-    placeName: {
-        fontSize: 14,
-        fontWeight: '900',
-        lineHeight: 18,
-        marginBottom: 6,
-        letterSpacing: -0.5,
-    },
-    chipRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-        marginBottom: 12,
-    },
-    categoryChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 20,
-        borderWidth: 1,
-    },
-    categoryChipText: {
-        fontSize: 11,
-        fontWeight: '800',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
-    reportButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderRadius: 20,
-        backgroundColor: '#FEF2F2',
-        alignSelf: 'flex-start',
-    },
-    reportButtonText: {
-        fontSize: 11,
-        fontWeight: '600',
-        color: '#EF4444',
-    },
-    card: {
-        marginHorizontal: 16,
-        marginBottom: 12,
-        borderRadius: 12,
-        padding: 10,
-        ...Platform.select({
-            ios: {
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.08,
-                shadowRadius: 10,
-            },
-            android: {
-                elevation: 2,
-            },
-        }),
-    },
-    cardHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 10,
-    },
-    cardTitle: {
-        fontSize: 12,
-        fontWeight: '700',
-        letterSpacing: -0.2,
-    },
-    sectionSeparator: {
-        marginTop: 10,
-    },
-    eduStatsContainer: {
-        gap: 10,
-    },
-    principalBox: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-        marginBottom: 4,
-    },
-    statsGrid: {
-        flexDirection: 'row',
-        gap: 12,
-    },
-    statBox: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
-    statIconCircle: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
+    fallbackBanner: {
+        width: '100%',
+        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    statLabel: {
-        fontSize: 11,
+    detailsCard: {
+        marginTop: -20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        paddingHorizontal: 16,
+        paddingTop: 20,
+        flex: 1,
+    },
+    cardHeader: {
+        marginBottom: 12,
+    },
+    businessTitle: {
+        fontSize: 18,
+        fontWeight: '800',
+        lineHeight: 24,
+        marginBottom: 6,
+    },
+    categoryRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    tag: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 6,
+    },
+    tagText: {
+        fontSize: 10,
         fontWeight: '700',
+    },
+    actionRow: {
+        flexDirection: 'row',
+        gap: 8,
+        paddingBottom: 16,
+        borderBottomWidth: 1,
+        marginBottom: 16,
+    },
+    actionBtnPrimary: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        height: 38,
+        borderRadius: 10,
+    },
+    actionBtnTextPrimary: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    actionBtnSec: {
+        paddingHorizontal: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+        height: 38,
+        borderRadius: 10,
+    },
+    actionBtnTextSec: {
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    detailAdWrapper: {
+        marginBottom: 16,
+        alignItems: 'center',
+    },
+    sectionsContainer: {
+        gap: 16,
+    },
+    detailSection: {
+        gap: 6,
+    },
+    sectionHeading: {
+        fontSize: 10,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+        letterSpacing: 0.8,
+        marginBottom: 4,
+    },
+    descriptionText: {
+        fontSize: 12,
+        lineHeight: 18,
+    },
+    infoListItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 8,
+        gap: 12,
+    },
+    infoListIcon: {
+        width: 26,
+        height: 26,
+        borderRadius: 13,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    infoListContent: {
+        flex: 1,
+    },
+    infoListLabel: {
+        fontSize: 9,
+        fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 1,
     },
-    statValue: {
-        fontSize: 11,
-        fontWeight: '700',
-    },
-    divider: {
-        height: 1,
-        width: '100%',
-        marginBottom: 10,
-        opacity: 0.5,
-    },
-    locationInfo: {
-        flexDirection: 'row',
-        gap: 10,
-        marginBottom: 10,
-    },
-    locationTextContainer: {
-        flex: 1,
-        gap: 2,
-    },
-    addressText: {
-        fontSize: 11,
+    infoListVal: {
+        fontSize: 12,
         fontWeight: '500',
-        lineHeight: 16,
     },
-    areaText: {
+    infoListSub: {
         fontSize: 11,
-        opacity: 0.7,
-    },
-    navigationBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 6,
-        borderRadius: 10,
-        gap: 8,
-    },
-    navigationBtnText: {
-        color: '#FFF',
-        fontSize: 11,
-        fontWeight: '700',
-    },
-    contactList: {
-        gap: 0,
-    },
-    contactRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 6,
-    },
-    contactInfo: {
-        flex: 1,
-    },
-    contactName: {
-        fontSize: 11,
-        fontWeight: '700',
-        marginBottom: 2,
-    },
-    contactNumber: {
-        fontSize: 11,
-        fontWeight: '600',
-    },
-    callIconBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    descriptionText: {
-        fontSize: 11,
-        lineHeight: 16,
-        letterSpacing: 0.1,
-    },
-    headerTitleRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
-    headerThumbnail: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        borderWidth: 1.5,
-        borderColor: 'rgba(255,255,255,0.4)',
+        marginTop: 1,
     },
     routeContainer: {
         marginTop: 4,
@@ -817,7 +931,7 @@ const styles = StyleSheet.create({
         }),
     },
     eduTabText: {
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: '600',
     },
     eduContentWrap: {
@@ -837,10 +951,5 @@ const styles = StyleSheet.create({
     eduEmptyText: {
         fontSize: 11,
         fontWeight: '500',
-    },
-    bannerContainer: {
-        justifyContent: 'center',
-        minHeight: 60,
-        marginVertical: 10,
     },
 });

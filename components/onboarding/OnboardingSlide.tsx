@@ -62,7 +62,7 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
                 <ThemedText type="defaultSemiBold" numberOfLines={1} style={[styles.title, { color: colors.text }]}>
                     {item.title}
                 </ThemedText>
-                <ThemedText style={[styles.description, { color: colors.textSecondary }]}>
+                <ThemedText numberOfLines={1} style={[styles.description, { color: colors.textSecondary }]}>
                     {item.description}
                 </ThemedText>
                 {item.id === '3' && ( // Placeholder for any other button if needed, but currently removing location
@@ -96,18 +96,18 @@ const styles = StyleSheet.create({
         marginTop: 30,
     },
     title: {
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: '800',
         textAlign: 'center',
         paddingTop: 12,
         paddingBottom: 0,
-        lineHeight: 28,
+        lineHeight: 22,
         marginBottom: 15,
     },
     description: {
-        fontSize: 16,
+        fontSize: 13,
         textAlign: 'center',
-        lineHeight: 24,
+        lineHeight: 18,
         paddingHorizontal: 10,
         fontWeight: '600',
         marginTop: 5,

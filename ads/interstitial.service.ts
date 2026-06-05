@@ -59,6 +59,7 @@ class InterstitialService {
   private static instance: InterstitialService | null = null;
 
   private interstitial: InterstitialAd | null = null;
+  private currentUnitId = '';
 
   private isLoaded = false;
   private isLoading = false;
@@ -211,15 +212,16 @@ class InterstitialService {
    * Create Ad
    * ----------------------------------------
    */
-  private createAd() {
+  private createAd(fallbackToTest = false) {
     this.cleanupAd();
+
+    const unitId = fallbackToTest ? TestIds.INTERSTITIAL : AD_UNIT_IDS.INTERSTITIAL;
+    this.currentUnitId = unitId;
 
     try {
       this.interstitial =
         InterstitialAd.createForAdRequest(
-          __DEV__
-            ? TestIds.INTERSTITIAL
-            : AD_UNIT_IDS.INTERSTITIAL,
+          unitId,
           {
             // requestNonPersonalizedAdsOnly: true,
           },
@@ -343,7 +345,7 @@ class InterstitialService {
         AdEventType.ERROR,
         (error) => {
           console.error(
-            '[InterstitialService] Error:',
+            `[InterstitialService] Error loading ad unit ${this.currentUnitId}:`,
             error,
           );
 
@@ -369,7 +371,22 @@ class InterstitialService {
 
           this.cleanupAd();
 
-          this.handleLoadError();
+          // Fallback to Test ID if the live ad unit ID fails
+          if (this.currentUnitId === AD_UNIT_IDS.INTERSTITIAL && AD_UNIT_IDS.INTERSTITIAL !== TestIds.INTERSTITIAL) {
+            console.log('[InterstitialService] Live Interstitial failed. Trying Test Interstitial ID fallback...');
+            this.createAd(true);
+            this.isLoading = true;
+            this.loadStartTime = Date.now();
+            try {
+              this.interstitial?.load();
+            } catch (err) {
+              console.error('[InterstitialService] Fallback load failed:', err);
+              this.isLoading = false;
+              this.handleLoadError();
+            }
+          } else {
+            this.handleLoadError();
+          }
         },
       );
 

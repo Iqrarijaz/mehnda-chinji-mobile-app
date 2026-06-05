@@ -12,6 +12,7 @@ class AppOpenService {
   private static instance: AppOpenService | null = null;
 
   private appOpenAd: AppOpenAd | null = null;
+  private currentUnitId = '';
 
   private isLoaded = false;
   private isPreloading = false;
@@ -71,14 +72,15 @@ class AppOpenService {
    * Create Ad
    * ----------------------------------------
    */
-  private createAd() {
+  private createAd(fallbackToTest = false) {
     this.cleanupAd();
+
+    const unitId = fallbackToTest ? TestIds.APP_OPEN : AD_UNIT_IDS.APP_OPEN;
+    this.currentUnitId = unitId;
 
     try {
       this.appOpenAd = AppOpenAd.createForAdRequest(
-        __DEV__
-          ? TestIds.APP_OPEN
-          : AD_UNIT_IDS.APP_OPEN,
+        unitId,
         {
           requestNonPersonalizedAdsOnly: true, // GDPR/Privacy compliant by default
         },
@@ -168,7 +170,7 @@ class AppOpenService {
         AdEventType.ERROR,
         (error) => {
           console.error(
-            '[AppOpenService] Error:',
+            `[AppOpenService] Error loading ad unit ${this.currentUnitId}:`,
             error,
           );
 
@@ -190,7 +192,22 @@ class AppOpenService {
 
           this.cleanupAd();
 
-          this.handleLoadError();
+          // Fallback to Test ID if the live ad unit ID fails
+          if (this.currentUnitId === AD_UNIT_IDS.APP_OPEN && AD_UNIT_IDS.APP_OPEN !== TestIds.APP_OPEN) {
+            console.log('[AppOpenService] Live App Open failed. Trying Test App Open ID fallback...');
+            this.createAd(true);
+            this.isPreloading = true;
+            this.loadStartTime = Date.now();
+            try {
+              this.appOpenAd?.load();
+            } catch (err) {
+              console.error('[AppOpenService] Fallback load failed:', err);
+              this.isPreloading = false;
+              this.handleLoadError();
+            }
+          } else {
+            this.handleLoadError();
+          }
         },
       );
 

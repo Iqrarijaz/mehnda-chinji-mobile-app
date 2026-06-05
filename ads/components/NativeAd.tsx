@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Platform, ActivityIndicator } from 'react-native';
-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { useAdsStore, selectCanShowNative } from '../../store/ads.store';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -16,6 +16,7 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [adUnitId, setAdUnitId] = useState(AD_UNIT_IDS.BANNER);
   const startTimeRef = useRef(Date.now());
 
   // Show immediately to avoid confusion, but handle loading state gracefully
@@ -45,7 +46,8 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
           </View>
         )}
         <BannerAd
-          unitId={AD_UNIT_IDS.NATIVE}
+          key={adUnitId}
+          unitId={adUnitId}
           size={BannerAdSize.MEDIUM_RECTANGLE}
           onAdLoaded={() => {
             setIsLoaded(true);
@@ -54,10 +56,20 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
             analyticsService.trackEvent(AnalyticsEvents.AD_LOAD_TIME, { type: 'native', placement, duration });
           }}
           onAdFailedToLoad={(error) => {
-            console.error('[NativeAd] Failed to load:', error);
-            setIsLoaded(false);
-            setLoadFailed(true);
-            analyticsService.trackEvent(AnalyticsEvents.AD_FAILED, { type: 'native', placement, error: error.message });
+            console.error('[NativeAd] Failed to load native ad:', error);
+            if (adUnitId === AD_UNIT_IDS.NATIVE && AD_UNIT_IDS.NATIVE !== AD_UNIT_IDS.BANNER) {
+              console.log('[NativeAd] Retrying using Banner Ad fallback unit ID...');
+              setAdUnitId(AD_UNIT_IDS.BANNER);
+              startTimeRef.current = Date.now();
+            } else if (adUnitId === AD_UNIT_IDS.BANNER && AD_UNIT_IDS.BANNER !== TestIds.BANNER) {
+              console.log('[NativeAd] Retrying using Test Banner Ad fallback...');
+              setAdUnitId(TestIds.BANNER);
+              startTimeRef.current = Date.now();
+            } else {
+              setIsLoaded(false);
+              setLoadFailed(true);
+              analyticsService.trackEvent(AnalyticsEvents.AD_FAILED, { type: 'native', placement, error: error.message });
+            }
           }}
           onAdOpened={() => {
             analyticsService.trackEvent(AnalyticsEvents.BANNER_CLICK_ATTEMPT, { type: 'native', placement });

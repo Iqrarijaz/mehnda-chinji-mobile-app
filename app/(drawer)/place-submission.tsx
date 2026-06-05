@@ -90,6 +90,8 @@ const PlaceSubmissionScreen = () => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isImageLoading, setIsImageLoading] = useState(false);
+    const [descSelection, setDescSelection] = useState({ start: 0, end: 0 });
+    const [servicesSelection, setServicesSelection] = useState({ start: 0, end: 0 });
 
     // Health Timing State
     const [fromTime, setFromTime] = useState('');
@@ -185,6 +187,20 @@ const PlaceSubmissionScreen = () => {
 
     const handleChange = (key: string, value: string) => {
         setForm(prev => ({ ...prev, [key]: value }));
+    };
+
+    const insertFormatting = (tag: string) => {
+        const { start, end } = descSelection;
+        const currentText = form.description;
+        const newText = currentText.substring(0, start) + tag + currentText.substring(end);
+        setForm(prev => ({ ...prev, description: newText }));
+    };
+
+    const insertServicesFormatting = (tag: string) => {
+        const { start, end } = servicesSelection;
+        const currentText = form.services;
+        const newText = currentText.substring(0, start) + tag + currentText.substring(end);
+        setForm(prev => ({ ...prev, services: newText }));
     };
 
     const handleMetadataChange = (key: string, value: string) => {
@@ -366,12 +382,12 @@ const PlaceSubmissionScreen = () => {
             return;
         }
 
-        if (isHealth) {
+        if (isHealth || isGovt) {
             if (!form.timing.trim() || !form.services.trim()) {
                 Toast.show({
                     type: 'error',
                     text1: 'Validation Error',
-                    text2: 'Timing and Services are required for Health category.',
+                    text2: `Timing and Services are required for ${isHealth ? 'Health' : 'Govt'} category.`,
                 });
                 return;
             }
@@ -776,20 +792,48 @@ const PlaceSubmissionScreen = () => {
                                     <ThemedText style={styles.label}>Description {!isEmergency && <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>}</ThemedText>
                                     <ThemedText style={[
                                         styles.charCount,
-                                        (!isEmergency && (form.description.length < 50 || form.description.length >= 500)) && { color: '#EF4444' }
+                                        (!isEmergency && form.description.length < 50) && { color: '#EF4444' }
                                     ]}>
-                                        {form.description.length}/500 {!isEmergency && '(Min 50)'}
+                                        {form.description.length} chars {!isEmergency && '(Min 50)'}
                                     </ThemedText>
                                 </View>
+
+                                <View style={styles.formatToolbar}>
+                                    <TouchableOpacity
+                                        onPress={() => insertFormatting('# ')}
+                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
+                                    >
+                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>H1 Heading</ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => insertFormatting('## ')}
+                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
+                                    >
+                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>H2 Subheading</ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => insertFormatting('• ')}
+                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
+                                    >
+                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>• Bullet</ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => insertFormatting('\n')}
+                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
+                                    >
+                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>↵ Line Break</ThemedText>
+                                    </TouchableOpacity>
+                                </View>
+
                                 <TextInput
-                                    style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
+                                    style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, fontSize: 14 }]}
                                     placeholder="اپنی جگہ کی خدمات اور پیشکش کی تفصیل لکھیں"
                                     placeholderTextColor={colors.icon}
                                     value={form.description}
                                     onChangeText={(text) => handleChange('description', text)}
                                     multiline
-                                    numberOfLines={3}
-                                    maxLength={500}
+                                    numberOfLines={4}
+                                    onSelectionChange={(e) => setDescSelection(e.nativeEvent.selection)}
                                 />
                             </View>
                         )}
@@ -838,7 +882,7 @@ const PlaceSubmissionScreen = () => {
                             </View>
                         )}
 
-                        {(isHealth || isEducation) && (
+                        {(isHealth || isEducation || isGovt) && (
                             <View style={styles.field}>
                                 <View style={styles.labelRow}>
                                     <ThemedText style={styles.label}>Timing <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
@@ -893,30 +937,53 @@ const PlaceSubmissionScreen = () => {
                             </View>
                         )}
 
-                        {isHealth && (
-                            <>
-                                <View style={styles.field}>
-                                    <View style={styles.labelRow}>
-                                        <ThemedText style={styles.label}>Services <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
-                                        <ThemedText style={[
-                                            styles.charCount,
-                                            (form.services.length < 50 || form.services.length >= 500) && { color: '#EF4444' }
-                                        ]}>
-                                            {form.services.length}/500 (Min 50)
-                                        </ThemedText>
-                                    </View>
-                                    <TextInput
-                                        style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                        placeholder="فراہم کردہ خدمات اور پیشکش کی تفصیل لکھیں"
-                                        placeholderTextColor={colors.icon}
-                                        value={form.services}
-                                        onChangeText={(text) => handleChange('services', text)}
-                                        multiline
-                                        numberOfLines={3}
-                                        maxLength={500}
-                                    />
+                        {(isHealth || isGovt) && (
+                            <View style={styles.field}>
+                                <View style={styles.labelRow}>
+                                    <ThemedText style={styles.label}>Services <ThemedText style={{ color: colors.textSecondary, fontSize: 10, fontWeight: 'normal' }}>(Optional)</ThemedText></ThemedText>
+                                    <ThemedText style={styles.charCount}>
+                                        {form.services.length} chars
+                                    </ThemedText>
                                 </View>
-                            </>
+
+                                <View style={styles.formatToolbar}>
+                                    <TouchableOpacity
+                                        onPress={() => insertServicesFormatting('# ')}
+                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
+                                    >
+                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>H1 Heading</ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => insertServicesFormatting('## ')}
+                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
+                                    >
+                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>H2 Subheading</ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => insertServicesFormatting('• ')}
+                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
+                                    >
+                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>• Bullet</ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => insertServicesFormatting('\n')}
+                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
+                                    >
+                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>↵ Line Break</ThemedText>
+                                    </TouchableOpacity>
+                                </View>
+
+                                <TextInput
+                                    style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, fontSize: 14 }]}
+                                    placeholder="فراہم کردہ خدمات اور پیشکش کی تفصیل لکھیں"
+                                    placeholderTextColor={colors.icon}
+                                    value={form.services}
+                                    onChangeText={(text) => handleChange('services', text)}
+                                    multiline
+                                    numberOfLines={4}
+                                    onSelectionChange={(e) => setServicesSelection(e.nativeEvent.selection)}
+                                />
+                            </View>
                         )}
 
                         {/* Footer Actions */}
@@ -1193,5 +1260,24 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         borderWidth: 1.5,
         borderColor: 'rgba(255,255,255,0.4)',
+    },
+    formatToolbar: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6,
+        marginBottom: 8,
+        marginTop: 4,
+    },
+    formatBtn: {
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    formatBtnText: {
+        fontSize: 10,
+        fontWeight: '800',
+        textTransform: 'uppercase',
     },
 });

@@ -15,6 +15,7 @@ class RewardedService {
   private static instance: RewardedService | null = null;
 
   private rewarded: RewardedAd | null = null;
+  private currentUnitId = '';
 
   private isLoaded = false;
   private isPreloading = false;
@@ -114,14 +115,15 @@ class RewardedService {
    * Create Ad
    * ----------------------------------------
    */
-  private createAd() {
+  private createAd(fallbackToTest = false) {
     this.cleanupAd();
+
+    const unitId = fallbackToTest ? TestIds.REWARDED : AD_UNIT_IDS.REWARDED;
+    this.currentUnitId = unitId;
 
     try {
       this.rewarded = RewardedAd.createForAdRequest(
-        __DEV__
-          ? TestIds.REWARDED
-          : AD_UNIT_IDS.REWARDED,
+        unitId,
         {
           // Remove this unless legally required
           // requestNonPersonalizedAdsOnly: true,
@@ -251,7 +253,7 @@ class RewardedService {
         AdEventType.ERROR,
         (error) => {
           console.error(
-            '[RewardedService] Error:',
+            `[RewardedService] Error loading ad unit ${this.currentUnitId}:`,
             error,
           );
 
@@ -274,7 +276,22 @@ class RewardedService {
 
           this.cleanupAd();
 
-          this.handleLoadError();
+          // Fallback to Test ID if the live ad unit ID fails
+          if (this.currentUnitId === AD_UNIT_IDS.REWARDED && AD_UNIT_IDS.REWARDED !== TestIds.REWARDED) {
+            console.log('[RewardedService] Live Rewarded ad failed. Trying Test Rewarded ID fallback...');
+            this.createAd(true);
+            this.isPreloading = true;
+            this.loadStartTime = Date.now();
+            try {
+              this.rewarded?.load();
+            } catch (err) {
+              console.error('[RewardedService] Fallback load failed:', err);
+              this.isPreloading = false;
+              this.handleLoadError();
+            }
+          } else {
+            this.handleLoadError();
+          }
         },
       );
 

@@ -3,9 +3,9 @@ module.exports = function (api) {
 
   const plugins = [];
   
-  // Strip all console logs in production builds
+  // Strip all console logs in production builds, excluding warnings and errors
   if (process.env.NODE_ENV === 'production') {
-    plugins.push('transform-remove-console');
+    plugins.push(['transform-remove-console', { exclude: ['error', 'warn'] }]);
   }
 
   return {
