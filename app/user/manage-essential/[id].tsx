@@ -246,22 +246,22 @@ const ManageEssentialDashboard = () => {
             </LinearGradient>
 
             {/* Tabs */}
-            <View style={[styles.tabContainer, { borderBottomColor: colors.border }]}>
+            <View style={[styles.tabContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9' }]}>
                 <TouchableOpacity
                     onPress={() => setActiveTab('toppers')}
-                    style={[styles.tab, activeTab === 'toppers' && { borderBottomColor: colors.primary, borderBottomWidth: 3 }]}
+                    style={[styles.tab, activeTab === 'toppers' && { backgroundColor: colors.primary }]}
                 >
-                    <Ionicons name="school" size={20} color={activeTab === 'toppers' ? colors.primary : colors.textSecondary} />
-                    <ThemedText style={[styles.tabText, activeTab === 'toppers' && { color: colors.primary, fontWeight: '700' }]}>
+                    <Ionicons name="school" size={18} color={activeTab === 'toppers' ? '#FFF' : colors.textSecondary} />
+                    <ThemedText style={[styles.tabText, { color: activeTab === 'toppers' ? '#FFF' : colors.textSecondary, fontWeight: activeTab === 'toppers' ? '700' : '500' }]}>
                         Toppers
                     </ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => setActiveTab('events')}
-                    style={[styles.tab, activeTab === 'events' && { borderBottomColor: colors.primary, borderBottomWidth: 3 }]}
+                    style={[styles.tab, activeTab === 'events' && { backgroundColor: colors.primary }]}
                 >
-                    <Ionicons name="calendar" size={20} color={activeTab === 'events' ? colors.primary : colors.textSecondary} />
-                    <ThemedText style={[styles.tabText, activeTab === 'events' && { color: colors.primary, fontWeight: '700' }]}>
+                    <Ionicons name="calendar" size={18} color={activeTab === 'events' ? '#FFF' : colors.textSecondary} />
+                    <ThemedText style={[styles.tabText, { color: activeTab === 'events' ? '#FFF' : colors.textSecondary, fontWeight: activeTab === 'events' ? '700' : '500' }]}>
                         Events
                     </ThemedText>
                 </TouchableOpacity>
@@ -388,19 +388,24 @@ const styles = StyleSheet.create({
     },
     tabContainer: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
+        borderRadius: 24,
+        padding: 4,
+        height: 44,
+        marginHorizontal: 20,
+        marginTop: 15,
+        marginBottom: 5,
     },
     tab: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 15,
+        borderRadius: 20,
         gap: 8,
+        height: '100%',
     },
     tabText: {
-        fontSize: 15,
-        fontWeight: '600',
+        fontSize: 14,
     },
     content: {
         flex: 1,

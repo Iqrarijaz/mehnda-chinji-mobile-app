@@ -2,6 +2,7 @@ import mobileAds, { AdsConsent, AdsConsentStatus } from 'react-native-google-mob
 import { getRemoteConfig, setConfigSettings, setDefaults, fetchAndActivate, getValue } from '@react-native-firebase/remote-config';
 import { useAdsStore } from '../store/ads.store';
 import { DEFAULT_ADS_CONFIG, AdsConfig } from '../types/ads.types';
+import { FORCE_PROD_ADS_IN_DEV } from '../constants/ads';
 
 const FETCH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
@@ -85,7 +86,7 @@ class AdMobService {
         console.log('[AdMobService] Remote Config fetched and activated successfully.');
       }
 
-      const configKey = __DEV__ ? 'test_ads' : 'prod_ads';
+      const configKey = (__DEV__ && !FORCE_PROD_ADS_IN_DEV) ? 'test_ads' : 'prod_ads';
       const adsJson = getValue(rc, configKey).asString();
       const config = this.parseConfig(adsJson);
 

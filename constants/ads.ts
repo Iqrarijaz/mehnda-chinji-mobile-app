@@ -2,7 +2,7 @@ import { TestIds } from 'react-native-google-mobile-ads';
 
 // Set this to true to test production Ad Unit IDs in development mode.
 // Ensure your device is registered as a Test Device in the AdMob Console first!
-export const FORCE_PROD_ADS_IN_DEV = true;
+export const FORCE_PROD_ADS_IN_DEV = false;
 
 const useTestIds = __DEV__ && !FORCE_PROD_ADS_IN_DEV;
 
@@ -10,20 +10,20 @@ const useTestIds = __DEV__ && !FORCE_PROD_ADS_IN_DEV;
  * Centralized Ad Unit IDs
  */
 export const AD_UNIT_IDS = {
-  BANNER: useTestIds 
-    ? TestIds.BANNER 
+  BANNER: useTestIds
+    ? TestIds.BANNER
     : 'ca-app-pub-1707254546231644/2265110414',
-  
-  INTERSTITIAL: useTestIds 
-    ? TestIds.INTERSTITIAL 
-    : 'ca-app-pub-1707254546231644/5509783484',
-  
-  REWARDED: useTestIds 
-    ? TestIds.REWARDED 
+
+  INTERSTITIAL: useTestIds
+    ? TestIds.INTERSTITIAL
+    : 'ca-app-pub-1707254546231644/4312708732',
+
+  REWARDED: useTestIds
+    ? TestIds.REWARDED
     : 'ca-app-pub-1707254546231644/4808115916',
-    
-  NATIVE: useTestIds 
-    ? TestIds.BANNER 
+
+  NATIVE: useTestIds
+    ? TestIds.BANNER
     : 'ca-app-pub-1707254546231644/8831121408',
 
   APP_OPEN: useTestIds

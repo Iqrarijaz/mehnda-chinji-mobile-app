@@ -110,7 +110,7 @@ export const PrayerHeader = React.memo(({
 
             {/* Next Prayer Card (overlapping the header) */}
             {nextPrayer && (
-                <View style={[styles.nextPrayerCard, { backgroundColor: isDark ? C.card : '#FFFFFF', shadowColor: isDark ? 'rgba(0,0,0,0.3)' : C.primary }]}>
+                <View style={[styles.nextPrayerCard, { backgroundColor: isDark ? C.card : '#FFFFFF' }]}>
                     <View style={styles.nextPrayerLeft}>
                         <ThemedText style={[styles.nextPrayerLabel, { color: C.textSecondary }]}>NEXT PRAYER</ThemedText>
                         <ThemedText type="urdu" style={[styles.nextPrayerArabic, { color: C.gold, fontSize: 18, marginTop: 4 }]}>
@@ -174,8 +174,6 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         paddingVertical: 12, paddingHorizontal: 16,
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 12,
-        elevation: 8,
         overflow: 'hidden',
     },
     nextPrayerLeft: { flex: 1 },

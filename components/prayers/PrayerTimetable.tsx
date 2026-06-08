@@ -70,8 +70,7 @@ const PrayerRow = memo(({ prayer, isNext, pulseAnim, C, isDark }: PrayerRowProps
         <Animated.View
             style={[
                 styles.gridCard,
-                { backgroundColor: rowBg, borderColor: borderColor },
-                isNext && { shadowColor: theme.accent, elevation: 1 },
+                { backgroundColor: rowBg },
                 isNext && { opacity: pulseAnim }
             ]}
         >
@@ -175,12 +174,8 @@ const styles = StyleSheet.create({
         width: '23.5%', // 4 columns per row
         padding: 6,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         minHeight: 65,
         justifyContent: 'center',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.02,
-        shadowRadius: 3,
     },
     miniHeader: {
         flexDirection: 'row',

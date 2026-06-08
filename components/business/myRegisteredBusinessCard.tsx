@@ -20,7 +20,6 @@ import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { TintedCard } from '../ui/tintedCard';
-import Animated, { FadeIn, FadeOut, ZoomIn, ZoomOut } from 'react-native-reanimated';
 
 interface MyRegisteredBusinessCardProps {
     business: any;
@@ -171,7 +170,7 @@ const MyRegisteredBusinessCard = React.memo(({
                                             ],
                                         }}
                                     >
-                                        {status === 'PENDING' && (
+                                        {(status === 'PENDING' || status === 'APPROVED') && (
                                             <MenuOption
                                                 onSelect={() => { setShowMenu(false); onEdit(business); }}
                                                 customStyles={{

@@ -174,6 +174,7 @@ const PlaceDetailScreen = () => {
     const category = categoryParam || capitalize(place?.category?.en || place?.category || '');
     const coordinates = place?.location?.coordinates;
     const hasValidCoordinates = coordinates && (coordinates[0] !== 0 || coordinates[1] !== 0);
+    const hasDirections = !!(place?.googleAddress?.trim()) || hasValidCoordinates;
 
     const handleCall = useCallback((phoneNumber: string) => {
         if (phoneNumber) {
@@ -199,6 +200,23 @@ const PlaceDetailScreen = () => {
     }, [id, placeName, address]);
 
     const handleNavigate = useCallback(() => {
+        if (place?.googleAddress?.trim()) {
+            const url = place.googleAddress.trim();
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+                Linking.openURL(url).catch(err => {
+                    console.error("Failed to open URL", err);
+                    Alert.alert('Error', 'Could not open the directions link.');
+                });
+            } else {
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(url)}`;
+                Linking.openURL(mapsUrl).catch(err => {
+                    console.error("Failed to open maps query", err);
+                    Alert.alert('Error', 'Could not open Google Maps.');
+                });
+            }
+            return;
+        }
+
         if (coordinates) {
             const [lng, lat] = coordinates;
             const url = Platform.select({
@@ -214,7 +232,7 @@ const PlaceDetailScreen = () => {
             });
             if (url) Linking.openURL(url);
         }
-    }, [coordinates, place.address, place.name]);
+    }, [coordinates, place.address, place.name, place?.googleAddress]);
 
     const handleEdit = useCallback(() => {
         router.push({
@@ -375,7 +393,7 @@ const PlaceDetailScreen = () => {
 
                     {/* Quick Interactive Actions Row */}
                     <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
-                        {hasValidCoordinates ? (
+                        {hasDirections ? (
                             <TouchableOpacity
                                 style={[styles.actionBtnPrimary, { backgroundColor: primaryColor }]}
                                 onPress={handleNavigate}
@@ -594,20 +612,17 @@ const PlaceDetailScreen = () => {
                     <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', marginTop: 12, borderTopLeftRadius: 0, borderTopRightRadius: 0, paddingVertical: 16, flex: 0 }]}>
 
                         {/* Tab Switcher */}
-                        <View style={[styles.eduTabContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9', borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#E2E8F0' }]}>
+                        <View style={[styles.eduTabContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9', borderColor: 'transparent' }]}>
                             <TouchableOpacity
                                 onPress={() => setEduTab('toppers')}
                                 style={[
                                     styles.eduTab,
-                                    eduTab === 'toppers' && [
-                                        styles.eduTabActive,
-                                        { backgroundColor: isDark ? primaryColor + '30' : '#FFFFFF', borderColor: eduTab === 'toppers' ? primaryColor + '40' : 'transparent' }
-                                    ]
+                                    eduTab === 'toppers' && { backgroundColor: primaryColor }
                                 ]}
                                 activeOpacity={0.7}
                             >
-                                <Ionicons name="trophy" size={15} color={eduTab === 'toppers' ? primaryColor : colors.textSecondary} />
-                                <ThemedText style={[styles.eduTabText, eduTab === 'toppers' && { color: primaryColor, fontWeight: '700' }]}>
+                                <Ionicons name="trophy" size={15} color={eduTab === 'toppers' ? '#FFFFFF' : colors.textSecondary} />
+                                <ThemedText style={[styles.eduTabText, { color: eduTab === 'toppers' ? '#FFFFFF' : colors.textSecondary, fontWeight: eduTab === 'toppers' ? '700' : '500' }]}>
                                     Toppers{sortedToppers.length > 0 ? ` (${sortedToppers.length})` : ''}
                                 </ThemedText>
                             </TouchableOpacity>
@@ -615,15 +630,12 @@ const PlaceDetailScreen = () => {
                                 onPress={() => setEduTab('events')}
                                 style={[
                                     styles.eduTab,
-                                    eduTab === 'events' && [
-                                        styles.eduTabActive,
-                                        { backgroundColor: isDark ? primaryColor + '30' : '#FFFFFF', borderColor: eduTab === 'events' ? primaryColor + '40' : 'transparent' }
-                                    ]
+                                    eduTab === 'events' && { backgroundColor: primaryColor }
                                 ]}
                                 activeOpacity={0.7}
                             >
-                                <Ionicons name="calendar" size={15} color={eduTab === 'events' ? primaryColor : colors.textSecondary} />
-                                <ThemedText style={[styles.eduTabText, eduTab === 'events' && { color: primaryColor, fontWeight: '700' }]}>
+                                <Ionicons name="calendar" size={15} color={eduTab === 'events' ? '#FFFFFF' : colors.textSecondary} />
+                                <ThemedText style={[styles.eduTabText, { color: eduTab === 'events' ? '#FFFFFF' : colors.textSecondary, fontWeight: eduTab === 'events' ? '700' : '500' }]}>
                                     Events{sortedEvents.length > 0 ? ` (${sortedEvents.length})` : ''}
                                 </ThemedText>
                             </TouchableOpacity>
@@ -902,37 +914,23 @@ const styles = StyleSheet.create({
     // ── Education Tabs ──
     eduTabContainer: {
         flexDirection: 'row',
-        borderRadius: 12,
+        borderRadius: 24,
         padding: 4,
-        marginBottom: 10,
-        borderWidth: 1,
+        marginBottom: 16,
+        borderWidth: 0,
+        height: 42,
     },
     eduTab: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 6,
-        borderRadius: 10,
+        borderRadius: 20,
         gap: 6,
-    },
-    eduTabActive: {
-        borderWidth: 1,
-        ...Platform.select({
-            ios: {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.08,
-                shadowRadius: 4,
-            },
-            android: {
-                elevation: 2,
-            },
-        }),
+        height: '100%',
     },
     eduTabText: {
         fontSize: 12,
-        fontWeight: '600',
     },
     eduContentWrap: {
         // Gap removed for list dividers

@@ -26,7 +26,7 @@ interface HadithCardProps {
 }
 
 const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: HadithCardProps) => {
-    
+
     const handleShare = useCallback(async () => {
         if (!hadith) return;
         const msg = `Hadith of the Day\n\n${hadith.hadithUrdu}\n\n[Source: ${hadith.book?.bookName}, Hadith ${hadith.hadithNumber}]`;
@@ -54,11 +54,11 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
                 style={[styles.hadithCard, { borderColor: isDark ? 'rgba(255,255,255,0.06)' : C.cardBorder }]}
             >
                 {/* Decorative Motif */}
-                <Ionicons 
-                    name="journal-outline" 
-                    size={80} 
-                    color={isDark ? 'rgba(255,255,255,0.04)' : 'rgba(4,120,87,0.03)'} 
-                    style={styles.motifIcon} 
+                <Ionicons
+                    name="journal-outline"
+                    size={80}
+                    color={isDark ? 'rgba(255,255,255,0.04)' : 'rgba(4,120,87,0.03)'}
+                    style={styles.motifIcon}
                 />
 
                 <View style={styles.header}>
@@ -67,10 +67,10 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
                             <ThemedText style={[styles.titleLabel, { color: isDark ? '#FFFFFF' : C.primary }]}>HADITH OF THE DAY</ThemedText>
                         </View>
                     </View>
-                    
+
                     {hadith && (
-                        <TouchableOpacity 
-                            onPress={handleShare} 
+                        <TouchableOpacity
+                            onPress={handleShare}
                             style={[styles.iconButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}
                             activeOpacity={0.7}
                         >
@@ -93,11 +93,11 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
                     ) : hadith ? (
                         <View style={styles.hadithContent}>
                             <View style={styles.textContainer}>
-                                <ThemedText 
-                                    type="urdu" 
+                                <ThemedText
+                                    type="urdu"
                                     style={[
-                                        styles.urduText, 
-                                        { 
+                                        styles.urduText,
+                                        {
                                             color: C.text,
                                             fontSize: getUrduFontSize(hadith.hadithUrdu)
                                         }
@@ -106,7 +106,7 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
                                     {hadith.hadithUrdu}
                                 </ThemedText>
                             </View>
-                            
+
                             <View style={[styles.footer, { borderTopColor: C.divider }]}>
                                 <ThemedText style={[styles.sourceText, { color: C.textSecondary }]}>
                                     {hadith.book?.bookName} • HADITH {hadith.hadithNumber}
@@ -130,22 +130,11 @@ const styles = StyleSheet.create({
     },
     hadithCard: {
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
+        borderWidth: 0,
         paddingVertical: 24,
         paddingHorizontal: 20,
         minHeight: 220,
         overflow: 'hidden',
-        ...Platform.select({
-            ios: {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.08,
-                shadowRadius: 16,
-            },
-            android: {
-                elevation: 4,
-            },
-        }),
     },
     motifIcon: {
         position: 'absolute',

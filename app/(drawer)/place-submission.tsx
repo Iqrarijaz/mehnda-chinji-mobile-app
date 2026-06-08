@@ -70,6 +70,7 @@ const PlaceSubmissionScreen = () => {
     const [form, setForm] = useState({
         name: '',
         address: '',
+        googleAddress: '',
         contact: [{ name: '', number: '' }] as { name: string; number: string }[],
         description: '',
         timing: '', // Health
@@ -92,6 +93,48 @@ const PlaceSubmissionScreen = () => {
     const [isImageLoading, setIsImageLoading] = useState(false);
     const [descSelection, setDescSelection] = useState({ start: 0, end: 0 });
     const [servicesSelection, setServicesSelection] = useState({ start: 0, end: 0 });
+    const [isOptimizingDesc, setIsOptimizingDesc] = useState(false);
+    const [isOptimizingServices, setIsOptimizingServices] = useState(false);
+
+    const handleOptimizeText = async (type: 'description' | 'services') => {
+        const textToOptimize = type === 'description' ? form.description : form.services;
+        if (!textToOptimize.trim()) {
+            Toast.show({ type: 'info', text1: 'Empty Text', text2: 'Please write something first to optimize.' });
+            return;
+        }
+
+        if (type === 'description') {
+            setIsOptimizingDesc(true);
+        } else {
+            setIsOptimizingServices(true);
+        }
+
+        try {
+            const { optimizeText } = await import('@/apis/ai');
+            const res = await optimizeText({
+                module: 'essentials',
+                category: category || 'general',
+                type,
+                text: textToOptimize
+            });
+
+            if (res.success && res.optimizedText) {
+                handleChange(type, res.optimizedText);
+                Toast.show({ type: 'success', text1: 'AI Optimized!', text2: `${type === 'description' ? 'Description' : 'Services'} optimized.` });
+            } else {
+                Toast.show({ type: 'error', text1: 'Optimization Failed', text2: 'Could not optimize the text.' });
+            }
+        } catch (error: any) {
+            console.error('AI Optimize error:', error);
+            Toast.show({ type: 'error', text1: 'Error', text2: error.message || 'An error occurred during AI optimization.' });
+        } finally {
+            if (type === 'description') {
+                setIsOptimizingDesc(false);
+            } else {
+                setIsOptimizingServices(false);
+            }
+        }
+    };
 
     // Health Timing State
     const [fromTime, setFromTime] = useState('');
@@ -130,6 +173,7 @@ const PlaceSubmissionScreen = () => {
             setForm({
                 name: editData.name || '',
                 address: editData.address || '',
+                googleAddress: editData.googleAddress || '',
                 contact: editData.contact?.length ? editData.contact : [{ name: '', number: '' }],
                 description: editData.description || '',
                 timing: editData.timing || '',
@@ -165,6 +209,7 @@ const PlaceSubmissionScreen = () => {
             setForm({
                 name: '',
                 address: '',
+                googleAddress: '',
                 contact: [{ name: '', number: '' }],
                 description: '',
                 timing: '',
@@ -382,12 +427,13 @@ const PlaceSubmissionScreen = () => {
             return;
         }
 
-        if (isHealth || isGovt) {
+        if (isHealth || isGovt || isEducation) {
             if (!form.timing.trim() || !form.services.trim()) {
+                const categoryLabel = isHealth ? 'Health' : isEducation ? 'Education' : 'Govt';
                 Toast.show({
                     type: 'error',
                     text1: 'Validation Error',
-                    text2: `Timing and Services are required for ${isHealth ? 'Health' : 'Govt'} category.`,
+                    text2: `Timing and Services are required for ${categoryLabel} category.`,
                 });
                 return;
             }
@@ -476,6 +522,7 @@ const PlaceSubmissionScreen = () => {
         const isMainChanged =
             form.name.trim() !== (editData.name || '').trim() ||
             form.address.trim() !== (editData.address || '').trim() ||
+            form.googleAddress.trim() !== (editData.googleAddress || '').trim() ||
             form.description.trim() !== (editData.description || '').trim() ||
             form.timing.trim() !== (editData.timing || '').trim() ||
             form.services.trim() !== (editData.services || '').trim() ||
@@ -607,8 +654,8 @@ const PlaceSubmissionScreen = () => {
                         <View style={styles.field}>
                             <View style={styles.labelRow}>
                                 <ThemedText style={styles.label}>Name <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
-                                <ThemedText style={[styles.charCount, form.name.length >= 40 && { color: '#EF4444' }]}>
-                                    {form.name.length}/40
+                                <ThemedText style={[styles.charCount, form.name.length >= 100 && { color: '#EF4444' }]}>
+                                    {form.name.length}/100
                                 </ThemedText>
                             </View>
                             <TextInput
@@ -617,7 +664,7 @@ const PlaceSubmissionScreen = () => {
                                 placeholderTextColor={colors.icon}
                                 value={form.name}
                                 onChangeText={(text) => handleChange('name', text)}
-                                maxLength={40}
+                                maxLength={100}
                             />
                         </View>
 
@@ -670,8 +717,8 @@ const PlaceSubmissionScreen = () => {
                             <View style={styles.field}>
                                 <View style={styles.labelRow}>
                                     <ThemedText style={styles.label}>Address <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
-                                    <ThemedText style={[styles.charCount, form.address.length >= 50 && { color: '#EF4444' }]}>
-                                        {form.address.length}/50
+                                    <ThemedText style={[styles.charCount, form.address.length >= 150 && { color: '#EF4444' }]}>
+                                        {form.address.length}/150
                                     </ThemedText>
                                 </View>
                                 <TextInput
@@ -680,7 +727,22 @@ const PlaceSubmissionScreen = () => {
                                     placeholderTextColor={colors.icon}
                                     value={form.address}
                                     onChangeText={(text) => handleChange('address', text)}
-                                    maxLength={50}
+                                    maxLength={150}
+                                />
+                            </View>
+                        )}
+
+                        {!isTravel && (
+                            <View style={styles.field}>
+                                <View style={styles.labelRow}>
+                                    <ThemedText style={styles.label}>Google Address (Optional)</ThemedText>
+                                </View>
+                                <TextInput
+                                    style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
+                                    placeholder="Enter Google Maps link or Google Address"
+                                    placeholderTextColor={colors.icon}
+                                    value={form.googleAddress}
+                                    onChangeText={(text) => handleChange('googleAddress', text)}
                                 />
                             </View>
                         )}
@@ -789,7 +851,21 @@ const PlaceSubmissionScreen = () => {
                         {!isReligious && !isTravel && (
                             <View style={styles.field}>
                                 <View style={styles.labelRow}>
-                                    <ThemedText style={styles.label}>Description {!isEmergency && <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>}</ThemedText>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                        <ThemedText style={styles.label}>Description {!isEmergency && <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>}</ThemedText>
+                                        {/* <TouchableOpacity
+                                            onPress={() => handleOptimizeText('description')}
+                                            disabled={isOptimizingDesc}
+                                            style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12, backgroundColor: colors.primary + '12', marginLeft: 4 }}
+                                        >
+                                            {isOptimizingDesc ? (
+                                                <ActivityIndicator size="small" color={colors.primary} style={{ transform: [{ scale: 0.7 }] }} />
+                                            ) : (
+                                                <Ionicons name="sparkles" size={12} color={colors.primary} />
+                                            )}
+                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: colors.primary }}>AI Optimize</ThemedText>
+                                        </TouchableOpacity> */}
+                                    </View>
                                     <ThemedText style={[
                                         styles.charCount,
                                         (!isEmergency && form.description.length < 50) && { color: '#EF4444' }
@@ -826,13 +902,13 @@ const PlaceSubmissionScreen = () => {
                                 </View>
 
                                 <TextInput
-                                    style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, fontSize: 14 }]}
-                                    placeholder="اپنی جگہ کی خدمات اور پیشکش کی تفصیل لکھیں"
+                                    style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, fontSize: 12 }]}
+                                    placeholder={`e.g.\n# About Us\nProvide a description about this place.\n\n- Feature 1\n- Feature 2`}
                                     placeholderTextColor={colors.icon}
                                     value={form.description}
                                     onChangeText={(text) => handleChange('description', text)}
                                     multiline
-                                    numberOfLines={4}
+                                    numberOfLines={7}
                                     onSelectionChange={(e) => setDescSelection(e.nativeEvent.selection)}
                                 />
                             </View>
@@ -937,10 +1013,24 @@ const PlaceSubmissionScreen = () => {
                             </View>
                         )}
 
-                        {(isHealth || isGovt) && (
+                        {(isHealth || isGovt || isEducation) && (
                             <View style={styles.field}>
                                 <View style={styles.labelRow}>
-                                    <ThemedText style={styles.label}>Services <ThemedText style={{ color: colors.textSecondary, fontSize: 10, fontWeight: 'normal' }}>(Optional)</ThemedText></ThemedText>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                        <ThemedText style={styles.label}>Services <ThemedText style={{ color: colors.textSecondary, fontSize: 10, fontWeight: 'normal' }}>(Optional)</ThemedText></ThemedText>
+                                        <TouchableOpacity
+                                            onPress={() => handleOptimizeText('services')}
+                                            disabled={isOptimizingServices}
+                                            style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12, backgroundColor: colors.primary + '12', marginLeft: 4 }}
+                                        >
+                                            {isOptimizingServices ? (
+                                                <ActivityIndicator size="small" color={colors.primary} style={{ transform: [{ scale: 0.7 }] }} />
+                                            ) : (
+                                                <Ionicons name="sparkles" size={12} color={colors.primary} />
+                                            )}
+                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: colors.primary }}>AI Optimize</ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
                                     <ThemedText style={styles.charCount}>
                                         {form.services.length} chars
                                     </ThemedText>
@@ -974,13 +1064,13 @@ const PlaceSubmissionScreen = () => {
                                 </View>
 
                                 <TextInput
-                                    style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, fontSize: 14 }]}
-                                    placeholder="فراہم کردہ خدمات اور پیشکش کی تفصیل لکھیں"
+                                    style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, fontSize: 12 }]}
+                                    placeholder={`e.g.\n# Our Services\nWe offer high quality services to the community.\n\n- Service details 1\n- Service details 2`}
                                     placeholderTextColor={colors.icon}
                                     value={form.services}
                                     onChangeText={(text) => handleChange('services', text)}
                                     multiline
-                                    numberOfLines={4}
+                                    numberOfLines={7}
                                     onSelectionChange={(e) => setServicesSelection(e.nativeEvent.selection)}
                                 />
                             </View>
@@ -1101,7 +1191,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 12,
         paddingHorizontal: 16,
-        fontSize: 14,
+        fontSize: 12,
         marginBottom: 12,
     },
     inputLabel: {
@@ -1115,7 +1205,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     textArea: {
-        height: 80,
+        height: 150,
         textAlignVertical: 'top',
         paddingTop: 10,
     },
