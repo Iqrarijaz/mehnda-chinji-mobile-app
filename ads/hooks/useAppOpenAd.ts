@@ -25,13 +25,14 @@ export const useAppOpenAd = () => {
     segments[0] === 'privacy' ||
     segments[0] === 'weather';
 
+  // 2. App State listener for foreground/warm start transitions
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
       if (
         appState.current.match(/inactive|background/) &&
         nextAppState === 'active'
       ) {
-        // 1. Fetch fresh Remote Config on every app resume (Foreground transition)
+        // Fetch fresh Remote Config on every app resume (Foreground transition)
         AdMobService.refreshConfig(true).catch(err => {
           console.error('[useAppOpenAd] Failed to refresh Remote Config:', err);
         });

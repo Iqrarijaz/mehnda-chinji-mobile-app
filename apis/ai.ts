@@ -5,6 +5,7 @@ export interface OptimizeTextRequest {
     category: string;
     type: 'description' | 'services';
     text: string;
+    tags?: { eng: string; ur: string }[];
 }
 
 export interface OptimizeTextResponse {

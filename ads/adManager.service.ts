@@ -27,9 +27,12 @@ class AdManager {
       // 1. Initialize AdMob SDK, UMP and Remote Config
       await AdMobService.init();
 
-      // 2. Initial Preload with delay to let app settle
+      // Load App Open ad immediately to maximize chance of showing on splash screen
+      AppOpenService.getInstance().load();
+
+      // 2. Initial Preload for other ads with delay to let app settle
       setTimeout(() => {
-        this.preloadAll();
+        this.preloadOtherFormats();
       }, 2000);
 
       analyticsService.trackEvent(AnalyticsEvents.AD_MANAGER_INIT, { status: 'success' });
@@ -40,20 +43,18 @@ class AdManager {
   }
 
   /**
-   * Preloads critical startup ad formats to ensure they are ready.
-   * Staggers loads to prioritize user experience and reduce network/CPU congestion.
-   * Rewarded ads are excluded from startup preloading to conserve memory and network resources
-   * on lower-end devices; they are instead loaded reactively when entering relevant screens.
+   * Preloads other startup ad formats
+   */
+  public preloadOtherFormats() {
+    InterstitialService.getInstance().load();
+  }
+
+  /**
+   * Preloads all critical formats
    */
   public preloadAll() {
-    // 1. Interstitials: High-priority for early transitions
+    AppOpenService.getInstance().load();
     InterstitialService.getInstance().load();
-    
-    // 2. App Open Ads: Staggered preload (1.5s delay) to prioritize boot performance
-    // and ensure fill readiness for subsequent app foreground events.
-    setTimeout(() => {
-      AppOpenService.getInstance().load();
-    }, 1500);
   }
 }
 

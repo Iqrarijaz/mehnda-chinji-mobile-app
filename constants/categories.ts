@@ -11,22 +11,20 @@ export const PLACE_CATEGORY_MAPPING: Record<string, string> = {
 export interface CategoryInfo {
     id: string;
     label: string;
-    icon: string;
-    color: string;
+    icon: any;
 }
 
 export const CATEGORIES_CONFIG: CategoryInfo[] = [
-    { id: 'emergency', label: 'Emergency', icon: 'alert-circle', color: '#F87171' },
-    { id: 'education', label: 'Education', icon: 'school', color: '#3B82F6' },
-    { id: 'religious', label: 'Religious', icon: 'book', color: '#10B981' },
-    { id: 'health', label: 'Health', icon: 'medkit', color: '#EF4444' },
-    { id: 'govt', label: 'Govt Offices', icon: 'business', color: '#6366F1' },
-
+    { id: 'emergency', label: 'Emergency', icon: require('@/assets/icons/emergency.webp') },
+    { id: 'education', label: 'Education', icon: require('@/assets/icons/education_icon.webp') },
+    { id: 'religious', label: 'Religious', icon: require('@/assets/icons/religious.webp') },
+    { id: 'health', label: 'Health', icon: require('@/assets/icons/health.webp') },
+    { id: 'govt', label: 'Govt Offices', icon: require('@/assets/icons/govt_office.webp') },
 ];
 
 export const MORE_CATEGORIES_CONFIG: CategoryInfo[] = [
-    { id: 'banks', label: 'Banks', icon: 'card', color: '#F59E0B' },
-    { id: 'travel', label: 'Travel', icon: 'bus', color: '#60A5FA' },
+    { id: 'banks', label: 'Banks', icon: require('@/assets/icons/bank.webp') },
+    { id: 'travel', label: 'Travel', icon: require('@/assets/icons/travel.webp') },
 ];
 
 export const PLACE_CATEGORIES = CATEGORIES_CONFIG.map(cat => ({

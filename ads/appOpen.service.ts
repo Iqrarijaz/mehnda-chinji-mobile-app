@@ -22,9 +22,8 @@ class AppOpenService {
 
   private loadStartTime = 0;
   private loadedTime = 0;
-  private lastShowTime = 0;
 
-  private readonly SHOW_COOLDOWN = 30000; // 30 seconds cooldown between app open ads
+  private readonly SHOW_COOLDOWN = 3 * 60 * 1000; // 3 minutes cooldown between app open ads
   private readonly AD_EXPIRATION_TIME = 4 * 60 * 60 * 1000; // 4 hours in milliseconds (Google Policy Limit)
 
   private backoff = new ExponentialBackoff();
@@ -143,7 +142,8 @@ class AppOpenService {
         AdEventType.CLOSED,
         () => {
           this.isShowing = false;
-          this.lastShowTime = Date.now();
+          useAdsStore.getState().setLastAppOpenShowTime(Date.now());
+          useAdsStore.getState().setAppOpenShowing(false);
 
           useAdsStore
             .getState()
@@ -177,6 +177,7 @@ class AppOpenService {
           this.isShowing = false;
           this.isLoaded = false;
           this.isPreloading = false;
+          useAdsStore.getState().setAppOpenShowing(false);
 
           useAdsStore
             .getState()
@@ -323,13 +324,14 @@ class AppOpenService {
     );
 
     const now = Date.now();
+    const lastShowTime = useAdsStore.getState().lastAppOpenShowTime || 0;
 
     // Safety checks: Cooldown, loaded state, global enabled flag, and Protected Screen policy
     if (
       !canShow ||
       this.isShowing ||
       isProtectedScreen ||
-      now - this.lastShowTime < this.SHOW_COOLDOWN
+      now - lastShowTime < this.SHOW_COOLDOWN
     ) {
       return false;
     }
@@ -346,6 +348,7 @@ class AppOpenService {
 
       try {
         this.isShowing = true;
+        useAdsStore.getState().setAppOpenShowing(true);
 
         await this.appOpenAd.show();
 
@@ -357,6 +360,7 @@ class AppOpenService {
         );
 
         this.isShowing = false;
+        useAdsStore.getState().setAppOpenShowing(false);
 
         return false;
       }

@@ -57,11 +57,10 @@
       "favicon": "./public/icon.png"
     },
     "splash": {
-      "image": "./public/logo_with_text.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F8FAFC",
+      "backgroundColor": "#FFFFFF",
       "dark": {
-        "backgroundColor": "#0F172A"
+        "backgroundColor": "#020617"
       }
     },
     "plugins": [

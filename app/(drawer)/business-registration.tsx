@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -19,7 +19,9 @@ import Toast from 'react-native-toast-message';
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { BUSINESS_QUERY_KEYS, registerBusiness, updateBusiness } from '@/apis/business';
+import { getAuthenticatedConfiguration, CONFIG_QUERY_KEYS } from '@/apis/configuration';
 import { ProfessionPicker } from '@/components/common/ProfessionPicker';
+import { TimePicker } from '@/components/common/TimePicker';
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -37,16 +39,36 @@ const BusinessRegistrationScreen = () => {
 
     const editData = editDataParam ? JSON.parse(editDataParam) : null;
 
+    const { data: configData } = useQuery({
+        queryKey: CONFIG_QUERY_KEYS.professions,
+        queryFn: () => getAuthenticatedConfiguration('PROFESSIONS'),
+        staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    });
+
+    const professionsList = configData?.data?.data || [];
+
     const [form, setForm] = useState({
         name: '',
         description: '',
         phone: '',
         address: '',
         category: null as any,
+        tags: [] as { eng: string; ur: string }[],
+        timing: '',
     });
 
     const [professionModalVisible, setProfessionModalVisible] = useState(false);
     const [descriptionError, setDescriptionError] = useState('');
+
+    const [openTime, setOpenTime] = useState('09:00 AM');
+    const [closeTime, setCloseTime] = useState('09:00 PM');
+    const [openTimePickerVisible, setOpenTimePickerVisible] = useState(false);
+    const [closeTimePickerVisible, setCloseTimePickerVisible] = useState(false);
+
+    const selectedProfessionInfo = professionsList.find(
+        (p: any) => p && p.name_eng?.toLowerCase() === form.category?.name_eng?.toLowerCase()
+    );
+    const availableTags = selectedProfessionInfo?.tags || form.category?.tags || [];
 
     const handleGoBack = () => {
         router.replace('/(drawer)/(tabs)/business');
@@ -73,6 +95,18 @@ const BusinessRegistrationScreen = () => {
             });
         }
         if (editData) {
+            let initialOpenTime = '09:00 AM';
+            let initialCloseTime = '09:00 PM';
+            if (editData.timing && editData.timing.includes(' - ')) {
+                const parts = editData.timing.split(' - ');
+                if (parts[0] && parts[1]) {
+                    initialOpenTime = parts[0];
+                    initialCloseTime = parts[1];
+                }
+            }
+            setOpenTime(initialOpenTime);
+            setCloseTime(initialCloseTime);
+
             setForm({
                 name: editData.name || '',
                 description: editData.description || '',
@@ -82,15 +116,21 @@ const BusinessRegistrationScreen = () => {
                     name_eng: editData.categoryEn,
                     name_ur: editData.categoryUr,
                     icon: editData.logo || (editData.images && editData.images.length > 0 ? editData.images[0] : undefined)
-                } as any
+                } as any,
+                tags: editData.tags || [],
+                timing: editData.timing || '',
             });
         } else {
+            setOpenTime('09:00 AM');
+            setCloseTime('09:00 PM');
             setForm({
                 name: '',
                 description: '',
                 phone: user?.user?.phone || '',
                 address: user?.user?.address || user?.user?.village || '',
                 category: null,
+                tags: [],
+                timing: '',
             });
         }
     }, [editDataParam, user]);
@@ -136,8 +176,50 @@ const BusinessRegistrationScreen = () => {
         }
     });
 
+    const [isOptimizing, setIsOptimizing] = useState(false);
+
+    const handleOptimizeText = async () => {
+        if (!form.category) {
+            Toast.show({ type: 'info', text1: 'Category Required', text2: 'Please select a category first.' });
+            return;
+        }
+
+        const textToOptimize = form.description.trim();
+        const tagsToOptimize = form.tags;
+
+        if (!textToOptimize && tagsToOptimize.length === 0) {
+            Toast.show({ type: 'info', text1: 'Input Required', text2: 'Please write a description or select some services/tags first.' });
+            return;
+        }
+
+        setIsOptimizing(true);
+        try {
+            const { optimizeText } = await import('@/apis/ai');
+            const res = await optimizeText({
+                module: 'business',
+                category: form.category.name_eng,
+                type: 'description',
+                text: textToOptimize,
+                tags: tagsToOptimize,
+            });
+
+            if (res.success && res.optimizedText) {
+                setForm(prev => ({ ...prev, description: res.optimizedText }));
+                setDescriptionError('');
+                Toast.show({ type: 'success', text1: 'AI Optimized!', text2: 'Description optimized successfully.' });
+            } else {
+                Toast.show({ type: 'error', text1: 'Optimization Failed', text2: 'Could not optimize the description.' });
+            }
+        } catch (error) {
+            console.error('AI Optimize error:', error);
+            Toast.show({ type: 'error', text1: 'Optimization Error', text2: 'Failed to connect to AI service.' });
+        } finally {
+            setIsOptimizing(false);
+        }
+    };
+
     const handleSubmit = () => {
-        const { name, category, phone, address, description } = form;
+        const { name, category, phone, address, description, timing } = form;
 
         let hasError = false;
 
@@ -146,12 +228,7 @@ const BusinessRegistrationScreen = () => {
             hasError = true;
         }
 
-        if (description && description.length > 0 && description.length < 100) {
-            setDescriptionError('Description must be at least 100 characters long if provided.');
-            hasError = true;
-        } else {
-            setDescriptionError('');
-        }
+        setDescriptionError('');
 
         if (hasError) return;
 
@@ -163,6 +240,8 @@ const BusinessRegistrationScreen = () => {
             phone,
             address,
             logo: category.icon || null,
+            tags: form.tags,
+            timing,
         };
 
         if (editData) {
@@ -265,12 +344,120 @@ const BusinessRegistrationScreen = () => {
                                 />
                             </View>
 
+                            {/* Timing Selection (Side by Side) */}
+                            <View style={styles.field}>
+                                <ThemedText style={styles.label}>Business Timing</ThemedText>
+                                <View style={{ flexDirection: 'row', gap: 12 }}>
+                                    <View style={{ flex: 1 }}>
+                                        <ThemedText style={[styles.label, { fontSize: 9, color: colors.textSecondary, marginBottom: 2 }]}>OPENS AT</ThemedText>
+                                        <TouchableOpacity
+                                            style={[styles.input, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderColor: colors.border, justifyContent: 'center' }]}
+                                            onPress={() => setOpenTimePickerVisible(true)}
+                                            activeOpacity={0.7}
+                                        >
+                                            <ThemedText style={{ color: colors.text, fontSize: 12, fontWeight: '600' }}>
+                                                {openTime}
+                                            </ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={{ flex: 1 }}>
+                                        <ThemedText style={[styles.label, { fontSize: 9, color: colors.textSecondary, marginBottom: 2 }]}>CLOSES AT</ThemedText>
+                                        <TouchableOpacity
+                                            style={[styles.input, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderColor: colors.border, justifyContent: 'center' }]}
+                                            onPress={() => setCloseTimePickerVisible(true)}
+                                            activeOpacity={0.7}
+                                        >
+                                            <ThemedText style={{ color: colors.text, fontSize: 12, fontWeight: '600' }}>
+                                                {closeTime}
+                                            </ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+
+                            {/* Tags Selection */}
+                            {availableTags && availableTags.length > 0 && (
+                                <View style={styles.field}>
+                                    <ThemedText style={styles.label}>Select Services / Tags</ThemedText>
+                                    <View style={styles.tagsContainer}>
+                                        {availableTags.map((tag: any) => {
+                                            const isSelected = form.tags.some((t: any) => t.eng?.toLowerCase() === tag.eng?.toLowerCase());
+                                            return (
+                                                <TouchableOpacity
+                                                    key={tag.eng}
+                                                    style={[
+                                                        styles.tagChip,
+                                                        {
+                                                            backgroundColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC'),
+                                                            borderColor: isSelected ? colors.primary : colors.border,
+                                                        }
+                                                    ]}
+                                                    onPress={() => {
+                                                        if (isSelected) {
+                                                            setForm(prev => ({
+                                                                ...prev,
+                                                                tags: prev.tags.filter((t: any) => t.eng?.toLowerCase() !== tag.eng?.toLowerCase())
+                                                            }));
+                                                        } else {
+                                                            setForm(prev => ({
+                                                                ...prev,
+                                                                tags: [...prev.tags, tag]
+                                                            }));
+                                                        }
+                                                    }}
+                                                    activeOpacity={0.8}
+                                                >
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                                        {isSelected && <Ionicons name="checkmark" size={12} color="#FFFFFF" />}
+                                                        <ThemedText
+                                                            style={[
+                                                                styles.tagChipText,
+                                                                {
+                                                                    color: isSelected ? '#FFFFFF' : colors.text,
+                                                                    fontWeight: isSelected ? '700' : '600',
+                                                                }
+                                                            ]}
+                                                        >
+                                                            {tag.eng} | {tag.ur}
+                                                        </ThemedText>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            );
+                                        })}
+                                    </View>
+                                </View>
+                            )}
+
                             {/* Description Input */}
                             <View style={styles.field}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <ThemedText style={styles.label}>Description</ThemedText>
-                                    <ThemedText style={{ fontSize: 10, color: (form.description.length > 0 && form.description.length < 100) ? '#EF4444' : colors.textSecondary, marginBottom: 4 }}>
-                                        {form.description.length}/100 min
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                        <ThemedText style={styles.label}>Description</ThemedText>
+                                        <TouchableOpacity
+                                            onPress={handleOptimizeText}
+                                            disabled={isOptimizing || !form.category || form.tags.length === 0}
+                                            style={{
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                gap: 4,
+                                                paddingHorizontal: 8,
+                                                paddingVertical: 3,
+                                                borderRadius: 12,
+                                                backgroundColor: (isOptimizing || !form.category || form.tags.length === 0) ? (isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0') : (colors.primary + '12'),
+                                                marginLeft: 4,
+                                                opacity: (isOptimizing || !form.category || form.tags.length === 0) ? 0.6 : 1
+                                            }}
+                                        >
+                                            {isOptimizing ? (
+                                                <ActivityIndicator size="small" color={colors.primary} style={{ transform: [{ scale: 0.7 }] }} />
+                                            ) : (
+                                                <Ionicons name="sparkles" size={12} color={(isOptimizing || !form.category || form.tags.length === 0) ? colors.textSecondary : colors.primary} />
+                                            )}
+                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: (isOptimizing || !form.category || form.tags.length === 0) ? colors.textSecondary : colors.primary }}>AI Optimize</ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <ThemedText style={{ fontSize: 10, color: colors.textSecondary }}>
+                                        {form.description.length} chars
                                     </ThemedText>
                                 </View>
                                 <TextInput
@@ -280,10 +467,9 @@ const BusinessRegistrationScreen = () => {
                                     value={form.description}
                                     onChangeText={(text) => {
                                         setForm(prev => ({ ...prev, description: text }));
-                                        if (text.length === 0 || text.length >= 100) setDescriptionError('');
                                     }}
                                     multiline
-                                    numberOfLines={4}
+                                    numberOfLines={15}
                                 />
                                 {!!descriptionError && (
                                     <ThemedText style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>
@@ -326,9 +512,29 @@ const BusinessRegistrationScreen = () => {
                 visible={professionModalVisible}
                 onClose={() => setProfessionModalVisible(false)}
                 onSelect={(cat: any) => {
-                    handleInputChange('category', cat);
+                    setForm(prev => ({
+                        ...prev,
+                        category: cat,
+                        tags: []
+                    }));
                     setProfessionModalVisible(false);
                 }}
+            />
+
+            <TimePicker
+                visible={openTimePickerVisible}
+                onClose={() => setOpenTimePickerVisible(false)}
+                onSelect={(time) => setOpenTime(time)}
+                title="Select Opening Time"
+                currentValue={openTime}
+            />
+
+            <TimePicker
+                visible={closeTimePickerVisible}
+                onClose={() => setCloseTimePickerVisible(false)}
+                onSelect={(time) => setCloseTime(time)}
+                title="Select Closing Time"
+                currentValue={closeTime}
             />
         </View>
     );
@@ -404,7 +610,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     textArea: {
-        height: 70,
+        height: 270,
         textAlignVertical: 'top',
         paddingTop: 8,
     },
@@ -438,5 +644,21 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         fontSize: 12,
         letterSpacing: 0.5,
+    },
+    tagsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6,
+        marginTop: 4,
+        marginBottom: 8,
+    },
+    tagChip: {
+        borderRadius: 20,
+        borderWidth: 1,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+    },
+    tagChipText: {
+        fontSize: 11,
     },
 });

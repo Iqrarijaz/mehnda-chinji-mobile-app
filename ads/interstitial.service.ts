@@ -170,7 +170,7 @@ class InterstitialService {
    * Cleanup
    * ----------------------------------------
    */
-  private cleanupAd() {
+  private cleanupAd(preservePending = false) {
     if (this.interstitial) {
       this.interstitial.removeAllListeners();
       this.interstitial = null;
@@ -178,7 +178,9 @@ class InterstitialService {
 
     this.isLoaded = false;
     this.isLoading = false;
-    this.showPending = false;
+    if (!preservePending) {
+      this.showPending = false;
+    }
   }
 
   private clearLoadTimer() {
@@ -212,8 +214,8 @@ class InterstitialService {
    * Create Ad
    * ----------------------------------------
    */
-  private createAd(fallbackToTest = false, customUnitId?: string) {
-    this.cleanupAd();
+  private createAd(fallbackToTest = false, customUnitId?: string, preservePending = false) {
+    this.cleanupAd(preservePending);
 
     const unitId = customUnitId || (fallbackToTest ? TestIds.INTERSTITIAL : AD_UNIT_IDS.INTERSTITIAL);
     this.currentUnitId = unitId;
@@ -352,7 +354,12 @@ class InterstitialService {
           this.isShowing = false;
           this.isLoaded = false;
           this.isLoading = false;
-          this.showPending = false;
+
+          const isFallbackPossible = this.currentUnitId !== TestIds.INTERSTITIAL;
+
+          if (!isFallbackPossible) {
+            this.showPending = false;
+          }
 
           useAdsStore
             .getState()
@@ -369,35 +376,37 @@ class InterstitialService {
             },
           );
 
-          this.cleanupAd();
+          this.cleanupAd(isFallbackPossible);
 
           // Fallback logic: Try alternate production ID first, then Test ID
           const primaryProdId = AD_UNIT_IDS.INTERSTITIAL;
           const backupProdId = 'ca-app-pub-1707254546231644/3460596415';
 
-          if (this.currentUnitId === primaryProdId && primaryProdId !== backupProdId && primaryProdId !== TestIds.INTERSTITIAL) {
-            console.log('[InterstitialService] Live Interstitial failed. Trying backup production ID...');
-            this.createAd(false, backupProdId);
-            this.isLoading = true;
-            this.loadStartTime = Date.now();
-            try {
-              this.interstitial?.load();
-            } catch (err) {
-              console.error('[InterstitialService] Backup production load failed:', err);
-              this.isLoading = false;
-              this.handleLoadError();
-            }
-          } else if (this.currentUnitId !== TestIds.INTERSTITIAL) {
-            console.log('[InterstitialService] Live Interstitial failed. Trying Test Interstitial ID fallback...');
-            this.createAd(true);
-            this.isLoading = true;
-            this.loadStartTime = Date.now();
-            try {
-              this.interstitial?.load();
-            } catch (err) {
-              console.error('[InterstitialService] Fallback test load failed:', err);
-              this.isLoading = false;
-              this.handleLoadError();
+          if (isFallbackPossible) {
+            if (this.currentUnitId === primaryProdId && primaryProdId !== backupProdId) {
+              console.log('[InterstitialService] Live Interstitial failed. Trying backup production ID...');
+              this.createAd(false, backupProdId, true);
+              this.isLoading = true;
+              this.loadStartTime = Date.now();
+              try {
+                this.interstitial?.load();
+              } catch (err) {
+                console.error('[InterstitialService] Backup production load failed:', err);
+                this.isLoading = false;
+                this.handleLoadError();
+              }
+            } else {
+              console.log('[InterstitialService] Live Interstitial failed. Trying Test Interstitial ID fallback...');
+              this.createAd(true, undefined, true);
+              this.isLoading = true;
+              this.loadStartTime = Date.now();
+              try {
+                this.interstitial?.load();
+              } catch (err) {
+                console.error('[InterstitialService] Fallback test load failed:', err);
+                this.isLoading = false;
+                this.handleLoadError();
+              }
             }
           } else {
             this.handleLoadError();

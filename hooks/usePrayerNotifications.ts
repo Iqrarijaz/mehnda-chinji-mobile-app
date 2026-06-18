@@ -4,7 +4,7 @@ import { clientStorage } from '@/utils/storage';
 import moment from 'moment';
 import { setupAdhanChannel, ADHAN_CHANNEL_ID } from '@/components/notification/channel';
 
-const LAST_SCHEDULED_KEY = 'last_prayer_scheduled_info_v3';
+const LAST_SCHEDULED_KEY = 'last_prayer_scheduled_info_v4';
 
 export const usePrayerNotifications = (
     calendarData: any,

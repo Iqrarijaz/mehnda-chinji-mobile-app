@@ -72,9 +72,8 @@ const CategoryListingScreen = React.memo(() => {
     const { data: essentialsConfig } = useQuery({
         queryKey: ['configuration', 'ESSENTIALS_ICONS'],
         queryFn: () => getAuthenticatedConfiguration('ESSENTIALS_ICONS'),
-        staleTime: 1000 * 60 * 60 * 24, // 24 hours
+        staleTime: 0, // Force fresh fetch to get newly added tags configuration
     });
-
     const getConfigArray = (resp: any) => {
         let val = resp?.data?.data || resp?.data?.value || resp?.data || resp;
         if (val && typeof val === 'object' && val.value) val = val.value;

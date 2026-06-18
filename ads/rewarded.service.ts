@@ -260,7 +260,12 @@ class RewardedService {
           this.isShowing = false;
           this.isLoaded = false;
           this.isPreloading = false;
-          this.showPending = false;
+
+          const isFallbackPossible = this.currentUnitId === AD_UNIT_IDS.REWARDED && AD_UNIT_IDS.REWARDED !== TestIds.REWARDED;
+
+          if (!isFallbackPossible) {
+            this.showPending = false;
+          }
 
           useAdsStore
             .getState()
@@ -277,7 +282,7 @@ class RewardedService {
           this.cleanupAd();
 
           // Fallback to Test ID if the live ad unit ID fails
-          if (this.currentUnitId === AD_UNIT_IDS.REWARDED && AD_UNIT_IDS.REWARDED !== TestIds.REWARDED) {
+          if (isFallbackPossible) {
             console.log('[RewardedService] Live Rewarded ad failed. Trying Test Rewarded ID fallback...');
             this.createAd(true);
             this.isPreloading = true;

@@ -1,11 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions, Animated, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, Dimensions, Animated } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { ThemedText } from '@/components/themedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
-import { Layout } from '@/constants/layout';
 
 const { width } = Dimensions.get('window');
 
@@ -15,19 +13,16 @@ interface OnboardingSlideProps {
         title: string;
         description: string;
         animation: any;
-        isPrivacy?: boolean;
     };
     index: number;
     scrollX: Animated.Value;
 }
 
-
 export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, scrollX }) => {
-
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    // Elite touch: Entrance animations for text
+    // Slide animations mapping scroll position
     const translateY = scrollX.interpolate({
         inputRange: [(index - 1) * width, index * width, (index + 1) * width],
         outputRange: [50, 0, -50],
@@ -35,19 +30,20 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
     });
 
     const opacity = scrollX.interpolate({
-        inputRange: [(index - 0.7) * width, index * width, (index + 0.7) * width],
+        inputRange: [(index - 0.6) * width, index * width, (index + 0.6) * width],
         outputRange: [0, 1, 0],
         extrapolate: 'clamp',
     });
 
     const scale = scrollX.interpolate({
         inputRange: [(index - 1) * width, index * width, (index + 1) * width],
-        outputRange: [0.8, 1, 0.8],
+        outputRange: [0.85, 1, 0.85],
         extrapolate: 'clamp',
     });
 
     return (
         <View style={styles.container}>
+            {/* Lottie Animation Display */}
             <Animated.View style={[styles.animationContainer, { transform: [{ scale }] }]}>
                 <LottieView
                     source={item.animation}
@@ -58,17 +54,36 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
                     renderMode="HARDWARE"
                 />
             </Animated.View>
-            <Animated.View style={[styles.textContainer, { opacity, transform: [{ translateY }] }]}>
-                <ThemedText type="defaultSemiBold" numberOfLines={1} style={[styles.title, { color: colors.text }]}>
+
+            {/* Information Card Container (Flat with no shadow/elevation/border) */}
+            <Animated.View 
+                style={[
+                    styles.cardContainer, 
+                    { 
+                        opacity, 
+                        transform: [{ translateY }],
+                        backgroundColor: colors.card,
+                    }
+                ]}
+            >
+                <ThemedText 
+                    type="urdu" 
+                    style={[
+                        styles.title, 
+                        { 
+                            color: colors.primary, 
+                            textAlign: 'center' 
+                        }
+                    ]}
+                >
                     {item.title}
                 </ThemedText>
-                <ThemedText numberOfLines={1} style={[styles.description, { color: colors.textSecondary }]}>
+                
+                <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+                <ThemedText style={[styles.description, { color: colors.textSecondary }]}>
                     {item.description}
                 </ThemedText>
-                {item.id === '3' && ( // Placeholder for any other button if needed, but currently removing location
-                    null
-                )}
-
             </Animated.View>
         </View>
     );
@@ -80,53 +95,43 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 40,
+        paddingHorizontal: 28,
     },
     animationContainer: {
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 8,
     },
     lottie: {
-        width: width * 0.9,
-        height: width * 0.9,
+        width: width * 0.76,
+        height: width * 0.76,
     },
-    textContainer: {
+    cardContainer: {
+        width: '100%',
+        borderRadius: 20,
+        paddingVertical: 20,
+        paddingHorizontal: 18,
         alignItems: 'center',
-        marginTop: 30,
     },
     title: {
-        fontSize: 16,
+        fontSize: 20,
+        lineHeight: 34,
         fontWeight: '800',
-        textAlign: 'center',
-        paddingTop: 12,
-        paddingBottom: 0,
-        lineHeight: 22,
-        marginBottom: 15,
+        paddingTop: 4,
+        letterSpacing: 0.2,
+    },
+    divider: {
+        width: 32,
+        height: 2,
+        borderRadius: 1,
+        marginVertical: 12,
     },
     description: {
-        fontSize: 13,
+        fontSize: 12,
         textAlign: 'center',
         lineHeight: 18,
-        paddingHorizontal: 10,
         fontWeight: '600',
-        marginTop: 5,
-    },
-    permissionButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: Layout.borderRadius,
-        marginTop: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-    },
-    permissionButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '700',
+        paddingHorizontal: 8,
     },
 });

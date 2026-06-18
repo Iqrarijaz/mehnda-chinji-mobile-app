@@ -40,7 +40,6 @@ export function CategoryGrid() {
                         <CategoryCard
                             label={cat.label}
                             icon={cat.icon}
-                            color={cat.color}
                             onPress={() => handlePress(cat.id)}
                         />
                     </Animated.View>
@@ -53,7 +52,6 @@ export function CategoryGrid() {
                     <CategoryCard
                         label="More"
                         icon="ellipsis-horizontal"
-                        color="#8B5CF6"
                         onPress={() => setIsModalVisible(true)}
                     />
                 </Animated.View>
@@ -83,7 +81,6 @@ export function CategoryGrid() {
                                     <CategoryCard
                                         label={cat.label}
                                         icon={cat.icon}
-                                        color={cat.color}
                                         onPress={() => {
                                             setIsModalVisible(false);
                                             handlePress(cat.id);

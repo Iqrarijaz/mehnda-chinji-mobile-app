@@ -495,7 +495,7 @@ export function RegisterForm() {
                         <ActivityIndicator color="#000000" />
                     ) : (
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../assets/icons/google.png')} style={{ width: 20, height: 20, marginRight: 8 }} />
+                            <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
                             <ThemedText style={[styles.registerButtonText, { color: '#000000' }]}>Sign up with Google</ThemedText>
                         </View>
                     )}

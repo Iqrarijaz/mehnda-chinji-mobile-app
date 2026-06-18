@@ -47,7 +47,7 @@ const PlaceSubmissionScreen = () => {
     const { data: essentialsConfig } = useQuery({
         queryKey: ['configuration', 'ESSENTIALS_ICONS'],
         queryFn: () => getAuthenticatedConfiguration('ESSENTIALS_ICONS'),
-        staleTime: 1000 * 60 * 60 * 24, // 24 hours
+        staleTime: 0, // Force fresh fetch to get newly added tags configuration
     });
 
     const getConfigArray = (resp: any) => {
@@ -77,6 +77,7 @@ const PlaceSubmissionScreen = () => {
         services: '', // Health
         type: '',
         images: [] as string[],
+        tags: [] as { eng: string; ur: string }[],
         route: [{ city: '', time: '' }] as { city: string; time: string }[],
         metadata: {
             principalName: '',
@@ -84,6 +85,9 @@ const PlaceSubmissionScreen = () => {
             totalTeachers: '',
         }
     });
+
+    const selectedTypeInfo = typesToRender.find((t: any) => t.key?.toLowerCase() === form.type?.toLowerCase());
+    const availableTags = selectedTypeInfo?.tags || [];
 
     const [routePickerIndex, setRoutePickerIndex] = useState<number | null>(null);
 
@@ -98,8 +102,9 @@ const PlaceSubmissionScreen = () => {
 
     const handleOptimizeText = async (type: 'description' | 'services') => {
         const textToOptimize = type === 'description' ? form.description : form.services;
-        if (!textToOptimize.trim()) {
-            Toast.show({ type: 'info', text1: 'Empty Text', text2: 'Please write something first to optimize.' });
+        const tagsToOptimize = form.tags || [];
+        if (!textToOptimize.trim() && tagsToOptimize.length === 0) {
+            Toast.show({ type: 'info', text1: 'Input Required', text2: 'Please write some text or select some tags first to optimize.' });
             return;
         }
 
@@ -115,7 +120,8 @@ const PlaceSubmissionScreen = () => {
                 module: 'essentials',
                 category: category || 'general',
                 type,
-                text: textToOptimize
+                text: textToOptimize,
+                tags: tagsToOptimize,
             });
 
             if (res.success && res.optimizedText) {
@@ -180,6 +186,7 @@ const PlaceSubmissionScreen = () => {
                 services: editData.services || '',
                 type: editData.type || '',
                 images: images,
+                tags: editData.tags || [],
                 route: editData.route || [{ city: '', time: '' }],
                 metadata: {
                     principalName: editData.metadata?.principalName || '',
@@ -216,6 +223,7 @@ const PlaceSubmissionScreen = () => {
                 services: '',
                 type: '',
                 images: [],
+                tags: [],
                 route: [{ city: '', time: '' }],
                 metadata: {
                     principalName: '',
@@ -527,6 +535,7 @@ const PlaceSubmissionScreen = () => {
             form.timing.trim() !== (editData.timing || '').trim() ||
             form.services.trim() !== (editData.services || '').trim() ||
             form.type !== (editData.type || '') ||
+            JSON.stringify(form.tags) !== JSON.stringify(editData.tags || []) ||
             JSON.stringify(form.route) !== JSON.stringify(editData.route || [{ city: '', time: '' }]) ||
             JSON.stringify(form.metadata) !== JSON.stringify(editData.metadata || { principalName: '', totalStudents: '', totalTeachers: '' });
 
@@ -677,11 +686,16 @@ const PlaceSubmissionScreen = () => {
                                     <TouchableOpacity
                                         key={t.key}
                                         onPress={() => {
-                                            handleChange('type', t.key);
-                                            // Auto-set image from config for religious/govt listings
+                                            setForm(prev => ({
+                                                ...prev,
+                                                type: t.key,
+                                                tags: [],
+                                                ...(isNoPhotoCategory && t.icon && typeof t.icon === 'string'
+                                                    ? { images: [t.icon] }
+                                                    : {})
+                                            }));
                                             if (isNoPhotoCategory && t.icon && typeof t.icon === 'string') {
                                                 setUploadedImage(t.icon);
-                                                setForm(prev => ({ ...prev, images: [t.icon] }));
                                                 setSelectedImage(t.icon);
                                             }
                                         }}
@@ -712,6 +726,59 @@ const PlaceSubmissionScreen = () => {
                                 ))}
                             </ScrollView>
                         </View>
+
+                        {/* Tags Selection */}
+                        {availableTags && availableTags.length > 0 && (
+                            <View style={styles.field}>
+                                <ThemedText style={styles.label}>Select Services / Tags</ThemedText>
+                                <View style={styles.tagsContainer}>
+                                    {availableTags.map((tag: any) => {
+                                        const isSelected = form.tags?.some((t: any) => t.eng?.toLowerCase() === tag.eng?.toLowerCase());
+                                        return (
+                                            <TouchableOpacity
+                                                key={tag.eng}
+                                                style={[
+                                                    styles.tagChip,
+                                                    {
+                                                        backgroundColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9'),
+                                                        borderColor: isSelected ? colors.primary : colors.border,
+                                                    }
+                                                ]}
+                                                onPress={() => {
+                                                    if (isSelected) {
+                                                        setForm(prev => ({
+                                                            ...prev,
+                                                            tags: (prev.tags || []).filter((t: any) => t.eng?.toLowerCase() !== tag.eng?.toLowerCase())
+                                                        }));
+                                                    } else {
+                                                        setForm(prev => ({
+                                                            ...prev,
+                                                            tags: [...(prev.tags || []), tag]
+                                                        }));
+                                                    }
+                                                }}
+                                                activeOpacity={0.8}
+                                            >
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                                    {isSelected && <Ionicons name="checkmark" size={12} color="#FFFFFF" />}
+                                                    <ThemedText
+                                                        style={[
+                                                            styles.tagChipText,
+                                                            {
+                                                                color: isSelected ? '#FFFFFF' : colors.text,
+                                                                fontWeight: isSelected ? '700' : '600',
+                                                            }
+                                                        ]}
+                                                    >
+                                                        {tag.eng} | {tag.ur}
+                                                    </ThemedText>
+                                                </View>
+                                            </TouchableOpacity>
+                                        );
+                                    })}
+                                </View>
+                            </View>
+                        )}
 
                         {!isTravel && (
                             <View style={styles.field}>
@@ -853,18 +920,28 @@ const PlaceSubmissionScreen = () => {
                                 <View style={styles.labelRow}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                                         <ThemedText style={styles.label}>Description {!isEmergency && <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>}</ThemedText>
-                                        {/* <TouchableOpacity
+                                        <TouchableOpacity
                                             onPress={() => handleOptimizeText('description')}
-                                            disabled={isOptimizingDesc}
-                                            style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12, backgroundColor: colors.primary + '12', marginLeft: 4 }}
+                                            disabled={isOptimizingDesc || !form.name.trim() || !form.type}
+                                            style={{
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                gap: 4,
+                                                paddingHorizontal: 8,
+                                                paddingVertical: 3,
+                                                borderRadius: 12,
+                                                backgroundColor: (isOptimizingDesc || !form.name.trim() || !form.type) ? (isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0') : (colors.primary + '12'),
+                                                marginLeft: 4,
+                                                opacity: (isOptimizingDesc || !form.name.trim() || !form.type) ? 0.6 : 1
+                                            }}
                                         >
                                             {isOptimizingDesc ? (
                                                 <ActivityIndicator size="small" color={colors.primary} style={{ transform: [{ scale: 0.7 }] }} />
                                             ) : (
-                                                <Ionicons name="sparkles" size={12} color={colors.primary} />
+                                                <Ionicons name="sparkles" size={12} color={(isOptimizingDesc || !form.name.trim() || !form.type) ? colors.textSecondary : colors.primary} />
                                             )}
-                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: colors.primary }}>AI Optimize</ThemedText>
-                                        </TouchableOpacity> */}
+                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: (isOptimizingDesc || !form.name.trim() || !form.type) ? colors.textSecondary : colors.primary }}>AI Optimize</ThemedText>
+                                        </TouchableOpacity>
                                     </View>
                                     <ThemedText style={[
                                         styles.charCount,
@@ -908,7 +985,7 @@ const PlaceSubmissionScreen = () => {
                                     value={form.description}
                                     onChangeText={(text) => handleChange('description', text)}
                                     multiline
-                                    numberOfLines={7}
+                                    numberOfLines={15}
                                     onSelectionChange={(e) => setDescSelection(e.nativeEvent.selection)}
                                 />
                             </View>
@@ -1020,15 +1097,25 @@ const PlaceSubmissionScreen = () => {
                                         <ThemedText style={styles.label}>Services <ThemedText style={{ color: colors.textSecondary, fontSize: 10, fontWeight: 'normal' }}>(Optional)</ThemedText></ThemedText>
                                         <TouchableOpacity
                                             onPress={() => handleOptimizeText('services')}
-                                            disabled={isOptimizingServices}
-                                            style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12, backgroundColor: colors.primary + '12', marginLeft: 4 }}
+                                            disabled={isOptimizingServices || !form.name.trim() || !form.type}
+                                            style={{
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                gap: 4,
+                                                paddingHorizontal: 8,
+                                                paddingVertical: 3,
+                                                borderRadius: 12,
+                                                backgroundColor: (isOptimizingServices || !form.name.trim() || !form.type) ? (isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0') : (colors.primary + '12'),
+                                                marginLeft: 4,
+                                                opacity: (isOptimizingServices || !form.name.trim() || !form.type) ? 0.6 : 1
+                                            }}
                                         >
                                             {isOptimizingServices ? (
                                                 <ActivityIndicator size="small" color={colors.primary} style={{ transform: [{ scale: 0.7 }] }} />
                                             ) : (
-                                                <Ionicons name="sparkles" size={12} color={colors.primary} />
+                                                <Ionicons name="sparkles" size={12} color={(isOptimizingServices || !form.name.trim() || !form.type) ? colors.textSecondary : colors.primary} />
                                             )}
-                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: colors.primary }}>AI Optimize</ThemedText>
+                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: (isOptimizingServices || !form.name.trim() || !form.type) ? colors.textSecondary : colors.primary }}>AI Optimize</ThemedText>
                                         </TouchableOpacity>
                                     </View>
                                     <ThemedText style={styles.charCount}>
@@ -1205,7 +1292,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     textArea: {
-        height: 150,
+        height: 270,
         textAlignVertical: 'top',
         paddingTop: 10,
     },
@@ -1369,5 +1456,21 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: '800',
         textTransform: 'uppercase',
+    },
+    tagsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6,
+        marginTop: 4,
+        marginBottom: 8,
+    },
+    tagChip: {
+        borderRadius: 20,
+        borderWidth: 1,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+    },
+    tagChipText: {
+        fontSize: 11,
     },
 });

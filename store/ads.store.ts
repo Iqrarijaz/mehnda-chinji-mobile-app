@@ -15,6 +15,8 @@ export const useAdsStore = create<AdsState>()(
       },
       lastFetchedAt: null,
       userRole: null,
+      lastAppOpenShowTime: 0,
+      isShowingAppOpen: false,
 
       setAdsConfig: (config: AdsConfig) => set({ adsConfig: config }),
       setLoading: (loading: boolean) => set({ isLoading: loading }),
@@ -23,10 +25,18 @@ export const useAdsStore = create<AdsState>()(
       })),
       setLastFetchedAt: (timestamp: number) => set({ lastFetchedAt: timestamp }),
       setUserRole: (role: string | null) => set({ userRole: role }),
+      setLastAppOpenShowTime: (time: number) => set({ lastAppOpenShowTime: time }),
+      setAppOpenShowing: (showing: boolean) => set({ isShowingAppOpen: showing }),
     }),
     {
       name: 'ads-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        adsConfig: state.adsConfig,
+        lastFetchedAt: state.lastFetchedAt,
+        userRole: state.userRole,
+        lastAppOpenShowTime: state.lastAppOpenShowTime,
+      }),
     }
   )
 );

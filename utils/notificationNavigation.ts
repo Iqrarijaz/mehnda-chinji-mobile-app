@@ -63,4 +63,13 @@ export function handleNotificationNavigation(data: NotificationData, router: Rou
         router.push('/(drawer)/(tabs)' as any);
         return;
     }
+
+    // ── Quran notification ──────────────────────────────────────────
+    if (screen.startsWith('quran/')) {
+        const parts = screen.split('/');
+        if (parts[1]) {
+            router.push(`/quran/${parts[1]}` as any);
+            return;
+        }
+    }
 }

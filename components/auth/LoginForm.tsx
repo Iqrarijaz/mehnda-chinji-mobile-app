@@ -331,7 +331,7 @@ export function LoginForm() {
                         <ActivityIndicator color="#000000" />
                     ) : (
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../assets/icons/google.png')} style={{ width: 20, height: 20, marginRight: 8 }} />
+                            <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
                             <ThemedText style={[styles.loginButtonText, { color: '#000000' }]}>Sign in with Google</ThemedText>
                         </View>
                     )}

@@ -1,19 +1,23 @@
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createMMKV } from 'react-native-mmkv';
+
+const storage = createMMKV();
 
 /**
- * Enhanced clientStorage that uses AsyncStorage.
+ * Enhanced clientStorage that uses MMKV.
  * Methods are kept async to maintain compatibility with React Query and Zustand persistence.
  */
 export const clientStorage = {
     setItem: async (key: string, value: string): Promise<void> => {
-        await AsyncStorage.setItem(key, value);
+        storage.set(key, value);
     },
     getItem: async (key: string): Promise<string | null> => {
-        return await AsyncStorage.getItem(key);
+        const val = storage.getString(key);
+        return val !== undefined ? val : null;
     },
     removeItem: async (key: string): Promise<void> => {
-        await AsyncStorage.removeItem(key);
+        storage.remove(key);
     },
 };
 

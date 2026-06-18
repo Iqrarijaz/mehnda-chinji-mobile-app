@@ -169,7 +169,7 @@ export default function ReportsScreen() {
                                 <ThemedText style={[styles.dateText, { color: colors.icon }]}>
                                     {format(new Date(report.createdAt), 'MMM dd, yyyy • hh:mm a')}
                                 </ThemedText>
-                                 {report.status === 'PENDING' && (
+                                {report.status === 'PENDING' && (
                                     <View style={{ position: 'relative' }}>
                                         <Menu>
                                             <MenuTrigger
@@ -344,9 +344,6 @@ const styles = StyleSheet.create({
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.12,
                 shadowRadius: 16,
-            },
-            android: {
-                elevation: 8,
             },
         }),
         paddingHorizontal: 6,

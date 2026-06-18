@@ -19,12 +19,16 @@ export interface AdsState {
   };
   lastFetchedAt: number | null;
   userRole: string | null;
+  lastAppOpenShowTime: number;
+  isShowingAppOpen: boolean;
   
   setAdsConfig: (config: AdsConfig) => void;
   setLoading: (loading: boolean) => void;
   setAdLoaded: (type: 'interstitial' | 'rewarded' | 'appOpen', loaded: boolean) => void;
   setLastFetchedAt: (timestamp: number) => void;
   setUserRole: (role: string | null) => void;
+  setLastAppOpenShowTime: (time: number) => void;
+  setAppOpenShowing: (showing: boolean) => void;
 }
 
 export const DEFAULT_ADS_CONFIG: AdsConfig = {

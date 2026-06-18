@@ -282,6 +282,33 @@ const BusinessDetailScreen = () => {
                             </View>
                         )}
 
+                        {/* Section: Tags/Specialties */}
+                        {business.tags && business.tags.length > 0 && (
+                            <View style={styles.detailSection}>
+                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                    Specialties & Services
+                                </ThemedText>
+                                <View style={styles.detailsTagsContainer}>
+                                    {business.tags.map((tag: any, index: number) => (
+                                        <View
+                                            key={index}
+                                            style={[
+                                                styles.detailTagChip,
+                                                {
+                                                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
+                                                    borderColor: colors.border,
+                                                }
+                                            ]}
+                                        >
+                                            <ThemedText style={[styles.detailTagText, { color: colors.text }]}>
+                                                {tag.eng} | {tag.ur}
+                                            </ThemedText>
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
+                        )}
+
                         {/* Section: Info Details */}
                         <View style={styles.detailSection}>
                             <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
@@ -335,6 +362,18 @@ const BusinessDetailScreen = () => {
                                         <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{business.phone2}</ThemedText>
                                     </View>
                                 </TouchableOpacity>
+                            )}
+
+                            {business.timing && (
+                                <View style={styles.infoListItem}>
+                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
+                                        <Ionicons name="time" size={12} color={colors.primary} />
+                                    </View>
+                                    <View style={styles.infoListContent}>
+                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Business Hours</ThemedText>
+                                        <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{business.timing}</ThemedText>
+                                    </View>
+                                </View>
                             )}
 
                             {business.createdAt && (
@@ -553,5 +592,21 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         backgroundColor: 'rgba(0,0,0,0.05)',
         borderWidth: 1,
+    },
+    detailsTagsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6,
+        marginTop: 4,
+    },
+    detailTagChip: {
+        borderRadius: 20,
+        borderWidth: 1,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+    },
+    detailTagText: {
+        fontSize: 10,
+        fontWeight: '600',
     },
 });

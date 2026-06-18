@@ -4,6 +4,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 
 import { GlobalSearchOverlay } from '@/components/common/GlobalSearchOverlay';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
+import { UtilsGrid } from '@/components/home/UtilsGrid';
 import { ContentCard } from '@/components/home/ContentCard';
 import { HomeHeader } from '@/components/home/HomeHeader';
 import { PasswordModal } from '@/components/setting/passwordModal';
@@ -51,47 +52,12 @@ export default function HomeScreen() {
           {/* Categories */}
           <CategoryGrid />
 
+          {/* Daily Utilities */}
+          <UtilsGrid />
+
           {/* Featured Village Pride Spotlight */}
           {featuredHero ? <FeaturedPrideCard /> : null}
 
-          {/* Quick Access Section */}
-          <Animated.View entering={SlideInLeft.delay(500).duration(400)} style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>Quick Access</ThemedText>
-          </Animated.View>
-
-          <ContentCard
-            icon="moon-outline"
-            iconColor="#006666" // Matching your Islamic theme color
-            title="Prayer Times"
-            subtitle="Daily timings & Hadith"
-            onPress={() => router.push('/prayerTimes' as any)}
-            delay={500} // slight delay for stagger
-          />
-
-          <ContentCard
-            icon="help-buoy-outline"
-            iconColor="#8B5CF6"
-            title="Support"
-            subtitle="Get help or report issues"
-            onPress={() => router.push('/support/tickets')}
-            delay={550}
-          />
-
-          {/* Insight Card */}
-          {/* <Animated.View
-            entering={SlideInLeft.delay(600).duration(450)}
-            style={[styles.insightCard, { backgroundColor: colors.card }]}
-          >
-            <View style={[styles.insightIconWrap, { backgroundColor: colors.primary + '12' }]}>
-              <ThemedText style={styles.insightEmoji}>💡</ThemedText>
-            </View>
-            <View style={styles.insightTextWrap}>
-              <ThemedText style={styles.insightTitle}>Did you know?</ThemedText>
-              <ThemedText style={[styles.insightSubtitle, { color: colors.textSecondary }]}>
-                Complete your profile to help community members find and connect with you easily.
-              </ThemedText>
-            </View>
-          </Animated.View> */}
         </ScrollView>
 
         {isSearchActive && (

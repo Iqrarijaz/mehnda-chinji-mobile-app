@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
 
 import { ThemedText } from '@/components/themedText';
 import { Colors } from '@/constants/colors';
@@ -9,15 +9,15 @@ import { Layout } from '@/constants/layout';
 
 interface CategoryCardProps {
     label: string;
-    icon: string;
+    icon: any;
     onPress: () => void;
-    color?: string;
 }
 
-export const CategoryCard = React.memo(({ label, icon, color, onPress }: CategoryCardProps) => {
+export const CategoryCard = React.memo(({ label, icon, onPress }: CategoryCardProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
-    const accentColor = color || colors.primary;
+    const accentColor = colors.primary;
+    const isImageAsset = typeof icon !== 'string';
 
     return (
         <TouchableOpacity
@@ -26,8 +26,16 @@ export const CategoryCard = React.memo(({ label, icon, color, onPress }: Categor
             style={styles.touchable}
         >
             <View style={[styles.card, { backgroundColor: colors.card }]}>
-                <View style={[styles.iconContainer, { backgroundColor: accentColor + '12' }]}>
-                    <Ionicons name={icon as any} size={24} color={accentColor} />
+                <View style={[styles.iconContainer, { backgroundColor: isImageAsset ? 'transparent' : accentColor + '12' }]}>
+                    {isImageAsset ? (
+                        <Image
+                            source={icon}
+                            style={styles.imageIcon}
+                            resizeMode="contain"
+                        />
+                    ) : (
+                        <Ionicons name={icon as any} size={28} color={accentColor} />
+                    )}
                 </View>
                 <ThemedText
                     style={[styles.label, { color: colors.text }]}
@@ -61,6 +69,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8,
+    },
+    imageIcon: {
+        width: 44,
+        height: 44,
     },
     label: {
         fontSize: 11,

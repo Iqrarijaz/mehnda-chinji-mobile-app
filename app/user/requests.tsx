@@ -15,6 +15,7 @@ import {
     TouchableOpacity,
     View,
     Platform,
+    Image,
 } from 'react-native';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -151,11 +152,15 @@ const MyRequestsScreen = () => {
                         {ALL_CATEGORIES.map(cat => (
                             <TouchableOpacity
                                 key={cat.id}
-                                style={[styles.catBtn, { backgroundColor: cat.color + '15', borderColor: cat.color + '40' }]}
+                                style={[styles.catBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '40' }]}
                                 onPress={() => router.push({ pathname: '/(drawer)/place-submission', params: { category: cat.id } })}
                             >
-                                <Ionicons name={cat.icon as any} size={16} color={cat.color} />
-                                <ThemedText style={{ fontSize: 13, color: cat.color, fontWeight: '700' }}>
+                                {typeof cat.icon === 'string' ? (
+                                    <Ionicons name={cat.icon as any} size={16} color={colors.primary} />
+                                ) : (
+                                    <Image source={cat.icon} style={{ width: 16, height: 16 }} resizeMode="contain" />
+                                )}
+                                <ThemedText style={{ fontSize: 13, color: colors.primary, fontWeight: '700' }}>
                                     {cat.label}
                                 </ThemedText>
                             </TouchableOpacity>
