@@ -206,7 +206,7 @@ export default function SettingsScreen() {
 
                 {/* Version */}
                 <Animated.View entering={FadeIn.delay(400).duration(400)} style={styles.versionWrap}>
-                    <ThemedText style={styles.versionText}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.0.6'}</ThemedText>
+                    <ThemedText style={styles.versionText}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.0.8'}</ThemedText>
                 </Animated.View>
             </ScrollView>
 
