@@ -103,8 +103,6 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
             router.push(`/listing/${catId}` as any);
         } else if (item.type === 'business') {
             router.push(`/business/${item.id}` as any);
-        } else if (item.type === 'post') {
-            // Navigate to post detail when implemented
         } else if (item.type === 'donor') {
             // Navigate to donor detail when implemented
         }
@@ -132,9 +130,6 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
         } else if (item.type === 'business') {
             icon = 'business';
             color = '#3B82F6';
-        } else if (item.type === 'post') {
-            icon = 'newspaper-outline';
-            color = '#10B981';
         } else if (item.type === 'donor') {
             icon = 'water';
             color = '#EF4444';

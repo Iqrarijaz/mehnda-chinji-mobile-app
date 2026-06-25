@@ -1,6 +1,6 @@
 import { clientStorage } from '@/utils/storage';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import CustomSplashScreen from '@/components/splashScreen';
 import { useAuth } from '../context/AuthContext';
 import { useAdsStore } from '../store/ads.store';
@@ -42,38 +42,59 @@ export default function SplashScreen() {
         }
     };
 
-    // Trigger navigation when the ad is closed or finished showing
+    const isAdLoaded = useAdsStore(state => state.isAdLoaded.appOpen);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Effect to start loading and set a max timeout
+    useEffect(() => {
+        if (!loading && showSplash && !hasAttemptedAd) {
+            // Trigger load in case it hasn't started yet
+            import('@/ads/appOpen.service').then(({ default: AppOpenService }) => {
+                AppOpenService.getInstance().load();
+            }).catch(err => console.error('Failed to preload ad:', err));
+
+            // Set max timeout to wait for ad load (e.g. 5 seconds)
+            timeoutRef.current = setTimeout(() => {
+                console.log('[Splash] Ad load timeout reached, transitioning...');
+                setHasAttemptedAd(true);
+            }, 5000);
+        }
+
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [loading, showSplash]);
+
+    // Effect to watch when the ad loads and show it
+    useEffect(() => {
+        if (!loading && showSplash && isAdLoaded && !hasAttemptedAd) {
+            console.log('[Splash] Ad loaded! Presenting App Open ad...');
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+            
+            setHasAttemptedAd(true);
+
+            import('@/ads/appOpen.service').then(async ({ default: AppOpenService }) => {
+                const shown = await AppOpenService.getInstance().show(false);
+                if (!shown) {
+                    navigateNext();
+                }
+            }).catch(err => {
+                console.error('[Splash] Failed to show ad:', err);
+                navigateNext();
+            });
+        }
+    }, [loading, showSplash, isAdLoaded, hasAttemptedAd]);
+
+    // Transition effect once ad is attempted and not showing
     useEffect(() => {
         if (!loading && showSplash && !isShowingAppOpen && hasAttemptedAd) {
             navigateNext();
         }
     }, [loading, showSplash, isShowingAppOpen, hasAttemptedAd]);
-
-    useEffect(() => {
-        if (!loading && showSplash === true && !hasAttemptedAd) {
-            const timeout = setTimeout(async () => {
-                setHasAttemptedAd(true);
-                
-                const isAdLoaded = useAdsStore.getState().isAdLoaded.appOpen;
-                let adShown = false;
-
-                if (isAdLoaded) {
-                    try {
-                        const { default: AppOpenService } = await import('@/ads/appOpen.service');
-                        adShown = await AppOpenService.getInstance().show(false);
-                    } catch (error) {
-                        console.error("Failed to show App Open ad:", error);
-                    }
-                }
-
-                if (!adShown) {
-                    navigateNext();
-                }
-            }, 2000);
-
-            return () => clearTimeout(timeout);
-        }
-    }, [loading, isAuthenticated, user, showSplash, hasAttemptedAd]);
 
     if (!showSplash) return null;
 

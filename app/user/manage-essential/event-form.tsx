@@ -78,10 +78,12 @@ const EventForm = () => {
     const pickImage = async () => {
         if (isUploading) return;
 
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-            Toast.show({ type: 'error', text1: 'Permission Denied' });
-            return;
+        if (Platform.OS === 'ios') {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                Toast.show({ type: 'error', text1: 'Permission Denied' });
+                return;
+            }
         }
 
         const result = await ImagePicker.launchImageLibraryAsync({

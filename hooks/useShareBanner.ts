@@ -2,6 +2,7 @@ import { useState, useCallback, RefObject } from 'react';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
 import { captureRef } from 'react-native-view-shot';
+import { Platform } from 'react-native';
 
 export interface ShareBannerOptions {
   width?: number;
@@ -16,7 +17,7 @@ export const useShareBanner = (viewRef: RefObject<any>) => {
   const [error, setError] = useState<string | null>(null);
 
   const requestPermission = async () => {
-    const { status } = await MediaLibrary.requestPermissionsAsync();
+    const { status } = await MediaLibrary.requestPermissionsAsync(Platform.OS === 'android');
     if (status !== 'granted') {
       throw new Error('Media library permission denied');
     }

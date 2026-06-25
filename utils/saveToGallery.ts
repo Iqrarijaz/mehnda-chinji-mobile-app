@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 
 export const saveToGallery = async (uri: string): Promise<boolean> => {
   try {
-    const { status } = await MediaLibrary.requestPermissionsAsync();
+    const { status } = await MediaLibrary.requestPermissionsAsync(Platform.OS === 'android');
     if (status !== 'granted') {
       throw new Error('Media library permission denied');
     }

@@ -18,8 +18,8 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
     const visibleRoutes = state.routes.filter(route => {
         const { options } = descriptors[route.key];
-        // Hide chat and feed tabs as requested
-        if (route.name === 'chat' || route.name === 'feed') return false;
+        // Hide chat tab as requested
+        if (route.name === 'chat') return false;
         return (options as any).href !== null;
     });
 
@@ -90,7 +90,6 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                     let label = 'Home';
 
                     if (route.name === 'index') { iconName = isFocused ? 'home' : 'home-outline'; label = 'Home'; }
-                    else if (route.name === 'feed') { iconName = isFocused ? 'list' : 'list-outline'; label = 'Feed'; }
                     else if (route.name === 'business') { iconName = isFocused ? 'search' : 'search-outline'; label = 'Directory'; }
                     // else if (route.name === 'portal') { iconName = isFocused ? 'briefcase' : 'briefcase-outline'; label = 'Portal'; }
                     else if (route.name === 'blood') { iconName = isFocused ? 'water' : 'water-outline'; label = 'Donors'; }

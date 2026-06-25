@@ -29,9 +29,12 @@ export const registerSchema = yup.object().shape({
 
 export const profileSchema = yup.object().shape({
     name: yup.string().min(3, 'Name must be at least 3 characters').required('Full Name is required'),
-    phone: yup.string().required('Phone is required'),
+    phone: yup.string()
+        .length(11, 'Phone number must be exactly 11 digits')
+        .matches(/^03[0-9]{9}$/, 'Phone number must start with 03 and contain only digits')
+        .required('Phone is required'),
     gender: yup.string().nullable(),
-    city: yup.string().nullable(),
+    city: yup.string().required('City is required'),
     village: yup.string().nullable(),
 });
 

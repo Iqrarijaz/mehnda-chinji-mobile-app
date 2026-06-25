@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rehbar",
     "slug": "rehbar",
-    "version": "1.0.8",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./public/icon.png",
     "scheme": "rehbarcommunityapp",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.rehbar.community",
-      "buildNumber": "7",
+      "buildNumber": "8",
       "icon": "./public/icon.png",
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera to take profile and support ticket photos.",
@@ -20,7 +20,7 @@
     },
     "android": {
       "package": "com.rehbar.community",
-      "versionCode": 7,
+      "versionCode": 8,
       "adaptiveIcon": {
         "foregroundImage": "./public/icon.png",
         "backgroundImage": "./public/icon.png",
@@ -31,6 +31,12 @@
         "NOTIFICATIONS",
         "VIBRATE",
         "CAMERA"
+      ],
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
       ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -57,6 +63,7 @@
       "favicon": "./public/icon.png"
     },
     "splash": {
+      "image": "./public/logo_with_text.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFFFFF",
       "dark": {

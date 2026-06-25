@@ -93,7 +93,7 @@ export const WeeklyBarChart = React.memo(({
                                     style={[
                                         styles.barFill, 
                                         { 
-                                            height: fillHeight, 
+                                            height: fillHeight as any, 
                                             backgroundColor: item.percentage > 0.8 ? accentColor : (item.percentage > 0.4 ? '#F59E0B' : '#EF4444') 
                                         }
                                     ]} 

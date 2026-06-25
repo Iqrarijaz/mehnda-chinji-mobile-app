@@ -95,15 +95,18 @@ const PlaceSubmissionScreen = () => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isImageLoading, setIsImageLoading] = useState(false);
-    const [descSelection, setDescSelection] = useState({ start: 0, end: 0 });
     const [servicesSelection, setServicesSelection] = useState({ start: 0, end: 0 });
     const [isOptimizingDesc, setIsOptimizingDesc] = useState(false);
     const [isOptimizingServices, setIsOptimizingServices] = useState(false);
+    const [descriptionHeight, setDescriptionHeight] = useState(120);
 
     const handleOptimizeText = async (type: 'description' | 'services') => {
-        const textToOptimize = type === 'description' ? form.description : form.services;
+        const textToOptimize = type === 'description'
+            ? (form.description.trim() || form.name.trim())
+            : form.services.trim();
         const tagsToOptimize = form.tags || [];
-        if (!textToOptimize.trim() && tagsToOptimize.length === 0) {
+
+        if (type === 'services' && !textToOptimize && tagsToOptimize.length === 0) {
             Toast.show({ type: 'info', text1: 'Input Required', text2: 'Please write some text or select some tags first to optimize.' });
             return;
         }
@@ -242,13 +245,6 @@ const PlaceSubmissionScreen = () => {
         setForm(prev => ({ ...prev, [key]: value }));
     };
 
-    const insertFormatting = (tag: string) => {
-        const { start, end } = descSelection;
-        const currentText = form.description;
-        const newText = currentText.substring(0, start) + tag + currentText.substring(end);
-        setForm(prev => ({ ...prev, description: newText }));
-    };
-
     const insertServicesFormatting = (tag: string) => {
         const { start, end } = servicesSelection;
         const currentText = form.services;
@@ -304,14 +300,16 @@ const PlaceSubmissionScreen = () => {
     };
 
     const pickImage = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-            Toast.show({
-                type: 'error',
-                text1: 'Permission Denied',
-                text2: 'Camera roll permissions are required to upload photos.',
-            });
-            return;
+        if (Platform.OS === 'ios') {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Permission Denied',
+                    text2: 'Camera roll permissions are required to upload photos.',
+                });
+                return;
+            }
         }
 
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -426,27 +424,27 @@ const PlaceSubmissionScreen = () => {
             return;
         }
 
-        if (!isReligious && !isTravel && !isEmergency && form.description.trim().length < 50) {
+        if (!isReligious && !isTravel && !isEmergency && form.description.trim().length < 100) {
             Toast.show({
                 type: 'error',
                 text1: 'Validation Error',
-                text2: 'Description must be at least 50 characters.',
+                text2: 'Description must be at least 100 characters.',
             });
             return;
         }
 
         if (isHealth || isGovt || isEducation) {
-            if (!form.timing.trim() || !form.services.trim()) {
+            if (!form.timing.trim()) {
                 const categoryLabel = isHealth ? 'Health' : isEducation ? 'Education' : 'Govt';
                 Toast.show({
                     type: 'error',
                     text1: 'Validation Error',
-                    text2: `Timing and Services are required for ${categoryLabel} category.`,
+                    text2: `Timing is required for ${categoryLabel} category.`,
                 });
                 return;
             }
 
-            if (form.services.trim().length < 50) {
+            if (form.services.trim() && form.services.trim().length < 50) {
                 Toast.show({
                     type: 'error',
                     text1: 'Validation Error',
@@ -503,10 +501,15 @@ const PlaceSubmissionScreen = () => {
 
         const payload: any = {
             ...form,
-            contact: validContacts,
+            contact: validContacts.map(c => ({ name: c.name, number: c.number })),
             category: category,
             images: uploadedImage ? [uploadedImage] : [],
-            route: isTravel ? form.route.filter(r => r.city.trim() !== '' || r.time !== '') : [],
+            tags: (form.tags || []).map((t: any) => ({ eng: t.eng, ur: t.ur })),
+            route: isTravel 
+                ? form.route
+                    .filter(r => r.city.trim() !== '' || r.time !== '')
+                    .map(r => ({ city: r.city, time: r.time }))
+                : [],
             metadata: isEducation ? form.metadata : {},
         };
 
@@ -940,53 +943,39 @@ const PlaceSubmissionScreen = () => {
                                             ) : (
                                                 <Ionicons name="sparkles" size={12} color={(isOptimizingDesc || !form.name.trim() || !form.type) ? colors.textSecondary : colors.primary} />
                                             )}
-                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: (isOptimizingDesc || !form.name.trim() || !form.type) ? colors.textSecondary : colors.primary }}>AI Optimize</ThemedText>
+                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: (isOptimizingDesc || !form.name.trim() || !form.type) ? colors.textSecondary : colors.primary }}>Write Description with AI</ThemedText>
                                         </TouchableOpacity>
                                     </View>
                                     <ThemedText style={[
                                         styles.charCount,
-                                        (!isEmergency && form.description.length < 50) && { color: '#EF4444' }
+                                        (!isEmergency && form.description.length < 100) && { color: '#EF4444' }
                                     ]}>
-                                        {form.description.length} chars {!isEmergency && '(Min 50)'}
+                                        {form.description.length} chars {!isEmergency && '(Min 100)'}
                                     </ThemedText>
                                 </View>
 
-                                <View style={styles.formatToolbar}>
-                                    <TouchableOpacity
-                                        onPress={() => insertFormatting('# ')}
-                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
-                                    >
-                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>H1 Heading</ThemedText>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => insertFormatting('## ')}
-                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
-                                    >
-                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>H2 Subheading</ThemedText>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => insertFormatting('• ')}
-                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
-                                    >
-                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>• Bullet</ThemedText>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => insertFormatting('\n')}
-                                        style={[styles.formatBtn, { backgroundColor: colors.primary + '12' }]}
-                                    >
-                                        <ThemedText style={[styles.formatBtnText, { color: colors.primary }]}>↵ Line Break</ThemedText>
-                                    </TouchableOpacity>
-                                </View>
-
                                 <TextInput
-                                    style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, fontSize: 12 }]}
-                                    placeholder={`e.g.\n# About Us\nProvide a description about this place.\n\n- Feature 1\n- Feature 2`}
+                                    style={[
+                                        styles.input,
+                                        styles.textArea,
+                                        {
+                                            backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9',
+                                            color: colors.text,
+                                            borderColor: colors.border,
+                                            fontSize: 12,
+                                            height: Math.max(120, descriptionHeight),
+                                        }
+                                    ]}
+                                    placeholder={`Click "Write Description with AI" to generate a description for this place.`}
                                     placeholderTextColor={colors.icon}
                                     value={form.description}
                                     onChangeText={(text) => handleChange('description', text)}
                                     multiline
-                                    numberOfLines={15}
-                                    onSelectionChange={(e) => setDescSelection(e.nativeEvent.selection)}
+                                    scrollEnabled={false}
+                                    onContentSizeChange={(e) => {
+                                        setDescriptionHeight(e.nativeEvent.contentSize.height);
+                                    }}
+                                    editable={false}
                                 />
                             </View>
                         )}

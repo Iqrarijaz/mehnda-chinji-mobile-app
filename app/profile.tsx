@@ -179,16 +179,18 @@ export default function ProfileScreen() {
     });
 
     const pickImage = useCallback(async () => {
-        // Request media library permissions
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (Platform.OS === 'ios') {
+            // Request media library permissions
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-        if (status !== 'granted') {
-            Toast.show({
-                type: 'error',
-                text1: 'Permission Denied',
-                text2: 'We need gallery permissions to update your profile picture.'
-            });
-            return;
+            if (status !== 'granted') {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Permission Denied',
+                    text2: 'We need gallery permissions to update your profile picture.'
+                });
+                return;
+            }
         }
 
         const result = await ImagePicker.launchImageLibraryAsync({

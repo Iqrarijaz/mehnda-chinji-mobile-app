@@ -27,6 +27,7 @@ import NetworkMonitor from '@/components/common/NetworkMonitor';
 import { useDataUsageStore } from '@/store/dataUsageStore';
 import { usePrayerCalendar } from '@/hooks/usePrayerTimes';
 import { usePrayerNotifications } from '@/hooks/usePrayerNotifications';
+import { useWeatherNotifications } from '@/hooks/useWeatherNotifications';
 import { useWeatherCity } from '@/context/WeatherContext';
 import * as Application from 'expo-application';
 import { fetchAppVersionInfo, AppVersionInfo } from '@/apis/app-info';
@@ -104,6 +105,7 @@ function AppInitializer() {
   const { selectedCity } = useWeatherCity();
   const { calendarData } = usePrayerCalendar(selectedCity);
   usePrayerNotifications(calendarData, selectedCity);
+  useWeatherNotifications(selectedCity);
 
   useEffect(() => {
     Notifications.setNotificationHandler({

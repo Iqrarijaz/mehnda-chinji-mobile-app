@@ -59,6 +59,7 @@ const BusinessRegistrationScreen = () => {
 
     const [professionModalVisible, setProfessionModalVisible] = useState(false);
     const [descriptionError, setDescriptionError] = useState('');
+    const [descriptionHeight, setDescriptionHeight] = useState(120);
 
     const [openTime, setOpenTime] = useState('09:00 AM');
     const [closeTime, setCloseTime] = useState('09:00 PM');
@@ -184,13 +185,8 @@ const BusinessRegistrationScreen = () => {
             return;
         }
 
-        const textToOptimize = form.description.trim();
+        const textToOptimize = form.description.trim() || form.name.trim();
         const tagsToOptimize = form.tags;
-
-        if (!textToOptimize && tagsToOptimize.length === 0) {
-            Toast.show({ type: 'info', text1: 'Input Required', text2: 'Please write a description or select some services/tags first.' });
-            return;
-        }
 
         setIsOptimizing(true);
         try {
@@ -230,6 +226,11 @@ const BusinessRegistrationScreen = () => {
 
         setDescriptionError('');
 
+        if (!description || description.trim().length < 100) {
+            setDescriptionError('Description must be at least 100 characters.');
+            hasError = true;
+        }
+
         if (hasError) return;
 
         const payload = {
@@ -240,7 +241,7 @@ const BusinessRegistrationScreen = () => {
             phone,
             address,
             logo: category.icon || null,
-            tags: form.tags,
+            tags: form.tags.map((t: any) => ({ eng: t.eng, ur: t.ur })),
             timing,
         };
 
@@ -432,10 +433,10 @@ const BusinessRegistrationScreen = () => {
                             <View style={styles.field}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                        <ThemedText style={styles.label}>Description</ThemedText>
+                                        <ThemedText style={styles.label}>Description <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                                         <TouchableOpacity
                                             onPress={handleOptimizeText}
-                                            disabled={isOptimizing || !form.category || form.tags.length === 0}
+                                            disabled={isOptimizing || !form.category || !form.name.trim()}
                                             style={{
                                                 flexDirection: 'row',
                                                 alignItems: 'center',
@@ -443,33 +444,46 @@ const BusinessRegistrationScreen = () => {
                                                 paddingHorizontal: 8,
                                                 paddingVertical: 3,
                                                 borderRadius: 12,
-                                                backgroundColor: (isOptimizing || !form.category || form.tags.length === 0) ? (isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0') : (colors.primary + '12'),
+                                                backgroundColor: (isOptimizing || !form.category || !form.name.trim()) ? (isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0') : (colors.primary + '12'),
                                                 marginLeft: 4,
-                                                opacity: (isOptimizing || !form.category || form.tags.length === 0) ? 0.6 : 1
+                                                opacity: (isOptimizing || !form.category || !form.name.trim()) ? 0.6 : 1
                                             }}
                                         >
                                             {isOptimizing ? (
                                                 <ActivityIndicator size="small" color={colors.primary} style={{ transform: [{ scale: 0.7 }] }} />
                                             ) : (
-                                                <Ionicons name="sparkles" size={12} color={(isOptimizing || !form.category || form.tags.length === 0) ? colors.textSecondary : colors.primary} />
+                                                <Ionicons name="sparkles" size={12} color={(isOptimizing || !form.category || !form.name.trim()) ? colors.textSecondary : colors.primary} />
                                             )}
-                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: (isOptimizing || !form.category || form.tags.length === 0) ? colors.textSecondary : colors.primary }}>AI Optimize</ThemedText>
+                                            <ThemedText style={{ fontSize: 9, fontWeight: '700', color: (isOptimizing || !form.category || !form.name.trim()) ? colors.textSecondary : colors.primary }}>Write Description with AI</ThemedText>
                                         </TouchableOpacity>
                                     </View>
-                                    <ThemedText style={{ fontSize: 10, color: colors.textSecondary }}>
-                                        {form.description.length} chars
+                                    <ThemedText style={{ fontSize: 10, color: form.description.length < 100 ? '#EF4444' : colors.textSecondary }}>
+                                        {form.description.length} chars (Min 100)
                                     </ThemedText>
                                 </View>
                                 <TextInput
-                                    style={[styles.input, styles.textArea, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', color: colors.text, borderColor: descriptionError ? '#EF4444' : colors.border }]}
-                                    placeholder="Tell us about your services..."
+                                    style={[
+                                        styles.input,
+                                        styles.textArea,
+                                        {
+                                            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
+                                            color: colors.text,
+                                            borderColor: descriptionError ? '#EF4444' : colors.border,
+                                            height: Math.max(120, descriptionHeight),
+                                        }
+                                    ]}
+                                    placeholder='Click "Write Description with AI" to generate a description for your business.'
                                     placeholderTextColor="#9CA3AF"
                                     value={form.description}
                                     onChangeText={(text) => {
                                         setForm(prev => ({ ...prev, description: text }));
                                     }}
                                     multiline
-                                    numberOfLines={15}
+                                    scrollEnabled={false}
+                                    onContentSizeChange={(e) => {
+                                        setDescriptionHeight(e.nativeEvent.contentSize.height);
+                                    }}
+                                    editable={false}
                                 />
                                 {!!descriptionError && (
                                     <ThemedText style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>

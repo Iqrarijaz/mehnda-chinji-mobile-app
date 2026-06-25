@@ -23,7 +23,7 @@ class AppOpenService {
   private loadStartTime = 0;
   private loadedTime = 0;
 
-  private readonly SHOW_COOLDOWN = 3 * 60 * 1000; // 3 minutes cooldown between app open ads
+  private readonly SHOW_COOLDOWN = 0; // Disabled cooldown to show ad on every launch
   private readonly AD_EXPIRATION_TIME = 4 * 60 * 60 * 1000; // 4 hours in milliseconds (Google Policy Limit)
 
   private backoff = new ExponentialBackoff();

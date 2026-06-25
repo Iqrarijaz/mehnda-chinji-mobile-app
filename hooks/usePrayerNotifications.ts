@@ -3,6 +3,7 @@ import * as Notifications from 'expo-notifications';
 import { clientStorage } from '@/utils/storage';
 import moment from 'moment';
 import { setupAdhanChannel, ADHAN_CHANNEL_ID } from '@/components/notification/channel';
+import { useNotificationStore } from '@/store/notificationStore';
 
 const LAST_SCHEDULED_KEY = 'last_prayer_scheduled_info_v4';
 
@@ -10,12 +11,31 @@ export const usePrayerNotifications = (
     calendarData: any,
     selectedCity: string
 ) => {
+    const preferences = useNotificationStore((state) => state.preferences);
+    const prayerEnabled = preferences?.prayer;
+
     // Schedule rolling 7-day prayer notifications
     useEffect(() => {
-        if (!calendarData?.data || !Array.isArray(calendarData.data) || !selectedCity) return;
-
         const scheduleAdhanNotifications = async () => {
             try {
+                const cancelPrayerNotifications = async () => {
+                    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+                    for (const n of scheduled) {
+                        if (n.content.data?.prayerName) {
+                            await Notifications.cancelScheduledNotificationAsync(n.identifier);
+                        }
+                    }
+                };
+
+                if (!prayerEnabled) {
+                    console.log('🕌 Prayer notifications disabled. Cancelling prayer notifications...');
+                    await cancelPrayerNotifications();
+                    await clientStorage.removeItem(LAST_SCHEDULED_KEY);
+                    return;
+                }
+
+                if (!calendarData?.data || !Array.isArray(calendarData.data) || !selectedCity) return;
+
                 // 1. Request/Check permissions
                 const { status: existingStatus } = await Notifications.getPermissionsAsync();
                 let finalStatus = existingStatus;
@@ -45,7 +65,7 @@ export const usePrayerNotifications = (
                 console.log(`📡 Scheduling rolling 7-day prayers (v3) for ${selectedCity}...`);
 
                 // 4. Clear old pending notifications
-                await Notifications.cancelAllScheduledNotificationsAsync();
+                await cancelPrayerNotifications();
 
                 const now = moment();
                 let scheduledCount = 0;
@@ -107,7 +127,7 @@ export const usePrayerNotifications = (
 
         scheduleAdhanNotifications();
 
-    }, [calendarData, selectedCity]);
+    }, [calendarData, selectedCity, prayerEnabled]);
 
     useEffect(() => {
         const subscription = Notifications.addNotificationReceivedListener((notification) => {
