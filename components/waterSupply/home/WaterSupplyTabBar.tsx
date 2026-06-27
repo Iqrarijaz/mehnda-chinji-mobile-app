@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 export type TabType = 'connections' | 'bills' | 'expenses' | 'report';
 

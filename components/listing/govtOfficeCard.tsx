@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -106,7 +106,7 @@ const GovtOfficeCard = React.memo(({ data, color }: GovtOfficeCardProps) => {
                                     </View>
                                 ) : null}
                             </View>
-                            
+
                             <View style={styles.addressRow}>
                                 <Ionicons name="location" size={14} color={isDark ? '#FFFFFF' : primaryColor} style={{ marginTop: 2 }} />
                                 <ThemedText style={[styles.addressText, { color: isDark ? '#94A3B8' : '#475569' }]} numberOfLines={2}>

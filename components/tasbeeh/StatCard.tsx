@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface StatCardProps {
     iconName: React.ComponentProps<typeof Ionicons>['name'];

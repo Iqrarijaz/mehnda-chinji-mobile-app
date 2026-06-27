@@ -4,7 +4,7 @@ import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads'
 import { useAdsStore, selectCanShowNative } from '../../store/ads.store';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemedText } from '../../components/themedText';
+import { ThemedText } from '../../components/ThemedText';
 import { AD_UNIT_IDS } from '../../constants/ads';
 import { Layout } from '@/constants/layout';
 import { analyticsService, AnalyticsEvents } from '@/analytics';

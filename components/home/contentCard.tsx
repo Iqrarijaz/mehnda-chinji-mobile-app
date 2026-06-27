@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -16,7 +16,7 @@ interface ContentCardProps {
     delay?: number;
 }
 
-export const ContentCard: React.FC<ContentCardProps> = ({
+export const ContentCard: React.FC<ContentCardProps> = React.memo(({
     icon,
     iconColor,
     title,
@@ -46,7 +46,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             </TouchableOpacity>
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     card: {

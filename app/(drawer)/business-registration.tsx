@@ -22,7 +22,9 @@ import { BUSINESS_QUERY_KEYS, registerBusiness, updateBusiness } from '@/apis/bu
 import { getAuthenticatedConfiguration, CONFIG_QUERY_KEYS } from '@/apis/configuration';
 import { ProfessionPicker } from '@/components/common/ProfessionPicker';
 import { TimePicker } from '@/components/common/TimePicker';
-import { ThemedText } from '@/components/themedText';
+import { ThankYouModal } from '@/components/common/ThankYou';
+import { ThemedText } from '@/components/ThemedText';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -58,6 +60,7 @@ const BusinessRegistrationScreen = () => {
     });
 
     const [professionModalVisible, setProfessionModalVisible] = useState(false);
+    const [showThankYou, setShowThankYou] = useState(false);
     const [descriptionError, setDescriptionError] = useState('');
     const [descriptionHeight, setDescriptionHeight] = useState(120);
 
@@ -136,9 +139,6 @@ const BusinessRegistrationScreen = () => {
         }
     }, [editDataParam, user]);
 
-    const handleInputChange = (key: string, value: string) => {
-        setForm(prev => ({ ...prev, [key]: value }));
-    };
 
     const registerMutation = useMutation({
         mutationFn: registerBusiness,
@@ -147,14 +147,7 @@ const BusinessRegistrationScreen = () => {
                 analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_SUCCESS, { action: 'create' });
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
                 Toast.show({ type: 'success', text1: 'Success', text2: 'Business registered!' });
-                handleGoBack();
-                if (user?.user?.role !== 'APP_ADMIN') {
-                    setTimeout(() => {
-                        import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
-                            InterstitialService.getInstance().show(true);
-                        });
-                    }, 2000);
-                }
+                setShowThankYou(true);
             }
         },
         onError: (err: any) => {
@@ -254,6 +247,16 @@ const BusinessRegistrationScreen = () => {
 
     const isPending = registerMutation.isPending || updateMutation.isPending;
 
+    const handleThankYouClose = () => {
+        setShowThankYou(false);
+        handleGoBack();
+        if (user?.user?.role !== 'APP_ADMIN') {
+            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                InterstitialService.getInstance().show(true);
+            });
+        }
+    };
+
     return (
         <View style={[styles.mainContainer, { backgroundColor: isDark ? '#0f172a' : '#f8fafc' }]}>
             <Stack.Screen options={{
@@ -261,6 +264,18 @@ const BusinessRegistrationScreen = () => {
                 gestureEnabled: true,
                 animation: 'slide_from_right'
             }} />
+
+            <ThankYouModal
+                visible={showThankYou}
+                onClose={handleThankYouClose}
+                animationSource={require('@/public/json/onboarding3.json')}
+                animationWidth={260}
+                animationHeight={200}
+            >
+                <ThemedText style={{ fontSize: 14, textAlign: 'center', lineHeight: 22, color: colors.textSecondary }}>
+                    Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{user?.user?.name ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Entrepreneur'}</ThemedText>, thank you for registering! Our team will review and approve your business shortly.
+                </ThemedText>
+            </ThankYouModal>
 
             {/* Header (Dynamic details-like header) */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
@@ -501,13 +516,9 @@ const BusinessRegistrationScreen = () => {
                                 disabled={isPending}
                                 activeOpacity={0.8}
                             >
-                                {isPending ? (
-                                    <ActivityIndicator color="#FFF" />
-                                ) : (
-                                    <ThemedText style={styles.submitText}>
-                                        {editData ? 'UPDATE' : 'REGISTER'}
-                                    </ThemedText>
-                                )}
+                                <ThemedText style={styles.submitText}>
+                                    {editData ? 'UPDATE' : 'REGISTER'}
+                                </ThemedText>
                             </TouchableOpacity>
 
                             <TouchableOpacity
@@ -550,6 +561,8 @@ const BusinessRegistrationScreen = () => {
                 title="Select Closing Time"
                 currentValue={closeTime}
             />
+
+            <LoaderOverlay visible={isPending} />
         </View>
     );
 };

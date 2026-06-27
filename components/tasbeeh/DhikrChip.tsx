@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface DhikrChipProps {
     roman: string;

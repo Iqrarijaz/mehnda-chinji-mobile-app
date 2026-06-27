@@ -20,7 +20,7 @@ import {
 import Toast from 'react-native-toast-message';
 
 import { getActiveSessions, revokeSession } from '@/apis/profile';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
@@ -177,13 +177,8 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
         <PremiumModal visible={visible} onClose={onClose} type="centered">
 
             <View style={styles.header}>
-                <View>
-                    <ThemedText style={styles.title}>Active Sessions</ThemedText>
-                    <ThemedText style={styles.subtitle}>Manage devices currently logged in</ThemedText>
-                </View>
-                <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]} activeOpacity={0.7}>
-                    <Ionicons name="close" size={18} color={colors.text} style={{ opacity: 0.5 }} />
-                </TouchableOpacity>
+                <ThemedText style={styles.title}>Active Sessions</ThemedText>
+                <ThemedText style={styles.subtitle}>Manage devices currently logged in</ThemedText>
             </View>
 
             <ScrollView
@@ -218,32 +213,35 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
                     ))
                 )}
             </ScrollView>
+
+            <View style={styles.footer}>
+                <TouchableOpacity
+                    style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                    onPress={onClose}
+                >
+                    <ThemedText style={styles.modalButtonText}>Done</ThemedText>
+                </TouchableOpacity>
+            </View>
         </PremiumModal>
     );
 });
 
 const styles = StyleSheet.create({
     header: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
+        alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: 12,
     },
     title: {
         fontSize: 14,
         fontWeight: '800',
+        textAlign: 'center',
         marginBottom: 3,
     },
     subtitle: {
         fontSize: 11,
         fontWeight: '500',
-    },
-    closeBtn: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        justifyContent: 'center',
-        alignItems: 'center',
+        textAlign: 'center',
     },
 
     // Session card
@@ -322,5 +320,23 @@ const styles = StyleSheet.create({
         fontSize: 11,
         color: '#94A3B8',
         fontWeight: '500',
+    },
+    footer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 16,
+    },
+    modalButton: {
+        width: 120,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: '600',
     },
 });

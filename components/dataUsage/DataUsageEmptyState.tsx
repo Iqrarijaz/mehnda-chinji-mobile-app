@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, SlideInUp } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 
 export const DataUsageEmptyState = () => {
     return (

@@ -26,7 +26,7 @@ import {
 } from 'react-native-popup-menu';
 
 import { deleteTopper, deleteEvent, getMyRequests } from '@/apis/essentials';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';

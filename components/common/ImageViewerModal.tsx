@@ -4,7 +4,7 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import Avatar from '@/components/ui/avatar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 
 interface ImageViewerModalProps {
@@ -16,13 +16,13 @@ interface ImageViewerModalProps {
     name?: string;
 }
 
-export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({ 
-    visible, 
-    onClose, 
-    images: propImages, 
-    uri, 
-    initialIndex = 0, 
-    name 
+export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
+    visible,
+    onClose,
+    images: propImages,
+    uri,
+    initialIndex = 0,
+    name
 }) => {
     const insets = useSafeAreaInsets();
     const images = propImages || (uri ? [uri] : []);
@@ -53,8 +53,8 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
         >
             <View style={styles.container}>
                 <View style={[styles.content, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-                    <TouchableOpacity 
-                        style={[styles.closeButton, { top: insets.top + (Platform.OS === 'android' ? 20 : 10) }]} 
+                    <TouchableOpacity
+                        style={[styles.closeButton, { top: insets.top + (Platform.OS === 'android' ? 20 : 10) }]}
                         onPress={onClose}
                     >
                         <Ionicons name="close" size={28} color="#FFFFFF" />

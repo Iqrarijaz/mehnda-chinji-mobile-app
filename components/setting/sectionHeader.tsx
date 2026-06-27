@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Layout } from '@/constants/layout';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface SectionHeaderProps {
     title: string;

@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { PRIMARY } from './weatherUtils';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -12,7 +12,7 @@ interface StatItemProps { icon: string; label: string; value: string; delay: num
 const StatItem = React.memo(({ icon, label, value, delay }: StatItemProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
-    
+
     return (
         <Animated.View entering={SlideInLeft.delay(delay).duration(400)} style={styles.statItem}>
             <View style={[styles.iconWrap, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : `${PRIMARY}12` }]}>

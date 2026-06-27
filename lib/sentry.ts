@@ -8,14 +8,18 @@ if (__DEV__) {
     console.log('🛡️ [Sentry] Disabled in DEV environment');
 }
 
+import { InteractionManager } from 'react-native';
+
 if (SENTRY_DSN) {
-    Sentry.init({
-        dsn: SENTRY_DSN,
-        enabled: !__DEV__,
-        integrations: [
-            routingInstrumentation,
-        ],
-        tracesSampleRate: 0.1,
+    InteractionManager.runAfterInteractions(() => {
+        Sentry.init({
+            dsn: SENTRY_DSN,
+            enabled: !__DEV__,
+            integrations: [
+                routingInstrumentation,
+            ],
+            tracesSampleRate: 0.1,
+        });
     });
 } else {
     console.warn('🛡️ [Sentry] Warning: SENTRY_DSN is not configured. Sentry is disabled.');

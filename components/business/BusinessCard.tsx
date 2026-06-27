@@ -7,7 +7,7 @@ import {
     View,
 } from 'react-native';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';

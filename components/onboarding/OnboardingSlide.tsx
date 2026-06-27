@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions, Animated } from 'react-native';
 import LottieView from 'lottie-react-native';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 
@@ -56,29 +56,29 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
             </Animated.View>
 
             {/* Information Card Container (Flat with no shadow/elevation/border) */}
-            <Animated.View 
+            <Animated.View
                 style={[
-                    styles.cardContainer, 
-                    { 
-                        opacity, 
+                    styles.cardContainer,
+                    {
+                        opacity,
                         transform: [{ translateY }],
                         backgroundColor: colors.card,
                     }
                 ]}
             >
-                <ThemedText 
-                    type="urdu" 
+                <ThemedText
+                    type="urdu"
                     style={[
-                        styles.title, 
-                        { 
-                            color: colors.primary, 
-                            textAlign: 'center' 
+                        styles.title,
+                        {
+                            color: colors.primary,
+                            textAlign: 'center'
                         }
                     ]}
                 >
                     {item.title}
                 </ThemedText>
-                
+
                 <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
                 <ThemedText style={[styles.description, { color: colors.textSecondary }]}>

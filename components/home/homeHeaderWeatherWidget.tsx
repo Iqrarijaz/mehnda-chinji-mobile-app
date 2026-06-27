@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Layout } from '@/constants/layout';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 
 interface HomeHeaderWeatherWidgetProps {
     onPress?: () => void;

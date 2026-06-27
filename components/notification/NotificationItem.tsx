@@ -7,7 +7,7 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 
 const PRIMARY = '#006666';

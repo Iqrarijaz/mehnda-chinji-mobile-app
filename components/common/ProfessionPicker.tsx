@@ -15,7 +15,7 @@ import { Image } from 'expo-image';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { getAuthenticatedConfiguration, CONFIG_QUERY_KEYS } from '@/apis/configuration';
 
 interface Profession {
@@ -109,10 +109,10 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                                     <View style={styles.labelContainer}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             {item.icon ? (
-                                                <Image 
-                                                    source={{ uri: item.icon }} 
-                                                    style={{ width: 28, height: 28, marginRight: 12, borderRadius: 4 }} 
-                                                    contentFit="contain" 
+                                                <Image
+                                                    source={{ uri: item.icon }}
+                                                    style={{ width: 28, height: 28, marginRight: 12, borderRadius: 4 }}
+                                                    contentFit="contain"
                                                 />
                                             ) : (
                                                 <View style={{ width: 28, height: 28, marginRight: 12, borderRadius: 4, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', justifyContent: 'center', alignItems: 'center' }}>
@@ -171,65 +171,65 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 10,
     },
-modalHeader: {
-    flexDirection: 'row',
+    modalHeader: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
-            alignItems: 'center',
-                marginBottom: 20,
+        alignItems: 'center',
+        marginBottom: 20,
     },
-modalTitle: {
-    fontSize: 18,
+    modalTitle: {
+        fontSize: 18,
         fontWeight: '800',
-            letterSpacing: -0.5,
+        letterSpacing: -0.5,
     },
-closeButton: {
-    padding: 4,
+    closeButton: {
+        padding: 4,
         borderRadius: 20,
     },
-searchBar: {
-    flexDirection: 'row',
+    searchBar: {
+        flexDirection: 'row',
         alignItems: 'center',
-            height: 52,
-                borderRadius: Layout.borderRadius,
-                    paddingHorizontal: 16,
-                        marginBottom: 20,
-                            borderWidth: 1,
+        height: 52,
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 16,
+        marginBottom: 20,
+        borderWidth: 1,
     },
-searchInput: {
-    flex: 1,
+    searchInput: {
+        flex: 1,
         marginLeft: 12,
-            fontSize: 16,
+        fontSize: 16,
     },
-listContent: {
-    paddingBottom: 40,
+    listContent: {
+        paddingBottom: 40,
     },
-item: {
-    flexDirection: 'row',
+    item: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
-            alignItems: 'center',
-                // paddingVertical: 8,
-                borderBottomWidth: 1,
+        alignItems: 'center',
+        // paddingVertical: 8,
+        borderBottomWidth: 1,
     },
-labelContainer: {
-    flexDirection: 'row',
+    labelContainer: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
-            alignItems: 'center',
-                flex: 1,
-                    marginRight: 15,
+        alignItems: 'center',
+        flex: 1,
+        marginRight: 15,
     },
-itemTextEng: {
-    fontSize: 12,
+    itemTextEng: {
+        fontSize: 12,
         fontWeight: '600',
-            paddingVertical: 16,
-                textTransform: 'capitalize',
+        paddingVertical: 16,
+        textTransform: 'capitalize',
     },
-itemTextUr: {
-    fontSize: 10,
+    itemTextUr: {
+        fontSize: 10,
         paddingRight: 16,
-            paddingVertical: 20,
-                fontWeight: '500',
+        paddingVertical: 20,
+        fontWeight: '500',
     },
-selectedText: {
-    fontWeight: '700',
+    selectedText: {
+        fontWeight: '700',
     },
 });

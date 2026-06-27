@@ -6,6 +6,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 
 
 export const usePushNotifications = () => {
@@ -14,6 +15,7 @@ export const usePushNotifications = () => {
         useState<Notifications.Notification | null>(null);
     const notificationListener = useRef<Notifications.Subscription | undefined>(undefined);
     const responseListener = useRef<Notifications.Subscription | undefined>(undefined);
+    const router = useRouter();
 
     const { isAuthenticated, updateUser } = useAuth();
 
@@ -115,7 +117,16 @@ export const usePushNotifications = () => {
         responseListener.current =
             Notifications.addNotificationResponseReceivedListener(response => {
                 if (!isMounted) return;
+                const data = response.notification.request.content.data;
                 if (__DEV__) console.log('👉 Notification interaction:', response);
+
+                if (data?.route) {
+                    router.push(data.route as any);
+                } else if (data?.type === 'weather_rain') {
+                    router.push('/weather');
+                } else if (typeof data?.type === 'string' && data.type.toLowerCase() === 'blood') {
+                    router.push('/blood');
+                }
             });
 
         return () => {

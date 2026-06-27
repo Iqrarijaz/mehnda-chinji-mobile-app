@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -27,6 +27,7 @@ import { UnitConverter } from '@/components/landConversion/UnitConverter';
 import { ResultCard } from '@/components/landConversion/ResultCard';
 import { PlotCalculator } from '@/components/landConversion/PlotCalculator';
 import { HistoryFavorites } from '@/components/landConversion/HistoryFavorites';
+import { MicroFeedback } from '@/components/feedback/MicroFeedback';
 
 type ProfileType = 'standard' | 'lahore' | 'kp' | 'custom';
 type UnitType = 'marla' | 'kanal' | 'acre' | 'sqft' | 'sqmeter' | 'gaj' | 'karam';
@@ -566,6 +567,9 @@ export default function LandConversionScreen() {
                             colors={colors}
                         />
                     )}
+
+                    {/* Feedback Widget */}
+                    <MicroFeedback componentName="land_conversion" />
                 </ScrollView>
             )}
         </KeyboardAvoidingView>

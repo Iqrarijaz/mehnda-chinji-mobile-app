@@ -3,14 +3,14 @@ import { View, StyleSheet } from 'react-native';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface NotificationSectionCardProps {
     title: string;
     children: React.ReactNode;
 }
 
-const NotificationSectionCard: React.FC<NotificationSectionCardProps> = ({ title, children }) => {
+const NotificationSectionCard: React.FC<NotificationSectionCardProps> = React.memo(({ title, children }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -22,7 +22,7 @@ const NotificationSectionCard: React.FC<NotificationSectionCardProps> = ({ title
             </View>
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

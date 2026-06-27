@@ -12,7 +12,7 @@ import {
 import Animated, { FadeIn, FadeInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -38,6 +38,7 @@ const MENU_ITEMS: MenuItem[] = [
     { label: 'My Requests', icon: 'list-outline', route: '/user/requests', section: 'Main' },
     { label: 'Profile', icon: 'person-outline', route: '/profile', section: 'Account' },
     { label: 'Settings', icon: 'settings-outline', route: '/settings', section: 'Account' },
+    { label: 'Give Feedback', icon: 'chatbubble-ellipses-outline', route: '/(drawer)/feedback', section: 'Support' },
     { label: 'Support & FAQ', icon: 'help-circle-outline', route: '/support', section: 'Support' },
     // { label: 'Watch Ad', icon: 'play-circle-outline', route: 'REWARDED_AD', section: 'Support' },
 ];

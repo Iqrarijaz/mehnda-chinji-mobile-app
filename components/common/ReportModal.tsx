@@ -23,8 +23,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '../toastConfig';
-import { ThemedText } from '@/components/themedText';
+import { ToastConfig } from '../ToastConfig';
+import { ThemedText } from '@/components/ThemedText';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -266,7 +266,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                     </TouchableOpacity>
                 </BottomSheetScrollView>
                 <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 99999 }}>
-                    <Toast config={toastConfig} topOffset={10} />
+                    <Toast config={ToastConfig} topOffset={10} />
                 </View>
             </BottomSheetModal>
         );

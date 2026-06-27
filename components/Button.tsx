@@ -2,7 +2,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
-import { ThemedText } from './themedText';
+import { ThemedText } from './ThemedText';
 
 interface ButtonProps {
     title: string;

@@ -9,8 +9,8 @@ import {
     FlatList
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import moment from 'moment';
-import { ThemedText } from '@/components/themedText';
+import moment from '@/utils/dayjs';
+import { ThemedText } from '@/components/ThemedText';
 import Animated, {
     useSharedValue,
     useAnimatedScrollHandler,

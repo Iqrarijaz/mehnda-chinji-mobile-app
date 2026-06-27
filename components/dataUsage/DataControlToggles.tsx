@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Switch } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 
 interface ToggleRowProps {
     label: string;

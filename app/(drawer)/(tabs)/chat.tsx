@@ -1,7 +1,7 @@
 import { getConversationsLines } from '@/apis/chat/chat';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
-import { ThemedText } from '@/components/themedText';
-import { ThemedView } from '@/components/themedView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import Avatar from '@/components/ui/avatar';
 import { useSocket } from '@/context/SocketContext';
 import { Colors } from '@/constants/colors';

@@ -1,26 +1,24 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
     View,
     StyleSheet,
     Modal,
     TouchableOpacity,
-    Dimensions,
     Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '../themedText';
+import LottieView from 'lottie-react-native';
+import { ThemedText } from '../ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { ReviewService } from '@/utils/review';
-
-const { width } = Dimensions.get('window');
+import { Layout } from '@/constants/layout';
 
 interface RatingModalProps {
     visible: boolean;
     onClose: () => void;
 }
 
-export const RatingModal: React.FC<RatingModalProps> = ({ visible, onClose }) => {
+const RatingModalComponent: React.FC<RatingModalProps> = ({ visible, onClose }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -42,80 +40,86 @@ export const RatingModal: React.FC<RatingModalProps> = ({ visible, onClose }) =>
             animationType="fade"
             onRequestClose={onClose}
         >
-            <View style={styles.overlay}>
-                <View style={[styles.container, { backgroundColor: colors.background }]}>
-                    <View style={[styles.iconContainer, { backgroundColor: colors.primary + '15' }]}>
-                        <Ionicons name="star" size={40} color={colors.primary} />
+            <View style={styles.modalOverlay}>
+                <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                    <View style={styles.lottieContainer}>
+                        <LottieView
+                            source={require('@/public/json/rating.json')}
+                            autoPlay
+                            loop
+                            style={styles.lottie}
+                        />
                     </View>
 
-                    <ThemedText style={styles.title}>Enjoying Rehbar?</ThemedText>
-                    <ThemedText style={styles.description}>
-                        If you like using Rehbar, could you take a moment to rate us? It helps us reach more people in our community!
-                    </ThemedText>
+                    <View style={styles.textContainer}>
+                        <ThemedText style={styles.title}>Enjoying Rehbar?</ThemedText>
+                        <ThemedText style={styles.description}>
+                            If you love Rehbar, please take a moment to rate us!
+                        </ThemedText>
+                    </View>
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
-                            style={[styles.button, styles.rateButton, { backgroundColor: colors.primary }]}
-                            onPress={handleRateNow}
-                        >
-                            <ThemedText style={styles.rateButtonText}>Rate Now</ThemedText>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.button, styles.laterButton]}
+                            style={styles.laterButton}
                             onPress={handleDismiss}
                         >
                             <ThemedText style={[styles.laterButtonText, { color: colors.textSecondary }]}>
                                 Maybe Later
                             </ThemedText>
                         </TouchableOpacity>
-                    </View>
 
-                    <TouchableOpacity 
-                        style={styles.closeIcon} 
-                        onPress={handleDismiss}
-                    >
-                        <Ionicons name="close" size={20} color={colors.textSecondary} />
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                            onPress={handleRateNow}
+                        >
+                            <ThemedText style={styles.modalButtonText}>Rate Now</ThemedText>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </Modal>
     );
 };
 
+export const RatingModal = memo(RatingModalComponent);
+
 const styles = StyleSheet.create({
-    overlay: {
+    modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 24,
     },
-    container: {
-        width: Math.min(width - 48, 340),
-        borderRadius: 24,
+    modalContent: {
+        width: '100%',
+        borderRadius: Layout.borderRadius,
         padding: 24,
         alignItems: 'center',
-        position: 'relative',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 20,
         ...Platform.select({
-            ios: {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.1,
-                shadowRadius: 12,
-            },
             android: {
                 elevation: 8,
             },
         }),
     },
-    iconContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+    lottieContainer: {
+        width: 220,
+        height: 180,
+        marginBottom: 16,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
+    },
+    lottie: {
+        width: '100%',
+        height: '100%',
+    },
+    textContainer: {
+        marginBottom: 24,
+        alignItems: 'center',
     },
     title: {
         fontSize: 22,
@@ -127,39 +131,36 @@ const styles = StyleSheet.create({
         fontSize: 15,
         lineHeight: 22,
         textAlign: 'center',
-        marginBottom: 24,
         opacity: 0.7,
     },
     buttonContainer: {
         width: '100%',
-        gap: 12,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        marginTop: 8,
     },
-    button: {
-        height: 52,
-        borderRadius: 16,
+    modalButton: {
+        width: 100,
+        height: 36,
+        borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
     },
-    rateButton: {
-        // color from props
-    },
-    rateButtonText: {
+    modalButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '700',
-    },
-    laterButton: {
-        // transparent
-    },
-    laterButtonText: {
-        fontSize: 15,
+        fontSize: 13,
         fontWeight: '600',
     },
-    closeIcon: {
-        position: 'absolute',
-        top: 16,
-        right: 16,
-        padding: 4,
+    laterButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    laterButtonText: {
+        fontSize: 14,
+        fontWeight: '600',
     },
 });

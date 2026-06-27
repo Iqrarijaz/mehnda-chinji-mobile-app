@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { PRIMARY } from './weatherUtils';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';

@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -83,7 +83,7 @@ const TopperCard = React.memo(({ topper, primaryColor = '#3B82F6' }: TopperCardP
                     <ThemedText style={[styles.name, { color: colors.text }]}>
                         {capitalize(topper.name)}
                     </ThemedText>
-                    
+
                     <View style={styles.metaRow}>
                         {topper.className ? (
                             <ThemedText style={[styles.metaText, { color: primaryColor }]}>

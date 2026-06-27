@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { DrawerActions } from '@react-navigation/native';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout as LayoutConst } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -38,14 +38,14 @@ export default function VillagePrideScreen() {
     }, [likeMutation]);
 
     // Fetch Village Pride posts from server
-    const { 
-        data, 
-        isLoading, 
-        fetchNextPage, 
-        hasNextPage, 
-        isFetchingNextPage, 
-        refetch, 
-        isRefetching 
+    const {
+        data,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        refetch,
+        isRefetching
     } = usePosts({ category: 'PRIDE', searchQuery: searchVal });
 
     // Gather live posts
@@ -92,7 +92,7 @@ export default function VillagePrideScreen() {
         }
     };
 
-    const renderCard = ({ item, index }: { item: any; index: number }) => {
+    const renderCard = useCallback(({ item, index }: { item: any; index: number }) => {
         const subType = item.metadata?.subType || 'LIVING_LEGEND';
         const fullName = item.metadata?.fullName || 'Community Hero';
         const title = item.metadata?.title || 'Honored Villager';
@@ -191,7 +191,7 @@ export default function VillagePrideScreen() {
                 </TouchableOpacity>
             </Animated.View>
         );
-    };
+    }, [theme, colors, router, handleLike]);
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>

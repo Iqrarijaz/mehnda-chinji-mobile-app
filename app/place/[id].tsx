@@ -27,7 +27,7 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { ReportModal } from '@/components/common/ReportModal';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopperCard from '@/components/places/TopperCard';
 import EventCard from '@/components/places/EventCard';

@@ -22,7 +22,7 @@ import Toast from 'react-native-toast-message';
 
 import { PremiumModal } from '../common/PremiumModal';
 import { changePassword } from '@/apis/profile';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -194,12 +194,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
         <PremiumModal visible={visible} onClose={resetAndClose} type="centered">
 
             <Animated.View entering={SlideInLeft.delay(60).duration(350)} style={styles.header}>
-                <View>
-                    <ThemedText style={styles.title}>Change Password</ThemedText>
-                </View>
-                <TouchableOpacity style={[styles.closeBtn, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]} onPress={resetAndClose} activeOpacity={0.7}>
-                    <Ionicons name="close" size={18} color={colors.text} style={{ opacity: 0.5 }} />
-                </TouchableOpacity>
+                <ThemedText style={styles.title}>Change Password</ThemedText>
             </Animated.View>
 
             <ScrollView
@@ -280,14 +275,14 @@ const styles = StyleSheet.create({
 
     // Header
     header: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
+        alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: 16,
     },
     title: {
         fontSize: 14,
         fontWeight: '800',
+        textAlign: 'center',
         marginBottom: 3,
     },
     subtitle: {
@@ -372,34 +367,30 @@ const styles = StyleSheet.create({
     // Buttons
     actions: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 12 },
     primaryBtn: {
-        backgroundColor: '#006666', // Standardizing to primary color hex
-        height: Platform.OS === 'android' ? 44 : 48,
-        borderRadius: Layout.borderRadius,
+        backgroundColor: '#006666', 
+        height: 40,
+        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
-        shadowColor: '#006666',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
     },
     primaryBtnDisabled: { opacity: 0.45 },
     primaryBtnText: {
         color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: '700',
-        letterSpacing: 0.3,
+        fontSize: 14,
+        fontWeight: '600',
     },
     cancelBtn: {
         flex: 1,
-        height: Platform.OS === 'android' ? 44 : 48,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 20,
+        backgroundColor: 'transparent',
     },
     cancelText: {
-        fontSize: 11,
+        fontSize: 14,
         color: '#94A3B8',
         fontWeight: '600',
     },

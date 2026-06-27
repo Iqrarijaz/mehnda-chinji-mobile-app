@@ -19,7 +19,7 @@ import Toast from 'react-native-toast-message';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { addEvent, updateEvent, uploadUserImage } from '@/apis/essentials';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
@@ -169,7 +169,7 @@ const EventForm = () => {
                         <Ionicons name="arrow-back" size={24} color={isDark ? colors.text : '#FFFFFF'} />
                     </TouchableOpacity>
                     <ThemedText style={[styles.headerTitle, { color: isDark ? colors.text : '#FFFFFF' }]}>
-                         {isEditing ? 'Edit Event' : 'Add New Event'}
+                        {isEditing ? 'Edit Event' : 'Add New Event'}
                     </ThemedText>
                     <View style={{ width: 44 }} />
                 </View>

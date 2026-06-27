@@ -1,5 +1,5 @@
 import { NotificationIcon } from '@/components/common/NotificationIcon';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';

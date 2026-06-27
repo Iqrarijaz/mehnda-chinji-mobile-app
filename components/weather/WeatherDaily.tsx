@@ -8,7 +8,7 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { getIconName, PRIMARY } from './weatherUtils';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';

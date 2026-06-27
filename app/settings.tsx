@@ -1,10 +1,7 @@
 import { updateProfile } from '@/apis/profile';
-import { ActiveSessionsModal } from '@/components/setting/activeSessionsModal';
-import { DeleteAccountModal } from '@/components/setting/deleteAccountModal';
-import { PasswordModal } from '@/components/setting/passwordModal';
-import { SectionCard } from '@/components/setting/sectionCard';
-import { SettingRowItem } from '@/components/setting/settingRow';
-import { ThemedText } from '@/components/themedText';
+import { DeleteAccountModal } from '@/components/setting/DeleteAccountModal';
+import { PasswordModal } from '@/components/setting/PasswordModal';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -27,6 +24,9 @@ import {
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import { SettingRowItem } from '@/components/setting/SettingRow';
+import { ActiveSessionsModal } from '@/components/setting/ActiveSessionsModal';
+import { SectionCard } from '@/components/setting/SectionCard';
 
 export default function SettingsScreen() {
     const { theme, toggleTheme, isDark } = useTheme();
@@ -41,7 +41,6 @@ export default function SettingsScreen() {
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [newEmail, setNewEmail] = useState(user?.user?.email || '');
     const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
-    const [pushNotifications, setPushNotifications] = useState(true);
 
     const handleUpdateEmail = async () => {
         if (!newEmail || newEmail === user?.user?.email) {

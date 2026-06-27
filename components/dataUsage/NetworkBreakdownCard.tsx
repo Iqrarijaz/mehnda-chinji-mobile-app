@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { SlideInLeft, useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { formatBytes } from '@/utils/dataUsageUtils';
 
 interface NetworkRowProps {
@@ -38,7 +38,7 @@ const NetworkRow = ({ icon, label, bytes, totalBytes, delay }: NetworkRowProps) 
     );
 };
 
-export const NetworkBreakdownCard = ({ wifi, mobile, total }: { wifi: number, mobile: number, total: number }) => {
+export const NetworkBreakdownCard = React.memo(({ wifi, mobile, total }: { wifi: number, mobile: number, total: number }) => {
     return (
         <Animated.View
             entering={SlideInLeft.delay(200).duration(500)}
@@ -64,7 +64,7 @@ export const NetworkBreakdownCard = ({ wifi, mobile, total }: { wifi: number, mo
             </View>
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

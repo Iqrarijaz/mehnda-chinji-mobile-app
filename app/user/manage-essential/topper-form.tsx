@@ -19,7 +19,7 @@ import Toast from 'react-native-toast-message';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { addTopper, updateTopper, uploadUserImage } from '@/apis/essentials';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
@@ -205,8 +205,8 @@ const TopperForm = () => {
                             )}
                         </TouchableOpacity>
                         {!!selectedImage && !isUploading && (
-                            <TouchableOpacity 
-                                style={styles.deleteAvatarBtn} 
+                            <TouchableOpacity
+                                style={styles.deleteAvatarBtn}
                                 onPress={() => {
                                     setSelectedImage(null);
                                     setForm(prev => ({ ...prev, image: '' }));

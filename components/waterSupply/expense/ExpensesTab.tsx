@@ -9,8 +9,8 @@ import {
     Modal
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
-import moment from 'moment';
+import { ThemedText } from '@/components/ThemedText';
+import moment from '@/utils/dayjs';
 
 const MONTHS = [
     { name: 'Jan', value: '01' },
@@ -61,7 +61,7 @@ const ExpenseCard = React.memo(({
     return (
         <View style={[styles.dataCard, { backgroundColor: isDark ? '#1e293b' : '#FFF' }]}>
             <View style={styles.cardHeader}>
-                <View style={{ flex: 1 }}>
+                <View style={styles.flex1}>
                     <ThemedText style={styles.cardTitle}>{item.title}</ThemedText>
                     <ThemedText style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
                         Logged on {moment(item.expenseDate).format('DD MMM YYYY')}
@@ -156,7 +156,7 @@ const ExpensesTab = React.memo(({
     }), []);
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={styles.flex1}>
             {/* Stats Header */}
             <View style={[styles.summaryCard, { backgroundColor: colors.primary }]}>
                 <ThemedText style={styles.summaryLabel}>Total Monthly Expenses</ThemedText>
@@ -308,6 +308,9 @@ const ExpensesTab = React.memo(({
 export default ExpensesTab;
 
 const styles = StyleSheet.create({
+    flex1: {
+        flex: 1,
+    },
     summaryCard: {
         borderRadius: 16,
         padding: 20,

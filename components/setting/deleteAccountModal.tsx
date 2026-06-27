@@ -12,7 +12,7 @@ import Toast from 'react-native-toast-message';
 
 import { deleteAccount } from '@/apis/profile';
 import { clientStorage } from '@/utils/storage';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { useAuth } from '@/context/AuthContext';
 import { Layout } from '@/constants/layout';
 import { PremiumModal } from '../common/PremiumModal';

@@ -6,8 +6,8 @@ import { profileSchema } from '@/utils/validation';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { ImageViewerModal } from '@/components/common/ImageViewerModal';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
-import { ThemedText } from '@/components/themedText';
-import Avatar from '@/components/ui/avatar';
+import { ThemedText } from '@/components/ThemedText';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -69,8 +69,6 @@ export default function ProfileScreen() {
     const citiesData: string[] = citiesConfigData?.data?.data || citiesDataFallback;
     const villagesData: string[] = villagesConfigData?.data?.data || villagesDataFallback;
 
-    const buttonScale = useSharedValue(1);
-
     const toTitleCase = useCallback((str: string) => {
         if (!str) return '';
         return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
@@ -89,7 +87,6 @@ export default function ProfileScreen() {
 
     const [cityPickerVisible, setCityPickerVisible] = useState(false);
     const [villagePickerVisible, setVillagePickerVisible] = useState(false);
-    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
 
     // Derive stable baseline data from user object
@@ -239,10 +236,6 @@ export default function ProfileScreen() {
 
 
     const handleUpdate = useCallback(async () => {
-        buttonScale.value = withSpring(0.9, { damping: 10 }, () => {
-            buttonScale.value = withSpring(1);
-        });
-
         try {
             await profileSchema.validate(formData);
             profileMutation.mutate({
@@ -256,7 +249,7 @@ export default function ProfileScreen() {
                 text2: error.message
             });
         }
-    }, [formData, profileMutation, buttonScale]);
+    }, [formData, profileMutation]);
 
     const handleBack = () => {
         if (router.canGoBack()) router.back();
@@ -265,10 +258,6 @@ export default function ProfileScreen() {
     };
 
     useBackHandler(handleBack);
-
-    const animatedButtonStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: buttonScale.value }]
-    }));
 
     return (
         <ErrorBoundary>
@@ -450,33 +439,29 @@ export default function ProfileScreen() {
                                 </TouchableOpacity>
                             </Animated.View>
 
-                        {/* Why complete profile? */}
-                        <View style={styles.infoTip}>
-                            <Ionicons name="information-circle-outline" size={16} color="#64748B" />
-                            <ThemedText style={styles.infoText}>A complete profile helps other community members find you more easily.</ThemedText>
-                        </View>
+                            {/* Why complete profile? */}
+                            <View style={styles.infoTip}>
+                                <Ionicons name="information-circle-outline" size={16} color="#64748B" />
+                                <ThemedText style={styles.infoText}>A complete profile helps other community members find you more easily.</ThemedText>
+                            </View>
 
-                        {/* Update Button (Now Scrollable) */}
-                        <Animated.View style={[animatedButtonStyle, { marginTop: 24 }]}>
-                            <TouchableOpacity
-                                style={[styles.updateButton, !isModified && { opacity: 0.6 }]}
-                                onPress={handleUpdate}
-                                disabled={!isModified || profileMutation.isPending}
-                            >
-                                <LinearGradient colors={['#0D9488', '#0F766E']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-                                {profileMutation.isPending ? (
-                                    <ActivityIndicator color="#FFFFFF" />
-                                ) : (
+                            {/* Update Button (Now Scrollable) */}
+                            <View style={{ marginTop: 24 }}>
+                                <TouchableOpacity
+                                    style={[styles.updateButton, !isModified && { opacity: 0.6 }]}
+                                    onPress={handleUpdate}
+                                    disabled={!isModified || profileMutation.isPending}
+                                >
+                                    <LinearGradient colors={['#0D9488', '#0F766E']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
                                     <View style={styles.buttonContent}>
                                         <ThemedText style={styles.updateButtonText}>Update Profile</ThemedText>
                                         <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
                                     </View>
-                                )}
-                            </TouchableOpacity>
-                        </Animated.View>
-                    </View>
-                </ScrollView>
-            </KeyboardAvoidingView>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
 
                 <SearchableDropdown
                     visible={cityPickerVisible}
@@ -504,6 +489,8 @@ export default function ProfileScreen() {
                     uri={user?.user?.profileImage}
                     name={user?.user?.name}
                 />
+
+                <LoaderOverlay visible={profileMutation.isPending} />
             </View >
         </ErrorBoundary>
     );

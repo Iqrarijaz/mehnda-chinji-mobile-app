@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -35,54 +35,54 @@ const WeatherSearchBar = React.memo(({
 }: WeatherSearchBarProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
-    
-    return (
-    <View style={styles.wrapper}>
-        {/* Input pill */}
-        <BlurView intensity={40} tint="light" style={styles.inputBlur}>
-            <Ionicons name="search" size={16} color="rgba(255,255,255,0.7)" style={{ marginRight: 8 }} />
-            <TextInput
-                placeholder="Search city..."
-                placeholderTextColor="rgba(255,255,255,0.6)"
-                style={styles.input}
-                value={searchInput}
-                onChangeText={onChangeText}
-                onSubmitEditing={onSubmit}
-                returnKeyType="search"
-            />
-            {searchInput.length > 0 && (
-                <TouchableOpacity onPress={onClear}>
-                    <Ionicons name="close-circle" size={16} color="rgba(255,255,255,0.6)" />
-                </TouchableOpacity>
-            )}
-            {onGPS && searchInput.length === 0 && (
-                <TouchableOpacity onPress={onGPS} style={{ marginLeft: 8 }}>
-                    <Ionicons name="location" size={18} color="rgba(255,255,255,0.8)" />
-                </TouchableOpacity>
-            )}
-        </BlurView>
 
-        {/* Dropdown */}
-        {showDropdown && filteredCities.length > 0 && (
-            <View style={[styles.dropdown, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
-                {filteredCities.map((item, i) => (
-                    <TouchableOpacity
-                        key={i}
-                        style={[
-                            styles.dropItem, 
-                            i < filteredCities.length - 1 && styles.dropItemBorder,
-                            i < filteredCities.length - 1 && { borderBottomColor: colors.border }
-                        ]}
-                        onPress={() => onSelectCity(item)}
-                        activeOpacity={0.7}
-                    >
-                        <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
-                        <ThemedText style={[styles.dropText, { color: colors.text }]}>{item}</ThemedText>
+    return (
+        <View style={styles.wrapper}>
+            {/* Input pill */}
+            <BlurView intensity={40} tint="light" style={styles.inputBlur}>
+                <Ionicons name="search" size={16} color="rgba(255,255,255,0.7)" style={{ marginRight: 8 }} />
+                <TextInput
+                    placeholder="Search city..."
+                    placeholderTextColor="rgba(255,255,255,0.6)"
+                    style={styles.input}
+                    value={searchInput}
+                    onChangeText={onChangeText}
+                    onSubmitEditing={onSubmit}
+                    returnKeyType="search"
+                />
+                {searchInput.length > 0 && (
+                    <TouchableOpacity onPress={onClear}>
+                        <Ionicons name="close-circle" size={16} color="rgba(255,255,255,0.6)" />
                     </TouchableOpacity>
-                ))}
-            </View>
-        )}
-    </View>
+                )}
+                {onGPS && searchInput.length === 0 && (
+                    <TouchableOpacity onPress={onGPS} style={{ marginLeft: 8 }}>
+                        <Ionicons name="location" size={18} color="rgba(255,255,255,0.8)" />
+                    </TouchableOpacity>
+                )}
+            </BlurView>
+
+            {/* Dropdown */}
+            {showDropdown && filteredCities.length > 0 && (
+                <View style={[styles.dropdown, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
+                    {filteredCities.map((item, i) => (
+                        <TouchableOpacity
+                            key={i}
+                            style={[
+                                styles.dropItem,
+                                i < filteredCities.length - 1 && styles.dropItemBorder,
+                                i < filteredCities.length - 1 && { borderBottomColor: colors.border }
+                            ]}
+                            onPress={() => onSelectCity(item)}
+                            activeOpacity={0.7}
+                        >
+                            <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
+                            <ThemedText style={[styles.dropText, { color: colors.text }]}>{item}</ThemedText>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            )}
+        </View>
     );
 });
 

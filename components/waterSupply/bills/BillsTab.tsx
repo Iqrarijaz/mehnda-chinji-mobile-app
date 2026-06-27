@@ -9,8 +9,8 @@ import {
     Modal
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
-import moment from 'moment';
+import { ThemedText } from '@/components/ThemedText';
+import moment from '@/utils/dayjs';
 
 const MONTHS = [
     { name: 'Jan', value: '01' },

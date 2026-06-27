@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import moment from 'moment';
+import moment from '@/utils/dayjs';
 
 /**
  * Converts a 24h time string (e.g., "14:30") to a 12h format with AM/PM (e.g., "2:30 PM").

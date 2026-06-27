@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { TintedCard } from '@/components/ui/tintedCard';
@@ -94,133 +94,133 @@ const HealthCard = React.memo(({ data, color, onReport }: HealthCardProps) => {
             ]}
         >
             {/* ── Hero ── */}
-                <View style={styles.heroSection}>
-                    {healthImage ? (
-                        <Image
-                            source={{ uri: healthImage }}
-                            style={styles.heroImage}
-                            contentFit="cover"
-                            transition={400}
-                        />
-                    ) : (
-                        <LinearGradient
-                            colors={[
-                                isDark ? '#0F1420' : primaryAlpha10,
-                                isDark ? '#1A2035' : '#FFF5F5',
-                            ]}
-                            style={styles.placeholderContainer}
-                        >
-                            {/* Decorative rings behind icon */}
-                            <View style={[styles.ring, styles.ringOuter, { borderColor: primaryAlpha20 }]} />
-                            <View style={[styles.ring, styles.ringInner, { borderColor: primaryAlpha20 }]} />
-                            <View style={[styles.iconCircle, { backgroundColor: primaryAlpha20 }]}>
-                                <MaterialCommunityIcons name="medical-bag" size={36} color={primaryColor} />
-                            </View>
-                        </LinearGradient>
-                    )}
-
-                    {/* Bottom fade for text legibility */}
-                    <LinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.55)']}
-                        style={[StyleSheet.absoluteFillObject, styles.bottomFade]}
+            <View style={styles.heroSection}>
+                {healthImage ? (
+                    <Image
+                        source={{ uri: healthImage }}
+                        style={styles.heroImage}
+                        contentFit="cover"
+                        transition={400}
                     />
-
-                    {/* Top actions bar */}
-                    <View style={[styles.topActions, !data.type && { justifyContent: 'flex-end' }]}>
-                        {data.type && (
-                            <View style={[styles.typePill, { backgroundColor: primaryColor }]}>
-                                <MaterialCommunityIcons name="hospital-box-outline" size={9} color="#fff" style={{ marginRight: 3 }} />
-                                <ThemedText style={styles.typePillText}>{data.type}</ThemedText>
-                            </View>
-                        )}
-                        <View style={{ flexDirection: 'row', gap: 8 }}>
-                            <TouchableOpacity style={styles.actionBtn} activeOpacity={0.8}>
-                                <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
-                            </TouchableOpacity>
-                            {onReport && (
-                                <TouchableOpacity
-                                    style={[styles.actionBtn, { backgroundColor: 'rgba(239,68,68,0.4)' }]}
-                                    activeOpacity={0.8}
-                                    onPress={(e) => {
-                                        e.stopPropagation();
-                                        onReport();
-                                    }}
-                                >
-                                    <Ionicons name="flag" size={15} color="#FFFFFF" />
-                                </TouchableOpacity>
-                            )}
+                ) : (
+                    <LinearGradient
+                        colors={[
+                            isDark ? '#0F1420' : primaryAlpha10,
+                            isDark ? '#1A2035' : '#FFF5F5',
+                        ]}
+                        style={styles.placeholderContainer}
+                    >
+                        {/* Decorative rings behind icon */}
+                        <View style={[styles.ring, styles.ringOuter, { borderColor: primaryAlpha20 }]} />
+                        <View style={[styles.ring, styles.ringInner, { borderColor: primaryAlpha20 }]} />
+                        <View style={[styles.iconCircle, { backgroundColor: primaryAlpha20 }]}>
+                            <MaterialCommunityIcons name="medical-bag" size={36} color={primaryColor} />
                         </View>
-                    </View>
+                    </LinearGradient>
+                )}
 
-                    {/* Bottom-left image label when image exists */}
-                    {healthImage && (
-                        <View style={styles.imageLabel}>
-                            <Ionicons name="images-outline" size={11} color="rgba(255,255,255,0.75)" />
-                            <ThemedText style={styles.imageLabelText}>
-                                {(data.images?.length ?? 0) > 1
-                                    ? `${data.images!.length} Photos`
-                                    : '1 Photo'}
+                {/* Bottom fade for text legibility */}
+                <LinearGradient
+                    colors={['transparent', 'rgba(0,0,0,0.55)']}
+                    style={[StyleSheet.absoluteFillObject, styles.bottomFade]}
+                />
+
+                {/* Top actions bar */}
+                <View style={[styles.topActions, !data.type && { justifyContent: 'flex-end' }]}>
+                    {data.type && (
+                        <View style={[styles.typePill, { backgroundColor: primaryColor }]}>
+                            <MaterialCommunityIcons name="hospital-box-outline" size={9} color="#fff" style={{ marginRight: 3 }} />
+                            <ThemedText style={styles.typePillText}>{data.type}</ThemedText>
+                        </View>
+                    )}
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.8}>
+                            <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
+                        </TouchableOpacity>
+                        {onReport && (
+                            <TouchableOpacity
+                                style={[styles.actionBtn, { backgroundColor: 'rgba(239,68,68,0.4)' }]}
+                                activeOpacity={0.8}
+                                onPress={(e) => {
+                                    e.stopPropagation();
+                                    onReport();
+                                }}
+                            >
+                                <Ionicons name="flag" size={15} color="#FFFFFF" />
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                </View>
+
+                {/* Bottom-left image label when image exists */}
+                {healthImage && (
+                    <View style={styles.imageLabel}>
+                        <Ionicons name="images-outline" size={11} color="rgba(255,255,255,0.75)" />
+                        <ThemedText style={styles.imageLabelText}>
+                            {(data.images?.length ?? 0) > 1
+                                ? `${data.images!.length} Photos`
+                                : '1 Photo'}
+                        </ThemedText>
+                    </View>
+                )}
+            </View>
+
+            {/* ── Content ── */}
+            <View
+                style={[
+                    styles.contentSection,
+                    { backgroundColor: colors.card },
+                ]}
+            >
+                {/* Name */}
+                <ThemedText
+                    style={[styles.healthName, { color: isDark ? '#F1F5F9' : '#0F172A' }]}
+                    numberOfLines={2}
+                >
+                    {placeName}
+                </ThemedText>
+
+                {/* Divider strip */}
+                <View style={styles.dividerRow}>
+                    <View style={[styles.dividerAccent, { backgroundColor: primaryColor }]} />
+                    <View
+                        style={[
+                            styles.dividerLine,
+                            { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' },
+                        ]}
+                    />
+                </View>
+
+                {/* Location row */}
+                <View style={styles.locationRow}>
+                    <View style={[styles.locationIconWrap, { backgroundColor: primaryAlpha10 }]}>
+                        <Ionicons name="location" size={13} color={primaryColor} />
+                    </View>
+                    <ThemedText
+                        style={[styles.locationText, { color: isDark ? '#94A3B8' : '#475569' }]}
+                    >
+                        {address}
+                    </ThemedText>
+                </View>
+
+                {/* Footer CTA row */}
+                <View style={styles.footerRow}>
+                    {data.phone && (
+                        <View style={[styles.contactChip, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                            <Ionicons
+                                name="call-outline"
+                                size={12}
+                                color={isDark ? '#94A3B8' : '#475569'}
+                            />
+                            <ThemedText
+                                style={[styles.contactChipText, { color: isDark ? '#94A3B8' : '#475569' }]}
+                            >
+                                Contact
                             </ThemedText>
                         </View>
                     )}
                 </View>
-
-                {/* ── Content ── */}
-                <View
-                    style={[
-                        styles.contentSection,
-                        { backgroundColor: colors.card },
-                    ]}
-                >
-                    {/* Name */}
-                    <ThemedText
-                        style={[styles.healthName, { color: isDark ? '#F1F5F9' : '#0F172A' }]}
-                        numberOfLines={2}
-                    >
-                        {placeName}
-                    </ThemedText>
-
-                    {/* Divider strip */}
-                    <View style={styles.dividerRow}>
-                        <View style={[styles.dividerAccent, { backgroundColor: primaryColor }]} />
-                        <View
-                            style={[
-                                styles.dividerLine,
-                                { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' },
-                            ]}
-                        />
-                    </View>
-
-                    {/* Location row */}
-                    <View style={styles.locationRow}>
-                        <View style={[styles.locationIconWrap, { backgroundColor: primaryAlpha10 }]}>
-                            <Ionicons name="location" size={13} color={primaryColor} />
-                        </View>
-                        <ThemedText
-                            style={[styles.locationText, { color: isDark ? '#94A3B8' : '#475569' }]}
-                        >
-                            {address}
-                        </ThemedText>
-                    </View>
-
-                    {/* Footer CTA row */}
-                    <View style={styles.footerRow}>
-                        {data.phone && (
-                            <View style={[styles.contactChip, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
-                                <Ionicons
-                                    name="call-outline"
-                                    size={12}
-                                    color={isDark ? '#94A3B8' : '#475569'}
-                                />
-                                <ThemedText
-                                    style={[styles.contactChipText, { color: isDark ? '#94A3B8' : '#475569' }]}
-                                >
-                                    Contact
-                                </ThemedText>
-                            </View>
-                        )}
-                    </View>
-                </View>
+            </View>
         </TouchableOpacity>
     );
 });

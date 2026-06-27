@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { CalendarDay } from '@/apis/quran';
 
 interface DayTileProps {
@@ -20,11 +20,11 @@ export const DayTile = React.memo(({ day, isToday, isSelected, colors, accentCol
     const isWeekend = day.gregorian.weekday.en === 'Sunday' || day.gregorian.weekday.en === 'Saturday';
 
     return (
-        <TouchableOpacity 
+        <TouchableOpacity
             activeOpacity={0.75}
             onPress={onPress}
             style={[
-                styles.dayTile, 
+                styles.dayTile,
                 { backgroundColor: colors.card, borderColor: colors.border },
                 isWeekend && { backgroundColor: colors.card + '80' },
                 isToday && { borderColor: accentColor, borderWidth: 1.5, backgroundColor: accentColor + '08' },
@@ -33,15 +33,15 @@ export const DayTile = React.memo(({ day, isToday, isSelected, colors, accentCol
         >
             <View style={styles.tileHeader}>
                 <ThemedText style={[
-                    styles.gregorianDayText, 
+                    styles.gregorianDayText,
                     { color: isSelected ? '#FFFFFFaa' : colors.textSecondary },
                 ]}>
                     {day.gregorian.day}
                 </ThemedText>
             </View>
-            
+
             <ThemedText style={[
-                styles.hijriDayText, 
+                styles.hijriDayText,
                 { color: isSelected ? '#FFFFFF' : (isToday ? accentColor : colors.text) }
             ]}>
                 {day.hijri.day}

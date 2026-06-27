@@ -16,13 +16,14 @@ import {
     manageDonorStatus,
     removeAsDonor
 } from '@/apis/bloodDonation';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { CleanConfirmationModal } from '../common/CleanConfirmationModal';
+import { ThankYouModal } from '../common/ThankYou';
 import BloodRegistrationModal from './BloodRegistrationModal';
 import MyBloodDonorRegistrationCard from './MyBloodDonorRegistrationCard';
 
@@ -38,6 +39,7 @@ const BloodRegistration = React.memo(() => {
     const [modalVisible, setModalVisible] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showStatusConfirmModal, setShowStatusConfirmModal] = useState(false);
+    const [showThankYou, setShowThankYou] = useState(false);
 
     // Query
     const { data: statusRes, isLoading: loading, refetch } = useQuery({
@@ -82,6 +84,10 @@ const BloodRegistration = React.memo(() => {
 
     const isProcessing = removeMutation.isPending || manageStatusMutation.isPending;
 
+    const userName = user?.user?.name
+        ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+        : 'Hero';
+
     const handleRegisterOpen = () => {
         analyticsService.trackEvent(AnalyticsEvents.DONOR_REGISTRATION_CLICKED);
         setModalVisible(true);
@@ -99,6 +105,15 @@ const BloodRegistration = React.memo(() => {
         manageStatusMutation.mutate();
     };
 
+    const handleThankYouClose = () => {
+        setShowThankYou(false);
+        if (user?.user?.role !== 'APP_ADMIN') {
+            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                InterstitialService.getInstance().show(true);
+            });
+        }
+    };
+
     if (loading && !donorData) {
         return (
             <View style={[styles.container, styles.centerContent]}>
@@ -114,8 +129,21 @@ const BloodRegistration = React.memo(() => {
                 onClose={() => setModalVisible(false)}
                 onSuccess={() => {
                     refetch();
+                    setShowThankYou(true);
                 }}
             />
+
+            <ThankYouModal
+                visible={showThankYou}
+                onClose={handleThankYouClose}
+                animationSource={require('@/public/json/onboarding2.json')}
+                animationWidth={260}
+                animationHeight={200}
+            >
+                <ThemedText style={[styles.thankYouText, { color: colors.textSecondary }]}>
+                    Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{userName}</ThemedText>, Thank you for registering as a blood donor. Your generosity can save lives!
+                </ThemedText>
+            </ThankYouModal>
 
             <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
                 {/* Header with Add Button */}
@@ -213,6 +241,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 20,
+    },
+    thankYouText: {
+        fontSize: 14,
+        textAlign: 'center',
+        lineHeight: 22,
     },
     headerBox: {
         flex: 1,

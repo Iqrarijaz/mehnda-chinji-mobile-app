@@ -2,7 +2,7 @@ import React, { memo, useCallback } from 'react';
 import { View, StyleSheet, ActivityIndicator, TouchableOpacity, Share, Platform, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Layout } from '@/constants/layout';
 import type { Hadith } from '@/apis/hadith';
 

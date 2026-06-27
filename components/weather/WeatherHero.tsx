@@ -11,7 +11,7 @@ import Animated, {
     withSpring,
     withTiming,
 } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { getIconName } from './weatherUtils';
 
 interface WeatherHeroProps {

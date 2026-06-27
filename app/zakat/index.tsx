@@ -4,7 +4,7 @@ import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -12,6 +12,8 @@ import { useTheme } from '@/context/ThemeContext';
 import { ZakatHeader } from '@/components/zakat/ZakatHeader';
 import { ZakatResultCard } from '@/components/zakat/ZakatResultCard';
 import { ZakatInputField } from '@/components/zakat/ZakatInputField';
+import { MicroFeedback } from '@/components/feedback/MicroFeedback';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 const ACCENT = '#059669'; // Emerald green
 
@@ -35,6 +37,8 @@ export default function ZakatCalculatorScreen() {
         return isNaN(num) || num < 0 ? 0 : num;
     }, []);
 
+    const [hasTracked, setHasTracked] = useState(false);
+
     // Calculate Zakat details in real-time
     const calculation = useMemo(() => {
         const totalCash = parseVal(cash);
@@ -49,13 +53,18 @@ export default function ZakatCalculatorScreen() {
         const isEligible = netWealth >= currentNisab;
         const zakatDue = isEligible ? netWealth * 0.025 : 0;
 
+        if (totalAssets > 0 && !hasTracked) {
+            analyticsService.trackEvent(AnalyticsEvents.ZAKAT_CALCULATOR_USED);
+            setHasTracked(true);
+        }
+
         return {
             totalAssets,
             netWealth,
             zakatDue,
             isEligible
         };
-    }, [cash, goldSilver, investments, receivables, debts, nisab, parseVal]);
+    }, [cash, goldSilver, investments, receivables, debts, nisab, parseVal, hasTracked]);
 
     const handleBack = useCallback(() => {
         if (router.canGoBack()) {
@@ -83,19 +92,19 @@ export default function ZakatCalculatorScreen() {
             <Stack.Screen options={{ headerShown: false }} />
 
             {/* Header Component */}
-            <ZakatHeader 
-                insetsTop={insets.top} 
-                colors={colors} 
-                onBack={handleBack} 
-                onReset={handleReset} 
+            <ZakatHeader
+                insetsTop={insets.top}
+                colors={colors}
+                onBack={handleBack}
+                onReset={handleReset}
             />
 
-            <ScrollView 
+            <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 32 }]}
             >
                 {/* Result Card Component */}
-                <ZakatResultCard 
+                <ZakatResultCard
                     colors={colors}
                     accentColor={ACCENT}
                     isEligible={calculation.isEligible}
@@ -124,30 +133,30 @@ export default function ZakatCalculatorScreen() {
 
                 {/* Asset Inputs */}
                 <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>ASSETS & SAVINGS</ThemedText>
-                
+
                 <View style={[styles.inputGroup, { backgroundColor: colors.card }]}>
-                    <ZakatInputField 
+                    <ZakatInputField
                         label="Cash & Bank Savings"
                         value={cash}
                         onChangeText={setCash}
                         colors={colors}
                     />
 
-                    <ZakatInputField 
+                    <ZakatInputField
                         label="Value of Gold & Silver Owned"
                         value={goldSilver}
                         onChangeText={setGoldSilver}
                         colors={colors}
                     />
 
-                    <ZakatInputField 
+                    <ZakatInputField
                         label="Value of Stocks, Funds & Business Assets"
                         value={investments}
                         onChangeText={setInvestments}
                         colors={colors}
                     />
 
-                    <ZakatInputField 
+                    <ZakatInputField
                         label="Money Owed to You (Receivables)"
                         value={receivables}
                         onChangeText={setReceivables}
@@ -159,13 +168,16 @@ export default function ZakatCalculatorScreen() {
                 <View style={{ height: 10 }} />
                 <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>LIABILITIES & DEBTS</ThemedText>
                 <View style={[styles.inputGroup, { backgroundColor: colors.card }]}>
-                    <ZakatInputField 
+                    <ZakatInputField
                         label="Immediate Debts & Bills Due"
                         value={debts}
                         onChangeText={setDebts}
                         colors={colors}
                     />
                 </View>
+
+                {/* Feedback Widget */}
+                <MicroFeedback componentName="zakat_calculator" />
 
             </ScrollView>
         </View>

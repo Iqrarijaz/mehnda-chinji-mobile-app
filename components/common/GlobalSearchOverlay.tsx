@@ -14,7 +14,7 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -104,7 +104,9 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
         } else if (item.type === 'business') {
             router.push(`/business/${item.id}` as any);
         } else if (item.type === 'donor') {
-            // Navigate to donor detail when implemented
+            router.push('/(tabs)/blood' as any);
+        } else if (item.type === 'place') {
+            router.push(`/place/${item.id}` as any);
         }
 
         if (item.id) {
@@ -133,6 +135,9 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
         } else if (item.type === 'donor') {
             icon = 'water';
             color = '#EF4444';
+        } else if (item.type === 'place') {
+            icon = 'location';
+            color = '#10B981';
         }
 
         return (

@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import React from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
@@ -12,7 +12,7 @@ interface SectionCardProps {
     delay?: number;
 }
 
-export const SectionCard: React.FC<SectionCardProps> = ({ title, children, delay = 0 }) => {
+export const SectionCard: React.FC<SectionCardProps> = React.memo(({ title, children, delay = 0 }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -22,7 +22,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({ title, children, delay
             {children}
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     sectionCard: {

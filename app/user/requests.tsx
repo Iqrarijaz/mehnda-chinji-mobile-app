@@ -1,5 +1,5 @@
 import { deleteRequest, getMyRequests, ESSENTIAL_SUBMISSION_QUERY_KEYS } from '@/apis/essentials';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -136,7 +136,7 @@ const MyRequestsScreen = () => {
                 Your submitted places and updates will appear here.
             </ThemedText>
             {category ? (
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={[styles.emptyBtn, { backgroundColor: colors.primary }]}
                     onPress={() => router.push({ pathname: '/(drawer)/place-submission', params: { category } })}
                 >

@@ -18,7 +18,7 @@ interface FAQItemProps {
     onToggle: () => void;
 }
 
-const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onToggle }) => {
+const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, onToggle }) => {
     const animation = useSharedValue(0);
 
     React.useEffect(() => {
@@ -68,7 +68,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onToggle })
             )}
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

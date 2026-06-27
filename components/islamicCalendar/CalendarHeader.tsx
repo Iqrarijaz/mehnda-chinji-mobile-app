@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface CalendarHeaderProps {
     insetsTop: number;
@@ -11,19 +11,19 @@ interface CalendarHeaderProps {
 
 export const CalendarHeader = React.memo(({ insetsTop, colors, onBack }: CalendarHeaderProps) => (
     <View style={[styles.header, { paddingTop: insetsTop + 14, backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-        <TouchableOpacity 
-            activeOpacity={0.7} 
-            onPress={onBack} 
+        <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={onBack}
             style={[styles.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
         >
             <Ionicons name="arrow-back" size={20} color={colors.text} />
         </TouchableOpacity>
-        
+
         <View style={[styles.logoContainer, { backgroundColor: '#05966910' }]}>
-            <Image 
-                source={require('@/assets/icons/religious.webp')} 
-                style={styles.logo} 
-                resizeMode="contain" 
+            <Image
+                source={require('@/assets/icons/religious.webp')}
+                style={styles.logo}
+                resizeMode="contain"
             />
         </View>
 

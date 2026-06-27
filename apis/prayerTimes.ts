@@ -1,5 +1,5 @@
 import axios from 'axios';
-import moment from 'moment';
+import moment from '@/utils/dayjs';
 
 const BASE_URL = 'https://api.aladhan.com/v1';
 
@@ -8,7 +8,8 @@ export const getPrayerTimes = async (city: string, country: string = 'Pakistan')
         const cleanCity = city.split(',')[0].trim();
         const today = moment().format('DD-MM-YYYY');
         // method=1 is University of Islamic Sciences, Karachi
-        const url = `${BASE_URL}/timingsByCity/${today}?city=${encodeURIComponent(cleanCity)}&country=${encodeURIComponent(country)}&method=1`;
+        // adjustment=-1 offsets the Hijri date by 1 day (Pakistan is typically 1 day behind Saudi Arabia)
+        const url = `${BASE_URL}/timingsByCity/${today}?city=${encodeURIComponent(cleanCity)}&country=${encodeURIComponent(country)}&method=1&adjustment=-1`;
         
         const response = await axios.get(url);
         return response.data;
@@ -23,7 +24,7 @@ export const getPrayerCalendar = async (city: string, country: string = 'Pakista
         const cleanCity = city.split(',')[0].trim();
         const month = moment().format('M');
         const year = moment().format('YYYY');
-        const url = `${BASE_URL}/calendarByCity/${year}/${month}?city=${encodeURIComponent(cleanCity)}&country=${encodeURIComponent(country)}&method=1`;
+        const url = `${BASE_URL}/calendarByCity/${year}/${month}?city=${encodeURIComponent(cleanCity)}&country=${encodeURIComponent(country)}&method=1&adjustment=-1`;
         
         const response = await axios.get(url);
         return response.data;

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getBusinessesList } from '@/apis/business';
 import { getDonorsList } from '@/apis/bloodDonation';
+import { getEssentialsList } from '@/apis/essentials';
 
 export type GlobalSearchResultType = 'business' | 'donor' | 'place';
 
@@ -33,9 +34,10 @@ export const useGlobalSearch = (query: string) => {
         setIsLoading(true);
         try {
             // Concurrent fetching from all sources
-            const [businessRes, donorsRes] = await Promise.all([
+            const [businessRes, donorsRes, essentialsRes] = await Promise.all([
                 getBusinessesList({ text: normalizedQuery, currentPage: 1 }).catch(() => null),
                 getDonorsList({ name: normalizedQuery, currentPage: 1 }).catch(() => null),
+                getEssentialsList({ search: normalizedQuery, limit: 5 }).catch(() => null),
             ]);
 
             const aggregated: GlobalSearchResult[] = [];
@@ -53,7 +55,20 @@ export const useGlobalSearch = (query: string) => {
                     });
                 });
             }
-
+            // 2. Process Places (Essentials)
+            if ((essentialsRes as any)?.data?.data || (essentialsRes as any)?.data) {
+                const placesData = Array.isArray((essentialsRes as any).data) ? (essentialsRes as any).data : (essentialsRes as any).data?.data || [];
+                placesData.slice(0, 5).forEach((p: any) => {
+                    aggregated.push({
+                        id: p._id,
+                        type: 'place',
+                        title: p.name || p.title,
+                        subtitle: p.category || 'Place',
+                        image: p.images?.[0] || '',
+                        data: p,
+                    });
+                });
+            }
 
             // 3. Process Donors
             if ((donorsRes as any)?.data) {

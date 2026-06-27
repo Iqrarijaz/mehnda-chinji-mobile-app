@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { getIconName, PRIMARY } from './weatherUtils';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -12,12 +12,12 @@ interface HourlyCardProps { time: string; icon: string; temp: number; isNow: boo
 const HourlyCard = React.memo(({ time, icon, temp, isNow, delay }: HourlyCardProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
-    
+
     return (
         <Animated.View
             entering={SlideInLeft.delay(delay).duration(400)}
             style={[
-                styles.card, 
+                styles.card,
                 { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : colors.background },
                 isNow && { backgroundColor: isDark ? colors.primary : PRIMARY }
             ]}

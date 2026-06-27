@@ -27,6 +27,11 @@ export const AnalyticsEvents = {
     POST_SHARED: 'post_shared',
     BANNER_GENERATED: 'banner_generated',
     BANNER_SAVED: 'banner_saved',
+    QURAN_SURAH_OPENED: 'quran_surah_opened',
+    TASBEEH_COMPLETED: 'tasbeeh_completed',
+    ZAKAT_CALCULATOR_USED: 'zakat_calculator_used',
+    ASMA_AL_HUSNA_VIEWED: 'asma_al_husna_viewed',
+    ISLAMIC_CALENDAR_VIEWED: 'islamic_calendar_viewed',
 
     // Community Specific
     DONOR_CARD_CLICKED: 'donor_card_clicked',
@@ -40,6 +45,10 @@ export const AnalyticsEvents = {
     // User Profile
     PROFILE_UPDATED: 'profile_updated',
     AVATAR_CHANGED: 'avatar_changed',
+
+    // Feedback
+    MICRO_FEEDBACK_SUBMITTED: 'micro_feedback_submitted',
+    GLOBAL_FEEDBACK_SUBMITTED: 'global_feedback_submitted',
 
     // System
     CONNECTION_CHANGED: 'connection_changed',

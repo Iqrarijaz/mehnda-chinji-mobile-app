@@ -2,7 +2,7 @@ import React from 'react';
 import { Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Layout as LayoutConst } from '@/constants/layout';
 
 interface PrideHeaderProps {

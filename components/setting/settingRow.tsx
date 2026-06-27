@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -10,8 +10,8 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
+import { AnimatedToggle } from './AnimatedToggle';
 
-import { AnimatedToggle } from './animatedToggle';
 
 export interface SettingRowItemProps {
     icon: keyof typeof Ionicons.glyphMap;
@@ -31,7 +31,7 @@ export interface SettingRowItemProps {
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
-export const SettingRowItem: React.FC<SettingRowItemProps> = ({
+export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
     icon,
     label,
     subtitle,
@@ -94,7 +94,7 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = ({
             ) : null}
         </AnimatedTouchable>
     );
-};
+});
 
 const styles = StyleSheet.create({
     settingRow: {

@@ -61,7 +61,8 @@ export default function NotificationsScreen() {
     const [activeFilter, setActiveFilter] = useState('ALL');
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [showSwipeTooltip, setShowSwipeTooltip] = useState(false);
-    const tooltipStore = useTooltipStore();
+    const viewedTooltips = useTooltipStore(state => state.viewedTooltips);
+    const markAsViewed = useTooltipStore(state => state.markAsViewed);
 
     const { data: response, isLoading, isFetching, refetch } = useQuery<any>({
         queryKey: ['notifications', activeFilter],
@@ -75,17 +76,17 @@ export default function NotificationsScreen() {
     // Show swipe tooltip once when notifications first appear and wasn't viewed before
     useEffect(() => {
         const tooltipId = 'notifications-screen';
-        if (!tooltipStore.viewedTooltips[tooltipId] && notifications.length > 0) {
+        if (!viewedTooltips[tooltipId] && notifications.length > 0) {
             const timer = setTimeout(() => setShowSwipeTooltip(true), 600);
             return () => clearTimeout(timer);
         }
-    }, [notifications.length, tooltipStore.viewedTooltips]);
+    }, [notifications.length, viewedTooltips]);
 
     const closeSwipeTooltip = useCallback(() => {
         const tooltipId = 'notifications-screen';
-        tooltipStore.markAsViewed(tooltipId);
+        markAsViewed(tooltipId);
         setShowSwipeTooltip(false);
-    }, [tooltipStore]);
+    }, [markAsViewed]);
 
     const markAsReadMutation = useMutation({
         mutationFn: markNotificationAsRead,

@@ -7,7 +7,7 @@ import Animated, {
     SlideInLeft
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { splitBytes } from '@/utils/dataUsageUtils';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -20,7 +20,7 @@ interface UsageSummaryCardProps {
     resetDate: string;
 }
 
-export const UsageSummaryCard = ({ totalBytes, resetDate }: UsageSummaryCardProps) => {
+export const UsageSummaryCard = React.memo(({ totalBytes, resetDate }: UsageSummaryCardProps) => {
     const { value, unit } = splitBytes(totalBytes);
     const progress = useSharedValue(0);
 
@@ -81,7 +81,7 @@ export const UsageSummaryCard = ({ totalBytes, resetDate }: UsageSummaryCardProp
             </View>
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     card: {

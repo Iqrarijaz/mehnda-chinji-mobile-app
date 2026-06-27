@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { SlideInLeft, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 
 const PRIMARY = '#006666';

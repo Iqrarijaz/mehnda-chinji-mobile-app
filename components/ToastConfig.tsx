@@ -7,7 +7,7 @@ import {
     View,
 } from 'react-native';
 import { BaseToastProps } from 'react-native-toast-message';
-import { ThemedText } from './themedText';
+import { ThemedText } from './ThemedText';
 
 /* ------------------ Animated BG Blob ------------------ */
 const FloatingBlob = ({ color }: { color: string }) => {
@@ -88,7 +88,7 @@ const ToastLayout = ({
 };
 
 /* ------------------ Export Config ------------------ */
-export const toastConfig = {
+export const ToastConfig = {
     success: (props: BaseToastProps & { hide: () => void }) => (
         <ToastLayout {...props} type="success" />
     ),
@@ -116,52 +116,52 @@ const styles = StyleSheet.create({
         zIndex: 99999,
     },
 
-successBg: {
-    backgroundColor: '#CFFAE3',
+    successBg: {
+        backgroundColor: '#CFFAE3',
     },
-errorBg: {
-    backgroundColor: '#FAD1D1',
+    errorBg: {
+        backgroundColor: '#FAD1D1',
     },
 
-blob: {
-    position: 'absolute',
+    blob: {
+        position: 'absolute',
         left: -20,
-            width: 80,
-                height: 80,
-                    borderRadius: 40,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
     },
 
-iconWrapper: {
-    width: 36,
+    iconWrapper: {
+        width: 36,
         height: 36,
-            borderRadius: 18,
-                backgroundColor: '#FFFFFF',
-                    justifyContent: 'center',
-                        alignItems: 'center',
-                            marginRight: 12,
-                                zIndex: 2,
-    },
-
-textContainer: {
-    flex: 1,
+        borderRadius: 18,
+        backgroundColor: '#FFFFFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
         zIndex: 2,
     },
 
-title: {
-    fontSize: 14,
+    textContainer: {
+        flex: 1,
+        zIndex: 2,
+    },
+
+    title: {
+        fontSize: 14,
         fontWeight: '800',
-            color: '#0F172A',
+        color: '#0F172A',
     },
 
-subtitle: {
-    fontSize: 12,
+    subtitle: {
+        fontSize: 12,
         color: '#334155',
-            marginTop: 2,
-                lineHeight: 18,
+        marginTop: 2,
+        lineHeight: 18,
     },
 
-closeBtn: {
-    padding: 6,
+    closeBtn: {
+        padding: 6,
         zIndex: 2,
     },
 });

@@ -1,11 +1,11 @@
 import { BUSINESS_QUERY_KEYS, getBusinessesList } from '@/apis/business';
 import BusinessCard from '@/components/business/BusinessCard';
-import BankCard from '@/components/listing/bankCard';
+import BankCard from '@/components/listing/BankCard';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { BusinessRegistration } from '@/components/business/BusinessRegistration';
 import { NotificationIcon } from '@/components/common/NotificationIcon';
 import { ProfessionPicker } from '@/components/common/ProfessionPicker';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -17,7 +17,6 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useLocalSearchParams, useNavigation, useFocusEffect } from 'expo-router';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
-    FlatList,
     Platform,
     StyleSheet,
     TextInput,
@@ -25,6 +24,7 @@ import {
     View,
     ActivityIndicator
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import { useTooltipStore } from '@/store/tooltipStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -155,6 +155,38 @@ export default function BusinessScreen() {
     }, []);
     const keyExtractor = React.useCallback((item: any) => item._id?.$oid || item._id?.toString() || Math.random().toString(), []);
 
+    const handleEndReached = useCallback(() => {
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    const renderFooter = useCallback(() => {
+        if (isFetchingNextPage) {
+            return (
+                <View style={{ paddingVertical: 20 }}>
+                    <ActivityIndicator color={colors.primary} />
+                </View>
+            );
+        }
+        if (!hasNextPage && businesses.length > 0) {
+            return (
+                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, paddingVertical: 20 }}>
+                    End of directory
+                </ThemedText>
+            );
+        }
+        return null;
+    }, [isFetchingNextPage, hasNextPage, businesses.length, colors.primary]);
+
+    const renderEmpty = useCallback(() => (
+        <View style={styles.emptyContainer}>
+            <Ionicons name="business-outline" size={64} color={colors.icon} />
+            <ThemedText style={[styles.emptyText, { color: colors.text }]}>No businesses found.</ThemedText>
+            <ThemedText style={[styles.emptySubText, { color: colors.icon }]}>Try adjusting your search criteria</ThemedText>
+        </View>
+    ), [colors.icon, colors.text]);
+
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -275,37 +307,17 @@ export default function BusinessScreen() {
                             ))}
                         </View>
                     ) : (
-                        <FlatList
+                        <FlashList
                             data={businesses}
                             renderItem={renderItem}
                             keyExtractor={keyExtractor}
                             contentContainerStyle={styles.listContent}
                             onRefresh={handleRefresh}
                             refreshing={loading && !isFetchingNextPage}
-                            onEndReached={() => {
-                                if (hasNextPage && !isFetchingNextPage) {
-                                    fetchNextPage();
-                                }
-                            }}
+                            onEndReached={handleEndReached}
                             onEndReachedThreshold={0.5}
-                            ListFooterComponent={
-                                isFetchingNextPage ? (
-                                    <View style={{ paddingVertical: 20 }}>
-                                        <ActivityIndicator color={colors.primary} />
-                                    </View>
-                                ) : hasNextPage ? null : businesses.length > 0 ? (
-                                    <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, paddingVertical: 20 }}>
-                                        End of directory
-                                    </ThemedText>
-                                ) : null
-                            }
-                            ListEmptyComponent={
-                                <View style={styles.emptyContainer}>
-                                    <Ionicons name="business-outline" size={64} color={colors.icon} />
-                                    <ThemedText style={[styles.emptyText, { color: colors.text }]}>No businesses found.</ThemedText>
-                                    <ThemedText style={[styles.emptySubText, { color: colors.icon }]}>Try adjusting your search criteria</ThemedText>
-                                </View>
-                            }
+                            ListFooterComponent={renderFooter}
+                            ListEmptyComponent={renderEmpty}
                         />
                     )}
                 </View>

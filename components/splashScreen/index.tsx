@@ -2,7 +2,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
     Easing,
@@ -17,9 +17,9 @@ import Animated, {
 const { width } = Dimensions.get('window');
 const LOGO_SIZE = width * 0.6;
 
-const logoImg = require('../../public/logo_with_text.png');
+const logoImg = require('../../public/logo_with_text.webp');
 
-export default function SplashScreen() {
+const SplashScreen = React.memo(function SplashScreen() {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const isDark = theme === 'dark';
@@ -32,9 +32,9 @@ export default function SplashScreen() {
     const subtitleChars = subtitleText.split("");
 
     // Shared values for animations
-    const logoScale = useSharedValue(0.5);
-    const logoOpacity = useSharedValue(0);
-    const logoTranslateY = useSharedValue(35);
+    const logoScale = useSharedValue(1); // Start fully scaled
+    const logoOpacity = useSharedValue(1); // Start fully visible
+    const logoTranslateY = useSharedValue(0); // Start at rest
 
     const glowScale = useSharedValue(0.85);
     const glowOpacity = useSharedValue(0);
@@ -46,10 +46,10 @@ export default function SplashScreen() {
     const subtitleProgress = useSharedValue(0);
 
     useEffect(() => {
-        // 1. Elastic Spring logo entrance
-        logoScale.value = withSpring(1, { damping: 14, stiffness: 85 });
-        logoOpacity.value = withTiming(1, { duration: 600 });
-        logoTranslateY.value = withSpring(0, { damping: 14, stiffness: 85 });
+        // 1. Elastic Spring logo entrance (Commented out for seamless transition from OS Splash)
+        // logoScale.value = withSpring(1, { damping: 14, stiffness: 85 });
+        // logoOpacity.value = withTiming(1, { duration: 600 });
+        // logoTranslateY.value = withSpring(0, { damping: 14, stiffness: 85 });
 
         // 2. Repeating breathing glow halo behind the logo
         glowScale.value = withRepeat(
@@ -181,7 +181,7 @@ export default function SplashScreen() {
             </View>
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -240,3 +240,5 @@ const styles = StyleSheet.create({
         letterSpacing: 1.5,
     },
 });
+
+export default SplashScreen;

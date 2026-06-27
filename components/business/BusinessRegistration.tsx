@@ -18,7 +18,7 @@ import {
     getBusinessStatus,
     manageBusinessSearch
 } from '@/apis/business';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -113,8 +113,8 @@ const BusinessRegistration = React.memo(() => {
 
     return (
         <View style={styles.container}>
-            <ScrollView 
-                style={styles.container} 
+            <ScrollView
+                style={styles.container}
                 contentContainerStyle={styles.scrollContent}
                 refreshControl={
                     <RefreshControl

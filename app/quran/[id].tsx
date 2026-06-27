@@ -7,10 +7,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Audio } from 'expo-av';
 
 import { getSurah } from '@/apis/quran';
-import { ThemedText } from '@/components/themedText';
-import { ThemedView } from '@/components/themedView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 // Import memoized components
 import { AyahItem } from '@/components/quran/AyahItem';
@@ -87,6 +88,17 @@ export default function SurahDetailScreen() {
             cleanupExpiredCache();
         }
     }, [audioEdition, surahNumber]);
+
+    // Track analytics event when Surah is loaded
+    useEffect(() => {
+        if (surahInfo && surahInfo.name) {
+            analyticsService.trackEvent(AnalyticsEvents.QURAN_SURAH_OPENED, {
+                surahNumber,
+                surahName: surahInfo.name,
+                surahEnglishName: surahInfo.englishName
+            });
+        }
+    }, [surahInfo?.name, surahNumber]);
 
     // Clean up sound on unmount
     useEffect(() => {
@@ -285,7 +297,7 @@ export default function SurahDetailScreen() {
                             onPress={handlePlaySurah}
                             style={[
                                 styles.headerToggle,
-                                { 
+                                {
                                     backgroundColor: playingIndex !== null ? colors.primary : colors.card,
                                     borderColor: playingIndex !== null ? colors.primary : colors.border,
                                     marginRight: 8
@@ -293,10 +305,10 @@ export default function SurahDetailScreen() {
                             ]}
                             activeOpacity={0.7}
                         >
-                            <Ionicons 
-                                name={playingIndex !== null ? "pause" : "play"} 
-                                size={12} 
-                                color={playingIndex !== null ? '#FFFFFF' : colors.text} 
+                            <Ionicons
+                                name={playingIndex !== null ? "pause" : "play"}
+                                size={12}
+                                color={playingIndex !== null ? '#FFFFFF' : colors.text}
                                 style={{ marginRight: 4 }}
                             />
                             <ThemedText style={[
@@ -312,7 +324,7 @@ export default function SurahDetailScreen() {
                             onPress={() => setIsAutoPlay(prev => !prev)}
                             style={[
                                 styles.headerToggle,
-                                { 
+                                {
                                     backgroundColor: isAutoPlay ? colors.primary : colors.card,
                                     borderColor: isAutoPlay ? colors.primary : colors.border,
                                     marginRight: 8
@@ -320,10 +332,10 @@ export default function SurahDetailScreen() {
                             ]}
                             activeOpacity={0.7}
                         >
-                            <Ionicons 
-                                name={isAutoPlay ? "play-circle" : "play-circle-outline"} 
-                                size={14} 
-                                color={isAutoPlay ? '#FFFFFF' : colors.text} 
+                            <Ionicons
+                                name={isAutoPlay ? "play-circle" : "play-circle-outline"}
+                                size={14}
+                                color={isAutoPlay ? '#FFFFFF' : colors.text}
                                 style={{ marginRight: 4 }}
                             />
                             <ThemedText style={[
@@ -339,7 +351,7 @@ export default function SurahDetailScreen() {
                             onPress={() => setShowTranslation(prev => !prev)}
                             style={[
                                 styles.headerToggle,
-                                { 
+                                {
                                     backgroundColor: showTranslation ? colors.primary : colors.card,
                                     borderColor: showTranslation ? colors.primary : colors.border
                                 }

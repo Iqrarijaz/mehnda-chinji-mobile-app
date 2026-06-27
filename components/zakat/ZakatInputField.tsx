@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, TextInput } from 'react-native';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface ZakatInputFieldProps {
     label: string;

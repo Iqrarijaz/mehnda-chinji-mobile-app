@@ -23,7 +23,8 @@ import Toast from 'react-native-toast-message';
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import { submitEssential, updateRequest, uploadUserImage } from '@/apis/essentials';
 import { TimePicker } from '@/components/common/TimePicker';
-import { ThemedText } from '@/components/themedText';
+import { ThankYouModal } from '@/components/common/ThankYou';
+import { ThemedText } from '@/components/ThemedText';
 import { getCategoryTypes } from '@/constants/categoryTypes';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -99,6 +100,7 @@ const PlaceSubmissionScreen = () => {
     const [isOptimizingDesc, setIsOptimizingDesc] = useState(false);
     const [isOptimizingServices, setIsOptimizingServices] = useState(false);
     const [descriptionHeight, setDescriptionHeight] = useState(120);
+    const [showThankYou, setShowThankYou] = useState(false);
 
     const handleOptimizeText = async (type: 'description' | 'services') => {
         const textToOptimize = type === 'description'
@@ -376,16 +378,9 @@ const PlaceSubmissionScreen = () => {
             });
             queryClient.invalidateQueries({ queryKey: ['my-essential-requests'] });
             if (!isEditing) {
-                router.replace('/user/requests');
+                setShowThankYou(true);
             } else {
                 handleGoBack();
-            }
-            if (!isEditing && user?.user?.role !== 'APP_ADMIN') {
-                setTimeout(() => {
-                    import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
-                        InterstitialService.getInstance().show(true);
-                    });
-                }, 2000);
             }
         },
         onError: (error: any) => {
@@ -505,7 +500,7 @@ const PlaceSubmissionScreen = () => {
             category: category,
             images: uploadedImage ? [uploadedImage] : [],
             tags: (form.tags || []).map((t: any) => ({ eng: t.eng, ur: t.ur })),
-            route: isTravel 
+            route: isTravel
                 ? form.route
                     .filter(r => r.city.trim() !== '' || r.time !== '')
                     .map(r => ({ city: r.city, time: r.time }))
@@ -562,6 +557,16 @@ const PlaceSubmissionScreen = () => {
         return false;
     }, [form, uploadedImage, editData, isEditing]);
 
+    const handleThankYouClose = () => {
+        setShowThankYou(false);
+        router.replace('/user/requests');
+        if (user?.user?.role !== 'APP_ADMIN') {
+            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                InterstitialService.getInstance().show(true);
+            });
+        }
+    };
+
     return (
         <View style={[styles.mainContainer, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{
@@ -569,6 +574,18 @@ const PlaceSubmissionScreen = () => {
                 gestureEnabled: true,
                 animation: 'slide_from_right'
             }} />
+
+            <ThankYouModal
+                visible={showThankYou}
+                onClose={handleThankYouClose}
+                animationSource={require('@/public/json/onboarding1.json')}
+                animationWidth={260}
+                animationHeight={200}
+            >
+                <ThemedText style={{ fontSize: 14, textAlign: 'center', lineHeight: 22, color: colors.textSecondary }}>
+                    Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{user?.user?.name ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Hero'}</ThemedText>, thank you for your submission! Our team will review and approve this place shortly.
+                </ThemedText>
+            </ThankYouModal>
 
             {/* Header */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>

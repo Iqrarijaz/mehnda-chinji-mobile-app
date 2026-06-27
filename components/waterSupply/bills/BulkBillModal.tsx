@@ -11,8 +11,8 @@ import {
     Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
-import moment from 'moment';
+import { ThemedText } from '@/components/ThemedText';
+import moment from '@/utils/dayjs';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 

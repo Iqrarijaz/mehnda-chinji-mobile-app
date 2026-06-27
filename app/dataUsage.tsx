@@ -14,19 +14,17 @@ import { DataUsageEmptyState } from '@/components/dataUsage/DataUsageEmptyState'
 
 const DataUsageScreen = () => {
     const router = useRouter();
-    const {
-        total,
-        wifi,
-        mobile,
-        resetDate,
-        resetUsage,
-        toggleSetting,
-        clearCache,
-        lowDataMode,
-        downloadWifiOnly,
-        autoSyncMobile,
-        backgroundUsage
-    } = useDataUsageStore();
+    const total = useDataUsageStore(state => state.total);
+    const wifi = useDataUsageStore(state => state.wifi);
+    const mobile = useDataUsageStore(state => state.mobile);
+    const resetDate = useDataUsageStore(state => state.resetDate);
+    const resetUsage = useDataUsageStore(state => state.resetUsage);
+    const toggleSetting = useDataUsageStore(state => state.toggleSetting);
+    const clearCache = useDataUsageStore(state => state.clearCache);
+    const lowDataMode = useDataUsageStore(state => state.lowDataMode);
+    const downloadWifiOnly = useDataUsageStore(state => state.downloadWifiOnly);
+    const autoSyncMobile = useDataUsageStore(state => state.autoSyncMobile);
+    const backgroundUsage = useDataUsageStore(state => state.backgroundUsage);
 
     const settings = {
         lowDataMode,

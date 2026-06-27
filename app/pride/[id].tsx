@@ -8,7 +8,7 @@ import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInUp, FadeInLeft } from 'react-native-reanimated';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -197,13 +197,13 @@ export default function PrideDetailsScreen() {
                 </View>
 
                 {/* 2. Floating profile overview card */}
-                <Animated.View 
-                    entering={FadeInUp.delay(200).duration(500)} 
+                <Animated.View
+                    entering={FadeInUp.delay(200).duration(500)}
                     style={[
-                        styles.profileCard, 
-                        { 
-                            backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', 
-                            marginTop: -37 
+                        styles.profileCard,
+                        {
+                            backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF',
+                            marginTop: -37
                         }
                     ]}
                 >
@@ -290,9 +290,9 @@ export default function PrideDetailsScreen() {
                 <Animated.View entering={FadeInLeft.delay(350).duration(450)} style={styles.section}>
                     <ThemedText style={styles.sectionHeader}>The Inspiring Story</ThemedText>
                     <View style={[
-                        styles.storyCard, 
-                        { 
-                            backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', 
+                        styles.storyCard,
+                        {
+                            backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF',
                         }
                     ]}>
                         <ThemedText style={[styles.storyText, { color: colors.text }]}>
@@ -305,9 +305,9 @@ export default function PrideDetailsScreen() {
                     <Animated.View entering={FadeInLeft.delay(450).duration(450)} style={styles.section}>
                         <ThemedText style={styles.sectionHeader}>Key Contributions</ThemedText>
                         <View style={[
-                            styles.milestonesCard, 
-                            { 
-                                backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF', 
+                            styles.milestonesCard,
+                            {
+                                backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF',
                             }
                         ]}>
                             {achievements.map((achievement: string, idx: number) => (
@@ -335,8 +335,8 @@ export default function PrideDetailsScreen() {
                             contentContainerStyle={styles.galleryScroll}
                         >
                             {postData.images.map((img: string, idx: number) => (
-                                <View 
-                                    key={idx} 
+                                <View
+                                    key={idx}
                                     style={styles.galleryImageWrap}
                                 >
                                     <Image

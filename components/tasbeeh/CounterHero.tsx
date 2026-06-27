@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface CounterHeroProps {
     count: number;
@@ -25,10 +25,10 @@ export const CounterHero = React.memo(({
             onPress={onTap}
             style={[styles.counterBtn, { backgroundColor: accentColor }]}
         >
-            <Image 
-                source={require('@/assets/icons/tasbeeh_icon.webp')} 
-                style={styles.btnIcon} 
-                resizeMode="contain" 
+            <Image
+                source={require('@/assets/icons/tasbeeh_icon.webp')}
+                style={styles.btnIcon}
+                resizeMode="contain"
             />
             <ThemedText style={styles.counterNum}>{count}</ThemedText>
             {target > 0 && (

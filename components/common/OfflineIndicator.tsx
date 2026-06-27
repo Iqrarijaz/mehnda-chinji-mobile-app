@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View, Platform } from 'react-native';
-import Animated, { 
-    useSharedValue, 
-    useAnimatedStyle, 
-    withSpring, 
-    withTiming 
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withSpring,
+    withTiming
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface OfflineIndicatorProps {
     visible: boolean;

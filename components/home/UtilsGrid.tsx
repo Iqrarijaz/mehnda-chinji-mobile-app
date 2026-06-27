@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
@@ -84,7 +84,7 @@ export function UtilsGrid() {
     const colors = Colors[theme];
 
     // Only render categories that have items populated
-    const activeCategories = CATEGORIES.filter(cat => cat.items.length > 0);
+    const activeCategories = React.useMemo(() => CATEGORIES.filter(cat => cat.items.length > 0), []);
 
     return (
         <View style={styles.container}>

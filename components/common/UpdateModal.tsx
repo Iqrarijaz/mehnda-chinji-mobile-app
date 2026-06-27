@@ -8,7 +8,7 @@ import {
     Platform,
     Linking
 } from 'react-native';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';

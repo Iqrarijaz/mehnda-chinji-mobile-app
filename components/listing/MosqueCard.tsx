@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 

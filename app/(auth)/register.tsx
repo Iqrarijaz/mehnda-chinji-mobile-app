@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Image } from 'expo-image';
 import {
     KeyboardAvoidingView,

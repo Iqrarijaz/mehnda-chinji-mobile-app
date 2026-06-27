@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { View, StyleSheet, ActivityIndicator, Animated } from 'react-native';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { formatTime12h } from '@/utils/dateUtils';
 import { Layout } from '@/constants/layout';
 
@@ -89,7 +89,7 @@ const PrayerRow = memo(({ prayer, isNext, pulseAnim, C, isDark }: PrayerRowProps
                         {prayer.arabic}
                     </ThemedText>
                 </View>
-                <ThemedText 
+                <ThemedText
                     style={[styles.adhanText, { color: isNext ? (isDark ? '#F1F5F9' : theme.accent) : C.textSecondary, textAlign: 'center' }]}
                 >
                     {formatTime12h(prayer.adhan).replace(' ', '')}

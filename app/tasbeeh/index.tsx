@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -17,6 +17,7 @@ import { StatCard } from '@/components/tasbeeh/StatCard';
 import { TargetChip } from '@/components/tasbeeh/TargetChip';
 
 // Import Analytics components
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { PrayerTrackerCard, PrayerKey, PrayerStatus } from '@/components/tasbeeh/PrayerTrackerCard';
 import { StreakBanner } from '@/components/tasbeeh/StreakBanner';
 import { WeeklyBarChart } from '@/components/tasbeeh/SpiritualCharts';
@@ -26,10 +27,10 @@ import { WeeklyBarChart } from '@/components/tasbeeh/SpiritualCharts';
 const ACCENT = '#059669'; // emerald green — Quran module colour
 
 const DHIKR_PRESETS = [
-    { id: 'subhanallah',   arabic: 'سُبْحَانَ ٱللَّهِ',   roman: 'SubhanAllah',   meaning: 'Glory be to Allah' },
-    { id: 'alhamdulillah', arabic: 'ٱلْحَمْدُ لِلَّهِ',   roman: 'Alhamdulillah', meaning: 'Praise be to Allah' },
-    { id: 'allahuakbar',   arabic: 'ٱللَّهُ أَكْبَرُ',    roman: 'Allahu Akbar',  meaning: 'Allah is the Greatest' },
-    { id: 'astaghfirullah',arabic: 'أَسْتَغْفِرُ ٱللَّهَ', roman: 'Astaghfirullah',meaning: 'I seek forgiveness' },
+    { id: 'subhanallah', arabic: 'سُبْحَانَ ٱللَّهِ', roman: 'SubhanAllah', meaning: 'Glory be to Allah' },
+    { id: 'alhamdulillah', arabic: 'ٱلْحَمْدُ لِلَّهِ', roman: 'Alhamdulillah', meaning: 'Praise be to Allah' },
+    { id: 'allahuakbar', arabic: 'ٱللَّهُ أَكْبَرُ', roman: 'Allahu Akbar', meaning: 'Allah is the Greatest' },
+    { id: 'astaghfirullah', arabic: 'أَسْتَغْفِرُ ٱللَّهَ', roman: 'Astaghfirullah', meaning: 'I seek forgiveness' },
 ];
 
 const TARGETS = [33, 99, 100, 0];
@@ -82,7 +83,7 @@ export default function TasbeehScreen() {
                 if (s) setSessions(parseInt(s, 10));
                 if (pLogs) setPrayerLogs(JSON.parse(pLogs));
                 if (tHistory) setTasbeehHistory(JSON.parse(tHistory));
-            } catch {}
+            } catch { }
         })();
     }, []);
 
@@ -94,7 +95,7 @@ export default function TasbeehScreen() {
                 AsyncStorage.setItem('tasbeeh_target', t.toString()),
                 AsyncStorage.setItem('tasbeeh_sessions', s.toString()),
             ]);
-        } catch {}
+        } catch { }
     };
 
     // ── Handlers ───────────────────────────────────────────────────────────────
@@ -114,7 +115,13 @@ export default function TasbeehScreen() {
                 [todayStr]: (tasbeehHistory[todayStr] || 0) + 1
             };
             setTasbeehHistory(updatedHistory);
-            AsyncStorage.setItem('tasbeeh_history_logs', JSON.stringify(updatedHistory)).catch(() => {});
+            AsyncStorage.setItem('tasbeeh_history_logs', JSON.stringify(updatedHistory)).catch(() => { });
+
+            analyticsService.trackEvent(AnalyticsEvents.TASBEEH_COMPLETED, {
+                dhikr: DHIKR_PRESETS[dhikrIdx]?.id,
+                target,
+                session: ns
+            });
 
             Alert.alert('MashaAllah! 🎉', `Session ${ns} complete.`, [{ text: 'Alhamdulillah' }]);
         } else {
@@ -152,20 +159,20 @@ export default function TasbeehScreen() {
     // Toggle daily prayer status cycle
     const handleTogglePrayer = useCallback(async (prayerKey: PrayerKey) => {
         const todayStr = getTodayString();
-        const currentDayLog = prayerLogs[todayStr] || { 
-            fajr: 'unchecked', 
-            dhuhr: 'unchecked', 
-            asr: 'unchecked', 
-            maghrib: 'unchecked', 
-            isha: 'unchecked' 
+        const currentDayLog = prayerLogs[todayStr] || {
+            fajr: 'unchecked',
+            dhuhr: 'unchecked',
+            asr: 'unchecked',
+            maghrib: 'unchecked',
+            isha: 'unchecked'
         };
         const currentStatus = currentDayLog[prayerKey] || 'unchecked';
-        
+
         let nextStatus: PrayerStatus = 'unchecked';
         if (currentStatus === 'unchecked') nextStatus = 'on_time';
         else if (currentStatus === 'on_time') nextStatus = 'late';
         else if (currentStatus === 'late') nextStatus = 'missed';
-        
+
         const updatedLogs = {
             ...prayerLogs,
             [todayStr]: {
@@ -173,11 +180,11 @@ export default function TasbeehScreen() {
                 [prayerKey]: nextStatus
             }
         };
-        
+
         setPrayerLogs(updatedLogs);
         try {
             await AsyncStorage.setItem('prayer_tracker_logs', JSON.stringify(updatedLogs));
-        } catch {}
+        } catch { }
     }, [prayerLogs]);
 
     // ── Calculated Streaks & Weekly Charts Data ─────────────────────────────────
@@ -189,7 +196,7 @@ export default function TasbeehScreen() {
         // Check if there is anything logged today. If not, start yesterday to maintain streak
         const todayLog = prayerLogs[todayStr];
         const hasLoggedToday = todayLog && Object.values(todayLog).some(val => val === 'on_time' || val === 'late');
-        
+
         if (!hasLoggedToday) {
             checkDate.setDate(checkDate.getDate() - 1);
         }
@@ -199,7 +206,7 @@ export default function TasbeehScreen() {
             const month = String(checkDate.getMonth() + 1).padStart(2, '0');
             const day = String(checkDate.getDate()).padStart(2, '0');
             const dateStr = `${year}-${month}-${day}`;
-            
+
             const dayLog = prayerLogs[dateStr];
             if (dayLog) {
                 const hasLogged = Object.values(dayLog).some(val => val === 'on_time' || val === 'late');
@@ -217,25 +224,25 @@ export default function TasbeehScreen() {
     const weeklyChartData = useMemo(() => {
         const data = [];
         const weekdaysShort = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-        
+
         for (let i = 6; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
-            
+
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
             const dateStr = `${year}-${month}-${day}`;
-            
-            const dayLog = prayerLogs[dateStr] || { 
-                fajr: 'unchecked', 
-                dhuhr: 'unchecked', 
-                asr: 'unchecked', 
-                maghrib: 'unchecked', 
-                isha: 'unchecked' 
+
+            const dayLog = prayerLogs[dateStr] || {
+                fajr: 'unchecked',
+                dhuhr: 'unchecked',
+                asr: 'unchecked',
+                maghrib: 'unchecked',
+                isha: 'unchecked'
             };
             const completedCount = Object.values(dayLog).filter(val => val === 'on_time' || val === 'late').length;
-            
+
             data.push({
                 dayLabel: weekdaysShort[d.getDay()],
                 percentage: completedCount / 5,
@@ -258,10 +265,10 @@ export default function TasbeehScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={[styles.iconBtn, { backgroundColor: colors.card }]}>
                     <Ionicons name="arrow-back" size={22} color={colors.text} />
                 </TouchableOpacity>
-                <Image 
-                    source={require('@/assets/icons/tasbeeh_icon.webp')} 
-                    style={{ width: 26, height: 26, marginLeft: 10 }} 
-                    resizeMode="contain" 
+                <Image
+                    source={require('@/assets/icons/tasbeeh_icon.webp')}
+                    style={{ width: 26, height: 26, marginLeft: 10 }}
+                    resizeMode="contain"
                 />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                     <ThemedText style={styles.screenTitle}>Tasbeeh</ThemedText>
@@ -274,8 +281,8 @@ export default function TasbeehScreen() {
 
             {/* Segmented Tab Controls */}
             <View style={[styles.tabContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <TouchableOpacity 
-                    onPress={() => setActiveTab('counter')} 
+                <TouchableOpacity
+                    onPress={() => setActiveTab('counter')}
                     style={[styles.tabButton, activeTab === 'counter' && { backgroundColor: ACCENT }]}
                 >
                     <Ionicons name="finger-print-outline" size={16} color={activeTab === 'counter' ? '#fff' : colors.textSecondary} />
@@ -283,8 +290,8 @@ export default function TasbeehScreen() {
                         Counter
                     </ThemedText>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                    onPress={() => setActiveTab('analytics')} 
+                <TouchableOpacity
+                    onPress={() => setActiveTab('analytics')}
                     style={[styles.tabButton, activeTab === 'analytics' && { backgroundColor: ACCENT }]}
                 >
                     <Ionicons name="analytics-outline" size={16} color={activeTab === 'analytics' ? '#fff' : colors.textSecondary} />
@@ -386,14 +393,14 @@ export default function TasbeehScreen() {
                     contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 32 }]}
                 >
                     {/* Streak Banner */}
-                    <StreakBanner 
+                    <StreakBanner
                         colors={colors}
                         accentColor={ACCENT}
                         streak={currentStreak}
                     />
 
                     {/* Today's Prayers Checklist */}
-                    <PrayerTrackerCard 
+                    <PrayerTrackerCard
                         colors={colors}
                         accentColor={ACCENT}
                         log={prayerLogs[getTodayString()] || { fajr: 'unchecked', dhuhr: 'unchecked', asr: 'unchecked', maghrib: 'unchecked', isha: 'unchecked' }}
@@ -401,7 +408,7 @@ export default function TasbeehScreen() {
                     />
 
                     {/* Weekly Bar Chart */}
-                    <WeeklyBarChart 
+                    <WeeklyBarChart
                         colors={colors}
                         accentColor={ACCENT}
                         data={weeklyChartData}
@@ -472,10 +479,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 12,
     },
-    dhikrArabic: { 
-        fontSize: 21, 
-        fontWeight: 'bold', 
-        textAlign: 'center', 
+    dhikrArabic: {
+        fontSize: 21,
+        fontWeight: 'bold',
+        textAlign: 'center',
         marginBottom: 2,
         paddingVertical: 4,
     },

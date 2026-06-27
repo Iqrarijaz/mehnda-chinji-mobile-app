@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface AyahItemProps {
     index: number;
@@ -28,21 +28,21 @@ export const AyahItem = React.memo(({
     cardColor,
 }: AyahItemProps) => (
     <View style={[
-        styles.rowContainer, 
-        { 
+        styles.rowContainer,
+        {
             borderBottomColor: borderColor,
         }
     ]}>
         {/* Controls Column (Badge Only) */}
         <View style={styles.leftControls}>
             <View style={[
-                styles.badge, 
-                { 
+                styles.badge,
+                {
                     backgroundColor: isPlaying ? primaryColor : (primaryColor + '12'),
                 }
             ]}>
                 <ThemedText style={[
-                    styles.badgeText, 
+                    styles.badgeText,
                     { color: isPlaying ? '#FFFFFF' : primaryColor }
                 ]}>
                     {index + 1}
@@ -53,7 +53,7 @@ export const AyahItem = React.memo(({
         {/* Text Content Column */}
         <View style={styles.textContent}>
             <ThemedText style={[
-                styles.arabicText, 
+                styles.arabicText,
                 { color: isPlaying ? primaryColor : undefined }
             ]}>
                 {arabicText.replace(/\s+/g, '   ')}
@@ -90,9 +90,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    badgeText: { 
-        fontSize: 9, 
-        fontWeight: 'bold' 
+    badgeText: {
+        fontSize: 9,
+        fontWeight: 'bold'
     },
     textContent: {
         flex: 1,

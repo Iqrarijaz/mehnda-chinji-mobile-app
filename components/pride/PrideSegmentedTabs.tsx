@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
 import Animated, { Layout } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Layout as LayoutConst } from '@/constants/layout';
 
 export type PrideTabType = 'LEGENDS' | 'MEMORIAM';

@@ -17,7 +17,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -157,7 +157,7 @@ export default function CreatePridePostScreen() {
             .forEach((line, idx) => {
                 formData.append(`metadata[achievements][${idx}]`, line);
             });
-        
+
         if (form.profileImage?.uri) {
             const uriParts = form.profileImage.uri.split('.');
             const fileType = uriParts[uriParts.length - 1];
@@ -253,10 +253,10 @@ export default function CreatePridePostScreen() {
                     <View style={styles.profileImageInner}>
                         <TouchableOpacity
                             onPress={form.profileImage ? undefined : pickProfileImage}
-                            style={[styles.profileImageWrapper, { 
-                                borderColor: colors.border, 
+                            style={[styles.profileImageWrapper, {
+                                borderColor: colors.border,
                                 backgroundColor: theme === 'dark' ? colors.card : '#FFFFFF',
-                                borderStyle: form.profileImage ? 'solid' : 'dashed' 
+                                borderStyle: form.profileImage ? 'solid' : 'dashed'
                             }]}
                             activeOpacity={form.profileImage ? 1 : 0.8}
                         >
@@ -272,8 +272,8 @@ export default function CreatePridePostScreen() {
                             )}
                         </TouchableOpacity>
                         {form.profileImage && (
-                            <TouchableOpacity 
-                                style={[styles.profileRemoveIcon, { zIndex: 99 }]} 
+                            <TouchableOpacity
+                                style={[styles.profileRemoveIcon, { zIndex: 99 }]}
                                 onPress={() => updateForm('profileImage', null)}
                             >
                                 <Ionicons name="trash" size={16} color="#FFFFFF" />
@@ -348,7 +348,7 @@ export default function CreatePridePostScreen() {
                     textAlignVertical="top"
                 />
                 <ThemedText style={styles.fieldLabel}>Key Contributions</ThemedText>
-                
+
                 {/* Achievements Tiles */}
                 <View style={styles.tilesContainer}>
                     {form.achievements.map((item, index) => (

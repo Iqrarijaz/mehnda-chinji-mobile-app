@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { PremiumModal } from '../common/PremiumModal';
 import { Layout } from '@/constants/layout';
 

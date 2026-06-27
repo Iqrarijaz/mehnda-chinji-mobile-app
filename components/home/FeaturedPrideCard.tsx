@@ -4,14 +4,14 @@ import { useRouter } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp, useAnimatedStyle, useSharedValue, withRepeat, withTiming, interpolateColor } from 'react-native-reanimated';
 
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { usePosts, useLikePost } from '@/hooks/usePosts';
 import Avatar from '../ui/avatar';
 
-export const FeaturedPrideCard = () => {
+export const FeaturedPrideCard = React.memo(() => {
     const router = useRouter();
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -188,7 +188,7 @@ export const FeaturedPrideCard = () => {
             </TouchableOpacity>
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

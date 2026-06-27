@@ -11,9 +11,9 @@ import {
     Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import moment from 'moment';
+import moment from '@/utils/dayjs';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 

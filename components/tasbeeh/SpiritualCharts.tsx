@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 // ── Progress Ring Component (SVG) ──
 interface ProgressRingProps {
@@ -79,24 +79,24 @@ export const WeeklyBarChart = React.memo(({
         <View style={[styles.chartCard, { backgroundColor: colors.card }]}>
             <ThemedText style={styles.chartTitle}>Weekly Consistency</ThemedText>
             <ThemedText style={[styles.chartSub, { color: colors.textSecondary }]}>Percentage of completed daily prayers</ThemedText>
-            
+
             <View style={styles.barsContainer}>
                 {data.map((item, idx) => {
                     const fillHeight = `${Math.round(item.percentage * 100)}%`;
-                    
+
                     return (
                         <View key={idx} style={styles.barColumn}>
                             {/* Bar Track */}
                             <View style={[styles.barTrack, { backgroundColor: colors.border }]}>
                                 {/* Bar Fill */}
-                                <View 
+                                <View
                                     style={[
-                                        styles.barFill, 
-                                        { 
-                                            height: fillHeight as any, 
-                                            backgroundColor: item.percentage > 0.8 ? accentColor : (item.percentage > 0.4 ? '#F59E0B' : '#EF4444') 
+                                        styles.barFill,
+                                        {
+                                            height: fillHeight as any,
+                                            backgroundColor: item.percentage > 0.8 ? accentColor : (item.percentage > 0.4 ? '#F59E0B' : '#EF4444')
                                         }
-                                    ]} 
+                                    ]}
                                 />
                             </View>
                             {/* Day Label */}

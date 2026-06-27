@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { useRouter } from 'expo-router';
 import { EdgeInsets } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
@@ -33,7 +33,7 @@ function formatCountdown(secs: number): string {
     return [h, m, s].map((v) => String(v).padStart(2, '0')).join(':');
 }
 
-const HEADER_IMAGE = require('../../assets/images/mosque-banner.jpg');
+const HEADER_IMAGE = require('../../assets/images/mosque-banner.webp');
 
 
 /** Standalone component to isolate 1-second re-renders */
@@ -119,7 +119,7 @@ export const PrayerHeader = React.memo(({
                     </View>
 
                     <View style={styles.nextPrayerRight}>
-                        <ThemedText 
+                        <ThemedText
                             style={[styles.nextPrayerTime, { color: C.text, textAlign: 'right' }]}
                         >
                             {formatTime12h(nextPrayer.adhan)}

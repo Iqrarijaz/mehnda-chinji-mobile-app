@@ -12,7 +12,7 @@ import {
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 
 interface TimePickerProps {
     visible: boolean;
@@ -75,8 +75,8 @@ export function TimePicker({
                         activeOpacity={0.7}
                         style={[
                             styles.optionItem,
-                            value === item && { 
-                                backgroundColor: colors.primary + '15', 
+                            value === item && {
+                                backgroundColor: colors.primary + '15',
                                 borderRadius: 12,
                                 borderColor: colors.primary + '30',
                                 borderWidth: 1
@@ -112,7 +112,7 @@ export function TimePicker({
                             style={StyleSheet.absoluteFill}
                         />
                     )}
-                    
+
                     <View style={styles.modalHeader}>
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>{title}</ThemedText>
                         <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: colors.border }]}>
@@ -130,8 +130,8 @@ export function TimePicker({
                         {renderColumn(periods, period, setPeriod, 0.8)}
                     </View>
 
-                    <TouchableOpacity 
-                        style={styles.confirmBtn} 
+                    <TouchableOpacity
+                        style={styles.confirmBtn}
                         onPress={handleConfirm}
                         activeOpacity={0.8}
                     >

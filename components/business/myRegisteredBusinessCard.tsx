@@ -5,7 +5,6 @@ import {
     Platform,
     StyleSheet,
     Switch,
-    TouchableOpacity,
     View,
 } from 'react-native';
 import {
@@ -15,7 +14,7 @@ import {
     MenuTrigger,
 } from 'react-native-popup-menu';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
@@ -337,35 +336,30 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     menuPopover: {
-        width: 170,
+        width: 130,
         borderRadius: Layout.borderRadius,
         borderWidth: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.12,
-        shadowRadius: 16,
-        elevation: 8,
         zIndex: 100,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
+        paddingHorizontal: 4,
+        paddingVertical: 4,
     },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
-        paddingHorizontal: 8,
+        paddingVertical: 6,
+        paddingHorizontal: 6,
         borderRadius: Layout.borderRadius - 4,
-        gap: 10,
+        gap: 8,
     },
     menuIconBox: {
-        width: 28,
-        height: 28,
-        borderRadius: 8,
+        width: 24,
+        height: 24,
+        borderRadius: 6,
         justifyContent: 'center',
         alignItems: 'center',
     },
     menuItemText: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '600',
     },
     menuSeparator: {

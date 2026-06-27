@@ -11,8 +11,8 @@ import {
     Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
-import moment from 'moment';
+import { ThemedText } from '@/components/ThemedText';
+import moment from '@/utils/dayjs';
 
 interface BillModalProps {
     visible: boolean;
@@ -108,7 +108,7 @@ export default function BillModal({
         >
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{ flex: 1 }}
+                style={styles.keyboardAvoidingView}
             >
                 <View style={styles.modalOverlay}>
                     <View style={[styles.modalContent, { backgroundColor: isDark ? '#1e293b' : '#FFF' }]}>
@@ -133,7 +133,7 @@ export default function BillModal({
                             ) : (
                                 <View style={styles.formGroup}>
                                     <ThemedText style={styles.fieldLabel}>Select Connection *</ThemedText>
-                                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 8 }}>
+                                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.connectionScroll}>
                                         {connections.map((c) => (
                                             <TouchableOpacity
                                                 key={c._id}
@@ -153,8 +153,8 @@ export default function BillModal({
                                                     }
                                                 ]}
                                             >
-                                                <ThemedText style={{ color: formData.connectionId === c._id ? '#FFF' : colors.text, fontWeight: '600' }}>{c.name}</ThemedText>
-                                                <ThemedText style={{ color: formData.connectionId === c._id ? '#FFF' : colors.textSecondary, fontSize: 10 }}>{c.connectionId}</ThemedText>
+                                                <ThemedText style={[styles.connectionOptionName, { color: formData.connectionId === c._id ? '#FFF' : colors.text }]}>{c.name}</ThemedText>
+                                                <ThemedText style={[styles.connectionOptionSub, { color: formData.connectionId === c._id ? '#FFF' : colors.textSecondary }]}>{c.connectionId}</ThemedText>
                                             </TouchableOpacity>
                                         ))}
                                     </ScrollView>
@@ -198,7 +198,7 @@ export default function BillModal({
                                     {submitting ? 'Processing...' : mode === 'add' ? 'Generate Bill' : 'Save Changes'}
                                 </ThemedText>
                             </TouchableOpacity>
-                            <View style={{ height: 40 }} />
+                            <View style={styles.footerSpacing} />
                         </ScrollView>
                     </View>
                 </View>
@@ -288,5 +288,20 @@ const styles = StyleSheet.create({
         fontSize: 11,
         marginTop: 2,
         fontWeight: '600',
+    },
+    keyboardAvoidingView: {
+        flex: 1,
+    },
+    connectionScroll: {
+        marginVertical: 8,
+    },
+    connectionOptionName: {
+        fontWeight: '600',
+    },
+    connectionOptionSub: {
+        fontSize: 10,
+    },
+    footerSpacing: {
+        height: 40,
     },
 });

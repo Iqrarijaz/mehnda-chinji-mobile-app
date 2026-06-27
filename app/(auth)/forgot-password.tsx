@@ -1,9 +1,8 @@
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import {
-    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -15,17 +14,18 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '../../context/ThemeContext';
 import { forgotPasswordSchema } from '@/utils/validation';
 import * as yup from 'yup';
 import { checkAccountDetails, sendOtp } from '@/apis/login/forgot-password';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 
-export default function ForgotPasswordScreen() {
+const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { theme, isDark } = useTheme();
@@ -162,7 +162,7 @@ export default function ForgotPasswordScreen() {
                         {step === 1 ? (
                             <>
                                 {/* Email/Phone Input */}
-                                 <View style={styles.inputField}>
+                                <View style={styles.inputField}>
                                     <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
                                     <View style={[styles.inputBox, {
                                         backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
@@ -198,11 +198,7 @@ export default function ForgotPasswordScreen() {
                                     onPress={handleSubmit}
                                     disabled={loading}
                                 >
-                                    {loading ? (
-                                        <ActivityIndicator color="#FFFFFF" />
-                                    ) : (
-                                        <ThemedText style={styles.submitButtonText}>Find Account</ThemedText>
-                                    )}
+                                    <ThemedText style={styles.submitButtonText}>Find Account</ThemedText>
                                 </TouchableOpacity>
                             </>
                         ) : (
@@ -236,11 +232,7 @@ export default function ForgotPasswordScreen() {
                                     onPress={handleSendOtp}
                                     disabled={loading}
                                 >
-                                    {loading ? (
-                                        <ActivityIndicator color="#FFFFFF" />
-                                    ) : (
-                                        <ThemedText style={styles.submitButtonText}>Send OTP</ThemedText>
-                                    )}
+                                    <ThemedText style={styles.submitButtonText}>Send OTP</ThemedText>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
@@ -267,10 +259,12 @@ export default function ForgotPasswordScreen() {
                     </View>
                 </View>
             </ScrollView>
+            <LoaderOverlay visible={loading} />
         </KeyboardAvoidingView>
     );
+});
 
-}
+export default ForgotPasswordScreen;
 
 const styles = StyleSheet.create({
     container: {

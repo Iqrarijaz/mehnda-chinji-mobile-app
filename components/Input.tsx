@@ -3,7 +3,7 @@ import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
-import { ThemedText } from './themedText';
+import { ThemedText } from './ThemedText';
 
 interface InputProps extends TextInputProps {
     label?: string;

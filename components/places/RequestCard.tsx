@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,11 +11,11 @@ import {
     Platform,
 } from 'react-native';
 import { Image } from 'expo-image';
-import Animated, { 
-    FadeIn, 
-    useAnimatedStyle, 
-    useSharedValue, 
-    withSpring 
+import Animated, {
+    FadeIn,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring
 } from 'react-native-reanimated';
 import {
     Menu,
@@ -74,7 +74,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
     const isEducation = (item.category?.en || item.category) === 'education';
     const canManage = isEducation && isApproved;
     const hasActions = canManage || isPending || !isApproved;
-    
+
     // Animation Shared Values
     const scale = useSharedValue(1);
 
@@ -93,7 +93,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
     const mainImage = item.images?.[0] || item.image;
 
     return (
-        <Animated.View 
+        <Animated.View
             entering={FadeIn.duration(300)}
             style={[animatedStyle]}
         >
@@ -124,7 +124,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
                                 <Ionicons name="location" size={28} color={categoryColor} />
                             </View>
                         )}
-                        
+
                         {/* Category Chip Overlay */}
                         <View style={[styles.categoryBadge, { backgroundColor: categoryColor }]}>
                             <ThemedText style={styles.categoryText} numberOfLines={1}>
@@ -139,7 +139,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
                             <ThemedText style={[styles.title, { color: colors.text }]} numberOfLines={1}>
                                 {item.name}
                             </ThemedText>
-                            
+
                             {/* Status Pill */}
                             <View style={[styles.statusPill, { backgroundColor: statusConfig.color + '15' }]}>
                                 <Ionicons name={statusConfig.icon} size={12} color={statusConfig.color} />

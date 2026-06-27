@@ -25,6 +25,22 @@ export const useAppOpenAd = () => {
     segments[0] === 'privacy' ||
     segments[0] === 'weather';
 
+  const isAdLoaded = useAdsStore(state => state.isAdLoaded.appOpen);
+  const isShowingAppOpen = useAdsStore(state => state.isShowingAppOpen);
+  const hasShownColdStartAd = useRef(false);
+
+  // 1. Cold Start listener: Show the ad as soon as it loads during initial launch
+  useEffect(() => {
+    if (isAdLoaded && !isShowingAppOpen && !hasShownColdStartAd.current) {
+      const { isLoading } = useAdsStore.getState();
+      if (!isLoading && !isProtectedScreen) {
+        console.log('[useAppOpenAd] Ad loaded on cold start, showing ad...');
+        hasShownColdStartAd.current = true;
+        AppOpenService.getInstance().show(isProtectedScreen);
+      }
+    }
+  }, [isAdLoaded, isShowingAppOpen, isProtectedScreen]);
+
   // 2. App State listener for foreground/warm start transitions
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {

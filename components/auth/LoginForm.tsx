@@ -3,7 +3,6 @@ import {
     View,
     TextInput,
     TouchableOpacity,
-    ActivityIndicator,
     StyleSheet,
     Platform,
     Image
@@ -14,7 +13,7 @@ import * as Device from 'expo-device';
 import * as yup from 'yup';
 import Toast from 'react-native-toast-message';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -24,10 +23,11 @@ import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { loginSchema } from '@/utils/validation';
 import { clientStorage } from '@/utils/storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
 // Removed global configuration
 
-export function LoginForm() {
+export const LoginForm = React.memo(function LoginForm() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const { login } = useAuth();
@@ -219,14 +219,14 @@ export function LoginForm() {
             <View style={[styles.formCard, { backgroundColor: colors.card }]}>
                 {/* Email/Phone Input */}
                 <View style={styles.inputField}>
-                    <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL OR PHONE <ThemedText style={styles.required}>*</ThemedText></ThemedText>
+                    <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL <ThemedText style={styles.required}>*</ThemedText></ThemedText>
                     <View style={[styles.inputBox, {
                         backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
                         borderColor: errors.email && touched.email ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0')
                     }]}>
                         <Ionicons name="person-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
                         <TextInput
-                            placeholder="Enter your email or phone"
+                            placeholder="Enter your email"
                             placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
                             value={formData.email}
                             onChangeText={(email) => {
@@ -314,11 +314,7 @@ export function LoginForm() {
                     onPress={handleLogin}
                     disabled={formData.loading}
                 >
-                    {formData.loading ? (
-                        <ActivityIndicator color="#FFFFFF" />
-                    ) : (
-                        <ThemedText style={styles.loginButtonText}>Log In</ThemedText>
-                    )}
+                    <ThemedText style={styles.loginButtonText}>Log In</ThemedText>
                 </TouchableOpacity>
 
                 {/* Google Login Button */}
@@ -327,14 +323,10 @@ export function LoginForm() {
                     onPress={handleGoogleLogin}
                     disabled={formData.googleLoading}
                 >
-                    {formData.googleLoading ? (
-                        <ActivityIndicator color="#000000" />
-                    ) : (
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
-                            <ThemedText style={[styles.loginButtonText, { color: '#000000' }]}>Sign in with Google</ThemedText>
-                        </View>
-                    )}
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
+                        <ThemedText style={[styles.loginButtonText, { color: '#000000' }]}>Sign in with Google</ThemedText>
+                    </View>
                 </TouchableOpacity>
 
 
@@ -349,9 +341,10 @@ export function LoginForm() {
                     </TouchableOpacity>
                 </View>
             </View>
+            <LoaderOverlay visible={formData.loading || formData.googleLoading} />
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     formContainer: {

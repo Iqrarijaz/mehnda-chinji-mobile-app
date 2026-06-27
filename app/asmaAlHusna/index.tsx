@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { StyleSheet, View, FlatList, TextInput, TouchableOpacity, RefreshControl, ActivityIndicator, Image } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,9 +6,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getAsmaAlHusna, AsmaAlHusnaItem } from '@/apis/quran';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 const ACCENT = '#059669'; // Emerald green
 
@@ -58,7 +59,12 @@ export default function AsmaAlHusnaScreen() {
     const { data: response, isLoading, isError, refetch, isRefetching } = useQuery({
         queryKey: ['asma-al-husna'],
         queryFn: getAsmaAlHusna,
+        staleTime: 1000 * 60 * 60 * 24, // 24 hours
     });
+
+    useEffect(() => {
+        analyticsService.trackEvent(AnalyticsEvents.ASMA_AL_HUSNA_VIEWED);
+    }, []);
 
     const filteredNames = useMemo(() => {
         const list = response?.data || [];
@@ -254,7 +260,7 @@ const styles = StyleSheet.create({
     },
     arabicText: {
         fontSize: 20,
-        fontFamily: 'NotoNastaliq',
+        fontFamily: 'NotoNastaliqUrdu-Regular',
         textAlign: 'center',
         paddingVertical: 10,
         paddingHorizontal: 4,

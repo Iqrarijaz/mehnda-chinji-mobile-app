@@ -17,7 +17,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useNotificationStore, NotificationPreferences } from '@/store/notificationStore';
 import NotificationSectionCard from '@/components/notification/NotificationSectionCard';
 import NotificationToggleRow from '@/components/notification/NotificationToggleRow';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 export default function ManageNotificationsScreen() {
     const { theme } = useTheme();
@@ -25,12 +25,10 @@ export default function ManageNotificationsScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
 
-    const {
-        preferences,
-        isLoading,
-        loadPreferences,
-        setPreference
-    } = useNotificationStore();
+    const preferences = useNotificationStore(state => state.preferences);
+    const isLoading = useNotificationStore(state => state.isLoading);
+    const loadPreferences = useNotificationStore(state => state.loadPreferences);
+    const setPreference = useNotificationStore(state => state.setPreference);
 
     useEffect(() => {
         loadPreferences();

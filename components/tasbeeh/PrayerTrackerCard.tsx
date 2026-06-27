@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 export type PrayerStatus = 'unchecked' | 'on_time' | 'late' | 'missed';
 export type PrayerKey = 'fajr' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
@@ -51,7 +51,7 @@ export const PrayerTrackerCard = React.memo(({
         <View style={[styles.card, { backgroundColor: colors.card }]}>
             <ThemedText style={[styles.title, { color: colors.text }]}>Today's Prayers</ThemedText>
             <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>Tap to cycle: On-Time → Late → Missed → Reset</ThemedText>
-            
+
             <View style={styles.list}>
                 {PRAYERS.map((p) => {
                     const status = log[p.key] || 'unchecked';

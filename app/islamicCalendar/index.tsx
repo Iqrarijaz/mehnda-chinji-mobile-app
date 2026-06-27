@@ -1,19 +1,21 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity, ActivityIndicator, ImageBackground } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getHijriCalendar, CalendarDay } from '@/apis/quran';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 // Import refactored components
 import { CalendarHeader } from '@/components/islamicCalendar/CalendarHeader';
 import { MonthSelector } from '@/components/islamicCalendar/MonthSelector';
 import { DayTile } from '@/components/islamicCalendar/DayTile';
+import { MicroFeedback } from '@/components/feedback/MicroFeedback';
 
 const ACCENT = '#059669'; // Emerald green
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -29,14 +31,18 @@ export default function IslamicCalendarScreen() {
     const today = useMemo(() => new Date(), []);
     const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1); // 1-indexed
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
-    
+
     // State to hold the selected day details
     const [selectedDay, setSelectedDay] = useState<CalendarDay | null>(null);
 
+    useEffect(() => {
+        analyticsService.trackEvent(AnalyticsEvents.ISLAMIC_CALENDAR_VIEWED);
+    }, []);
+
     // Fetch monthly calendar data
-    const { 
-        data: calendarResponse, 
-        isLoading: calendarLoading, 
+    const {
+        data: calendarResponse,
+        isLoading: calendarLoading,
         isError: calendarError,
         refetch: refetchCalendar
     } = useQuery({
@@ -130,25 +136,20 @@ export default function IslamicCalendarScreen() {
         <View style={[styles.root, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            <ImageBackground
-                source={require('../../public/quran_bg_image.png')}
-                style={styles.backgroundImage}
-                imageStyle={{ opacity: theme === 'dark' ? 0.04 : 0.08 }}
-                resizeMode="cover"
-            >
+            <View style={styles.backgroundImage}>
                 {/* Header Component */}
-                <CalendarHeader 
-                    insetsTop={insets.top} 
-                    colors={colors} 
-                    onBack={handleBack} 
+                <CalendarHeader
+                    insetsTop={insets.top}
+                    colors={colors}
+                    onBack={handleBack}
                 />
 
-                <ScrollView 
+                <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
                 >
                     {/* Month Selector Component */}
-                    <MonthSelector 
+                    <MonthSelector
                         colors={colors}
                         accentColor={ACCENT}
                         gregorianLabel={monthHeaderLabel.gregorian}
@@ -162,10 +163,10 @@ export default function IslamicCalendarScreen() {
                         {WEEKDAYS.map((day, idx) => {
                             const isWeekend = idx === 0 || idx === 6; // Sunday is 0, Saturday is 6
                             return (
-                                <ThemedText 
-                                    key={idx} 
+                                <ThemedText
+                                    key={idx}
                                     style={[
-                                        styles.weekdayText, 
+                                        styles.weekdayText,
                                         { color: isWeekend ? '#EF4444' : colors.textSecondary }
                                     ]}
                                 >
@@ -200,13 +201,13 @@ export default function IslamicCalendarScreen() {
                                 const isSelected = !!(day && selectedDay && day.gregorian.date === selectedDay.gregorian.date);
 
                                 return (
-                                    <DayTile 
-                                        key={day ? day.gregorian.date : `empty-${index}`} 
-                                        day={day} 
-                                        isToday={isToday} 
+                                    <DayTile
+                                        key={day ? day.gregorian.date : `empty-${index}`}
+                                        day={day}
+                                        isToday={isToday}
                                         isSelected={isSelected}
-                                        colors={colors} 
-                                        accentColor={ACCENT} 
+                                        colors={colors}
+                                        accentColor={ACCENT}
                                         onPress={() => day && setSelectedDay(day)}
                                     />
                                 );
@@ -234,8 +235,11 @@ export default function IslamicCalendarScreen() {
                             </View>
                         </View>
                     )}
+
+                    {/* Feedback Widget */}
+                    <MicroFeedback componentName="islamic_calendar" />
                 </ScrollView>
-            </ImageBackground>
+            </View>
         </View>
     );
 }

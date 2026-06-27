@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 import SwipeableNotificationItem from './SwipeableNotificationItem';
 
 interface Props {

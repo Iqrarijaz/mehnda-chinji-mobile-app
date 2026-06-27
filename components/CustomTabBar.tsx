@@ -2,7 +2,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, LayoutChangeEvent, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -16,12 +16,14 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     const primaryColor = colors.tint;
     const inactiveColor = colors.icon;
 
-    const visibleRoutes = state.routes.filter(route => {
-        const { options } = descriptors[route.key];
-        // Hide chat tab as requested
-        if (route.name === 'chat') return false;
-        return (options as any).href !== null;
-    });
+    const visibleRoutes = React.useMemo(() => {
+        return state.routes.filter(route => {
+            const { options } = descriptors[route.key];
+            // Hide chat tab as requested
+            if (route.name === 'chat') return false;
+            return (options as any).href !== null;
+        });
+    }, [state.routes, descriptors]);
 
     const [layout, setLayout] = useState({ width: 0, height: 0 });
     const tabCount = visibleRoutes.length;

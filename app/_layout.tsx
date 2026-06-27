@@ -2,36 +2,31 @@ import { Colors } from '@/constants/colors';
 import { SocketProvider } from '@/context/SocketContext';
 import * as Notifications from 'expo-notifications';
 import Sentry from '@/lib/sentry';
-import { useSocketNotifications } from '@/hooks/useSocketNotifications';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useSocketNotifications } from '@/hooks/notificationHooks/useSocketNotifications';
+import { usePushNotifications } from '@/hooks/notificationHooks/usePushNotifications';
+import { useSystemPushNotifications } from '@/hooks/notificationHooks/useSystemPushNotifications';
 import { useAppOpenAd } from '@/ads/hooks/useAppOpenAd';
-import { QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { Drawer } from 'expo-router/drawer';
 import { StatusBar } from 'expo-status-bar';
-import { View, Platform } from 'react-native';
+import { View, Platform, InteractionManager } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { MenuProvider } from 'react-native-popup-menu';
 import React, { useState, useEffect } from 'react';
-import CustomDrawerContent from '../components/CustomDrawerContent';
 import { analyticsService, useScreenTracking, AnalyticsEvents } from '@/analytics';
-import { toastConfig } from '../components/toastConfig';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import { WeatherProvider } from '../context/WeatherContext';
 import { asyncStoragePersister, queryClient } from '../lib/query-client';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import NetworkMonitor from '@/components/common/NetworkMonitor';
-import { useDataUsageStore } from '@/store/dataUsageStore';
 import { usePrayerCalendar } from '@/hooks/usePrayerTimes';
-import { usePrayerNotifications } from '@/hooks/usePrayerNotifications';
-import { useWeatherNotifications } from '@/hooks/useWeatherNotifications';
+import { usePrayerNotifications } from '@/hooks/notificationHooks/usePrayerNotifications';
+import { useWeatherNotifications } from '@/hooks/notificationHooks/useWeatherNotifications';
 import { useWeatherCity } from '@/context/WeatherContext';
 import * as Application from 'expo-application';
-import { fetchAppVersionInfo, AppVersionInfo } from '@/apis/app-info';
-import { checkUpdateStatus } from '@/utils/versioning';
+
 import { UpdateModal } from '@/components/common/UpdateModal';
 import { RatingModal } from '@/components/common/RatingModal';
 import { ReviewService } from '@/utils/review';
@@ -41,14 +36,15 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useAppFonts } from '@/hooks/useFonts';
 import { initConfig } from '@/lib/remoteConfig';
 import AdManager from '@/ads/adManager.service';
-
+import { Text, TextInput } from 'react-native';
+import { ToastConfig } from '@/components/ToastConfig';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 // Disable global font scaling to prevent UI breakage on devices with large accessibility fonts
-import { Text, TextInput } from 'react-native';
+
 
 if (!(Text as any).defaultProps) {
   (Text as any).defaultProps = {};
@@ -96,9 +92,10 @@ function DrawerLayout() {
     </View>
   );
 }
-function AppInitializer() {
+function DeferredHooks() {
   usePushNotifications();
   useSocketNotifications();
+  useSystemPushNotifications();
   useScreenTracking();
   useAppOpenAd();
 
@@ -114,25 +111,10 @@ function AppInitializer() {
         shouldPlaySound: true,
         shouldSetBadge: false,
         shouldShowBanner: true,
-
         shouldShowList: true,
       }),
     });
   }, []);
-
-  const [updateInfo, setUpdateInfo] = useState<{
-    visible: boolean;
-    isMandatory: boolean;
-    latestVersion: string;
-    updateUrl: string;
-    releaseNotes: string;
-  }>({
-    visible: false,
-    isMandatory: false,
-    latestVersion: '',
-    updateUrl: '',
-    releaseNotes: ''
-  });
 
   const { isAuthenticated } = useAuth();
 
@@ -145,44 +127,20 @@ function AppInitializer() {
       platform: Platform.OS
     });
 
-    // const checkVersion = async () => {
-    //   try {
-    //     const info = await fetchAppVersionInfo();
-    //     if (!info) {
-    //       console.warn('Version info is null, skipping version check');
-    //       return;
-    //     }
-    //     const currentVersion = Application.nativeApplicationVersion || '1.0.0';
-
-    //     const { isMandatory, isOptional } = checkUpdateStatus(
-    //       currentVersion,
-    //       info.latestVersion,
-    //       info.minRequiredVersion
-    //     );
-
-    //     if (isMandatory || isOptional) {
-    //       setUpdateInfo({
-    //         visible: true,
-    //         isMandatory,
-    //         latestVersion: info.latestVersion,
-    //         updateUrl: Platform.OS === 'ios' ? info.updateUrl.ios : info.updateUrl.android,
-    //         releaseNotes: info.releaseNotes
-    //       });
-
-    //       analyticsService.trackEvent(AnalyticsEvents.UPDATE_AVAILABLE, {
-    //         currentVersion,
-    //         latestVersion: info.latestVersion,
-    //         isMandatory
-    //       });
-    //     }
-    //   } catch (error) {
-    //     console.error('Version check failed:', error);
-    //   }
-    // };
-
-    // checkVersion();
-    // checkVersion();
   }, [isAuthenticated]);
+
+  return null;
+}
+
+function AppInitializer() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      setIsReady(true);
+    });
+    return () => task.cancel();
+  }, []);
 
   const [showRating, setShowRating] = useState(false);
 
@@ -203,8 +161,23 @@ function AppInitializer() {
     return () => clearTimeout(timer);
   }, []);
 
+  const [updateInfo, setUpdateInfo] = useState<{
+    visible: boolean;
+    isMandatory: boolean;
+    latestVersion: string;
+    updateUrl: string;
+    releaseNotes: string;
+  }>({
+    visible: false,
+    isMandatory: false,
+    latestVersion: '',
+    updateUrl: '',
+    releaseNotes: ''
+  });
+
   return (
     <>
+      {isReady && <DeferredHooks />}
       <UpdateModal
         visible={updateInfo.visible}
         isMandatory={updateInfo.isMandatory}
@@ -226,15 +199,21 @@ function RootLayout() {
   const [configLoaded, setConfigLoaded] = useState(false);
 
   useEffect(() => {
-    const setupConfig = async () => {
-      try {
-        await initConfig();
-        await AdManager.init();
-      } finally {
-        setConfigLoaded(true);
-      }
-    };
-    setupConfig();
+    console.time("config");
+    initConfig()
+      .finally(() => {
+        console.timeEnd("config");
+      })
+      .catch(console.error);
+
+    setConfigLoaded(true);
+
+    console.time("ads");
+    AdManager.init()
+      .finally(() => {
+        console.timeEnd("ads");
+      })
+      .catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -268,7 +247,7 @@ function RootLayout() {
                   </SocketProvider>
                 </WeatherProvider>
               </AuthProvider>
-              <Toast config={toastConfig} topOffset={45} />
+              <Toast config={ToastConfig} topOffset={45} />
             </BottomSheetModalProvider>
           </ThemeProvider>
         </ErrorBoundary>

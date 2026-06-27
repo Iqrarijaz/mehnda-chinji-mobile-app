@@ -1,9 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import {
-    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -15,15 +14,16 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { resetPasswordSchema } from '@/utils/validation';
 import { resetPassword } from '@/apis/login/forgot-password';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
-export default function ResetPasswordScreen() {
+const ResetPasswordScreen = memo(function ResetPasswordScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const insets = useSafeAreaInsets();
@@ -191,18 +191,17 @@ export default function ResetPasswordScreen() {
                             onPress={handleSubmit}
                             disabled={formData.loading}
                         >
-                            {formData.loading ? (
-                                <ActivityIndicator color="#FFFFFF" />
-                            ) : (
-                                <ThemedText style={styles.submitButtonText}>Set New Password</ThemedText>
-                            )}
+                            <ThemedText style={styles.submitButtonText}>Set New Password</ThemedText>
                         </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
+            <LoaderOverlay visible={formData.loading} />
         </KeyboardAvoidingView>
     );
-}
+});
+
+export default ResetPasswordScreen;
 
 const styles = StyleSheet.create({
     container: {

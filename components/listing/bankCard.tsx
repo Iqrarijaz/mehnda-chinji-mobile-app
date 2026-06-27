@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -93,10 +93,10 @@ const BankCard = React.memo(({ business, onReport }: BankCardProps) => {
                         <ThemedText style={[styles.addressText, { color: isDark ? '#FFFFFF' : colors.textSecondary }]} numberOfLines={1}>
                             {address}
                         </ThemedText>
-                        
+
                         {onReport && (
-                            <TouchableOpacity 
-                                style={styles.reportBtn} 
+                            <TouchableOpacity
+                                style={styles.reportBtn}
                                 onPress={(e) => {
                                     e.stopPropagation();
                                     onReport();

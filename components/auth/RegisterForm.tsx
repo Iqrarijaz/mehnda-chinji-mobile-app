@@ -12,9 +12,8 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Device from 'expo-device';
 import Toast from 'react-native-toast-message';
-import * as yup from 'yup';
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -23,11 +22,9 @@ import { signup, checkAccountExistsApi, googleLoginApi } from '@/apis/login';
 import { registerSchema, getPasswordStrength } from '@/utils/validation';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
-
-// Removed global configuration
-
-export function RegisterForm() {
+export const RegisterForm = React.memo(function RegisterForm() {
     const router = useRouter();
     const { login } = useAuth();
     const { theme } = useTheme();
@@ -491,14 +488,10 @@ export function RegisterForm() {
                     onPress={handleGoogleLogin}
                     disabled={formData.googleLoading}
                 >
-                    {formData.googleLoading ? (
-                        <ActivityIndicator color="#000000" />
-                    ) : (
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
-                            <ThemedText style={[styles.registerButtonText, { color: '#000000' }]}>Sign up with Google</ThemedText>
-                        </View>
-                    )}
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
+                        <ThemedText style={[styles.registerButtonText, { color: '#000000' }]}>Sign up with Google</ThemedText>
+                    </View>
                 </TouchableOpacity>
 
 
@@ -512,9 +505,10 @@ export function RegisterForm() {
                     </TouchableOpacity>
                 </View>
             </View>
+            <LoaderOverlay visible={formData.loading || formData.googleLoading} />
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     formContainer: {

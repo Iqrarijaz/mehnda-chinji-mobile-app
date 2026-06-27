@@ -1,5 +1,6 @@
 import { getAnalytics, logEvent, logLogin, logSignUp, setUserId, setUserProperties } from '@react-native-firebase/analytics';
 import { EventName } from './analyticsEvents';
+import { InteractionManager } from 'react-native';
 
 /**
  * AnalyticsService handles the actual communication with Firebase.
@@ -12,17 +13,19 @@ class AnalyticsService {
      * Core function to track any custom event.
      */
     async trackEvent(name: EventName | string, params?: Record<string, any>) {
-        try {
-            await logEvent(getAnalytics(), name, params);
+        InteractionManager.runAfterInteractions(async () => {
+            try {
+                await logEvent(getAnalytics(), name, params);
 
-            if (__DEV__) {
-                console.log(`📊 [Analytics] Event: ${name}`, params || '');
+                if (__DEV__) {
+                    console.log(`📊 [Analytics] Event: ${name}`, params || '');
+                }
+            } catch (error) {
+                if (__DEV__) {
+                    console.error(`❌ [Analytics] Failed to log event: ${name}`, error);
+                }
             }
-        } catch (error) {
-            if (__DEV__) {
-                console.error(`❌ [Analytics] Failed to log event: ${name}`, error);
-            }
-        }
+        });
     }
 
     /**

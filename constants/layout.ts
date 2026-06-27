@@ -1,5 +1,5 @@
 export const Layout = {
-    borderRadius: 14,
+    borderRadius: 18,
     headerBorderRadius: 20,
-    cardBorderRadius: 16,
+    cardBorderRadius: 20,
 };

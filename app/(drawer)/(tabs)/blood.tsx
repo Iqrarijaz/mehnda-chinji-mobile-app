@@ -1,12 +1,11 @@
 import { DONOR_QUERY_KEYS, getDonorsList } from '@/apis/bloodDonation';
-import { BloodDonorHeader } from '@/components/blood/bloodDonorHeader';
 import BloodRegistration from '@/components/blood/BloodRegistration';
+import { BloodDonorHeader } from '@/components/blood/BloodDonorHeader';
 import DonorCard from '@/components/blood/DonorCard';
 import { DonorCardSkeleton } from '@/components/common/CardSkeletons';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
-import { ThemedText } from '@/components/themedText';
-import { ThemedView } from '@/components/themedView';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -16,9 +15,9 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useFocusEffect, useNavigation } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTooltipStore } from '@/store/tooltipStore';
+import { ThemedView } from '@/components/ThemedView';
 import {
     ActivityIndicator,
-    FlatList,
     Modal,
     Platform,
     Pressable,
@@ -26,12 +25,14 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
 export default function BloodScreen() {
     const { theme, isDark } = useTheme();
-    const tooltipStore = useTooltipStore();
+    const hasViewedBloodTooltip = useTooltipStore(state => state.viewedTooltips['blood-screen']);
+    const markAsViewed = useTooltipStore(state => state.markAsViewed);
     const { user } = useAuth();
     const navigation = useNavigation();
     const colors = Colors[theme];
@@ -43,7 +44,7 @@ export default function BloodScreen() {
     useFocusEffect(
         useCallback(() => {
             const tooltipId = 'blood-screen';
-            if (tooltipStore.viewedTooltips[tooltipId]) {
+            if (hasViewedBloodTooltip) {
                 setShowTooltip(false);
                 return;
             }
@@ -56,12 +57,12 @@ export default function BloodScreen() {
                 clearTimeout(timer);
                 setShowTooltip(false);
             };
-        }, [tooltipStore.viewedTooltips])
+        }, [hasViewedBloodTooltip])
     );
 
     const handleDismissTooltip = () => {
         const tooltipId = 'blood-screen';
-        tooltipStore.markAsViewed(tooltipId);
+        markAsViewed(tooltipId);
         setShowTooltip(false);
     };
 
@@ -138,6 +139,38 @@ export default function BloodScreen() {
     ), [handleReportPress]);
     const keyExtractor = useCallback((item: any) => item._id, []);
 
+    const handleEndReached = useCallback(() => {
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    const renderFooter = useCallback(() => {
+        if (isFetchingNextPage) {
+            return (
+                <View style={{ paddingVertical: 20 }}>
+                    <ActivityIndicator color={colors.primary} />
+                </View>
+            );
+        }
+        if (!hasNextPage && donors.length > 0) {
+            return (
+                <ThemedText style={{ textAlign: 'center', color: colors.icon, fontSize: 12, paddingVertical: 20 }}>
+                    End of list
+                </ThemedText>
+            );
+        }
+        return null;
+    }, [isFetchingNextPage, hasNextPage, donors.length, colors]);
+
+    const renderEmpty = useCallback(() => (
+        <View style={styles.emptyContainer}>
+            <Ionicons name="water-outline" size={64} color={colors.icon} />
+            <ThemedText style={[styles.emptyText, { color: colors.text }]}>No donors found.</ThemedText>
+            <ThemedText style={[styles.emptySubText, { color: colors.icon }]}>Try adjusting your search criteria</ThemedText>
+        </View>
+    ), [colors]);
+
     return (
         <ErrorBoundary>
             <ThemedView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -165,37 +198,17 @@ export default function BloodScreen() {
                             ))}
                         </View>
                     ) : (
-                        <FlatList
+                        <FlashList
                             data={donors}
                             renderItem={renderItem}
                             keyExtractor={keyExtractor}
                             contentContainerStyle={styles.listContent}
                             onRefresh={handleRefresh}
                             refreshing={loading && !isFetchingNextPage}
-                            onEndReached={() => {
-                                if (hasNextPage && !isFetchingNextPage) {
-                                    fetchNextPage();
-                                }
-                            }}
+                            onEndReached={handleEndReached}
                             onEndReachedThreshold={0.5}
-                            ListFooterComponent={
-                                isFetchingNextPage ? (
-                                    <View style={{ paddingVertical: 20 }}>
-                                        <ActivityIndicator color={colors.primary} />
-                                    </View>
-                                ) : hasNextPage ? null : donors.length > 0 ? (
-                                    <ThemedText style={{ textAlign: 'center', color: colors.icon, fontSize: 12, paddingVertical: 20 }}>
-                                        End of list
-                                    </ThemedText>
-                                ) : null
-                            }
-                            ListEmptyComponent={
-                                <View style={styles.emptyContainer}>
-                                    <Ionicons name="water-outline" size={64} color={colors.icon} />
-                                    <ThemedText style={[styles.emptyText, { color: colors.text }]}>No donors found.</ThemedText>
-                                    <ThemedText style={[styles.emptySubText, { color: colors.icon }]}>Try adjusting your search criteria</ThemedText>
-                                </View>
-                            }
+                            ListFooterComponent={renderFooter}
+                            ListEmptyComponent={renderEmpty}
                         />
                     )}
                 </View>

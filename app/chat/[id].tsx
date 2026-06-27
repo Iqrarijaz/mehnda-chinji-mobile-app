@@ -1,6 +1,6 @@
 import { blockConversation, getConversationDetails, getMessages, markMessagesSeen, sendMessage, unblockConversation } from '@/apis/chat/chat';
-import { ThemedText } from '@/components/themedText';
-import { ThemedView } from '@/components/themedView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import Avatar from '@/components/ui/avatar';
 import { GlassConfirmationModal } from '@/components/ui/GlassConfirmationModal';
 import { useSocket } from '@/context/SocketContext';

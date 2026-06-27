@@ -4,7 +4,7 @@
     "slug": "rehbar",
     "version": "1.2.0",
     "orientation": "portrait",
-    "icon": "./public/icon.png",
+    "icon": "./public/icon.webp",
     "scheme": "rehbarcommunityapp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -12,19 +12,28 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.rehbar.community",
       "buildNumber": "8",
-      "icon": "./public/icon.png",
+      "icon": "./public/icon.webp",
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera to take profile and support ticket photos.",
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+      },
+      "splash": {
+        "image": "./public/logo_with_text.webp",
+        "resizeMode": "contain",
+        "backgroundColor": "#FFFFFF",
+        "dark": {
+          "image": "./public/logo_with_text.webp",
+          "backgroundColor": "#0F172A"
+        }
       }
     },
     "android": {
       "package": "com.rehbar.community",
       "versionCode": 8,
       "adaptiveIcon": {
-        "foregroundImage": "./public/icon.png",
-        "backgroundImage": "./public/icon.png",
-        "monochromeImage": "./public/icon.png",
+        "foregroundImage": "./public/icon.webp",
+        "backgroundImage": "./public/icon.webp",
+        "monochromeImage": "./public/icon.webp",
         "backgroundColor": "#E6F4FE"
       },
       "permissions": [
@@ -56,24 +65,42 @@
             "DEFAULT"
           ]
         }
-      ]
+      ],
+      "splash": {
+        "image": "./public/logo_with_text.webp",
+        "resizeMode": "contain",
+        "backgroundColor": "#FFFFFF",
+        "dark": {
+          "image": "./public/logo_with_text.webp",
+          "backgroundColor": "#0F172A"
+        }
+      }
     },
     "web": {
       "output": "static",
-      "favicon": "./public/icon.png"
+      "favicon": "./public/icon.webp"
     },
     "splash": {
-      "image": "./public/logo_with_text.png",
+      "image": "./public/logo_with_text.webp",
       "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF",
-      "dark": {
-        "backgroundColor": "#020617"
-      }
+      "backgroundColor": "#FFFFFF"
     },
     "plugins": [
       "expo-router",
       "expo-secure-store",
       "@react-native-firebase/app",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFFFFF",
+          "image": "./public/logo_with_text.webp",
+          "imageWidth": 220,
+          "dark": {
+            "image": "./public/logo_with_text.webp",
+            "backgroundColor": "#0F172A"
+          }
+        }
+      ],
       [
         "expo-notifications",
         {

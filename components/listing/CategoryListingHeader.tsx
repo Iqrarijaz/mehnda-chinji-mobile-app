@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -54,7 +54,7 @@ const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
                     <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
                 <ThemedText style={styles.headerTitle}>{categoryTitle}</ThemedText>
-                
+
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                     <TouchableOpacity
                         onPress={() => setActiveTab(activeTab === 'all' ? 'requests' : 'all')}
@@ -63,10 +63,10 @@ const CategoryListingHeader: React.FC<CategoryListingHeaderProps> = ({
                             activeTab === 'requests' && { backgroundColor: '#FFFFFF' }
                         ]}
                     >
-                        <Ionicons 
-                            name={activeTab === 'requests' ? "list" : "list-outline"} 
-                            size={22} 
-                            color={activeTab === 'requests' ? headerColor : "#FFFFFF"} 
+                        <Ionicons
+                            name={activeTab === 'requests' ? "list" : "list-outline"}
+                            size={22}
+                            color={activeTab === 'requests' ? headerColor : "#FFFFFF"}
                         />
                     </TouchableOpacity>
 

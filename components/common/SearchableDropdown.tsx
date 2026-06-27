@@ -13,7 +13,7 @@ import {
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemedText } from '../themedText';
+import { ThemedText } from '../ThemedText';
 
 interface Option {
     label: string;

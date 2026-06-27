@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import { clientStorage } from '@/utils/storage';
-import moment from 'moment';
-import { setupAdhanChannel, ADHAN_CHANNEL_ID } from '@/components/notification/channel';
+import moment from '@/utils/dayjs';
 import { useNotificationStore } from '@/store/notificationStore';
+import { ADHAN_CHANNEL_ID, setupAdhanChannel } from '@/components/notification/Channel';
 
 const LAST_SCHEDULED_KEY = 'last_prayer_scheduled_info_v4';
 

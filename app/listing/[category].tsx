@@ -11,9 +11,9 @@ import EmptyListingState from '@/components/listing/EmptyListingState';
 import HealthCard from '@/components/listing/HealthCard';
 import MosqueCard from '@/components/listing/MosqueCard';
 import RequestCard from '@/components/places/RequestCard';
-import EmergencyCard from '@/components/listing/emergencyCard';
-import GovtOfficeCard from '@/components/listing/govtOfficeCard';
-import TravelCard from '@/components/listing/travelCard';
+import EmergencyCard from '@/components/listing/EmergencyCard';
+import GovtOfficeCard from '@/components/listing/GovtOfficeCard';
+import TravelCard from '@/components/listing/TravelCard';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
@@ -37,9 +37,9 @@ import { useTooltipStore } from '@/store/tooltipStore';
 import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
 
 
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
-import BankCard from '@/components/listing/bankCard';
+import BankCard from '@/components/listing/BankCard';
 
 const CategoryListingScreen = React.memo(() => {
     const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();

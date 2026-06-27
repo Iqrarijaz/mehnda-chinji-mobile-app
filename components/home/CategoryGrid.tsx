@@ -5,14 +5,14 @@ import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-nat
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 import { CATEGORIES_CONFIG, MORE_CATEGORIES_CONFIG, PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { CategoryCard } from './CategoryCard';
 
-export function CategoryGrid() {
+export const CategoryGrid = React.memo(function CategoryGrid() {
     const router = useRouter();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const { theme, isDark } = useTheme();
@@ -94,7 +94,7 @@ export function CategoryGrid() {
             </Modal>
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {

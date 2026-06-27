@@ -4,7 +4,7 @@ import Animated, { FadeInRight } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface NotificationToggleRowProps {
     label: string;
@@ -17,7 +17,7 @@ interface NotificationToggleRowProps {
     isLast?: boolean;
 }
 
-const NotificationToggleRow: React.FC<NotificationToggleRowProps> = ({
+const NotificationToggleRow: React.FC<NotificationToggleRowProps> = React.memo(({
     label,
     description,
     icon,
@@ -53,7 +53,7 @@ const NotificationToggleRow: React.FC<NotificationToggleRowProps> = ({
             />
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

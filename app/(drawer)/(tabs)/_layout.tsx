@@ -4,12 +4,12 @@ import { Tabs, useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
-import { CustomTabBar } from '@/components/customTabBar';
 import { ProfileUpdatePrompt } from '@/components/profile/ProfileUpdatePrompt';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { AppState, AppStateStatus } from 'react-native';
+import { CustomTabBar } from '@/components/CustomTabBar';
 
 export default function TabLayout() {
   const { theme } = useTheme();

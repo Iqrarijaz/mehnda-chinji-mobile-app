@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ThemedText } from '../themedText';
-import { TintedCard } from '../ui/tintedCard';
+import { ActivityIndicator, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
-import { PremiumModal } from './PremiumModal';
+import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
 
 interface CleanConfirmationModalProps {
     visible: boolean;
@@ -29,6 +29,9 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
     type = 'info',
     isLoading = false
 }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
     // Determine colors and icons based on type
     const getStyles = () => {
         switch (type) {
@@ -67,13 +70,14 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
     const config = getStyles();
 
     return (
-        <PremiumModal visible={visible} onClose={onClose} type="centered">
-            <TintedCard
-                tintColor={config.color}
-                bgColor="#FFFFFF"
-                style={styles.modalWrapper}
-            >
-                <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
+        <Modal
+            visible={visible}
+            transparent
+            animationType="fade"
+            onRequestClose={onClose}
+        >
+            <View style={styles.modalOverlay}>
+                <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
                     {/* Header with Icon */}
                     <View style={styles.header}>
                         <View style={[
@@ -116,32 +120,29 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
                             )}
                         </TouchableOpacity>
                     </View>
-                </Pressable>
-            </TintedCard>
-        </PremiumModal>
+                </View>
+            </View>
+        </Modal>
     );
 };
 
 const styles = StyleSheet.create({
-    overlay: {
+    modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 24,
     },
-    modalWrapper: {
-        width: '100%',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.1,
-        shadowRadius: 24,
-    },
     modalContent: {
         width: '100%',
-        paddingHorizontal: 24,
-        paddingBottom: 24,
-        paddingTop: 32,
+        borderRadius: Layout.borderRadius,
+        padding: 24,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 20,
     },
     header: {
         alignItems: 'center',
@@ -156,19 +157,18 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     title: {
-        fontSize: 22,
-        fontWeight: '900',
+        fontSize: 18,
+        fontWeight: '700',
         textAlign: 'center',
-        letterSpacing: -0.5,
+        marginBottom: 8,
     },
     message: {
-        fontSize: 16,
+        fontSize: 13,
         color: '#64748B',
         textAlign: 'center',
-        lineHeight: 24,
-        marginBottom: 32,
+        lineHeight: 20,
+        marginBottom: 24,
         fontWeight: '500',
-        paddingHorizontal: 4,
     },
     footer: {
         flexDirection: 'row',
@@ -177,23 +177,23 @@ const styles = StyleSheet.create({
     },
     cancelBtn: {
         flex: 1,
-        height: 50,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
+        borderRadius: 20,
         backgroundColor: '#F8FAFC',
         borderWidth: 1.5,
         borderColor: '#E2E8F0',
     },
     cancelText: {
-        fontSize: 15,
-        fontWeight: '700',
+        fontSize: 14,
+        fontWeight: '600',
         color: '#64748B',
     },
     confirmBtnWrapper: {
         flex: 1,
-        height: 50,
-        borderRadius: Layout.borderRadius,
+        height: 40,
+        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
@@ -202,8 +202,8 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
     },
     confirmBtnText: {
-        fontSize: 15,
-        fontWeight: '800',
+        fontSize: 14,
+        fontWeight: '600',
         color: '#FFFFFF',
     },
 });

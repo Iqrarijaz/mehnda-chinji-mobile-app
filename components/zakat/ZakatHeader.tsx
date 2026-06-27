@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themedText';
+import { ThemedText } from '@/components/ThemedText';
 
 interface ZakatHeaderProps {
     insetsTop: number;
@@ -15,10 +15,10 @@ export const ZakatHeader = React.memo(({ insetsTop, colors, onBack, onReset }: Z
         <TouchableOpacity onPress={onBack} style={[styles.iconBtn, { backgroundColor: colors.card }]}>
             <Ionicons name="arrow-back" size={22} color={colors.text} />
         </TouchableOpacity>
-        <Image 
-            source={require('@/assets/icons/bank.webp')} 
-            style={styles.logo} 
-            resizeMode="contain" 
+        <Image
+            source={require('@/assets/icons/bank.webp')}
+            style={styles.logo}
+            resizeMode="contain"
         />
         <View style={styles.titleWrapper}>
             <ThemedText style={styles.screenTitle}>Zakat Calculator</ThemedText>

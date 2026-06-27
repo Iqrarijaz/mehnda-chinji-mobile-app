@@ -145,5 +145,8 @@ export interface IslamicHoliday {
 }
 
 export const getHijriCalendar = async (month: number, year: number): Promise<QuranResponse<CalendarDay[]>> => {
-    return apiClient.get(`/api/user/v1/quran/calendar/month/${month}/${year}`);
+    // Adding adjustment=-1 to align with Pakistan's moon sighting (typically 1 day behind Saudi Arabia)
+    return apiClient.get(`/api/user/v1/quran/calendar/month/${month}/${year}`, {
+        params: { adjustment: -1 }
+    });
 };

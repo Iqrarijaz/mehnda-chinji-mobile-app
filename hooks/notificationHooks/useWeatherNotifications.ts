@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import { clientStorage } from '@/utils/storage';
-import moment from 'moment';
+import moment from '@/utils/dayjs';
 import { useNotificationStore } from '@/store/notificationStore';
 import { getForecast } from '@/apis/weather';
 
@@ -72,7 +72,7 @@ export const useWeatherNotifications = (selectedCity: string) => {
                     const popPercentage = Math.round((rainEntry.pop || 0.3) * 100);
                     const weatherDesc = rainEntry.weather?.[0]?.description || 'rain';
                     const cityNameClean = selectedCity.split(',')[0].trim();
-                    
+
                     console.log(`🌧️ Rain detected for tomorrow! Pop: ${popPercentage}%, Desc: ${weatherDesc}. Scheduling notification...`);
 
                     // Determine trigger time: 8:00 PM today

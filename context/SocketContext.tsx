@@ -65,12 +65,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         });
 
         newSocket.on('connect_error', (err) => {
-            console.warn('[Socket] Connection error details:', {
-                message: err.message,
-                type: err.name,
-                description: (err as any).description, // Extra info from socket.io
-                context: (err as any).context // Extra info from socket.io
-            });
+            console.warn('[Socket] Connection error:', err.message);
         });
 
         return () => {
