@@ -184,7 +184,7 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
                         <ThemedText style={styles.logoutText}>Sign Out</ThemedText>
                     </TouchableOpacity>
 
-                    <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.0'}</ThemedText>
+                    <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.3'}</ThemedText>
                 </View>
             </DrawerContentScrollView>
         </View>

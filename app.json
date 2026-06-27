@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rehbar",
     "slug": "rehbar",
-    "version": "1.2.0",
+    "version": "1.2.3",
     "orientation": "portrait",
     "icon": "./public/icon.webp",
     "scheme": "rehbarcommunityapp",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.rehbar.community",
-      "buildNumber": "8",
+      "buildNumber": "9",
       "icon": "./public/icon.webp",
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera to take profile and support ticket photos.",
@@ -29,7 +29,7 @@
     },
     "android": {
       "package": "com.rehbar.community",
-      "versionCode": 8,
+      "versionCode": 9,
       "adaptiveIcon": {
         "foregroundImage": "./public/icon.webp",
         "backgroundImage": "./public/icon.webp",
