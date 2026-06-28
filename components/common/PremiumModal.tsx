@@ -11,6 +11,8 @@ import Animated, {
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
+import Toast from 'react-native-toast-message';
+import { ToastConfig } from '../ToastConfig';
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 const isAndroid = Platform.OS === 'android';
@@ -106,6 +108,7 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
                     {children}
                 </Animated.View>
             </View>
+            <Toast config={ToastConfig} topOffset={Platform.OS === 'ios' ? 50 : 20} />
         </Modal>
     );
 };

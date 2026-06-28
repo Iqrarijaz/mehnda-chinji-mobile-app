@@ -50,9 +50,7 @@ const styles = StyleSheet.create({
                 shadowOpacity: 0.1,
                 shadowRadius: 12,
             },
-            android: {
-                elevation: 8,
-            }
+
         }),
     },
     headerTopRow: {

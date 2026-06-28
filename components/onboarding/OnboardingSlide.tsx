@@ -55,7 +55,6 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
                 />
             </Animated.View>
 
-            {/* Information Card Container (Flat with no shadow/elevation/border) */}
             <Animated.View
                 style={[
                     styles.cardContainer,

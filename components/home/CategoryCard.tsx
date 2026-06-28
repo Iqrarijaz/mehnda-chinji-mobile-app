@@ -11,9 +11,11 @@ interface CategoryCardProps {
     label: string;
     icon: any;
     onPress: () => void;
+    isSelected?: boolean;
+    compact?: boolean;
 }
 
-export const CategoryCard = React.memo(({ label, icon, onPress }: CategoryCardProps) => {
+export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, compact }: CategoryCardProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const accentColor = colors.primary;
@@ -25,16 +27,20 @@ export const CategoryCard = React.memo(({ label, icon, onPress }: CategoryCardPr
             activeOpacity={0.7}
             style={styles.touchable}
         >
-            <View style={[styles.card, { backgroundColor: colors.card }]}>
-                <View style={[styles.iconContainer, { backgroundColor: isImageAsset ? 'transparent' : accentColor + '12' }]}>
+            <View style={[
+                styles.card, 
+                { backgroundColor: colors.card, borderColor: isSelected ? accentColor : 'transparent', borderWidth: 2 },
+                compact && styles.cardCompact
+            ]}>
+                <View style={[styles.iconContainer, compact && styles.iconContainerCompact, { backgroundColor: isImageAsset ? 'transparent' : accentColor + '12' }]}>
                     {isImageAsset ? (
                         <Image
                             source={icon}
-                            style={styles.imageIcon}
+                            style={[styles.imageIcon, compact && styles.imageIconCompact]}
                             resizeMode="contain"
                         />
                     ) : (
-                        <Ionicons name={icon as any} size={28} color={accentColor} />
+                        <Ionicons name={icon as any} size={compact ? 24 : 28} color={accentColor} />
                     )}
                 </View>
                 <ThemedText
@@ -62,6 +68,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         minHeight: 80,
     },
+    cardCompact: {
+        padding: 8,
+        minHeight: 60,
+    },
     iconContainer: {
         width: 44,
         height: 44,
@@ -70,9 +80,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 8,
     },
+    iconContainerCompact: {
+        width: 36,
+        height: 36,
+        marginBottom: 4,
+    },
     imageIcon: {
         width: 44,
         height: 44,
+    },
+    imageIconCompact: {
+        width: 36,
+        height: 36,
     },
     label: {
         fontSize: 11,

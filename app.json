@@ -4,7 +4,7 @@
     "slug": "rehbar",
     "version": "1.2.3",
     "orientation": "portrait",
-    "icon": "./public/icon.webp",
+    "icon": "./public/icon.png",
     "scheme": "rehbarcommunityapp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -12,17 +12,17 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.rehbar.community",
       "buildNumber": "9",
-      "icon": "./public/icon.webp",
+      "icon": "./public/icon.png",
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera to take profile and support ticket photos.",
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
       },
       "splash": {
-        "image": "./public/logo_with_text.webp",
+        "image": "./public/logo_with_text.png",
         "resizeMode": "contain",
         "backgroundColor": "#FFFFFF",
         "dark": {
-          "image": "./public/logo_with_text.webp",
+          "image": "./public/logo_with_text.png",
           "backgroundColor": "#0F172A"
         }
       }
@@ -31,9 +31,9 @@
       "package": "com.rehbar.community",
       "versionCode": 9,
       "adaptiveIcon": {
-        "foregroundImage": "./public/icon.webp",
-        "backgroundImage": "./public/icon.webp",
-        "monochromeImage": "./public/icon.webp",
+        "foregroundImage": "./public/icon.png",
+        "backgroundImage": "./public/icon.png",
+        "monochromeImage": "./public/icon.png",
         "backgroundColor": "#E6F4FE"
       },
       "permissions": [
@@ -67,21 +67,21 @@
         }
       ],
       "splash": {
-        "image": "./public/logo_with_text.webp",
+        "image": "./public/logo_with_text.png",
         "resizeMode": "contain",
         "backgroundColor": "#FFFFFF",
         "dark": {
-          "image": "./public/logo_with_text.webp",
+          "image": "./public/logo_with_text.png",
           "backgroundColor": "#0F172A"
         }
       }
     },
     "web": {
       "output": "static",
-      "favicon": "./public/icon.webp"
+      "favicon": "./public/icon.png"
     },
     "splash": {
-      "image": "./public/logo_with_text.webp",
+      "image": "./public/logo_with_text.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },
@@ -93,10 +93,10 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#FFFFFF",
-          "image": "./public/logo_with_text.webp",
+          "image": "./public/logo_with_text.png",
           "imageWidth": 220,
           "dark": {
-            "image": "./public/logo_with_text.webp",
+            "image": "./public/logo_with_text.png",
             "backgroundColor": "#0F172A"
           }
         }

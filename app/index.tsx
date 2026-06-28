@@ -9,42 +9,41 @@ export default function SplashScreen() {
     const { loading, isAuthenticated } = useAuth();
     const router = useRouter();
     const [showSplash, setShowSplash] = useState<boolean>(true);
+    const [minTimeElapsed, setMinTimeElapsed] = useState<boolean>(false);
 
     useEffect(() => {
-        const checkOnboarding = async () => {
-            try {
-                const onboardingCompleted = await clientStorage.getItem('onboarding_completed');
-                if (onboardingCompleted !== 'true') {
-                    setShowSplash(false);
-                    router.replace('/onboarding' as any);
-                }
-            } catch (error) {
-                if (__DEV__) console.log("Error checking onboarding status:", error);
-            }
-        };
-
-        checkOnboarding();
+        // Enforce a minimum display time of 2.2 seconds to allow splash animations to complete
+        const timer = setTimeout(() => setMinTimeElapsed(true), 2200);
+        return () => clearTimeout(timer);
     }, []);
 
-    const navigateNext = () => {
+    const navigateNext = async () => {
         setShowSplash(false);
         try {
+            const onboardingCompleted = await clientStorage.getItem('onboarding_completed');
+
+            if (onboardingCompleted !== 'true') {
+                router.replace('/onboarding' as any);
+                return;
+            }
+
             if (isAuthenticated) {
                 router.replace('/(drawer)/(tabs)' as any);
             } else {
                 router.replace('/(auth)/login');
             }
         } catch (error) {
-            console.log("Error in splash flow:", error);
+            if (__DEV__) console.log("Error in splash flow:", error);
             router.replace('/(auth)/login');
         }
     };
 
     useEffect(() => {
-        if (!loading && showSplash) {
+        // Only navigate when auth checking is done AND the minimum time has passed
+        if (!loading && showSplash && minTimeElapsed) {
             navigateNext();
         }
-    }, [loading, showSplash]);
+    }, [loading, showSplash, minTimeElapsed]);
 
     if (!showSplash) return null;
 

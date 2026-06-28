@@ -8,9 +8,11 @@ interface ZakatHeaderProps {
     colors: any;
     onBack: () => void;
     onReset: () => void;
+    isUrdu?: boolean;
+    onToggleLanguage?: () => void;
 }
 
-export const ZakatHeader = React.memo(({ insetsTop, colors, onBack, onReset }: ZakatHeaderProps) => (
+export const ZakatHeader = React.memo(({ insetsTop, colors, onBack, onReset, isUrdu, onToggleLanguage }: ZakatHeaderProps) => (
     <View style={[styles.header, { paddingTop: insetsTop + 12, backgroundColor: colors.background, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={onBack} style={[styles.iconBtn, { backgroundColor: colors.card }]}>
             <Ionicons name="arrow-back" size={22} color={colors.text} />
@@ -21,10 +23,21 @@ export const ZakatHeader = React.memo(({ insetsTop, colors, onBack, onReset }: Z
             resizeMode="contain"
         />
         <View style={styles.titleWrapper}>
-            <ThemedText style={styles.screenTitle}>Zakat Calculator</ThemedText>
-            <ThemedText style={[styles.screenSub, { color: colors.textSecondary }]}>Calculate Wealth Contribution</ThemedText>
+            <ThemedText style={styles.screenTitle}>
+                {isUrdu ? 'زکوٰۃ کیلکولیٹر' : 'Zakat Calculator'}
+            </ThemedText>
+            <ThemedText style={[isUrdu ? styles.screenSubUrdu : styles.screenSub, { color: colors.textSecondary }]}>
+                {isUrdu ? 'Zakat Calculator' : 'زکوٰۃ کیلکولیٹر'}
+            </ThemedText>
         </View>
-        <TouchableOpacity onPress={onReset} style={[styles.iconBtn, { backgroundColor: colors.card }]}>
+        {onToggleLanguage && (
+            <TouchableOpacity onPress={onToggleLanguage} style={[styles.langBtn, { backgroundColor: colors.card }]}>
+                <ThemedText style={[styles.langText, { color: colors.text }]}>
+                    {isUrdu ? 'EN' : 'اردو'}
+                </ThemedText>
+            </TouchableOpacity>
+        )}
+        <TouchableOpacity onPress={onReset} style={[styles.iconBtn, { backgroundColor: colors.card, marginLeft: 8 }]}>
             <Ionicons name="refresh" size={18} color={colors.textSecondary} />
         </TouchableOpacity>
     </View>
@@ -63,5 +76,22 @@ const styles = StyleSheet.create({
     screenSub: {
         fontSize: 11,
         marginTop: 1,
+    },
+    screenSubUrdu: {
+        fontSize: 11,
+        marginTop: 1,
+        fontFamily: 'NotoNastaliqUrdu-Regular',
+        lineHeight: 20,
+    },
+    langBtn: {
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    langText: {
+        fontSize: 12,
+        fontWeight: '700',
     },
 });

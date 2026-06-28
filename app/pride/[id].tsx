@@ -408,9 +408,7 @@ const styles = StyleSheet.create({
                 shadowOpacity: 0.15,
                 shadowRadius: 4,
             },
-            android: {
-                elevation: 3,
-            },
+
         }),
     },
     coverContainer: {

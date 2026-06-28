@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, memo } from 'react';
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue,
@@ -48,19 +48,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
     };
   });
 
-  // Motivational Messages for Rehbar App
-  const motivationalMessage = useMemo(() => {
-    switch (step) {
-      case 1:
-        return 'ہر رابطہ، ایک جگہ — Your complete community directory';
-      case 2:
-        return 'ایک قطرہ، ایک زندگی — Connect with blood donors near you';
-      case 3:
-        return 'اپنا کاروبار بڑھائیں — Grow your business with the community';
-      default:
-        return 'Welcome to Rehbar Community';
-    }
-  }, [step]);
+
 
   // CTA Text depending on step
   const ctaText = useMemo(() => {
@@ -135,12 +123,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
         animatedNavStyle,
       ]}
     >
-      {/* Dynamic Motivational Message */}
-      <View style={styles.motivationContainer}>
-        <Text style={[styles.motivationText, { color: colors.textSecondary }]}>
-          {motivationalMessage}
-        </Text>
-      </View>
+
 
       {/* Progress Dots Indicator */}
       <View style={styles.dotsRow}>
@@ -195,15 +178,10 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
           disabled={isLoading}
           style={[
             styles.nextBtn,
+            { backgroundColor: colors.primary },
             animatedNextBtnStyle,
           ]}
         >
-          <LinearGradient
-            colors={[colors.primary, '#008080']}
-            style={styles.nextBtnGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          >
             {isLoading ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
@@ -216,7 +194,6 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
                 </Animated.View>
               </View>
             )}
-          </LinearGradient>
         </AnimatedPressable>
       </View>
     </Animated.View>
@@ -262,16 +239,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  motivationContainer: {
-    marginBottom: 10,
-    alignItems: 'center',
-  },
-  motivationText: {
-    fontSize: 11,
-    fontWeight: '600',
-    textAlign: 'center',
-    letterSpacing: 0.2,
-  },
+
   dotsRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -295,27 +263,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 44,
+    height: 40,
     paddingHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: 20,
     borderWidth: 1,
   },
   backBtnText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   nextBtn: {
     flex: 1,
-    height: 44,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  nextBtnGradient: {
-    flex: 1,
-    flexDirection: 'row',
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%',
   },
   ctaContent: {
     flexDirection: 'row',
@@ -324,8 +286,7 @@ const styles = StyleSheet.create({
   },
   nextBtnText: {
     color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

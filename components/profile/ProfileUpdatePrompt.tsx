@@ -1,12 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
-    Modal,
     StyleSheet,
     View,
     TouchableOpacity,
     Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import LottieView from 'lottie-react-native';
 import { PremiumModal } from '../common/PremiumModal';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -38,28 +37,28 @@ export const ProfileUpdatePrompt = React.memo(({
             closable={false}
         >
             <View style={styles.modalContent}>
-                <View style={styles.header}>
-                    <View style={styles.titleSection}>
-                        <View style={[styles.iconBox, { backgroundColor: colors.primary + '15' }]}>
-                            <Ionicons name="person-circle-sharp" size={20} color={colors.primary} />
-                        </View>
-                        <ThemedText style={[styles.title, { color: colors.text }]}>Update Profile</ThemedText>
-                    </View>
+
+                <View style={styles.lottieContainer}>
+                    <LottieView
+                        source={require('@/public/json/edit_profile.json')}
+                        autoPlay
+                        loop
+                        style={styles.lottie}
+                    />
                 </View>
 
-                <ThemedText style={[styles.description, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+                <ThemedText style={[styles.description, { color: isDark ? '#94A3B8' : '#64748B', textAlign: 'center' }]}>
                     Please set your phone number, city, and village in your profile for a better experience.
                 </ThemedText>
 
                 <View style={styles.footer}>
-                    <View style={styles.actions}>
+                    <View style={[styles.actions, { justifyContent: 'center' }]}>
                         <TouchableOpacity
-                            style={[styles.primaryBtn, { flex: 1, marginTop: 0, backgroundColor: colors.primary }]}
+                            style={[styles.primaryBtn, { backgroundColor: colors.primary }]}
                             onPress={onUpdate}
                             activeOpacity={0.8}
                         >
                             <ThemedText style={styles.primaryBtnText}>Update Profile</ThemedText>
-                            <Ionicons name="chevron-forward" size={18} color="#FFFFFF" />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -119,18 +118,16 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     primaryBtn: {
-        height: Platform.OS === 'android' ? 48 : 52,
-        paddingHorizontal: 16,
-        borderRadius: Layout.borderRadius,
+        width: 150,
+        height: 40,
+        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        flexDirection: 'row',
-        gap: 8,
     },
     primaryBtnText: {
         color: '#FFF',
-        fontSize: 15,
-        fontWeight: 'bold',
+        fontSize: 14,
+        fontWeight: '600',
     },
     cancelBtn: {
         flex: 1,
@@ -144,6 +141,18 @@ const styles = StyleSheet.create({
     cancelText: {
         fontSize: 14,
         fontWeight: '600',
+    },
+    lottieContainer: {
+        width: 150,
+        height: 120,
+        marginBottom: 12,
+        alignSelf: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    lottie: {
+        width: '100%',
+        height: '100%',
     },
 });
 

@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.1,
         shadowRadius: 20,
-        elevation: 10,
     },
     modalIconBox: {
         width: 80,

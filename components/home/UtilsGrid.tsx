@@ -53,13 +53,13 @@ const CATEGORIES: UtilCategory[] = [
             {
                 id: 'islamicCalendar',
                 label: 'Calendar',
-                image: require('@/assets/icons/religious.webp'),
+                image: require('@/assets/icons/islamic_calander.webp'),
                 route: '/islamicCalendar',
             },
             {
                 id: 'zakat',
                 label: 'Zakat',
-                image: require('@/assets/icons/bank.webp'),
+                image: require('@/assets/icons/zakat.webp'),
                 route: '/zakat',
             },
         ],

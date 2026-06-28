@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
                 shadowRadius: 14,
             },
             android: {
-                elevation: 5,
+
             },
         }),
     },

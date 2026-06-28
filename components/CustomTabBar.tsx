@@ -92,6 +92,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                     let label = 'Home';
 
                     if (route.name === 'index') { iconName = isFocused ? 'home' : 'home-outline'; label = 'Home'; }
+                    else if (route.name === 'announcements') { iconName = isFocused ? 'megaphone' : 'megaphone-outline'; label = 'Notices'; }
                     else if (route.name === 'business') { iconName = isFocused ? 'search' : 'search-outline'; label = 'Directory'; }
                     // else if (route.name === 'portal') { iconName = isFocused ? 'briefcase' : 'briefcase-outline'; label = 'Portal'; }
                     else if (route.name === 'blood') { iconName = isFocused ? 'water' : 'water-outline'; label = 'Donors'; }

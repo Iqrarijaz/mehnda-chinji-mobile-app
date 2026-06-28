@@ -197,7 +197,7 @@ const MosqueCard = React.memo(({ data, color, onReport }: MosqueCardProps) => {
                     {
                         backgroundColor: colors.card,
                         shadowColor: 'transparent',
-                        elevation: 0,
+
                     },
                 ]}
             >

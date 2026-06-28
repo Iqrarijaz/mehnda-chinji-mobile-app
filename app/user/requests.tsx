@@ -256,9 +256,7 @@ const styles = StyleSheet.create({
                 shadowOpacity: 0.1,
                 shadowRadius: 12,
             },
-            android: {
-                elevation: 8,
-            }
+
         }),
     },
     headerTopRow: {
@@ -328,9 +326,7 @@ const styles = StyleSheet.create({
                 shadowOpacity: 0.2,
                 shadowRadius: 8,
             },
-            android: {
-                elevation: 6,
-            }
+
         }),
     },
     emptyBtnText: {

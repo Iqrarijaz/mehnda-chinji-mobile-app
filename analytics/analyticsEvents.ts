@@ -33,6 +33,11 @@ export const AnalyticsEvents = {
     ASMA_AL_HUSNA_VIEWED: 'asma_al_husna_viewed',
     ISLAMIC_CALENDAR_VIEWED: 'islamic_calendar_viewed',
 
+    // Announcements
+    ANNOUNCEMENT_VIEWED: 'announcement_viewed',
+    ANNOUNCEMENT_TAB_CHANGED: 'announcement_tab_changed',
+    ANNOUNCEMENT_CAROUSEL_CLICKED: 'announcement_carousel_clicked',
+
     // Community Specific
     DONOR_CARD_CLICKED: 'donor_card_clicked',
     BUSINESS_CARD_CLICKED: 'business_card_clicked',

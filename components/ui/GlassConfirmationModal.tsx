@@ -28,7 +28,7 @@ export const GlassConfirmationModal: React.FC<GlassConfirmationModalProps> = ({
     type = 'info'
 }) => {
     return (
-        <PremiumModal visible={visible} onClose={onClose} type="centered" sheetStyle={{ backgroundColor: 'transparent', elevation: 0, paddingHorizontal: 0, paddingBottom: 0, paddingTop: 0 }}>
+        <PremiumModal visible={visible} onClose={onClose} type="centered" sheetStyle={{ backgroundColor: 'transparent', paddingHorizontal: 0, paddingBottom: 0, paddingTop: 0 }}>
             <View style={styles.modalContent}>
                 <LinearGradient
                     colors={['rgba(255, 255, 255, 0.98)', 'rgba(241, 245, 249, 0.99)']}

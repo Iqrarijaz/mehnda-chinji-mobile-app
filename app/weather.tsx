@@ -365,10 +365,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         gap: 12,
         marginBottom: 24,
-
         zIndex: 9999,
-        elevation: 9999,
-
         overflow: 'visible',
     },
 
@@ -386,7 +383,6 @@ const styles = StyleSheet.create({
     searchWrapper: {
         flex: 1,
         zIndex: 9999,
-        elevation: 9999,
         overflow: 'visible',
     },
 

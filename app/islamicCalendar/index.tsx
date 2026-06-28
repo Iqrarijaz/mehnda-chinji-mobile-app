@@ -21,7 +21,7 @@ const ACCENT = '#059669'; // Emerald green
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export default function IslamicCalendarScreen() {
+const IslamicCalendarScreenComponent = () => {
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
@@ -243,6 +243,8 @@ export default function IslamicCalendarScreen() {
         </View>
     );
 }
+
+export default React.memo(IslamicCalendarScreenComponent);
 
 const styles = StyleSheet.create({
     root: {

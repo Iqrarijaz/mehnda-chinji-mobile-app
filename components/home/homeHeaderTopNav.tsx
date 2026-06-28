@@ -53,7 +53,6 @@ export function HomeHeaderTopNav({ onSearchPress }: HomeHeaderTopNavProps) {
                         uri={user?.user?.profileImage}
                         name={user?.user?.name}
                         size={34}
-                        style={{ borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}
                     />
                 </TouchableOpacity>
             </View>
@@ -97,12 +96,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 10,
+        marginRight: 12,
     },
     avatarButton: {
         width: 38,
         height: 38,
+        borderRadius: 19,
+        borderWidth: 2,
+        borderColor: 'rgba(255,255,255,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
+        overflow: 'hidden',
     },
 });

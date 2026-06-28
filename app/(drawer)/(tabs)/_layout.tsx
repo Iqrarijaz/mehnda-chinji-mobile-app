@@ -100,6 +100,13 @@ export default function TabLayout() {
             headerShown: false,
           }}
         />
+        <Tabs.Screen
+          name="announcements"
+          options={{
+            title: 'Notices',
+            headerShown: false,
+          }}
+        />
         {/* <Tabs.Screen
           name="feed"
           options={{
