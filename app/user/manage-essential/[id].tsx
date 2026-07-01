@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderRadius: 24,
         padding: 4,
-        height: 44,
+        height: 42,
         marginHorizontal: 20,
         marginTop: 15,
         marginBottom: 5,

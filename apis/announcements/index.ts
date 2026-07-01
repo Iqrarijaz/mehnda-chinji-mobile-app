@@ -26,7 +26,7 @@ export const ANNOUNCEMENT_QUERY_KEYS = {
     list: (filters: any) => [...ANNOUNCEMENT_QUERY_KEYS.all, 'list', filters] as const,
 };
 
-export const getAnnouncementsList = async (params: { page?: number; limit?: number; type?: string; essentialId?: string; authorId?: string } = {}) => {
+export const getAnnouncementsList = async (params: { page?: number; limit?: number; type?: string; essentialId?: string; authorId?: string; search?: string } = {}) => {
     const response: any = await apiClient.get('/api/user/v1/announcements/list', { params });
     return response;
 };

@@ -19,7 +19,7 @@ export interface SearchCategoryResult {
 export const SEARCH_NAV_ITEMS: SearchNavResult[] = [
     // Main screens
     { id: 'emergency', label: 'Emergency', route: '/listing/emergency', icon: 'alert-circle', color: '#EF4444' },
-    { id: 'blood', label: 'Blood Donors', subtitle: 'Find donors near you', route: '/(tabs)/blood', icon: 'water', color: '#EF4444' },
+    { id: 'blood', label: 'Blood Donors', subtitle: 'Find donors near you', route: '/(drawer)/blood', icon: 'water', color: '#EF4444' },
     { id: 'support', label: 'Support & FAQ', subtitle: 'Get help or report issues', route: '/support', icon: 'help-circle-outline', color: '#8B5CF6' },
     // Account
     { id: 'edit-profile', label: 'Edit Profile', subtitle: 'Update your personal info', route: '/profile', icon: 'person-circle-outline', color: '#3B82F6' },

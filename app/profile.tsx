@@ -9,6 +9,7 @@ import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { ThemedText } from '@/components/ThemedText';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Colors } from '@/constants/colors';
+import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -19,6 +20,7 @@ import { useBackHandler } from '@/hooks/useBackHandler';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState, useMemo } from 'react';
@@ -45,7 +47,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 export default function ProfileScreen() {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const { user, updateUser } = useAuth();
     const router = useRouter();
@@ -116,24 +118,24 @@ export default function ProfileScreen() {
         formData.city !== currentData.city ||
         formData.village !== currentData.village;
 
-    const calculatePercentage = useCallback(() => {
+    // Direct inline derivations of completion stats (avoids useCallback recreation on keystroke)
+    const completionPercentage = (() => {
         let pct = 50;
         if (formData.gender && formData.gender !== 'N/A') pct += 5;
         if (formData.city) pct += 5;
         if (formData.village) pct += 5;
         if (user?.user?.isBusiness) pct += 25;
-        // Simplified mapping for UI (Donor logic might need backend fetch or flag)
         if (user?.user?.isDonor) pct += 10;
         return Math.min(pct, 100);
-    }, [formData.gender, formData.city, formData.village, user?.user?.isBusiness, user?.user?.isDonor]);
+    })();
 
-    const remainingFields = useCallback(() => {
+    const remainingFieldsCount = (() => {
         let count = 0;
         if (!formData.gender || formData.gender === 'N/A') count++;
         if (!formData.city) count++;
         if (!formData.village) count++;
         return count;
-    }, [formData.gender, formData.city, formData.village]);
+    })();
 
     const profileMutation = useMutation({
         mutationFn: updateProfile,
@@ -199,14 +201,22 @@ export default function ProfileScreen() {
 
         if (!result.canceled && result.assets && result.assets.length > 0) {
             const asset = result.assets[0];
+
+            // Compress and resize the image to exactly 300x300 pixels
+            const manipResult = await ImageManipulator.manipulateAsync(
+                asset.uri,
+                [{ resize: { width: 300, height: 300 } }],
+                { compress: 0.6, format: ImageManipulator.SaveFormat.JPEG }
+            );
+
             const uploadFormData = new FormData();
 
-            // Extract file extension
-            const uriParts = asset.uri.split('.');
+            // Extract file extension from manipulated image uri
+            const uriParts = manipResult.uri.split('.');
             const fileType = uriParts[uriParts.length - 1];
 
             const file: any = {
-                uri: asset.uri,
+                uri: manipResult.uri,
                 name: `profile_${user?.user?._id || Date.now()}.${fileType}`,
                 type: `image/${fileType}`,
             };
@@ -273,7 +283,7 @@ export default function ProfileScreen() {
                             <Ionicons name="arrow-back" size={24} color={theme === 'dark' ? colors.text : '#FFFFFF'} />
                         </TouchableOpacity>
                         <ThemedText style={[styles.headerTitle, { color: theme === 'dark' ? colors.text : '#FFFFFF' }]}>Update Profile</ThemedText>
-                        <View style={{ width: 44 }} />
+                        <View style={{ width: 42 }} />
                     </View>
 
                     <ProfileAvatar
@@ -305,7 +315,7 @@ export default function ProfileScreen() {
 
                         {/* Progress Component */}
                         {/* <Animated.View entering={FadeInDown.delay(200).duration(600)}>
-                            <ProfileProgress percentage={calculatePercentage()} remainingFields={remainingFields()} />
+                            <ProfileProgress percentage={completionPercentage} remainingFields={remainingFieldsCount} />
                         </Animated.View> */}
 
                         {/* Form Sections */}
@@ -321,12 +331,12 @@ export default function ProfileScreen() {
                                         {formData.name.length}/30
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="person-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         placeholder="Enter your name"
-                                        placeholderTextColor={colors.icon + '70'}
-                                        style={[styles.textInput, { color: colors.text, fontSize: 12 }]}
+                                        placeholderTextColor={colors.icon}
+                                        style={[styles.textInput, { color: colors.text, fontSize: 14 }]}
                                         value={formData.name}
                                         onChangeText={(val) => setFormData(p => ({ ...p, name: toTitleCase(val) }))}
                                         maxLength={30}
@@ -341,10 +351,10 @@ export default function ProfileScreen() {
                                         EMAIL ADDRESS
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52, opacity: 0.8 }]}>
+                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52, opacity: 0.8 }]}>
                                     <Ionicons name="mail-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
-                                        style={[styles.textInput, { color: colors.text, fontSize: 12 }]}
+                                        style={[styles.textInput, { color: colors.text, fontSize: 14 }]}
                                         value={formData.email}
                                         editable={false}
                                     />
@@ -362,12 +372,12 @@ export default function ProfileScreen() {
                                         {formData.phone.length}/11
                                     </ThemedText>
                                 </View>
-                                <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="call-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         placeholder="03*********"
-                                        placeholderTextColor={colors.icon + '70'}
-                                        style={[styles.textInput, { color: colors.text, fontSize: 12 }]}
+                                        placeholderTextColor={colors.icon}
+                                        style={[styles.textInput, { color: colors.text, fontSize: 14 }]}
                                         value={formData.phone}
                                         onChangeText={(val) => setFormData(p => ({ ...p, phone: val }))}
                                         keyboardType="phone-pad"
@@ -382,14 +392,14 @@ export default function ProfileScreen() {
                                 <View style={styles.genderRow}>
                                     <TouchableOpacity
                                         onPress={() => setFormData(p => ({ ...p, gender: 'MALE' }))}
-                                        style={[styles.genderPill, { borderColor: colors.border }, formData.gender?.toUpperCase() === 'MALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                                        style={[styles.genderPill, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' }, formData.gender?.toUpperCase() === 'MALE' && { backgroundColor: colors.primary }]}
                                     >
                                         <Ionicons name="male" size={16} color={formData.gender?.toUpperCase() === 'MALE' ? '#FFF' : colors.icon} />
                                         <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'MALE' && { color: '#FFF' }, theme === 'dark' && { color: colors.textSecondary }]}>Male</ThemedText>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => setFormData(p => ({ ...p, gender: 'FEMALE' }))}
-                                        style={[styles.genderPill, { borderColor: colors.border }, formData.gender?.toUpperCase() === 'FEMALE' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                                        style={[styles.genderPill, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' }, formData.gender?.toUpperCase() === 'FEMALE' && { backgroundColor: colors.primary }]}
                                     >
                                         <Ionicons name="female" size={16} color={formData.gender?.toUpperCase() === 'FEMALE' ? '#FFF' : colors.icon} />
                                         <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'FEMALE' && { color: '#FFF' }, theme === 'dark' && { color: colors.textSecondary }]}>Female</ThemedText>
@@ -398,46 +408,26 @@ export default function ProfileScreen() {
                             </Animated.View>
 
                             {/* City Picker */}
-                            <Animated.View entering={FadeInDown.delay(500)} style={styles.inputField}>
-                                <View style={styles.labelContainer}>
-                                    <ThemedText style={[styles.label, { color: colors.text }]}>
-                                        CITY <ThemedText style={styles.required}>*</ThemedText>
-                                    </ThemedText>
-                                </View>
-                                <TouchableOpacity
-                                    style={[styles.dropdownTrigger, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
-                                    onPress={() => setCityPickerVisible(true)}
-                                >
-                                    <View style={styles.triggerContent}>
-                                        <Ionicons name="location-outline" size={18} color={formData.city ? colors.primary : colors.icon} style={{ marginRight: 10 }} />
-                                        <ThemedText style={[styles.triggerText, !formData.city ? { color: colors.icon + '70' } : { color: colors.text, textTransform: 'capitalize' }, { fontSize: 12 }]}>
-                                            {formData.city || "Select your city"}
-                                        </ThemedText>
-                                    </View>
-                                    <Ionicons name="chevron-down" size={16} color={colors.icon} />
-                                </TouchableOpacity>
-                            </Animated.View>
+                            <ModalPickerTrigger
+                                label="CITY"
+                                required
+                                icon="location-outline"
+                                value={formData.city}
+                                placeholder="Select your city"
+                                onPress={() => setCityPickerVisible(true)}
+                                delay={500}
+                            />
 
                             {/* Village Field */}
-                            <Animated.View entering={FadeInDown.delay(550)} style={styles.inputField}>
-                                <View style={styles.labelContainer}>
-                                    <ThemedText style={[styles.label, { color: colors.text }]}>
-                                        VILLAGE / TOWN <ThemedText style={styles.required}>*</ThemedText>
-                                    </ThemedText>
-                                </View>
-                                <TouchableOpacity
-                                    style={[styles.dropdownTrigger, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
-                                    onPress={() => setVillagePickerVisible(true)}
-                                >
-                                    <View style={styles.triggerContent}>
-                                        <Ionicons name="business-outline" size={18} color={formData.village ? colors.primary : colors.icon} style={{ marginRight: 10 }} />
-                                        <ThemedText style={[styles.triggerText, !formData.village ? { color: colors.icon + '70' } : { color: colors.text, textTransform: 'capitalize' }, { fontSize: 12 }]}>
-                                            {formData.village || "Select your village/town"}
-                                        </ThemedText>
-                                    </View>
-                                    <Ionicons name="chevron-down" size={16} color={colors.icon} />
-                                </TouchableOpacity>
-                            </Animated.View>
+                            <ModalPickerTrigger
+                                label="VILLAGE / TOWN"
+                                required
+                                icon="business-outline"
+                                value={formData.village}
+                                placeholder="Select your village/town"
+                                onPress={() => setVillagePickerVisible(true)}
+                                delay={550}
+                            />
 
                             {/* Why complete profile? */}
                             <View style={styles.infoTip}>
@@ -479,7 +469,7 @@ export default function ProfileScreen() {
                     onSelect={(village) => setFormData(prev => ({ ...prev, village }))}
                     currentValue={formData.village}
                     options={villagesData}
-                    title="Select Village/Town"
+                    title="Select Village"
                     placeholder="Search village/town..."
                 />
 
@@ -513,8 +503,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
     },
     backButton: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         borderRadius: 22,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
@@ -574,9 +564,8 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
+        borderRadius: 12,
         paddingHorizontal: 14,
-        borderWidth: 1,
     },
     textInput: {
         flex: 1,
@@ -586,9 +575,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: Layout.borderRadius,
+        borderRadius: 12,
         paddingHorizontal: 14,
-        borderWidth: 1,
     },
     triggerContent: {
         flexDirection: 'row',
@@ -608,9 +596,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: Layout.borderRadius,
-        borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderRadius: 12,
         gap: 6,
     },
     genderText: {

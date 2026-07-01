@@ -96,8 +96,8 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     iconBox: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         borderRadius: 14,
         backgroundColor: '#F8FAFC',
         justifyContent: 'center',

@@ -1,25 +1,24 @@
 import React, { useState, useCallback, memo, useRef, useEffect, useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, FlatList, ActivityIndicator, Image, Platform, Alert } from 'react-native';
-import { Stack, useNavigation, useLocalSearchParams } from 'expo-router';
+import { StyleSheet, View, TouchableOpacity, FlatList, ActivityIndicator, Platform, TextInput } from 'react-native';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
+import { Stack, useNavigation, useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DrawerActions } from '@react-navigation/native';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { ThemedText } from '@/components/ThemedText';
-import { useAnnouncements } from '@/hooks/useAnnouncements';
+import { useInfiniteAnnouncements } from '@/hooks/useAnnouncements';
 import { AnnouncementCard } from '@/components/announcements/AnnouncementCard';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { useAuth } from '@/context/AuthContext';
-import { NotificationIcon } from '@/components/common/NotificationIcon';
-import Avatar from '@/components/ui/avatar';
 import { CreatePublicAnnouncement } from '@/components/announcements/CreatePublicAnnouncement';
 import Toast from 'react-native-toast-message';
-import { useMutation } from '@tanstack/react-query';
-import { deleteAnnouncement } from '@/apis/announcements';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteAnnouncement, ANNOUNCEMENT_QUERY_KEYS, AnnouncementData } from '@/apis/announcements';
 import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { AnnouncementCardSkeleton } from '@/components/common/CardSkeletons';
+import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
 
 // Category tab config
 const TABS = [
@@ -36,24 +35,48 @@ const TABS = [
     { id: 'lost_found', label: 'Lost & Found' },
 ];
 
-export default function AnnouncementsScreen() {
-    const navigation = useNavigation();
+const AnnouncementsScreen = memo(function AnnouncementsScreen() {
     const { theme } = useTheme();
     const { user } = useAuth();
+    const currentUserId = user?.user?._id;
+    const queryClient = useQueryClient();
     const colors = Colors[theme];
-    const insets = useSafeAreaInsets();
     const { id } = useLocalSearchParams<{ id?: string }>();
     const [selectedTab, setSelectedTab] = useState('');
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
-    const flatListRef = useRef<FlatList>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const flatListRef = useRef<FlashListRef<AnnouncementData>>(null);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+            flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     const announcementFilters = useMemo(() => {
-        return selectedTab === 'mine'
-            ? { authorId: user?.user?._id }
-            : { type: selectedTab || undefined };
-    }, [selectedTab, user?.user?._id]);
+        return {
+            type: selectedTab === 'mine' ? undefined : (selectedTab || undefined),
+            authorId: selectedTab === 'mine' ? user?.user?._id : undefined,
+            search: debouncedSearch || undefined,
+        };
+    }, [selectedTab, user?.user?._id, debouncedSearch]);
 
-    const { data: announcements = [], isLoading, refetch, isRefetching } = useAnnouncements(announcementFilters);
+    const {
+        data: infiniteData,
+        isLoading,
+        refetch,
+        isRefetching,
+        hasNextPage,
+        fetchNextPage,
+        isFetchingNextPage
+    } = useInfiniteAnnouncements(announcementFilters);
+
+    const announcements = useMemo(() => {
+        return infiniteData?.pages?.flatMap(page => Array.isArray(page?.data) ? page.data : []) || [];
+    }, [infiniteData]);
 
     useEffect(() => {
         if (id) {
@@ -85,44 +108,126 @@ export default function AnnouncementsScreen() {
         }
     }, [id, announcements]);
 
-    const [announcementToEdit, setAnnouncementToEdit] = useState<any>(null);
-    const [announcementToDelete, setAnnouncementToDelete] = useState<any>(null);
+    const [announcementToEdit, setAnnouncementToEdit] = useState<AnnouncementData | null>(null);
+    const [announcementToDelete, setAnnouncementToDelete] = useState<AnnouncementData | null>(null);
 
     const deleteMutation = useMutation({
         mutationFn: deleteAnnouncement,
+        onMutate: async (announcementId: string) => {
+            await queryClient.cancelQueries({ queryKey: ANNOUNCEMENT_QUERY_KEYS.all });
+            const previousData = queryClient.getQueriesData({ queryKey: ANNOUNCEMENT_QUERY_KEYS.all });
+
+            queryClient.setQueriesData(
+                { queryKey: ANNOUNCEMENT_QUERY_KEYS.all },
+                (old: any) => {
+                    if (!old?.pages) return old;
+                    return {
+                        ...old,
+                        pages: old.pages.map((page: any) => {
+                            if (!page || !Array.isArray(page.data)) return page;
+                            return {
+                                ...page,
+                                data: page.data.filter((item: any) => item._id !== announcementId)
+                            };
+                        })
+                    };
+                }
+            );
+
+            return { previousData };
+        },
         onSuccess: () => {
-            refetch();
             Toast.show({ type: 'success', text1: 'Deleted', text2: 'Announcement deleted successfully!' });
         },
-        onError: (error: any) => {
+        onError: (error: any, _variables, context: any) => {
+            if (context?.previousData) {
+                context.previousData.forEach(([queryKey, data]: [any, any]) => {
+                    queryClient.setQueryData(queryKey, data);
+                });
+            }
             Toast.show({ type: 'error', text1: 'Error', text2: error.message || 'Failed to delete announcement.' });
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ANNOUNCEMENT_QUERY_KEYS.all });
         }
     });
 
-    const handleEdit = useCallback((item: any) => {
+
+    const feedListStyle = useMemo(() => [
+        styles.feedList,
+        { paddingBottom: 100 }
+    ], []);
+
+    const handleEdit = useCallback((item: AnnouncementData) => {
         setAnnouncementToEdit(item);
         setIsCreateModalVisible(true);
     }, []);
 
-    const handleDelete = useCallback((item: any) => {
+    const handleDelete = useCallback((item: AnnouncementData) => {
         setAnnouncementToDelete(item);
     }, []);
 
-    const toggleDrawer = useCallback(() => {
-        navigation.dispatch(DrawerActions.toggleDrawer());
-    }, [navigation]);
+    const handleCreateClose = useCallback(() => {
+        setIsCreateModalVisible(false);
+        setAnnouncementToEdit(null);
+    }, []);
 
-    const renderItem = useCallback(({ item }: { item: any }) => {
+    const handleCreateSuccess = useCallback(() => {
+        // queryClient.invalidateQueries is already handled inside CreatePublicAnnouncement
+    }, []);
+
+    const handleDeleteClose = useCallback(() => {
+        setAnnouncementToDelete(null);
+    }, []);
+
+    const handleDeleteConfirm = useCallback(() => {
+        if (announcementToDelete) {
+            deleteMutation.mutate(announcementToDelete._id);
+            setAnnouncementToDelete(null);
+        }
+    }, [announcementToDelete, deleteMutation]);
+
+    const handleEndReached = useCallback(() => {
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    const renderFooter = useCallback(() => {
+        if (isFetchingNextPage) {
+            return (
+                <View style={{ paddingVertical: 20 }}>
+                    <ActivityIndicator color={colors.primary} />
+                </View>
+            );
+        }
+        if (!hasNextPage && announcements.length > 0) {
+            return (
+                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, paddingVertical: 20 }}>
+                    That's all
+                </ThemedText>
+            );
+        }
+        return null;
+    }, [isFetchingNextPage, hasNextPage, announcements.length, colors.primary]);
+
+
+    const renderItem = useCallback(({ item }: { item: AnnouncementData }) => {
+        const isAuthor = !!(currentUserId && item.authorId && (typeof item.authorId === 'string' ? item.authorId : (item.authorId as any)._id || item.authorId).toString() === currentUserId.toString());
+        const isEssentialAdmin = !!(item.essentialId?._id && user?.user?.managedEssentials?.some((id: any) => (id._id || id).toString() === item.essentialId?._id?.toString()));
+        const canManage = isAuthor || isEssentialAdmin;
+
         return (
             <AnnouncementCard
                 item={item}
                 colors={colors}
                 selected={item._id === id}
+                canManage={canManage}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
             />
         );
-    }, [colors, id, handleEdit, handleDelete]);
+    }, [colors, id, handleEdit, handleDelete, currentUserId, user?.user?.managedEssentials]);
 
     const renderTabItem = useCallback(({ item }: { item: any }) => {
         const isActive = selectedTab === item.id;
@@ -135,6 +240,7 @@ export default function AnnouncementsScreen() {
                 onPress={() => {
                     analyticsService.trackEvent(AnalyticsEvents.ANNOUNCEMENT_TAB_CHANGED, { tab: item.id || 'all' });
                     setSelectedTab(item.id);
+                    flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
                 }}
             >
                 <ThemedText style={[
@@ -151,49 +257,38 @@ export default function AnnouncementsScreen() {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            {/* Header Section with Primary Color Background */}
-            <View style={[
-                styles.headerContainer,
-                {
-                    backgroundColor: colors.primary,
-                    paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20),
-                }
-            ]}>
-                <View style={styles.headerContent}>
-                    <TouchableOpacity
-                        onPress={toggleDrawer}
-                        style={styles.iconButton}
-                    >
-                        <Ionicons name="grid-outline" size={20} color="#FFFFFF" />
-                    </TouchableOpacity>
-
-
-                    <View style={styles.rightActions}>
-                        {(user?.user?.isPublicAnnouncer || (user?.user?.managedEssentials && user.user.managedEssentials.length > 0) || selectedTab === 'mine') && (
-                            <TouchableOpacity
-                                onPress={() => setIsCreateModalVisible(true)}
-                                style={[styles.iconButton, { marginRight: 12 }]}
-                            >
-                                <Ionicons name="add" size={22} color="#FFFFFF" />
-                            </TouchableOpacity>
-                        )}
-                        <NotificationIcon
-                            containerStyle={{ marginRight: 12 }}
-                            badgeStyle={{ borderColor: colors.primary }}
+            {/* Header */}
+            <ScreenHeader
+                rightActions={
+                    (user?.user?.isPublicAnnouncer ||
+                        (user?.user?.managedEssentials && user.user.managedEssentials.length > 0) ||
+                        selectedTab === 'mine') ? (
+                        <HeaderIconBtn
+                            name="add"
+                            size={22}
+                            onPress={() => setIsCreateModalVisible(true)}
                         />
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('profile' as never)}
-                            style={styles.profileButton}
-                        >
-                            <Avatar
-                                uri={user?.user?.profileImage}
-                                name={user?.user?.name}
-                                size={34}
+                    ) : undefined
+                }
+            >
+                {/* Search Bar */}
+                <View style={styles.searchSection}>
+                    <View style={styles.searchRow}>
+                        <View style={[styles.searchInputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                            <Ionicons name="search" size={20} color="#94A3B8" style={{ marginRight: 10 }} />
+                            <TextInput
+                                style={[styles.searchInput, { color: colors.text }]}
+                                placeholder="Search notices..."
+                                placeholderTextColor="#94A3B8"
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                                returnKeyType="search"
+                                clearButtonMode="while-editing"
                             />
-                        </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-            </View>
+            </ScreenHeader>
 
             {/* Tabs */}
             <View style={styles.tabsContainer}>
@@ -206,61 +301,50 @@ export default function AnnouncementsScreen() {
                     contentContainerStyle={styles.tabsList}
                 />
             </View>
- 
+
             {/* Announcements Feed */}
             {isLoading ? (
-                <View style={styles.centered}>
-                    <ActivityIndicator size="large" color={colors.primary} />
-                </View>
+                <FlashList
+                    data={[1, 2, 3, 4, 5]}
+                    keyExtractor={(item) => String(item)}
+                    renderItem={() => <AnnouncementCardSkeleton />}
+                    contentContainerStyle={feedListStyle}
+                    scrollEnabled={false}
+                />
             ) : announcements.length === 0 ? (
                 <View style={styles.centered}>
                     <Ionicons name="megaphone-outline" size={48} color={colors.textSecondary} style={{ opacity: 0.5 }} />
                     <ThemedText style={[styles.emptyText, { color: colors.textSecondary }]}>
-                        No announcements posted in this category.
+                        {searchQuery ? 'No matching announcements found.' : 'No announcements posted in this category.'}
                     </ThemedText>
                 </View>
             ) : (
-                <FlatList
+                <FlashList
                     ref={flatListRef}
                     data={announcements}
                     keyExtractor={(item) => item._id}
                     renderItem={renderItem}
-                    contentContainerStyle={[styles.feedList, { paddingBottom: insets.bottom + 100 }]}
+                    contentContainerStyle={feedListStyle}
                     refreshing={isRefetching}
                     onRefresh={refetch}
-                    initialNumToRender={8}
-                    maxToRenderPerBatch={10}
-                    windowSize={10}
-                    removeClippedSubviews={Platform.OS === 'android'}
-                    onScrollToIndexFailed={(info) => {
-                        const wait = new Promise(resolve => setTimeout(resolve, 500));
-                        wait.then(() => {
-                            flatListRef.current?.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.5 });
-                        });
-                    }}
+                    onEndReached={handleEndReached}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={renderFooter}
                 />
             )}
             {/* Create/Edit Announcement Modal */}
             <CreatePublicAnnouncement
                 visible={isCreateModalVisible}
-                onClose={() => {
-                    setIsCreateModalVisible(false);
-                    setAnnouncementToEdit(null);
-                }}
-                onSuccess={refetch}
+                onClose={handleCreateClose}
+                onSuccess={handleCreateSuccess}
                 announcementToEdit={announcementToEdit}
             />
 
             {/* Delete Confirmation Modal */}
             <CleanConfirmationModal
                 visible={!!announcementToDelete}
-                onClose={() => setAnnouncementToDelete(null)}
-                onConfirm={() => {
-                    if (announcementToDelete) {
-                        deleteMutation.mutate(announcementToDelete._id);
-                        setAnnouncementToDelete(null);
-                    }
-                }}
+                onClose={handleDeleteClose}
+                onConfirm={handleDeleteConfirm}
                 title="Delete Announcement"
                 message="Are you sure you want to delete this announcement? This action cannot be undone."
                 confirmText="Delete"
@@ -271,59 +355,13 @@ export default function AnnouncementsScreen() {
             <LoaderOverlay visible={deleteMutation.isPending} />
         </View>
     );
-}
+});
+
+export default AnnouncementsScreen;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    headerContainer: {
-        paddingBottom: Platform.OS === 'android' ? 14 : 16,
-        borderBottomLeftRadius: Layout.headerBorderRadius,
-        borderBottomRightRadius: Layout.headerBorderRadius,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-        zIndex: 10,
-    },
-    headerContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: '#FFFFFF',
-    },
-    iconButton: {
-        width: 38,
-        height: 38,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    rightActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    profileButton: {
-        width: 38,
-        height: 38,
-        borderRadius: 19,
-        borderWidth: 2,
-        borderColor: 'rgba(255,255,255,0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-    },
-    addBtn: {
-        marginRight: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     tabsContainer: {
         paddingVertical: 12,
@@ -361,66 +399,27 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         gap: 16,
     },
-    card: {
-        borderRadius: 16,
-        padding: 16,
+    searchSection: {
+        paddingTop: Platform.OS === 'android' ? 2 : 4,
+        paddingBottom: 8,
     },
-    cardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    tag: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-    },
-    tagText: {
-        fontSize: 10,
-        fontWeight: '800',
-    },
-    dateText: {
-        fontSize: 11,
-        fontWeight: '600',
-    },
-    cardTitle: {
-        fontSize: 16,
-        fontWeight: '800',
-        marginBottom: 6,
-    },
-    cardMessage: {
-        fontSize: 13,
-        fontWeight: '500',
-        lineHeight: 18,
-    },
-    placeInfo: {
+    searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-        marginTop: 10,
-    },
-    placeText: {
-        fontSize: 12,
-        fontWeight: '700',
-    },
-    imageGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
         gap: 8,
-        marginTop: 12,
     },
-    image: {
-        width: 80,
-        height: 80,
-        borderRadius: 8,
+    searchInputContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
+        height: 42,
+        borderWidth: 1,
     },
-    cardFooter: {
-        marginTop: 14,
-        paddingTop: 10,
-        borderTopWidth: 1,
-    },
-    authorText: {
-        fontSize: 11,
+    searchInput: {
+        flex: 1,
+        fontSize: Platform.OS === 'android' ? 13 : 15,
+        height: '100%',
     },
 });

@@ -21,7 +21,7 @@ export const BusinessCardSkeleton = () => {
                     <Skeleton width="30%" height={24} borderRadius={8} style={{ marginBottom: 8 }} />
                     <Skeleton width="80%" height={14} borderRadius={4} />
                 </View>
-                <Skeleton width={44} height={44} borderRadius={22} style={{ marginLeft: 10 }} />
+                <Skeleton width={42} height={42} borderRadius={22} style={{ marginLeft: 10 }} />
             </View>
         </View>
     );
@@ -79,7 +79,7 @@ export const DonorCardSkeleton = () => {
 };
 
 /**
- * ChatCardSkeleton matches the layout of app/(drawer)/(tabs)/chat.tsx
+ * ChatCardSkeleton matches the layout of app/chat/index.tsx
  */
 export const ChatCardSkeleton = () => {
     const { theme } = useTheme();
@@ -120,6 +120,29 @@ export const RequestCardSkeleton = () => {
                         <Skeleton width={24} height={24} borderRadius={12} />
                         <Skeleton width={24} height={24} borderRadius={12} style={{ marginLeft: 8 }} />
                     </View>
+                </View>
+            </View>
+        </View>
+    );
+};
+
+/**
+ * AnnouncementCardSkeleton matches the layout of components/announcements/AnnouncementCard.tsx
+ */
+export const AnnouncementCardSkeleton = () => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+    return (
+        <View style={{ paddingTop: 12, width: '100%' }}>
+            <Skeleton width={80} height={20} borderRadius={8} style={{ marginBottom: 0 }} />
+            <View style={{ backgroundColor: colors.card, borderBottomLeftRadius: 16, borderBottomRightRadius: 16, borderTopRightRadius: 16, padding: 12 }}>
+                <Skeleton width="70%" height={18} borderRadius={4} style={{ marginBottom: 8 }} />
+                <Skeleton width="100%" height={14} borderRadius={4} style={{ marginBottom: 6 }} />
+                <Skeleton width="100%" height={14} borderRadius={4} style={{ marginBottom: 6 }} />
+                <Skeleton width="60%" height={14} borderRadius={4} style={{ marginBottom: 10 }} />
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Skeleton width={100} height={12} borderRadius={4} />
+                    <Skeleton width={60} height={12} borderRadius={4} />
                 </View>
             </View>
         </View>

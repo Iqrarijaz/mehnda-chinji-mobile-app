@@ -151,7 +151,7 @@ export const PlotCalculator = React.memo(function PlotCalculator({
                                     backgroundColor: colors.background,
                                     color: colors.text,
                                     textAlign: isUrdu ? 'right' : 'left',
-                                    height: isUrdu ? 46 : 44,
+                                    height: isUrdu ? 46 : 42,
                                     paddingHorizontal: isUrdu ? 14 : 12
                                 }
                             ]}
@@ -173,7 +173,7 @@ export const PlotCalculator = React.memo(function PlotCalculator({
                                     backgroundColor: colors.background,
                                     color: colors.text,
                                     textAlign: isUrdu ? 'right' : 'left',
-                                    height: isUrdu ? 46 : 44,
+                                    height: isUrdu ? 46 : 42,
                                     paddingHorizontal: isUrdu ? 14 : 12
                                 }
                             ]}

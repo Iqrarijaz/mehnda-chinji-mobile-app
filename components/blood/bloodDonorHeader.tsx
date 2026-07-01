@@ -6,7 +6,7 @@ import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions } from '@react-navigation/native';
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
     Platform,
     StyleSheet,
@@ -15,6 +15,7 @@ import {
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import Tooltip from 'react-native-walkthrough-tooltip';
 
 interface BloodDonorHeaderProps {
@@ -46,6 +47,22 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
+    const router = useRouter();
+
+    const [localQuery, setLocalQuery] = useState(searchQuery);
+
+    useEffect(() => {
+        setLocalQuery(searchQuery);
+    }, [searchQuery]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (localQuery !== searchQuery) {
+                setSearchQuery(localQuery);
+            }
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [localQuery, searchQuery, setSearchQuery]);
 
     return (
         <View style={[
@@ -58,10 +75,16 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
             {/* Top Row: Menu & Profile */}
             <View style={styles.headerContent}>
                 <TouchableOpacity
-                    onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                    onPress={() => {
+                        if (router.canGoBack()) {
+                            router.back();
+                        } else {
+                            router.replace('/(drawer)/(tabs)');
+                        }
+                    }}
                     style={styles.iconButton}
                 >
-                    <Ionicons name="grid-outline" size={20} color={colors.white} />
+                    <Ionicons name="arrow-back" size={20} color={colors.white} />
                 </TouchableOpacity>
 
 
@@ -70,6 +93,12 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
                         containerStyle={{ marginRight: 12 }}
                         badgeStyle={{ borderColor: colors.primary }}
                     />
+                    <TouchableOpacity
+                        onPress={() => router.push('/(drawer)/(tabs)/chat')}
+                        style={[styles.iconButton, { marginRight: 12 }]}
+                    >
+                        <Ionicons name="chatbubbles" size={20} color={colors.white} />
+                    </TouchableOpacity>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('profile' as never)}
                         style={styles.profileButton}
@@ -83,77 +112,65 @@ export const BloodDonorHeader: React.FC<BloodDonorHeaderProps> = React.memo(({
                 </View>
             </View>
 
-            {/* Search Row — only when on Find tab */}
-            {activeTab === 'find' && (
-                <View style={styles.searchSection}>
-                    <View style={styles.searchRow}>
-                        <TouchableOpacity
-                            activeOpacity={1}
-                            onPress={() => inputRef.current?.focus()}
-                            style={[styles.searchInputContainer, { backgroundColor: colors.card, borderColor: colors.border, flex: 1 }]}
-                        >
-                            <Ionicons name="search" size={20} color="#94A3B8" style={{ marginRight: 10 }} />
-                            <TextInput
-                                ref={inputRef}
-                                style={[styles.searchInput, { color: colors.text }]}
-                                placeholder="Search donors..."
-                                placeholderTextColor="#94A3B8"
-                                value={searchQuery}
-                                onChangeText={setSearchQuery}
-                                returnKeyType="search"
-                                clearButtonMode="while-editing"
-                            />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.bloodGroupButton, { backgroundColor: colors.card, borderColor: colors.border }]}
-                            onPress={onOpenGroupModal}
-                        >
-                            <Ionicons name="water" size={16} color={isDark ? '#FFFFFF' : colors.primary} />
-                            <ThemedText style={[styles.bloodGroupText, { color: isDark ? '#FFFFFF' : colors.primary }]}>
-                                {selectedGroup || 'Any'}
-                            </ThemedText>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            )}
-
-            {/* Tab Toggle Chips — same layout as Directory tabs */}
-            <View style={styles.mainToggleContainer}>
-                <TouchableOpacity
-                    style={[styles.mainToggleBtn, activeTab === 'find' && styles.mainToggleBtnActive, activeTab !== 'find' && { backgroundColor: 'rgba(255,255,255,0.2)' }]}
-                    onPress={() => setActiveTab('find')}
-                >
-                    <ThemedText style={[styles.mainToggleText, activeTab === 'find' ? [styles.mainToggleTextActive, { color: colors.primary }] : { color: '#FFFFFF' }]}>
-                        Find Donors
-                    </ThemedText>
-                </TouchableOpacity>
-                <Tooltip
-                    isVisible={showTooltip}
-                    content={
-                        <View style={styles.tooltipPill}>
-                            <ThemedText style={[styles.tooltipText, { color: colors.textSecondary }]}>بطور عطیہ دہندہ رجسٹر کرنے کے لیے یہاں ٹیپ کریں</ThemedText>
-                            <TouchableOpacity onPress={onCloseTooltip} style={styles.tooltipClose}>
-                                <Ionicons name="close-circle" size={18} color="#64748B" />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    placement="bottom"
-                    onClose={onCloseTooltip}
-                    contentStyle={styles.tooltipContent}
-                    backgroundColor="rgba(0,0,0,0.2)"
-                    displayInsets={{ top: 0, bottom: 0, left: 16, right: 16 }}
-                    childrenWrapperStyle={{ flex: 1 }}
-                >
+            {/* Search Row */}
+            <View style={styles.searchSection}>
+                <View style={styles.searchRow}>
                     <TouchableOpacity
-                        style={[styles.mainToggleBtn, activeTab === 'portal' && styles.mainToggleBtnActive, activeTab !== 'portal' && { backgroundColor: 'rgba(255,255,255,0.2)' }, { width: '100%' }]}
-                        onPress={() => setActiveTab('portal')}
+                        activeOpacity={1}
+                        onPress={() => inputRef.current?.focus()}
+                        style={[styles.searchInputContainer, { backgroundColor: colors.card, borderColor: colors.border, flex: 1 }]}
                     >
-                        <ThemedText style={[styles.mainToggleText, activeTab === 'portal' ? [styles.mainToggleTextActive, { color: colors.primary }] : { color: '#FFFFFF' }]}>
-                            Register
-                        </ThemedText>
+                        <Ionicons name="search" size={20} color="#94A3B8" style={{ marginRight: 10 }} />
+                        <TextInput
+                            ref={inputRef}
+                            style={[styles.searchInput, { color: colors.text }]}
+                            placeholder="Search donors..."
+                            placeholderTextColor="#94A3B8"
+                            value={localQuery}
+                            onChangeText={setLocalQuery}
+                            returnKeyType="search"
+                            clearButtonMode="while-editing"
+                        />
                     </TouchableOpacity>
-                </Tooltip>
+
+                    <TouchableOpacity
+                        style={[styles.filterButton, { backgroundColor: selectedGroup ? '#10B981' : 'rgba(255, 255, 255, 0.2)' }]}
+                        onPress={onOpenGroupModal}
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons name="funnel-outline" size={20} color="#FFFFFF" />
+                        {selectedGroup && (
+                            <View style={styles.filterBadge}>
+                                <ThemedText style={styles.filterBadgeText}>1</ThemedText>
+                            </View>
+                        )}
+                    </TouchableOpacity>
+
+                    <Tooltip
+                        isVisible={showTooltip}
+                        content={
+                            <View style={styles.tooltipPill}>
+                                <ThemedText style={[styles.tooltipText, { color: colors.textSecondary }]}>بطور عطیہ دہندہ رجسٹر کرنے کے لیے یہاں ٹیپ کریں</ThemedText>
+                                <TouchableOpacity onPress={onCloseTooltip} style={styles.tooltipClose}>
+                                    <Ionicons name="close-circle" size={18} color="#64748B" />
+                                </TouchableOpacity>
+                            </View>
+                        }
+                        placement="bottom"
+                        onClose={onCloseTooltip}
+                        contentStyle={styles.tooltipContent}
+                        backgroundColor="rgba(0,0,0,0.2)"
+                        displayInsets={{ top: 0, bottom: 0, left: 16, right: 16 }}
+                    >
+                        <TouchableOpacity
+                            style={[styles.listingIconButton, { backgroundColor: activeTab === 'portal' ? '#10B981' : 'rgba(255, 255, 255, 0.2)' }]}
+                            onPress={() => setActiveTab(activeTab === 'portal' ? 'find' : 'portal')}
+                            activeOpacity={0.7}
+                        >
+                            <Ionicons name="list-outline" size={20} color="#FFFFFF" />
+                        </TouchableOpacity>
+                    </Tooltip>
+                </View>
             </View>
         </View>
     );
@@ -206,12 +223,12 @@ const styles = StyleSheet.create({
     },
     searchSection: {
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-        paddingBottom: Platform.OS === 'android' ? 14 : 16,
+        paddingBottom: 8,
     },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
+        gap: 8,
     },
     searchInputContainer: {
         flex: 1,
@@ -219,7 +236,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        height: Platform.OS === 'android' ? 42 : 48,
+        height: 42,
         borderWidth: 1,
     },
     searchInput: {
@@ -228,46 +245,40 @@ const styles = StyleSheet.create({
         height: '100%',
         color: '#0F172A',
     },
-    bloodGroupButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    filterButton: {
+        width: 42,
+        height: 42,
+        borderRadius: 21,
         justifyContent: 'center',
-        borderRadius: Layout.borderRadius,
-        paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        height: Platform.OS === 'android' ? 42 : 48,
-        gap: 6,
-        borderWidth: 1,
-    },
-    bloodGroupText: {
-        fontSize: Platform.OS === 'android' ? 12 : 14,
-        fontWeight: '700',
-    },
-    mainToggleContainer: {
-        flexDirection: 'row',
-        paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        marginBottom: Platform.OS === 'android' ? 14 : 16,
-        gap: Platform.OS === 'android' ? 6 : 8,
-    },
-    mainToggleBtn: {
-        flex: 1,
-        paddingVertical: Platform.OS === 'android' ? 6 : 8,
-        paddingHorizontal: Platform.OS === 'android' ? 12 : 14,
-        borderRadius: Layout.borderRadius,
         alignItems: 'center',
+        position: 'relative',
+    },
+    filterBadge: {
+        position: 'absolute',
+        top: -2,
+        right: -2,
+        backgroundColor: '#EF4444',
+        borderRadius: 9,
+        width: 18,
+        height: 18,
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.3)',
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderColor: '#FFFFFF',
     },
-    mainToggleBtnActive: {
-        backgroundColor: '#FFFFFF',
+    filterBadgeText: {
+        color: '#FFFFFF',
+        fontSize: 8,
+        fontWeight: 'bold',
     },
-    mainToggleText: {
-        fontSize: Platform.OS === 'android' ? 12 : 14,
-        fontWeight: '600',
+    listingIconButton: {
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    mainToggleTextActive: {
-        fontWeight: '700',
-    },
+
     tooltipContent: {
         padding: 0,
         borderRadius: Layout.borderRadius,

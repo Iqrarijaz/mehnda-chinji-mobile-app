@@ -28,7 +28,7 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
             style={styles.touchable}
         >
             <View style={[
-                styles.card, 
+                styles.card,
                 { backgroundColor: colors.card, borderColor: isSelected ? accentColor : 'transparent', borderWidth: 2 },
                 compact && styles.cardCompact
             ]}>
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
         minHeight: 60,
     },
     iconContainer: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
@@ -86,8 +86,8 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     imageIcon: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
     },
     imageIconCompact: {
         width: 36,

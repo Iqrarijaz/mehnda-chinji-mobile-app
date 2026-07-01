@@ -104,7 +104,7 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
         } else if (item.type === 'business') {
             router.push(`/business/${item.id}` as any);
         } else if (item.type === 'donor') {
-            router.push('/(tabs)/blood' as any);
+            router.push('/(drawer)/blood' as any);
         } else if (item.type === 'place') {
             router.push(`/place/${item.id}` as any);
         }

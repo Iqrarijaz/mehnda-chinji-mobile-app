@@ -4,6 +4,7 @@ import * as Notifications from 'expo-notifications';
 import Sentry from '@/lib/sentry';
 import { useSocketNotifications } from '@/hooks/notificationHooks/useSocketNotifications';
 import { usePushNotifications } from '@/hooks/notificationHooks/usePushNotifications';
+import { useFcmNotifications } from '@/hooks/notificationHooks/useFcmNotifications';
 import { useSystemPushNotifications } from '@/hooks/notificationHooks/useSystemPushNotifications';
 import { useAppOpenAd } from '@/ads/hooks/useAppOpenAd';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
@@ -13,7 +14,7 @@ import { View, Platform, InteractionManager } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { MenuProvider } from 'react-native-popup-menu';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { analyticsService, useScreenTracking, AnalyticsEvents } from '@/analytics';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
@@ -26,6 +27,8 @@ import { usePrayerNotifications } from '@/hooks/notificationHooks/usePrayerNotif
 import { useWeatherNotifications } from '@/hooks/notificationHooks/useWeatherNotifications';
 import { useWeatherCity } from '@/context/WeatherContext';
 import * as Application from 'expo-application';
+import { useNotificationStore } from '@/store/notificationStore';
+import { getMessaging, subscribeToTopic, unsubscribeFromTopic } from '@react-native-firebase/messaging';
 
 import { UpdateModal } from '@/components/common/UpdateModal';
 import { RatingModal } from '@/components/common/RatingModal';
@@ -35,9 +38,11 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useAppFonts } from '@/hooks/useFonts';
 import { initConfig } from '@/lib/remoteConfig';
+import { initializeDeviceInfo } from '@/lib/deviceInfo';
 import AdManager from '@/ads/adManager.service';
 import { Text, TextInput } from 'react-native';
 import { ToastConfig } from '@/components/ToastConfig';
+import CustomSplashScreen from '@/components/splashScreen';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -94,6 +99,7 @@ function DrawerLayout() {
 }
 function DeferredHooks() {
   usePushNotifications();
+  useFcmNotifications();
   useSocketNotifications();
   useSystemPushNotifications();
   useScreenTracking();
@@ -103,6 +109,42 @@ function DeferredHooks() {
   const { calendarData } = usePrayerCalendar(selectedCity);
   usePrayerNotifications(calendarData, selectedCity);
   useWeatherNotifications(selectedCity);
+
+  const preferences = useNotificationStore(state => state.preferences);
+  const weatherEnabled = preferences?.weather;
+  const lastWeatherTopicRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const updateWeatherSubscription = async () => {
+      try {
+        if (!selectedCity) return;
+        const cleanCity = selectedCity.split(',')[0].trim().toLowerCase().replace(/\s+/g, '_');
+        const newTopic = `weather_${cleanCity}`;
+
+        // Unsubscribe from previous city if it changed
+        const messagingInstance = getMessaging();
+        if (lastWeatherTopicRef.current && lastWeatherTopicRef.current !== newTopic) {
+          await unsubscribeFromTopic(messagingInstance, lastWeatherTopicRef.current);
+          if (__DEV__) console.log(`📡 Unsubscribed from old weather topic: ${lastWeatherTopicRef.current}`);
+          lastWeatherTopicRef.current = null;
+        }
+
+        if (weatherEnabled) {
+          await subscribeToTopic(messagingInstance, newTopic);
+          lastWeatherTopicRef.current = newTopic;
+          if (__DEV__) console.log(`📡 Subscribed to weather topic: ${newTopic}`);
+        } else {
+          // If disabled, ensure we are unsubscribed from the topic
+          await unsubscribeFromTopic(messagingInstance, newTopic);
+          if (__DEV__) console.log(`📡 Unsubscribed from weather topic: ${newTopic}`);
+        }
+      } catch (err) {
+        console.warn('⚠️ Weather topic subscription sync failed:', err);
+      }
+    };
+
+    updateWeatherSubscription();
+  }, [selectedCity, weatherEnabled]);
 
   useEffect(() => {
     Notifications.setNotificationHandler({
@@ -197,16 +239,31 @@ function AppInitializer() {
 function RootLayout() {
   const fontsLoaded = useAppFonts();
   const [configLoaded, setConfigLoaded] = useState(false);
+  const [minimumTimeElapsed, setMinimumTimeElapsed] = useState(false);
 
   useEffect(() => {
+    // Hide the native flash screen immediately to render our custom JS splash screen
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinimumTimeElapsed(true);
+    }, 2500);
+
+    // Initialize device info cache for API interceptors
+    initializeDeviceInfo().catch(err => console.error('Failed to initialize device info', err));
+
     console.time("config");
     initConfig()
       .finally(() => {
         console.timeEnd("config");
+        setConfigLoaded(true);
       })
-      .catch(console.error);
-
-    setConfigLoaded(true);
+      .catch((err) => {
+        console.error(err);
+        setConfigLoaded(true);
+      });
 
     console.time("ads");
     AdManager.init()
@@ -214,17 +271,11 @@ function RootLayout() {
         console.timeEnd("ads");
       })
       .catch(console.error);
+
+    return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (fontsLoaded && configLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, configLoaded]);
-
-  if (!fontsLoaded || !configLoaded) {
-    return null;
-  }
+  const isAppReady = fontsLoaded && configLoaded && minimumTimeElapsed;
 
   return (
     <PersistQueryClientProvider
@@ -239,10 +290,16 @@ function RootLayout() {
                 <WeatherProvider>
                   <SocketProvider>
                     <MenuProvider>
-                      <AppInitializer />
                       <StatusBar style="dark" />
-                      <DrawerLayout />
-                      <NetworkMonitor />
+                      {isAppReady ? (
+                        <>
+                          <AppInitializer />
+                          <DrawerLayout />
+                          <NetworkMonitor />
+                        </>
+                      ) : (
+                        <CustomSplashScreen />
+                      )}
                     </MenuProvider>
                   </SocketProvider>
                 </WeatherProvider>

@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     backBtn: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         borderRadius: 22,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
@@ -247,8 +247,8 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     historyBtn: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         borderRadius: 22,
         justifyContent: 'center',
         alignItems: 'center',

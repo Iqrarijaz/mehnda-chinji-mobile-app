@@ -174,7 +174,7 @@ const BloodRegistration = React.memo(() => {
                             style={[styles.emptyStateBtn, { backgroundColor: '#ef4444' }]}
                             onPress={handleRegisterOpen}
                         >
-                            <ThemedText style={{ color: '#FFF', fontWeight: 'bold' }}>Register Now</ThemedText>
+                            <ThemedText style={{ color: '#FFF', fontWeight: '600', fontSize: 14 }}>Register Now</ThemedText>
                         </TouchableOpacity>
                     </View>
                 )}
@@ -261,8 +261,8 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     addButton: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         borderRadius: 22,
         backgroundColor: '#ef4444',
         justifyContent: 'center',
@@ -297,9 +297,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     emptyStateBtn: {
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: Layout.borderRadius,
+        width: 120,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     tipsSection: {
         marginTop: 20,

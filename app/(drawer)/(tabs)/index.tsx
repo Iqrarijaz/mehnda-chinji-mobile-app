@@ -187,8 +187,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   insightIconWrap: {
-    width: 44,
-    height: 44,
+    width: 42,
+    height: 42,
     borderRadius: Layout.borderRadius,
     justifyContent: 'center',
     alignItems: 'center',

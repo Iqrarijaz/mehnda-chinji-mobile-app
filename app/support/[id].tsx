@@ -447,8 +447,8 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     sendButton: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         borderRadius: 22,
         justifyContent: 'center',
         alignItems: 'center',

@@ -16,15 +16,6 @@
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera to take profile and support ticket photos.",
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
-      },
-      "splash": {
-        "image": "./public/logo_with_text.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#FFFFFF",
-        "dark": {
-          "image": "./public/logo_with_text.png",
-          "backgroundColor": "#0F172A"
-        }
       }
     },
     "android": {
@@ -65,25 +56,11 @@
             "DEFAULT"
           ]
         }
-      ],
-      "splash": {
-        "image": "./public/logo_with_text.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#FFFFFF",
-        "dark": {
-          "image": "./public/logo_with_text.png",
-          "backgroundColor": "#0F172A"
-        }
-      }
+      ]
     },
     "web": {
       "output": "static",
       "favicon": "./public/icon.png"
-    },
-    "splash": {
-      "image": "./public/logo_with_text.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
     },
     "plugins": [
       "expo-router",
@@ -115,9 +92,18 @@
           "ios": {
             "useFrameworks": "static",
             "extraPods": [
-              { "name": "GoogleMobileAdsMediationAppLovin", "version": "13.0.1.0" },
-              { "name": "GoogleMobileAdsMediationFacebook", "version": "6.15.2.0" },
-              { "name": "GoogleMobileAdsMediationUnity", "version": "4.12.3.0" }
+              {
+                "name": "GoogleMobileAdsMediationAppLovin",
+                "version": "13.0.1.0"
+              },
+              {
+                "name": "GoogleMobileAdsMediationFacebook",
+                "version": "6.15.2.0"
+              },
+              {
+                "name": "GoogleMobileAdsMediationUnity",
+                "version": "4.12.3.0"
+              }
             ]
           },
           "android": {

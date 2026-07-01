@@ -8,8 +8,7 @@ import { tokenCache } from '@/lib/tokenCache';
 import { getApiUrl } from '@/lib/remoteConfig';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
-import * as Network from 'expo-network';
-import * as Application from 'expo-application';
+import { getDeviceInfo } from '@/lib/deviceInfo';
 import { Platform } from 'react-native';
 
 // Standardized Error Class
@@ -91,26 +90,12 @@ apiClient.interceptors.request.use(
             config.headers['x-channel'] = 'mobile_app';
             config.headers['x-timezone'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-            // Get Unique Device ID
-            let deviceId = 'unknown';
-            try {
-                if (Platform.OS === 'ios') {
-                    deviceId = await Application.getIosIdForVendorAsync() || 'unknown';
-                } else if (Platform.OS === 'android') {
-                    deviceId = (Application as any).androidId || 'unknown';
-                }
-            } catch (e) {}
-            config.headers['x-device-id'] = deviceId;
-
-            // Get Network Info (Async)
-            try {
-                const networkState = await Network.getNetworkStateAsync();
-                config.headers['x-net-type'] = networkState.type || 'unknown';
-                
-                const ip = await Network.getIpAddressAsync();
-                if (ip) config.headers['x-local-ip'] = ip;
-            } catch (e) {
-                // Silently fail for network info to avoid blocking requests
+            // Get Unique Device ID and Network Info from Cache
+            const deviceInfo = getDeviceInfo();
+            config.headers['x-device-id'] = deviceInfo.deviceId;
+            config.headers['x-net-type'] = deviceInfo.networkType;
+            if (deviceInfo.localIp) {
+                config.headers['x-local-ip'] = deviceInfo.localIp;
             }
         } catch (error) {
             console.error('API Client: Error attaching token', error);

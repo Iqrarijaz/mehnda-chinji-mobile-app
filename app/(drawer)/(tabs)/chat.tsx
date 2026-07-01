@@ -2,7 +2,6 @@ import { getConversationsLines } from '@/apis/chat/chat';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import Avatar from '@/components/ui/avatar';
 import { useSocket } from '@/context/SocketContext';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -11,12 +10,15 @@ import { Conversation, ConversationSource } from '@/types/chat';
 import { StorageKeys, getStorageData, setStorageData } from '@/utils/storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect, useRouter, Stack } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, TextInput, TouchableOpacity, View, Platform } from 'react-native';
 import { ChatCardSkeleton } from '@/components/common/CardSkeletons';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { GlassCard } from '@/components/ui/GlassCard';
+import { ScreenHeader } from '@/components/common/ScreenHeader';
+import Avatar from '@/components/ui/avatar';
+import { useChatUiStore } from '@/store/chatUiStore';
+
 
 
 export default function ChatListScreen() {
@@ -26,6 +28,7 @@ export default function ChatListScreen() {
     const queryClient = useQueryClient();
     const { socket } = useSocket();
     const [searchQuery, setSearchQuery] = useState('');
+    const colors = Colors[theme];
 
     const { data: conversations = [], isLoading, refetch, isRefetching } = useQuery({
         queryKey: ['conversations'],
@@ -43,6 +46,15 @@ export default function ChatListScreen() {
         },
         enabled: !!user?.user?._id,
     });
+
+    const setChatActive = useChatUiStore((s) => s.setChatActive);
+
+    useFocusEffect(
+        useCallback(() => {
+            setChatActive(true);
+            return () => setChatActive(false);
+        }, [setChatActive])
+    );
 
     useFocusEffect(
         useCallback(() => {
@@ -121,28 +133,17 @@ export default function ChatListScreen() {
     };
 
     const renderItem = ({ item }: { item: Conversation }) => {
-        // Find the other participant
-        // Robust filtering: convert IDs to strings to ensure comparison works
-        // Verify structure of user object from AuthContext
-        // It should be user.user._id, but sometimes might differ in user.user.id
         const currentUserId = user?.user?._id?.toString();
 
-        // Debugging logs to verify data
-        // console.log("Current User:", currentUserId);
-
-        // Find other participant: strict diff from current user
         let otherParticipant = item.participants.find((p: any) => {
             const pId = typeof p === 'string' ? p : p._id;
             return pId && pId.toString() !== currentUserId;
         }) as any;
 
-        // Fallback: if no other participant found (e.g. self chat or data issue), take the first one.
-        // We do NOT want to show 'unknown user' unless absolutely necessary.
         if (!otherParticipant && item.participants.length > 0) {
             otherParticipant = item.participants[0];
         }
 
-        // Ensure we have a name object, or fallback string
         const displayName = (typeof otherParticipant === 'object' ? otherParticipant?.name : 'Unknown User') || 'Unknown User';
         const profileImage = typeof otherParticipant === 'object' ? otherParticipant?.profileImage : null;
 
@@ -164,7 +165,7 @@ export default function ChatListScreen() {
                 })}
                 activeOpacity={0.8}
             >
-                <GlassCard>
+                <View style={[styles.card, { backgroundColor: colors.card }]}>
                     <View style={styles.cardContent}>
                         <Avatar
                             uri={profileImage as string}
@@ -214,7 +215,7 @@ export default function ChatListScreen() {
                             </View>
                         </View>
                     </View>
-                </GlassCard>
+                </View>
             </TouchableOpacity>
         );
     };
@@ -224,6 +225,7 @@ export default function ChatListScreen() {
     if (loading) {
         return (
             <ThemedView style={styles.container}>
+                <Stack.Screen options={{ headerShown: false }} />
                 <View style={styles.listContent}>
                     {[1, 2, 3, 4, 5, 6].map((i) => (
                         <ChatCardSkeleton key={i} />
@@ -236,20 +238,28 @@ export default function ChatListScreen() {
     return (
         <ErrorBoundary>
             <ThemedView style={styles.container}>
-                <View style={styles.searchWrapper}>
-                    <GlassCard style={{ borderRadius: 12, padding: 0 }}>
-                        <View style={[styles.searchContainer, { backgroundColor: Colors[theme].tint + '20' }]}>
-                            <Ionicons name="search" size={20} color={Colors[theme].tint} style={styles.searchIcon} />
-                            <TextInput
-                                style={[styles.searchInput, { color: Colors[theme].text }]}
-                                placeholder="Search"
-                                placeholderTextColor={Colors[theme].icon}
-                                value={searchQuery}
-                                onChangeText={setSearchQuery}
-                            />
+                <Stack.Screen options={{ headerShown: false }} />
+
+                <ScreenHeader>
+                    {/* Search Bar */}
+                    <View style={styles.searchSection}>
+                        <View style={styles.searchRow}>
+                            <View style={[styles.searchInputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                                <Ionicons name="search" size={20} color="#94A3B8" style={{ marginRight: 10 }} />
+                                <TextInput
+                                    style={[styles.searchInput, { color: colors.text }]}
+                                    placeholder="Search chats..."
+                                    placeholderTextColor="#94A3B8"
+                                    value={searchQuery}
+                                    onChangeText={setSearchQuery}
+                                    returnKeyType="search"
+                                    clearButtonMode="while-editing"
+                                />
+                            </View>
                         </View>
-                    </GlassCard>
-                </View>
+                    </View>
+                </ScreenHeader>
+
                 <FlatList
                     data={filteredConversations}
                     renderItem={renderItem}
@@ -280,6 +290,11 @@ const styles = StyleSheet.create({
     },
     listContent: {
         padding: 16,
+    },
+    card: {
+        borderRadius: 16,
+        padding: 12,
+        marginBottom: 8,
     },
     cardContent: {
         flexDirection: 'row',
@@ -357,25 +372,25 @@ const styles = StyleSheet.create({
         marginTop: 16,
         color: '#94a3b8',
     },
-    searchWrapper: {
-        margin: 16,
+    searchSection: {
         marginBottom: 8,
     },
-    searchContainer: {
+    searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
-        height: 48,
-        borderRadius: 24,
-        borderWidth: 1,
-        borderColor: 'rgba(0,0,0,0.05)',
     },
-    searchIcon: {
-        marginRight: 8,
+    searchInputContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 42,
+        borderWidth: 1,
+        borderRadius: 22,
+        paddingHorizontal: 16,
     },
     searchInput: {
         flex: 1,
-        fontSize: 16,
-        height: '100%',
+        fontSize: 14,
+        paddingVertical: 8,
     },
 });

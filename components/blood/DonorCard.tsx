@@ -77,17 +77,6 @@ const DonorCard = React.memo(({ donor }: DonorCardProps) => {
                         <Ionicons name="call" size={14} color={isDark ? colors.text : primaryColor} />
                     </TouchableOpacity>
                 </View>
-
-                <View style={[styles.divider, { backgroundColor: primaryColor + '10' }]} />
-
-                <View style={styles.cardFooter}>
-                    <View style={styles.footerLeft}>
-                        <Ionicons name="calendar-outline" size={12} color={colors.textSecondary} />
-                        <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>
-                            {new Date(donor.createdAt || donor.lastDonationDate || Date.now()).toLocaleDateString()}
-                        </ThemedText>
-                    </View>
-                </View>
             </TintedCard>
         </View>
     );
@@ -154,25 +143,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textTransform: 'capitalize',
         flex: 1,
-    },
-    divider: {
-        height: 1,
-        width: '100%',
-        marginVertical: 8,
-    },
-    cardFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    footerLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-    },
-    dateText: {
-        fontSize: 11,
-        fontWeight: '600',
     },
     callBtn: {
         width: 32,

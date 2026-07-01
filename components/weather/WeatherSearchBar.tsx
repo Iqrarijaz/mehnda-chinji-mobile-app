@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 14,
-        height: 44,
+        height: 42,
         borderRadius: Layout.borderRadius,
         overflow: 'hidden',
         borderWidth: 1,

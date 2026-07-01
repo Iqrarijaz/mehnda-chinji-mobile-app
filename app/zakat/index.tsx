@@ -111,21 +111,39 @@ const ZakatCalculatorScreenComponent = () => {
                             style={[styles.toggleBtn, cropIrrigation === 'natural' ? { backgroundColor: ACCENT } : { backgroundColor: colors.card }]}
                             onPress={() => setCropIrrigation('natural')}
                         >
-                            <ThemedText style={[styles.toggleText, { color: cropIrrigation === 'natural' ? '#FFF' : colors.text }]}>Natural Rain (10%)</ThemedText>
+                            <ThemedText style={[
+                                styles.toggleText, 
+                                { color: cropIrrigation === 'natural' ? '#FFF' : colors.text },
+                                isUrdu && { fontFamily: 'NotoNastaliqUrdu-Regular', fontSize: 11 }
+                            ]}>
+                                {isUrdu ? 'بارانی / قدرتی (10٪)' : 'Natural Rain (10%)'}
+                            </ThemedText>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.toggleBtn, cropIrrigation === 'artificial' ? { backgroundColor: ACCENT } : { backgroundColor: colors.card }]}
                             onPress={() => setCropIrrigation('artificial')}
                         >
-                            <ThemedText style={[styles.toggleText, { color: cropIrrigation === 'artificial' ? '#FFF' : colors.text }]}>Irrigated (5%)</ThemedText>
+                            <ThemedText style={[
+                                styles.toggleText, 
+                                { color: cropIrrigation === 'artificial' ? '#FFF' : colors.text },
+                                isUrdu && { fontFamily: 'NotoNastaliqUrdu-Regular', fontSize: 11 }
+                            ]}>
+                                {isUrdu ? 'مصنوعی / نہری (5٪)' : 'Irrigated (5%)'}
+                            </ThemedText>
                         </TouchableOpacity>
                     </View>
                 )}
 
                 <View style={[styles.inputContainer, { backgroundColor: colors.card }]}>
-                    <ThemedText style={[styles.inputLabel, { color: colors.textSecondary }]}>Enter Total Value (PKR)</ThemedText>
+                    <ThemedText style={[
+                        styles.inputLabel, 
+                        { color: colors.textSecondary },
+                        isUrdu && { fontFamily: 'NotoNastaliqUrdu-Regular', fontSize: 11, textAlign: 'right' }
+                    ]}>
+                        {isUrdu ? 'کل رقم/مالیت درج کریں (روپے)' : 'Enter Total Value (PKR)'}
+                    </ThemedText>
                     <TextInput
-                        style={[styles.input, { color: colors.text }]}
+                        style={[styles.input, { color: colors.text }, isUrdu && { textAlign: 'right' }]}
                         value={inputValue}
                         onChangeText={setInputValue}
                         keyboardType="numeric"
@@ -135,11 +153,23 @@ const ZakatCalculatorScreenComponent = () => {
                 </View>
 
                 <View style={[styles.resultCard, { backgroundColor: ACCENT }]}>
-                    <ThemedText style={styles.resultLabel}>Zakat Payable</ThemedText>
-                    <ThemedText style={styles.resultValue}>Rs. {formatCurrency(calculatedZakat)}</ThemedText>
+                    <ThemedText style={[
+                        styles.resultLabel,
+                        isUrdu && { fontFamily: 'NotoNastaliqUrdu-Regular', fontSize: 12 }
+                    ]}>
+                        {isUrdu ? 'قابلِ ادائیگی زکوٰۃ' : 'Zakat Payable'}
+                    </ThemedText>
+                    <ThemedText style={styles.resultValue}>
+                        {isUrdu ? `روپے ${formatCurrency(calculatedZakat)}` : `Rs. ${formatCurrency(calculatedZakat)}`}
+                    </ThemedText>
 
                     {selectedCategory !== 'crop' && (
-                        <ThemedText style={styles.resultNote}>* Calculated at standard 2.5%</ThemedText>
+                        <ThemedText style={[
+                            styles.resultNote,
+                            isUrdu && { fontFamily: 'NotoNastaliqUrdu-Regular', fontSize: 10 }
+                        ]}>
+                            {isUrdu ? '* حساب برائے مقررہ شرح 2.5 فیصد' : '* Calculated at standard 2.5%'}
+                        </ThemedText>
                     )}
                 </View>
             </View>

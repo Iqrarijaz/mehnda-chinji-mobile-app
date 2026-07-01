@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, { FadeInUp } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
 import { PRIMARY } from './weatherUtils';
 import { useTheme } from '@/context/ThemeContext';
@@ -15,7 +14,7 @@ const WeatherSunrise = React.memo(({ sunrise, sunset }: WeatherSunriseProps) => 
     const colors = Colors[theme];
 
     return (
-        <Animated.View entering={FadeInUp.delay(650).springify().damping(16)} style={[styles.card, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
+        <View style={[styles.card, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
             <LinearGradient
                 colors={isDark ? ['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)'] : [`${PRIMARY}18`, `${PRIMARY}08`]}
                 style={StyleSheet.absoluteFill}
@@ -35,7 +34,7 @@ const WeatherSunrise = React.memo(({ sunrise, sunset }: WeatherSunriseProps) => 
                     <ThemedText style={[styles.time, { color: colors.text }]}>{sunset}</ThemedText>
                 </View>
             </View>
-        </Animated.View>
+        </View>
     );
 });
 

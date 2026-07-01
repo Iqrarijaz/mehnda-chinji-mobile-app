@@ -9,6 +9,7 @@ export enum ConversationSource {
     BUSINESS = 'BUSINESS',
     DONOR = 'DONOR',
     MULTIPLE = 'MULTIPLE',
+    MARKETPLACE = 'MARKETPLACE',
     NONE = 'NONE',
 }
 

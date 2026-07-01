@@ -6,6 +6,7 @@ import {
 } from '@react-navigation/drawer';
 import { useRouter } from 'expo-router';
 import {
+    Platform,
     StyleSheet,
     TouchableOpacity,
     View,
@@ -32,7 +33,7 @@ const MENU_ITEMS: MenuItem[] = [
     { label: 'Home', icon: 'home-outline', route: '/(drawer)/(tabs)', section: 'Main' },
     { label: 'Notice Board', icon: 'megaphone-outline', route: '/(drawer)/(tabs)/announcements', section: 'Main' },
     { label: 'Village Pride', icon: 'ribbon-outline', route: '/(drawer)/pride', section: 'Main' },
-    { label: 'Blood Donors', icon: 'water-outline', route: '/(drawer)/(tabs)/blood', section: 'Main' },
+    { label: 'Blood Donors', icon: 'water-outline', route: '/(drawer)/blood', section: 'Main' },
     { label: 'Business Directory', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },
     { label: 'Water Supply', icon: 'water-outline', route: '/(drawer)/water-supply', section: 'Main' },
     { label: 'My Requests', icon: 'list-outline', route: '/user/requests', section: 'Main' },
@@ -87,7 +88,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
     return (
         <View style={[styles.container, { backgroundColor: colors.card }]}>
             {/* Minimalist Centered Header */}
-            <Animated.View entering={FadeIn.duration(400)} style={[styles.header, { paddingTop: insets.top + 12 }]}>
+            <Animated.View entering={FadeIn.duration(400)} style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }]}>
                 <View style={styles.headerTop}>
                     <TouchableOpacity
                         style={styles.closeBtn}
@@ -204,6 +205,8 @@ const styles = StyleSheet.create({
     headerTop: {
         width: '100%',
         alignItems: 'flex-end',
+        height: 38,
+        justifyContent: 'center',
         marginBottom: 4,
     },
     closeBtn: {

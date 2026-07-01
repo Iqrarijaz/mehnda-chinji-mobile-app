@@ -130,7 +130,7 @@ export default function VillagePrideScreen() {
 
                     <View style={styles.cardHeroInfo}>
                         <View style={[styles.avatarBorder, { borderColor: meta.accent + '30' }]}>
-                            <Avatar uri={item.metadata?.profileImage || item.images?.[0]} name={fullName} size={44} />
+                            <Avatar uri={item.metadata?.profileImage || item.images?.[0]} name={fullName} size={42} />
                         </View>
                         <View style={styles.heroTextWrap}>
                             <ThemedText style={styles.heroName} numberOfLines={1}>

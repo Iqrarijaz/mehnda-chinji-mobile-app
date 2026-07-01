@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
     FlatList,
     Modal,
@@ -44,41 +44,90 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
 
     const professionsList: Profession[] = configData?.data?.data || [];
 
-    const filteredProfessions = professionsList.filter(prof =>
-        prof.name_eng?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        prof.name_ur?.includes(searchQuery)
-    );
+    const filteredProfessions = useMemo(() => {
+        return professionsList.filter(prof =>
+            prof.name_eng?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            prof.name_ur?.includes(searchQuery)
+        );
+    }, [professionsList, searchQuery]);
+
+    const keyExtractor = useCallback((item: Profession) => item.name_eng, []);
+
+    const renderItem = useCallback(({ item }: { item: Profession }) => {
+        const isSelected = currentProfession === item.name_eng;
+        return (
+            <TouchableOpacity
+                style={[
+                    styles.item,
+                    isSelected && { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.primary + '10' }
+                ]}
+                onPress={() => {
+                    onSelect(item);
+                    setSearchQuery('');
+                    onClose();
+                }}
+            >
+                <View style={styles.labelContainer}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        {item.icon ? (
+                            <Image
+                                source={{ uri: item.icon }}
+                                style={{ width: 28, height: 28, marginRight: 12, borderRadius: 4 }}
+                                contentFit="contain"
+                            />
+                        ) : (
+                            <View style={{ width: 28, height: 28, marginRight: 12, borderRadius: 4, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', justifyContent: 'center', alignItems: 'center' }}>
+                                <Ionicons name="briefcase-outline" size={16} color={colors.icon} />
+                            </View>
+                        )}
+                        <ThemedText style={[
+                            styles.itemTextEng,
+                            { color: colors.text },
+                            isSelected && { color: colors.primary, fontWeight: '700' }
+                        ]}>
+                            {item.name_eng}
+                        </ThemedText>
+                    </View>
+                    <ThemedText style={[
+                        styles.itemTextUr,
+                        { color: colors.icon },
+                        isSelected && { color: colors.primary, fontWeight: '700' }
+                    ]}>
+                        {item.name_ur}
+                    </ThemedText>
+                </View>
+                {isSelected && (
+                    <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                )}
+            </TouchableOpacity>
+        );
+    }, [currentProfession, isDark, colors.primary, colors.text, colors.icon, onSelect, onClose]);
 
     return (
         <Modal
             visible={visible}
-            animationType="slide"
+            animationType="fade"
             transparent={true}
             onRequestClose={onClose}
         >
             <View style={styles.modalOverlay}>
                 <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
-                    <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+                    <View style={styles.modalHeader}>
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Profession</ThemedText>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                            {currentProfession && currentProfession !== 'All' && (
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        onSelect({ name_eng: 'All', name_ur: 'تمام' });
-                                        onClose();
-                                    }}
-                                >
-                                    <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Clear</ThemedText>
-                                </TouchableOpacity>
-                            )}
-                            <TouchableOpacity onPress={onClose} style={[styles.closeButton, { backgroundColor: colors.background }]}>
-                                <Ionicons name="close" size={24} color={colors.text} />
+                        {currentProfession && currentProfession !== 'All' && (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    onSelect({ name_eng: 'All', name_ur: 'تمام' });
+                                    onClose();
+                                }}
+                            >
+                                <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Clear</ThemedText>
                             </TouchableOpacity>
-                        </View>
+                        )}
                     </View>
 
-                    <View style={[styles.searchBar, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: colors.border }]}>
-                        <Ionicons name="search" size={20} color={colors.icon} />
+                    <View style={[styles.searchBar, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' }]}>
+                        <Ionicons name="search" size={18} color={colors.icon} />
                         <TextInput
                             placeholder="Search profession..."
                             placeholderTextColor={colors.icon}
@@ -87,6 +136,11 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                             onChangeText={setSearchQuery}
                             autoFocus={false}
                         />
+                        {searchQuery.length > 0 && (
+                            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                                <Ionicons name="close-circle" size={18} color={colors.icon} />
+                            </TouchableOpacity>
+                        )}
                     </View>
 
                     {isLoading ? (
@@ -96,50 +150,8 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                     ) : (
                         <FlatList
                             data={filteredProfessions}
-                            keyExtractor={(item: Profession) => item.name_eng}
-                            renderItem={({ item }: { item: Profession }) => (
-                                <TouchableOpacity
-                                    style={[styles.item, { borderBottomColor: colors.border }]}
-                                    onPress={() => {
-                                        onSelect(item);
-                                        setSearchQuery('');
-                                        onClose();
-                                    }}
-                                >
-                                    <View style={styles.labelContainer}>
-                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            {item.icon ? (
-                                                <Image
-                                                    source={{ uri: item.icon }}
-                                                    style={{ width: 28, height: 28, marginRight: 12, borderRadius: 4 }}
-                                                    contentFit="contain"
-                                                />
-                                            ) : (
-                                                <View style={{ width: 28, height: 28, marginRight: 12, borderRadius: 4, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', justifyContent: 'center', alignItems: 'center' }}>
-                                                    <Ionicons name="briefcase-outline" size={16} color={colors.icon} />
-                                                </View>
-                                            )}
-                                            <ThemedText style={[
-                                                styles.itemTextEng,
-                                                { color: colors.text },
-                                                currentProfession === item.name_eng && { color: colors.primary, fontWeight: '700' }
-                                            ]}>
-                                                {item.name_eng}
-                                            </ThemedText>
-                                        </View>
-                                        <ThemedText style={[
-                                            styles.itemTextUr,
-                                            { color: colors.icon },
-                                            currentProfession === item.name_eng && { color: colors.primary, fontWeight: '700' }
-                                        ]}>
-                                            {item.name_ur}
-                                        </ThemedText>
-                                    </View>
-                                    {currentProfession === item.name_eng && (
-                                        <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-                                    )}
-                                </TouchableOpacity>
-                            )}
+                            keyExtractor={keyExtractor}
+                            renderItem={renderItem}
                             contentContainerStyle={styles.listContent}
                             ListEmptyComponent={() => (
                                 <View style={{ padding: 20, alignItems: 'center' }}>
@@ -148,6 +160,15 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                             )}
                         />
                     )}
+
+                    <View style={styles.footerContainer}>
+                        <TouchableOpacity
+                            style={[styles.closePill, { backgroundColor: colors.primary }]}
+                            onPress={onClose}
+                        >
+                            <ThemedText style={styles.closePillText}>Close</ThemedText>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </Modal >
@@ -158,57 +179,58 @@ const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
     },
     modalContent: {
-        height: '80%',
+        width: '90%',
+        maxHeight: '70%',
         backgroundColor: '#FFFFFF',
-        borderTopLeftRadius: Layout.borderRadius,
-        borderTopRightRadius: Layout.borderRadius,
-        padding: 24,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: -4 },
+        borderRadius: Layout.borderRadius,
+        padding: 20,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.1,
-        shadowRadius: 10,
+        shadowRadius: 20,
     },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 16,
     },
     modalTitle: {
         fontSize: 18,
         fontWeight: '800',
         letterSpacing: -0.5,
     },
-    closeButton: {
-        padding: 4,
-        borderRadius: 20,
-    },
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        height: 52,
-        borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16,
-        marginBottom: 20,
-        borderWidth: 1,
+        height: 42,
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        marginBottom: 16,
     },
     searchInput: {
         flex: 1,
-        marginLeft: 12,
-        fontSize: 16,
+        marginLeft: 8,
+        fontSize: 14,
+        paddingVertical: 8,
     },
     listContent: {
-        paddingBottom: 40,
+        paddingBottom: 8,
     },
     item: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // paddingVertical: 8,
-        borderBottomWidth: 1,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        marginVertical: 4,
+        borderRadius: 12,
     },
     labelContainer: {
         flexDirection: 'row',
@@ -218,18 +240,29 @@ const styles = StyleSheet.create({
         marginRight: 15,
     },
     itemTextEng: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: '600',
-        paddingVertical: 16,
         textTransform: 'capitalize',
     },
     itemTextUr: {
-        fontSize: 10,
-        paddingRight: 16,
-        paddingVertical: 20,
+        fontSize: 12,
         fontWeight: '500',
     },
-    selectedText: {
-        fontWeight: '700',
+    footerContainer: {
+        marginTop: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    closePill: {
+        width: 90,
+        height: 34,
+        borderRadius: 17,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    closePillText: {
+        color: '#FFFFFF',
+        fontSize: 13,
+        fontWeight: '600',
     },
 });

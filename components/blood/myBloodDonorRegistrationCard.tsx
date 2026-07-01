@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     avatarWrapper: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         borderRadius: 22,
         overflow: 'hidden',
     },

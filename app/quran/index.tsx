@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
-        height: 44,
+        height: 42,
         marginTop: 16,
         marginBottom: 12,
     },

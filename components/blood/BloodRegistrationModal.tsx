@@ -304,7 +304,7 @@ const BloodRegistrationModal = memo(({ visible, onClose, onSuccess }: BloodRegis
                             </TouchableOpacity>
 
                             <TouchableOpacity
-                                style={[styles.modalButton, { backgroundColor: colors.primary, flex: 1 }]}
+                                style={[styles.modalButton, { backgroundColor: colors.primary }]}
                                 onPress={handleRegister}
                                 disabled={registerMutation.isPending}
                             >
@@ -456,8 +456,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 12,
         marginTop: 16,
+        width: '100%',
     },
     modalButton: {
+        width: 120,
         height: 40,
         borderRadius: 20,
         justifyContent: 'center',
@@ -469,7 +471,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     cancelBtn: {
-        flex: 1,
+        width: 100,
         backgroundColor: 'transparent',
         borderWidth: 1,
     },

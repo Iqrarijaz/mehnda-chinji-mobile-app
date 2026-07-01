@@ -9,13 +9,20 @@ interface NotificationData {
     placeType?: string;
     type?: string;
     status?: string;
-    /** true  → notification sent to the submitter (go to My Requests)
-     *  false → community broadcast (go to the listing page) */
     isOwnerNotification?: boolean;
     [key: string]: any;
 }
 
 export function handleNotificationNavigation(data: NotificationData, router: Router) {
+    // ── Announcement notification ───────────────────────────────────
+    if (data.screen === 'announcements' || data.type === 'ANNOUNCEMENT') {
+        router.push({
+            pathname: '/(drawer)/(tabs)/announcements',
+            params: { id: data.announcementId }
+        } as any);
+        return;
+    }
+
     if (!data?.screen) return;
 
     const screen = data.screen;

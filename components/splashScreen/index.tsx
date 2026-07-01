@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
+import * as ExpoSplashScreen from 'expo-splash-screen';
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -17,9 +18,9 @@ import Animated, {
 const { width } = Dimensions.get('window');
 const LOGO_SIZE = width * 0.6;
 
-const logoImg = require('../../public/logo_with_text.webp');
+const logoImg = require('../../public/logo_with_text.png');
 
-const SplashScreen = React.memo(function SplashScreen() {
+const CustomSplashScreen = React.memo(function CustomSplashScreen() {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const isDark = theme === 'dark';
@@ -241,4 +242,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SplashScreen;
+export default CustomSplashScreen;

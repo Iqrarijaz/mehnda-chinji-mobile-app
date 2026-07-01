@@ -1,21 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { getIconName, PRIMARY } from './weatherUtils';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 
-interface HourlyCardProps { time: string; icon: string; temp: number; isNow: boolean; delay: number; }
-const HourlyCard = React.memo(({ time, icon, temp, isNow, delay }: HourlyCardProps) => {
+interface HourlyCardProps { time: string; icon: string; temp: number; isNow: boolean; }
+const HourlyCard = React.memo(({ time, icon, temp, isNow }: HourlyCardProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
     return (
-        <Animated.View
-            entering={SlideInLeft.delay(delay).duration(400)}
+        <View
             style={[
                 styles.card,
                 { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : colors.background },
@@ -25,7 +23,7 @@ const HourlyCard = React.memo(({ time, icon, temp, isNow, delay }: HourlyCardPro
             <ThemedText style={[styles.time, { color: colors.textSecondary }, isNow && styles.timeActive]}>{time}</ThemedText>
             <Ionicons name={getIconName(icon) as any} size={22} color={isNow ? '#FFFFFF' : colors.textSecondary} />
             <ThemedText style={[styles.temp, { color: colors.text }, isNow && styles.tempActive]}>{temp}°</ThemedText>
-        </Animated.View>
+        </View>
     );
 });
 
@@ -35,14 +33,14 @@ const WeatherHourly = React.memo(({ data }: WeatherHourlyProps) => {
     const colors = Colors[theme];
     if (!data.length) return null;
     return (
-        <Animated.View entering={SlideInLeft.delay(450).duration(400)} style={[styles.wrapper, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
+        <View style={[styles.wrapper, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
             <ThemedText style={[styles.title, { color: colors.text }]}>Hourly Forecast</ThemedText>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scroll}>
                 {data.map((h, i) => (
-                    <HourlyCard key={i} time={h.time} icon={h.icon} temp={h.temp} isNow={i === 0} delay={i * 40} />
+                    <HourlyCard key={i} time={h.time} icon={h.icon} temp={h.temp} isNow={i === 0} />
                 ))}
             </ScrollView>
-        </Animated.View>
+        </View>
     );
 });
 

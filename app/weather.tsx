@@ -12,7 +12,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import Animated, { FadeInDown, SlideInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import cities from '../data/cities.json';
@@ -260,10 +259,7 @@ export default function WeatherScreen() {
                     }
                 >
                     {/* Header */}
-                    <Animated.View
-                        entering={SlideInLeft.duration(350)}
-                        style={styles.topNav}
-                    >
+                    <View style={styles.topNav}>
                         <TouchableOpacity
                             activeOpacity={0.8}
                             style={styles.backBtn}
@@ -291,50 +287,35 @@ export default function WeatherScreen() {
                                 onSelectCity={handleSelectCity}
                             />
                         </View>
-                    </Animated.View>
+                    </View>
 
                     {/* Hero */}
-                    <Animated.View entering={FadeInDown.delay(100)}>
-                        <WeatherHero
-                            weather={weather}
-                            isLoading={isLoading}
-                        />
-                    </Animated.View>
-
+                    <WeatherHero
+                        weather={weather}
+                        isLoading={isLoading}
+                    />
 
                     {/* Stats */}
-                    <Animated.View entering={FadeInDown.delay(150)}>
-                        <WeatherStats
-                            weather={weather}
-                            forecast={forecast}
-                        />
-                    </Animated.View>
+                    <WeatherStats
+                        weather={weather}
+                        forecast={forecast}
+                    />
 
                     <NativeAd placement="weather" />
 
-
                     {/* Hourly */}
-                    <Animated.View entering={FadeInDown.delay(250)}>
-                        <WeatherHourly data={hourlyData} />
-                    </Animated.View>
+                    <WeatherHourly data={hourlyData} />
 
                     {/* Daily */}
-                    <Animated.View entering={FadeInDown.delay(300)}>
-                        <WeatherDaily data={dailyData} />
-                    </Animated.View>
+                    <WeatherDaily data={dailyData} />
 
                     {/* Sunrise */}
                     {weather && (
-                        <Animated.View
-                            entering={FadeInDown.delay(350)}
-                        >
-                            <WeatherSunrise
-                                sunrise={sunrise}
-                                sunset={sunset}
-                            />
-                        </Animated.View>
+                        <WeatherSunrise
+                            sunrise={sunrise}
+                            sunset={sunset}
+                        />
                     )}
-
 
                 </ScrollView>
 
@@ -370,13 +351,11 @@ const styles = StyleSheet.create({
     },
 
     backBtn: {
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         borderRadius: 22,
-
         justifyContent: 'center',
         alignItems: 'center',
-
         backgroundColor: 'rgba(255,255,255,0.18)',
     },
 

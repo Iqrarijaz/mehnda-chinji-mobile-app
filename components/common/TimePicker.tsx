@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState, useEffect } from 'react';
 import {
     Modal,
+    Platform,
     StyleSheet,
     TouchableOpacity,
     View,
@@ -67,32 +67,33 @@ export function TimePicker({
                 data={data}
                 keyExtractor={(item) => item}
                 showsVerticalScrollIndicator={false}
-                snapToInterval={44}
+                snapToInterval={48}
                 decelerationRate="fast"
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        onPress={() => setValue(item)}
-                        activeOpacity={0.7}
-                        style={[
-                            styles.optionItem,
-                            value === item && {
-                                backgroundColor: colors.primary + '15',
-                                borderRadius: 12,
-                                borderColor: colors.primary + '30',
-                                borderWidth: 1
-                            }
-                        ]}
-                    >
-                        <ThemedText style={[
-                            styles.optionText,
-                            { color: colors.textSecondary },
-                            value === item && { color: colors.primary, fontWeight: '900', fontSize: 20 }
-                        ]}>
-                            {item}
-                        </ThemedText>
-                    </TouchableOpacity>
-                )}
-                contentContainerStyle={{ paddingVertical: 80 }}
+                renderItem={({ item }) => {
+                    const isSelected = value === item;
+                    return (
+                        <TouchableOpacity
+                            onPress={() => setValue(item)}
+                            activeOpacity={0.7}
+                            style={[
+                                styles.optionItem,
+                                isSelected && {
+                                    backgroundColor: '#0D9488' + '18',
+                                    borderRadius: 12,
+                                }
+                            ]}
+                        >
+                            <ThemedText style={[
+                                styles.optionText,
+                                { color: colors.textSecondary },
+                                isSelected && { color: '#0D9488', fontWeight: '900', fontSize: 22 }
+                            ]}>
+                                {item}
+                            </ThemedText>
+                        </TouchableOpacity>
+                    );
+                }}
+                contentContainerStyle={{ paddingVertical: 88 }}
             />
         </View>
     );
@@ -104,44 +105,57 @@ export function TimePicker({
             transparent={true}
             onRequestClose={onClose}
         >
-            <View style={styles.modalOverlay}>
-                <View style={[styles.modalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    {isDark && (
-                        <LinearGradient
-                            colors={['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.05)']}
-                            style={StyleSheet.absoluteFill}
-                        />
-                    )}
+            <View style={styles.overlay}>
+                <TouchableOpacity style={styles.backdropTap} onPress={onClose} activeOpacity={1} />
 
-                    <View style={styles.modalHeader}>
-                        <ThemedText style={[styles.modalTitle, { color: colors.text }]}>{title}</ThemedText>
-                        <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: colors.border }]}>
+                <View style={[styles.sheet, { backgroundColor: isDark ? '#1E293B' : '#FFFFFF' }]}>
+                    {/* Drag handle */}
+                    <View style={styles.handle} />
+
+                    {/* Header row — title left, close right */}
+                    <View style={styles.headerRow}>
+                        <View style={{ flex: 1 }}>
+                            <ThemedText style={[styles.sheetTitle, { color: colors.text }]}>{title}</ThemedText>
+                            <ThemedText style={[styles.sheetSubtitle, { color: colors.textSecondary }]}>
+                                Scroll to select time
+                            </ThemedText>
+                        </View>
+
+                        <TouchableOpacity
+                            onPress={onClose}
+                            style={[styles.closeBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }]}
+                        >
                             <Ionicons name="close" size={20} color={colors.text} />
                         </TouchableOpacity>
                     </View>
 
+
+                    {/* Scroll columns */}
                     <View style={styles.pickerContainer}>
                         {renderColumn(hours, hour, setHour, 1)}
-                        <View style={styles.separatorContainer}>
-                            <ThemedText style={[styles.separator, { color: colors.textSecondary }]}>:</ThemedText>
+
+                        <View style={styles.separatorWrap}>
+                            <ThemedText style={[styles.separator, { color: '#0D9488' }]}>:</ThemedText>
                         </View>
+
                         {renderColumn(minutes, minute, setMinute, 1)}
-                        <View style={{ width: 15 }} />
+
+                        <View style={{ width: 16 }} />
+
                         {renderColumn(periods, period, setPeriod, 0.8)}
                     </View>
 
-                    <TouchableOpacity
-                        style={styles.confirmBtn}
-                        onPress={handleConfirm}
-                        activeOpacity={0.8}
-                    >
-                        <LinearGradient
-                            colors={[colors.primary, colors.primary]}
-                            style={styles.gradient}
+
+                    {/* Confirm button — same design as ThankYou modal */}
+                    <View style={{ alignItems: 'center' }}>
+                        <TouchableOpacity
+                            style={[styles.confirmBtn, { backgroundColor: colors.primary }]}
+                            onPress={handleConfirm}
+                            activeOpacity={0.85}
                         >
-                            <ThemedText style={styles.confirmText}>CONFIRM TIME</ThemedText>
-                        </LinearGradient>
-                    </TouchableOpacity>
+                            <ThemedText style={styles.confirmText}>Confirm</ThemedText>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </Modal>
@@ -149,85 +163,129 @@ export function TimePicker({
 }
 
 const styles = StyleSheet.create({
-    modalOverlay: {
+    overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.7)',
+        backgroundColor: 'rgba(0,0,0,0.55)',
         justifyContent: 'flex-end',
     },
-    modalContent: {
-        height: '55%',
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
-        padding: 24,
-        paddingBottom: 48,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+    backdropTap: {
+        flex: 1,
     },
-    modalHeader: {
+
+    // ── Bottom Sheet ──────────────────────────────────────────────────────
+    sheet: {
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+        paddingHorizontal: 24,
+        paddingBottom: Platform.OS === 'android' ? 28 : 40,
+        paddingTop: 12,
+        // Subtle top shadow
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 16,
+        elevation: 16,
+    },
+    handle: {
+        width: 40,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: 'rgba(148,163,184,0.4)',
+        alignSelf: 'center',
+        marginBottom: 20,
+    },
+
+    // ── Header ────────────────────────────────────────────────────────────
+    headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 24,
+        alignItems: 'flex-start',
+        marginBottom: 4,
     },
-    modalTitle: {
+    sheetTitle: {
         fontSize: 18,
-        fontWeight: '700',
+        fontWeight: '800',
+        letterSpacing: 0.2,
+    },
+    sheetSubtitle: {
+        fontSize: 11,
+        marginTop: 2,
+        fontWeight: '500',
     },
     closeBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    pickerContainer: {
-        flex: 1,
+    accentRule: {
+        height: 2,
+        borderRadius: 1,
+        backgroundColor: '#0D9488',
+        width: 36,
+        marginBottom: 14,
+    },
+
+    // ── Preview badge (standalone, above scroll) ─────────────────────────
+    previewRow: {
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    previewBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 24,
-        paddingHorizontal: 10,
+        gap: 8,
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+        borderRadius: 14,
+    },
+    previewText: {
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#0D9488',
+        letterSpacing: 1,
+    },
+
+    // ── Scroll columns ────────────────────────────────────────────────────
+    pickerContainer: {
+        height: 300,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
     },
     optionItem: {
-        height: 44,
+        height: 48,
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: 4,
+        marginVertical: 2,
     },
     optionText: {
         fontSize: 18,
         fontWeight: '600',
     },
-    separatorContainer: {
-        height: 44,
+    separatorWrap: {
+        height: 48,
         justifyContent: 'center',
-        paddingBottom: 4,
+        paddingBottom: 2,
     },
     separator: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: '800',
         marginHorizontal: 4,
     },
-    confirmBtn: {
-        height: 56,
-        borderRadius: 16,
-        overflow: 'hidden',
-        marginTop: 10,
 
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-    },
-    gradient: {
-        flex: 1,
+    // ── Confirm button (ThankYou modal style) ────────────────────────────
+    confirmBtn: {
+        width: 120,
+        height: 40,
+        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
     },
     confirmText: {
         color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '800',
-        letterSpacing: 1,
+        fontSize: 14,
+        fontWeight: '600',
     },
 });

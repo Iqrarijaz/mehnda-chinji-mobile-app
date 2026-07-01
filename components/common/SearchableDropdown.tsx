@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
     FlatList,
@@ -58,31 +57,23 @@ export function SearchableDropdown({
     return (
         <Modal
             visible={visible}
-            animationType="slide"
+            animationType="fade"
             transparent={true}
             onRequestClose={onClose}
         >
             <View style={styles.modalOverlay}>
-                <View style={[styles.modalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    {isDark && (
-                        <LinearGradient
-                            colors={['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.05)']}
-                            style={StyleSheet.absoluteFill}
-                        />
-                    )}
-
+                <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
                     <View style={styles.modalHeader}>
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>{title}</ThemedText>
-                        <TouchableOpacity onPress={onClose} style={{ padding: 4 }}>
-                            <Ionicons name="close" size={24} color={colors.text} />
-                        </TouchableOpacity>
+                        {currentValue ? (
+                            <TouchableOpacity onPress={() => { onSelect(''); onClose(); }}>
+                                <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Clear</ThemedText>
+                            </TouchableOpacity>
+                        ) : null}
                     </View>
 
-                    <View style={[styles.searchBar, {
-                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9',
-                        borderColor: colors.border
-                    }]}>
-                        <Ionicons name="search" size={20} color={colors.icon} />
+                    <View style={[styles.searchBar, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' }]}>
+                        <Ionicons name="search" size={18} color={colors.icon} />
                         <TextInput
                             placeholder={placeholder}
                             placeholderTextColor={colors.icon}
@@ -91,32 +82,45 @@ export function SearchableDropdown({
                             onChangeText={setSearchQuery}
                             autoFocus={false}
                         />
+                        {searchQuery.length > 0 && (
+                            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                                <Ionicons name="close-circle" size={18} color={colors.icon} />
+                            </TouchableOpacity>
+                        )}
                     </View>
 
                     <FlatList
                         data={filteredOptions}
                         keyExtractor={(item) => item.value}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity
-                                style={[styles.optionItem, { borderBottomColor: colors.border }]}
-                                onPress={() => {
-                                    onSelect(item.value);
-                                    setSearchQuery('');
-                                    onClose();
-                                }}
-                            >
-                                <ThemedText style={[
-                                    styles.optionText,
-                                    { color: colors.text },
-                                    currentValue === item.value && { color: colors.primary, fontWeight: '700' }
-                                ]}>
-                                    {item.label}
-                                </ThemedText>
-                                {currentValue === item.value && (
-                                    <Ionicons name="checkmark" size={20} color={colors.primary} />
-                                )}
-                            </TouchableOpacity>
-                        )}
+                        renderItem={({ item }) => {
+                            const isSelected = currentValue === item.value;
+                            return (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.item,
+                                        isSelected && { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.primary + '10' }
+                                    ]}
+                                    onPress={() => {
+                                        onSelect(item.value);
+                                        setSearchQuery('');
+                                        onClose();
+                                    }}
+                                >
+                                    <View style={styles.labelContainer}>
+                                        <ThemedText style={[
+                                            styles.itemText,
+                                            { color: colors.text },
+                                            isSelected && { color: colors.primary, fontWeight: '700' }
+                                        ]}>
+                                            {item.label}
+                                        </ThemedText>
+                                    </View>
+                                    {isSelected && (
+                                        <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                                    )}
+                                </TouchableOpacity>
+                            );
+                        }}
                         contentContainerStyle={styles.listContent}
                         ListEmptyComponent={
                             <View style={styles.emptyContainer}>
@@ -141,6 +145,15 @@ export function SearchableDropdown({
                             </View>
                         }
                     />
+
+                    <View style={styles.footerContainer}>
+                        <TouchableOpacity
+                            style={[styles.closePill, { backgroundColor: colors.primary }]}
+                            onPress={onClose}
+                        >
+                            <ThemedText style={styles.closePillText}>Close</ThemedText>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </Modal>
@@ -150,73 +163,72 @@ export function SearchableDropdown({
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
     },
     modalContent: {
-        height: '80%',
-        borderTopLeftRadius: Layout.borderRadius,
-        borderTopRightRadius: Layout.borderRadius,
-        padding: 24,
+        width: '90%',
+        maxHeight: '70%',
+        borderRadius: Layout.borderRadius,
+        padding: 20,
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 20,
     },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
-        zIndex: 1,
+        marginBottom: 16,
     },
     modalTitle: {
         fontSize: 18,
-        fontWeight: '800',
-        color: '#FFFFFF',
+        fontWeight: 'bold',
     },
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-        height: 52,
-        borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16,
-        marginBottom: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        zIndex: 1,
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        marginBottom: 16,
     },
     searchInput: {
         flex: 1,
-        marginLeft: 12,
-        fontSize: 12,
-        color: '#FFFFFF',
+        height: 40,
+        marginLeft: 8,
+        fontFamily: 'Inter-Regular',
     },
     listContent: {
-        paddingBottom: 40,
+        paddingBottom: 20,
     },
-    optionItem: {
+    item: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        marginBottom: 4,
     },
-    optionText: {
-        fontSize: 12,
-        color: '#FFFFFF',
+    labelContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingRight: 16,
     },
-    selectedOptionText: {
-        color: '#FF9B51',
-        fontWeight: '700',
+    itemText: {
+        fontSize: 15,
+        fontFamily: 'Inter-Medium',
     },
     emptyContainer: {
         padding: 20,
         alignItems: 'center',
     },
     emptyText: {
-        color: 'rgba(255, 255, 255, 0.4)',
         fontSize: 14,
         textAlign: 'center',
     },
@@ -240,5 +252,19 @@ const styles = StyleSheet.create({
     addButtonText: {
         fontSize: 15,
         fontWeight: '700',
-    }
+    },
+    footerContainer: {
+        marginTop: 16,
+        alignItems: 'center',
+    },
+    closePill: {
+        paddingHorizontal: 16,
+        paddingVertical: 6,
+        borderRadius: 16,
+    },
+    closePillText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '600',
+    },
 });

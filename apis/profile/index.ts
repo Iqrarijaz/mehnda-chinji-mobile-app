@@ -28,6 +28,10 @@ export async function savePushToken(data: any) {
     return apiClient.post('/api/user/v1/save-push-token', data);
 }
 
+export async function saveFcmToken(data: { fcmToken: string }) {
+    return apiClient.post('/api/user/v1/save-fcm-token', data);
+}
+
 export async function uploadProfileImage(formData: FormData) {
     return apiClient.post('/api/user/v1/upload-profile-image', formData, {
         headers: {

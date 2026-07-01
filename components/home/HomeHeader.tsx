@@ -1,44 +1,34 @@
-import { Colors } from '@/constants/colors';
-import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Layout } from '@/constants/layout';
-import { HomeHeaderTopNav } from './homeHeaderTopNav';
-import HomeHeaderWeatherWidget from './HomeHeaderWeatherWidget';
+import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import HomeHeaderWeatherWidget from './HomeHeaderWeatherWidget';
+import { ScreenHeader, HeaderIconBtn } from '../common/ScreenHeader';
 
 interface HomeHeaderProps {
     setIsSearchActive: (active: boolean) => void;
 }
 
 export const HomeHeader = React.memo(({ setIsSearchActive }: HomeHeaderProps) => {
-    const { theme } = useTheme();
     const router = useRouter();
-    const insets = useSafeAreaInsets();
-    const colors = Colors[theme];
-    const isDark = theme === 'dark';
 
     return (
         <View style={styles.headerWrapper}>
-            <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20), backgroundColor: colors.primary }]}>
-                <HomeHeaderTopNav onSearchPress={() => setIsSearchActive(true)} />
-
+            <ScreenHeader
+                rightActions={
+                    <HeaderIconBtn
+                        name="search-outline"
+                        onPress={() => setIsSearchActive(true)}
+                    />
+                }
+            >
                 <HomeHeaderWeatherWidget onPress={() => router.push('/weather')} />
-            </View>
+            </ScreenHeader>
         </View>
     );
 });
 
 const styles = StyleSheet.create({
     headerWrapper: {
-        zIndex: 10,
-    },
-    container: {
-        paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-        paddingBottom: Platform.OS === 'android' ? 4 : 6,
-        borderBottomLeftRadius: Layout.headerBorderRadius,
-        borderBottomRightRadius: Layout.headerBorderRadius,
         zIndex: 10,
     },
 });

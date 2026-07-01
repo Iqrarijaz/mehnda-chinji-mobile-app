@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     modalInput: {
         borderWidth: 2,
         borderRadius: 10,
-        height: 44,
+        height: 42,
         paddingHorizontal: 12,
         fontSize: 14,
     },

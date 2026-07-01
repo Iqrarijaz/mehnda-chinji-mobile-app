@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     button: {
-        height: Platform.OS === 'android' ? 44 : 48,
+        height: Platform.OS === 'android' ? 42 : 48,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',

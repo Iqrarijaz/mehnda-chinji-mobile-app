@@ -5,12 +5,13 @@ export const CONFIG_QUERY_KEYS = {
     villages: ['configuration', 'VILLAGES'] as const,
     professions: ['configuration', 'PROFESSIONS'] as const,
     postCategories: ['configuration', 'POST_CATEGORIES'] as const,
+    marketplaceCategories: ['configuration', 'MARKETPLACE_CATEGORIES'] as const,
 };
 
 /**
  * Fetch configuration by type (authenticated endpoint).
  * Used for CITIES, VILLAGES, PROFESSIONS, etc.
  */
-export async function getAuthenticatedConfiguration(type: string) {
+export async function getAuthenticatedConfiguration(type: string): Promise<any> {
     return apiClient.get(`/api/user/v1/configuration/${type}`);
 }

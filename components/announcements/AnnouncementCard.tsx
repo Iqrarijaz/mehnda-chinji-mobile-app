@@ -1,96 +1,25 @@
 import React, { memo } from 'react';
-import { StyleSheet, View, Image, Dimensions } from 'react-native';
+import { StyleSheet, View, Dimensions } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { ThemedText } from '../ThemedText';
-import { useAuth } from '@/context/AuthContext';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
+import { ANNOUNCEMENT_TYPE_CONFIG, DEFAULT_TYPE_CONFIG } from '@/constants/announcementTypes';
+import { AnnouncementData } from '@/apis/announcements';
 
 interface AnnouncementCardProps {
-    item: any;
+    item: AnnouncementData;
     colors: any;
     selected?: boolean;
-    onEdit?: (item: any) => void;
-    onDelete?: (item: any) => void;
+    canManage?: boolean;
+    onEdit?: (item: AnnouncementData) => void;
+    onDelete?: (item: AnnouncementData) => void;
 }
 
-const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; icon?: any; ionicon: (keyof typeof Ionicons.glyphMap) | string }> = {
-    emergency: {
-        label: 'Emergency',
-        color: '#EF4444',
-        bg: 'rgba(239, 68, 68, 0.08)',
-        icon: require('../../assets/icons/emergency.webp'),
-        ionicon: 'alert-circle-outline'
-    },
-    health: {
-        label: 'Health',
-        color: '#10B981',
-        bg: 'rgba(16, 185, 129, 0.08)',
-        icon: require('../../assets/icons/health.webp'),
-        ionicon: 'medical-outline'
-    },
-    education: {
-        label: 'Education',
-        color: '#8B5CF6',
-        bg: 'rgba(139, 92, 246, 0.08)',
-        icon: require('../../assets/icons/education_icon.webp'),
-        ionicon: 'book-outline'
-    },
-    travel: {
-        label: 'Travel',
-        color: '#F59E0B',
-        bg: 'rgba(245, 158, 11, 0.08)',
-        icon: require('../../assets/icons/travel.webp'),
-        ionicon: 'bus-outline'
-    },
-    religious: {
-        label: 'Religious',
-        color: '#06B6D4',
-        bg: 'rgba(6, 182, 212, 0.08)',
-        icon: require('../../assets/icons/religious.webp'),
-        ionicon: 'moon-outline'
-    },
-    govt: {
-        label: 'Govt Office',
-        color: '#6B7280',
-        bg: 'rgba(107, 114, 128, 0.08)',
-        icon: require('../../assets/icons/govt_office.webp'),
-        ionicon: 'business-outline'
-    },
-    banks: {
-        label: 'Banks',
-        color: '#3B82F6',
-        bg: 'rgba(59, 130, 246, 0.08)',
-        icon: require('../../assets/icons/bank.webp'),
-        ionicon: 'cash-outline'
-    },
-    public: {
-        label: 'Public',
-        color: '#EC4899',
-        bg: 'rgba(236, 72, 153, 0.08)',
-        ionicon: '../../public/json/announcement.json'
-    },
-    lost_found: {
-        label: 'Lost & Found',
-        color: '#14B8A6',
-        bg: 'rgba(20, 184, 166, 0.08)',
-        ionicon: '../../public/json/announcement.json'
-    }
-};
+export const AnnouncementCard = memo(({ item, colors, selected, canManage, onEdit, onDelete }: AnnouncementCardProps) => {
 
-export const AnnouncementCard = memo(({ item, colors, selected, onEdit, onDelete }: AnnouncementCardProps) => {
-    const { user } = useAuth();
-
-    const isAuthor = user?.user?._id && item.authorId && (item.authorId._id || item.authorId).toString() === user.user._id.toString();
-    const isEssentialAdmin = item.essentialId?._id && user?.user?.managedEssentials?.some((id: any) => (id._id || id).toString() === item.essentialId._id.toString());
-    const canManage = isAuthor || isEssentialAdmin;
-
-    const config = TYPE_CONFIG[item.type] || {
-        label: (item.type || 'public').toUpperCase(),
-        color: colors.primary,
-        bg: 'rgba(0, 0, 0, 0.03)',
-        ionicon: 'megaphone-outline'
-    };
+    const config = ANNOUNCEMENT_TYPE_CONFIG[item.type] || DEFAULT_TYPE_CONFIG(colors.primary);
 
     const dateToDisplay = item.eventDate || item.createdAt;
     const formattedDate = React.useMemo(() => {
@@ -153,7 +82,7 @@ export const AnnouncementCard = memo(({ item, colors, selected, onEdit, onDelete
                         {canManage && (onEdit || onDelete) && (
                             <Menu>
                                 <MenuTrigger customStyles={{ triggerWrapper: styles.menuBtn }}>
-                                    <Ionicons name="ellipsis-horizontal" size={16} color={colors.textSecondary} />
+                                     <Ionicons name="ellipsis-horizontal" size={16} color={colors.textSecondary} />
                                 </MenuTrigger>
                                 <MenuOptions customStyles={{ optionsContainer: [styles.menuOptions, { backgroundColor: colors.card, borderColor: colors.border }] }}>
                                     {onEdit && (
@@ -177,8 +106,14 @@ export const AnnouncementCard = memo(({ item, colors, selected, onEdit, onDelete
                 {/* Image attachments if any */}
                 {item.images && item.images.length > 0 && (
                     <View style={styles.imageGrid}>
-                        {item.images.map((img: string, idx: number) => (
-                            <Image key={idx} source={{ uri: img }} style={styles.image} />
+                        {item.images.map((img: string) => (
+                            <Image
+                                key={img}
+                                source={{ uri: img }}
+                                style={styles.image}
+                                contentFit="cover"
+                                transition={200}
+                            />
                         ))}
                     </View>
                 )}
@@ -191,13 +126,13 @@ export const AnnouncementCard = memo(({ item, colors, selected, onEdit, onDelete
                 <Image
                     source={config.icon}
                     style={styles.typeOverlayIcon}
-                    resizeMode="contain"
+                    contentFit="contain"
                 />
             ) : typeof config.ionicon === 'string' && config.ionicon.endsWith('.json') ? (
                 <LottieView
                     source={require('../../public/json/announcement.json')}
                     autoPlay
-                    loop
+                    loop={false}
                     style={styles.typeOverlayLottie}
                     hardwareAccelerationAndroid
                     renderMode="HARDWARE"

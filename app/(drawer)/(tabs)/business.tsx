@@ -3,73 +3,38 @@ import BusinessCard from '@/components/business/BusinessCard';
 import BankCard from '@/components/listing/BankCard';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { BusinessRegistration } from '@/components/business/BusinessRegistration';
-import { NotificationIcon } from '@/components/common/NotificationIcon';
 import { ProfessionPicker } from '@/components/common/ProfessionPicker';
 import { ThemedText } from '@/components/ThemedText';
-import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
-import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Layout } from '@/constants/layout';
-import { DrawerActions } from '@react-navigation/native';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useLocalSearchParams, useNavigation, useFocusEffect } from 'expo-router';
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Platform,
     StyleSheet,
-    TextInput,
     TouchableOpacity,
     View,
-    ActivityIndicator
+    ActivityIndicator,
+    TextInput
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
-import { useTooltipStore } from '@/store/tooltipStore';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import Tooltip from 'react-native-walkthrough-tooltip';
+import { ScreenHeader } from '@/components/common/ScreenHeader';
+import { SearchBar } from '@/components/common/SearchBar';
 
 
 export default function BusinessScreen() {
     const { theme } = useTheme();
-    const tooltipStore = useTooltipStore();
-    const { user } = useAuth();
-    const navigation = useNavigation();
-    const insets = useSafeAreaInsets();
     const colors = Colors[theme];
     const params = useLocalSearchParams<{ tab?: string }>();
 
     // Determine initial tab based on params
     const [activeTab, setActiveTab] = useState<'find' | 'portal'>(params.tab === 'portal' ? 'portal' : 'find');
-    const [showTooltip, setShowTooltip] = useState(false);
-
-    // Show tooltip only if not viewed before
-    useFocusEffect(
-        useCallback(() => {
-            const tooltipId = 'business-screen';
-            if (tooltipStore.viewedTooltips[tooltipId]) {
-                setShowTooltip(false);
-                return;
-            }
-
-            setShowTooltip(false);
-            const timer = setTimeout(() => {
-                setShowTooltip(true);
-            }, 1000);
-            return () => {
-                clearTimeout(timer);
-                setShowTooltip(false);
-            };
-        }, [tooltipStore.viewedTooltips])
-    );
-
-    const handleDismissTooltip = () => {
-        const tooltipId = 'business-screen';
-        tooltipStore.markAsViewed(tooltipId);
-        setShowTooltip(false);
-    };
+    const isPortalTab = activeTab === 'portal';
 
     useEffect(() => {
         if (params.tab) {
@@ -77,10 +42,10 @@ export default function BusinessScreen() {
         }
     }, [params.tab]);
     const [searchQuery, setSearchQuery] = useState('');
+    const searchInputRef = React.useRef<TextInput>(null);
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [isProfessionPickerVisible, setIsProfessionPickerVisible] = useState(false);
-    const searchInputRef = useRef<TextInput>(null);
     const lastTrackedQuery = React.useRef<string>('');
 
     const categories = ['All', 'Doctors', 'Vendors', 'Pharmacies', 'Mechanics', 'Tailors', 'Restaurants'];
@@ -148,6 +113,8 @@ export default function BusinessScreen() {
         refetch();
     };
 
+    const hasActiveFilters = selectedCategory !== 'All';
+
 
     const renderItem = React.useCallback(({ item }: { item: any }) => {
         const isBank = item?.category?.toLowerCase() === 'banks' || item?.categoryEn?.toLowerCase() === 'banks';
@@ -191,111 +158,50 @@ export default function BusinessScreen() {
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
                 {/* Top Bar Area */}
-                <View style={[styles.headerContainer, { paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20), backgroundColor: colors.primary }]}>
-                    <View style={styles.headerContent}>
-                        {/* Top Row: Menu & Title & Profile */}
-                        <TouchableOpacity
-                            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-                            style={[styles.iconButton, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
-                        >
-                            <Ionicons name="grid-outline" size={20} color="#FFFFFF" />
-                        </TouchableOpacity>
-
-
-
-                        <View style={styles.rightActions}>
-                            <NotificationIcon
-                                containerStyle={{ marginRight: 12 }}
-                                badgeStyle={{ borderColor: colors.primary }}
-                            />
-
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('profile' as never)}
-                                style={[styles.profileButton, { borderColor: 'rgba(255,255,255,0.5)' }]}
-                            >
-                                <Avatar
-                                    uri={user?.user?.profileImage}
-                                    name={user?.user?.name}
-                                    size={34}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    {/* Main Find / Portal Toggle */}
-                    <View style={styles.mainToggleContainer}>
-                        <TouchableOpacity
-                            style={[styles.mainToggleBtn, activeTab === 'find' ? styles.mainToggleBtnActive : { backgroundColor: 'rgba(255,255,255,0.2)' }]}
-                            onPress={() => setActiveTab('find')}
-                        >
-                            <ThemedText style={[styles.mainToggleText, activeTab === 'find' ? [styles.mainToggleTextActive, { color: colors.primary }] : { color: '#FFFFFF' }]}>Find Service</ThemedText>
-                        </TouchableOpacity>
-                        <Tooltip
-                            isVisible={showTooltip}
-                            content={
-                                <View style={styles.tooltipPill}>
-                                    <ThemedText style={styles.tooltipText}>اپنا کاروبار رجسٹر کرنے کے لیے یہاں ٹیپ کریں</ThemedText>
-                                    <TouchableOpacity onPress={handleDismissTooltip} style={styles.tooltipClose}>
-                                        <Ionicons name="close-circle" size={18} color="#64748B" />
-                                    </TouchableOpacity>
-                                </View>
-                            }
-                            placement="bottom"
-                            onClose={handleDismissTooltip}
-                            contentStyle={styles.tooltipContent}
-                            backgroundColor="rgba(0,0,0,0.2)"
-                            // useInteraction={true}
-                            displayInsets={{ top: 0, bottom: 0, left: 16, right: 16 }}
-                            childrenWrapperStyle={{ flex: 1 }}
-                        >
-                            <TouchableOpacity
-                                style={[styles.mainToggleBtn, activeTab === 'portal' ? styles.mainToggleBtnActive : { backgroundColor: 'rgba(255,255,255,0.2)' }, { width: '100%' }]}
-                                onPress={() => setActiveTab('portal')}
-                            >
-                                <ThemedText style={[styles.mainToggleText, activeTab === 'portal' ? [styles.mainToggleTextActive, { color: colors.primary }] : { color: '#FFFFFF' }]}>My Business</ThemedText>
-                            </TouchableOpacity>
-                        </Tooltip>
-                    </View>
-
-                    {/* Sticky Search & Categories - Only on 'find' tab */}
-                    {activeTab === 'find' && (
-                        <View style={styles.stickySearchSection}>
-                            <TouchableOpacity
-                                activeOpacity={1}
+                <ScreenHeader>
+                    {/* Search Row with filter + My Business toggle icon */}
+                    <View style={styles.searchSection}>
+                        <View style={styles.searchRow}>
+                            <SearchBar
+                                inputRef={searchInputRef}
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                                placeholder="Search businesses..."
                                 onPress={() => searchInputRef.current?.focus()}
-                                style={styles.searchBar}
-                            >
-                                <Ionicons name="search" size={20} color="#94A3B8" />
-                                <TextInput
-                                    ref={searchInputRef}
-                                    style={styles.searchInput}
-                                    placeholder="Search businesses..."
-                                    placeholderTextColor="#94A3B8"
-                                    value={searchQuery}
-                                    onChangeText={setSearchQuery}
-                                    returnKeyType="search"
-                                    clearButtonMode="while-editing"
-                                />
-                                <TouchableOpacity
-                                    style={styles.filterIconButton}
-                                    onPress={(e) => {
-                                        e.stopPropagation();
-                                        setIsProfessionPickerVisible(true);
-                                    }}
-                                >
-                                    <Ionicons name="options-outline" size={20} color={colors.primary} />
-                                </TouchableOpacity>
-                            </TouchableOpacity>
-
-                            <ProfessionPicker
-                                visible={isProfessionPickerVisible}
-                                onClose={() => setIsProfessionPickerVisible(false)}
-                                onSelect={(prof) => setSelectedCategory(prof.name_eng)}
-                                currentProfession={selectedCategory}
+                                style={{ flex: 1 }}
                             />
+                            <TouchableOpacity
+                                style={[styles.filterButton, { backgroundColor: hasActiveFilters ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                                onPress={() => setIsProfessionPickerVisible(true)}
+                                activeOpacity={0.7}
+                            >
+                                <Ionicons name="funnel-outline" size={20} color="#FFFFFF" />
+                                {hasActiveFilters && (
+                                    <View style={styles.filterBadge}>
+                                        <ThemedText style={styles.filterBadgeText}>
+                                            1
+                                        </ThemedText>
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                            {/* My Business toggle — same as marketplace listing icon */}
+                            <TouchableOpacity
+                                style={[styles.listingIconButton, { backgroundColor: isPortalTab ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                                onPress={() => setActiveTab(isPortalTab ? 'find' : 'portal')}
+                                activeOpacity={0.7}
+                            >
+                                <Ionicons name="list-outline" size={20} color="#FFFFFF" />
+                            </TouchableOpacity>
                         </View>
-                    )}
-                </View>
+
+                        <ProfessionPicker
+                            visible={isProfessionPickerVisible}
+                            onClose={() => setIsProfessionPickerVisible(false)}
+                            onSelect={(prof) => setSelectedCategory(prof.name_eng)}
+                            currentProfession={selectedCategory}
+                        />
+                    </View>
+                </ScreenHeader>
 
                 {/* Find Service Section */}
                 <View style={[styles.content, { display: activeTab === 'find' ? 'flex' : 'none' }]}>
@@ -334,132 +240,51 @@ export default function BusinessScreen() {
 }
 
 const styles = StyleSheet.create({
-    tooltipContent: {
-        padding: 0,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: 'transparent',
-    },
-    tooltipPill: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: '#FFFFFF',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-        borderWidth: 1,
-        borderColor: 'rgba(0,0,0,0.05)',
-        gap: 12,
-    },
-    tooltipText: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: '#64748B',
-    },
-    tooltipClose: {
-        padding: 4,
-    },
     container: {
         flex: 1,
         backgroundColor: '#F8FAFC',
     },
-    headerContainer: {
-        borderBottomLeftRadius: Layout.headerBorderRadius,
-        borderBottomRightRadius: Layout.headerBorderRadius,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 12,
-        zIndex: 10,
-        paddingBottom: Platform.OS === 'android' ? 8 : 20,
-    },
-    headerContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-        marginBottom: Platform.OS === 'android' ? 18 : 20,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: '#FFFFFF',
-    },
-    rightActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    iconButton: {
-        width: 38,
-        height: 38,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    profileButton: {
-        width: 38,
-        height: 38,
-        borderRadius: 19,
-        borderWidth: 2,
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-    },
-    mainToggleContainer: {
-        flexDirection: 'row',
-        paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        marginBottom: Platform.OS === 'android' ? 14 : 16,
-        gap: Platform.OS === 'android' ? 6 : 8,
-    },
-    mainToggleBtn: {
-        flex: 1,
-        paddingVertical: Platform.OS === 'android' ? 6 : 8,
-        paddingHorizontal: Platform.OS === 'android' ? 12 : 14,
-        borderRadius: Layout.borderRadius,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.3)',
-    },
-    mainToggleBtnActive: {
-        backgroundColor: '#FFFFFF',
-    },
-    mainToggleText: {
-        fontSize: Platform.OS === 'android' ? 12 : 14,
-        fontWeight: '600',
-    },
-    mainToggleTextActive: {
-        fontWeight: '700',
-    },
-    stickySearchSection: {
+    searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 4,
+        paddingBottom: 8,
     },
-    searchBar: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: Layout.borderRadius,
+    searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        height: Platform.OS === 'android' ? 40 : 48,
-        marginHorizontal: Platform.OS === 'android' ? 14 : 16,
-        marginBottom: Platform.OS === 'android' ? 14 : 16,
-        borderWidth: 0,
+        gap: 8,
     },
-    searchInput: {
-        flex: 1,
-        marginLeft: 8,
-        fontSize: Platform.OS === 'android' ? 13 : 15,
-        color: '#0F172A',
-        height: '100%',
+    listingIconButton: {
+        width: 42,
+        height: 42,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    filterIconButton: {
-        marginLeft: 8,
-        paddingLeft: 10,
-        borderLeftWidth: 1,
-        borderLeftColor: '#E2E8F0',
+    filterButton: {
+        width: 42,
+        height: 42,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    filterBadge: {
+        position: 'absolute',
+        top: -2,
+        right: -2,
+        backgroundColor: '#EF4444',
+        borderRadius: 9,
+        width: 18,
+        height: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderColor: '#FFFFFF',
+    },
+    filterBadgeText: {
+        color: '#FFFFFF',
+        fontSize: 8,
+        fontWeight: 'bold',
     },
     categoryScroller: {
         paddingHorizontal: 16,

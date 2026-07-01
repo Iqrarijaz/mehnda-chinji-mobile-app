@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     activePill: {
-        minHeight: 44,
+        minHeight: 42,
         borderRadius: LayoutConst.borderRadius + 6,
         flexDirection: 'row',
         alignItems: 'center',
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     inactivePill: {
-        minHeight: 44,
+        minHeight: 42,
         borderRadius: LayoutConst.borderRadius + 6,
         flexDirection: 'row',
         alignItems: 'center',

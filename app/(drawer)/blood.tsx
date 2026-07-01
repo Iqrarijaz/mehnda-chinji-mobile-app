@@ -12,8 +12,10 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useFocusEffect, useNavigation } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect, useNavigation, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FloatingHomeButton } from '@/components/common/FloatingHomeButton';
+import { useCallback, useEffect, useRef, useState, memo, useMemo } from 'react';
 import { useTooltipStore } from '@/store/tooltipStore';
 import { ThemedView } from '@/components/ThemedView';
 import {
@@ -29,13 +31,19 @@ import { FlashList } from '@shopify/flash-list';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
-export default function BloodScreen() {
+const BloodScreen = memo(function BloodScreen() {
     const { theme, isDark } = useTheme();
     const hasViewedBloodTooltip = useTooltipStore(state => state.viewedTooltips['blood-screen']);
     const markAsViewed = useTooltipStore(state => state.markAsViewed);
     const { user } = useAuth();
     const navigation = useNavigation();
     const colors = Colors[theme];
+    const router = useRouter();
+    const insets = useSafeAreaInsets();
+
+    const handleHomePress = useCallback(() => {
+        router.replace('/(drawer)/(tabs)');
+    }, [router]);
 
     const [activeTab, setActiveTab] = useState<'find' | 'portal'>('find');
     const [showTooltip, setShowTooltip] = useState(false);
@@ -60,28 +68,19 @@ export default function BloodScreen() {
         }, [hasViewedBloodTooltip])
     );
 
-    const handleDismissTooltip = () => {
+    const handleDismissTooltip = useCallback(() => {
         const tooltipId = 'blood-screen';
         markAsViewed(tooltipId);
         setShowTooltip(false);
-    };
+    }, [markAsViewed]);
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
     const [groupModalVisible, setGroupModalVisible] = useState(false);
 
     // Reporting
     const reportModalRef = useRef<ReportModalRef>(null);
     const [reportTargetId, setReportTargetId] = useState<string>('');
-
-    // Debounce search
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearch(searchQuery);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
 
     const {
         data: infiniteData,
@@ -93,11 +92,11 @@ export default function BloodScreen() {
         refetch
     } = useInfiniteQuery({
         queryKey: DONOR_QUERY_KEYS.list({
-            name: debouncedSearch || undefined,
+            name: searchQuery || undefined,
             bloodGroup: selectedGroup || undefined
         }),
         queryFn: ({ pageParam = 1 }) => getDonorsList({
-            name: debouncedSearch || undefined,
+            name: searchQuery || undefined,
             bloodGroup: selectedGroup || undefined,
             currentPage: pageParam
         }),
@@ -117,17 +116,54 @@ export default function BloodScreen() {
         enabled: activeTab === 'find',
     });
 
-    const donors = (infiniteData as any)?.pages?.flatMap((page: any) => Array.isArray(page?.data) ? page.data : []) || [];
+    const donors = useMemo(() => {
+        return (infiniteData as any)?.pages?.flatMap((page: any) => Array.isArray(page?.data) ? page.data : []) || [];
+    }, [infiniteData]);
     const loading = queryLoading || isRefetching;
 
-    const handleRefresh = () => {
-        refetch();
-    };
+    const containerStyle = useMemo(() => [
+        styles.container,
+        { backgroundColor: colors.background }
+    ], [colors.background]);
 
-    const handleGroupSelect = (group: string | null) => {
+    const contentStyle = useMemo(() => [
+        styles.content,
+        { display: (activeTab === 'find' ? 'flex' : 'none') as 'flex' | 'none' }
+    ], [activeTab]);
+
+    const portalStyle = useMemo(() => [
+        { flex: 1, display: (activeTab === 'portal' ? 'flex' : 'none') as 'flex' | 'none' }
+    ], [activeTab]);
+
+    const dropdownModalContentStyle = useMemo(() => [
+        styles.dropdownModalContent,
+        {
+            backgroundColor: colors.card,
+            borderColor: colors.border
+        }
+    ], [colors.card, colors.border]);
+
+    const modalHeaderStyle = useMemo(() => [
+        styles.modalHeader,
+        { borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }
+    ], [isDark, colors.border]);
+
+    const handleRefresh = useCallback(() => {
+        refetch();
+    }, [refetch]);
+
+    const handleGroupSelect = useCallback((group: string | null) => {
         setSelectedGroup(group);
         setGroupModalVisible(false);
-    };
+    }, []);
+
+    const handleOpenGroupModal = useCallback(() => {
+        setGroupModalVisible(true);
+    }, []);
+
+    const handleCloseGroupModal = useCallback(() => {
+        setGroupModalVisible(false);
+    }, []);
 
     const handleReportPress = useCallback((donorId: string) => {
         setReportTargetId(donorId);
@@ -173,7 +209,7 @@ export default function BloodScreen() {
 
     return (
         <ErrorBoundary>
-            <ThemedView style={[styles.container, { backgroundColor: colors.background }]}>
+            <ThemedView style={containerStyle}>
                 {/* Header Section with Primary Color Background */}
                 <BloodDonorHeader
                     navigation={navigation}
@@ -183,13 +219,13 @@ export default function BloodScreen() {
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                     selectedGroup={selectedGroup}
-                    onOpenGroupModal={() => setGroupModalVisible(true)}
+                    onOpenGroupModal={handleOpenGroupModal}
                     showTooltip={showTooltip}
                     onCloseTooltip={handleDismissTooltip}
                 />
 
 
-                <View style={[styles.content, { display: activeTab === 'find' ? 'flex' : 'none' }]}>
+                <View style={contentStyle}>
                     {/* Donors List */}
                     {loading && donors.length === 0 ? (
                         <View style={styles.listContent}>
@@ -213,7 +249,7 @@ export default function BloodScreen() {
                     )}
                 </View>
 
-                <View style={{ flex: 1, display: activeTab === 'portal' ? 'flex' : 'none' }}>
+                <View style={portalStyle}>
                     <BloodRegistration />
                 </View>
 
@@ -222,14 +258,14 @@ export default function BloodScreen() {
                     visible={groupModalVisible}
                     animationType="fade"
                     transparent={true}
-                    onRequestClose={() => setGroupModalVisible(false)}
+                    onRequestClose={handleCloseGroupModal}
                 >
                     <Pressable
                         style={styles.modalOverlay}
-                        onPress={() => setGroupModalVisible(false)}
+                        onPress={handleCloseGroupModal}
                     >
-                        <View style={[styles.dropdownModalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                            <View style={[styles.modalHeader, { borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]}>
+                        <View style={dropdownModalContentStyle}>
+                            <View style={modalHeaderStyle}>
                                 <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Filter by Group</ThemedText>
                             </View>
 
@@ -287,11 +323,23 @@ export default function BloodScreen() {
                     targetType="DONOR"
                 />
 
-
             </ThemedView>
+
+            {/* Floating Home Button */}
+            <FloatingHomeButton
+                onPress={handleHomePress}
+                isChatActive={true}
+                style={{
+                    position: 'absolute',
+                    bottom: insets.bottom + 20,
+                    right: 20,
+                }}
+            />
         </ErrorBoundary>
     );
-}
+});
+
+export default BloodScreen;
 
 const styles = StyleSheet.create({
     container: {

@@ -1,16 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
-import Animated, {
-    FadeIn,
-    FadeInUp,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withSequence,
-    withSpring,
-    withTiming,
-} from 'react-native-reanimated';
+import React from 'react';
+import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { getIconName } from './weatherUtils';
 
@@ -19,62 +9,11 @@ interface WeatherHeroProps {
     isLoading: boolean;
 }
 
-// ── Shimmer ──────────────────────────────────────────────────────────────────
-const ShimmerBox = React.memo(({ w, h, radius = 12 }: { w: number | string; h: number; radius?: number }) => {
-    const opacity = useSharedValue(0.4);
-    useEffect(() => {
-        opacity.value = withRepeat(
-            withSequence(withTiming(1, { duration: 700 }), withTiming(0.4, { duration: 700 })),
-            -1,
-            true
-        );
-    }, []);
-    const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
-    return (
-        <Animated.View
-            style={[{ width: w as any, height: h, borderRadius: radius, backgroundColor: 'rgba(255,255,255,0.25)' }, style]}
-        />
-    );
-});
-
-// ── Floating Icon ────────────────────────────────────────────────────────────
-const FloatingIcon = React.memo(({ icon }: { icon: string }) => {
-    const float = useSharedValue(0);
-    useEffect(() => {
-        float.value = withRepeat(
-            withSequence(withTiming(-8, { duration: 2000 }), withTiming(0, { duration: 2000 })),
-            -1,
-            true
-        );
-    }, []);
-    const floatStyle = useAnimatedStyle(() => ({ transform: [{ translateY: float.value }] }));
-    return (
-        <Animated.View style={floatStyle}>
-            <Ionicons
-                name={icon as any}
-                size={Platform.OS === 'android' ? 72 : 80}
-                color="rgba(255,255,255,0.95)"
-            />
-        </Animated.View>
-    );
-});
-
-// ── Hero ─────────────────────────────────────────────────────────────────────
 const WeatherHero = React.memo(({ weather, isLoading }: WeatherHeroProps) => {
-    const scaleAnim = useSharedValue(0.92);
-    useEffect(() => {
-        if (weather) scaleAnim.value = withSpring(1, { damping: 14 });
-    }, [weather]);
-    const scaleStyle = useAnimatedStyle(() => ({ transform: [{ scale: scaleAnim.value }] }));
-
     if (isLoading && !weather) {
         return (
-            <View style={styles.hero}>
-                <ShimmerBox w={200} h={100} radius={16} />
-                <View style={{ height: 12 }} />
-                <ShimmerBox w={140} h={24} radius={10} />
-                <View style={{ height: 8 }} />
-                <ShimmerBox w={100} h={18} radius={8} />
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#FFFFFF" />
             </View>
         );
     }
@@ -82,65 +21,152 @@ const WeatherHero = React.memo(({ weather, isLoading }: WeatherHeroProps) => {
     if (!weather) return null;
 
     return (
-        <Animated.View style={[styles.hero, scaleStyle]}>
-            <Animated.View entering={FadeIn.delay(100).duration(500)}>
-                <FloatingIcon icon={getIconName(weather.weather[0].icon)} />
-            </Animated.View>
-
-            <Animated.View entering={FadeInUp.delay(200).duration(500)} style={{ alignItems: 'center' }}>
-                <ThemedText style={styles.temp}>{Math.round(weather.main.temp)}°</ThemedText>
-                <ThemedText style={styles.condition}>{weather.weather[0].description}</ThemedText>
-            </Animated.View>
-
-            <Animated.View entering={FadeInUp.delay(300).duration(500)} style={{ alignItems: 'center', marginTop: 12 }}>
+        <View style={styles.heroCard}>
+            {/* Top row: City Name & Date */}
+            <View style={styles.locationContainer}>
                 <View style={styles.locationRow}>
-                    <Ionicons name="location" size={14} color="rgba(255,255,255,0.8)" />
+                    <Ionicons name="location" size={16} color="rgba(255,255,255,0.9)" />
                     <ThemedText style={styles.city}>{weather.name}</ThemedText>
                 </View>
                 <ThemedText style={styles.date}>
-                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                 </ThemedText>
-            </Animated.View>
+            </View>
 
-            <Animated.View entering={FadeInUp.delay(400).duration(500)} style={styles.metaPill}>
-                <ThemedText style={styles.metaText}>Feels like {Math.round(weather.main.feels_like)}°</ThemedText>
-                <View style={styles.metaDot} />
-                <ThemedText style={styles.metaText}>
-                    H:{Math.round(weather.main.temp_max)}° L:{Math.round(weather.main.temp_min)}°
-                </ThemedText>
-            </Animated.View>
-        </Animated.View>
+            {/* Middle Row: Temperature & Icon */}
+            <View style={styles.mainRow}>
+                <View style={styles.tempColumn}>
+                    <ThemedText style={styles.temp}>{Math.round(weather.main.temp)}°</ThemedText>
+                    <ThemedText style={styles.condition}>{weather.weather[0].description}</ThemedText>
+                </View>
+
+                <Ionicons
+                    name={getIconName(weather.weather[0].icon) as any}
+                    size={Platform.OS === 'android' ? 64 : 70}
+                    color="rgba(255,255,255,0.95)"
+                    style={styles.staticIcon}
+                />
+            </View>
+
+            {/* Bottom Row: Meta Info Pills (Feels Like, High/Low) */}
+            <View style={styles.metaRow}>
+                <View style={styles.metaItem}>
+                    <Ionicons name="thermometer-outline" size={13} color="rgba(255,255,255,0.7)" />
+                    <ThemedText style={styles.metaText}>Feels {Math.round(weather.main.feels_like)}°</ThemedText>
+                </View>
+                <View style={styles.metaDivider} />
+                <View style={styles.metaItem}>
+                    <Ionicons name="arrow-up" size={13} color="rgba(255,255,255,0.7)" />
+                    <ThemedText style={styles.metaText}>H: {Math.round(weather.main.temp_max)}°</ThemedText>
+                </View>
+                <View style={styles.metaDivider} />
+                <View style={styles.metaItem}>
+                    <Ionicons name="arrow-down" size={13} color="rgba(255,255,255,0.7)" />
+                    <ThemedText style={styles.metaText}>L: {Math.round(weather.main.temp_min)}°</ThemedText>
+                </View>
+            </View>
+        </View>
     );
 });
 
 export default WeatherHero;
 
 const styles = StyleSheet.create({
-    hero: { alignItems: 'center', paddingVertical: 16, marginBottom: 20 },
-    temp: {
-        fontSize: Platform.OS === 'android' ? 80 : 90,
-        fontWeight: '900',
-        color: '#FFFFFF',
-        letterSpacing: -4,
-        lineHeight: Platform.OS === 'android' ? 88 : 100,
-        textShadowColor: 'rgba(0,0,0,0.15)',
-        textShadowOffset: { width: 0, height: 4 },
-        textShadowRadius: 8,
+    heroCard: {
+        backgroundColor: 'rgba(255, 255, 255, 0.12)',
+        borderRadius: 16,
+        borderColor: 'rgba(255, 255, 255, 0.15)',
+        padding: 16,
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
     },
-    condition: { fontSize: 18, color: 'rgba(255,255,255,0.9)', fontWeight: '600', textTransform: 'capitalize', marginTop: 4 },
-    locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8 },
-    city: { fontSize: 16, color: 'rgba(255,255,255,0.9)', fontWeight: '700' },
-    date: { fontSize: 13, color: 'rgba(255,255,255,0.65)', marginTop: 4, fontWeight: '500' },
-    metaPill: {
+    loadingContainer: {
+        height: 150,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.12)',
+        borderRadius: 16,
+        marginBottom: 16,
+    },
+    locationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+        paddingBottom: 10,
+        marginBottom: 12,
+    },
+    locationRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        marginTop: 12,
-        backgroundColor: 'rgba(255,255,255,0.15)',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
+        gap: 4,
     },
-    metaText: { color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: '600' },
-    metaDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.5)' },
+    city: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#FFFFFF',
+    },
+    date: {
+        fontSize: 12,
+        color: 'rgba(255, 255, 255, 0.7)',
+        fontWeight: '500',
+    },
+    mainRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12,
+        paddingHorizontal: 4,
+    },
+    tempColumn: {
+        flexDirection: 'column',
+    },
+    temp: {
+        fontSize: Platform.OS === 'android' ? 52 : 56,
+        fontWeight: '900',
+        color: '#FFFFFF',
+        lineHeight: Platform.OS === 'android' ? 56 : 60,
+        letterSpacing: -1,
+    },
+    condition: {
+        fontSize: 15,
+        color: 'rgba(255, 255, 255, 0.85)',
+        fontWeight: '600',
+        textTransform: 'capitalize',
+        marginTop: 2,
+    },
+    staticIcon: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    metaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        borderRadius: 12,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+    },
+    metaItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    metaText: {
+        color: 'rgba(255, 255, 255, 0.9)',
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    metaDivider: {
+        width: 1,
+        height: 12,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    },
 });

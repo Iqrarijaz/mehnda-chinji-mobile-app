@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     datePickerHeader: {
-        minHeight: 44,
+        minHeight: 42,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',

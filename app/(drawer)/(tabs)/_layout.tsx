@@ -71,6 +71,7 @@ export default function TabLayout() {
       <Tabs
         tabBar={(props) => <CustomTabBar {...props} />}
         screenOptions={{
+          freezeOnBlur: true,
           headerShown: true,
           headerStyle: {
             backgroundColor: Colors[theme].background,
@@ -98,6 +99,10 @@ export default function TabLayout() {
           options={{
             title: 'Home',
             headerShown: false,
+            tabBarLabel: 'Home',
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
@@ -105,41 +110,54 @@ export default function TabLayout() {
           options={{
             title: 'Notices',
             headerShown: false,
+            tabBarLabel: 'Notices',
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons name={focused ? 'megaphone' : 'megaphone-outline'} size={size} color={color} />
+            ),
           }}
         />
-        {/* <Tabs.Screen
-          name="feed"
-          options={{
-            title: 'Feed',
-            headerShown: false,
-            href: null,
-          }}
-        /> */}
         <Tabs.Screen
           name="business"
           options={{
             title: 'Directory',
             headerShown: false,
-          }}
+            tabBarLabel: 'Directory',
+            tabBarIcon: ({ focused, color, size }: { focused: boolean; color: string; size: number }) => (
+              <Ionicons name={focused ? 'search' : 'search-outline'} size={size} color={color} />
+            ),
+            unmountOnBlur: true,
+          } as any}
         />
+
         <Tabs.Screen
-          name="blood"
+          name="marketplace"
           options={{
-            title: 'Blood',
+            title: 'Bazaar',
             headerShown: false,
-          }}
+            tabBarLabel: 'Bazaar',
+            tabBarIcon: ({ focused, color, size }: { focused: boolean; color: string; size: number }) => (
+              <Ionicons name={focused ? 'cart' : 'cart-outline'} size={size} color={color} />
+            ),
+            unmountOnBlur: true,
+          } as any}
         />
         <Tabs.Screen
           name="chat"
           options={{
             title: 'Chat',
+            headerShown: false,
+            href: null,
+            tabBarLabel: 'Chat',
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons name={focused ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline'} size={size} color={color} />
+            ),
           }}
         />
+
       </Tabs>
 
       {memoizedModal}
     </>
-
 
   );
 }

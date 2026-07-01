@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: '#E2E8F0', // Overridden in wrapStyle
         paddingHorizontal: 14,
-        height: Platform.OS === 'android' ? 44 : 48,
+        height: Platform.OS === 'android' ? 42 : 48,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.03,
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     strengthLabel: {
         fontSize: 11,
         fontWeight: '700',
-        width: 44,
+        width: 42,
     },
 
     // Mismatch
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     // Buttons
     actions: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 12 },
     primaryBtn: {
-        backgroundColor: '#006666', 
+        backgroundColor: '#006666',
         height: 40,
         borderRadius: 20,
         justifyContent: 'center',

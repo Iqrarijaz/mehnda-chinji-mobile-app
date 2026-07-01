@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
@@ -15,17 +14,17 @@ import { CategoryCard } from './CategoryCard';
 export const CategoryGrid = React.memo(function CategoryGrid() {
     const router = useRouter();
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const colors = (Colors as any)[theme];
 
-    const handlePress = (category: string) => {
+    const handlePress = useCallback((category: string) => {
         const categoryLabel = PLACE_CATEGORY_MAPPING[category] || category;
         analyticsService.trackEvent(AnalyticsEvents.CATEGORY_CLICKED, {
             category,
             categoryLabel
         });
         router.push(`/listing/${category}` as any);
-    };
+    }, [router]);
 
     return (
         <View style={styles.container}>
@@ -64,14 +63,11 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                 onRequestClose={() => setIsModalVisible(false)}
             >
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalCard, { backgroundColor: colors.background }]}>
+                    <View style={[styles.modalCard, { backgroundColor: colors.card }]}>
                         <View style={styles.modalHeader}>
-                            <ThemedText style={styles.modalTitle}>More Categories</ThemedText>
-                            <TouchableOpacity onPress={() => setIsModalVisible(false)} style={[styles.closeButton, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#F1F5F9' }]}>
-                                <Ionicons name="close" size={24} color={colors.text} />
-                            </TouchableOpacity>
+                            <ThemedText style={[styles.modalTitle, { color: colors.text }]}>More Categories</ThemedText>
                         </View>
-                        <ScrollView contentContainerStyle={styles.modalGrid}>
+                        <ScrollView contentContainerStyle={styles.modalGrid} showsVerticalScrollIndicator={false}>
                             {MORE_CATEGORIES_CONFIG.map((cat, index) => (
                                 <Animated.View
                                     key={cat.id}
@@ -89,6 +85,15 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                                 </Animated.View>
                             ))}
                         </ScrollView>
+
+                        <View style={styles.footerContainer}>
+                            <TouchableOpacity
+                                style={[styles.closePill, { backgroundColor: colors.primary }]}
+                                onPress={() => setIsModalVisible(false)}
+                            >
+                                <ThemedText style={styles.closePillText}>Close</ThemedText>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>
@@ -122,34 +127,48 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalCard: {
-        width: '95%',
-        height: '50%',
+        width: '90%',
+        maxHeight: '70%',
         borderRadius: Layout.borderRadius,
         padding: 20,
+        overflow: 'hidden',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 20,
     },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: 16,
         paddingHorizontal: 6,
-        marginBottom: 20,
     },
     modalTitle: {
         fontSize: 18,
-        fontWeight: '700',
-    },
-    closeButton: {
-        padding: 8,
-        borderRadius: 20,
+        fontWeight: '800',
+        letterSpacing: -0.5,
     },
     modalGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        paddingBottom: 20,
+        paddingBottom: 8,
+    },
+    footerContainer: {
+        marginTop: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    closePill: {
+        width: 90,
+        height: 34,
+        borderRadius: 17,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    closePillText: {
+        color: '#FFFFFF',
+        fontSize: 13,
+        fontWeight: '600',
     },
 });

@@ -16,7 +16,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -410,20 +410,11 @@ const PlaceSubmissionScreen = () => {
             return;
         }
 
-        if (!form.name.trim() || (!isTravel && !form.address.trim()) || (!isReligious && !isTravel && !isEmergency && !form.description.trim()) || !form.type.trim()) {
+        if (!form.name.trim() || (!isTravel && !form.address.trim()) || !form.type.trim()) {
             Toast.show({
                 type: 'error',
                 text1: 'Validation Error',
-                text2: `Name, ${!isTravel ? 'Address, ' : ''}${!isReligious && !isTravel && !isEmergency ? 'Description ' : ''}and Type are required.`,
-            });
-            return;
-        }
-
-        if (!isReligious && !isTravel && !isEmergency && form.description.trim().length < 100) {
-            Toast.show({
-                type: 'error',
-                text1: 'Validation Error',
-                text2: 'Description must be at least 100 characters.',
+                text2: `Name, ${!isTravel ? 'Address, ' : ''}and Type are required.`,
             });
             return;
         }
@@ -587,30 +578,44 @@ const PlaceSubmissionScreen = () => {
                 </ThemedText>
             </ThankYouModal>
 
-            {/* Header */}
-            <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
+            {/* ── Hero Header ─────────────────────────────────────────── */}
+            <Animated.View entering={FadeInUp.duration(500)} style={styles.headerWrap}>
+                <LinearGradient
+                    colors={['#0D9488', '#0F766E']}
+                    style={StyleSheet.absoluteFill}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                />
+
+                {/* Nav row */}
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
-                    <TouchableOpacity
-                        onPress={handleGoBack}
-                        style={styles.backBtn}
-                    >
+                    <TouchableOpacity onPress={handleGoBack} style={styles.backBtn}>
                         <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
                     </TouchableOpacity>
-                    <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.headerTitleWrap}>
-                        <View style={styles.headerTitleRow}>
-                            {!isEmergency && !isNoPhotoCategory && selectedImage && (
-                                <Image
-                                    source={{ uri: selectedImage }}
-                                    style={styles.headerThumbnail}
-                                />
-                            )}
-                            <ThemedText style={styles.headerTitle} numberOfLines={1}>
-                                {title}
-                            </ThemedText>
-                        </View>
+                    <Animated.View entering={FadeIn.delay(200).duration(400)} style={{ flex: 1, alignItems: 'center' }}>
+                        <ThemedText style={styles.headerTitle} numberOfLines={1}>
+                            {title}
+                        </ThemedText>
                     </Animated.View>
                     <View style={{ width: 42 }} />
                 </View>
+
+                {/* Hero icon + text */}
+                <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
+                    <View style={styles.heroIconWrap}>
+                        {!isEmergency && !isNoPhotoCategory && selectedImage ? (
+                            <Image source={{ uri: selectedImage }} style={{ width: 40, height: 40, borderRadius: 12 }} contentFit="cover" />
+                        ) : (
+                            <Ionicons name="location" size={32} color="#0D9488" />
+                        )}
+                    </View>
+                    <ThemedText style={styles.heroTitle}>
+                        {isEditing ? 'Update Your Submission' : 'Submit a Place'}
+                    </ThemedText>
+                    <ThemedText style={styles.heroSubtitle}>
+                        Fill in the details below to list this place in the community directory
+                    </ThemedText>
+                </Animated.View>
             </Animated.View>
 
             <KeyboardAvoidingView
@@ -680,22 +685,28 @@ const PlaceSubmissionScreen = () => {
                                 )}
                             </View>
                         )}
-                        <View style={styles.field}>
+                        <Animated.View entering={FadeInDown.delay(200)} style={styles.field}>
                             <View style={styles.labelRow}>
-                                <ThemedText style={styles.label}>Name <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                <ThemedText style={styles.label}>NAME <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                                 <ThemedText style={[styles.charCount, form.name.length >= 100 && { color: '#EF4444' }]}>
                                     {form.name.length}/100
                                 </ThemedText>
                             </View>
-                            <TextInput
-                                style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                placeholder="Enter name"
-                                placeholderTextColor={colors.icon}
-                                value={form.name}
-                                onChangeText={(text) => handleChange('name', text)}
-                                maxLength={100}
-                            />
-                        </View>
+                            <View style={[styles.inputBox, {
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
+                                height: Platform.OS === 'android' ? 48 : 52,
+                            }]}>
+                                <Ionicons name="storefront-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
+                                <TextInput
+                                    style={[styles.inputText, { color: colors.text }]}
+                                    placeholder="Enter name"
+                                    placeholderTextColor={colors.icon}
+                                    value={form.name}
+                                    onChangeText={(text) => handleChange('name', text)}
+                                    maxLength={100}
+                                />
+                            </View>
+                        </Animated.View>
 
                         <View style={styles.field}>
                             <View style={styles.labelRow}>
@@ -801,74 +812,98 @@ const PlaceSubmissionScreen = () => {
                         )}
 
                         {!isTravel && (
-                            <View style={styles.field}>
+                            <Animated.View entering={FadeInDown.delay(250)} style={styles.field}>
                                 <View style={styles.labelRow}>
-                                    <ThemedText style={styles.label}>Address <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                    <ThemedText style={styles.label}>ADDRESS <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                                     <ThemedText style={[styles.charCount, form.address.length >= 150 && { color: '#EF4444' }]}>
                                         {form.address.length}/150
                                     </ThemedText>
                                 </View>
-                                <TextInput
-                                    style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                    placeholder="Enter address"
-                                    placeholderTextColor={colors.icon}
-                                    value={form.address}
-                                    onChangeText={(text) => handleChange('address', text)}
-                                    maxLength={150}
-                                />
-                            </View>
+                                <View style={[styles.inputBox, {
+                                    backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
+                                    height: Platform.OS === 'android' ? 48 : 52,
+                                }]}>
+                                    <Ionicons name="map-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
+                                    <TextInput
+                                        style={[styles.inputText, { color: colors.text }]}
+                                        placeholder="Enter address"
+                                        placeholderTextColor={colors.icon}
+                                        value={form.address}
+                                        onChangeText={(text) => handleChange('address', text)}
+                                        maxLength={150}
+                                    />
+                                </View>
+                            </Animated.View>
                         )}
 
                         {!isTravel && (
-                            <View style={styles.field}>
+                            <Animated.View entering={FadeInDown.delay(300)} style={styles.field}>
                                 <View style={styles.labelRow}>
-                                    <ThemedText style={styles.label}>Google Address (Optional)</ThemedText>
+                                    <ThemedText style={styles.label}>GOOGLE ADDRESS <ThemedText style={[styles.label, { color: colors.icon, fontWeight: '400' }]}>(Optional)</ThemedText></ThemedText>
                                 </View>
-                                <TextInput
-                                    style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                    placeholder="Enter Google Maps link or Google Address"
-                                    placeholderTextColor={colors.icon}
-                                    value={form.googleAddress}
-                                    onChangeText={(text) => handleChange('googleAddress', text)}
-                                />
-                            </View>
+                                <View style={[styles.inputBox, {
+                                    backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
+                                    height: Platform.OS === 'android' ? 48 : 52,
+                                }]}>
+                                    <Ionicons name="navigate-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
+                                    <TextInput
+                                        style={[styles.inputText, { color: colors.text }]}
+                                        placeholder="Enter Google Maps link or address"
+                                        placeholderTextColor={colors.icon}
+                                        value={form.googleAddress}
+                                        onChangeText={(text) => handleChange('googleAddress', text)}
+                                    />
+                                </View>
+                            </Animated.View>
                         )}
 
-                        <View style={styles.field}>
+                        <Animated.View entering={FadeInDown.delay(350)} style={styles.field}>
                             <View style={styles.labelRow}>
-                                <ThemedText style={styles.label}>Contacts (Max 3) <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                <ThemedText style={styles.label}>CONTACTS (MAX 3) <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                                 {form.contact.length < 3 && (
                                     <TouchableOpacity onPress={addContact}>
-                                        <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add Contact</ThemedText>
+                                        <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add</ThemedText>
                                     </TouchableOpacity>
                                 )}
                             </View>
 
                             {form.contact.map((contact, index) => (
-                                <View key={index} style={{ marginBottom: 12 }}>
+                                <View key={index} style={{ marginBottom: 10 }}>
                                     <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
                                         <View style={{ flex: 1, gap: 8 }}>
-                                            <TextInput
-                                                style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                                placeholder="Contact name (e.g. Admin)"
-                                                placeholderTextColor={colors.icon}
-                                                value={contact.name}
-                                                onChangeText={(text) => handleContactChange(index, 'name', text)}
-                                            />
-                                            <TextInput
-                                                style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                                placeholder="Phone number (e.g. 03000000000)"
-                                                placeholderTextColor={colors.icon}
-                                                value={contact.number}
-                                                onChangeText={(text) => handleContactChange(index, 'number', text)}
-                                                keyboardType="phone-pad"
-                                                maxLength={11}
-                                            />
+                                            <View style={[styles.inputBox, {
+                                                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
+                                                height: Platform.OS === 'android' ? 48 : 52,
+                                            }]}>
+                                                <Ionicons name="person-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
+                                                <TextInput
+                                                    style={[styles.inputText, { color: colors.text }]}
+                                                    placeholder="Contact name (e.g. Admin)"
+                                                    placeholderTextColor={colors.icon}
+                                                    value={contact.name}
+                                                    onChangeText={(text) => handleContactChange(index, 'name', text)}
+                                                />
+                                            </View>
+                                            <View style={[styles.inputBox, {
+                                                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
+                                                height: Platform.OS === 'android' ? 48 : 52,
+                                            }]}>
+                                                <Ionicons name="call-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
+                                                <TextInput
+                                                    style={[styles.inputText, { color: colors.text }]}
+                                                    placeholder="Phone (e.g. 03000000000)"
+                                                    placeholderTextColor={colors.icon}
+                                                    value={contact.number}
+                                                    onChangeText={(text) => handleContactChange(index, 'number', text)}
+                                                    keyboardType="phone-pad"
+                                                    maxLength={11}
+                                                />
+                                            </View>
                                         </View>
                                         {index > 0 && (
                                             <TouchableOpacity
                                                 onPress={() => removeContact(index)}
-                                                style={{ paddingTop: 14 }}
+                                                style={{ paddingTop: 16 }}
                                             >
                                                 <Ionicons name="trash-outline" size={20} color="#EF4444" />
                                             </TouchableOpacity>
@@ -876,12 +911,12 @@ const PlaceSubmissionScreen = () => {
                                     </View>
                                 </View>
                             ))}
-                        </View>
+                        </Animated.View>
 
                         {isTravel && (
-                            <View style={[styles.field, { marginBottom: 20 }]}>
+                            <Animated.View entering={FadeInDown.delay(400)} style={[styles.field, { marginBottom: 20 }]}>
                                 <View style={styles.labelRow}>
-                                    <ThemedText style={styles.label}>Route / Schedule (Optional)</ThemedText>
+                                    <ThemedText style={styles.label}>ROUTE / SCHEDULE <ThemedText style={[styles.label, { color: colors.icon, fontWeight: '400' }]}>(Optional)</ThemedText></ThemedText>
                                     {form.route.length < 10 && (
                                         <TouchableOpacity onPress={addRoute}>
                                             <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add Stop</ThemedText>
@@ -890,29 +925,30 @@ const PlaceSubmissionScreen = () => {
                                 </View>
 
                                 {form.route.map((r, index) => (
-                                    <View key={index} style={{ marginBottom: 12 }}>
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                                            <TextInput
-                                                style={[styles.input, { flex: 2, marginBottom: 0, backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                                placeholder="City (e.g. Chinji)"
-                                                placeholderTextColor={colors.icon}
-                                                value={r.city}
-                                                onChangeText={(val) => handleRouteChange(index, 'city', val)}
-                                            />
+                                    <View key={index} style={{ marginBottom: 10 }}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                            <View style={[styles.inputBox, { flex: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                                <Ionicons name="location-outline" size={16} color={colors.icon} style={{ marginRight: 8 }} />
+                                                <TextInput
+                                                    style={[styles.inputText, { color: colors.text }]}
+                                                    placeholder="City (e.g. Chinji)"
+                                                    placeholderTextColor={colors.icon}
+                                                    value={r.city}
+                                                    onChangeText={(val) => handleRouteChange(index, 'city', val)}
+                                                />
+                                            </View>
                                             <TouchableOpacity
                                                 onPress={() => setRoutePickerIndex(index)}
-                                                style={[styles.input, { flex: 1.2, marginBottom: 0, justifyContent: 'center', backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', borderColor: colors.border }]}
+                                                style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}
                                             >
-                                                <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 12, fontWeight: '600' }}>
+                                                <Ionicons name="time-outline" size={16} color={colors.icon} style={{ marginRight: 6 }} />
+                                                <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 13, fontWeight: '600' }}>
                                                     {r.time || 'Time'}
                                                 </ThemedText>
                                             </TouchableOpacity>
 
                                             {index > 0 && (
-                                                <TouchableOpacity
-                                                    onPress={() => removeRoute(index)}
-                                                    style={{ padding: 4 }}
-                                                >
+                                                <TouchableOpacity onPress={() => removeRoute(index)} style={{ padding: 4 }}>
                                                     <Ionicons name="trash-outline" size={20} color="#EF4444" />
                                                 </TouchableOpacity>
                                             )}
@@ -932,10 +968,10 @@ const PlaceSubmissionScreen = () => {
                                     title="Departure Time"
                                     currentValue={routePickerIndex !== null ? form.route[routePickerIndex].time : ''}
                                 />
-                            </View>
+                            </Animated.View>
                         )}
 
-                        {!isReligious && !isTravel && (
+                        {/* {!isReligious && !isTravel && (
                             <View style={styles.field}>
                                 <View style={styles.labelRow}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -995,19 +1031,17 @@ const PlaceSubmissionScreen = () => {
                                     editable={false}
                                 />
                             </View>
-                        )}
+                        )} */}
 
                         {isEducation && (
-                            <View style={[styles.field, { gap: 12 }]}>
-                                <View style={styles.labelRow}>
-                                    <ThemedText style={styles.label}>School/College Details</ThemedText>
-                                </View>
+                            <Animated.View entering={FadeInDown.delay(420)} style={[styles.field, { gap: 12 }]}>
+                                <ThemedText style={styles.label}>SCHOOL / COLLEGE DETAILS</ThemedText>
 
-                                <View style={styles.inputWrap}>
-                                    <ThemedText style={styles.inputLabel}>Principal Name</ThemedText>
+                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                    <Ionicons name="person-circle-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
-                                        style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                        placeholder="Enter Principal Name"
+                                        style={[styles.inputText, { color: colors.text }]}
+                                        placeholder="Principal Name"
                                         placeholderTextColor={colors.icon}
                                         value={form.metadata.principalName}
                                         onChangeText={(text) => handleMetadataChange('principalName', text)}
@@ -1015,22 +1049,22 @@ const PlaceSubmissionScreen = () => {
                                 </View>
 
                                 <View style={{ flexDirection: 'row', gap: 12 }}>
-                                    <View style={{ flex: 1 }}>
-                                        <ThemedText style={styles.inputLabel}>Total Students</ThemedText>
+                                    <View style={[styles.inputBox, { flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                        <Ionicons name="people-outline" size={18} color={colors.icon} style={{ marginRight: 8 }} />
                                         <TextInput
-                                            style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                            placeholder="e.g. 500"
+                                            style={[styles.inputText, { color: colors.text }]}
+                                            placeholder="Students"
                                             placeholderTextColor={colors.icon}
                                             value={form.metadata.totalStudents}
                                             onChangeText={(text) => handleMetadataChange('totalStudents', text.replace(/[^0-9]/g, ''))}
                                             keyboardType="number-pad"
                                         />
                                     </View>
-                                    <View style={{ flex: 1 }}>
-                                        <ThemedText style={styles.inputLabel}>Total Teachers</ThemedText>
+                                    <View style={[styles.inputBox, { flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                        <Ionicons name="school-outline" size={18} color={colors.icon} style={{ marginRight: 8 }} />
                                         <TextInput
-                                            style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
-                                            placeholder="e.g. 25"
+                                            style={[styles.inputText, { color: colors.text }]}
+                                            placeholder="Teachers"
                                             placeholderTextColor={colors.icon}
                                             value={form.metadata.totalTeachers}
                                             onChangeText={(text) => handleMetadataChange('totalTeachers', text.replace(/[^0-9]/g, ''))}
@@ -1038,31 +1072,53 @@ const PlaceSubmissionScreen = () => {
                                         />
                                     </View>
                                 </View>
-                            </View>
+                            </Animated.View>
                         )}
 
                         {(isHealth || isEducation || isGovt) && (
-                            <View style={styles.field}>
-                                <View style={styles.labelRow}>
-                                    <ThemedText style={styles.label}>Timing <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
-                                </View>
+                            <Animated.View entering={FadeInDown.delay(440)} style={styles.field}>
+                                <ThemedText style={[styles.label, { marginBottom: 6 }]}>TIMING <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                                 <View style={{ flexDirection: 'row', gap: 12 }}>
-                                    <TouchableOpacity
-                                        onPress={() => setShowFromPicker(true)}
-                                        style={[styles.input, { flex: 1, justifyContent: 'center', backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9', borderColor: colors.border }]}
-                                    >
-                                        <ThemedText style={{ color: fromTime ? colors.text : colors.icon, fontSize: 13, fontWeight: '600' }}>
-                                            {fromTime || 'From'}
-                                        </ThemedText>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => setShowToPicker(true)}
-                                        style={[styles.input, { flex: 1, justifyContent: 'center', backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9', borderColor: colors.border }]}
-                                    >
-                                        <ThemedText style={{ color: toTime ? colors.text : colors.icon, fontSize: 13, fontWeight: '600' }}>
-                                            {toTime || 'To'}
-                                        </ThemedText>
-                                    </TouchableOpacity>
+                                    <View style={{ flex: 1 }}>
+                                        <ThemedText style={[styles.subLabel, { color: colors.icon }]}>OPENS AT</ThemedText>
+                                        <TouchableOpacity
+                                            onPress={() => setShowFromPicker(true)}
+                                            style={[styles.inputBox, {
+                                                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
+                                                height: Platform.OS === 'android' ? 48 : 52,
+                                                justifyContent: 'space-between',
+                                            }]}
+                                            activeOpacity={0.7}
+                                        >
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                                <Ionicons name="time-outline" size={18} color={colors.icon} />
+                                                <ThemedText style={{ color: fromTime ? colors.text : colors.icon, fontSize: 14, fontWeight: '500' }}>
+                                                    {fromTime || 'From'}
+                                                </ThemedText>
+                                            </View>
+                                            <Ionicons name="chevron-down" size={16} color={colors.icon} />
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={{ flex: 1 }}>
+                                        <ThemedText style={[styles.subLabel, { color: colors.icon }]}>CLOSES AT</ThemedText>
+                                        <TouchableOpacity
+                                            onPress={() => setShowToPicker(true)}
+                                            style={[styles.inputBox, {
+                                                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
+                                                height: Platform.OS === 'android' ? 48 : 52,
+                                                justifyContent: 'space-between',
+                                            }]}
+                                            activeOpacity={0.7}
+                                        >
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                                <Ionicons name="time-outline" size={18} color={colors.icon} />
+                                                <ThemedText style={{ color: toTime ? colors.text : colors.icon, fontSize: 14, fontWeight: '500' }}>
+                                                    {toTime || 'To'}
+                                                </ThemedText>
+                                            </View>
+                                            <Ionicons name="chevron-down" size={16} color={colors.icon} />
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
 
                                 <TimePicker
@@ -1093,7 +1149,7 @@ const PlaceSubmissionScreen = () => {
                                     title="Closing Time"
                                     currentValue={toTime}
                                 />
-                            </View>
+                            </Animated.View>
                         )}
 
                         {(isHealth || isGovt || isEducation) && (
@@ -1170,39 +1226,35 @@ const PlaceSubmissionScreen = () => {
                         )}
 
                         {/* Footer Actions */}
-                        <View style={styles.footer}>
-                            <TouchableOpacity
-                                style={[styles.submitBtn, (isPending || isUploading || (isEditing && !hasChanges)) && { opacity: 0.6 }]}
-                                onPress={handleSubmit}
-                                disabled={isPending || isUploading || (isEditing && !hasChanges)}
-                            >
-                                <LinearGradient
-                                    colors={[colors.primary, colors.primary]}
-                                    style={styles.gradient}
-                                >
-                                    {isUploading ? (
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                            <ActivityIndicator color="#FFF" size="small" />
-                                            <ThemedText style={styles.submitText}>UPLOADING PHOTO...</ThemedText>
-                                        </View>
-                                    ) : isPending ? (
-                                        <ActivityIndicator color="#FFF" />
-                                    ) : (
-                                        <ThemedText style={styles.submitText}>
-                                            {isEditing ? 'UPDATE REQUEST' : 'SUBMIT REQUEST'}
-                                        </ThemedText>
-                                    )}
-                                </LinearGradient>
-                            </TouchableOpacity>
-
+                        <Animated.View entering={FadeInDown.delay(500)} style={styles.footer}>
                             <TouchableOpacity
                                 onPress={handleGoBack}
                                 style={[styles.cancelBtn, { borderColor: colors.border }]}
                                 activeOpacity={0.7}
                             >
-                                <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                                <ThemedText style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</ThemedText>
                             </TouchableOpacity>
-                        </View>
+
+                            <TouchableOpacity
+                                style={[styles.submitBtn, { backgroundColor: colors.primary }, (isPending || isUploading || (isEditing && !hasChanges)) && { opacity: 0.6 }]}
+                                onPress={handleSubmit}
+                                disabled={isPending || isUploading || (isEditing && !hasChanges)}
+                                activeOpacity={0.85}
+                            >
+                                {isUploading ? (
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                        <ActivityIndicator color="#FFF" size="small" />
+                                        <ThemedText style={styles.submitText}>Uploading...</ThemedText>
+                                    </View>
+                                ) : isPending ? (
+                                    <ActivityIndicator color="#FFF" />
+                                ) : (
+                                    <ThemedText style={styles.submitText}>
+                                        {isEditing ? 'Update Request' : 'Submit Request'}
+                                    </ThemedText>
+                                )}
+                            </TouchableOpacity>
+                        </Animated.View>
                     </ScrollView>
                 </View>
             </KeyboardAvoidingView>
@@ -1222,86 +1274,134 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
     },
+
+    // ── Hero Header ──────────────────────────────────────────────────────
     headerWrap: {
-        paddingBottom: 16,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        zIndex: 2,
+        paddingBottom: 24,
     },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
+        paddingBottom: 4,
     },
     backBtn: {
         width: 42,
         height: 42,
-        borderRadius: 21,
-        backgroundColor: 'rgba(255,255,255,0.18)',
+        borderRadius: 22,
+        backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    headerTitleWrap: {
-        flex: 1,
-        alignItems: 'center',
-        paddingHorizontal: 10,
-    },
     headerTitle: {
-        fontSize: 16,
+        fontSize: 17,
         fontWeight: '700',
         color: '#FFFFFF',
+        letterSpacing: 0.2,
         textTransform: 'capitalize',
     },
+    heroContent: {
+        alignItems: 'center',
+        paddingHorizontal: 24,
+        marginTop: 16,
+    },
+    heroIconWrap: {
+        width: 64,
+        height: 64,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.95)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    heroTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        letterSpacing: 0.2,
+    },
+    heroSubtitle: {
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.8)',
+        textAlign: 'center',
+        marginTop: 6,
+        lineHeight: 18,
+    },
+
+    // ── Form ─────────────────────────────────────────────────────────────
     scroll: {
         flex: 1,
     },
     scrollContent: {
-        paddingHorizontal: 22,
+        paddingHorizontal: 20,
+        paddingBottom: 40,
     },
     field: {
-        marginBottom: 12,
+        gap: 6,
+        marginBottom: 16,
     },
     labelRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 4,
     },
     label: {
-        fontSize: 10,
-        fontWeight: '800',
-        color: '#64748B',
+        fontSize: 11,
+        fontWeight: '700',
         letterSpacing: 0.5,
+        marginLeft: 2,
+        color: '#64748B',
+    },
+    subLabel: {
+        fontSize: 9,
+        fontWeight: '700',
+        letterSpacing: 0.6,
+        marginBottom: 4,
+        marginLeft: 2,
     },
     charCount: {
         fontSize: 11,
         opacity: 0.6,
         fontWeight: '500',
     },
+
+    // ── Inputs (flat, borderless) ─────────────────────────────────────────
+    inputBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 12,
+        paddingHorizontal: 14,
+    },
+    inputText: {
+        flex: 1,
+        fontSize: 14,
+        fontWeight: '500',
+        paddingVertical: 0,
+    },
+
+    // Legacy — kept for textArea only
     input: {
-        height: 48,
         borderWidth: 1,
         borderRadius: 12,
-        paddingHorizontal: 16,
+        paddingHorizontal: 14,
         fontSize: 12,
-        marginBottom: 12,
-    },
-    inputLabel: {
-        fontSize: 12,
-        fontWeight: '600',
-        marginBottom: 6,
-        opacity: 0.7,
-        marginLeft: 4,
-    },
-    inputWrap: {
-        marginBottom: 4,
     },
     textArea: {
         height: 270,
         textAlignVertical: 'top',
         paddingTop: 10,
     },
+
+    // ── Type chips ───────────────────────────────────────────────────────
     typeChip: {
         flexDirection: 'column',
         alignItems: 'center',
@@ -1330,40 +1430,41 @@ const styles = StyleSheet.create({
         color: '#64748B',
         textAlign: 'center',
     },
+
+    // ── Buttons row ──────────────────────────────────────────────────────
     footer: {
-        marginTop: 12,
         flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
         gap: 12,
-    },
-    submitBtn: {
-        flex: 1.5,
-        borderRadius: Layout.borderRadius,
-        overflow: 'hidden',
+        marginTop: 20,
     },
     cancelBtn: {
-        flex: 1,
-        height: 44,
+        width: 120,
+        height: 40,
+        borderRadius: 20,
+        borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
-        borderRadius: Layout.borderRadius,
     },
     cancelText: {
-        fontSize: 13,
-        color: '#94A3B8',
+        fontSize: 14,
         fontWeight: '600',
     },
-    gradient: {
-        height: 44,
+    submitBtn: {
+        width: 160,
+        height: 40,
+        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
     },
     submitText: {
         color: '#FFFFFF',
-        fontWeight: '900',
+        fontWeight: '600',
         fontSize: 14,
-        letterSpacing: 1,
     },
+
+    // ── Image section ────────────────────────────────────────────────────
     imageSection: {
         marginTop: 20,
         marginBottom: 20,
@@ -1432,18 +1533,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: Layout.borderRadius,
     },
-    headerTitleRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
-    headerThumbnail: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        borderWidth: 1.5,
-        borderColor: 'rgba(255,255,255,0.4)',
-    },
+
+    // ── Format toolbar ───────────────────────────────────────────────────
     formatToolbar: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -1463,20 +1554,22 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         textTransform: 'uppercase',
     },
+
+    // ── Tags ─────────────────────────────────────────────────────────────
     tagsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 6,
+        gap: 8,
         marginTop: 4,
         marginBottom: 8,
     },
     tagChip: {
         borderRadius: 20,
         borderWidth: 1,
-        paddingHorizontal: 10,
-        paddingVertical: 6,
+        paddingHorizontal: 12,
+        paddingVertical: 7,
     },
     tagChipText: {
-        fontSize: 11,
+        fontSize: 12,
     },
 });

@@ -9,12 +9,12 @@ export const getConversationsLines = async (): Promise<any> => {
     return apiClient.get('/api/user/chat/conversations');
 };
 
-export const sendMessage = async (conversationId: string, text: string, type: 'text' | 'image' | 'file' = 'text'): Promise<any> => {
-    return apiClient.post(`/api/user/chat/message/${conversationId}`, { text, type });
+export const sendMessage = async (conversationId: string, text: string, type: 'text' | 'image' | 'file' = 'text', temporaryId?: string): Promise<any> => {
+    return apiClient.post(`/api/user/chat/message/${conversationId}`, { text, type, temporaryId });
 };
 
-export const getMessages = async (conversationId: string, page = 1): Promise<any> => {
-    return apiClient.get(`/api/user/chat/messages/${conversationId}?page=${page}`);
+export const getMessages = async (conversationId: string, page = 1, limit = 30): Promise<any> => {
+    return apiClient.get(`/api/user/chat/messages/${conversationId}?page=${page}&limit=${limit}`);
 };
 
 export const markMessagesSeen = async (conversationId: string): Promise<boolean> => {
