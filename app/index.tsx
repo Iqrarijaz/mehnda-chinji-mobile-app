@@ -1,24 +1,16 @@
 import { clientStorage } from '@/utils/storage';
 import { useRouter } from 'expo-router';
-import { useEffect, useState, useRef } from 'react';
-import CustomSplashScreen from '@/components/splashScreen';
+import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useAdsStore } from '../store/ads.store';
+import { View } from 'react-native';
+import { useTheme } from '@/context/ThemeContext';
 
-export default function SplashScreen() {
+export default function IndexScreen() {
     const { loading, isAuthenticated } = useAuth();
     const router = useRouter();
-    const [showSplash, setShowSplash] = useState<boolean>(true);
-    const [minTimeElapsed, setMinTimeElapsed] = useState<boolean>(false);
-
-    useEffect(() => {
-        // Enforce a minimum display time of 2.2 seconds to allow splash animations to complete
-        const timer = setTimeout(() => setMinTimeElapsed(true), 2200);
-        return () => clearTimeout(timer);
-    }, []);
+    const { theme } = useTheme();
 
     const navigateNext = async () => {
-        setShowSplash(false);
         try {
             const onboardingCompleted = await clientStorage.getItem('onboarding_completed');
 
@@ -39,13 +31,12 @@ export default function SplashScreen() {
     };
 
     useEffect(() => {
-        // Only navigate when auth checking is done AND the minimum time has passed
-        if (!loading && showSplash && minTimeElapsed) {
+        // Only navigate when auth checking is done
+        if (!loading) {
             navigateNext();
         }
-    }, [loading, showSplash, minTimeElapsed]);
+    }, [loading]);
 
-    if (!showSplash) return null;
-
-    return <CustomSplashScreen />;
+    // Return a blank view with the theme background color to prevent flashing white
+    return <View style={{ flex: 1, backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF' }} />;
 }

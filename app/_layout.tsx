@@ -235,7 +235,7 @@ function RootLayout() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinimumTimeElapsed(true);
-    }, 4000);
+    }, 2000);
 
     // Initialize device info cache for API interceptors
     initializeDeviceInfo().catch(err => console.error('Failed to initialize device info', err));

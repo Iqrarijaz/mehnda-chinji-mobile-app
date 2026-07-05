@@ -22,11 +22,8 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
 
     // Split words into character arrays for staggered typewriter animation
     const titleText = "RAHBAR";
-    const subtitleText = "YOUR LOCAL GUIDE";
 
     const titleChars = titleText.split("");
-    const subtitleChars = subtitleText.split("");
-
     // Shared values for animations
     const logoScale = useSharedValue(1); // Start fully scaled
     const logoOpacity = useSharedValue(1); // Start fully visible
@@ -42,10 +39,6 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
     const subtitleProgress = useSharedValue(0);
 
     useEffect(() => {
-        // 1. Elastic Spring logo entrance (Commented out for seamless transition from OS Splash)
-        // logoScale.value = withSpring(1, { damping: 14, stiffness: 85 });
-        // logoOpacity.value = withTiming(1, { duration: 600 });
-        // logoTranslateY.value = withSpring(0, { damping: 14, stiffness: 85 });
 
         // 2. Repeating breathing glow halo behind the logo
         glowScale.value = withRepeat(
@@ -61,13 +54,13 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
 
         // 3. Fill loading progress bar
         progressWidth.value = withTiming(1, {
-            duration: 3500, // Slowed down
+            duration: 2000, // Slowed down
             easing: Easing.bezier(0.2, 0.8, 0.2, 1)
         });
 
         // 4. Staggered character typing start
-        titleProgress.value = withDelay(400, withTiming(1, { duration: 1800, easing: Easing.out(Easing.quad) })); // Slowed down
-        subtitleProgress.value = withDelay(1500, withTiming(1, { duration: 2000, easing: Easing.out(Easing.quad) })); // Slowed down
+        titleProgress.value = withDelay(200, withTiming(1, { duration: 800, easing: Easing.out(Easing.quad) })); // Sped up
+        subtitleProgress.value = withDelay(1000, withTiming(1, { duration: 900, easing: Easing.out(Easing.quad) })); // Sped up
     }, []);
 
     // Animated Styles
@@ -159,32 +152,7 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
                     })}
                 </View>
 
-                {/* Subtitle */}
-                <View style={[styles.charRow, { marginTop: 6 }]}>
-                    {subtitleChars.map((char, index) => {
-                        const charStyle = useAnimatedStyle(() => {
-                            const start = index / subtitleChars.length;
-                            const end = (index + 1.5) / subtitleChars.length;
-                            const opacity = Math.min(Math.max((subtitleProgress.value - start) / (end - start), 0), 1);
-                            return {
-                                opacity,
-                                transform: [{ translateY: (1 - opacity) * 4 }]
-                            };
-                        });
-                        return (
-                            <Animated.Text
-                                key={`s-${index}`}
-                                style={[
-                                    styles.footerSubText,
-                                    { color: colors.primary },
-                                    charStyle
-                                ]}
-                            >
-                                {char}
-                            </Animated.Text>
-                        );
-                    })}
-                </View>
+
             </View>
         </View>
     );
@@ -239,12 +207,6 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         marginHorizontal: 1,
         letterSpacing: 2,
-    },
-    footerSubText: {
-        fontSize: 9,
-        fontWeight: '700',
-        marginHorizontal: 0.5,
-        letterSpacing: 1.5,
     },
 });
 
