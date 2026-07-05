@@ -18,7 +18,7 @@ const termsData = [
     {
         id: '2',
         title: 'User Accounts and Responsibilities',
-        content: '• Account Registration: To use certain features of the app (such as registering a business, signing up as a blood donor, or submitting places), you must create an account. You agree to provide accurate, current, and complete information during registration.\n• Account Security: You are responsible for safeguarding your login credentials. You must notify us immediately of any unauthorized use of your account.',
+        content: '• Account Registration: To use certain features of the app (such as registering a business, signing up as a , or submitting places), you must create an account. You agree to provide accurate, current, and complete information during registration.\n• Account Security: You are responsible for safeguarding your login credentials. You must notify us immediately of any unauthorized use of your account.',
     },
     {
         id: '3',
@@ -28,8 +28,8 @@ const termsData = [
 
     {
         id: '4',
-        title: 'Blood Donor Registry',
-        content: '• Role of Rehbar: The Rehbar Blood Donor feature is strictly a communication platform to connect potential blood donors with those in need. Rehbar is not a medical organization, hospital, or blood bank.\n• No Liability: Rehbar and its developers assume zero liability for any injury, illness, or complications resulting from blood donations coordinated through this app.',
+        title: ' Registry',
+        content: '• Role of Rehbar: The Rehbar  feature is strictly a communication platform to connect potential  with those in need. Rehbar is not a medical organization, hospital, or .\n• No Liability: Rehbar and its developers assume zero liability for any injury, illness, or complications resulting from  coordinated through this app.',
     },
     {
         id: '5',
@@ -279,7 +279,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        borderWidth: 1,
     },
     accordionHeader: {
         flexDirection: 'row',
@@ -343,7 +342,6 @@ const styles = StyleSheet.create({
         width: 24,
         height: 24,
         borderRadius: 6,
-        borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,

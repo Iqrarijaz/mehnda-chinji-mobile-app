@@ -124,8 +124,6 @@ export const usePushNotifications = () => {
                     router.push(data.route as any);
                 } else if (data?.type === 'weather_rain') {
                     router.push('/weather');
-                } else if (typeof data?.type === 'string' && data.type.toLowerCase() === 'blood') {
-                    router.push('/blood');
                 }
             });
 

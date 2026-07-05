@@ -1,7 +1,5 @@
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { useChatUiStore } from '@/store/chatUiStore';
-import { FloatingHomeButton } from './common/FloatingHomeButton';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import * as Haptics from 'expo-haptics';
@@ -95,12 +93,11 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     const colors = Colors[theme];
     const { width: windowWidth } = useWindowDimensions();
 
-    const isChatActive = useChatUiStore((s) => s.isChatActive);
 
     // ─── Consolidated Route & Dimensions Selector ────────────────────────────
     const { visibleRoutes, tabWidth, FULL_WIDTH } = React.useMemo(() => {
         // Routes hidden from the tab bar (registered with href: null in _layout)
-        const HIDDEN_ROUTES = new Set(['chat']);
+        const HIDDEN_ROUTES = new Set<string>([]);
         const routes = state.routes.filter((route) => {
             if (HIDDEN_ROUTES.has(route.name)) return false;
             const { options } = descriptors[route.key];
@@ -119,8 +116,6 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
     // ─── Shared Values (UI Thread Animations) ─────────────────────────────────
     const indicatorX = useSharedValue(0);
-    const slideProgress = useSharedValue(0);
-
     // ─── JSI-Powered UI-Thread Keyboard Height Tracking ────────────────────────
     const keyboard = useAnimatedKeyboard();
 
@@ -130,30 +125,15 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
             (route) => route.key === state.routes[state.index].key,
         );
         if (activeIndex !== -1 && tabWidth > 0) {
-            indicatorX.value = withSpring(activeIndex * tabWidth, {
-                damping: 15,
-                stiffness: 120,
-                reduceMotion: ReduceMotion.System,
+            indicatorX.value = withTiming(activeIndex * tabWidth, {
+                duration: 250,
             });
         }
     }, [state.index, tabWidth, visibleRoutes]);
 
-    // ─── Chat Screen Slide State Tracking ────────────────────────────────────
-    useEffect(() => {
-        slideProgress.value = withTiming(isChatActive ? 1 : 0, {
-            duration: 250,
-            reduceMotion: ReduceMotion.System,
-        });
-    }, [isChatActive]);
-
     // ─── UI-Thread Animated Styles ───────────────────────────────────────────
     const animatedContainerStyle = useAnimatedStyle(() => {
-        const slideDownY = interpolate(
-            slideProgress.value,
-            [0, 1],
-            [0, BAR_HEIGHT + insets.bottom + 30],
-            Extrapolate.CLAMP
-        );
+        const slideDownY = 0; // Removed chat slide logic
 
         const keyboardY = interpolate(
             keyboard.height.value,
@@ -180,26 +160,6 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     const animatedIndicatorStyle = useAnimatedStyle(() => {
         return {
             transform: [{ translateX: indicatorX.value }],
-        };
-    });
-
-    const animatedFabStyle = useAnimatedStyle(() => {
-        const opacity = slideProgress.value;
-        const scale = slideProgress.value;
-
-        const translateY = interpolate(
-            keyboard.height.value,
-            [0, 100],
-            [0, BAR_HEIGHT + insets.bottom + 30],
-            Extrapolate.CLAMP
-        );
-
-        return {
-            opacity,
-            transform: [
-                { scale },
-                { translateY }
-            ],
         };
     });
 
@@ -253,7 +213,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                     },
                     animatedContainerStyle,
                 ]}
-                pointerEvents={isChatActive ? 'none' : 'auto'}
+                pointerEvents="auto"
             >
                 {/* Sliding indicator */}
                 {tabWidth > 0 && (
@@ -288,13 +248,6 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                     );
                 })}
             </Animated.View>
-
-            {/* Floating Home Button (Only visible on active chat screen) */}
-            <FloatingHomeButton
-                onPress={onHomePress}
-                style={[{ bottom: bottomPadding }, animatedFabStyle]}
-                isChatActive={isChatActive}
-            />
         </View>
     );
 }

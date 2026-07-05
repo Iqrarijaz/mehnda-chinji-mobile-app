@@ -28,6 +28,8 @@ export interface ScreenHeaderProps {
     children?: React.ReactNode;
     /** Override the outer container style if needed. */
     containerStyle?: ViewStyle;
+    /** If true, show the drawer menu icon. If false, show a back button. Defaults to true. */
+    showMenuIcon?: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -37,6 +39,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
     rightActions,
     children,
     containerStyle,
+    showMenuIcon = true,
 }: ScreenHeaderProps) {
     const { theme } = useTheme();
     const { user } = useAuth();
@@ -62,11 +65,23 @@ export const ScreenHeader = React.memo(function ScreenHeader({
         >
             {/* ── Icon row ────────────────────────────────────────────────── */}
             <View style={styles.row}>
-                {/* Left side: menu + optional extras */}
+                {/* Left side: menu/back + optional extras */}
                 <View style={styles.leftSide}>
-                    <TouchableOpacity onPress={openDrawer} style={styles.iconBtn}>
-                        <Ionicons name="grid-outline" size={20} color="#FFFFFF" />
-                    </TouchableOpacity>
+                    {showMenuIcon ? (
+                        <TouchableOpacity onPress={openDrawer} style={styles.iconBtn}>
+                            <Ionicons name="grid-outline" size={20} color="#FFFFFF" />
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (router.canGoBack()) router.back();
+                                else router.replace('/(drawer)/(tabs)' as any);
+                            }}
+                            style={styles.iconBtn}
+                        >
+                            <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
+                        </TouchableOpacity>
+                    )}
                     {leftActions}
                 </View>
 
@@ -79,12 +94,6 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                         badgeStyle={{ borderColor: colors.primary }}
                     />
 
-                    <TouchableOpacity
-                        onPress={() => router.push('/(drawer)/(tabs)/chat')}
-                        style={[styles.iconBtn, { marginRight: 12 }]}
-                    >
-                        <Ionicons name="chatbubble-ellipses-outline" size={20} color="#FFFFFF" />
-                    </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={() => router.push('/profile')}
@@ -137,11 +146,6 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: Layout.headerBorderRadius,
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
         paddingBottom: Platform.OS === 'android' ? 8 : 16,
-        // Subtle shadow to lift the header off the content
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
         zIndex: 10,
     },
     row: {
@@ -170,8 +174,8 @@ const styles = StyleSheet.create({
         width: 38,
         height: 38,
         borderRadius: 19,
-        borderWidth: 2,
         borderColor: 'rgba(255,255,255,0.5)',
+        // borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',

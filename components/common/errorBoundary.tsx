@@ -1,6 +1,10 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import LottieView from 'lottie-react-native';
 import { errorLogger } from '@/lib/errorLogger';
+import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
+import { ThemedText } from '@/components/ThemedText';
 
 interface Props {
   children: ReactNode;
@@ -10,6 +14,40 @@ interface Props {
 interface State {
   hasError: boolean;
 }
+
+const FallbackUI = React.memo(({ onRetry }: { onRetry: () => void }) => {
+  const { theme } = useTheme();
+  const colors = Colors[theme];
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.lottieContainer}>
+        <LottieView
+          source={require('@/public/json/no_connection.json')}
+          autoPlay
+          loop
+          style={styles.lottie}
+        />
+      </View>
+
+      <View style={styles.textContainer}>
+        <ThemedText style={styles.title}>
+          Oops! Something went wrong
+        </ThemedText>
+
+        <ThemedText
+          style={[styles.message, { color: colors.textSecondary }]}
+        >
+          We're having trouble loading this page. Please try again.
+        </ThemedText>
+      </View>
+
+      <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.primary }]} onPress={onRetry}>
+        <ThemedText style={styles.modalButtonText}>Retry</ThemedText>
+      </TouchableOpacity>
+    </View>
+  );
+});
 
 /**
  * React Error Boundary to catch rendering errors and show a user-friendly fallback.
@@ -39,20 +77,8 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
-
-      return (
-        <View style={styles.container}>
-          <Text style={styles.title}>Something went wrong</Text>
-          <Text style={styles.message}>
-            We encountered an unexpected error. Please try again.
-          </Text>
-          <TouchableOpacity style={styles.button} onPress={this.handleRetry}>
-            <Text style={styles.buttonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      );
+      return <FallbackUI onRetry={this.handleRetry} />;
     }
-
     return this.props.children;
   }
 }
@@ -63,29 +89,42 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#FFFFFF',
+  },
+  lottieContainer: {
+    width: 350,
+    height: 350,
+    marginBottom: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lottie: {
+    width: '100%',
+    height: '100%',
+  },
+  textContainer: {
+    marginBottom: 24,
+    alignItems: 'center',
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '700',
     marginBottom: 8,
-    color: '#1E293B',
+    textAlign: 'center',
   },
   message: {
-    fontSize: 16,
+    fontSize: 14,
     textAlign: 'center',
-    marginBottom: 24,
-    color: '#64748B',
   },
-  button: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#004030',
+  modalButton: {
+    width: 120,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  buttonText: {
+  modalButtonText: {
     color: '#FFFFFF',
+    fontSize: 14,
     fontWeight: '600',
-    fontSize: 16,
   },
 });

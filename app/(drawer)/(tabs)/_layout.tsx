@@ -105,17 +105,7 @@ export default function TabLayout() {
             ),
           }}
         />
-        <Tabs.Screen
-          name="announcements"
-          options={{
-            title: 'Notices',
-            headerShown: false,
-            tabBarLabel: 'Notices',
-            tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons name={focused ? 'megaphone' : 'megaphone-outline'} size={size} color={color} />
-            ),
-          }}
-        />
+
         <Tabs.Screen
           name="business"
           options={{
@@ -141,19 +131,6 @@ export default function TabLayout() {
             unmountOnBlur: true,
           } as any}
         />
-        <Tabs.Screen
-          name="chat"
-          options={{
-            title: 'Chat',
-            headerShown: false,
-            href: null,
-            tabBarLabel: 'Chat',
-            tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons name={focused ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline'} size={size} color={color} />
-            ),
-          }}
-        />
-
       </Tabs>
 
       {memoizedModal}

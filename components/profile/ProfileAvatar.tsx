@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
     },
     avatar: {
         borderRadius: 40,
-        borderWidth: 2.5,
         borderColor: '#FFFFFF',
     },
     cameraIcon: {
@@ -85,7 +84,6 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 2,
         borderColor: '#FFFFFF',
     },
     deleteIcon: {
@@ -98,7 +96,6 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 2,
         borderColor: '#FFFFFF',
     },
     loaderOverlay: {

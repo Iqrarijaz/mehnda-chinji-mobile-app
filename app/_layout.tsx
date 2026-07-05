@@ -14,7 +14,7 @@ import { View, Platform, InteractionManager } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { MenuProvider } from 'react-native-popup-menu';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { analyticsService, useScreenTracking, AnalyticsEvents } from '@/analytics';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
@@ -29,11 +29,9 @@ import { useWeatherCity } from '@/context/WeatherContext';
 import * as Application from 'expo-application';
 import { useNotificationStore } from '@/store/notificationStore';
 import { getMessaging, subscribeToTopic, unsubscribeFromTopic } from '@react-native-firebase/messaging';
-
-import { UpdateModal } from '@/components/common/UpdateModal';
+import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { RatingModal } from '@/components/common/RatingModal';
 import { ReviewService } from '@/utils/review';
-
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useAppFonts } from '@/hooks/useFonts';
@@ -43,6 +41,7 @@ import AdManager from '@/ads/adManager.service';
 import { Text, TextInput } from 'react-native';
 import { ToastConfig } from '@/components/ToastConfig';
 import CustomSplashScreen from '@/components/splashScreen';
+import { AppUpdateModal } from '@/components/common/AppUpdateModal';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -64,6 +63,8 @@ if (!(TextInput as any).defaultProps) {
 function DrawerLayout() {
   const { theme } = useTheme();
   const { loading } = useAuth();
+
+
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors[theme].background }}>
@@ -203,30 +204,18 @@ function AppInitializer() {
     return () => clearTimeout(timer);
   }, []);
 
-  const [updateInfo, setUpdateInfo] = useState<{
-    visible: boolean;
-    isMandatory: boolean;
-    latestVersion: string;
-    updateUrl: string;
-    releaseNotes: string;
-  }>({
-    visible: false,
-    isMandatory: false,
-    latestVersion: '',
-    updateUrl: '',
-    releaseNotes: ''
-  });
+  const { updateInfo, hideUpdateModal } = useAppUpdate();
 
   return (
     <>
       {isReady && <DeferredHooks />}
-      <UpdateModal
+      <AppUpdateModal
         visible={updateInfo.visible}
         isMandatory={updateInfo.isMandatory}
         latestVersion={updateInfo.latestVersion}
         updateUrl={updateInfo.updateUrl}
         releaseNotes={updateInfo.releaseNotes}
-        onClose={() => setUpdateInfo(prev => ({ ...prev, visible: false }))}
+        onClose={hideUpdateModal}
       />
       <RatingModal
         visible={showRating}
@@ -241,15 +230,12 @@ function RootLayout() {
   const [configLoaded, setConfigLoaded] = useState(false);
   const [minimumTimeElapsed, setMinimumTimeElapsed] = useState(false);
 
-  useEffect(() => {
-    // Hide the native flash screen immediately to render our custom JS splash screen
-    SplashScreen.hideAsync().catch(() => {});
-  }, []);
+  // Native splash screen hiding is deferred to CustomSplashScreen's Image onLoad
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinimumTimeElapsed(true);
-    }, 2500);
+    }, 4000);
 
     // Initialize device info cache for API interceptors
     initializeDeviceInfo().catch(err => console.error('Failed to initialize device info', err));
@@ -278,12 +264,12 @@ function RootLayout() {
   const isAppReady = fontsLoaded && configLoaded && minimumTimeElapsed;
 
   return (
-    <PersistQueryClientProvider
-      client={queryClient}
-      persistOptions={{ persister: asyncStoragePersister }}
-    >
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <ErrorBoundary>
+    <ErrorBoundary>
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{ persister: asyncStoragePersister }}
+      >
+        <GestureHandlerRootView style={{ flex: 1 }}>
           <ThemeProvider>
             <BottomSheetModalProvider>
               <AuthProvider>
@@ -307,9 +293,9 @@ function RootLayout() {
               <Toast config={ToastConfig} topOffset={45} />
             </BottomSheetModalProvider>
           </ThemeProvider>
-        </ErrorBoundary>
-      </GestureHandlerRootView>
-    </PersistQueryClientProvider>
+        </GestureHandlerRootView>
+      </PersistQueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

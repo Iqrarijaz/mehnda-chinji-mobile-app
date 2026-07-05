@@ -463,7 +463,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingHorizontal: 8,
         borderRadius: 12,
-        borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
         minWidth: 42,
@@ -490,7 +489,6 @@ const styles = StyleSheet.create({
         borderRadius: 19,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.03)',
     },
     disabledPageButton: {

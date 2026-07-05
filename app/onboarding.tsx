@@ -28,7 +28,7 @@ const SLIDES = [
     {
         id: '2',
         title: 'ایک قطرہ، ایک زندگی',
-        description: 'Be a hero in your neighborhood. Join our blood donor network or request donations.',
+        description: 'Be a hero in your neighborhood. Join our  network or request donations.',
         animation: require('../public/json/onboarding2.json'),
     },
     {

@@ -25,6 +25,8 @@ import { TimePicker } from '@/components/common/TimePicker';
 import { ThankYouModal } from '@/components/common/ThankYou';
 import { ThemedText } from '@/components/ThemedText';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { FormInput } from '@/components/common/FormInput';
+import { SubmitButton } from '@/components/common/SubmitButton';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -227,12 +229,7 @@ const BusinessRegistrationScreen = () => {
 
             {/* ── Hero Header ─────────────────────────────────────────── */}
             <Animated.View entering={FadeInUp.duration(500)} style={styles.header}>
-                <LinearGradient
-                    colors={['#0D9488', '#0F766E']}
-                    style={StyleSheet.absoluteFill}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
 
                 {/* Nav row */}
                 <View style={[styles.headerTop, { paddingTop: insets.top + 8 }]}>
@@ -278,24 +275,15 @@ const BusinessRegistrationScreen = () => {
                     <View style={styles.formSection}>
 
                         {/* Business Name */}
-                        <Animated.View entering={FadeInDown.delay(200)} style={styles.inputField}>
-                            <ThemedText style={[styles.label, { color: colors.text }]}>
-                                BUSINESS NAME <ThemedText style={styles.required}>*</ThemedText>
-                            </ThemedText>
-                            <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                height: Platform.OS === 'android' ? 48 : 52,
-                            }]}>
-                                <Ionicons name="storefront-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
-                                <TextInput
-                                    placeholder="Your business name"
-                                    placeholderTextColor={colors.icon}
-                                    style={[styles.textInput, { color: colors.text, fontSize: 14 }]}
-                                    value={form.name}
-                                    onChangeText={(text) => setForm(prev => ({ ...prev, name: text }))}
-                                />
-                            </View>
-                        </Animated.View>
+                        <FormInput
+                            delay={200}
+                            label="BUSINESS NAME"
+                            required
+                            icon="storefront-outline"
+                            placeholder="Your business name"
+                            value={form.name}
+                            onChangeText={(text) => setForm(prev => ({ ...prev, name: text }))}
+                        />
 
                         {/* Category */}
                         <Animated.View entering={FadeInDown.delay(250)} style={styles.inputField}>
@@ -331,45 +319,27 @@ const BusinessRegistrationScreen = () => {
                         </Animated.View>
 
                         {/* Address */}
-                        <Animated.View entering={FadeInDown.delay(300)} style={styles.inputField}>
-                            <ThemedText style={[styles.label, { color: colors.text }]}>
-                                ADDRESS <ThemedText style={styles.required}>*</ThemedText>
-                            </ThemedText>
-                            <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                height: Platform.OS === 'android' ? 48 : 52,
-                            }]}>
-                                <Ionicons name="map-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
-                                <TextInput
-                                    placeholder="Shop #, Street, Area"
-                                    placeholderTextColor={colors.icon}
-                                    style={[styles.textInput, { color: colors.text, fontSize: 14 }]}
-                                    value={form.address}
-                                    onChangeText={(text) => setForm(prev => ({ ...prev, address: text }))}
-                                />
-                            </View>
-                        </Animated.View>
+                        <FormInput
+                            delay={300}
+                            label="ADDRESS"
+                            required
+                            icon="map-outline"
+                            placeholder="Shop #, Street, Area"
+                            value={form.address}
+                            onChangeText={(text) => setForm(prev => ({ ...prev, address: text }))}
+                        />
 
                         {/* Phone */}
-                        <Animated.View entering={FadeInDown.delay(350)} style={styles.inputField}>
-                            <ThemedText style={[styles.label, { color: colors.text }]}>
-                                PRIMARY PHONE <ThemedText style={styles.required}>*</ThemedText>
-                            </ThemedText>
-                            <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                height: Platform.OS === 'android' ? 48 : 52,
-                            }]}>
-                                <Ionicons name="call-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
-                                <TextInput
-                                    placeholder="e.g. 03xx xxxxxxx"
-                                    placeholderTextColor={colors.icon}
-                                    style={[styles.textInput, { color: colors.text, fontSize: 14 }]}
-                                    value={form.phone}
-                                    onChangeText={(text) => setForm(prev => ({ ...prev, phone: text }))}
-                                    keyboardType="phone-pad"
-                                />
-                            </View>
-                        </Animated.View>
+                        <FormInput
+                            delay={350}
+                            label="PRIMARY PHONE"
+                            required
+                            icon="call-outline"
+                            placeholder="e.g. 03xx xxxxxxx"
+                            value={form.phone}
+                            onChangeText={(text) => setForm(prev => ({ ...prev, phone: text }))}
+                            keyboardType="phone-pad"
+                        />
 
                         {/* Timings */}
                         <Animated.View entering={FadeInDown.delay(400)} style={styles.inputField}>
@@ -477,16 +447,12 @@ const BusinessRegistrationScreen = () => {
                                 <ThemedText style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</ThemedText>
                             </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={[styles.submitButton, { backgroundColor: colors.primary }, isPending && { opacity: 0.6 }]}
+                            <SubmitButton
+                                title={editData ? 'Update' : 'Register'}
                                 onPress={handleSubmit}
-                                disabled={isPending}
-                                activeOpacity={0.85}
-                            >
-                                <ThemedText style={styles.submitText}>
-                                    {editData ? 'Update Business' : 'Register Business'}
-                                </ThemedText>
-                            </TouchableOpacity>
+                                isLoading={isPending}
+                                style={{ width: 160, height: 40, borderRadius: 20 }}
+                            />
                         </Animated.View>
 
                     </View>
@@ -571,11 +537,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 5,
     },
     heroTitle: {
         fontSize: 20,
@@ -678,7 +639,6 @@ const styles = StyleSheet.create({
         width: 120,
         height: 40,
         borderRadius: 20,
-        borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },

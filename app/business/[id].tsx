@@ -14,17 +14,14 @@ import {
     Dimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    useAnimatedScrollHandler,
-    interpolate,
-    Extrapolate,
     FadeInDown,
+    FadeInUp,
+    FadeIn,
 } from 'react-native-reanimated';
 
 import { Colors } from '@/constants/colors';
-import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { ReportModal } from '@/components/common/ReportModal';
 import { ThemedText } from '@/components/ThemedText';
@@ -32,8 +29,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BannerAd from '@/ads/components/BannerAd';
 import InterstitialService from '@/ads/interstitial.service';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const HEADER_IMAGE_HEIGHT = 200;
 
 const BusinessDetailScreen = () => {
     const { id, businessData } = useLocalSearchParams<{ id: string; businessData?: string }>();
@@ -42,8 +37,6 @@ const BusinessDetailScreen = () => {
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
     const reportModalRef = useRef<any>(null);
-
-    const scrollY = useSharedValue(0);
 
     // Preload Interstitial Ad
     useEffect(() => {
@@ -99,42 +92,7 @@ const BusinessDetailScreen = () => {
         }
     }, [businessName, address, business?.phone]);
 
-    const scrollHandler = useAnimatedScrollHandler({
-        onScroll: (event) => {
-            scrollY.value = event.contentOffset.y;
-        },
-    });
-
-    const headerAnimatedStyle = useAnimatedStyle(() => {
-        const opacity = interpolate(
-            scrollY.value,
-            [0, HEADER_IMAGE_HEIGHT - 80],
-            [0, 1],
-            Extrapolate.CLAMP
-        );
-        return {
-            opacity,
-            backgroundColor: colors.primary,
-        };
-    });
-
-    const imageAnimatedStyle = useAnimatedStyle(() => {
-        const scale = interpolate(
-            scrollY.value,
-            [-HEADER_IMAGE_HEIGHT, 0],
-            [2, 1],
-            Extrapolate.CLAMP
-        );
-        const translateY = interpolate(
-            scrollY.value,
-            [-HEADER_IMAGE_HEIGHT, 0, HEADER_IMAGE_HEIGHT],
-            [-HEADER_IMAGE_HEIGHT / 2, 0, HEADER_IMAGE_HEIGHT * 0.4],
-            Extrapolate.CLAMP
-        );
-        return {
-            transform: [{ scale }, { translateY }],
-        };
-    });
+    // Animations removed for Hero Header
 
     if (!business) {
         return (
@@ -151,88 +109,47 @@ const BusinessDetailScreen = () => {
         <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            {/* Custom Dynamic Header */}
-            <View style={[styles.headerContainer, { height: insets.top + 48 }]}>
-                <Animated.View style={[StyleSheet.absoluteFillObject, headerAnimatedStyle]} />
-                <View style={[styles.headerContent, { paddingTop: insets.top }]}>
-                    <TouchableOpacity
-                        onPress={() => router.back()}
-                        style={[styles.headerBtn, { backgroundColor: isDark ? 'rgba(15,23,42,0.6)' : 'rgba(0,0,0,0.4)' }]}
-                    >
+            {/* ── Hero Header ─────────────────────────────────────────── */}
+            <Animated.View entering={FadeInUp.duration(500)} style={styles.heroHeader}>
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
+
+                {/* Nav row */}
+                <View style={[styles.heroHeaderTop, { paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 8) }]}>
+                    <TouchableOpacity onPress={() => router.back()} style={styles.heroBackButton}>
                         <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
                     </TouchableOpacity>
-
-                    <View style={styles.headerTitleContainer}>
-                        <ThemedText style={styles.headerTitleText} numberOfLines={1}>
+                    <Animated.View entering={FadeIn.delay(200).duration(400)} style={{ flex: 1, alignItems: 'center', paddingRight: 40 }}>
+                        <ThemedText style={styles.heroHeaderNavTitle} numberOfLines={1}>
                             {businessName}
                         </ThemedText>
-                    </View>
-
-                    <TouchableOpacity
-                        onPress={handleShare}
-                        style={[styles.headerBtn, { backgroundColor: isDark ? 'rgba(15,23,42,0.6)' : 'rgba(0,0,0,0.4)' }]}
-                    >
-                        <Ionicons name="share-outline" size={20} color="#FFFFFF" />
-                    </TouchableOpacity>
+                    </Animated.View>
                 </View>
-            </View>
 
-            <Animated.ScrollView
-                onScroll={scrollHandler}
-                scrollEventThrottle={16}
+                {/* Hero icon + text */}
+                <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
+                    <View style={styles.heroIconWrap}>
+                        {businessImage ? (
+                            <Image source={{ uri: businessImage }} style={styles.heroBusinessLogo} contentFit="cover" />
+                        ) : (
+                            <Ionicons name="business" size={32} color="#0D9488" />
+                        )}
+                    </View>
+                    <ThemedText style={styles.heroTitle} numberOfLines={1}>
+                        {businessName}
+                    </ThemedText>
+                    <ThemedText style={styles.heroSubtitle} numberOfLines={2}>
+                        {category} {urduCategory ? `| ${urduCategory}` : ''}
+                    </ThemedText>
+                </Animated.View>
+            </Animated.View>
+
+            <ScrollView
                 showsVerticalScrollIndicator={false}
                 style={[styles.scrollView, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}
                 contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 40 }}
             >
-                {/* Hero Cover Banner */}
-                <View style={styles.bannerWrapper}>
-                    {businessImage ? (
-                        <Animated.View style={[styles.imageContainer, imageAnimatedStyle]}>
-                            <Image
-                                source={{ uri: businessImage }}
-                                style={StyleSheet.absoluteFillObject}
-                                contentFit="cover"
-                            />
-                            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.2)' }]} />
-                        </Animated.View>
-                    ) : (
-                        <Animated.View style={[styles.fallbackBanner, { backgroundColor: colors.primary }, imageAnimatedStyle]}>
-                            <Ionicons name="business" size={64} color="rgba(255,255,255,0.4)" />
-                        </Animated.View>
-                    )}
-                </View>
-
-                {/* Overlapping Detail Card Container */}
+                {/* Detail Card Container */}
                 <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', flex: 1 }]}>
-
-                    {/* Header info */}
-                    <View style={styles.cardHeader}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                            <View style={{ flex: 1 }}>
-                                <ThemedText style={[styles.businessTitle, { color: colors.text }]} numberOfLines={2}>
-                                    {businessName}
-                                </ThemedText>
-
-                                {/* Combined Categories list */}
-                                <View style={styles.categoryRow}>
-                                    <View style={[styles.tag, { backgroundColor: colors.primary + '10' }]}>
-                                        <Ionicons name="pricetag-outline" size={10} color={colors.primary} />
-                                        <ThemedText style={[styles.tagText, { color: colors.primary }]}>
-                                            {category} {urduCategory ? `| ${urduCategory}` : ''}
-                                        </ThemedText>
-                                    </View>
-                                </View>
-                            </View>
-
-                            {(business.logo || (business.images && business.images.length > 0)) && (
-                                <Image
-                                    source={{ uri: business.logo || business.images[0] }}
-                                    style={[styles.detailLogo, { borderColor: isDark ? '#334155' : 'rgba(0,0,0,0.08)' }]}
-                                    contentFit="cover"
-                                />
-                            )}
-                        </View>
-                    </View>
 
                     {/* Quick Interactive Actions Row */}
                     <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
@@ -242,12 +159,12 @@ const BusinessDetailScreen = () => {
                                 onPress={handleCall}
                                 activeOpacity={0.8}
                             >
-                                <Ionicons name="call" size={16} color="#FFFFFF" />
+                                <Ionicons name="call" size={20} color="#FFFFFF" />
                                 <ThemedText style={styles.actionBtnTextPrimary}>Call Business</ThemedText>
                             </TouchableOpacity>
                         ) : (
                             <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
-                                <Ionicons name="call-outline" size={16} color={colors.textSecondary} />
+                                <Ionicons name="call-outline" size={20} color={colors.textSecondary} />
                                 <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Phone</ThemedText>
                             </View>
                         )}
@@ -257,7 +174,7 @@ const BusinessDetailScreen = () => {
                             onPress={() => reportModalRef.current?.present()}
                             activeOpacity={0.8}
                         >
-                            <Ionicons name="flag-outline" size={14} color="#EF4444" />
+                            <Ionicons name="flag-outline" size={20} color="#EF4444" />
                             <ThemedText style={[styles.actionBtnTextSec, { color: '#EF4444' }]}>Report</ThemedText>
                         </TouchableOpacity>
                     </View>
@@ -279,33 +196,6 @@ const BusinessDetailScreen = () => {
                                 <ThemedText style={[styles.descriptionText, { color: colors.text }]}>
                                     {business.description}
                                 </ThemedText>
-                            </View>
-                        )}
-
-                        {/* Section: Tags/Specialties */}
-                        {business.tags && business.tags.length > 0 && (
-                            <View style={styles.detailSection}>
-                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                    Specialties & Services
-                                </ThemedText>
-                                <View style={styles.detailsTagsContainer}>
-                                    {business.tags.map((tag: any, index: number) => (
-                                        <View
-                                            key={index}
-                                            style={[
-                                                styles.detailTagChip,
-                                                {
-                                                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
-                                                    borderColor: colors.border,
-                                                }
-                                            ]}
-                                        >
-                                            <ThemedText style={[styles.detailTagText, { color: colors.text }]}>
-                                                {tag.eng} | {tag.ur}
-                                            </ThemedText>
-                                        </View>
-                                    ))}
-                                </View>
                             </View>
                         )}
 
@@ -340,17 +230,7 @@ const BusinessDetailScreen = () => {
                                 </View>
                             </View>
 
-                            {business.phone && (
-                                <TouchableOpacity style={styles.infoListItem} onPress={handleCall} activeOpacity={0.7}>
-                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
-                                        <Ionicons name="call" size={12} color={colors.primary} />
-                                    </View>
-                                    <View style={styles.infoListContent}>
-                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Primary Contact</ThemedText>
-                                        <ThemedText style={[styles.infoListVal, { color: colors.text, fontWeight: '600' }]}>{business.phone}</ThemedText>
-                                    </View>
-                                </TouchableOpacity>
-                            )}
+
 
                             {business.phone2 && (
                                 <TouchableOpacity style={styles.infoListItem} onPress={() => Linking.openURL(`tel:${business.phone2}`)} activeOpacity={0.7}>
@@ -376,27 +256,34 @@ const BusinessDetailScreen = () => {
                                 </View>
                             )}
 
-                            {business.createdAt && (
-                                <View style={styles.infoListItem}>
-                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
-                                        <Ionicons name="calendar" size={12} color={colors.primary} />
-                                    </View>
-                                    <View style={styles.infoListContent}>
-                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Listed On</ThemedText>
-                                        <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
-                                            {new Date(business.createdAt).toLocaleDateString(undefined, {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}
-                                        </ThemedText>
-                                    </View>
-                                </View>
-                            )}
                         </View>
+
+                        {/* Section: Tags/Specialties */}
+                        {business.tags && business.tags.length > 0 && (
+                            <View style={styles.detailSection}>
+                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                    Specialties & Services
+                                </ThemedText>
+                                <View style={styles.detailsTagsContainer}>
+                                    {business.tags.map((tag: any, index: number) => (
+                                        <View
+                                            key={index}
+                                            style={[
+                                                styles.detailTagChip,
+                                                { backgroundColor: colors.primary + '15' }
+                                            ]}
+                                        >
+                                            <ThemedText style={[styles.detailTagText, { color: colors.primary }]}>
+                                                {tag.eng} {tag.ur ? `• ${tag.ur}` : ''}
+                                            </ThemedText>
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
+                        )}
                     </View>
                 </View>
-            </Animated.ScrollView>
+            </ScrollView>
 
             <ReportModal
                 ref={reportModalRef}
@@ -418,131 +305,121 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    headerContainer: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
+    heroHeader: {
+        width: '100%',
+        paddingBottom: 24,
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24,
+        overflow: 'hidden',
     },
-    headerContent: {
-        flex: 1,
+    heroHeaderTop: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 12,
-    },
-    headerBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    headerTitleContainer: {
-        flex: 1,
-        marginHorizontal: 16,
-        alignItems: 'center',
-    },
-    headerTitleText: {
-        fontSize: 15,
-        fontWeight: '700',
-        color: '#FFFFFF',
+        paddingHorizontal: 16,
+        paddingBottom: 8,
     },
     scrollView: {
         flex: 1,
     },
-    bannerWrapper: {
-        height: HEADER_IMAGE_HEIGHT,
-        width: '100%',
-        overflow: 'hidden',
+    detailsCard: {
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        flex: 1,
     },
-    imageContainer: {
-        width: '100%',
-        height: '100%',
-    },
-    fallbackBanner: {
-        width: '100%',
-        height: '100%',
+    heroBackButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: 'rgba(0,0,0,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    detailsCard: {
-        marginTop: -20,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        paddingHorizontal: 16,
-        paddingTop: 20,
-        flex: 1,
-    },
-    cardHeader: {
-        marginBottom: 12,
-    },
-    businessTitle: {
-        fontSize: 18,
-        fontWeight: '800',
-        lineHeight: 24,
-        marginBottom: 6,
-    },
-    categoryRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-    },
-    tag: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 6,
-    },
-    tagText: {
-        fontSize: 10,
+
+    heroHeaderNavTitle: {
+        fontSize: 17,
         fontWeight: '700',
+        color: '#FFFFFF',
+        letterSpacing: 0.2,
+    },
+    heroContent: {
+        alignItems: 'center',
+        paddingHorizontal: 24,
+        marginTop: 16,
+    },
+    heroIconWrap: {
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        backgroundColor: 'rgba(255,255,255,0.95)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 12,
+        overflow: 'hidden',
+    },
+    heroBusinessLogo: {
+        width: '100%',
+        height: '100%',
+    },
+    heroTitle: {
+        fontSize: 22,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        letterSpacing: 0.2,
+    },
+    heroSubtitle: {
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.8)',
+        textAlign: 'center',
+        marginTop: 6,
+        lineHeight: 18,
     },
     actionRow: {
         flexDirection: 'row',
-        gap: 8,
-        paddingBottom: 16,
+        justifyContent: 'center',
+        gap: 12,
+        paddingBottom: 12,
+        paddingTop: 0,
         borderBottomWidth: 1,
-        marginBottom: 16,
+        borderBottomColor: 'rgba(0,0,0,0.05)',
+        marginBottom: 10,
     },
     actionBtnPrimary: {
-        flex: 1,
+        width: 140,
+        height: 40,
+        borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
-        height: 38,
-        borderRadius: 10,
     },
     actionBtnTextPrimary: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: '700',
     },
     actionBtnSec: {
-        paddingHorizontal: 12,
+        width: 140,
+        height: 40,
+        borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 4,
-        height: 38,
-        borderRadius: 10,
+        gap: 6,
     },
     actionBtnTextSec: {
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: '700',
     },
     detailAdWrapper: {
-        marginBottom: 16,
+        marginBottom: 10,
         alignItems: 'center',
     },
     sectionsContainer: {
-        gap: 16,
+        gap: 12,
     },
     detailSection: {
-        gap: 6,
+        gap: 4,
     },
     sectionHeading: {
         fontSize: 10,
@@ -558,8 +435,8 @@ const styles = StyleSheet.create({
     infoListItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 8,
-        gap: 12,
+        paddingVertical: 2,
+        gap: 8,
     },
     infoListIcon: {
         width: 26,
@@ -591,22 +468,22 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 30,
         backgroundColor: 'rgba(0,0,0,0.05)',
-        borderWidth: 1,
     },
     detailsTagsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 6,
+        gap: 8,
         marginTop: 4,
     },
     detailTagChip: {
-        borderRadius: 20,
-        borderWidth: 1,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
+        borderRadius: 16,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     detailTagText: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: '600',
     },
 });

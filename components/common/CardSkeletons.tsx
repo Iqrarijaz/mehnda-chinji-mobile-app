@@ -27,34 +27,6 @@ export const BusinessCardSkeleton = () => {
     );
 };
 
-/**
- * PostCardSkeleton matches the layout of components/feed/postCard.tsx
- */
-export const PostCardSkeleton = () => {
-    const { theme } = useTheme();
-    const colors = Colors[theme];
-    return (
-        <View style={[styles.postCard, { backgroundColor: colors.card }]}>
-            <View style={styles.header}>
-                <Skeleton width={80} height={24} borderRadius={8} />
-                <View style={{ flex: 1 }} />
-                <Skeleton width={60} height={14} borderRadius={4} />
-            </View>
-            <View style={styles.contentContainer}>
-                <Skeleton width="90%" height={16} borderRadius={4} style={{ marginBottom: 8 }} />
-                <Skeleton width="100%" height={16} borderRadius={4} style={{ marginBottom: 8 }} />
-                <Skeleton width="40%" height={16} borderRadius={4} style={{ marginBottom: 12 }} />
-                <Skeleton width="100%" height={width * 0.5} borderRadius={12} />
-            </View>
-            <View style={[styles.footer, { borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
-                <Skeleton width={50} height={20} borderRadius={4} />
-                <Skeleton width={50} height={20} borderRadius={4} style={{ marginLeft: 24 }} />
-                <View style={{ flex: 1 }} />
-                <Skeleton width={20} height={20} borderRadius={10} />
-            </View>
-        </View>
-    );
-};
 
 
 
@@ -73,26 +45,6 @@ export const DonorCardSkeleton = () => {
                     <Skeleton width="70%" height={14} borderRadius={4} />
                 </View>
                 <Skeleton width={36} height={36} borderRadius={18} style={{ marginLeft: 10 }} />
-            </View>
-        </View>
-    );
-};
-
-/**
- * ChatCardSkeleton matches the layout of app/chat/index.tsx
- */
-export const ChatCardSkeleton = () => {
-    const { theme } = useTheme();
-    const colors = Colors[theme];
-    return (
-        <View style={[styles.chatCard, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.5)' }]}>
-            <Skeleton width={50} height={50} borderRadius={25} />
-            <View style={styles.content}>
-                <View style={[styles.row, { justifyContent: 'space-between', marginBottom: 8 }]}>
-                    <Skeleton width="40%" height={16} borderRadius={4} />
-                    <Skeleton width="15%" height={12} borderRadius={4} />
-                </View>
-                <Skeleton width="70%" height={14} borderRadius={4} />
             </View>
         </View>
     );
@@ -126,28 +78,7 @@ export const RequestCardSkeleton = () => {
     );
 };
 
-/**
- * AnnouncementCardSkeleton matches the layout of components/announcements/AnnouncementCard.tsx
- */
-export const AnnouncementCardSkeleton = () => {
-    const { theme } = useTheme();
-    const colors = Colors[theme];
-    return (
-        <View style={{ paddingTop: 12, width: '100%' }}>
-            <Skeleton width={80} height={20} borderRadius={8} style={{ marginBottom: 0 }} />
-            <View style={{ backgroundColor: colors.card, borderBottomLeftRadius: 16, borderBottomRightRadius: 16, borderTopRightRadius: 16, padding: 12 }}>
-                <Skeleton width="70%" height={18} borderRadius={4} style={{ marginBottom: 8 }} />
-                <Skeleton width="100%" height={14} borderRadius={4} style={{ marginBottom: 6 }} />
-                <Skeleton width="100%" height={14} borderRadius={4} style={{ marginBottom: 6 }} />
-                <Skeleton width="60%" height={14} borderRadius={4} style={{ marginBottom: 10 }} />
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Skeleton width={100} height={12} borderRadius={4} />
-                    <Skeleton width={60} height={12} borderRadius={4} />
-                </View>
-            </View>
-        </View>
-    );
-};
+
 
 const styles = StyleSheet.create({
     businessCard: {
@@ -155,26 +86,12 @@ const styles = StyleSheet.create({
         padding: 14,
         marginBottom: 12,
     },
-    postCard: {
-        borderRadius: 16,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        marginBottom: 16,
-    },
+
     donorCard: {
         borderRadius: 16,
         paddingHorizontal: 16,
         paddingVertical: 12,
         marginBottom: 16,
-        borderWidth: 1,
-    },
-    chatCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        borderRadius: 16,
-        marginBottom: 8,
     },
     row: {
         flexDirection: 'row',

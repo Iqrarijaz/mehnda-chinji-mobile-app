@@ -7,12 +7,7 @@ import {
     Switch,
     View,
 } from 'react-native';
-import {
-    Menu,
-    MenuOptions,
-    MenuOption,
-    MenuTrigger,
-} from 'react-native-popup-menu';
+import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
@@ -40,7 +35,6 @@ const MyRegisteredBusinessCard = React.memo(({
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const isAndroid = Platform.OS === 'android';
-    const [showMenu, setShowMenu] = useState(false);
 
     const status = business.status?.toUpperCase();
 
@@ -59,6 +53,21 @@ const MyRegisteredBusinessCard = React.memo(({
     const category = business.categoryEn || business.category?.en || 'Category';
     const urduCategory = business.categoryUr || business.category?.ur;
     const address = (business.address || business.village || 'N/A').toLowerCase();
+
+    const actions: ActionMenuItem[] = [];
+    if (status === 'PENDING' || status === 'APPROVED') {
+        actions.push({
+            label: 'Edit',
+            icon: 'create',
+            onPress: () => onEdit(business)
+        });
+    }
+    actions.push({
+        label: 'Delete',
+        icon: 'trash',
+        destructive: true,
+        onPress: () => onDelete(business._id)
+    });
 
     return (
         <TintedCard
@@ -144,61 +153,15 @@ const MyRegisteredBusinessCard = React.memo(({
                             )}
 
                             <View style={{ position: 'relative', zIndex: 100 }}>
-                                <Menu opened={showMenu} onBackdropPress={() => setShowMenu(false)}>
-                                    <MenuTrigger
-                                        onPress={() => setShowMenu(true)}
-                                        customStyles={{
-                                            triggerWrapper: styles.moreBtn,
-                                        }}
-                                    >
-                                        {isDeleting ? (
-                                            <ActivityIndicator size="small" color="#EF4444" />
-                                        ) : (
-                                            <Ionicons name="ellipsis-horizontal" size={20} color={primaryColor} style={{ opacity: 0.7 }} />
-                                        )}
-                                    </MenuTrigger>
-
-                                    <MenuOptions
-                                        customStyles={{
-                                            optionsContainer: [
-                                                styles.menuPopover,
-                                                {
-                                                    backgroundColor: colors.background,
-                                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                                                }
-                                            ],
-                                        }}
-                                    >
-                                        {(status === 'PENDING' || status === 'APPROVED') && (
-                                            <MenuOption
-                                                onSelect={() => { setShowMenu(false); onEdit(business); }}
-                                                customStyles={{
-                                                    optionWrapper: styles.menuItem,
-                                                }}
-                                            >
-                                                <View style={[styles.menuIconBox, { backgroundColor: '#3B82F615' }]}>
-                                                    <Ionicons name="create" size={16} color="#3B82F6" />
-                                                </View>
-                                                <ThemedText style={[styles.menuItemText, { color: primaryColor }]}>Edit</ThemedText>
-                                            </MenuOption>
-                                        )}
-
-                                        <MenuOption
-                                            onSelect={() => { setShowMenu(false); onDelete(business._id); }}
-                                            disabled={isDeleting}
-                                            customStyles={{
-                                                optionWrapper: styles.menuItem,
-                                            }}
-                                        >
-                                            <View style={[styles.menuIconBox, { backgroundColor: '#EF444415' }]}>
-                                                <Ionicons name="trash" size={16} color="#EF4444" />
-                                            </View>
-                                            <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>Delete</ThemedText>
-                                        </MenuOption>
-
-
-                                    </MenuOptions>
-                                </Menu>
+                                {isDeleting ? (
+                                    <View style={styles.moreBtn}>
+                                        <ActivityIndicator size="small" color="#EF4444" />
+                                    </View>
+                                ) : (
+                                    <View style={styles.moreBtn}>
+                                        <ActionMenu actions={actions} triggerIconColor={primaryColor} triggerIcon="ellipsis-horizontal" />
+                                    </View>
+                                )}
                             </View>
                         </View>
                     </View>
@@ -338,7 +301,6 @@ const styles = StyleSheet.create({
     menuPopover: {
         width: 130,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         zIndex: 100,
         paddingHorizontal: 4,
         paddingVertical: 4,

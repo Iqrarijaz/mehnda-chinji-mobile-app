@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
     },
     logoContainer: {
         width: 38,

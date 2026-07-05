@@ -37,7 +37,7 @@ const FAQ_DATA = [
         answer: "Go to the Business tab and click on 'Register Business'. Fill in your details and submit for approval. Our team usually reviews applications within 24-48 hours."
     },
     {
-        question: "How can I find blood donors?",
+        question: "How can I find ?",
         answer: "Use the 'Blood' module on the home screen. You can filter by blood group and location to find compatible donors near you instantly."
     },
     {

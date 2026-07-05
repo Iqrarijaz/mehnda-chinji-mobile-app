@@ -14,14 +14,7 @@ interface NotificationData {
 }
 
 export function handleNotificationNavigation(data: NotificationData, router: Router) {
-    // ── Announcement notification ───────────────────────────────────
-    if (data.screen === 'announcements' || data.type === 'ANNOUNCEMENT') {
-        router.push({
-            pathname: '/(drawer)/(tabs)/announcements',
-            params: { id: data.announcementId }
-        } as any);
-        return;
-    }
+
 
     if (!data?.screen) return;
 

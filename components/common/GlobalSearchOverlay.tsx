@@ -103,8 +103,7 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
             router.push(`/listing/${catId}` as any);
         } else if (item.type === 'business') {
             router.push(`/business/${item.id}` as any);
-        } else if (item.type === 'donor') {
-            router.push('/(drawer)/blood' as any);
+
         } else if (item.type === 'place') {
             router.push(`/place/${item.id}` as any);
         }
@@ -132,9 +131,7 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
         } else if (item.type === 'business') {
             icon = 'business';
             color = '#3B82F6';
-        } else if (item.type === 'donor') {
-            icon = 'water';
-            color = '#EF4444';
+
         } else if (item.type === 'place') {
             icon = 'location';
             color = '#10B981';
@@ -248,7 +245,6 @@ const styles = StyleSheet.create({
         height: 48,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
-        borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
     },
     input: {

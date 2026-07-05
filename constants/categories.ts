@@ -20,11 +20,12 @@ export const CATEGORIES_CONFIG: CategoryInfo[] = [
     { id: 'religious', label: 'Religious', icon: require('@/assets/icons/religious.webp') },
     { id: 'health', label: 'Health', icon: require('@/assets/icons/health.webp') },
     { id: 'govt', label: 'Govt Offices', icon: require('@/assets/icons/govt_office.webp') },
+    { id: 'banks', label: 'Banks', icon: require('@/assets/icons/bank.webp') },
+    { id: 'travel', label: 'Travel', icon: require('@/assets/icons/travel.webp') },
 ];
 
 export const MORE_CATEGORIES_CONFIG: CategoryInfo[] = [
-    { id: 'banks', label: 'Banks', icon: require('@/assets/icons/bank.webp') },
-    { id: 'travel', label: 'Travel', icon: require('@/assets/icons/travel.webp') },
+
 ];
 
 export const PLACE_CATEGORIES = CATEGORIES_CONFIG.map(cat => ({

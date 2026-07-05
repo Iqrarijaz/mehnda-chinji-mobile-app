@@ -3,7 +3,7 @@ export const CATEGORY_TYPES: Record<string, string[]> = {
     religious: ['mosque', 'madrasa', 'imam bargah', 'shrine', 'janaz-gah', 'temple', 'church', 'other'],
     health: ['hospital', 'clinic', 'pharmacy', 'laboratory', 'medical store', 'other'],
     govt: ['office', 'post office', 'police station', 'court', 'union council', 'other'],
-    emergency: ['fire station', 'ambulance', 'rescue', 'blood bank', 'other'],
+    emergency: ['fire station', 'ambulance', 'rescue', '', 'other'],
     banks: ['bank', 'atm', 'microfinance', 'other'],
     travel: ['bus service', 'car service', 'other'],
 };

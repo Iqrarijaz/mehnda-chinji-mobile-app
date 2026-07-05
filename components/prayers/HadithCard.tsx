@@ -130,7 +130,6 @@ const styles = StyleSheet.create({
     },
     hadithCard: {
         borderRadius: Layout.borderRadius,
-        borderWidth: 0,
         paddingVertical: 24,
         paddingHorizontal: 20,
         minHeight: 220,

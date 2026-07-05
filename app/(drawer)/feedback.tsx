@@ -328,14 +328,12 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 16,
         borderRadius: 20,
-        borderWidth: 1,
     },
     typeButtonText: {
         fontSize: 13,
         fontWeight: '600',
     },
     textInput: {
-        borderWidth: 1,
         borderRadius: Layout.borderRadius,
         padding: 16,
         height: 150,
@@ -365,7 +363,6 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
-        borderWidth: StyleSheet.hairlineWidth,
     },
     cardHeader: {
         flexDirection: 'row',

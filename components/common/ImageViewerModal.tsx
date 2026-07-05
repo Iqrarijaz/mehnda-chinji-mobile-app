@@ -145,7 +145,6 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     placeholderAvatar: {
-        borderWidth: 0,
     },
     pagination: {
         position: 'absolute',

@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import {
     View,
     Text,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform
+    StyleSheet
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Layout } from '@/constants/layout';
-import Animated, { SlideInLeft, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { SlideInLeft } from 'react-native-reanimated';
+import { FormInput } from '@/components/common/FormInput';
+import { SubmitButton } from '@/components/common/SubmitButton';
 
 interface FeedbackFormProps {
     onSubmit: (subject: string, description: string) => Promise<void>;
@@ -21,7 +17,6 @@ interface FeedbackFormProps {
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) => {
     const [subject, setSubject] = useState('');
     const [description, setDescription] = useState('');
-    const [focusedField, setFocusedField] = useState<'subject' | 'description' | null>(null);
 
     const handleSubmit = async () => {
         if (!subject.trim() || !description.trim()) return;
@@ -39,70 +34,33 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) =
         >
             <Text style={styles.title}>Send us Feedback</Text>
             <View style={styles.card}>
-                <View style={[
-                    styles.inputContainer,
-                    focusedField === 'subject' && styles.inputFocused
-                ]}>
-                    <Ionicons
-                        name="bookmark-outline"
-                        size={20}
-                        color={focusedField === 'subject' ? "#009688" : "#94A3B8"}
-                        style={styles.inputIcon}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Subject"
-                        placeholderTextColor="#94A3B8"
-                        value={subject}
-                        onChangeText={setSubject}
-                        onFocus={() => setFocusedField('subject')}
-                        onBlur={() => setFocusedField(null)}
-                    />
-                </View>
+                <FormInput
+                    label="SUBJECT"
+                    icon="bookmark-outline"
+                    placeholder="Subject"
+                    value={subject}
+                    onChangeText={setSubject}
+                    containerStyle={{ marginBottom: 16 }}
+                />
 
-                <View style={[
-                    styles.inputContainer,
-                    styles.textAreaContainer,
-                    focusedField === 'description' && styles.inputFocused
-                ]}>
-                    <Ionicons
-                        name="chatbox-ellipses-outline"
-                        size={20}
-                        color={focusedField === 'description' ? "#009688" : "#94A3B8"}
-                        style={[styles.inputIcon, { marginTop: 14 }]}
-                    />
-                    <TextInput
-                        style={[styles.input, styles.textArea]}
-                        placeholder="How can we help you?"
-                        placeholderTextColor="#94A3B8"
-                        value={description}
-                        onChangeText={setDescription}
-                        multiline
-                        numberOfLines={4}
-                        textAlignVertical="top"
-                        onFocus={() => setFocusedField('description')}
-                        onBlur={() => setFocusedField(null)}
-                    />
-                </View>
+                <FormInput
+                    label="DESCRIPTION"
+                    icon="chatbox-ellipses-outline"
+                    placeholder="How can we help you?"
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
+                    containerStyle={{ marginBottom: 16 }}
+                />
 
-                <TouchableOpacity
-                    activeOpacity={0.8}
-                    disabled={!isFormValid || isSubmitting}
+                <SubmitButton
+                    title="Submit Feedback"
                     onPress={handleSubmit}
-                    style={[
-                        styles.submitButton,
-                        (!isFormValid || isSubmitting) && styles.submitButtonDisabled
-                    ]}
-                >
-                    {isSubmitting ? (
-                        <ActivityIndicator color="#FFFFFF" size="small" />
-                    ) : (
-                        <>
-                            <Text style={styles.submitText}>Submit Feedback</Text>
-                            <Ionicons name="send" size={16} color="#FFFFFF" style={{ marginLeft: 8 }} />
-                        </>
-                    )}
-                </TouchableOpacity>
+                    isLoading={isSubmitting}
+                    disabled={!isFormValid}
+                    style={{ marginTop: 8 }}
+                    icon="send"
+                />
             </View>
         </Animated.View>
     );
@@ -135,7 +93,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F8FAFC',
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         borderColor: '#F1F5F9',
         marginBottom: 16,
         paddingHorizontal: 14,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, TextInput, Alert, Platform } from 'react-native';
-import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,7 +11,6 @@ import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { getUserReports, updateReport, deleteReport, ReportPayload } from '@/apis/report';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
 import { format } from 'date-fns';
 
@@ -142,85 +142,60 @@ export default function ReportsScreen() {
                         <ThemedText style={[styles.emptySubtitle, { color: colors.icon }]}>Your submitted reports will appear here.</ThemedText>
                     </Animated.View>
                 ) : (
-                    reports.map((report: any, index: number) => (
-                        <Animated.View key={report._id} entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.reportCard, { backgroundColor: colors.card, shadowColor: theme === 'dark' ? '#000' : '#000' }]}>
-                            <View style={styles.cardHeader}>
-                                <View style={[styles.targetBadge, { backgroundColor: colors.primary + '15' }]}>
-                                    <ThemedText style={[styles.targetText, { color: colors.primary }]}>
-                                        {getTargetLabel(report.targetType)}
-                                    </ThemedText>
-                                </View>
-                                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(report.status) + '20' }]}>
-                                    <View style={[styles.statusDot, { backgroundColor: getStatusColor(report.status) }]} />
-                                    <ThemedText style={[styles.statusText, { color: getStatusColor(report.status) }]}>
-                                        {report.status}
-                                    </ThemedText>
-                                </View>
-                            </View>
+                    reports.map((report: any, index: number) => {
+                        const actions: ActionMenuItem[] = [];
+                        if (report.status === 'PENDING') {
+                            actions.push({
+                                label: 'Edit',
+                                icon: 'create-outline',
+                                onPress: () => handleEdit(report)
+                            });
+                            actions.push({
+                                label: 'Delete',
+                                icon: 'trash-outline',
+                                destructive: true,
+                                onPress: () => handleDelete(report._id)
+                            });
+                        }
 
-                            <ThemedText style={[styles.reasonText, { color: colors.text }]}>{report.reason}</ThemedText>
-                            {report.description && (
-                                <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]} numberOfLines={3}>
-                                    {report.description}
-                                </ThemedText>
-                            )}
-
-                            <View style={[styles.cardFooter, { borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
-                                <ThemedText style={[styles.dateText, { color: colors.icon }]}>
-                                    {format(new Date(report.createdAt), 'MMM dd, yyyy • hh:mm a')}
-                                </ThemedText>
-                                {report.status === 'PENDING' && (
-                                    <View style={{ position: 'relative' }}>
-                                        <Menu>
-                                            <MenuTrigger
-                                                customStyles={{
-                                                    triggerWrapper: styles.moreBtn,
-                                                }}
-                                            >
-                                                <Ionicons name="ellipsis-vertical" size={20} color={colors.textSecondary} />
-                                            </MenuTrigger>
-
-                                            <MenuOptions
-                                                customStyles={{
-                                                    optionsContainer: [
-                                                        styles.menuPopover,
-                                                        {
-                                                            backgroundColor: colors.card,
-                                                            borderColor: colors.border,
-                                                        }
-                                                    ],
-                                                }}
-                                            >
-                                                <MenuOption
-                                                    onSelect={() => handleEdit(report)}
-                                                    customStyles={{
-                                                        optionWrapper: styles.menuItem,
-                                                    }}
-                                                >
-                                                    <View style={[styles.menuIconBox, { backgroundColor: colors.primary + '15' }]}>
-                                                        <Ionicons name="create-outline" size={16} color={colors.primary} />
-                                                    </View>
-                                                    <ThemedText style={[styles.menuItemText, { color: colors.text }]}>Edit</ThemedText>
-                                                </MenuOption>
-
-                                                <MenuOption
-                                                    onSelect={() => handleDelete(report._id)}
-                                                    customStyles={{
-                                                        optionWrapper: styles.menuItem,
-                                                    }}
-                                                >
-                                                    <View style={[styles.menuIconBox, { backgroundColor: '#EF444415' }]}>
-                                                        <Ionicons name="trash-outline" size={16} color="#EF4444" />
-                                                    </View>
-                                                    <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>Delete</ThemedText>
-                                                </MenuOption>
-                                            </MenuOptions>
-                                        </Menu>
+                        return (
+                            <Animated.View key={report._id} entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.reportCard, { backgroundColor: colors.card, shadowColor: theme === 'dark' ? '#000' : '#000' }]}>
+                                <View style={styles.cardHeader}>
+                                    <View style={[styles.targetBadge, { backgroundColor: colors.primary + '15' }]}>
+                                        <ThemedText style={[styles.targetText, { color: colors.primary }]}>
+                                            {getTargetLabel(report.targetType)}
+                                        </ThemedText>
                                     </View>
+                                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(report.status) + '20' }]}>
+                                        <View style={[styles.statusDot, { backgroundColor: getStatusColor(report.status) }]} />
+                                        <ThemedText style={[styles.statusText, { color: getStatusColor(report.status) }]}>
+                                            {report.status}
+                                        </ThemedText>
+                                    </View>
+                                </View>
+
+                                <ThemedText style={[styles.reasonText, { color: colors.text }]}>{report.reason}</ThemedText>
+                                {report.description && (
+                                    <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]} numberOfLines={3}>
+                                        {report.description}
+                                    </ThemedText>
                                 )}
-                            </View>
-                        </Animated.View>
-                    ))
+
+                                <View style={[styles.cardFooter, { borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                                    <ThemedText style={[styles.dateText, { color: colors.icon }]}>
+                                        {format(new Date(report.createdAt), 'MMM dd, yyyy • hh:mm a')}
+                                    </ThemedText>
+                                    {actions.length > 0 && (
+                                        <View style={{ position: 'relative' }}>
+                                            <View style={styles.moreBtn}>
+                                                <ActionMenu actions={actions} triggerIcon="ellipsis-vertical" />
+                                            </View>
+                                        </View>
+                                    )}
+                                </View>
+                            </Animated.View>
+                        );
+                    })
                 )}
             </ScrollView>
 
@@ -237,7 +212,7 @@ export default function ReportsScreen() {
 
                         <ThemedText style={[styles.inputLabel, { color: colors.textSecondary }]}>Reason</ThemedText>
                         <TextInput
-                            style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, borderWidth: theme === 'dark' ? 1 : 0 }]}
+                            style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
                             value={editReason}
                             onChangeText={setEditReason}
                             placeholder="Enter reason"
@@ -246,7 +221,7 @@ export default function ReportsScreen() {
 
                         <ThemedText style={[styles.inputLabel, { color: colors.textSecondary }]}>Additional Details</ThemedText>
                         <TextInput
-                            style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border, borderWidth: theme === 'dark' ? 1 : 0 }]}
+                            style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
                             value={editDescription}
                             onChangeText={setEditDescription}
                             placeholder="Enter description"
@@ -337,15 +312,6 @@ const styles = StyleSheet.create({
     menuPopover: {
         width: 160,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
-        ...Platform.select({
-            ios: {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.12,
-                shadowRadius: 16,
-            },
-        }),
         paddingHorizontal: 6,
         paddingVertical: 6,
     },

@@ -17,12 +17,7 @@ import Animated, {
     useSharedValue,
     withSpring
 } from 'react-native-reanimated';
-import {
-    Menu,
-    MenuOptions,
-    MenuOption,
-    MenuTrigger,
-} from 'react-native-popup-menu';
+import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 import { Layout } from '@/constants/layout';
 
 interface RequestCardProps {
@@ -73,7 +68,31 @@ const RequestCard: React.FC<RequestCardProps> = ({
     const isApproved = item.status === 'APPROVED';
     const isEducation = (item.category?.en || item.category) === 'education';
     const canManage = isEducation && isApproved;
-    const hasActions = canManage || isPending || !isApproved;
+    const hasActions = isPending || !isApproved || canManage;
+
+    const actions: ActionMenuItem[] = [];
+    if (canManage) {
+        actions.push({
+            label: 'Manage Toppers/Events',
+            icon: 'settings-outline',
+            onPress: () => onManage?.(item)
+        });
+    }
+    if (isPending) {
+        actions.push({
+            label: 'Edit Request',
+            icon: 'create-outline',
+            onPress: () => onEdit(item)
+        });
+    }
+    if (!isApproved) {
+        actions.push({
+            label: 'Delete Request',
+            icon: 'trash-outline',
+            destructive: true,
+            onPress: () => onDelete(item._id, item.name)
+        });
+    }
 
     // Animation Shared Values
     const scale = useSharedValue(1);
@@ -163,36 +182,12 @@ const RequestCard: React.FC<RequestCardProps> = ({
 
                             {/* Action Menu */}
                             <View style={styles.actions}>
-                                {hasActions && (
-                                    <Menu>
-                                        <MenuTrigger customStyles={{ triggerWrapper: styles.menuBtn }}>
-                                            {isDeleting ? (
-                                                <ActivityIndicator size="small" color="#EF4444" />
-                                            ) : (
-                                                <Ionicons name="ellipsis-horizontal-circle" size={26} color={colors.textSecondary} />
-                                            )}
-                                        </MenuTrigger>
-                                        <MenuOptions customStyles={{ optionsContainer: [styles.menuOptions, { backgroundColor: colors.card, borderColor: colors.border }] }}>
-                                            {canManage && (
-                                                <MenuOption onSelect={() => onManage?.(item)} style={styles.menuItem}>
-                                                    <Ionicons name="settings-outline" size={18} color={colors.primary} />
-                                                    <ThemedText style={styles.menuText}>Manage Toppers/Events</ThemedText>
-                                                </MenuOption>
-                                            )}
-                                            {isPending && (
-                                                <MenuOption onSelect={() => onEdit(item)} style={styles.menuItem}>
-                                                    <Ionicons name="create-outline" size={18} color="#3B82F6" />
-                                                    <ThemedText style={styles.menuText}>Edit Request</ThemedText>
-                                                </MenuOption>
-                                            )}
-                                            {!isApproved && (
-                                                <MenuOption onSelect={() => onDelete(item._id, item.name)} style={styles.menuItem}>
-                                                    <Ionicons name="trash-outline" size={18} color="#EF4444" />
-                                                    <ThemedText style={[styles.menuText, { color: '#EF4444' }]}>Delete Request</ThemedText>
-                                                </MenuOption>
-                                            )}
-                                        </MenuOptions>
-                                    </Menu>
+                                {hasActions && actions.length > 0 && (
+                                    isDeleting ? (
+                                        <ActivityIndicator size="small" color="#EF4444" />
+                                    ) : (
+                                        <ActionMenu actions={actions} />
+                                    )
                                 )}
                             </View>
                         </View>
@@ -207,7 +202,6 @@ export default React.memo(RequestCard);
 
 const styles = StyleSheet.create({
     card: {
-        marginHorizontal: 16,
         marginBottom: 16,
         borderRadius: 20,
     },
@@ -308,7 +302,6 @@ const styles = StyleSheet.create({
     menuOptions: {
         width: 200,
         borderRadius: 14,
-        borderWidth: 1,
         padding: 8,
         ...Platform.select({
             ios: {

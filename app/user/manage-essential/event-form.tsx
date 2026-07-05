@@ -160,10 +160,7 @@ const EventForm = () => {
 
             {/* Animated Header */}
             <Animated.View entering={FadeInUp.duration(600)} style={styles.header}>
-                <LinearGradient
-                    colors={[colors.primary, '#0D9488']}
-                    style={StyleSheet.absoluteFill}
-                />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
                 <View style={[styles.headerTop, { paddingTop: insets.top + 10 }]}>
                     <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
                         <Ionicons name="arrow-back" size={24} color={isDark ? colors.text : '#FFFFFF'} />
@@ -338,7 +335,7 @@ const EventForm = () => {
                     onPress={handleSubmit}
                     disabled={mutation.isPending || isUploading}
                 >
-                    <LinearGradient colors={['#0D9488', '#0F766E']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+                    <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
                     {mutation.isPending ? (
                         <ActivityIndicator color="#FFFFFF" />
                     ) : (
@@ -422,7 +419,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
-        borderWidth: 1,
     },
     textInput: { flex: 1, fontWeight: '500' },
     dropdownTrigger: {
@@ -431,7 +427,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
-        borderWidth: 1,
     },
     triggerContent: {
         flexDirection: 'row',
@@ -448,7 +443,6 @@ const styles = StyleSheet.create({
         width: 90,
         height: 90,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         borderStyle: 'dashed',
         justifyContent: 'center',
         alignItems: 'center',

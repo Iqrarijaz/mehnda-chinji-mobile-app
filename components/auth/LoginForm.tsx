@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
     View,
-    TextInput,
     TouchableOpacity,
     StyleSheet,
     Platform,
@@ -24,6 +23,7 @@ import { loginSchema } from '@/utils/validation';
 import { clientStorage } from '@/utils/storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { FormInput } from '@/components/common/FormInput';
 
 // Removed global configuration
 
@@ -219,30 +219,30 @@ export const LoginForm = React.memo(function LoginForm() {
             <View style={[styles.formCard, { backgroundColor: colors.card }]}>
                 {/* Email/Phone Input */}
                 <View style={styles.inputField}>
-                    <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL <ThemedText style={styles.required}>*</ThemedText></ThemedText>
-                    <View style={[styles.inputBox, {
-                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        borderColor: errors.email && touched.email ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0')
-                    }]}>
-                        <Ionicons name="person-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                        <TextInput
-                            placeholder="Enter your email"
-                            placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
-                            value={formData.email}
-                            onChangeText={(email) => {
-                                setFormData(prev => ({ ...prev, email }));
-                                if (errors.email) validateField('email', email);
-                            }}
-                            onBlur={() => handleBlur('email')}
-                            style={[styles.input, { color: colors.text }]}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            editable={!formData.loading}
-                        />
-                        {touched.email && !errors.email && formData.email.length > 0 && (
-                            <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
-                        )}
-                    </View>
+                    <FormInput
+                        label="EMAIL"
+                        required
+                        icon="person-outline"
+                        placeholder="Enter your email"
+                        value={formData.email}
+                        onChangeText={(email) => {
+                            setFormData(prev => ({ ...prev, email }));
+                            if (errors.email) validateField('email', email);
+                        }}
+                        onBlur={() => handleBlur('email')}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        editable={!formData.loading}
+                        inputBoxStyle={{
+                            borderColor: errors.email && touched.email ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                        }}
+                        rightAccessory={
+                            touched.email && !errors.email && formData.email.length > 0 ? (
+                                <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
+                            ) : undefined
+                        }
+                    />
                     {touched.email && errors.email ? (
                         <ThemedText style={styles.errorText}>{errors.email}</ThemedText>
                     ) : null}
@@ -250,38 +250,41 @@ export const LoginForm = React.memo(function LoginForm() {
 
                 {/* Password */}
                 <View style={styles.inputField}>
-                    <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>PASSWORD <ThemedText style={styles.required}>*</ThemedText></ThemedText>
-                    <View style={[styles.inputBox, {
-                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        borderColor: errors.password && touched.password ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0')
-                    }]}>
-                        <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                        <TextInput
-                            placeholder="Enter your password"
-                            placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
-                            value={formData.password}
-                            onChangeText={(password) => {
-                                setFormData(prev => ({ ...prev, password }));
-                                if (errors.password) validateField('password', password);
-                            }}
-                            onBlur={() => handleBlur('password')}
-                            style={[styles.input, { color: colors.text }]}
-                            secureTextEntry={!formData.showPassword}
-                            editable={!formData.loading}
-                        />
-                        {touched.password && !errors.password && formData.password.length > 0 && (
-                            <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
-                        )}
-                        <TouchableOpacity
-                            onPress={() => setFormData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
-                        >
-                            <Ionicons
-                                name={formData.showPassword ? 'eye-outline' : 'eye-off-outline'}
-                                size={20}
-                                color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
-                            />
-                        </TouchableOpacity>
-                    </View>
+                    <FormInput
+                        label="PASSWORD"
+                        required
+                        icon="lock-closed-outline"
+                        placeholder="Enter your password"
+                        value={formData.password}
+                        onChangeText={(password) => {
+                            setFormData(prev => ({ ...prev, password }));
+                            if (errors.password) validateField('password', password);
+                        }}
+                        onBlur={() => handleBlur('password')}
+                        secureTextEntry={!formData.showPassword}
+                        editable={!formData.loading}
+                        inputBoxStyle={{
+                            borderColor: errors.password && touched.password ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                        }}
+                        rightAccessory={
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                {touched.password && !errors.password && formData.password.length > 0 && (
+                                    <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginRight: 8 }} />
+                                )}
+                                <TouchableOpacity
+                                    onPress={() => setFormData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
+                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                >
+                                    <Ionicons
+                                        name={formData.showPassword ? 'eye-outline' : 'eye-off-outline'}
+                                        size={20}
+                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        }
+                    />
                     {touched.password && errors.password ? (
                         <ThemedText style={styles.errorText}>{errors.password}</ThemedText>
                     ) : null}
@@ -387,7 +390,6 @@ const styles = StyleSheet.create({
         height: 52,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
-        borderWidth: 1,
     },
     input: {
         flex: 1,

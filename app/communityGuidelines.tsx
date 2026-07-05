@@ -27,8 +27,8 @@ const guidelinesData = [
     },
     {
         id: '4',
-        title: 'Blood Donation Ethics',
-        content: 'The blood donor feature is a selfless community service. Do not solicit payment, trade, or any form of compensation for blood donations. Users found engaging in such practices will be banned immediately.',
+        title: ' Ethics',
+        content: 'The  feature is a selfless community service. Do not solicit payment, trade, or any form of compensation for . Users found engaging in such practices will be banned immediately.',
     },
     {
         id: '5',
@@ -274,7 +274,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8FAFC',
         borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        borderWidth: 1,
         borderColor: '#F1F5F9'
     },
     accordionHeader: {
@@ -342,7 +341,6 @@ const styles = StyleSheet.create({
         width: 24,
         height: 24,
         borderRadius: 6,
-        borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,

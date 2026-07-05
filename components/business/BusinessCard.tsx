@@ -12,6 +12,7 @@ import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useRouter } from 'expo-router';
+import { ListingCard } from '@/components/listing/ListingCard';
 
 interface BusinessCardProps {
     business: any;
@@ -78,9 +79,7 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
             }}
             style={styles.cardWrapper}
         >
-            <View
-                style={[styles.card, { backgroundColor: isDark ? '#1e293b' : '#FFF' }]}
-            >
+            <ListingCard style={{ padding: 8 }}>
                 <View style={styles.topRow}>
                     {/* Business Image/Avatar */}
                     <View style={[styles.avatarContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.primary + '10' }]}>
@@ -106,7 +105,7 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
                         </View>
                     </View>
                 </View>
-            </View>
+            </ListingCard>
         </TouchableOpacity>
     );
 });
@@ -116,12 +115,6 @@ export default BusinessCard;
 const styles = StyleSheet.create({
     cardWrapper: {
         flex: 1,
-        margin: 4,
-        marginBottom: 8,
-    },
-    card: {
-        borderRadius: 12,
-        padding: 8,
     },
     topRow: {
         flexDirection: 'row',

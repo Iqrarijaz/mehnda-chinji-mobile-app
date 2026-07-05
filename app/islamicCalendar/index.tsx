@@ -279,7 +279,6 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         marginHorizontal: 16,
         borderRadius: 20,
-        borderWidth: 1,
     },
     centeredHeight: {
         height: 200,
@@ -302,7 +301,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         marginTop: 20,
         borderRadius: 18,
-        borderWidth: 1,
         padding: 16,
     },
     detailHeader: {
@@ -327,7 +325,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 10,
-        borderWidth: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },

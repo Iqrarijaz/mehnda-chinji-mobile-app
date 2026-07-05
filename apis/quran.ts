@@ -85,18 +85,6 @@ export const getAyah = async (
     });
 };
 
-export interface AsmaAlHusnaItem {
-    name: string;
-    transliteration: string;
-    number: number;
-    en: {
-        meaning: string;
-    };
-}
-
-export const getAsmaAlHusna = async (): Promise<QuranResponse<AsmaAlHusnaItem[]>> => {
-    return apiClient.get('/api/user/v1/quran/asma-al-husna');
-};
 
 export interface HijriDate {
     date: string;

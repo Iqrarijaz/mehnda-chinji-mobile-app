@@ -44,16 +44,18 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                     </Animated.View>
                 ))}
 
-                <Animated.View
-                    entering={SlideInLeft.delay(100 + CATEGORIES_CONFIG.length * 80).duration(400)}
-                    style={styles.gridItem}
-                >
-                    <CategoryCard
-                        label="More"
-                        icon="ellipsis-horizontal"
-                        onPress={() => setIsModalVisible(true)}
-                    />
-                </Animated.View>
+                {MORE_CATEGORIES_CONFIG.length > 0 && (
+                    <Animated.View
+                        entering={SlideInLeft.delay(100 + CATEGORIES_CONFIG.length * 80).duration(400)}
+                        style={styles.gridItem}
+                    >
+                        <CategoryCard
+                            label="More"
+                            icon="ellipsis-horizontal"
+                            onPress={() => setIsModalVisible(true)}
+                        />
+                    </Animated.View>
+                )}
             </View>
 
             <Modal
@@ -110,6 +112,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: '700',
         marginLeft: 6,
+        marginTop: 10,
         marginBottom: 14,
         opacity: 0.85,
     },

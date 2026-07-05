@@ -33,48 +33,17 @@ const CATEGORIES: UtilCategory[] = [
                 route: '/quran',
             },
             {
-                id: 'tasbeeh',
-                label: 'Tasbeeh',
-                image: require('@/assets/icons/tasbeeh_icon.webp'),
-                route: '/tasbeeh',
-            },
-            {
                 id: 'prayers',
                 label: 'Prayers',
                 image: require('@/assets/icons/prayer_icon.webp'),
                 route: '/prayerTimes',
             },
             {
-                id: 'asmaAlHusna',
-                label: '99 Names',
-                image: require('@/assets/icons/allah_name.webp'),
-                route: '/asmaAlHusna',
-            },
-            {
                 id: 'islamicCalendar',
                 label: 'Calendar',
                 image: require('@/assets/icons/islamic_calander.webp'),
                 route: '/islamicCalendar',
-            },
-            {
-                id: 'zakat',
-                label: 'Zakat',
-                image: require('@/assets/icons/zakat.webp'),
-                route: '/zakat',
-            },
-        ],
-    },
-    {
-        id: 'farmer',
-        title: 'Farmer Utilities',
-        items: [
-            // {
-            //     id: 'land-conversion',
-            //     label: 'Land Calc',
-            //     image: require('@/assets/icons/land_measure.webp'),
-            //     route: '/landConversion',
-            // },
-        ],
+            },],
     },
 ];
 

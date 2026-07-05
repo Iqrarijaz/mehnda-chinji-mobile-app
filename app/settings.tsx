@@ -10,6 +10,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ReviewService } from '@/utils/review';
+import { fetchAppVersionInfo } from '@/apis/app-info';
+import { checkUpdateStatus } from '@/utils/versioning';
+import { ThankYouModal } from '@/components/common/ThankYou';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -20,6 +23,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    Linking,
 } from 'react-native';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -41,6 +45,28 @@ export default function SettingsScreen() {
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [newEmail, setNewEmail] = useState(user?.user?.email || '');
     const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+    const [updateCheckState, setUpdateCheckState] = useState({ visible: false, isAvailable: false, updateUrl: '' });
+
+    const handleCheckUpdate = async () => {
+        try {
+            const info = await fetchAppVersionInfo();
+            const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.3';
+            const { isOptional, isMandatory } = checkUpdateStatus(currentVersion, info.latestVersion, info.minRequiredVersion);
+            const isAvailable = isOptional || isMandatory;
+            
+            setUpdateCheckState({
+                visible: true,
+                isAvailable,
+                updateUrl: Platform.OS === 'ios' ? info.updateUrl.ios : info.updateUrl.android
+            });
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to check for updates'
+            });
+        }
+    };
 
     const handleUpdateEmail = async () => {
         if (!newEmail || newEmail === user?.user?.email) {
@@ -127,6 +153,12 @@ export default function SettingsScreen() {
                         </SectionCard>
 
                         <SectionCard title="System" delay={200}>
+                            <SettingRowItem 
+                                icon="download-outline" 
+                                label="Check for Updates" 
+                                subtitle="Make sure you have the latest version" 
+                                onPress={handleCheckUpdate} 
+                            />
                             <SettingRowItem icon="analytics-outline" label="Data Usage" subtitle="Manage your data preferences" onPress={() => router.push('/dataUsage')} isLast />
                         </SectionCard>
                     </Animated.View>
@@ -254,6 +286,28 @@ export default function SettingsScreen() {
                     </KeyboardAvoidingView>
                 </View>
             </Modal>
+
+            <ThankYouModal
+                visible={updateCheckState.visible}
+                onClose={() => {
+                    if (updateCheckState.isAvailable && updateCheckState.updateUrl) {
+                        Linking.openURL(updateCheckState.updateUrl);
+                    }
+                    setUpdateCheckState(prev => ({ ...prev, visible: false }));
+                }}
+                buttonText={updateCheckState.isAvailable ? "Update Now" : "Done"}
+            >
+                <View style={{ alignItems: 'center', paddingHorizontal: 10 }}>
+                    <ThemedText style={{ textAlign: 'center', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>
+                        {updateCheckState.isAvailable ? "Update Available!" : "Up to Date"}
+                    </ThemedText>
+                    <ThemedText style={{ textAlign: 'center', fontSize: 14, color: colors.textSecondary }}>
+                        {updateCheckState.isAvailable
+                            ? "A new version of the app is available. Please update to enjoy the latest features and improvements."
+                            : "You are already using the latest version of the app."}
+                    </ThemedText>
+                </View>
+            </ThankYouModal>
         </View>
     );
 }

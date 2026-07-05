@@ -85,15 +85,7 @@ export default function ManageNotificationsScreen() {
                 }
             >
                 <NotificationSectionCard title="General Updates">
-                    {/* <NotificationToggleRow
-                        index={0}
-                        icon="newspaper-outline"
-                        color="#6366F1" // Indigo
-                        label="Community Feed"
-                        description="Stay updated with posts from your community"
-                        value={preferences.feed}
-                        onValueChange={() => togglePreference('feed')}
-                    /> */}
+
                     <NotificationToggleRow
                         index={1}
                         icon="business-outline"
@@ -129,21 +121,13 @@ export default function ManageNotificationsScreen() {
                 </NotificationSectionCard>
 
                 <NotificationSectionCard title="Emergency & Health">
-                    <NotificationToggleRow
-                        index={2}
-                        icon="water-outline"
-                        color="#EF4444" // Red (Blood)
-                        label="Blood Donations"
-                        description="Urgent blood donation requests in your area"
-                        value={preferences.blood}
-                        onValueChange={() => togglePreference('blood')}
-                    />
+
                     <NotificationToggleRow
                         index={3}
                         icon="alert-circle-outline"
                         color="#F59E0B" // Amber/Orange
                         label="Emergencies"
-                        description="Critical alerts and emergency announcements"
+                        description="Critical alerts and emergency alerts"
                         value={preferences.emergency}
                         onValueChange={() => togglePreference('emergency')}
                     />
@@ -165,7 +149,7 @@ export default function ManageNotificationsScreen() {
                         icon="school-outline"
                         color="#10B981" // Green (Education)
                         label="Education"
-                        description="School announcements and educational resources"
+                        description="School updates and educational resources"
                         value={preferences.education}
                         onValueChange={() => togglePreference('education')}
                     />

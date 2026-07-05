@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Modal, Linking, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { getMarketplaceDetails, MARKETPLACE_QUERY_KEYS, incrementMarketplaceInquiry } from '@/apis/marketplace';
-import { createOrGetConversation } from '@/apis/chat/chat';
-import { ConversationSource } from '@/types/chat';
+import { getMarketplaceDetails, MARKETPLACE_QUERY_KEYS, incrementMarketplaceInquiry, deleteMarketplaceListing, markMarketplaceListingAsSold } from '@/apis/marketplace';
 import Toast from 'react-native-toast-message';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
+import BannerAd from '@/ads/components/BannerAd';
+import { ActionMenu } from '@/components/common/ActionMenu';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 const { width } = Dimensions.get('window');
 
 export default function MarketplaceDetailsScreen() {
@@ -22,9 +22,12 @@ export default function MarketplaceDetailsScreen() {
     const colors = Colors[theme];
     const { user } = useAuth();
     const insets = useSafeAreaInsets();
-    
+
     const [viewerVisible, setViewerVisible] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const queryClient = useQueryClient();
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showSoldConfirm, setShowSoldConfirm] = useState(false);
 
     const parsedOtherItems = React.useMemo(() => {
         if (!otherItems) return [];
@@ -59,25 +62,52 @@ export default function MarketplaceDetailsScreen() {
         }
     };
 
-    const handleChat = async () => {
-        const sellerId = item?.sellerId?._id || item?.sellerId;
-        if (!sellerId) return;
-        
-        try {
-            const res = await createOrGetConversation(sellerId, ConversationSource.MARKETPLACE);
-            if (res.success && res.data?._id) {
-                router.push({
-                    pathname: '/chat/[id]' as any,
-                    params: { id: res.data._id, name: item.sellerId?.name || 'Seller', profileImage: item.sellerId?.profileImage || '' }
-                });
-            } else {
-                Toast.show({ type: 'error', text1: 'Error', text2: 'Could not create conversation.' });
-            }
-        } catch (error) {
-            console.error("Chat init error:", error);
-            Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to start chat.' });
+    const markSoldMutation = useMutation({
+        mutationFn: () => markMarketplaceListingAsSold(item?._id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.all });
+            queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.details(id as string) });
+            Toast.show({ type: 'success', text1: 'Success', text2: 'Item marked as sold!' });
+        },
+        onError: (err: any) => {
+            Toast.show({ type: 'error', text1: 'Error', text2: err.message || 'Failed to update listing' });
         }
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: () => deleteMarketplaceListing(item?._id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.all });
+            Toast.show({ type: 'success', text1: 'Deleted', text2: 'Listing deleted successfully!' });
+            router.back();
+        },
+        onError: (err: any) => {
+            Toast.show({ type: 'error', text1: 'Error', text2: err.message || 'Failed to delete listing' });
+        }
+    });
+
+    const confirmMarkSold = () => {
+        setShowSoldConfirm(true);
     };
+
+    const confirmDelete = () => {
+        setShowDeleteConfirm(true);
+    };
+
+    const handleEdit = () => {
+        router.push({
+            pathname: '/listing/create',
+            params: { listing: JSON.stringify(item) }
+        });
+    };
+
+    const ownerActions = [
+        ...(item?.status !== 'sold' ? [
+            { label: 'Edit Listing', icon: 'create-outline' as const, onPress: handleEdit },
+            { label: 'Mark Sold', icon: 'checkmark-circle-outline' as const, color: '#10B981', onPress: confirmMarkSold }
+        ] : []),
+        { label: 'Delete', icon: 'trash-outline' as const, color: '#EF4444', onPress: confirmDelete, destructive: true }
+    ];
 
     const renderHeader = () => (
         <View style={[styles.header, { backgroundColor: colors.primary }]}>
@@ -87,17 +117,20 @@ export default function MarketplaceDetailsScreen() {
             <ThemedText style={[styles.headerTitle, { color: '#fff' }]} numberOfLines={1}>
                 Details
             </ThemedText>
-            <View style={{ width: 36 }} />
-            {!isOwner && item?.status === 'live' && (
-                <View style={styles.headerActionsRight}>
-                    <TouchableOpacity onPress={handleChat} style={styles.headerIconButton}>
-                        <Ionicons name="chatbubble-ellipses-outline" size={20} color="#fff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleCall} style={styles.headerIconButton}>
-                        <Ionicons name="call-outline" size={20} color="#fff" />
-                    </TouchableOpacity>
-                </View>
-            )}
+            <View style={{ width: 36, alignItems: 'flex-end', justifyContent: 'center' }}>
+                {isOwner ? (
+                    <View style={styles.headerActionsRight}>
+                        <ActionMenu actions={ownerActions} triggerIconColor="#fff" triggerIconSize={24} />
+                    </View>
+                ) : item?.status === 'live' ? (
+                    <View style={styles.headerActionsRight}>
+
+                        <TouchableOpacity onPress={handleCall} style={styles.headerIconButton}>
+                            <Ionicons name="call-outline" size={20} color="#fff" />
+                        </TouchableOpacity>
+                    </View>
+                ) : null}
+            </View>
         </View>
     );
 
@@ -126,6 +159,22 @@ export default function MarketplaceDetailsScreen() {
         );
     }
 
+    const getStatusColor = (status: string) => {
+        switch (status?.toLowerCase()) {
+            case 'sold': return '#EF4444';
+            case 'pending': return '#F59E0B';
+            case 'live':
+            default:
+                return '#10B981';
+        }
+    };
+
+    const renderStatusBadge = () => (
+        <View style={[styles.statusTab, { backgroundColor: getStatusColor(item.status) }]}>
+            <ThemedText style={styles.statusTabText}>{item.status?.toUpperCase() || 'LIVE'}</ThemedText>
+        </View>
+    );
+
     return (
         <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
             {renderHeader()}
@@ -134,9 +183,10 @@ export default function MarketplaceDetailsScreen() {
                 {/* Images */}
                 {item.images && item.images.length > 0 ? (
                     <View>
-                        <ScrollView 
-                            horizontal 
-                            pagingEnabled 
+                        {isOwner && renderStatusBadge()}
+                        <ScrollView
+                            horizontal
+                            pagingEnabled
                             showsHorizontalScrollIndicator={false}
                             onMomentumScrollEnd={(e) => {
                                 const index = Math.round(e.nativeEvent.contentOffset.x / width);
@@ -144,9 +194,9 @@ export default function MarketplaceDetailsScreen() {
                             }}
                         >
                             {item.images.map((img: string, idx: number) => (
-                                <TouchableOpacity 
-                                    key={idx} 
-                                    activeOpacity={0.9} 
+                                <TouchableOpacity
+                                    key={idx}
+                                    activeOpacity={0.9}
                                     onPress={() => {
                                         setActiveImageIndex(idx);
                                         setViewerVisible(true);
@@ -166,6 +216,7 @@ export default function MarketplaceDetailsScreen() {
                     </View>
                 ) : (
                     <View style={[styles.noImage, { backgroundColor: colors.card, width }]}>
+                        {isOwner && renderStatusBadge()}
                         <Ionicons name="images-outline" size={48} color={colors.textSecondary} />
                         <ThemedText style={{ color: colors.textSecondary, marginTop: 8 }}>No Images</ThemedText>
                     </View>
@@ -186,7 +237,9 @@ export default function MarketplaceDetailsScreen() {
                     <View style={styles.infoRow}>
                         <View style={styles.infoItem}>
                             <Ionicons name="location-outline" size={16} color={colors.textSecondary} />
-                            <ThemedText style={[styles.infoText, { color: colors.textSecondary }]}>{item.place}</ThemedText>
+                            <ThemedText style={[styles.infoText, { color: colors.textSecondary }]}>
+                                {item?.village ? `${item.village}, ${item.city}` : item?.city}
+                            </ThemedText>
                         </View>
                         <View style={styles.infoItem}>
                             <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
@@ -238,13 +291,16 @@ export default function MarketplaceDetailsScreen() {
                         </ThemedText>
                     </View>
 
+                    {/* Banner Ad */}
+                    <BannerAd placement="marketplace-details" />
+
                     {/* Other Items */}
                     {parsedOtherItems.length > 0 && (
                         <View style={styles.otherItemsContainer}>
                             <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Other Items</ThemedText>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.otherItemsScroll} contentContainerStyle={{ gap: 12, paddingRight: 16 }}>
                                 {parsedOtherItems.map((otherItem: any) => (
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         key={otherItem._id}
                                         style={[styles.smallCard, { backgroundColor: colors.card }]}
                                         onPress={() => {
@@ -276,9 +332,9 @@ export default function MarketplaceDetailsScreen() {
                     <TouchableOpacity style={styles.viewerClose} onPress={() => setViewerVisible(false)}>
                         <Ionicons name="close" size={30} color="#fff" />
                     </TouchableOpacity>
-                    <ScrollView 
-                        horizontal 
-                        pagingEnabled 
+                    <ScrollView
+                        horizontal
+                        pagingEnabled
                         showsHorizontalScrollIndicator={false}
                         contentOffset={{ x: activeImageIndex * width, y: 0 }}
                         onMomentumScrollEnd={(e) => {
@@ -299,6 +355,34 @@ export default function MarketplaceDetailsScreen() {
                     </View>
                 </View>
             </Modal>
+
+            <ConfirmationModal
+                visible={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={() => {
+                    setShowDeleteConfirm(false);
+                    deleteMutation.mutate();
+                }}
+                title="Delete Listing"
+                message="Are you sure you want to remove this listing? This action cannot be undone."
+                type="danger"
+                confirmText="Delete"
+                cancelText="Cancel"
+            />
+
+            <ConfirmationModal
+                visible={showSoldConfirm}
+                onClose={() => setShowSoldConfirm(false)}
+                onConfirm={() => {
+                    setShowSoldConfirm(false);
+                    markSoldMutation.mutate();
+                }}
+                title="Mark as Sold"
+                message="Mark this item as sold? It will no longer be visible in public listings."
+                type="info"
+                confirmText="Yes, Mark Sold"
+                cancelText="Cancel"
+            />
         </View>
     );
 }
@@ -353,6 +437,21 @@ const styles = StyleSheet.create({
     },
     mainImage: {
         height: 300,
+    },
+    statusTab: {
+        position: 'absolute',
+        top: 12,
+        left: 12,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 4,
+        zIndex: 5,
+    },
+    statusTabText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: '700',
+        letterSpacing: 0.5,
     },
     noImage: {
         height: 300,

@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useMemo } from 'react';
 import {
     SectionList,
@@ -58,7 +57,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
     // Extremely robust extraction, matches ProfessionPicker
     const categoriesList: CategoryConfig[] = Array.isArray(configData?.data?.data) ? configData.data.data :
         Array.isArray(configData?.data) ? configData.data :
-        Array.isArray(configData) ? configData : [];
+            Array.isArray(configData) ? configData : [];
 
     // Group the categories and types into sections
     const sectionsList = useMemo(() => {
@@ -107,18 +106,14 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                         {item.name.ur}
                     </ThemedText>
                 </View>
-                {isSelected && (
-                    <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-                )}
+                {/* Removed checkmark icon */}
             </TouchableOpacity>
         );
     }, [currentCategory, currentType, isDark, colors.primary, colors.text, colors.icon, onSelect, onClose]);
 
     const renderSectionHeader = useCallback(({ section }: { section: SectionData }) => {
-        const isSelected = currentCategory === section.title.title.en && currentType === 'All';
-        
         return (
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={[styles.sectionHeader, { backgroundColor: colors.card, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
                 onPress={() => {
                     onSelect({
@@ -131,11 +126,6 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                 <ThemedText style={[styles.sectionHeaderTextEng, { color: colors.textSecondary }]}>
                     {section.title.title.en}
                 </ThemedText>
-                <Ionicons 
-                    name={isSelected ? "checkmark-circle" : "ellipse-outline"} 
-                    size={20} 
-                    color={isSelected ? colors.primary : colors.icon} 
-                />
             </TouchableOpacity>
         );
     }, [colors.card, colors.textSecondary, colors.primary, colors.icon, currentCategory, currentType, onSelect, onClose]);

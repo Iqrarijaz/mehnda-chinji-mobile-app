@@ -202,8 +202,6 @@ export default function VerifyOtpScreen() {
                                         {
                                             color: colors.text,
                                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F5F9',
-                                            borderColor: digit ? '#006666' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
-                                            borderWidth: digit ? 2.5 : 1.5,
                                         }
                                     ]}
                                     value={digit}

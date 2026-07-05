@@ -14,6 +14,7 @@ interface ModalPickerTriggerProps {
     placeholder: string;
     onPress: () => void;
     delay?: number;
+    containerStyle?: any;
 }
 
 export function ModalPickerTrigger({
@@ -24,6 +25,7 @@ export function ModalPickerTrigger({
     placeholder,
     onPress,
     delay = 0,
+    containerStyle,
 }: ModalPickerTriggerProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
@@ -33,7 +35,7 @@ export function ModalPickerTrigger({
     const animatedProps = delay > 0 ? { entering: FadeInDown.delay(delay) } : {};
 
     return (
-        <AnimatedView {...animatedProps} style={styles.inputField}>
+        <AnimatedView {...animatedProps} style={[styles.inputField, containerStyle]}>
             <View style={styles.labelContainer}>
                 <ThemedText style={[styles.label, { color: colors.text }]}>
                     {label} {required && <ThemedText style={styles.required}>*</ThemedText>}

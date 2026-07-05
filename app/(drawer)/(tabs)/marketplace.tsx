@@ -14,6 +14,17 @@ import { MarketplaceCategoryPicker } from '@/components/marketplace/MarketplaceC
 import { useInfiniteMarketplace, useInfiniteMyMarketplace } from '@/hooks/useMarketplace';
 import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
+import NativeAd from '@/ads/components/NativeAd';
+import { PillsList } from '@/components/common/PillsList';
+
+const EmptyMarketplace = memo(({ colors }: { colors: any }) => (
+    <View style={[styles.centered, { flex: 1, marginTop: 100 }]}>
+        <Ionicons name="cart-outline" size={64} color="#CBD5E1" />
+        <ThemedText style={{ color: colors.textSecondary, marginTop: 12, fontSize: 16 }}>
+            No items found
+        </ThemedText>
+    </View>
+));
 
 const MarketplaceScreen = memo(function MarketplaceScreen() {
     const router = useRouter();
@@ -99,9 +110,39 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
         isFetchingNextPage
     } = activeQuery;
 
-    const listings = useMemo(() => {
+    const rawListings = useMemo(() => {
         return infiniteData?.pages?.flatMap(page => Array.isArray(page?.data) ? page.data : []) || [];
     }, [infiniteData]);
+
+    const listingsRows = useMemo(() => {
+        const rows: any[] = [];
+        const adInterval = 6;
+        let currentRow: any[] = [];
+
+        rawListings.forEach((item: any, index: number) => {
+            const otherItems = rawListings.slice(0, 9).filter(l => l._id !== item._id).slice(0, 8);
+            const minimalOtherItems = otherItems.map(i => ({
+                _id: i._id,
+                title: i.title,
+                price: i.price,
+                image: i.images?.[0],
+                sellerId: i.sellerId?._id || i.sellerId
+            }));
+            const precomputedOtherItemsStr = minimalOtherItems.length > 0 ? JSON.stringify(minimalOtherItems) : undefined;
+            
+            currentRow.push({ ...item, precomputedOtherItemsStr });
+
+            if (currentRow.length === 2 || index === rawListings.length - 1) {
+                rows.push({ _id: `row-${index}`, isRow: true, items: currentRow });
+                currentRow = [];
+            }
+
+            if ((index + 1) % adInterval === 0 && index !== rawListings.length - 1) {
+                rows.push({ _id: `ad-${index}`, isAd: true });
+            }
+        });
+        return rows;
+    }, [rawListings]);
 
     const handleEdit = useCallback((item: any) => {
         router.push({
@@ -135,7 +176,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                 </View>
             );
         }
-        if (!hasNextPage && listings.length > 0) {
+        if (!hasNextPage && rawListings.length > 0) {
             return (
                 <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, paddingVertical: 20 }}>
                     That's all
@@ -143,46 +184,37 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
             );
         }
         return null;
-    }, [isFetchingNextPage, hasNextPage, listings.length, colors.primary]);
+    }, [isFetchingNextPage, hasNextPage, rawListings.length, colors.primary]);
 
 
     const renderItem = useCallback(({ item }: { item: any }) => {
-        const otherItems = listings.filter((l: any) => l._id !== item._id).slice(0, 4);
-        return (
-            <MarketplaceCard
-                item={item}
-                otherItems={otherItems}
-                colors={colors}
-                onEdit={handleEdit}
-                showActions={isMineTab}
-            />
-        );
-    }, [colors, handleEdit, isMineTab, listings]);
+        if (item.isAd) {
+            return (
+                <View style={{ width: '100%', paddingVertical: 2 }}>
+                    <NativeAd placement="marketplace-feed" />
+                </View>
+            );
+        }
 
-    const renderTabItem = useCallback(({ item }: { item: any }) => {
-        const isActive = selectedTab === item.id && selectedCategories.length === 0;
         return (
-            <TouchableOpacity
-                style={[
-                    styles.tab,
-                    { borderColor: colors.border },
-                    isActive && { backgroundColor: colors.primary, borderColor: colors.primary }
-                ]}
-                onPress={() => {
-                    setSelectedTab(item.id);
-                    setSelectedCategories([]);
-                    setSelectedItems([]);
-                }}
-            >
-                <ThemedText style={[
-                    styles.tabText,
-                    { color: isActive ? '#FFF' : colors.textSecondary }
-                ]}>
-                    {item.label}
-                </ThemedText>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 2 }}>
+                {item.items.map((subItem: any) => {
+                    return (
+                        <View key={subItem._id} style={{ flex: 1 }}>
+                            <MarketplaceCard
+                                item={subItem}
+                                otherItemsStr={subItem.precomputedOtherItemsStr}
+                                colors={colors}
+                                onEdit={handleEdit}
+                                showActions={isMineTab}
+                            />
+                        </View>
+                    );
+                })}
+                {item.items.length === 1 && <View style={{ flex: 1 }} />}
+            </View>
         );
-    }, [selectedTab, colors, selectedCategories]);
+    }, [colors, handleEdit, isMineTab]);
 
 
     const hasActiveFilters = selectedCategories.length > 0 || selectedItems.length > 0;
@@ -220,7 +252,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             {hasActiveFilters && (
                                 <View style={styles.filterBadge}>
                                     <ThemedText style={styles.filterBadgeText}>
-                                        {selectedCategories.length + selectedItems.length}
+                                        1
                                     </ThemedText>
                                 </View>
                             )}
@@ -246,16 +278,15 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
 
             {/* Category Filter Tabs */}
             {!isMineTab && (
-                <View style={styles.tabsContainer}>
-                    <FlatList
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        data={tabs}
-                        keyExtractor={(item) => item.id}
-                        renderItem={renderTabItem}
-                        contentContainerStyle={styles.tabsList}
-                    />
-                </View>
+                <PillsList
+                    data={tabs}
+                    selectedId={selectedCategories.length === 0 ? selectedTab : ''}
+                    onSelect={(id) => {
+                        setSelectedTab(id);
+                        setSelectedCategories([]);
+                        setSelectedItems([]);
+                    }}
+                />
             )}
 
             {/* Active multi-filter indicators row */}
@@ -285,26 +316,21 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                 </View>
             ) : (
                 <FlatList
-                    data={listings}
+                    data={listingsRows}
                     renderItem={renderItem}
                     keyExtractor={(item: any) => item._id}
-                    numColumns={2}
-                    columnWrapperStyle={{ gap: 12 }}
                     contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 80, flexGrow: 1, paddingTop: isMineTab ? 20 : 0 }]}
                     onEndReached={handleEndReached}
                     onEndReachedThreshold={0.5}
+                    initialNumToRender={8}
+                    maxToRenderPerBatch={5}
+                    windowSize={5}
+                    removeClippedSubviews={Platform.OS === 'android'}
                     ListFooterComponent={renderFooter}
                     refreshing={isRefetching}
                     onRefresh={handleRefresh}
                     showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={() => (
-                        <View style={[styles.centered, { flex: 1, marginTop: 100 }]}>
-                            <Ionicons name="cart-outline" size={64} color="#CBD5E1" />
-                            <ThemedText style={{ color: colors.textSecondary, marginTop: 12, fontSize: 16 }}>
-                                No items found
-                            </ThemedText>
-                        </View>
-                    )}
+                    ListEmptyComponent={<EmptyMarketplace colors={colors} />}
                 />
             )}
 
@@ -368,8 +394,6 @@ const styles = StyleSheet.create({
         width: 38,
         height: 38,
         borderRadius: 19,
-        borderWidth: 2,
-        borderColor: 'rgba(255,255,255,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',
@@ -388,7 +412,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: 42,
-        borderWidth: 1,
         borderRadius: 22,
         paddingHorizontal: 16,
     },
@@ -415,30 +438,15 @@ const styles = StyleSheet.create({
         height: 18,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1.5,
         borderColor: '#FFFFFF',
     },
     filterBadgeText: {
         color: '#FFFFFF',
-        fontSize: 8,
+        fontSize: 10,
         fontWeight: 'bold',
-    },
-    tabsContainer: {
-        paddingVertical: 12,
-    },
-    tabsList: {
-        paddingHorizontal: 16,
-    },
-    tab: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
-        borderWidth: 1,
-        marginRight: 8,
-    },
-    tabText: {
-        fontSize: 12,
-        fontWeight: '700',
+        textAlign: 'center',
+        lineHeight: 12,
+        includeFontPadding: false,
     },
     activeFiltersRow: {
         flexDirection: 'row',
@@ -452,7 +460,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     clearFiltersBtn: {
-        borderWidth: 1,
         borderRadius: 12,
         paddingHorizontal: 10,
         paddingVertical: 3,

@@ -21,6 +21,8 @@ import {
 import Toast from 'react-native-toast-message';
 
 import { PremiumModal } from '../common/PremiumModal';
+import { FormInput } from '@/components/common/FormInput';
+import { SubmitButton } from '@/components/common/SubmitButton';
 import { changePassword } from '@/apis/profile';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -54,53 +56,29 @@ interface InputFieldProps {
 const InputField = React.memo(({
     label, value, onChangeText, placeholder, inputRef, onSubmit, returnKeyType = 'next', delay = 0
 }: InputFieldProps) => {
-    const { theme } = useTheme();
-    const colors = Colors[theme];
-    const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(true);
-    const borderColor = useSharedValue(0);
-
-    const wrapStyle = useAnimatedStyle(() => ({
-        borderColor: withTiming(
-            borderColor.value === 1 ? colors.primary : (theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0'),
-            { duration: 200 }
-        ),
-        shadowOpacity: withTiming(borderColor.value === 1 ? 0.08 : 0.03, { duration: 200 }),
-    }));
-
-    const onFocus = useCallback(() => { setFocused(true); borderColor.value = 1; }, []);
-    const onBlur = useCallback(() => { setFocused(false); borderColor.value = 0; }, []);
 
     return (
-        <Animated.View entering={SlideInLeft.delay(delay).duration(350)} style={styles.fieldWrap}>
-            <ThemedText style={styles.label}>{label}</ThemedText>
-            <Animated.View style={[styles.inputRow, wrapStyle]}>
-                <Ionicons
-                    name="lock-closed-outline"
-                    size={18}
-                    color={focused ? colors.primary : '#94A3B8'}
-                    style={styles.inputIcon}
-                />
-                <TextInput
-                    ref={inputRef}
-                    style={[styles.input, { color: colors.text }]}
-                    value={value}
-                    onChangeText={onChangeText}
-                    placeholder={placeholder}
-                    placeholderTextColor={theme === 'dark' ? 'rgba(255,255,255,0.3)' : '#CBD5E1'}
-                    secureTextEntry={secure}
-                    returnKeyType={returnKeyType}
-                    onSubmitEditing={onSubmit}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                    blurOnSubmit={returnKeyType === 'done'}
-                    autoCapitalize="none"
-                />
-                <TouchableOpacity onPress={() => setSecure(s => !s)} style={styles.eyeBtn} activeOpacity={0.7}>
+        <FormInput
+            label={label}
+            value={value}
+            onChangeText={onChangeText}
+            placeholder={placeholder}
+            secureTextEntry={secure}
+            icon="lock-closed-outline"
+            ref={inputRef}
+            returnKeyType={returnKeyType}
+            onSubmitEditing={onSubmit}
+            blurOnSubmit={returnKeyType === 'done'}
+            autoCapitalize="none"
+            delay={delay}
+            containerStyle={{ marginBottom: 16 }}
+            rightAccessory={
+                <TouchableOpacity onPress={() => setSecure(s => !s)} activeOpacity={0.7} style={{ padding: 4 }}>
                     <Ionicons name={secure ? 'eye-off-outline' : 'eye-outline'} size={18} color="#94A3B8" />
                 </TouchableOpacity>
-            </Animated.View>
-        </Animated.View>
+            }
+        />
     );
 });
 
@@ -133,7 +111,6 @@ interface PasswordModalProps {
 
 export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible, onClose }) => {
     const { theme } = useTheme();
-    const colors = Colors[theme];
     const { updateUser } = useAuth();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -142,12 +119,6 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
 
     const newRef = useRef<TextInput>(null);
     const confirmRef = useRef<TextInput>(null);
-
-    const btnScale = useSharedValue(1);
-    const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnScale.value }] }));
-    const onPressIn = useCallback(() => { btnScale.value = withSpring(0.97, { damping: 15 }); }, []);
-    const onPressOut = useCallback(() => { btnScale.value = withSpring(1, { damping: 12 }); }, []);
-
     const resetAndClose = useCallback(() => {
         setCurrentPassword('');
         setNewPassword('');
@@ -244,22 +215,14 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
 
                 {/* Buttons */}
                 <View style={styles.actions}>
-                    <Animated.View style={[btnStyle, { flex: 1 }]}>
-                        <TouchableOpacity
+                    <View style={{ flex: 1 }}>
+                        <SubmitButton
+                            title="Update"
                             onPress={handleSubmit}
-                            onPressIn={onPressIn}
-                            onPressOut={onPressOut}
-                            disabled={isLoading || !canSubmit}
-                            activeOpacity={1}
-                            style={[styles.primaryBtn, (!canSubmit || isLoading) && styles.primaryBtnDisabled]}
-                        >
-                            {isLoading ? (
-                                <ActivityIndicator color="#FFFFFF" />
-                            ) : (
-                                <ThemedText style={styles.primaryBtnText}>Update</ThemedText>
-                            )}
-                        </TouchableOpacity>
-                    </Animated.View>
+                            disabled={!canSubmit}
+                            isLoading={isLoading}
+                        />
+                    </View>
 
                     <TouchableOpacity onPress={resetAndClose} style={[styles.cancelBtn, { borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }]} activeOpacity={0.7}>
                         <ThemedText style={styles.cancelText}>Cancel</ThemedText>
@@ -311,7 +274,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        borderWidth: 1.5,
         borderColor: '#E2E8F0', // Overridden in wrapStyle
         paddingHorizontal: 14,
         height: Platform.OS === 'android' ? 42 : 48,
@@ -385,7 +347,6 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
         borderRadius: 20,
         backgroundColor: 'transparent',
     },

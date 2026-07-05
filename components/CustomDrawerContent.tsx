@@ -31,12 +31,8 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
     { label: 'Home', icon: 'home-outline', route: '/(drawer)/(tabs)', section: 'Main' },
-    { label: 'Notice Board', icon: 'megaphone-outline', route: '/(drawer)/(tabs)/announcements', section: 'Main' },
-    { label: 'Village Pride', icon: 'ribbon-outline', route: '/(drawer)/pride', section: 'Main' },
-    { label: 'Blood Donors', icon: 'water-outline', route: '/(drawer)/blood', section: 'Main' },
+
     { label: 'Business Directory', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },
-    { label: 'Water Supply', icon: 'water-outline', route: '/(drawer)/water-supply', section: 'Main' },
-    { label: 'My Requests', icon: 'list-outline', route: '/user/requests', section: 'Main' },
     { label: 'Profile', icon: 'person-outline', route: '/profile', section: 'Account' },
     { label: 'Settings', icon: 'settings-outline', route: '/settings', section: 'Account' },
     { label: 'Give Feedback', icon: 'chatbubble-ellipses-outline', route: '/(drawer)/feedback', section: 'Support' },
@@ -69,16 +65,9 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
 
     const userEmail = user?.user?.email || '';
 
-    // Filter MENU_ITEMS based on user role
-    const filteredMenuItems = MENU_ITEMS.filter(item => {
-        if (item.route === '/(drawer)/water-supply') {
-            return user?.user?.role === 'WATER_SUPPLY_ADMIN'
-        }
-        return true;
-    });
 
     // Group items by section
-    const sections = filteredMenuItems.reduce<Record<string, MenuItem[]>>((acc, item) => {
+    const sections = MENU_ITEMS.reduce<Record<string, MenuItem[]>>((acc, item) => {
         const section = item.section || 'Other';
         if (!acc[section]) acc[section] = [];
         acc[section].push(item);
@@ -181,7 +170,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                     <Ionicons name="log-out-outline" size={18} color={colors.textSecondary} style={{ marginRight: 8 }} />
                     <ThemedText style={[styles.logoutText, { color: colors.textSecondary }]}>Sign Out</ThemedText>
                 </TouchableOpacity>
-                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.3'}</ThemedText>
+                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.4'}</ThemedText>
             </View>
         </View>
     );
@@ -224,7 +213,6 @@ const styles = StyleSheet.create({
         height: 14,
         borderRadius: 7,
         backgroundColor: '#10B981',
-        borderWidth: 2.5,
     },
     headerTextWrap: {
         alignItems: 'center',

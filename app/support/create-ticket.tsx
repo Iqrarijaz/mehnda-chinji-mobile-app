@@ -1,6 +1,8 @@
 import { createSupportTicket } from '@/apis/support';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { ThemedText } from '@/components/ThemedText';
+import { FormInput } from '@/components/common/FormInput';
+import { SubmitButton } from '@/components/common/SubmitButton';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -17,7 +19,7 @@ import Toast from 'react-native-toast-message';
 const PREDEFINED_SUBJECTS = [
     'Profile Update Issue',
     'Submit Places Issue',
-    'Blood Donor Issue',
+    
     'Business Registration Issue',
     'Authentication / Login Issue',
     'General Feedback',
@@ -137,23 +139,18 @@ export default function CreateTicketScreen() {
             </View>
 
             <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-                <View style={styles.labelContainer}>
-                    <ThemedText style={styles.label}>Subject <ThemedText style={{ color: '#FF5252' }}>*</ThemedText></ThemedText>
-                    <ThemedText style={[styles.charCount, { color: subject.length > 40 ? '#FF5252' : colors.textSecondary }]}>
-                        {subject.length}/40
-                    </ThemedText>
-                </View>
                 <View style={{ position: 'relative', justifyContent: 'center' }}>
-                    <TextInput
-                        style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: subject.length > 40 ? '#FF5252' : colors.border, paddingRight: 40 }]}
+                    <FormInput
+                        label="SUBJECT"
+                        required
                         placeholder="Briefly describe the issue"
-                        placeholderTextColor={colors.textSecondary}
                         value={subject}
                         onChangeText={setSubject}
                         maxLength={40}
+                        containerStyle={{ marginBottom: 12 }}
                     />
                     <TouchableOpacity
-                        style={{ position: 'absolute', right: 12 }}
+                        style={{ position: 'absolute', right: 12, top: 38 }}
                         onPress={() => setSubjectDropdownVisible(true)}
                     >
                         <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
@@ -170,22 +167,15 @@ export default function CreateTicketScreen() {
                     currentValue={subject}
                 />
 
-                <View style={styles.labelContainer}>
-                    <ThemedText style={styles.label}>Description <ThemedText style={{ color: '#FF5252' }}>*</ThemedText></ThemedText>
-                    <ThemedText style={[styles.charCount, { color: description.length > 400 ? '#FF5252' : colors.textSecondary }]}>
-                        {description.length}/400
-                    </ThemedText>
-                </View>
-                <TextInput
-                    style={[styles.input, styles.textArea, { backgroundColor: colors.card, color: colors.text, borderColor: description.length > 400 ? '#FF5252' : colors.border }]}
+                <FormInput
+                    label="DESCRIPTION"
+                    required
                     placeholder="Provide details about your problem or question..."
-                    placeholderTextColor={colors.textSecondary}
                     value={description}
                     onChangeText={setDescription}
                     multiline
-                    numberOfLines={6}
-                    textAlignVertical="top"
                     maxLength={400}
+                    containerStyle={{ marginBottom: 16 }}
                 />
 
                 <ThemedText style={styles.label}>Attachments (Max 5)</ThemedText>
@@ -219,17 +209,13 @@ export default function CreateTicketScreen() {
                     </ScrollView>
                 </View>
 
-                <TouchableOpacity
-                    style={[styles.submitButton, { backgroundColor: colors.primary }]}
+                <SubmitButton
+                    title="Submit Ticket"
                     onPress={handleSubmit}
-                    disabled={createTicketMutation.isPending}
-                >
-                    {createTicketMutation.isPending ? (
-                        <ActivityIndicator color="#FFFFFF" />
-                    ) : (
-                        <ThemedText style={styles.submitButtonText}>Submit Ticket</ThemedText>
-                    )}
-                </TouchableOpacity>
+                    isLoading={createTicketMutation.isPending}
+                    style={{ marginTop: 24, borderRadius: Layout.borderRadius + 2 }}
+                    icon="paper-plane"
+                />
             </ScrollView>
         </View>
     );
@@ -279,7 +265,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 12,
         fontSize: 15,
-        borderWidth: 1,
     },
     textArea: {
         height: 150,
@@ -309,7 +294,6 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         borderStyle: 'dashed',
         justifyContent: 'center',
         alignItems: 'center',

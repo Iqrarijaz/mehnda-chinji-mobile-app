@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
         height: 42,
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
     },
     icon: {
         marginRight: 10,

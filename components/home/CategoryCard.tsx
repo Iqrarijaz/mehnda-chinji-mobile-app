@@ -29,7 +29,7 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
         >
             <View style={[
                 styles.card,
-                { backgroundColor: colors.card, borderColor: isSelected ? accentColor : 'transparent', borderWidth: 2 },
+                { backgroundColor: colors.card, borderColor: isSelected ? accentColor : 'transparent'},
                 compact && styles.cardCompact
             ]}>
                 <View style={[styles.iconContainer, compact && styles.iconContainerCompact, { backgroundColor: isImageAsset ? 'transparent' : accentColor + '12' }]}>

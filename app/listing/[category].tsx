@@ -1,24 +1,20 @@
 import { deleteRequest, getMyRequests, getEssentialsList, ESSENTIAL_SUBMISSION_QUERY_KEYS, ESSENTIALS_QUERY_KEYS } from '@/apis/essentials';
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import { getCategoryTypes } from '@/constants/categoryTypes';
-import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
+import { PillsList } from '@/components/common/PillsList';
 import BusinessCard from '@/components/business/BusinessCard';
 import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
-import CategoryListingHeader from '@/components/listing/CategoryListingHeader';
-import EducationCard from '@/components/listing/EducationCard';
+import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
+import { SearchBar } from '@/components/common/SearchBar';
+import PlaceCard from '@/components/listing/PlaceCard';
 import EmptyListingState from '@/components/listing/EmptyListingState';
-import HealthCard from '@/components/listing/HealthCard';
-import MosqueCard from '@/components/listing/MosqueCard';
 import RequestCard from '@/components/places/RequestCard';
-import EmergencyCard from '@/components/listing/EmergencyCard';
-import GovtOfficeCard from '@/components/listing/GovtOfficeCard';
-import TravelCard from '@/components/listing/TravelCard';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { Stack, useLocalSearchParams, useNavigation, useRouter, useFocusEffect } from 'expo-router';
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useMemo, useState, useCallback } from 'react';
 import NativeAd from '@/ads/components/NativeAd';
 import {
     ActivityIndicator,
@@ -27,16 +23,12 @@ import {
     StyleSheet,
     View,
     Platform,
-    ScrollView,
     TouchableOpacity,
 } from 'react-native';
 import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTooltipStore } from '@/store/tooltipStore';
 import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
-
-
 import { ThemedText } from '@/components/ThemedText';
 import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 import BankCard from '@/components/listing/BankCard';
@@ -44,10 +36,8 @@ import BankCard from '@/components/listing/BankCard';
 const CategoryListingScreen = React.memo(() => {
     const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();
     const { theme, isDark } = useTheme();
-    const navigation = useNavigation();
     const router = useRouter();
     const queryClient = useQueryClient();
-    const tooltipStore = useTooltipStore();
 
 
     const colors = Colors[theme];
@@ -56,7 +46,6 @@ const CategoryListingScreen = React.memo(() => {
     const [debouncedSearch, setDebouncedSearch] = React.useState('');
     const [activeTab, setActiveTab] = useState<'all' | 'requests'>(tab === 'requests' ? 'requests' : 'all');
     const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
-    const [showTooltip, setShowTooltip] = useState(false);
     const [selectedType, setSelectedType] = useState<string>('');
 
     // Reporting state
@@ -97,37 +86,8 @@ const CategoryListingScreen = React.memo(() => {
 
         // Add "All" type at the beginning
         return [{ key: '', label: 'All' }, ...types];
-    }, [dynamicTypes, category]);
+    }, [dynamicTypes]);
 
-
-    // Show tooltip only if not viewed before
-    useFocusEffect(
-        useCallback(() => {
-            const tooltipId = `listing-${category}`;
-            if (tooltipStore.viewedTooltips[tooltipId]) {
-                setShowTooltip(false);
-                return;
-            }
-
-            // Reset state first to ensure it triggers if already false
-            setShowTooltip(false);
-
-            const timer = setTimeout(() => {
-                setShowTooltip(true);
-            }, 1000);
-
-            return () => {
-                clearTimeout(timer);
-                setShowTooltip(false);
-            };
-        }, [category, tooltipStore.viewedTooltips])
-    );
-
-    const handleDismissTooltip = () => {
-        const tooltipId = `listing-${category}`;
-        tooltipStore.markAsViewed(tooltipId);
-        setShowTooltip(false);
-    };
 
     // Debounce search
     React.useEffect(() => {
@@ -144,17 +104,6 @@ const CategoryListingScreen = React.memo(() => {
     const headerColor = useMemo(() => {
         return colors.primary;
     }, [colors.primary]);
-
-    const tooltipMessage = useMemo(() => {
-        switch (category) {
-            case 'religious': return 'نیا مقام (مسجد) شامل کرنے کے لیے یہاں ٹیپ کریں';
-            case 'education': return 'نیا تعلیمی ادارہ شامل کرنے کے لیے یہاں ٹیپ کریں';
-            case 'health': return 'نیا ہسپتال یا کلینک شامل کرنے کے لیے یہاں ٹیپ کریں';
-            case 'emergency': return 'ایمرجنسی سروس شامل کرنے کے لیے یہاں ٹیپ کریں';
-            case 'govt': return 'نیا سرکاری دفتر شامل کرنے کے لیے یہاں ٹیپ کریں';
-            default: return 'نیا مقام شامل کرنے کے لیے یہاں ٹیپ کریں';
-        }
-    }, [category]);
 
     // --- Queries ---
 
@@ -270,7 +219,7 @@ const CategoryListingScreen = React.memo(() => {
         });
 
         return processed;
-    }, [rawData, activeTab]);
+    }, [rawData, activeTab, category]);
 
     // --- Render Items ---
 
@@ -285,26 +234,11 @@ const CategoryListingScreen = React.memo(() => {
             onReport: () => handleReport(item._id)
         };
 
-        if (category === 'religious') {
-            return <MosqueCard {...commonProps} />;
-        }
-        if (category === 'health') {
-            return <HealthCard {...commonProps} />;
-        }
-        if (category === 'education') {
-            return <EducationCard {...commonProps} />;
+        if (['religious', 'health', 'education', 'emergency', 'govt', 'travel'].includes(category || '')) {
+            return <PlaceCard {...commonProps} category={category || ''} />;
         }
         if (category === 'banks') {
             return <BankCard business={item} onReport={() => handleReport(item._id)} />;
-        }
-        if (category === 'emergency') {
-            return <EmergencyCard {...commonProps} />;
-        }
-        if (category === 'govt') {
-            return <GovtOfficeCard {...commonProps} />;
-        }
-        if (category === 'travel') {
-            return <TravelCard {...commonProps} />;
         }
         return <BusinessCard business={item} onReport={() => handleReport(item._id)} />;
     }, [category, headerColor, handleReport]);
@@ -319,7 +253,7 @@ const CategoryListingScreen = React.memo(() => {
             onEdit={handleEdit}
             onDelete={handleDelete}
         />
-    ), [headerColor, deleteMutation.isPending, deleteMutation.variables]);
+    ), [headerColor, deleteMutation.isPending, deleteMutation.variables, handleEdit, handleDelete]);
 
     const keyExtractor = React.useCallback((item: any) => item._id, []);
 
@@ -353,85 +287,46 @@ const CategoryListingScreen = React.memo(() => {
             />
 
             {/* Header Component */}
-            <CategoryListingHeader
-                categoryTitle={categoryTitle}
-                headerColor={headerColor}
-                search={search}
-                setSearch={setSearch}
-                activeTab={activeTab}
-                setActiveTab={(tab) => {
-                    if (tab === 'requests') {
-                        router.push({
-                            pathname: '/user/requests',
-                            params: { category: category }
-                        });
-                    } else {
-                        setActiveTab(tab);
-                    }
-                }}
-                onBack={() => {
-                    if (router.canGoBack()) {
-                        router.back();
-                    } else {
-                        router.replace('/(drawer)/(tabs)' as any);
-                    }
-                }}
-                onAdd={() => router.push({ pathname: '/(drawer)/place-submission', params: { category: category } })}
-                showTooltip={showTooltip}
-                onCloseTooltip={handleDismissTooltip}
-                tooltipMessage={tooltipMessage}
+            <ScreenHeader
+                showMenuIcon={false}
+                rightActions={
+                    <HeaderIconBtn
+                        name="add"
+                        size={22}
+                        onPress={() => router.push({ pathname: '/(drawer)/place-submission', params: { category: category } })}
+                    />
+                }
             >
-                {/* Type Filters moved inside Header */}
-                {activeTab === 'all' && typesToRender.length > 0 && (
-                    <View style={styles.headerTypesContainer}>
-                        <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={styles.headerTypesScrollContent}
+                {/* Search Bar & actions */}
+                <View style={styles.searchSection}>
+                    <View style={styles.searchRow}>
+                        <SearchBar
+                            value={search}
+                            onChangeText={setSearch}
+                            placeholder={`Search ${categoryTitle}...`}
+                            style={{ flex: 1 }}
+                        />
+                        <TouchableOpacity
+                            style={[styles.filterButton, { backgroundColor: activeTab === 'requests' ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                            onPress={() => setActiveTab(activeTab === 'requests' ? 'all' : 'requests')}
+                            activeOpacity={0.7}
                         >
-                            {typesToRender.map((t: any) => (
-                                <TouchableOpacity
-                                    key={t.key}
-                                    onPress={() => setSelectedType(t.key)}
-                                    style={[
-                                        styles.headerTypeChip,
-                                        selectedType === t.key && styles.headerTypeChipActive
-                                    ]}
-                                >
-                                    <View style={[
-                                        styles.headerTypeIconContainer,
-                                        selectedType === t.key && styles.headerTypeIconContainerActive
-                                    ]}>
-                                        {t.icon && typeof t.icon === 'string' && t.key !== '' ? (
-                                            <Image
-                                                source={{ uri: t.icon }}
-                                                style={{ width: 14, height: 14 }}
-                                                contentFit="contain"
-                                                tintColor={selectedType === t.key ? headerColor : undefined}
-                                            />
-                                        ) : (
-                                            <Ionicons
-                                                name={t.key === '' ? "apps-outline" : "layers-outline"}
-                                                size={14}
-                                                color={selectedType === t.key ? headerColor : '#FFFFFF'}
-                                            />
-                                        )}
-                                    </View>
-                                    <View style={styles.headerTypeTextContainer}>
-                                        <ThemedText style={[
-                                            styles.headerTypeChipText,
-                                            selectedType === t.key && { color: headerColor },
-                                            selectedType === t.key && styles.headerTypeChipTextActive
-                                        ]} numberOfLines={1}>
-                                            {t.label}
-                                        </ThemedText>
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
-                        </ScrollView>
+                            <Ionicons name="list-outline" size={20} color="#FFFFFF" />
+                        </TouchableOpacity>
                     </View>
-                )}
-            </CategoryListingHeader>
+
+                </View>
+            </ScreenHeader>
+
+            {/* Category Filter Tabs */}
+            {activeTab === 'all' && typesToRender.length > 0 && (
+                <PillsList
+                    data={typesToRender.map((t: any) => ({ id: t.key, label: t.label }))}
+                    selectedId={selectedType}
+                    onSelect={setSelectedType}
+                    activeColor={headerColor}
+                />
+            )}
 
             {/* Content */}
             <View style={styles.content}>
@@ -452,6 +347,10 @@ const CategoryListingScreen = React.memo(() => {
                             refreshing={loading && !isFetchingNextPage && !myRequestsFetchingNextPage}
                             onEndReached={handleLoadMore}
                             onEndReachedThreshold={0.5}
+                            initialNumToRender={8}
+                            maxToRenderPerBatch={8}
+                            windowSize={5}
+                            removeClippedSubviews={Platform.OS === 'android'}
                             ListFooterComponent={
                                 () => {
                                     const hasMore = activeTab === 'all' ? hasNextPage : myRequestsHasNextPage;
@@ -471,7 +370,7 @@ const CategoryListingScreen = React.memo(() => {
                                             <View style={styles.endOfListContainer}>
                                                 <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
                                                 <ThemedText style={[styles.endOfListText, { color: colors.icon }]}>
-                                                    You've reached the end of the list
+                                                    You&apos;ve reached the end of the list
                                                 </ThemedText>
                                                 <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
                                             </View>
@@ -488,7 +387,6 @@ const CategoryListingScreen = React.memo(() => {
                     </>
                 )}
             </View>
-
             <ReportModal
                 ref={reportModalRef}
                 targetId={reportTarget?.id || ''}
@@ -500,6 +398,7 @@ const CategoryListingScreen = React.memo(() => {
 
 export default CategoryListingScreen;
 
+CategoryListingScreen.displayName = 'CategoryListingScreen';
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -550,70 +449,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         gap: 10,
     },
-    headerTypesContainer: {
-        paddingVertical: 10,
-        marginTop: 4,
+    searchSection: {
+        paddingTop: Platform.OS === 'android' ? 2 : 12,
+        paddingBottom: 4,
     },
-    headerTypesScrollContent: {
-        paddingHorizontal: 0,
-        gap: 8,
-    },
-    headerTypeChip: {
+    searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255, 255, 255, 0.15)',
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.08)',
-        height: 36,
-        marginRight: 8,
-    },
-    headerTypeChipActive: {
-        backgroundColor: '#FFFFFF',
-        borderColor: '#FFFFFF',
-    },
-    headerTypeIconContainer: {
-        width: 20,
-        height: 20,
-        borderRadius: 6,
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-    },
-    headerTypeIconContainerActive: {
-        backgroundColor: 'transparent',
-    },
-    headerTypeTextContainer: {
-        marginLeft: 6,
-        justifyContent: 'center',
-    },
-    headerTypeChipText: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.9)',
-    },
-    headerTypeChipTextActive: {
-        fontWeight: '800',
-    },
-    typeChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
-        borderWidth: 1,
         gap: 8,
     },
-    typeChipImageContainer: {
-        width: 18,
-        height: 18,
-        borderRadius: 9,
-        overflow: 'hidden',
-    },
-    typeChipText: {
-        fontSize: 13,
-        fontWeight: '600',
+    filterButton: {
+        width: 42,
+        height: 42,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

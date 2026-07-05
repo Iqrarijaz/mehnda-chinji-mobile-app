@@ -21,7 +21,7 @@ export function usePrayerTimes(city: string) {
 }
 
 export function usePrayerCalendar(city: string) {
-    const { data, isLoading, error, refetch } = useQuery({
+    const { data, isLoading, error } = useQuery({
         queryKey: [PRAYER_TIMES_QUERY_KEY, 'calendar', city],
         queryFn: () => getPrayerCalendar(city),
         enabled: !!city,

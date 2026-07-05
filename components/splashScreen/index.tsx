@@ -1,9 +1,8 @@
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import * as ExpoSplashScreen from 'expo-splash-screen';
 import Animated, {
     Easing,
@@ -11,13 +10,9 @@ import Animated, {
     useSharedValue,
     withDelay,
     withRepeat,
-    withSpring,
     withTiming
 } from 'react-native-reanimated';
-
-const { width } = Dimensions.get('window');
-const LOGO_SIZE = width * 0.6;
-
+const LOGO_SIZE = 220;
 const logoImg = require('../../public/logo_with_text.png');
 
 const CustomSplashScreen = React.memo(function CustomSplashScreen() {
@@ -66,13 +61,13 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
 
         // 3. Fill loading progress bar
         progressWidth.value = withTiming(1, {
-            duration: 1800,
+            duration: 3500, // Slowed down
             easing: Easing.bezier(0.2, 0.8, 0.2, 1)
         });
 
         // 4. Staggered character typing start
-        titleProgress.value = withDelay(400, withTiming(1, { duration: 800, easing: Easing.out(Easing.quad) }));
-        subtitleProgress.value = withDelay(1000, withTiming(1, { duration: 1100, easing: Easing.out(Easing.quad) }));
+        titleProgress.value = withDelay(400, withTiming(1, { duration: 1800, easing: Easing.out(Easing.quad) })); // Slowed down
+        subtitleProgress.value = withDelay(1500, withTiming(1, { duration: 2000, easing: Easing.out(Easing.quad) })); // Slowed down
     }, []);
 
     // Animated Styles
@@ -93,13 +88,17 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
         width: `${progressWidth.value * 100}%`,
     }));
 
+    useEffect(() => {
+        // Fallback in case onLoad doesn't fire
+        const timer = setTimeout(() => {
+            ExpoSplashScreen.hideAsync().catch(() => { });
+        }, 800);
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
-        <View style={styles.container}>
-            {/* Background premium gradient */}
-            <LinearGradient
-                colors={isDark ? ['#020617', '#0F172A'] : ['#FFFFFF', '#ECFDF5']}
-                style={StyleSheet.absoluteFill}
-            />
+        <View style={[styles.container, { backgroundColor: isDark ? '#0F172A' : '#FFFFFF' }]}>
+            {/* Solid background matching native splash perfectly */}
 
             {/* Glowing Aura/Halo behind logo */}
             <Animated.View
@@ -116,6 +115,13 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
                     source={logoImg}
                     style={styles.logo}
                     contentFit="contain"
+                    onLoad={async () => {
+                        try {
+                            await ExpoSplashScreen.hideAsync();
+                        } catch (e) {
+                            console.warn(e);
+                        }
+                    }}
                 />
             </Animated.View>
 

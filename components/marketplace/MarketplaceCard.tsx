@@ -1,28 +1,29 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { StyleSheet, View, Image, TouchableOpacity, Linking, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../ThemedText';
 import { useAuth } from '@/context/AuthContext';
-import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
+import { ActionMenu, ActionMenuItem } from '../common/ActionMenu';
+import { ConfirmationModal } from '../ui/ConfirmationModal';
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteMarketplaceListing, markMarketplaceListingAsSold, incrementMarketplaceInquiry, MARKETPLACE_QUERY_KEYS } from '@/apis/marketplace';
-import { createOrGetConversation } from '@/apis/chat/chat';
-import { ConversationSource } from '@/types/chat';
 
 interface MarketplaceCardProps {
     item: any;
-    otherItems?: any[];
+    otherItemsStr?: string;
     colors: any;
     onEdit?: (item: any) => void;
     showActions?: boolean;
 }
 
-export const MarketplaceCard = memo(({ item, otherItems, colors, onEdit, showActions }: MarketplaceCardProps) => {
+export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, showActions }: MarketplaceCardProps) => {
     const { user } = useAuth();
     const router = useRouter();
     const queryClient = useQueryClient();
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showPhoneErrorModal, setShowPhoneErrorModal] = useState(false);
 
     const isOwner = user?.user?._id && item.sellerId && (item.sellerId._id || item.sellerId).toString() === user.user._id.toString();
 
@@ -38,7 +39,7 @@ export const MarketplaceCard = memo(({ item, otherItems, colors, onEdit, showAct
     }, [item.createdAt]);
 
     // Handle Contact / Phone Dial
-    const handleCall = async () => {
+    const handleCall = React.useCallback(async () => {
         const phone = item.sellerPhone;
         if (!phone) {
             Toast.show({ type: 'error', text1: 'Contact Failed', text2: 'Seller phone number is unavailable.' });
@@ -53,36 +54,13 @@ export const MarketplaceCard = memo(({ item, otherItems, colors, onEdit, showAct
             if (supported) {
                 await Linking.openURL(url);
             } else {
-                Alert.alert("Error", "Call dialer is not supported on this device. Phone: " + phone);
+                setShowPhoneErrorModal(true);
             }
         } catch (error) {
             console.log(error);
         }
-    };
+    }, [item.sellerPhone, item._id]);
 
-    // Handle Chat Initialization
-    const handleChat = async () => {
-        const sellerId = item.sellerId?._id || item.sellerId;
-        if (!sellerId) return;
-
-        // Register inquiry metric
-        incrementMarketplaceInquiry(item._id).catch(err => console.log("Failed to log inquiry:", err));
-
-        try {
-            const res = await createOrGetConversation(sellerId, ConversationSource.MARKETPLACE);
-            if (res.success && res.data?._id) {
-                router.push({
-                    pathname: '/chat/[id]' as any,
-                    params: { id: res.data._id, name: item.sellerId?.name || 'Seller', profileImage: item.sellerId?.profileImage || '' }
-                });
-            } else {
-                Toast.show({ type: 'error', text1: 'Error', text2: 'Could not create conversation.' });
-            }
-        } catch (error) {
-            console.error("Chat init error:", error);
-            Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to start chat.' });
-        }
-    };
 
     // Mark as Sold Mutation
     const markSoldMutation = useMutation({
@@ -108,18 +86,27 @@ export const MarketplaceCard = memo(({ item, otherItems, colors, onEdit, showAct
         }
     });
 
-    const confirmDelete = () => {
-        Alert.alert(
-            "Delete Listing",
-            "Are you sure you want to remove this listing? This action cannot be undone.",
-            [
-                { text: "Cancel", style: "cancel" },
-                { text: "Delete", style: "destructive", onPress: () => deleteMutation.mutate() }
-            ]
-        );
+    const confirmDelete = React.useCallback(() => {
+        setShowDeleteConfirm(true);
+    }, []);
+
+    const getStatusColor = (status: string) => {
+        switch (status?.toLowerCase()) {
+            case 'sold': return '#EF4444';
+            case 'pending': return '#F59E0B';
+            case 'live':
+            default:
+                return '#10B981';
+        }
     };
 
-    const confirmMarkSold = () => {
+    const renderStatusBadge = () => (
+        <View style={[styles.statusTab, { backgroundColor: getStatusColor(item.status) }]}>
+            <ThemedText style={styles.statusTabText}>{item.status?.toUpperCase() || 'LIVE'}</ThemedText>
+        </View>
+    );
+
+    const confirmMarkSold = React.useCallback(() => {
         Alert.alert(
             "Mark as Sold",
             "Mark this item as sold? It will no longer be visible in public listings.",
@@ -128,128 +115,127 @@ export const MarketplaceCard = memo(({ item, otherItems, colors, onEdit, showAct
                 { text: "Yes, Mark Sold", onPress: () => markSoldMutation.mutate() }
             ]
         );
-    };
+    }, [markSoldMutation]);
+
+    const actions = React.useMemo(() => {
+        const baseActions: ActionMenuItem[] = [
+            { label: 'Delete', icon: 'trash-outline', color: '#EF4444', onPress: confirmDelete, destructive: true }
+        ];
+        if (item.status !== 'sold') {
+            baseActions.unshift(
+                { label: 'Edit Listing', icon: 'create-outline', onPress: () => onEdit?.(item) },
+                { label: 'Mark Sold', icon: 'checkmark-circle-outline', color: '#10B981', onPress: confirmMarkSold }
+            );
+        }
+        return baseActions;
+    }, [item.status, item, confirmDelete, confirmMarkSold, onEdit]);
+
+    const handlePress = React.useCallback(() => {
+        if (!isOwner) {
+            incrementMarketplaceInquiry(item._id).catch(console.error);
+        }
+        router.push({
+            pathname: `/marketplace/${item._id}`,
+            params: otherItemsStr ? { otherItems: otherItemsStr } : {}
+        } as any)
+    }, [isOwner, item._id, otherItemsStr, router]);
 
     return (
-        <TouchableOpacity
-            style={[styles.container, { backgroundColor: colors.card }]}
-            activeOpacity={0.9}
-            onPress={() => {
-                if (!isOwner) {
-                    incrementMarketplaceInquiry(item._id).catch(console.error);
-                }
-                const minimalOtherItems = otherItems?.map(i => ({
-                    _id: i._id,
-                    title: i.title,
-                    price: i.price,
-                    image: i.images?.[0],
-                    sellerId: i.sellerId?._id || i.sellerId
-                })) || [];
-                router.push({
-                    pathname: `/marketplace/${item._id}`,
-                    params: minimalOtherItems.length > 0 ? { otherItems: JSON.stringify(minimalOtherItems) } : {}
-                } as any)
-            }}
-        >
-            {/* Header / Actions Info */}
-            <View style={styles.header}>
-                {/* Owner Operations Menu */}
-                {isOwner && showActions && (
-                    <Menu>
-                        <MenuTrigger style={styles.menuTrigger}>
-                            <Ionicons name="ellipsis-vertical" size={20} color={colors.textSecondary} />
-                        </MenuTrigger>
-                        <MenuOptions customStyles={{ optionsContainer: { backgroundColor: colors.card, borderRadius: 8, padding: 4 } }}>
-                            {item.status !== 'sold' && (
-                                <>
-                                    <MenuOption onSelect={() => onEdit?.(item)}>
-                                        <View style={styles.menuItem}>
-                                            <Ionicons name="create-outline" size={18} color={colors.text} />
-                                            <ThemedText style={[styles.menuText, { color: colors.text }]}>Edit Listing</ThemedText>
-                                        </View>
-                                    </MenuOption>
-                                    <MenuOption onSelect={confirmMarkSold}>
-                                        <View style={styles.menuItem}>
-                                            <Ionicons name="checkmark-circle-outline" size={18} color="#10B981" />
-                                            <ThemedText style={[styles.menuText, { color: "#10B981" }]}>Mark Sold</ThemedText>
-                                        </View>
-                                    </MenuOption>
-                                </>
-                            )}
-                            <MenuOption onSelect={confirmDelete}>
-                                <View style={styles.menuItem}>
-                                    <Ionicons name="trash-outline" size={18} color="#EF4444" />
-                                    <ThemedText style={[styles.menuText, { color: "#EF4444" }]}>Delete</ThemedText>
-                                </View>
-                            </MenuOption>
-                        </MenuOptions>
-                    </Menu>
-                )}
-            </View>
+        <>
+            <TouchableOpacity
+                style={[styles.container, { backgroundColor: colors.card }]}
+                activeOpacity={0.9}
+                onPress={handlePress}
+            >
 
-            {/* Listing Image */}
-            {item.images && item.images.length > 0 ? (
-                <View style={styles.imageContainer}>
-                    <Image source={{ uri: item.images[0] }} style={styles.image} resizeMode="cover" />
-                    {item.images.length > 1 && (
-                        <View style={styles.imageBadge}>
-                            <ThemedText style={styles.imageBadgeText}>+{item.images.length - 1} photos</ThemedText>
-                        </View>
-                    )}
-                </View>
-            ) : (
-                <View style={[styles.imagePlaceholder, { backgroundColor: colors.background }]}>
-                    <Ionicons name="images-outline" size={48} color={colors.textSecondary} />
-                    <ThemedText style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>No Images Available</ThemedText>
-                </View>
-            )}
-
-            {/* Content Details */}
-            <View style={styles.detailsContainer}>
-
-                <View style={{ marginTop: 4, marginBottom: 4 }}>
-                    <ThemedText style={[styles.title, { color: colors.primary }]}>
-                        {item.title}
-                    </ThemedText>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
-                        <ThemedText style={{ color: colors.textSecondary, fontSize: 11, flex: 1 }} numberOfLines={1}>
-                            {item.place}
-                        </ThemedText>
-                        {formattedDate ? (
-                            <ThemedText style={{ color: colors.textSecondary, fontSize: 10, marginLeft: 8 }}>
-                                {formattedDate}
-                            </ThemedText>
-                        ) : null}
+                {/* Listing Image */}
+                {item.images && item.images.length > 0 ? (
+                    <View style={styles.imageContainer}>
+                        <Image source={{ uri: item.images[0] }} style={styles.image} resizeMode="cover" />
+                        {(isOwner && showActions) && renderStatusBadge()}
+                        {item.images.length > 1 && (
+                            <View style={styles.imageBadge}>
+                                <ThemedText style={styles.imageBadgeText}>+{item.images.length - 1} photos</ThemedText>
+                            </View>
+                        )}
                     </View>
-                </View>
+                ) : (
+                    <View style={[styles.imagePlaceholder, { backgroundColor: colors.background }]}>
+                        <Ionicons name="images-outline" size={48} color={colors.textSecondary} />
+                        <ThemedText style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>No Images Available</ThemedText>
+                        {(isOwner && showActions) && renderStatusBadge()}
+                    </View>
+                )}
 
-                {/* Metadata details rendering for Vehicles */}
-                {item.metadata && Object.keys(item.metadata).length > 0 && (
-                    <View style={[styles.metadataContainer, { backgroundColor: colors.background }]}>
-                        {Object.entries(item.metadata).map(([key, val]) => (
-                            <View key={key} style={styles.metadataTag}>
-                                <ThemedText style={[styles.metaTagKey, { color: colors.textSecondary }]}>
-                                    {key.toUpperCase()}:
-                                </ThemedText>
-                                <ThemedText style={[styles.metaTagVal, { color: colors.text }]}>
-                                    {String(val)}
+                {/* Content Details */}
+                <View style={styles.detailsContainer}>
+
+                    <View style={{ marginTop: 4, marginBottom: 4 }}>
+                        <ThemedText style={[styles.title, { color: colors.primary }]}>
+                            {item.title}
+                        </ThemedText>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, paddingRight: 8 }}>
+                                <Ionicons name="location-outline" size={12} color={colors.textSecondary} />
+                                <ThemedText style={{ color: colors.textSecondary, fontSize: 11, marginLeft: 4 }} numberOfLines={1}>
+                                    {item.village ? `${item.village}, ${item.city}` : item.city}
                                 </ThemedText>
                             </View>
-                        ))}
+                            {isOwner && showActions ? (
+                                <ActionMenu actions={actions} />
+                            ) : formattedDate ? (
+                                <ThemedText style={{ color: colors.textSecondary, fontSize: 10, marginLeft: 8 }}>
+                                    {formattedDate}
+                                </ThemedText>
+                            ) : null}
+                        </View>
                     </View>
-                )}
 
-                {/* Call / Chat Action Row */}
-                {!isOwner && item.status === 'live' && (
-                    <View style={styles.actionRow}>
-                        <Ionicons name="chatbubble-ellipses-outline" size={24} color={colors.primary} />
-                        <Ionicons name="call-outline" size={24} color="#000000ff" />
+                    {/* Metadata details rendering for Vehicles */}
+                    {/* {item.metadata && Object.keys(item.metadata).filter(key => key.toLowerCase() !== 'model' && key.toLowerCase() !== 'year').length > 0 && (
+                        <View style={[styles.metadataContainer, { backgroundColor: colors.background }]}>
+                            {Object.entries(item.metadata)
+                                .filter(([key]) => key.toLowerCase() !== 'model' && key.toLowerCase() !== 'year')
+                                .map(([key, val]) => (
+                                    <View key={key} style={styles.metadataTag}>
+                                        <ThemedText style={[styles.metaTagKey, { color: colors.textSecondary }]}>
+                                            {key.toUpperCase()}:
+                                        </ThemedText>
+                                        <ThemedText style={[styles.metaTagVal, { color: colors.text }]}>
+                                            {String(val)}
+                                        </ThemedText>
+                                    </View>
+                                ))}
+                        </View>
+                    )} */}
 
+                </View>
+            </TouchableOpacity>
+            <ConfirmationModal
+                visible={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={() => {
+                    setShowDeleteConfirm(false);
+                    deleteMutation.mutate();
+                }}
+                title="Delete Listing"
+                message="Are you sure you want to remove this listing? This action cannot be undone."
+                type="danger"
+                confirmText="Delete"
+                cancelText="Cancel"
+            />
 
-                    </View>
-                )}
-            </View>
-        </TouchableOpacity>
+            <ConfirmationModal
+                visible={showPhoneErrorModal}
+                onClose={() => setShowPhoneErrorModal(false)}
+                onConfirm={() => setShowPhoneErrorModal(false)}
+                title="Dialer Not Supported"
+                message={`Call dialer is not supported on this device. Phone: ${item.sellerPhone}`}
+                type="danger"
+                confirmText="OK"
+                cancelText="Close"
+            />
+        </>
     );
 });
 
@@ -269,19 +255,7 @@ const styles = StyleSheet.create({
     dateText: {
         fontSize: 10,
     },
-    menuTrigger: {
-        padding: 6,
-    },
-    menuItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 10,
-        paddingHorizontal: 8,
-    },
-    menuText: {
-        marginLeft: 8,
-        fontSize: 13,
-    },
+
     imageContainer: {
         height: 130,
         width: '100%',
@@ -304,6 +278,21 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 11,
         fontWeight: '600',
+    },
+    statusTab: {
+        position: 'absolute',
+        top: 8,
+        left: 8,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+        zIndex: 5,
+    },
+    statusTabText: {
+        color: '#fff',
+        fontSize: 10,
+        fontWeight: '700',
+        letterSpacing: 0.5,
     },
     imagePlaceholder: {
         height: 180,
@@ -423,7 +412,6 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     chatButton: {
-        borderWidth: 1,
     },
     callButton: {},
     actionButtonText: {

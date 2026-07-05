@@ -244,7 +244,6 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         borderStyle: 'dashed',
         width: '100%',
         gap: 8,

@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -322,9 +323,20 @@ const PlaceSubmissionScreen = () => {
         });
 
         if (!result.canceled) {
-            const uri = result.assets[0].uri;
-            setSelectedImage(uri);
-            handleImageUpload(uri);
+            const asset = result.assets[0];
+            let finalUri = asset.uri;
+            try {
+                const manipResult = await ImageManipulator.manipulateAsync(
+                    asset.uri,
+                    [{ resize: { width: 1080 } }],
+                    { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+                );
+                finalUri = manipResult.uri;
+            } catch (e) {
+                console.error('Image compression failed', e);
+            }
+            setSelectedImage(finalUri);
+            handleImageUpload(finalUri);
         }
     };
 
@@ -332,12 +344,9 @@ const PlaceSubmissionScreen = () => {
         setIsUploading(true);
         try {
             const formData = new FormData();
-            const filename = uri.split('/').pop() || 'image.jpg';
-            const match = /\.(\w+)$/.exec(filename);
-            const type = match ? `image/${match[1]}` : `image`;
-
+            
             // @ts-ignore
-            formData.append('image', { uri, name: filename, type });
+            formData.append('image', { uri, name: `image_${Date.now()}.jpg`, type: 'image/jpeg' });
 
             if (uploadedImage) {
                 formData.append('existingImageUrl', uploadedImage);
@@ -550,12 +559,16 @@ const PlaceSubmissionScreen = () => {
 
     const handleThankYouClose = () => {
         setShowThankYou(false);
-        router.replace('/user/requests');
-        if (user?.user?.role !== 'APP_ADMIN') {
-            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
-                InterstitialService.getInstance().show(true);
-            });
+        if (category) {
+            router.replace({ pathname: '/listing/[category]', params: { category, tab: 'requests' } });
+        } else {
+            router.back();
         }
+        // if (user?.user?.role !== 'APP_ADMIN') {
+        //     import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+        //         InterstitialService.getInstance().show(true);
+        //     });
+        // }
     };
 
     return (
@@ -580,12 +593,7 @@ const PlaceSubmissionScreen = () => {
 
             {/* ── Hero Header ─────────────────────────────────────────── */}
             <Animated.View entering={FadeInUp.duration(500)} style={styles.headerWrap}>
-                <LinearGradient
-                    colors={['#0D9488', '#0F766E']}
-                    style={StyleSheet.absoluteFill}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
 
                 {/* Nav row */}
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
@@ -1316,11 +1324,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 5,
     },
     heroTitle: {
         fontSize: 20,
@@ -1390,7 +1393,6 @@ const styles = StyleSheet.create({
 
     // Legacy — kept for textArea only
     input: {
-        borderWidth: 1,
         borderRadius: 12,
         paddingHorizontal: 14,
         fontSize: 12,
@@ -1407,7 +1409,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-start',
         borderRadius: 12,
-        borderWidth: 0,
         backgroundColor: 'transparent',
         width: 80,
         height: 85,
@@ -1443,7 +1444,6 @@ const styles = StyleSheet.create({
         width: 120,
         height: 40,
         borderRadius: 20,
-        borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -1503,7 +1503,6 @@ const styles = StyleSheet.create({
         height: 200,
         width: '100%',
         borderRadius: Layout.borderRadius,
-        borderWidth: 2,
         borderStyle: 'dashed',
         alignItems: 'center',
         justifyContent: 'center',
@@ -1565,7 +1564,6 @@ const styles = StyleSheet.create({
     },
     tagChip: {
         borderRadius: 20,
-        borderWidth: 1,
         paddingHorizontal: 12,
         paddingVertical: 7,
     },

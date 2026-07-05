@@ -18,12 +18,7 @@ import BannerAd from '@/ads/components/BannerAd';
 import { useAdsStore, selectCanShowBanner } from '@/store/ads.store';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import {
-    Menu,
-    MenuOptions,
-    MenuOption,
-    MenuTrigger,
-} from 'react-native-popup-menu';
+import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 
 import { deleteTopper, deleteEvent, getMyRequests } from '@/apis/essentials';
 import { ThemedText } from '@/components/ThemedText';
@@ -150,27 +145,24 @@ const ManageEssentialDashboard = () => {
                     ) : null}
                     <ThemedText style={styles.itemSubtitle}>{topper.passingYear} • {topper.obtainedMarks}/{topper.totalMarks}</ThemedText>
                 </View>
-                <Menu>
-                    <MenuTrigger customStyles={{ triggerWrapper: styles.moreBtn }}>
-                        <Ionicons name="ellipsis-vertical" size={20} color={colors.textSecondary} />
-                    </MenuTrigger>
-                    <MenuOptions customStyles={{ optionsContainer: [styles.menuContainer, { backgroundColor: colors.card, borderColor: colors.border }] }}>
-                        <MenuOption
-                            onSelect={() => router.push({ pathname: '/user/manage-essential/topper-form', params: { essentialId: id, editData: JSON.stringify(topper) } })}
-                            customStyles={{ optionWrapper: styles.menuItem }}
-                        >
-                            <Ionicons name="create-outline" size={18} color={colors.primary} />
-                            <ThemedText style={[styles.menuItemText, { color: colors.text }]}>Edit</ThemedText>
-                        </MenuOption>
-                        <MenuOption
-                            onSelect={() => setDeleteTarget({ id: topper._id, type: 'topper', name: topper.name })}
-                            customStyles={{ optionWrapper: styles.menuItem }}
-                        >
-                            <Ionicons name="trash-outline" size={18} color="#EF4444" />
-                            <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>Delete</ThemedText>
-                        </MenuOption>
-                    </MenuOptions>
-                </Menu>
+                <View style={styles.moreBtn}>
+                    <ActionMenu
+                        actions={[
+                            {
+                                label: 'Edit',
+                                icon: 'create-outline',
+                                onPress: () => router.push({ pathname: '/user/manage-essential/topper-form', params: { essentialId: id, editData: JSON.stringify(topper) } })
+                            },
+                            {
+                                label: 'Delete',
+                                icon: 'trash-outline',
+                                destructive: true,
+                                onPress: () => setDeleteTarget({ id: topper._id, type: 'topper', name: topper.name })
+                            }
+                        ]}
+                        triggerIcon="ellipsis-vertical"
+                    />
+                </View>
             </View>
         </View>
     );
@@ -188,27 +180,24 @@ const ManageEssentialDashboard = () => {
                     <ThemedText style={styles.itemName}>{event.name}</ThemedText>
                     <ThemedText style={styles.itemSubtitle} numberOfLines={1}>{event.description}</ThemedText>
                 </View>
-                <Menu>
-                    <MenuTrigger customStyles={{ triggerWrapper: styles.moreBtn }}>
-                        <Ionicons name="ellipsis-vertical" size={20} color={colors.textSecondary} />
-                    </MenuTrigger>
-                    <MenuOptions customStyles={{ optionsContainer: [styles.menuContainer, { backgroundColor: colors.card, borderColor: colors.border }] }}>
-                        <MenuOption
-                            onSelect={() => router.push({ pathname: '/user/manage-essential/event-form', params: { essentialId: id, editData: JSON.stringify(event) } })}
-                            customStyles={{ optionWrapper: styles.menuItem }}
-                        >
-                            <Ionicons name="create-outline" size={18} color={colors.primary} />
-                            <ThemedText style={[styles.menuItemText, { color: colors.text }]}>Edit</ThemedText>
-                        </MenuOption>
-                        <MenuOption
-                            onSelect={() => setDeleteTarget({ id: event._id, type: 'event', name: event.name })}
-                            customStyles={{ optionWrapper: styles.menuItem }}
-                        >
-                            <Ionicons name="trash-outline" size={18} color="#EF4444" />
-                            <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>Delete</ThemedText>
-                        </MenuOption>
-                    </MenuOptions>
-                </Menu>
+                <View style={styles.moreBtn}>
+                    <ActionMenu
+                        actions={[
+                            {
+                                label: 'Edit',
+                                icon: 'create-outline',
+                                onPress: () => router.push({ pathname: '/user/manage-essential/event-form', params: { essentialId: id, editData: JSON.stringify(event) } })
+                            },
+                            {
+                                label: 'Delete',
+                                icon: 'trash-outline',
+                                destructive: true,
+                                onPress: () => setDeleteTarget({ id: event._id, type: 'event', name: event.name })
+                            }
+                        ]}
+                        triggerIcon="ellipsis-vertical"
+                    />
+                </View>
             </View>
         </View>
     );
@@ -416,7 +405,6 @@ const styles = StyleSheet.create({
     itemCard: {
         padding: 12,
         borderRadius: 15,
-        borderWidth: 1,
     },
     itemMain: {
         flexDirection: 'row',
@@ -469,7 +457,6 @@ const styles = StyleSheet.create({
     menuContainer: {
         width: 160,
         borderRadius: 12,
-        borderWidth: 1,
         padding: 6,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },

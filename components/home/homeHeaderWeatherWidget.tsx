@@ -136,9 +136,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         padding: 14,
         borderRadius: Layout.headerBorderRadius,
-        marginBottom: 16,
+        marginBottom: 8,
         alignItems: 'center',
-        borderWidth: 1,
     },
     leftSection: {
         flex: 3,

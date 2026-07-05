@@ -27,7 +27,7 @@ export const DayTile = React.memo(({ day, isToday, isSelected, colors, accentCol
                 styles.dayTile,
                 { backgroundColor: colors.card, borderColor: colors.border },
                 isWeekend && { backgroundColor: colors.card + '80' },
-                isToday && { borderColor: accentColor, borderWidth: 1.5, backgroundColor: accentColor + '08' },
+                isToday && { borderColor: accentColor, backgroundColor: accentColor + '08' },
                 isSelected && { backgroundColor: accentColor, borderColor: accentColor }
             ]}
         >
@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
         padding: 5,
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderWidth: 1,
     },
     dayTileEmpty: {
         width: '12.28%',

@@ -179,12 +179,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         paddingBottom: Platform.OS === 'android' ? 28 : 40,
         paddingTop: 12,
-        // Subtle top shadow
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 16,
-        elevation: 16,
     },
     handle: {
         width: 40,

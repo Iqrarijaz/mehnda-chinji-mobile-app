@@ -11,6 +11,7 @@ import {
     View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { ListingCard } from './ListingCard';
 
 import { ThemedText } from '@/components/ThemedText';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
@@ -66,7 +67,7 @@ const BankCard = React.memo(({ business, onReport }: BankCardProps) => {
                     });
                 }}
             >
-                <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <ListingCard style={{ padding: 14, alignItems: 'center' }}>
                     {/* Bank Image */}
                     <View style={styles.imageContainer}>
                         {bankImage ? (
@@ -107,7 +108,7 @@ const BankCard = React.memo(({ business, onReport }: BankCardProps) => {
                             </TouchableOpacity>
                         )}
                     </View>
-                </View>
+                </ListingCard>
             </TouchableOpacity>
         </>
     );
@@ -116,17 +117,6 @@ const BankCard = React.memo(({ business, onReport }: BankCardProps) => {
 export default BankCard;
 
 const styles = StyleSheet.create({
-    card: {
-        borderRadius: Layout.borderRadius,
-        padding: 14,
-        marginBottom: 16,
-        alignItems: 'center',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.04,
-        shadowRadius: 10,
-
-        borderWidth: 1,
-    },
     imageContainer: {
         width: 70,
         height: 70,
@@ -135,7 +125,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',
-        borderWidth: 1,
     },
     bankImage: {
         width: '80%',

@@ -333,7 +333,6 @@ const styles = StyleSheet.create({
         height: 52,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
-        borderWidth: 1,
     },
     input: {
         flex: 1,
@@ -386,7 +385,6 @@ const styles = StyleSheet.create({
         height: 80,
         borderRadius: 40,
         marginBottom: 10,
-        borderWidth: 2,
         borderColor: '#00666620',
     },
     profileAvatarPlaceholder: {

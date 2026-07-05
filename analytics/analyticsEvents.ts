@@ -16,27 +16,16 @@ export const AnalyticsEvents = {
 
     // Feature Specific
     PLACE_ADDED: 'place_added',
-    POST_VIEWED: 'post_viewed',
     SEARCH_USED: 'search_used',
     SEARCH_RESULTS_VIEWED: 'search_results_viewed',
     NOTIFICATION_OPENED: 'notification_opened',
     WEATHER_VIEWED: 'weather_viewed',
     PRAYER_TIMES_VIEWED: 'prayer_times_viewed',
-    POST_LIKED: 'post_liked',
-    POST_COMMENTED: 'post_commented',
-    POST_SHARED: 'post_shared',
     BANNER_GENERATED: 'banner_generated',
     BANNER_SAVED: 'banner_saved',
     QURAN_SURAH_OPENED: 'quran_surah_opened',
-    TASBEEH_COMPLETED: 'tasbeeh_completed',
-    ZAKAT_CALCULATOR_USED: 'zakat_calculator_used',
-    ASMA_AL_HUSNA_VIEWED: 'asma_al_husna_viewed',
     ISLAMIC_CALENDAR_VIEWED: 'islamic_calendar_viewed',
 
-    // Announcements
-    ANNOUNCEMENT_VIEWED: 'announcement_viewed',
-    ANNOUNCEMENT_TAB_CHANGED: 'announcement_tab_changed',
-    ANNOUNCEMENT_CAROUSEL_CLICKED: 'announcement_carousel_clicked',
 
     // Community Specific
     DONOR_CARD_CLICKED: 'donor_card_clicked',

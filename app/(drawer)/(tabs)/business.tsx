@@ -10,7 +10,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Layout } from '@/constants/layout';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
     Platform,
@@ -23,7 +23,7 @@ import {
 import { FlashList } from '@shopify/flash-list';
 import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { ScreenHeader } from '@/components/common/ScreenHeader';
+import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
 
 
@@ -31,6 +31,7 @@ export default function BusinessScreen() {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const params = useLocalSearchParams<{ tab?: string }>();
+    const router = useRouter();
 
     // Determine initial tab based on params
     const [activeTab, setActiveTab] = useState<'find' | 'portal'>(params.tab === 'portal' ? 'portal' : 'find');
@@ -158,7 +159,15 @@ export default function BusinessScreen() {
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
                 {/* Top Bar Area */}
-                <ScreenHeader>
+                <ScreenHeader
+                    rightActions={
+                        <HeaderIconBtn
+                            name="add"
+                            size={22}
+                            onPress={() => router.push('/(drawer)/business-registration')}
+                        />
+                    }
+                >
                     {/* Search Row with filter + My Business toggle icon */}
                     <View style={styles.searchSection}>
                         <View style={styles.searchRow}>
@@ -278,7 +287,6 @@ const styles = StyleSheet.create({
         height: 18,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1.5,
         borderColor: '#FFFFFF',
     },
     filterBadgeText: {
@@ -295,7 +303,6 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
-        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.3)',
     },
     categoryChipActive: {

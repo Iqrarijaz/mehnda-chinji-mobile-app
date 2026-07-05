@@ -83,7 +83,7 @@ export const useFcmNotifications = () => {
                 // Subscribe to default topics
                 try {
                     await subscribeToTopic(messagingInstance, 'global');
-                    await subscribeToTopic(messagingInstance, 'announcements');
+
                     if (__DEV__) console.log('📡 Subscribed to default FCM topics');
                 } catch (err) {
                     if (__DEV__) console.warn('⚠️ Topic subscription failed:', err);

@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
         height: 11,
         borderRadius: 6,
         backgroundColor: PRIMARY,
-        borderWidth: 2,
         borderColor: '#FFFFFF',
     },
     content: { flex: 1 },

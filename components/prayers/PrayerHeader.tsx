@@ -156,7 +156,6 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         borderRadius: 20,
         alignSelf: 'flex-start',
-        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.2)',
     },
     gregorianDate: {

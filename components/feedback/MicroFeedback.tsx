@@ -164,7 +164,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     textInput: {
-        borderWidth: 1,
         borderRadius: 12,
         padding: 12,
         height: 100,

@@ -40,7 +40,6 @@ const Avatar: React.FC<AvatarProps> = memo(({ uri, name, size = 40, style, prima
                     backgroundColor: resolvedIsDark ? 'rgba(255,255,255,0.05)' : '#FFFFFF',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    borderWidth: 1,
                     borderColor: resolvedIsDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
                 },
                 style,

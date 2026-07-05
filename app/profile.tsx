@@ -9,6 +9,8 @@ import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { ThemedText } from '@/components/ThemedText';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Colors } from '@/constants/colors';
+import { FormInput } from '@/components/common/FormInput';
+import { SubmitButton } from '@/components/common/SubmitButton';
 import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -18,7 +20,7 @@ import villagesDataFallback from '@/data/villages.json';
 import { Ionicons } from '@expo/vector-icons';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { LinearGradient } from 'expo-linear-gradient';
+
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 
@@ -211,14 +213,10 @@ export default function ProfileScreen() {
 
             const uploadFormData = new FormData();
 
-            // Extract file extension from manipulated image uri
-            const uriParts = manipResult.uri.split('.');
-            const fileType = uriParts[uriParts.length - 1];
-
             const file: any = {
                 uri: manipResult.uri,
-                name: `profile_${user?.user?._id || Date.now()}.${fileType}`,
-                type: `image/${fileType}`,
+                name: `profile_${user?.user?._id || Date.now()}.jpg`,
+                type: `image/jpeg`,
             };
 
             uploadFormData.append('image', file);
@@ -274,10 +272,7 @@ export default function ProfileScreen() {
             <View style={[styles.container, { backgroundColor: colors.background }]}>
                 {/* Animated Header */}
                 <Animated.View entering={FadeInUp.duration(600)} style={styles.header}>
-                    <LinearGradient
-                        colors={[colors.primary, '#0D9488']}
-                        style={StyleSheet.absoluteFill}
-                    />
+                    <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
                     <View style={[styles.headerTop, { paddingTop: insets.top + 10 }]}>
                         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
                             <Ionicons name="arrow-back" size={24} color={theme === 'dark' ? colors.text : '#FFFFFF'} />
@@ -313,77 +308,45 @@ export default function ProfileScreen() {
                         keyboardShouldPersistTaps="handled"
                     >
 
-                        {/* Progress Component */}
-                        {/* <Animated.View entering={FadeInDown.delay(200).duration(600)}>
-                            <ProfileProgress percentage={completionPercentage} remainingFields={remainingFieldsCount} />
-                        </Animated.View> */}
-
                         {/* Form Sections */}
                         <View style={styles.formSection}>
 
                             {/* Full Name */}
-                            <Animated.View entering={FadeInDown.delay(300)} style={styles.inputField}>
-                                <View style={styles.labelContainer}>
-                                    <ThemedText style={[styles.label, { color: colors.text }]}>
-                                        FULL NAME <ThemedText style={styles.required}>*</ThemedText>
-                                    </ThemedText>
-                                    <ThemedText style={[styles.charCount, formData.name.length > 30 ? { color: '#EF4444' } : { color: colors.icon }]}>
-                                        {formData.name.length}/30
-                                    </ThemedText>
-                                </View>
-                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
-                                    <Ionicons name="person-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
-                                    <TextInput
-                                        placeholder="Enter your name"
-                                        placeholderTextColor={colors.icon}
-                                        style={[styles.textInput, { color: colors.text, fontSize: 14 }]}
-                                        value={formData.name}
-                                        onChangeText={(val) => setFormData(p => ({ ...p, name: toTitleCase(val) }))}
-                                        maxLength={30}
-                                    />
-                                </View>
+                            <Animated.View entering={FadeInDown.delay(300)}>
+                                <FormInput
+                                    label="FULL NAME"
+                                    required
+                                    icon="person-outline"
+                                    placeholder="Enter your name"
+                                    value={formData.name}
+                                    onChangeText={(val) => setFormData(p => ({ ...p, name: toTitleCase(val) }))}
+                                    maxLength={30}
+                                />
                             </Animated.View>
 
                             {/* Email Address */}
-                            <Animated.View entering={FadeInDown.delay(350)} style={styles.inputField}>
-                                <View style={styles.labelContainer}>
-                                    <ThemedText style={[styles.label, { color: colors.text }]}>
-                                        EMAIL ADDRESS
-                                    </ThemedText>
-                                </View>
-                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52, opacity: 0.8 }]}>
-                                    <Ionicons name="mail-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
-                                    <TextInput
-                                        style={[styles.textInput, { color: colors.text, fontSize: 14 }]}
-                                        value={formData.email}
-                                        editable={false}
-                                    />
-                                    <Ionicons name="lock-closed-outline" size={16} color={colors.icon} />
-                                </View>
+                            <Animated.View entering={FadeInDown.delay(350)}>
+                                <FormInput
+                                    label="EMAIL ADDRESS"
+                                    icon="mail-outline"
+                                    value={formData.email}
+                                    editable={false}
+                                    containerStyle={{ opacity: 0.8 }}
+                                />
                             </Animated.View>
 
                             {/* Phone Field */}
-                            <Animated.View entering={FadeInDown.delay(400)} style={styles.inputField}>
-                                <View style={styles.labelContainer}>
-                                    <ThemedText style={[styles.label, { color: colors.text }]}>
-                                        PHONE NUMBER <ThemedText style={styles.required}>*</ThemedText>
-                                    </ThemedText>
-                                    <ThemedText style={[styles.charCount, formData.phone.length > 0 && formData.phone.length !== 11 ? { color: '#EF4444' } : { color: colors.icon }]}>
-                                        {formData.phone.length}/11
-                                    </ThemedText>
-                                </View>
-                                <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
-                                    <Ionicons name="call-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
-                                    <TextInput
-                                        placeholder="03*********"
-                                        placeholderTextColor={colors.icon}
-                                        style={[styles.textInput, { color: colors.text, fontSize: 14 }]}
-                                        value={formData.phone}
-                                        onChangeText={(val) => setFormData(p => ({ ...p, phone: val }))}
-                                        keyboardType="phone-pad"
-                                        maxLength={11}
-                                    />
-                                </View>
+                            <Animated.View entering={FadeInDown.delay(400)}>
+                                <FormInput
+                                    label="PHONE NUMBER"
+                                    required
+                                    icon="call-outline"
+                                    placeholder="03*********"
+                                    keyboardType="phone-pad"
+                                    value={formData.phone}
+                                    onChangeText={(val) => setFormData(p => ({ ...p, phone: val }))}
+                                    maxLength={11}
+                                />
                             </Animated.View>
 
                             {/* Gender Selector */}
@@ -436,18 +399,14 @@ export default function ProfileScreen() {
                             </View>
 
                             {/* Update Button (Now Scrollable) */}
-                            <View style={{ marginTop: 24 }}>
-                                <TouchableOpacity
-                                    style={[styles.updateButton, !isModified && { opacity: 0.6 }]}
+                            <View style={{ marginTop: 24, alignItems: 'center' }}>
+                                <SubmitButton
+                                    title="Update Profile"
                                     onPress={handleUpdate}
-                                    disabled={!isModified || profileMutation.isPending}
-                                >
-                                    <LinearGradient colors={['#0D9488', '#0F766E']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-                                    <View style={styles.buttonContent}>
-                                        <ThemedText style={styles.updateButtonText}>Update Profile</ThemedText>
-                                        <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
-                                    </View>
-                                </TouchableOpacity>
+                                    disabled={!isModified}
+                                    isLoading={profileMutation.isPending}
+                                    style={{ width: 140, height: 40, borderRadius: 20 }}
+                                />
                             </View>
                         </View>
                     </ScrollView>

@@ -5,14 +5,13 @@ import { NOTIFICATION_TOPICS } from '@/constants/notificationTopics';
 import { getMessaging, subscribeToTopic, unsubscribeFromTopic } from '@react-native-firebase/messaging';
 
 export interface NotificationPreferences {
-    blood: boolean;
+
     business: boolean;
     education: boolean;
     emergency: boolean;
     govt: boolean;
     health: boolean;
     religious: boolean;
-    feed: boolean;
     weather: boolean;
     prayer: boolean;
 }
@@ -27,14 +26,13 @@ interface NotificationState {
 }
 
 const DEFAULT_PREFERENCES: NotificationPreferences = {
-    blood: false,
+
     business: false,
     education: false,
     emergency: false,
     govt: false,
     health: false,
     religious: true,
-    feed: true,
     weather: true,
     prayer: true,
 };

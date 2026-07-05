@@ -4,6 +4,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { ListingCard } from './ListingCard';
 
 interface EmptyListingStateProps {
     activeTab: 'all' | 'requests';
@@ -15,7 +16,8 @@ const EmptyListingState: React.FC<EmptyListingStateProps> = ({ activeTab, catego
     const colors = Colors[theme];
 
     return (
-        <View style={styles.emptyContainer}>
+        <ListingCard style={{ marginTop: 60, marginHorizontal: 16, padding: 32, alignItems: 'center' }}>
+            <View style={styles.emptyContainer}>
             <Ionicons
                 name={activeTab === 'all' ? "search-outline" : "document-text-outline"}
                 size={64}
@@ -29,7 +31,8 @@ const EmptyListingState: React.FC<EmptyListingStateProps> = ({ activeTab, catego
                     ? `No ${categoryTitle.toLowerCase()} found in this category yet.`
                     : "You haven't submitted any requests for this category."}
             </ThemedText>
-        </View>
+            </View>
+        </ListingCard>
     );
 };
 
@@ -38,7 +41,6 @@ export default EmptyListingState;
 const styles = StyleSheet.create({
     emptyContainer: {
         alignItems: 'center',
-        marginTop: 60,
     },
     emptyText: {
         marginTop: 16,

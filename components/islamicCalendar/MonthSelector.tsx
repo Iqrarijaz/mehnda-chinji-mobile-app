@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 16,
         borderRadius: 16,
-        borderWidth: 1,
     },
     arrowBtn: {
         width: 36,
@@ -68,7 +67,6 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
     },
     monthLabelWrapper: {
         alignItems: 'center',

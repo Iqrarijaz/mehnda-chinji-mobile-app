@@ -266,7 +266,6 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 16,
     borderRadius: 20,
-    borderWidth: 1,
   },
   backBtnText: {
     fontSize: 13,

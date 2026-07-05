@@ -13,17 +13,17 @@ const privacyData = [
     {
         id: '1',
         title: 'Information We Collect',
-        content: 'We collect information you directly provide to us when you register for an account or submit data:\n\n• Personal Profile Data: Your name, phone number, and email address required for account creation.\n• Manual City Selection: Your city and village name that you set manually in your profile for Azaan and weather updates. The app does NOT request, access, or use your GPS location or any automatic location tracking technology.\n• Public Directory Submissions: Information you submit regarding businesses, schools, mosques, or other public places.\n• Blood Donor Information: If you register as a blood donor, we collect your blood type and contact availability.',
+        content: 'We collect information you directly provide to us when you register for an account or submit data:\n\n• Personal Profile Data: Your name, phone number, and email address required for account creation.\n• Manual City Selection: Your city and village name that you set manually in your profile for Azaan and weather updates. The app does NOT request, access, or use your GPS location or any automatic location tracking technology.\n• Public Directory Submissions: Information you submit regarding businesses, schools, mosques, or other public places.\n•  Information: If you register as a , we collect your blood type and contact availability.',
     },
     {
         id: '2',
         title: 'How We Use Your Information',
-        content: 'Your data is used specifically to provide and improve Rehbar\'s community services:\n• To authenticate your account and secure your data.\n• To display your submitted businesses and places in our public directory.\n• To allow users in need of blood donations to contact you (only if you opted-in).\n• To send push notifications regarding account updates or relevant community alerts.',
+        content: 'Your data is used specifically to provide and improve Rehbar\'s community services:\n• To authenticate your account and secure your data.\n• To display your submitted businesses and places in our public directory.\n• To allow users in need of  to contact you (only if you opted-in).\n• To send push notifications regarding account updates or relevant community alerts.',
     },
     {
         id: '3',
         title: 'Sharing of Information',
-        content: '• Public Sharing: Any business details, community places, or blood donor profiles you submit are intended for public consumption and will be visible to other app users.\n• Third Parties: We do not sell, rent, or trade your personal private data to marketing agencies or third parties. Information is only shared when legally required or to protect our platform\'s integrity.',
+        content: '• Public Sharing: Any business details, community places, or  profiles you submit are intended for public consumption and will be visible to other app users.\n• Third Parties: We do not sell, rent, or trade your personal private data to marketing agencies or third parties. Information is only shared when legally required or to protect our platform\'s integrity.',
     },
 
     {
@@ -39,7 +39,7 @@ const privacyData = [
     {
         id: '6',
         title: 'Your Rights & Choices',
-        content: 'You have the right to access, edit, or delete your personal information at any time.\n• You can opt out of the Blood Donor registry.\n• You can request the deletion of your entire account completely through the App Settings.',
+        content: 'You have the right to access, edit, or delete your personal information at any time.\n• You can opt out of the  registry.\n• You can request the deletion of your entire account completely through the App Settings.',
     },
 ];
 
@@ -162,7 +162,7 @@ export default function PrivacyPolicyScreen() {
                         </View>
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Why we need your data?</ThemedText>
                         <ThemedText style={[styles.modalBody, { color: colors.textSecondary }]}>
-                            We collect specific data to authenticate your account and display your community listings, such as businesses, mosques, and blood donor details. Your private data is never sold to third parties.
+                            We collect specific data to authenticate your account and display your community listings, such as businesses, mosques, and  details. Your private data is never sold to third parties.
                         </ThemedText>
 
                         <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.primary }]} onPress={() => setInfoModalVisible(false)}>
@@ -289,7 +289,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8FAFC',
         borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        borderWidth: 1,
         borderColor: '#F1F5F9'
     },
     accordionHeader: {
@@ -359,7 +358,6 @@ const styles = StyleSheet.create({
         width: 24,
         height: 24,
         borderRadius: 6,
-        borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,

@@ -1,0 +1,70 @@
+import { useState, useEffect } from 'react';
+import { Platform, InteractionManager } from 'react-native';
+import { fetchAppVersionInfo } from '@/apis/app-info';
+import { checkUpdateStatus } from '@/utils/versioning';
+import { clientStorage } from '@/utils/storage';
+
+export const useAppUpdate = () => {
+  const [updateInfo, setUpdateInfo] = useState<{
+    visible: boolean;
+    isMandatory: boolean;
+    latestVersion: string;
+    updateUrl: string;
+    releaseNotes: string;
+  }>({
+    visible: false,
+    isMandatory: false,
+    latestVersion: '',
+    updateUrl: '',
+    releaseNotes: ''
+  });
+
+  const hideUpdateModal = () => setUpdateInfo(prev => ({ ...prev, visible: false }));
+
+  useEffect(() => {
+    const checkUpdate = async () => {
+      try {
+        const lastCheckStr = await clientStorage.getItem('last_update_check');
+        const lastCheck = lastCheckStr ? parseInt(lastCheckStr, 10) : 0;
+        const now = Date.now();
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+        if (now - lastCheck > ONE_DAY_MS) {
+          const info = await fetchAppVersionInfo();
+          const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.3';
+          const { isMandatory } = checkUpdateStatus(currentVersion, info.latestVersion, info.minRequiredVersion);
+          
+          if (isMandatory) {
+            setUpdateInfo({
+              visible: true,
+              isMandatory: true,
+              latestVersion: info.latestVersion,
+              updateUrl: Platform.OS === 'ios' ? info.updateUrl.ios : info.updateUrl.android,
+              releaseNotes: info.releaseNotes
+            });
+          }
+          await clientStorage.setItem('last_update_check', now.toString());
+        }
+      } catch (e) {
+        console.warn('Failed to check for updates on load', e);
+      }
+    };
+
+    // Delay update check so it doesn't affect app startup performance
+    const task = InteractionManager.runAfterInteractions(() => {
+      const updateTimer = setTimeout(() => {
+        checkUpdate();
+      }, 10000); // 10 seconds delay after interactions
+      
+      // We can't clear the timeout inside InteractionManager easily if it unmounts immediately,
+      // but typically AppInitializer doesn't unmount unless the app closes.
+    });
+
+    return () => task.cancel();
+  }, []);
+
+  return {
+    updateInfo,
+    hideUpdateModal,
+  };
+};

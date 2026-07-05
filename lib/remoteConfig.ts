@@ -12,7 +12,7 @@ let API_URL = fallbackUrl;
 
 export const initConfig = async () => {
     try {
-        const configKey = __DEV__ ? 'dev_api_base_url' : 'api_base_url';
+        const configKey = __DEV__ ? 'dev_api_base_url' : 'prod_api_url';
         const rc = getRemoteConfig();
 
         // Set the fetch interval. In development, we want instant updates (0).
@@ -37,8 +37,6 @@ export const initConfig = async () => {
         }
 
         if (__DEV__) {
-            console.log(`🌐 [RemoteConfig] Initialized. Environment: ${__DEV__ ? 'DEV' : 'PROD'}, Key: ${configKey}`);
-            console.log(`🌐 [RemoteConfig] Fetched URL: ${fetchedUrl || 'None'}, Fallback: ${fallbackUrl}`);
             console.log(`🌐 [RemoteConfig] Current URL: ${API_URL}`);
         }
     } catch (error) {

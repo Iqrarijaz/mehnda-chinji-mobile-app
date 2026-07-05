@@ -156,7 +156,6 @@ const styles = StyleSheet.create({
     },
     input: {
         height: Platform.OS === 'android' ? 48 : 52,
-        borderWidth: 1.5,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 18,
         fontSize: 15,
@@ -197,7 +196,6 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 48 : 52,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
         borderColor: '#E2E8F0',
         borderRadius: Layout.borderRadius,
     },

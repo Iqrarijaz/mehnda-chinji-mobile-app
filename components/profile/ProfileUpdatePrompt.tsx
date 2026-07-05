@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 48 : 52,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
         borderColor: '#E2E8F0',
         borderRadius: Layout.borderRadius,
     },
