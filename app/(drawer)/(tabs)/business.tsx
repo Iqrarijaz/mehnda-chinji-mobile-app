@@ -1,30 +1,30 @@
+import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { BUSINESS_QUERY_KEYS, getBusinessesList } from '@/apis/business';
 import BusinessCard from '@/components/business/BusinessCard';
-import BankCard from '@/components/listing/BankCard';
-import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { BusinessRegistration } from '@/components/business/BusinessRegistration';
-import { ProfessionPicker } from '@/components/common/ProfessionPicker';
-import { ThemedText } from '@/components/ThemedText';
-import { Colors } from '@/constants/colors';
-import { useTheme } from '@/context/ThemeContext';
-import { Ionicons } from '@expo/vector-icons';
-import { Layout } from '@/constants/layout';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState, useCallback } from 'react';
-import {
-    Platform,
-    StyleSheet,
-    TouchableOpacity,
-    View,
-    ActivityIndicator,
-    TextInput
-} from 'react-native';
-import { FlashList } from '@shopify/flash-list';
 import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
+import { ProfessionPicker } from '@/components/common/ProfessionPicker';
+import { HeaderIconBtn, ScreenHeader } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
+import PlaceCard from '@/components/listing/PlaceCard';
+import { ThemedText } from '@/components/ThemedText';
+import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
+import { useTheme } from '@/context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
+import { FlashList } from '@shopify/flash-list';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    Platform,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View
+} from 'react-native';
 
 
 export default function BusinessScreen() {
@@ -119,8 +119,16 @@ export default function BusinessScreen() {
 
     const renderItem = React.useCallback(({ item }: { item: any }) => {
         const isBank = item?.category?.toLowerCase() === 'banks' || item?.categoryEn?.toLowerCase() === 'banks';
-        return isBank ? <BankCard business={item} /> : <BusinessCard business={item} />;
-    }, []);
+        return isBank ? (
+            <PlaceCard
+                data={item}
+                category="banks"
+                color={colors.primary}
+            />
+        ) : (
+            <BusinessCard business={item} />
+        );
+    }, [colors.primary]);
     const keyExtractor = React.useCallback((item: any) => item._id?.$oid || item._id?.toString() || Math.random().toString(), []);
 
     const handleEndReached = useCallback(() => {

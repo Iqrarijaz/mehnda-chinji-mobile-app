@@ -1,37 +1,36 @@
-import { deleteRequest, getMyRequests, getEssentialsList, ESSENTIAL_SUBMISSION_QUERY_KEYS, ESSENTIALS_QUERY_KEYS } from '@/apis/essentials';
+import NativeAd from '@/ads/components/NativeAd';
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
-import { getCategoryTypes } from '@/constants/categoryTypes';
-import { Ionicons } from '@expo/vector-icons';
-import { PillsList } from '@/components/common/PillsList';
+import { deleteRequest, ESSENTIAL_SUBMISSION_QUERY_KEYS, ESSENTIALS_QUERY_KEYS, getEssentialsList, getMyRequests } from '@/apis/essentials';
 import BusinessCard from '@/components/business/BusinessCard';
+import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
-import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
+import { PillsList } from '@/components/common/PillsList';
+import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
+import { HeaderIconBtn, ScreenHeader } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
-import PlaceCard from '@/components/listing/PlaceCard';
 import EmptyListingState from '@/components/listing/EmptyListingState';
+import PlaceCard from '@/components/listing/PlaceCard';
 import RequestCard from '@/components/places/RequestCard';
+import { ThemedText } from '@/components/ThemedText';
+import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
+import { getCategoryTypes } from '@/constants/categoryTypes';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
+import { FlashList } from '@shopify/flash-list';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useState, useCallback } from 'react';
-import NativeAd from '@/ads/components/NativeAd';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
-    StyleSheet,
-    View,
     Platform,
+    StyleSheet,
     TouchableOpacity,
+    View,
 } from 'react-native';
-import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
-import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
-import { ThemedText } from '@/components/ThemedText';
-import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
-import BankCard from '@/components/listing/BankCard';
-import { FlashList } from '@shopify/flash-list';
+import Toast from 'react-native-toast-message';
 
 const CategoryListingScreen = React.memo(() => {
     const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();
@@ -234,11 +233,8 @@ const CategoryListingScreen = React.memo(() => {
             onReport: () => handleReport(item._id)
         };
 
-        if (['religious', 'health', 'education', 'emergency', 'govt', 'travel'].includes(category || '')) {
+        if (['religious', 'health', 'education', 'emergency', 'govt', 'travel', 'banks'].includes(category || '')) {
             return <PlaceCard {...commonProps} category={category || ''} />;
-        }
-        if (category === 'banks') {
-            return <BankCard business={item} onReport={() => handleReport(item._id)} />;
         }
         return <BusinessCard business={item} onReport={() => handleReport(item._id)} />;
     }, [category, headerColor, handleReport]);

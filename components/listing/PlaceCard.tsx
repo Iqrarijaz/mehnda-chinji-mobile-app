@@ -1,14 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
     View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
 
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import { ThemedText } from '@/components/ThemedText';
@@ -57,19 +57,7 @@ const PlaceCard = React.memo(({ data, category, color, onReport }: PlaceCardProp
     const colors = Colors[theme];
     const router = useRouter();
 
-    const getDefaultColor = () => {
-        switch (category.toLowerCase()) {
-            case 'religious': return '#10B981';
-            case 'health': return '#EF4444';
-            case 'education': return '#3B82F6';
-            case 'emergency': return '#F59E0B';
-            case 'govt': return '#8B5CF6';
-            case 'travel': return '#EC4899';
-            default: return '#3B82F6';
-        }
-    };
-
-    const primaryColor = color || getDefaultColor();
+    const primaryColor = color || colors.primary;
 
     const primaryAlpha10 = primaryColor + '1A';
     const primaryAlpha20 = primaryColor + '33';
@@ -171,33 +159,7 @@ const PlaceCard = React.memo(({ data, category, color, onReport }: PlaceCardProp
                             </View>
                         ) : null}
 
-                        <View style={{ flexDirection: 'row', gap: 8 }}>
-                            <TouchableOpacity style={styles.actionBtn} activeOpacity={0.8}>
-                                <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
-                            </TouchableOpacity>
-                            {onReport && (
-                                <TouchableOpacity
-                                    style={[styles.actionBtn, { backgroundColor: 'rgba(239,68,68,0.4)' }]}
-                                    activeOpacity={0.8}
-                                    onPress={(e) => {
-                                        e.stopPropagation();
-                                        onReport();
-                                    }}
-                                >
-                                    <Ionicons name="flag" size={15} color="#FFFFFF" />
-                                </TouchableOpacity>
-                            )}
-                        </View>
                     </View>
-
-                    {placeImage && (
-                        <View style={styles.imageLabel}>
-                            <Ionicons name="images-outline" size={11} color="rgba(255,255,255,0.75)" />
-                            <ThemedText style={styles.imageLabelText}>
-                                {(data.images?.length ?? 0) > 1 ? `${data.images!.length} Photos` : '1 Photo'}
-                            </ThemedText>
-                        </View>
-                    )}
                 </View>
 
                 {/* Content */}
