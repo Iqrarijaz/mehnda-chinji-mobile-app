@@ -3,13 +3,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    FlatList,
     RefreshControl,
     StyleSheet,
     TouchableOpacity,
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FlashList } from '@shopify/flash-list';
 
 import {
     getNotifications,
@@ -209,16 +209,18 @@ export default function NotificationsScreen() {
                 <NotificationFilterTabs active={activeFilter} onSelect={setActiveFilter} />
             </View>
             {/* Scrollable List */}
-            <FlatList
-                data={listData}
-                renderItem={renderItem}
-                keyExtractor={(item, i) => `${item.type}-${i}`}
-                contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 32 }]}
-                showsVerticalScrollIndicator={false}
-                refreshControl={
-                    <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor="#006666" />
-                }
-            />
+            <View style={{ flex: 1 }}>
+                <FlashList
+                    data={listData}
+                    renderItem={renderItem as any}
+                    keyExtractor={(item: any, i: number) => `${item.type}-${i}`}
+                    contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 32 }]}
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor="#006666" />
+                    }
+                />
+            </View>
         </View>
     );
 }

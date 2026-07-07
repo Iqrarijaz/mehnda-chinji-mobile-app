@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
     StyleSheet,
-    FlatList,
     Animated,
     Dimensions,
     View,
+    FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -27,8 +27,8 @@ const SLIDES = [
     },
     {
         id: '2',
-        title: 'ایک قطرہ، ایک زندگی',
-        description: 'Be a hero in your neighborhood. Join our  network or request donations.',
+        title: 'آسانی سے خریدیں اور بیچیں',
+        description: 'Discover, buy, and sell item and vehicles directly within your community marketplace.',
         animation: require('../public/json/onboarding2.json'),
     },
     {
@@ -42,26 +42,19 @@ const SLIDES = [
 export default function OnboardingScreen() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const scrollX = useRef(new Animated.Value(0)).current;
-    const slidesRef = useRef<FlatList>(null);
+    const slidesRef = useRef<any>(null);
     const router = useRouter();
     const { theme } = useTheme();
     const { isAuthenticated } = useAuth();
     const isDark = theme === 'dark';
     const colors = Colors[theme];
 
-    // Background color interpolation for an elite visual fade transition
-    const backgroundColor = scrollX.interpolate({
-        inputRange: SLIDES.map((_, i) => i * width),
-        outputRange: isDark
-            ? ['#111827', '#0F172A', '#1E1B4B'] // Dark mode backgrounds
-            : ['#F8FAFC', '#F0F9FF', '#FAF5FF'], // Light mode backgrounds
-        extrapolate: 'clamp',
-    });
+    const backgroundColor = colors.background;
 
     // Handle tactile feedback when snap indices change
     useEffect(() => {
         if (currentIndex >= 0) {
-            Haptics.selectionAsync().catch(() => {});
+            Haptics.selectionAsync().catch(() => { });
         }
     }, [currentIndex]);
 
@@ -77,9 +70,9 @@ export default function OnboardingScreen() {
     const handleNext = () => {
         if (currentIndex < SLIDES.length - 1) {
             slidesRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => { });
         } else {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => { });
             completeOnboarding();
         }
     };
@@ -87,7 +80,7 @@ export default function OnboardingScreen() {
     const handleBack = () => {
         if (currentIndex > 0) {
             slidesRef.current?.scrollToIndex({ index: currentIndex - 1, animated: true });
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => { });
         }
     };
 
@@ -107,11 +100,11 @@ export default function OnboardingScreen() {
 
     return (
         <Animated.View style={[styles.container, { backgroundColor }]}>
-            <SafeAreaView style={styles.safeArea}>
+            <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
                 <View style={styles.content}>
-                    <FlatList
+                    <Animated.FlatList
                         data={SLIDES}
-                        renderItem={({ item, index }) => (
+                        renderItem={({ item, index }: any) => (
                             <OnboardingSlide
                                 item={item}
                                 index={index}
@@ -122,7 +115,7 @@ export default function OnboardingScreen() {
                         showsHorizontalScrollIndicator={false}
                         pagingEnabled
                         bounces={false}
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item: any) => item.id}
                         onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
                             useNativeDriver: false,
                         })}

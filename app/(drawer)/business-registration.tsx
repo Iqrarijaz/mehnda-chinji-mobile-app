@@ -223,7 +223,7 @@ const BusinessRegistrationScreen = () => {
                 animationHeight={200}
             >
                 <ThemedText style={{ fontSize: 14, textAlign: 'center', lineHeight: 22, color: colors.textSecondary }}>
-                    Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{user?.user?.name ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Entrepreneur'}</ThemedText>, thank you for registering! Our team will review and approve your business shortly.
+                    Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{user?.user?.name ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Entrepreneur'}</ThemedText>, {editData ? 'your business details have been updated successfully.' : 'thank you for registering! Our team will review and approve your business shortly.'}
                 </ThemedText>
             </ThankYouModal>
 

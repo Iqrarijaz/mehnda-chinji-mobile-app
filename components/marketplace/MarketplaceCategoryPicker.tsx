@@ -165,6 +165,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                             renderSectionHeader={renderSectionHeader}
                             contentContainerStyle={styles.listContent}
                             stickySectionHeadersEnabled={false}
+                            style={{ flex: 1 }}
                             ListEmptyComponent={() => (
                                 <View style={{ padding: 20, alignItems: 'center' }}>
                                     <ThemedText style={{ color: colors.icon }}>No categories found.</ThemedText>
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '90%',
-        maxHeight: '70%',
+        height: '60%',
         borderRadius: Layout.borderRadius,
         padding: 20,
         overflow: 'hidden',

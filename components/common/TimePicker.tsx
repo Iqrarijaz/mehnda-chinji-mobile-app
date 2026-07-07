@@ -6,8 +6,8 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
-    FlatList,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -63,7 +63,7 @@ export function TimePicker({
 
     const renderColumn = (data: string[], value: string, setValue: (v: string) => void, flex: number) => (
         <View style={{ flex }}>
-            <FlatList
+            <FlashList
                 data={data}
                 keyExtractor={(item) => item}
                 showsVerticalScrollIndicator={false}

@@ -18,7 +18,7 @@ const termsData = [
     {
         id: '2',
         title: 'User Accounts and Responsibilities',
-        content: '• Account Registration: To use certain features of the app (such as registering a business, signing up as a , or submitting places), you must create an account. You agree to provide accurate, current, and complete information during registration.\n• Account Security: You are responsible for safeguarding your login credentials. You must notify us immediately of any unauthorized use of your account.',
+        content: '• Account Registration: To use certain features of the app (such as registering a business, creating a marketplace listing, or submitting places), you must create an account. You agree to provide accurate, current, and complete information during registration.\n• Account Security: You are responsible for safeguarding your login credentials. You must notify us immediately of any unauthorized use of your account.',
     },
     {
         id: '3',
@@ -28,13 +28,13 @@ const termsData = [
 
     {
         id: '4',
-        title: ' Registry',
-        content: '• Role of Rehbar: The Rehbar  feature is strictly a communication platform to connect potential  with those in need. Rehbar is not a medical organization, hospital, or .\n• No Liability: Rehbar and its developers assume zero liability for any injury, illness, or complications resulting from  coordinated through this app.',
+        title: 'Marketplace Policy',
+        content: '• Role of Rehbar: The Rehbar Marketplace is strictly a communication platform to connect buyers and sellers. Rehbar does not facilitate payments, guarantee item quality, or mediate disputes.\n• No Liability: Rehbar and its developers assume zero liability for any financial loss, fraud, or disputes arising from transactions coordinated through this app.',
     },
     {
         id: '5',
         title: 'Prohibited Conduct',
-        content: 'When submitting businesses, places, or registering as a donor, you agree NOT to:\n• Provide false, misleading, or fraudulent information.\n• Submit content that is illegal, offensive, harassing, or discriminatory.\n• Attempt to manipulate, spam, or overload the application\'s forms.',
+        content: 'When submitting businesses, places, or creating a marketplace listing, you agree NOT to:\n• Provide false, misleading, or fraudulent information.\n• Submit content that is illegal, offensive, harassing, or discriminatory.\n• Attempt to manipulate, spam, or overload the application\'s forms.',
     },
 ];
 
@@ -157,7 +157,7 @@ export default function TermsAndConditionsScreen() {
                         </View>
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Why do we need this?</ThemedText>
                         <ThemedText style={[styles.modalBody, { color: colors.textSecondary }]}>
-                            To maintain a safe and reliable community platform, we require all users to agree to our guidelines. This ensures that submitted listings, businesses, and blood requests are genuine and appropriate for everyone.
+                            To maintain a safe and reliable community platform, we require all users to agree to our guidelines. This ensures that submitted businesses and marketplace listings are genuine and appropriate for everyone.
                         </ThemedText>
 
                         <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.primary }]} onPress={() => setInfoModalVisible(false)}>

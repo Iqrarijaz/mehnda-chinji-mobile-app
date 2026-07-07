@@ -27,8 +27,8 @@ const guidelinesData = [
     },
     {
         id: '4',
-        title: ' Ethics',
-        content: 'The  feature is a selfless community service. Do not solicit payment, trade, or any form of compensation for . Users found engaging in such practices will be banned immediately.',
+        title: 'Marketplace Ethics',
+        content: 'The Marketplace feature is designed for fair local trade. Do not list illegal items, engage in fraudulent transactions, or post misleading descriptions. Users found engaging in such practices will be banned immediately.',
     },
     {
         id: '5',
@@ -156,7 +156,7 @@ export default function CommunityGuidelinesScreen() {
                         </View>
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Community Trust</ThemedText>
                         <ThemedText style={[styles.modalBody, { color: colors.textSecondary }]}>
-                            These guidelines ensure that every interaction—whether listing a business or requesting blood—is safe, ethical, and helpful for the entire Rehbar community.
+                            These guidelines ensure that every interaction—whether listing a business or selling an item—is safe, ethical, and helpful for the entire Rehbar community.
                         </ThemedText>
                         <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.primary }]} onPress={() => setInfoModalVisible(false)}>
                             <ThemedText style={styles.modalBtnText}>I Understand</ThemedText>

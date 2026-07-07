@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useCallback, useMemo } from 'react';
 import {
-    FlatList,
     Modal,
     StyleSheet,
     TextInput,
@@ -9,6 +8,7 @@ import {
     View,
     ActivityIndicator,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 
@@ -148,17 +148,19 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                             <ActivityIndicator size="large" color={colors.primary} />
                         </View>
                     ) : (
-                        <FlatList
-                            data={filteredProfessions}
-                            keyExtractor={keyExtractor}
-                            renderItem={renderItem}
-                            contentContainerStyle={styles.listContent}
-                            ListEmptyComponent={() => (
-                                <View style={{ padding: 20, alignItems: 'center' }}>
-                                    <ThemedText style={{ color: colors.icon }}>No professions found.</ThemedText>
-                                </View>
-                            )}
-                        />
+                        <View style={{ flex: 1, width: '100%' }}>
+                            <FlashList
+                                data={filteredProfessions}
+                                keyExtractor={keyExtractor}
+                                renderItem={renderItem}
+                                contentContainerStyle={styles.listContent}
+                                ListEmptyComponent={() => (
+                                    <View style={{ padding: 20, alignItems: 'center' }}>
+                                        <ThemedText style={{ color: colors.icon }}>No professions found.</ThemedText>
+                                    </View>
+                                )}
+                            />
+                        </View>
                     )}
 
                     <View style={styles.footerContainer}>
@@ -185,7 +187,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '90%',
-        maxHeight: '70%',
+        height: '60%',
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
         padding: 20,

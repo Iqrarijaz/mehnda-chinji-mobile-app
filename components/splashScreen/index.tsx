@@ -90,7 +90,7 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
     }, []);
 
     return (
-        <View style={[styles.container, { backgroundColor: isDark ? '#0F172A' : '#FFFFFF' }]}>
+        <View style={[styles.container, { backgroundColor: isDark ? '#0F172A' : '#E6F4FE' }]}>
             {/* Solid background matching native splash perfectly */}
 
             {/* Glowing Aura/Halo behind logo */}

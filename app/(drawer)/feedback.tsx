@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, memo } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Stack, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
@@ -236,7 +237,7 @@ export default function FeedbackScreen() {
                             <ActivityIndicator size="large" color={colors.primary} />
                         </View>
                     ) : (
-                        <FlatList
+                        <FlashList
                             data={feedbacks}
                             keyExtractor={item => item._id}
                             renderItem={renderHistoryItem}

@@ -1,5 +1,6 @@
 import React, { useState, useCallback, memo, useRef, useEffect, useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, FlatList, ActivityIndicator, Platform } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
@@ -315,23 +316,21 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                     <ActivityIndicator size="large" color={colors.primary} />
                 </View>
             ) : (
-                <FlatList
-                    data={listingsRows}
-                    renderItem={renderItem}
-                    keyExtractor={(item: any) => item._id}
-                    contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 80, flexGrow: 1, paddingTop: isMineTab ? 20 : 0 }]}
-                    onEndReached={handleEndReached}
-                    onEndReachedThreshold={0.5}
-                    initialNumToRender={8}
-                    maxToRenderPerBatch={5}
-                    windowSize={5}
-                    removeClippedSubviews={Platform.OS === 'android'}
-                    ListFooterComponent={renderFooter}
-                    refreshing={isRefetching}
-                    onRefresh={handleRefresh}
-                    showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={<EmptyMarketplace colors={colors} />}
-                />
+                <View style={{ flex: 1 }}>
+                    <FlashList
+                        data={listingsRows}
+                        renderItem={renderItem as any}
+                        keyExtractor={(item: any) => item._id}
+                        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 80, paddingTop: isMineTab ? 20 : 0 }]}
+                        onEndReached={handleEndReached}
+                        onEndReachedThreshold={0.5}
+                        ListFooterComponent={renderFooter}
+                        refreshing={isRefetching}
+                        onRefresh={handleRefresh}
+                        showsVerticalScrollIndicator={false}
+                        ListEmptyComponent={<EmptyMarketplace colors={colors} />}
+                    />
+                </View>
             )}
 
             {/* Multi-select filter categories picker */}

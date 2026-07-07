@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { StyleSheet, View, FlatList, TextInput, TouchableOpacity, RefreshControl, ActivityIndicator, ImageBackground } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, RefreshControl, ActivityIndicator, ImageBackground } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
@@ -210,35 +211,37 @@ export default function QuranListScreen() {
                     </TouchableOpacity>
                 </View>
             ) : (
-                <FlatList
-                    data={filteredSurahs}
-                    keyExtractor={(item) => item.number.toString()}
-                    renderItem={renderSurahCard}
-                    contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 32 }]}
-                    showsVerticalScrollIndicator={false}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={isRefetching}
-                            onRefresh={refetch}
-                            colors={[colors.primary]}
-                            tintColor={colors.primary}
-                        />
-                    }
-                    ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <Ionicons
-                                name={activeTab === 'favourites' ? 'heart-outline' : 'search-outline'}
-                                size={48}
-                                color={colors.textSecondary}
+                <View style={{ flex: 1 }}>
+                    <FlashList
+                        data={filteredSurahs}
+                        keyExtractor={(item) => item.number.toString()}
+                        renderItem={renderSurahCard}
+                        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 32 }]}
+                        showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isRefetching}
+                                onRefresh={refetch}
+                                colors={[colors.primary]}
+                                tintColor={colors.primary}
                             />
-                            <ThemedText style={[styles.emptyText, { color: colors.textSecondary }]}>
-                                {activeTab === 'favourites'
-                                    ? 'No favourites yet.\nTap ♥ on a Surah to save it here.'
-                                    : `No Surahs match "${searchQuery}"`}
-                            </ThemedText>
-                        </View>
-                    }
-                />
+                        }
+                        ListEmptyComponent={
+                            <View style={styles.emptyContainer}>
+                                <Ionicons
+                                    name={activeTab === 'favourites' ? 'heart-outline' : 'search-outline'}
+                                    size={48}
+                                    color={colors.textSecondary}
+                                />
+                                <ThemedText style={[styles.emptyText, { color: colors.textSecondary }]}>
+                                    {activeTab === 'favourites'
+                                        ? 'No favourites yet.\nTap ♥ on a Surah to save it here.'
+                                        : `No Surahs match "${searchQuery}"`}
+                                </ThemedText>
+                            </View>
+                        }
+                    />
+                </View>
             )}
         </View>
     );

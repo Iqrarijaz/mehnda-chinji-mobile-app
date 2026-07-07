@@ -19,7 +19,6 @@ import NativeAd from '@/ads/components/NativeAd';
 import {
     ActivityIndicator,
     Alert,
-    FlatList,
     StyleSheet,
     View,
     Platform,
@@ -32,6 +31,7 @@ import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
 import { ThemedText } from '@/components/ThemedText';
 import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 import BankCard from '@/components/listing/BankCard';
+import { FlashList } from '@shopify/flash-list';
 
 const CategoryListingScreen = React.memo(() => {
     const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();
@@ -338,52 +338,50 @@ const CategoryListingScreen = React.memo(() => {
                     </View>
                 ) : (
                     <>
-                        <FlatList
-                            data={listData}
-                            renderItem={activeTab === 'all' ? renderItem : renderRequestItem}
-                            keyExtractor={keyExtractor}
-                            contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20 }]}
-                            onRefresh={handleRefresh}
-                            refreshing={loading && !isFetchingNextPage && !myRequestsFetchingNextPage}
-                            onEndReached={handleLoadMore}
-                            onEndReachedThreshold={0.5}
-                            initialNumToRender={8}
-                            maxToRenderPerBatch={8}
-                            windowSize={5}
-                            removeClippedSubviews={Platform.OS === 'android'}
-                            ListFooterComponent={
-                                () => {
-                                    const hasMore = activeTab === 'all' ? hasNextPage : myRequestsHasNextPage;
-                                    const isFetching = activeTab === 'all' ? isFetchingNextPage : myRequestsFetchingNextPage;
-                                    const hasData = listData.length > 0;
+                        <View style={{ flex: 1 }}>
+                            <FlashList
+                                data={listData}
+                                renderItem={activeTab === 'all' ? renderItem : renderRequestItem}
+                                keyExtractor={keyExtractor}
+                                contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20 }]}
+                                onRefresh={handleRefresh}
+                                refreshing={loading && !isFetchingNextPage && !myRequestsFetchingNextPage}
+                                onEndReached={handleLoadMore}
+                                onEndReachedThreshold={0.5}
+                                ListFooterComponent={
+                                    () => {
+                                        const hasMore = activeTab === 'all' ? hasNextPage : myRequestsHasNextPage;
+                                        const isFetching = activeTab === 'all' ? isFetchingNextPage : myRequestsFetchingNextPage;
+                                        const hasData = listData.length > 0;
 
-                                    if (isFetching) {
-                                        return (
-                                            <View style={styles.footerLoader}>
-                                                <ActivityIndicator color={colors.primary} />
-                                            </View>
-                                        );
+                                        if (isFetching) {
+                                            return (
+                                                <View style={styles.footerLoader}>
+                                                    <ActivityIndicator color={colors.primary} />
+                                                </View>
+                                            );
+                                        }
+
+                                        if (!hasMore && hasData) {
+                                            return (
+                                                <View style={styles.endOfListContainer}>
+                                                    <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
+                                                    <ThemedText style={[styles.endOfListText, { color: colors.icon }]}>
+                                                        You've reached the end of the list
+                                                    </ThemedText>
+                                                    <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
+                                                </View>
+                                            );
+                                        }
+
+                                        return <View style={{ height: 20 }} />;
                                     }
-
-                                    if (!hasMore && hasData) {
-                                        return (
-                                            <View style={styles.endOfListContainer}>
-                                                <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
-                                                <ThemedText style={[styles.endOfListText, { color: colors.icon }]}>
-                                                    You&apos;ve reached the end of the list
-                                                </ThemedText>
-                                                <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
-                                            </View>
-                                        );
-                                    }
-
-                                    return <View style={{ height: 20 }} />;
                                 }
-                            }
-                            ListEmptyComponent={
-                                <EmptyListingState activeTab={activeTab} categoryTitle={categoryTitle} />
-                            }
-                        />
+                                ListEmptyComponent={
+                                    <EmptyListingState activeTab={activeTab} categoryTitle={categoryTitle} />
+                                }
+                            />
+                        </View>
                     </>
                 )}
             </View>

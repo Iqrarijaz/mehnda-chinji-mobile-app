@@ -94,7 +94,7 @@ export default function ReportsScreen() {
     const getTargetLabel = (type: string) => {
         switch (type) {
             case 'BUSINESS': return 'Business';
-            case 'DONOR': return 'Donor';
+            case 'MARKETPLACE': return 'Marketplace Listing';
             case 'PLACE': return 'Place';
             default: return type;
         }

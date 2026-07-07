@@ -229,21 +229,17 @@ function RootLayout() {
   const fontsLoaded = useAppFonts();
   const [configLoaded, setConfigLoaded] = useState(false);
   const [minimumTimeElapsed, setMinimumTimeElapsed] = useState(false);
-
-  // Native splash screen hiding is deferred to CustomSplashScreen's Image onLoad
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinimumTimeElapsed(true);
-    }, 2000);
+    }, 1500);
 
-    // Initialize device info cache for API interceptors
     initializeDeviceInfo().catch(err => console.error('Failed to initialize device info', err));
 
-    console.time("config");
     initConfig()
       .finally(() => {
-        console.timeEnd("config");
         setConfigLoaded(true);
       })
       .catch((err) => {
@@ -251,17 +247,19 @@ function RootLayout() {
         setConfigLoaded(true);
       });
 
-    console.time("ads");
-    AdManager.init()
-      .finally(() => {
-        console.timeEnd("ads");
-      })
-      .catch(console.error);
+    AdManager.init().catch(console.error);
 
     return () => clearTimeout(timer);
   }, []);
 
   const isAppReady = fontsLoaded && configLoaded && minimumTimeElapsed;
+
+
+  useEffect(() => {
+    if (isAppReady) {
+      setShowSplash(false);
+    }
+  }, [isAppReady]);
 
   return (
     <ErrorBoundary>
@@ -277,14 +275,15 @@ function RootLayout() {
                   <SocketProvider>
                     <MenuProvider>
                       <StatusBar style="dark" />
-                      {isAppReady ? (
+
+                      {showSplash ? (
+                        <CustomSplashScreen />
+                      ) : (
                         <>
                           <AppInitializer />
                           <DrawerLayout />
                           <NetworkMonitor />
                         </>
-                      ) : (
-                        <CustomSplashScreen />
                       )}
                     </MenuProvider>
                   </SocketProvider>

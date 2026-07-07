@@ -17,8 +17,9 @@ export interface AppVersionInfo {
  */
 export const fetchAppVersionInfo = async (): Promise<AppVersionInfo> => {
     try {
-        const response: any = await apiClient.get('/api/public/v1/configuration/APP_VERSION');
-        return response.data;
+        const type = 'APP_VERSION';
+        const response: any = await apiClient.get(`/api/public/v1/configuration/${type}`);
+        return response.data?.data || response.data;
     } catch (error: any) {
         throw new Error(error.message || 'Failed to fetch app version info');
     }

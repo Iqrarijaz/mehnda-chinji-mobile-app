@@ -11,7 +11,6 @@ import {
     Alert,
     Animated,
     Dimensions,
-    FlatList,
     LayoutAnimation,
     RefreshControl,
     ScrollView,
@@ -22,6 +21,7 @@ import {
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import { FlashList } from '@shopify/flash-list';
 
 const { width } = Dimensions.get('window');
 
@@ -274,17 +274,19 @@ export default function TicketListScreen() {
                         </TouchableOpacity>
                     </View>
                 ) : (
-                    <FlatList
-                        data={tickets}
-                        renderItem={renderTicket}
-                        keyExtractor={(item) => item._id}
-                        contentContainerStyle={styles.listContent}
-                        showsVerticalScrollIndicator={false}
-                        ListEmptyComponent={renderEmpty}
-                        refreshControl={
-                            <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.primary} />
-                        }
-                    />
+                    <View style={{ flex: 1 }}>
+                        <FlashList
+                            data={tickets}
+                            renderItem={renderTicket}
+                            keyExtractor={(item) => item._id}
+                            contentContainerStyle={styles.listContent}
+                            showsVerticalScrollIndicator={false}
+                            ListEmptyComponent={renderEmpty}
+                            refreshControl={
+                                <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.primary} />
+                            }
+                        />
+                    </View>
                 )}
             </View>
         </GestureHandlerRootView>

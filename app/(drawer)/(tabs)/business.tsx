@@ -291,8 +291,11 @@ const styles = StyleSheet.create({
     },
     filterBadgeText: {
         color: '#FFFFFF',
-        fontSize: 8,
+        fontSize: 10,
         fontWeight: 'bold',
+        textAlign: 'center',
+        lineHeight: 12,
+        includeFontPadding: false,
     },
     categoryScroller: {
         paddingHorizontal: 16,

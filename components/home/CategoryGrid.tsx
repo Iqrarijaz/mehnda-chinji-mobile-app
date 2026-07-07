@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     },
     modalCard: {
         width: '90%',
-        maxHeight: '70%',
+        height: '60%',
         borderRadius: Layout.borderRadius,
         padding: 20,
         overflow: 'hidden',

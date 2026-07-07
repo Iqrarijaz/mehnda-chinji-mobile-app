@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     },
 
     // Session card
-    list: { maxHeight: 420 },
+    list: { maxHeight: '55%' },
     listContent: { paddingBottom: 8 },
     card: {
         flexDirection: 'row',

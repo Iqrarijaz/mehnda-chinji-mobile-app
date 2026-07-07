@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rehbar",
     "slug": "rehbar",
-    "version": "1.2.4",
+    "version": "1.2.6",
     "orientation": "portrait",
     "icon": "./public/icon.png",
     "scheme": "rehbarcommunityapp",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.rehbar.community",
-      "buildNumber": "10",
+      "buildNumber": "11",
       "icon": "./public/icon.png",
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera to take profile and support ticket photos.",
@@ -20,7 +20,7 @@
     },
     "android": {
       "package": "com.rehbar.community",
-      "versionCode": 10,
+      "versionCode": 11,
       "adaptiveIcon": {
         "foregroundImage": "./public/icon.png",
         "backgroundImage": "./public/icon.png",
@@ -69,7 +69,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#FFFFFF",
+          "backgroundColor": "#E6F4FE",
           "image": "./public/logo_with_text.png",
           "imageWidth": 220,
           "dark": {
@@ -107,6 +107,8 @@
             ]
           },
           "android": {
+            "kotlinVersion": "2.2.10",
+            "enableProguardInReleaseBuilds": true,
             "dependencies": [
               "com.google.ads.mediation:applovin:13.1.0.0",
               "com.google.ads.mediation:facebook:6.19.0.0",
@@ -125,7 +127,7 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": false
+      "reactCompiler": true
     },
     "extra": {
       "router": {},

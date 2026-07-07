@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, FlatList, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -31,7 +32,7 @@ export const PillsList = React.memo(function PillsList({
 
     return (
         <View style={[styles.tabsContainer, containerStyle]}>
-            <FlatList
+            <FlashList
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 data={data}
@@ -67,18 +68,18 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
     },
     tabsList: {
-        paddingHorizontal: 16,
-        gap: 8,
+        paddingHorizontal: 12,
     },
     tab: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
+        marginRight: 8,
     },
     tabText: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: '700',
     },
 });

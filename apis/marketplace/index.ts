@@ -27,7 +27,7 @@ export interface MarketplaceListing {
         coordinates: [number, number];
     };
     images: string[];
-    status: 'pending' | 'live' | 'rejected' | 'sold';
+    status: 'pending' | 'live' | 'rejected' | 'sold' | 'offline';
     rejectedReason?: string;
     isFeatured: boolean;
     sellerPhone: string;
@@ -78,4 +78,8 @@ export const incrementMarketplaceInquiry = async (listingId: string) => {
 
 export const deleteMarketplaceListing = async (listingId: string) => {
     return apiClient.post('/api/user/v1/marketplace/delete', { listingId });
+};
+
+export const toggleMarketplaceListingStatus = async (listingId: string, status: 'live' | 'offline') => {
+    return apiClient.post('/api/user/v1/marketplace/toggle-status', { listingId, status });
 };

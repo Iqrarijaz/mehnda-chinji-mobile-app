@@ -85,9 +85,9 @@ export const useWeatherNotifications = (selectedCity: string) => {
                     await Notifications.scheduleNotificationAsync({
                         identifier: WEATHER_NOTIFICATION_ID,
                         content: {
-                            title: '🌧️ Rain Alert / بارش کا الرٹ',
-                            body: `There is a ${popPercentage}% chance of ${weatherDesc} tomorrow in ${cityNameClean.charAt(0).toUpperCase() + cityNameClean.slice(1)}. Carry an umbrella! / کل بارش کا امکان ہے۔`,
-                            data: { type: 'weather_rain' }
+                            title: '☔ Rain Expected Tomorrow',
+                            body: `${popPercentage}% chance of rain in ${cityNameClean}. Plan ahead!`,
+                            data: { type: 'weather_rain' },
                         },
                         trigger: {
                             type: Notifications.SchedulableTriggerInputTypes.DATE,

@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-    FlatList,
     Modal,
     StyleSheet,
     TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -43,11 +43,16 @@ export function SearchableDropdown({
     const [searchQuery, setSearchQuery] = useState('');
 
     const formattedOptions: Option[] = React.useMemo(() => {
-        if (options.length === 0) return [];
-        if (typeof options[0] === 'string') {
+        if (!options || options.length === 0) return [];
+        const first = options[0];
+        if (typeof first === 'string') {
             return (options as string[]).map(opt => ({ label: opt, value: opt }));
         }
-        return options as Option[];
+        // If the API returned objects, map them using label/value or name fields
+        return (options as any[]).map(opt => ({
+            label: opt.label ?? opt.name ?? opt.name_eng ?? String(opt),
+            value: opt.value ?? opt.name ?? opt.name_eng ?? String(opt),
+        }));
     }, [options]);
 
     const filteredOptions = formattedOptions.filter(opt =>
@@ -89,62 +94,64 @@ export function SearchableDropdown({
                         )}
                     </View>
 
-                    <FlatList
-                        data={filteredOptions}
-                        keyExtractor={(item) => item.value}
-                        renderItem={({ item }) => {
-                            const isSelected = currentValue === item.value;
-                            return (
-                                <TouchableOpacity
-                                    style={[
-                                        styles.item,
-                                        isSelected && { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.primary + '10' }
-                                    ]}
-                                    onPress={() => {
-                                        onSelect(item.value);
-                                        setSearchQuery('');
-                                        onClose();
-                                    }}
-                                >
-                                    <View style={styles.labelContainer}>
-                                        <ThemedText style={[
-                                            styles.itemText,
-                                            { color: colors.text },
-                                            isSelected && { color: colors.primary, fontWeight: '700' }
-                                        ]}>
-                                            {item.label}
-                                        </ThemedText>
-                                    </View>
-                                    {isSelected && (
-                                        <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                    <View style={{ flex: 1, width: '100%' }}>
+                        <FlashList
+                            data={filteredOptions}
+                            keyExtractor={(item) => item.value}
+                            renderItem={({ item }) => {
+                                const isSelected = currentValue === item.value;
+                                return (
+                                    <TouchableOpacity
+                                        style={[
+                                            styles.item,
+                                            isSelected && { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.primary + '10' }
+                                        ]}
+                                        onPress={() => {
+                                            onSelect(item.value);
+                                            setSearchQuery('');
+                                            onClose();
+                                        }}
+                                    >
+                                        <View style={styles.labelContainer}>
+                                            <ThemedText style={[
+                                                styles.itemText,
+                                                { color: colors.text },
+                                                isSelected && { color: colors.primary, fontWeight: '700' }
+                                            ]}>
+                                                {item.label}
+                                            </ThemedText>
+                                        </View>
+                                        {isSelected && (
+                                            <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                                        )}
+                                    </TouchableOpacity>
+                                );
+                            }}
+                            contentContainerStyle={styles.listContent}
+                            ListEmptyComponent={
+                                <View style={styles.emptyContainer}>
+                                    {searchQuery.length > 0 ? (
+                                        <View style={styles.addOptionContainer}>
+                                            <ThemedText style={[styles.emptyText, { color: colors.icon, marginBottom: 12 }]}>No options found for "{searchQuery}"</ThemedText>
+                                            <TouchableOpacity
+                                                style={[styles.addButton, { backgroundColor: colors.primary + '15', borderColor: colors.primary }]}
+                                                onPress={() => {
+                                                    onSelect(searchQuery);
+                                                    setSearchQuery('');
+                                                    onClose();
+                                                }}
+                                            >
+                                                <Ionicons name="add-circle-outline" size={20} color={colors.primary} />
+                                                <ThemedText style={[styles.addButtonText, { color: colors.primary }]}>Add "{searchQuery}"</ThemedText>
+                                            </TouchableOpacity>
+                                        </View>
+                                    ) : (
+                                        <ThemedText style={[styles.emptyText, { color: colors.icon }]}>No options found</ThemedText>
                                     )}
-                                </TouchableOpacity>
-                            );
-                        }}
-                        contentContainerStyle={styles.listContent}
-                        ListEmptyComponent={
-                            <View style={styles.emptyContainer}>
-                                {searchQuery.length > 0 ? (
-                                    <View style={styles.addOptionContainer}>
-                                        <ThemedText style={[styles.emptyText, { color: colors.icon, marginBottom: 12 }]}>No options found for "{searchQuery}"</ThemedText>
-                                        <TouchableOpacity
-                                            style={[styles.addButton, { backgroundColor: colors.primary + '15', borderColor: colors.primary }]}
-                                            onPress={() => {
-                                                onSelect(searchQuery);
-                                                setSearchQuery('');
-                                                onClose();
-                                            }}
-                                        >
-                                            <Ionicons name="add-circle-outline" size={20} color={colors.primary} />
-                                            <ThemedText style={[styles.addButtonText, { color: colors.primary }]}>Add "{searchQuery}"</ThemedText>
-                                        </TouchableOpacity>
-                                    </View>
-                                ) : (
-                                    <ThemedText style={[styles.emptyText, { color: colors.icon }]}>No options found</ThemedText>
-                                )}
-                            </View>
-                        }
-                    />
+                                </View>
+                            }
+                        />
+                    </View>
 
                     <View style={styles.footerContainer}>
                         <TouchableOpacity
@@ -170,7 +177,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '90%',
-        maxHeight: '70%',
+        height: '60%',
         borderRadius: Layout.borderRadius,
         padding: 20,
         overflow: 'hidden',

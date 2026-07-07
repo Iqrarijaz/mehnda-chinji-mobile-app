@@ -3,13 +3,13 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
-    FlatList,
     Platform,
     StyleSheet,
     TouchableOpacity,
     View,
     TextInput
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -189,7 +189,7 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
                 </TouchableOpacity>
             </View>
 
-            <FlatList
+            <FlashList
                 contentContainerStyle={styles.listContent}
                 data={hasQuery ? [
                     ...filteredNav.map(n => ({ type: 'nav', data: n, title: n.label, id: n.id })),

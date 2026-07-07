@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { StyleSheet, View, FlatList, TouchableOpacity, ActivityIndicator, Alert, ImageBackground } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Alert, ImageBackground } from 'react-native';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
@@ -39,7 +40,7 @@ export default function SurahDetailScreen() {
     const [playingIndex, setPlayingIndex] = useState<number | null>(null);
     const [bufferingIndex, setBufferingIndex] = useState<number | null>(null);
     const soundRef = useRef<Audio.Sound | null>(null);
-    const flatListRef = useRef<FlatList>(null);
+    const flatListRef = useRef<FlashListRef<any>>(null);
 
     // Fetch Surah details with 3 editions: Uthmani Arabic, English translation, and audio recitation
     const { data: response, isLoading, isError, refetch } = useQuery({
@@ -386,7 +387,7 @@ export default function SurahDetailScreen() {
             ) : (
                 <View style={{ flex: 1 }}>
                     <View style={styles.readingContainer}>
-                        <FlatList
+                        <FlashList
                             ref={flatListRef}
                             data={ayahs}
                             keyExtractor={(_, index) => index.toString()}
@@ -394,10 +395,6 @@ export default function SurahDetailScreen() {
                             ListHeaderComponent={renderHeader}
                             contentContainerStyle={styles.listContent}
                             showsVerticalScrollIndicator={false}
-                            onScrollToIndexFailed={(info) => {
-                                const offset = info.averageItemLength * info.index;
-                                flatListRef.current?.scrollToOffset({ offset, animated: true });
-                            }}
                         />
                     </View>
                 </View>

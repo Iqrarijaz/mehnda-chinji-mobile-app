@@ -38,12 +38,7 @@ const CATEGORIES: UtilCategory[] = [
                 image: require('@/assets/icons/prayer_icon.webp'),
                 route: '/prayerTimes',
             },
-            {
-                id: 'islamicCalendar',
-                label: 'Calendar',
-                image: require('@/assets/icons/islamic_calander.webp'),
-                route: '/islamicCalendar',
-            },],
+        ],
     },
 ];
 

@@ -24,7 +24,6 @@ export const AnalyticsEvents = {
     BANNER_GENERATED: 'banner_generated',
     BANNER_SAVED: 'banner_saved',
     QURAN_SURAH_OPENED: 'quran_surah_opened',
-    ISLAMIC_CALENDAR_VIEWED: 'islamic_calendar_viewed',
 
 
     // Community Specific

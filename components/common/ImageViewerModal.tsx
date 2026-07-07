@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, StyleSheet, TouchableOpacity, View, SafeAreaView, Platform, Dimensions, FlatList } from 'react-native';
+import { Modal, StyleSheet, TouchableOpacity, View, SafeAreaView, Platform, Dimensions } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import Avatar from '@/components/ui/avatar';
@@ -62,7 +63,7 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
 
                     {images.length > 0 ? (
                         <View style={{ flex: 1 }}>
-                            <FlatList
+                            <FlashList
                                 data={images}
                                 horizontal
                                 pagingEnabled
@@ -70,11 +71,6 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
                                 showsHorizontalScrollIndicator={false}
                                 onViewableItemsChanged={onViewableItemsChanged}
                                 viewabilityConfig={viewabilityConfig}
-                                getItemLayout={(_, index) => ({
-                                    length: Dimensions.get('window').width,
-                                    offset: Dimensions.get('window').width * index,
-                                    index,
-                                })}
                                 keyExtractor={(_, index) => `viewer-${index}`}
                                 renderItem={({ item }) => (
                                     <View style={styles.listImageWrapper}>

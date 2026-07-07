@@ -6,6 +6,7 @@ import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { UtilsGrid } from '@/components/home/UtilsGrid';
 import { HomeHeader } from '@/components/home/HomeHeader';
 import { PasswordModal } from '@/components/setting/PasswordModal';
+import BannerAd from '@/ads/components/BannerAd';
 import { ThemedView } from '@/components/ThemedView';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -22,6 +23,7 @@ export default function HomeScreen() {
       <HomeHeader
         setIsSearchActive={setIsSearchActive}
       />
+      <BannerAd placement="home" />
 
       <View style={{ flex: 1 }}>
         <ScrollView
@@ -31,6 +33,7 @@ export default function HomeScreen() {
         >
           {/* Categories */}
           <CategoryGrid />
+
 
           {/* Daily Utilities */}
           <UtilsGrid />

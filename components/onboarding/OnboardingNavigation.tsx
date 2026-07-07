@@ -102,12 +102,12 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
   }, [totalSteps]);
 
   const handleBackPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => { });
     onBack();
   };
 
   const handleNextPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => { });
     onNext();
   };
 
@@ -116,8 +116,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
       style={[
         styles.container,
         {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
+          backgroundColor: colors.card,
           paddingBottom: Math.max(insets.bottom, 16),
         },
         animatedNavStyle,
@@ -182,18 +181,18 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
             animatedNextBtnStyle,
           ]}
         >
-            {isLoading ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <View style={styles.ctaContent}>
-                <Text style={styles.nextBtnText}>
-                  {ctaText}
-                </Text>
-                <Animated.View style={animatedArrowStyle}>
-                  <Ionicons name="arrow-forward" size={14} color="#FFFFFF" style={{ marginLeft: 4 }} />
-                </Animated.View>
-              </View>
-            )}
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <View style={styles.ctaContent}>
+              <Text style={styles.nextBtnText}>
+                {ctaText}
+              </Text>
+              <Animated.View style={animatedArrowStyle}>
+                <Ionicons name="arrow-forward" size={14} color="#FFFFFF" style={{ marginLeft: 4 }} />
+              </Animated.View>
+            </View>
+          )}
         </AnimatedPressable>
       </View>
     </Animated.View>
@@ -235,7 +234,8 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 24,
     paddingTop: 14,
-    borderTopWidth: 1,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
     alignItems: 'center',
     width: '100%',
   },
@@ -272,9 +272,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   nextBtn: {
-    flex: 1,
     height: 40,
     borderRadius: 20,
+    paddingHorizontal: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },

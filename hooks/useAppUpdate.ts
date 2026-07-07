@@ -31,13 +31,13 @@ export const useAppUpdate = () => {
 
         if (now - lastCheck > ONE_DAY_MS) {
           const info = await fetchAppVersionInfo();
-          const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.3';
-          const { isMandatory } = checkUpdateStatus(currentVersion, info.latestVersion, info.minRequiredVersion);
+          const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.5';
+          const { isMandatory, isOptional } = checkUpdateStatus(currentVersion, info.latestVersion, info.minRequiredVersion);
           
-          if (isMandatory) {
+          if (isMandatory || isOptional) {
             setUpdateInfo({
               visible: true,
-              isMandatory: true,
+              isMandatory: isMandatory,
               latestVersion: info.latestVersion,
               updateUrl: Platform.OS === 'ios' ? info.updateUrl.ios : info.updateUrl.android,
               releaseNotes: info.releaseNotes

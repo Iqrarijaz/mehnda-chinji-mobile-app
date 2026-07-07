@@ -8,7 +8,7 @@ import { ConfirmationModal } from '../ui/ConfirmationModal';
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteMarketplaceListing, markMarketplaceListingAsSold, incrementMarketplaceInquiry, MARKETPLACE_QUERY_KEYS } from '@/apis/marketplace';
+import { deleteMarketplaceListing, markMarketplaceListingAsSold, incrementMarketplaceInquiry, toggleMarketplaceListingStatus, MARKETPLACE_QUERY_KEYS } from '@/apis/marketplace';
 
 interface MarketplaceCardProps {
     item: any;
@@ -86,6 +86,18 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
         }
     });
 
+    // Toggle Status Mutation
+    const toggleStatusMutation = useMutation({
+        mutationFn: (newStatus: 'live' | 'offline') => toggleMarketplaceListingStatus(item._id, newStatus),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.all });
+            Toast.show({ type: 'success', text1: 'Success', text2: 'Listing status updated!' });
+        },
+        onError: (err: any) => {
+            Toast.show({ type: 'error', text1: 'Error', text2: err.message || 'Failed to update listing status' });
+        }
+    });
+
     const confirmDelete = React.useCallback(() => {
         setShowDeleteConfirm(true);
     }, []);
@@ -94,6 +106,7 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
         switch (status?.toLowerCase()) {
             case 'sold': return '#EF4444';
             case 'pending': return '#F59E0B';
+            case 'offline': return '#6B7280';
             case 'live':
             default:
                 return '#10B981';
@@ -122,13 +135,19 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
             { label: 'Delete', icon: 'trash-outline', color: '#EF4444', onPress: confirmDelete, destructive: true }
         ];
         if (item.status !== 'sold') {
+            if (item.status === 'live') {
+                baseActions.unshift({ label: 'Go Offline', icon: 'eye-off-outline', onPress: () => toggleStatusMutation.mutate('offline') });
+            } else if (item.status === 'offline') {
+                baseActions.unshift({ label: 'Go Online', icon: 'eye-outline', onPress: () => toggleStatusMutation.mutate('live') });
+            }
+
             baseActions.unshift(
                 { label: 'Edit Listing', icon: 'create-outline', onPress: () => onEdit?.(item) },
                 { label: 'Mark Sold', icon: 'checkmark-circle-outline', color: '#10B981', onPress: confirmMarkSold }
             );
         }
         return baseActions;
-    }, [item.status, item, confirmDelete, confirmMarkSold, onEdit]);
+    }, [item.status, item, confirmDelete, confirmMarkSold, onEdit, toggleStatusMutation]);
 
     const handlePress = React.useCallback(() => {
         if (!isOwner) {

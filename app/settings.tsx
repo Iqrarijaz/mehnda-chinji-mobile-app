@@ -31,6 +31,7 @@ import Toast from 'react-native-toast-message';
 import { SettingRowItem } from '@/components/setting/SettingRow';
 import { ActiveSessionsModal } from '@/components/setting/ActiveSessionsModal';
 import { SectionCard } from '@/components/setting/SectionCard';
+import { ScreenHeader } from '@/components/common/ScreenHeader';
 
 export default function SettingsScreen() {
     const { theme, toggleTheme, isDark } = useTheme();
@@ -50,10 +51,10 @@ export default function SettingsScreen() {
     const handleCheckUpdate = async () => {
         try {
             const info = await fetchAppVersionInfo();
-            const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.3';
+            const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.6';
             const { isOptional, isMandatory } = checkUpdateStatus(currentVersion, info.latestVersion, info.minRequiredVersion);
             const isAvailable = isOptional || isMandatory;
-            
+
             setUpdateCheckState({
                 visible: true,
                 isAvailable,
@@ -140,24 +141,15 @@ export default function SettingsScreen() {
                                 subtitle="Enjoying Rehbar? Let us know!"
                                 onPress={() => ReviewService.openStore()}
                             />
-                            {/* <SettingRowItem
-                                icon="moon-outline"
-                                label="Dark Mode"
-                                subtitle={isDark ? 'Currently enabled' : 'Currently disabled'}
-                                isToggle
-                                toggleValue={isDark}
-                                onToggleChange={() => toggleTheme()}
-                                primaryColor={colors.primary}
-                                isLast
-                            /> */}
+
                         </SectionCard>
 
                         <SectionCard title="System" delay={200}>
-                            <SettingRowItem 
-                                icon="download-outline" 
-                                label="Check for Updates" 
-                                subtitle="Make sure you have the latest version" 
-                                onPress={handleCheckUpdate} 
+                            <SettingRowItem
+                                icon="download-outline"
+                                label="Check for Updates"
+                                subtitle="Make sure you have the latest version"
+                                onPress={handleCheckUpdate}
                             />
                             <SettingRowItem icon="analytics-outline" label="Data Usage" subtitle="Manage your data preferences" onPress={() => router.push('/dataUsage')} isLast />
                         </SectionCard>
@@ -184,48 +176,36 @@ export default function SettingsScreen() {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
 
             {/* ── Header ──────────────────────────────────────────── */}
-            <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
-                <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
-                    <TouchableOpacity
-                        onPress={() => router.replace('/(drawer)/(tabs)' as any)}
-                        style={styles.backBtn}
-                    >
-                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.headerTitleWrap}>
-                        <ThemedText style={styles.headerTitle}>Settings</ThemedText>
-                    </Animated.View>
-                    <View style={{ width: 42 }} />
-                </View>
-
+            <ScreenHeader showMenuIcon={false} containerStyle={{ paddingBottom: 8 }}>
                 {/* ── Tabs ── */}
                 <View style={styles.tabContainer}>
-                    {tabs.map((tab) => (
-                        <TouchableOpacity
-                            key={tab.id}
-                            style={[
-                                styles.tabButton,
-                                activeTab === tab.id && styles.activeTabButton
-                            ]}
-                            onPress={() => setActiveTab(tab.id as any)}
-                        >
-                            <Ionicons
-                                name={tab.icon as any}
-                                size={18}
-                                color={activeTab === tab.id ? '#FFFFFF' : 'rgba(255,255,255,0.6)'}
-                            />
-                            <ThemedText
+                    {tabs.map((tab) => {
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <TouchableOpacity
+                                key={tab.id}
                                 style={[
-                                    styles.tabLabel,
-                                    activeTab === tab.id && styles.activeTabLabel
+                                    styles.tabButton,
+                                    isActive && styles.activeTabButton
                                 ]}
+                                onPress={() => setActiveTab(tab.id as any)}
                             >
-                                {tab.label}
-                            </ThemedText>
-                        </TouchableOpacity>
-                    ))}
+                                <Ionicons
+                                    name={tab.icon as any}
+                                    size={16}
+                                    color={isActive ? '#FFFFFF' : 'rgba(255,255,255,0.6)'}
+                                />
+                                <ThemedText style={[
+                                    styles.tabLabel,
+                                    isActive && styles.activeTabLabel
+                                ]}>
+                                    {tab.label}
+                                </ThemedText>
+                            </TouchableOpacity>
+                        );
+                    })}
                 </View>
-            </Animated.View>
+            </ScreenHeader>
 
             {/* ── Tab Content ────────────────────────────────────── */}
             <ScrollView
@@ -237,7 +217,7 @@ export default function SettingsScreen() {
 
                 {/* Version */}
                 <Animated.View entering={FadeIn.delay(400).duration(400)} style={styles.versionWrap}>
-                    <ThemedText style={styles.versionText}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.3'}</ThemedText>
+                    <ThemedText style={styles.versionText}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.6'}</ThemedText>
                 </Animated.View>
             </ScrollView>
 
@@ -347,8 +327,7 @@ const styles = StyleSheet.create({
     },
     tabContainer: {
         flexDirection: 'row',
-        marginTop: 20,
-        paddingHorizontal: 16,
+        marginBottom: 8,
         gap: 8,
     },
     tabButton: {
@@ -376,12 +355,11 @@ const styles = StyleSheet.create({
     // Scroll
     scrollView: {
         flex: 1,
-        marginTop: -10,
         zIndex: 0,
     },
     scrollContent: {
         paddingHorizontal: 16,
-        paddingTop: 30,
+        paddingTop: 16,
     },
 
     // Version

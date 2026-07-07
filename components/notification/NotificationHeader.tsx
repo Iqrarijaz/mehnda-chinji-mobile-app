@@ -7,6 +7,7 @@ import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { ScreenHeader } from '@/components/common/ScreenHeader';
 
 // PRIMARY is now accessed via colors.primary inside the component
 
@@ -21,11 +22,9 @@ interface Props {
 }
 
 const NotificationHeader = React.memo(({
-    onBack,
     onMarkAllRead,
     unreadCount,
     isPending,
-    paddingTop,
     showTooltip = false,
     onCloseTooltip = () => { },
 }: Props) => {
@@ -33,23 +32,13 @@ const NotificationHeader = React.memo(({
     const colors = Colors[theme];
 
     return (
-        <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
-
-            {/* Top row */}
-            <View style={[styles.headerTopRow, { paddingTop: paddingTop + 8 }]}>
-                <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                    <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                </TouchableOpacity>
-
-                <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.headerTitleWrap}>
-                    <ThemedText style={styles.headerTitle}>Notifications</ThemedText>
-                </Animated.View>
-
-                {/* Right slot — tooltip anchored here */}
+        <ScreenHeader
+            showMenuIcon={false}
+            rightActions={
                 <Tooltip
                     isVisible={showTooltip}
                     content={
-                        <View style={styles.tooltipPill}>
+                        <View style={[styles.tooltipPill, { backgroundColor: theme === 'dark' ? '#1E293B' : '#FFFFFF' }]}>
                             <ThemedText style={styles.tooltipText}>← Swipe left to delete Notification</ThemedText>
                             <TouchableOpacity onPress={onCloseTooltip} style={styles.tooltipClose}>
                                 <Ionicons name="close-circle" size={18} color="#64748B" />
@@ -63,7 +52,7 @@ const NotificationHeader = React.memo(({
                 >
                     <TouchableOpacity
                         onPress={onMarkAllRead}
-                        style={styles.markBtn}
+                        style={[styles.markBtn, { marginRight: 12 }]}
                         activeOpacity={0.7}
                         disabled={isPending || unreadCount === 0}
                     >
@@ -72,21 +61,21 @@ const NotificationHeader = React.memo(({
                         ) : (
                             <Ionicons
                                 name="checkmark-done"
-                                size={18}
-                                color={unreadCount > 0 ? "#FFFFFF" : "rgba(255,255,255,0.4)"}
+                                size={22}
+                                color="#FFFFFF"
                             />
                         )}
                     </TouchableOpacity>
                 </Tooltip>
-            </View>
-
+            }
+        >
             {/* Subtitle */}
             <Animated.View entering={FadeIn.delay(400).duration(500)} style={styles.headerSubtitleWrap}>
                 <ThemedText style={styles.headerSubtitle}>
                     {unreadCount > 0 ? `${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}` : 'Stay updated with recent activity'}
                 </ThemedText>
             </Animated.View>
-        </Animated.View>
+        </ScreenHeader>
     );
 });
 
@@ -123,17 +112,17 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,1)',
     },
     markBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: 'rgba(255,255,255,0.18)',
+        width: 38,
+        height: 38,
+        borderRadius: Layout.borderRadius,
+        backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    rightSpacer: { width: 32, height: 32 },
     headerSubtitleWrap: {
         alignItems: 'center',
-        marginTop: 4,
+        marginTop: -8,
+        marginBottom: 8,
     },
     headerSubtitle: {
         fontSize: 11,

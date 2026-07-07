@@ -56,7 +56,7 @@ const PlaceCard = React.memo(({ data, category, color, onReport }: PlaceCardProp
     const isDark = theme === 'dark';
     const colors = Colors[theme];
     const router = useRouter();
-    
+
     const getDefaultColor = () => {
         switch (category.toLowerCase()) {
             case 'religious': return '#10B981';
@@ -68,7 +68,7 @@ const PlaceCard = React.memo(({ data, category, color, onReport }: PlaceCardProp
             default: return '#3B82F6';
         }
     };
-    
+
     const primaryColor = color || getDefaultColor();
 
     const primaryAlpha10 = primaryColor + '1A';
@@ -170,7 +170,7 @@ const PlaceCard = React.memo(({ data, category, color, onReport }: PlaceCardProp
                                 <ThemedText style={styles.typePillText}>{typeLabel}</ThemedText>
                             </View>
                         ) : null}
-                        
+
                         <View style={{ flexDirection: 'row', gap: 8 }}>
                             <TouchableOpacity style={styles.actionBtn} activeOpacity={0.8}>
                                 <Ionicons name="share-social-outline" size={15} color="#FFFFFF" />
@@ -264,11 +264,6 @@ const styles = StyleSheet.create({
         borderRadius: 27,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 3,
     },
     bottomFade: {
         top: '40%',

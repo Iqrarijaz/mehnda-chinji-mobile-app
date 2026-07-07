@@ -69,9 +69,14 @@ export default function ProfileScreen() {
         staleTime: 1000 * 60 * 60 * 24, // 24 hours
     });
 
-    // Use API data with fallback to static JSON
-    const citiesData: string[] = citiesConfigData?.data?.data || citiesDataFallback;
-    const villagesData: string[] = villagesConfigData?.data?.data || villagesDataFallback;
+    const citiesData: string[] = useMemo(
+        () => citiesConfigData?.data?.data || citiesDataFallback,
+        [citiesConfigData]
+    );
+    const villagesData: string[] = useMemo(
+        () => villagesConfigData?.data?.data || villagesDataFallback,
+        [villagesConfigData]
+    );
 
     const toTitleCase = useCallback((str: string) => {
         if (!str) return '';
@@ -119,25 +124,6 @@ export default function ProfileScreen() {
         formData.gender !== currentData.gender ||
         formData.city !== currentData.city ||
         formData.village !== currentData.village;
-
-    // Direct inline derivations of completion stats (avoids useCallback recreation on keystroke)
-    const completionPercentage = (() => {
-        let pct = 50;
-        if (formData.gender && formData.gender !== 'N/A') pct += 5;
-        if (formData.city) pct += 5;
-        if (formData.village) pct += 5;
-        if (user?.user?.isBusiness) pct += 25;
-        if (user?.user?.isDonor) pct += 10;
-        return Math.min(pct, 100);
-    })();
-
-    const remainingFieldsCount = (() => {
-        let count = 0;
-        if (!formData.gender || formData.gender === 'N/A') count++;
-        if (!formData.city) count++;
-        if (!formData.village) count++;
-        return count;
-    })();
 
     const profileMutation = useMutation({
         mutationFn: updateProfile,
