@@ -25,6 +25,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 
 export default function BusinessScreen() {
@@ -147,21 +148,23 @@ export default function BusinessScreen() {
         }
         if (!hasNextPage && businesses.length > 0) {
             return (
-                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, paddingVertical: 20 }}>
+                <ThemedText style={{ textAlign: 'center', color: colors.textSecondary, fontSize: 12, paddingVertical: 20 }}>
                     End of directory
                 </ThemedText>
             );
         }
         return null;
-    }, [isFetchingNextPage, hasNextPage, businesses.length, colors.primary]);
+    }, [isFetchingNextPage, hasNextPage, businesses.length, colors.primary, colors.textSecondary]);
 
     const renderEmpty = useCallback(() => (
-        <View style={styles.emptyContainer}>
-            <Ionicons name="business-outline" size={64} color={colors.icon} />
-            <ThemedText style={[styles.emptyText, { color: colors.text }]}>No businesses found.</ThemedText>
-            <ThemedText style={[styles.emptySubText, { color: colors.icon }]}>Try adjusting your search criteria</ThemedText>
-        </View>
-    ), [colors.icon, colors.text]);
+        <Animated.View entering={FadeInDown.delay(80).duration(300)} style={styles.emptyContainer}>
+            <View style={[styles.emptyIconWell, { backgroundColor: colors.cream }]}>
+                <Ionicons name="business-outline" size={34} color={colors.primary} />
+            </View>
+            <ThemedText style={[styles.emptyText, { color: colors.text }]}>No businesses found</ThemedText>
+            <ThemedText style={[styles.emptySubText, { color: colors.textSecondary }]}>Try adjusting your search or filters</ThemedText>
+        </Animated.View>
+    ), [colors.cream, colors.primary, colors.text, colors.textSecondary]);
 
     return (
         <ErrorBoundary>
@@ -219,6 +222,26 @@ export default function BusinessScreen() {
                         />
                     </View>
                 </ScreenHeader>
+
+                {/* Active filter indicator */}
+                {hasActiveFilters && activeTab === 'find' && (
+                    <Animated.View entering={FadeInDown.duration(250)} style={styles.activeFiltersRow}>
+                        <View style={[styles.activeFilterChip, { backgroundColor: colors.limeSoft }]}>
+                            <Ionicons name="funnel" size={11} color={colors.limeDark} />
+                            <ThemedText style={[styles.activeFilterText, { color: colors.limeDark }]} numberOfLines={1}>
+                                {selectedCategory}
+                            </ThemedText>
+                        </View>
+                        <TouchableOpacity
+                            style={[styles.clearFiltersBtn, { backgroundColor: colors.field }]}
+                            onPress={() => setSelectedCategory('All')}
+                        >
+                            <ThemedText style={{ color: colors.primary, fontSize: 11, fontWeight: '700' }}>
+                                Clear
+                            </ThemedText>
+                        </TouchableOpacity>
+                    </Animated.View>
+                )}
 
                 {/* Find Service Section */}
                 <View style={[styles.content, { display: activeTab === 'find' ? 'flex' : 'none' }]}>
@@ -345,6 +368,40 @@ const styles = StyleSheet.create({
     emptyContainer: {
         alignItems: 'center',
         marginTop: Platform.OS === 'android' ? 58 : 60,
+    },
+    emptyIconWell: {
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    activeFiltersRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 18,
+        paddingTop: 12,
+        gap: 8,
+    },
+    activeFilterChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        borderRadius: 999,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        flexShrink: 1,
+    },
+    activeFilterText: {
+        fontSize: 11,
+        fontWeight: '700',
+        flexShrink: 1,
+    },
+    clearFiltersBtn: {
+        borderRadius: 999,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
     },
     emptyText: {
         marginTop: Platform.OS === 'android' ? 14 : 16,

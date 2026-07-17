@@ -531,7 +531,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                     </Animated.View>
 
                     {/* Footer Buttons inline */}
-                    <Animated.View entering={FadeInUp.delay(600).springify()} style={styles.buttonsRow}>
+                    <Animated.View entering={FadeInUp.delay(600).duration(300)} style={styles.buttonsRow}>
                         <TouchableOpacity
                             style={[styles.cancelButton, { backgroundColor: colors.field }]}
                             onPress={onClose}

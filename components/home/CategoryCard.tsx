@@ -4,6 +4,7 @@ import { StyleSheet, View, Image } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { PressableScale } from '@/components/ui/PressableScale';
 
@@ -16,8 +17,8 @@ interface CategoryCardProps {
 }
 
 /**
- * Category chip — round butter-cream icon well with the label underneath,
- * matching the reference design's category carousel.
+ * Premium flat category card — white surface, softly tinted icon squircle,
+ * label beneath. Hierarchy from surface contrast only (no borders/shadows).
  */
 export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, compact }: CategoryCardProps) => {
     const { theme } = useTheme();
@@ -27,17 +28,20 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
     return (
         <PressableScale
             onPress={onPress}
-            pressedScale={0.92}
+            pressedScale={0.97}
             style={styles.touchable}
         >
-            <View style={[styles.card, compact && styles.cardCompact]}>
-                <View
-                    style={[
-                        styles.iconContainer,
-                        compact && styles.iconContainerCompact,
-                        { backgroundColor: isSelected ? colors.limeSoft : colors.cream },
-                    ]}
-                >
+            <View style={[
+                styles.card,
+                { backgroundColor: isSelected ? colors.limeSoft : colors.card },
+                compact && styles.cardCompact,
+            ]}>
+                <View style={[
+                    styles.iconContainer,
+                    compact && styles.iconContainerCompact,
+                    { backgroundColor: isImageAsset ? 'transparent' : colors.limeSoft },
+                    isSelected && { backgroundColor: colors.card },
+                ]}>
                     {isImageAsset ? (
                         <Image
                             source={icon}
@@ -45,15 +49,11 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
                             resizeMode="contain"
                         />
                     ) : (
-                        <Ionicons
-                            name={icon as any}
-                            size={compact ? 22 : 26}
-                            color={isSelected ? colors.limeDark : colors.primary}
-                        />
+                        <Ionicons name={icon as any} size={compact ? 20 : 24} color={colors.primary} />
                     )}
                 </View>
                 <ThemedText
-                    style={[styles.label, { color: isSelected ? colors.primary : colors.text }]}
+                    style={[styles.label, { color: colors.text }]}
                     numberOfLines={2}
                     adjustsFontSizeToFit
                     minimumFontScale={0.8}
@@ -68,41 +68,42 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
 const styles = StyleSheet.create({
     touchable: {
         flex: 1,
-        margin: 6,
+        margin: 5,
     },
     card: {
-        paddingVertical: 10,
-        paddingHorizontal: 4,
+        borderRadius: Layout.cardBorderRadius,
+        paddingVertical: 14,
+        paddingHorizontal: 8,
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        minHeight: 88,
+        justifyContent: 'center',
+        minHeight: 96,
     },
     cardCompact: {
-        paddingVertical: 6,
-        minHeight: 66,
+        paddingVertical: 10,
+        minHeight: 72,
     },
     iconContainer: {
-        width: 56,
-        height: 56,
-        borderRadius: 28,
+        width: 44,
+        height: 44,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 10,
         overflow: 'hidden',
     },
     iconContainerCompact: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+        width: 38,
+        height: 38,
+        borderRadius: 12,
         marginBottom: 6,
     },
     imageIcon: {
-        width: 36,
-        height: 36,
+        width: 40,
+        height: 40,
     },
     imageIconCompact: {
-        width: 28,
-        height: 28,
+        width: 32,
+        height: 32,
     },
     label: {
         fontSize: 11,

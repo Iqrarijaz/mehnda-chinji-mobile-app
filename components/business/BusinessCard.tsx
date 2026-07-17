@@ -3,7 +3,6 @@ import { Image } from 'expo-image';
 import React, { useMemo } from 'react';
 import {
     StyleSheet,
-    TouchableOpacity,
     View,
 } from 'react-native';
 
@@ -13,6 +12,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useRouter } from 'expo-router';
 import { ListingCard } from '@/components/listing/ListingCard';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 interface BusinessCardProps {
     business: any;
@@ -29,7 +29,7 @@ const capitalize = (str?: string) =>
         : '';
 
 const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
 
@@ -58,15 +58,15 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
             );
         }
         return (
-            <ThemedText style={[styles.avatarLetter, { color: isDark ? colors.text : '#8FA79E' }]}>
+            <ThemedText style={[styles.avatarLetter, { color: colors.primary }]}>
                 {businessName?.charAt(0)?.toUpperCase()}
             </ThemedText>
         );
-    }, [businessImage, businessName, isDark, colors.text]);
+    }, [businessImage, businessName, colors.primary]);
 
     return (
-        <TouchableOpacity
-            activeOpacity={0.9}
+        <PressableScale
+            pressedScale={0.98}
             onPress={() => {
                 analyticsService.trackEvent(AnalyticsEvents.BUSINESS_CARD_CLICKED, { businessId: business._id, action: 'view' });
                 router.push({
@@ -79,10 +79,10 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
             }}
             style={styles.cardWrapper}
         >
-            <ListingCard style={{ padding: 8 }}>
+            <ListingCard style={{ padding: 12 }}>
                 <View style={styles.topRow}>
                     {/* Business Image/Avatar */}
-                    <View style={[styles.avatarContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.primary + '10' }]}>
+                    <View style={[styles.avatarContainer, { backgroundColor: colors.limeSoft }]}>
                         {avatarContent}
                     </View>
 
@@ -92,9 +92,11 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
                         </ThemedText>
 
                         {categoryLineText ? (
-                            <ThemedText style={[styles.categoryLine, { color: colors.primary }]} numberOfLines={1}>
-                                {categoryLineText}
-                            </ThemedText>
+                            <View style={[styles.categoryChip, { backgroundColor: colors.limeSoft }]}>
+                                <ThemedText style={[styles.categoryLine, { color: colors.limeDark }]} numberOfLines={1}>
+                                    {categoryLineText}
+                                </ThemedText>
+                            </View>
                         ) : null}
 
                         <View style={styles.locationRow}>
@@ -104,9 +106,11 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
                             </ThemedText>
                         </View>
                     </View>
+
+                    <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} style={styles.chevron} />
                 </View>
             </ListingCard>
-        </TouchableOpacity>
+        </PressableScale>
     );
 });
 
@@ -121,12 +125,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     avatarContainer: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
+        width: 60,
+        height: 60,
+        borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 16,
+        marginRight: 14,
         overflow: 'hidden',
     },
     avatarImage: {
@@ -134,8 +138,8 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     avatarLetter: {
-        fontSize: 16,
-        fontWeight: '700',
+        fontSize: 20,
+        fontWeight: '800',
     },
     content: {
         flex: 1,
@@ -143,12 +147,22 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     title: {
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '700',
+    },
+    categoryChip: {
+        alignSelf: 'flex-start',
+        borderRadius: 999,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        maxWidth: '100%',
     },
     categoryLine: {
         fontSize: 10,
-        fontWeight: '600',
+        fontWeight: '700',
+    },
+    chevron: {
+        marginLeft: 8,
     },
     locationRow: {
         flexDirection: 'row',

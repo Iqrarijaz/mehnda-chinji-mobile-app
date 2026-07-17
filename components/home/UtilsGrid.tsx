@@ -62,16 +62,16 @@ export function UtilsGrid() {
                         {category.items.map((util, index) => (
                             <Animated.View
                                 key={util.id}
-                                entering={FadeInDown.delay(120 + index * 60).springify().damping(16)}
+                                entering={FadeInDown.delay(120 + index * 60).duration(300)}
                                 style={styles.gridItem}
                             >
                                 <PressableScale
                                     onPress={() => router.push(util.route as any)}
-                                    pressedScale={0.92}
+                                    pressedScale={0.97}
                                     style={styles.touchable}
                                 >
-                                    <View style={styles.card}>
-                                        <View style={[styles.iconContainer, { backgroundColor: colors.cream }]}>
+                                    <View style={[styles.card, { backgroundColor: colors.card }]}>
+                                        <View style={styles.iconContainer}>
                                             {util.image ? (
                                                 <Image
                                                     source={util.image}
@@ -132,22 +132,24 @@ const styles = StyleSheet.create({
         margin: 6,
     },
     card: {
-        paddingVertical: 8,
+        borderRadius: 22,
+        paddingVertical: 14,
+        paddingHorizontal: 8,
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        minHeight: 88,
+        justifyContent: 'center',
+        minHeight: 96,
     },
     icon: {
-        width: 38,
-        height: 38,
+        width: 44,
+        height: 44,
     },
     iconContainer: {
-        width: 56,
-        height: 56,
-        borderRadius: 28,
+        width: 44,
+        height: 44,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 10,
         overflow: 'hidden',
     },
     label: {

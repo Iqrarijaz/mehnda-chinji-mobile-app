@@ -225,7 +225,7 @@ export default function MarketplaceDetailsScreen() {
                 )}
 
                 <Animated.View
-                    entering={FadeInDown.delay(60).springify().damping(17)}
+                    entering={FadeInDown.delay(60).duration(300)}
                     style={[styles.detailsSection, { backgroundColor: colors.card }]}
                 >
                     <View style={styles.grabHandle} />
@@ -343,7 +343,7 @@ export default function MarketplaceDetailsScreen() {
             {/* Sticky contact bar — buyers only, live items */}
             {!isOwner && item.status === 'live' && item.sellerPhone ? (
                 <Animated.View
-                    entering={FadeInUp.delay(200).springify().damping(17)}
+                    entering={FadeInUp.delay(200).duration(300)}
                     style={[styles.contactBar, { backgroundColor: colors.card, paddingBottom: insets.bottom + 12 }]}
                 >
                     <PressableScale

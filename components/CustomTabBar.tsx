@@ -12,9 +12,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
+    Easing,
     useSharedValue,
     useAnimatedStyle,
-    withSpring,
     withTiming,
     interpolate,
     Extrapolate,
@@ -27,8 +27,9 @@ const BAR_HEIGHT = 58;
 /** Soft highlight pill behind the active icon. */
 const PILL_WIDTH = 52;
 const PILL_HEIGHT = 30;
-/** Springs tuned for a quiet, iOS-like response. */
-const SPRING = { damping: 18, stiffness: 240 };
+/** Smooth, iOS-like timing — eases out with no bounce. */
+const SMOOTH = { duration: 260, easing: Easing.out(Easing.cubic) };
+const SMOOTH_FAST = { duration: 140, easing: Easing.out(Easing.quad) };
 
 interface TabItemProps {
     route: any;
@@ -49,7 +50,7 @@ const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, activeColo
     const pressScale = useSharedValue(1);
 
     useEffect(() => {
-        focus.value = withSpring(isFocused ? 1 : 0, SPRING);
+        focus.value = withTiming(isFocused ? 1 : 0, SMOOTH);
     }, [isFocused, focus]);
 
     const animatedItemStyle = useAnimatedStyle(() => ({
@@ -93,8 +94,8 @@ const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, activeColo
             testID={options.tabBarButtonTestID}
             onPress={handlePress}
             onLongPress={handleLongPress}
-            onPressIn={() => { pressScale.value = withSpring(0.94, SPRING); }}
-            onPressOut={() => { pressScale.value = withSpring(1, SPRING); }}
+            onPressIn={() => { pressScale.value = withTiming(0.95, SMOOTH_FAST); }}
+            onPressOut={() => { pressScale.value = withTiming(1, SMOOTH); }}
             style={styles.tabItem}
         >
             <Animated.View style={[styles.tabItemInner, animatedItemStyle]}>
@@ -124,8 +125,8 @@ TabItem.displayName = 'TabItem';
 
 /**
  * Integrated iOS-style tab bar: full-width surface with softly rounded top
- * corners, a lime-soft highlight that springs behind the active icon, and
- * spring icon/label motion. No borders, shadows, or elevation — hierarchy
+ * corners, a lime-soft highlight that glides behind the active icon, and
+ * smooth eased icon/label motion. No borders, shadows, or elevation — hierarchy
  * comes from the surface contrast against the off-white background.
  */
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
@@ -171,7 +172,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                 indicatorX.value = target;
                 indicatorShown.value = withTiming(1, { duration: 180 });
             } else {
-                indicatorX.value = withSpring(target, SPRING);
+                indicatorX.value = withTiming(target, SMOOTH);
             }
         }
     }, [state.index, tabWidth, visibleRoutes, indicatorX, indicatorShown]);
