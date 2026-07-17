@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
         height: 110,
         width: '100%',
         position: 'relative',
-        backgroundColor: '#E2E8F0',
+        backgroundColor: '#ECECEC',
     },
     heroImage: {
         width: '100%',

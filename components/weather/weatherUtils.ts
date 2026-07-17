@@ -1,6 +1,6 @@
 // Shared constants and helpers for weather components
-export const PRIMARY = '#006666';
-export const BG_GRADIENT: readonly [string, string] = ['#006666', '#004d4d'];
+export const PRIMARY = '#003D36';
+export const BG_GRADIENT: readonly [string, string] = ['#003D36', '#004d4d'];
 
 export function getIconName(icon: string): string {
     if (icon.startsWith('01')) return icon.endsWith('n') ? 'moon' : 'sunny';

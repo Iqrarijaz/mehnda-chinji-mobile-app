@@ -32,13 +32,13 @@ interface RequestCardProps {
 const getStatusConfig = (status: string) => {
     switch (status) {
         case 'APPROVED':
-            return { color: '#10B981', icon: 'checkmark-circle' as const, label: 'Approved' };
+            return { color: '#7BC043', icon: 'checkmark-circle' as const, label: 'Approved' };
         case 'REJECTED':
-            return { color: '#EF4444', icon: 'close-circle' as const, label: 'Rejected' };
+            return { color: '#FF5A5F', icon: 'close-circle' as const, label: 'Rejected' };
         case 'UNDER_REVIEW':
             return { color: '#3B82F6', icon: 'eye' as const, label: 'Reviewing' };
         default:
-            return { color: '#F59E0B', icon: 'time' as const, label: 'Pending' };
+            return { color: '#F0803C', icon: 'time' as const, label: 'Pending' };
     }
 };
 
@@ -184,7 +184,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
                             <View style={styles.actions}>
                                 {hasActions && actions.length > 0 && (
                                     isDeleting ? (
-                                        <ActivityIndicator size="small" color="#EF4444" />
+                                        <ActivityIndicator size="small" color="#FF5A5F" />
                                     ) : (
                                         <ActionMenu actions={actions} />
                                     )
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
             ios: {
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.1,
+                shadowOpacity: 0,
                 shadowRadius: 10,
             },
             android: {

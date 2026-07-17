@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-        paddingBottom: Platform.OS === 'android' ? 8 : 16,
+        paddingBottom: Platform.OS === 'android' ? 14 : 18,
         zIndex: 10,
     },
     row: {
@@ -163,10 +163,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     iconBtn: {
-        width: 38,
-        height: 38,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.14)',
         justifyContent: 'center',
         alignItems: 'center',
     },

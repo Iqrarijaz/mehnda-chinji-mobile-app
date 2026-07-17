@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         marginLeft: 2,
     },
     required: {
-        color: '#EF4444',
+        color: '#FF5A5F',
     },
     dropdownTrigger: {
         flexDirection: 'row',

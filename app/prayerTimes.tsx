@@ -36,7 +36,7 @@ const PALETTE = {
     },
     dark: {
         primary: Colors.dark.primary,
-        primaryLight: 'rgba(0,102,102,0.15)',
+        primaryLight: 'rgba(0,61,54,0.15)',
         gold: '#F0C040',
         goldLight: 'rgba(240,192,64,0.12)',
         background: Colors.dark.background,

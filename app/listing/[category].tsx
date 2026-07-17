@@ -303,7 +303,7 @@ const CategoryListingScreen = React.memo(() => {
                             style={{ flex: 1 }}
                         />
                         <TouchableOpacity
-                            style={[styles.filterButton, { backgroundColor: activeTab === 'requests' ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                            style={[styles.filterButton, { backgroundColor: activeTab === 'requests' ? '#7BC043' : 'rgba(255, 255, 255, 0.15)' }]}
                             onPress={() => setActiveTab(activeTab === 'requests' ? 'all' : 'requests')}
                             activeOpacity={0.7}
                         >

@@ -20,7 +20,7 @@ export const ClearCacheSection = ({ onClear }: { onClear: () => Promise<void> })
         >
             <View style={styles.card}>
                 <View style={styles.iconBox}>
-                    <Ionicons name="trash-outline" size={24} color="#EF4444" />
+                    <Ionicons name="trash-outline" size={24} color="#FF5A5F" />
                 </View>
                 <View style={styles.content}>
                     <ThemedText style={styles.label}>Cached Media</ThemedText>
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     button: {
-        backgroundColor: '#EF4444',
+        backgroundColor: '#FF5A5F',
         paddingHorizontal: 14,
         paddingVertical: 10,
         borderRadius: 12,

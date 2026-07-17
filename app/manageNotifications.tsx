@@ -125,7 +125,7 @@ export default function ManageNotificationsScreen() {
                     <NotificationToggleRow
                         index={3}
                         icon="alert-circle-outline"
-                        color="#F59E0B" // Amber/Orange
+                        color="#F0803C" // Amber/Orange
                         label="Emergencies"
                         description="Critical alerts and emergency alerts"
                         value={preferences.emergency}
@@ -147,7 +147,7 @@ export default function ManageNotificationsScreen() {
                     <NotificationToggleRow
                         index={5}
                         icon="school-outline"
-                        color="#10B981" // Green (Education)
+                        color="#7BC043" // Green (Education)
                         label="Education"
                         description="School updates and educational resources"
                         value={preferences.education}
@@ -156,7 +156,7 @@ export default function ManageNotificationsScreen() {
                     <NotificationToggleRow
                         index={6}
                         icon="library-outline"
-                        color="#64748B" // Slate (Govt)
+                        color="#6B7B73" // Slate (Govt)
                         label="Government"
                         description="Information on government schemes and news"
                         value={preferences.govt}

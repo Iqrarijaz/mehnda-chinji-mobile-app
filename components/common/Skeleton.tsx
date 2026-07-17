@@ -52,7 +52,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
         };
     });
 
-    const baseColor = isDark ? '#1E293B' : '#E2E8F0';
+    const baseColor = isDark ? '#1E293B' : '#ECECEC';
     const highlightColor = isDark ? '#334155' : '#F1F5F9';
 
     return (

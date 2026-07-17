@@ -47,7 +47,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     onSuccess,
     listingToEdit,
 }) => {
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const colors = Colors[theme];
     const { user } = useAuth();
     const queryClient = useQueryClient();
@@ -350,7 +350,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 {/* Hero icon + text */}
                 <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
                     <View style={styles.heroIconWrap}>
-                        <Ionicons name="pricetag" size={32} color="#0D9488" />
+                        <Ionicons name="pricetag" size={30} color="#003D36" />
                     </View>
                     <ThemedText style={styles.heroTitle}>
                         {listingToEdit ? 'Update Your Listing' : 'Sell An Item'}
@@ -442,7 +442,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             CATEGORY & TYPE <ThemedText style={styles.required}>*</ThemedText>
                         </ThemedText>
                         <TouchableOpacity
-                            style={[styles.dropdownTrigger, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' }]}
+                            style={[styles.dropdownTrigger, { backgroundColor: colors.field }]}
                             onPress={() => setIsPickerVisible(true)}
                         >
                             <View style={styles.triggerContent}>
@@ -457,7 +457,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
 
                     {/* Vehicle details section (Shown conditionally) */}
                     {isVehicle && (
-                        <Animated.View entering={FadeInDown.delay(350)} style={[styles.vehicleSection, { borderColor: colors.border }]}>
+                        <Animated.View entering={FadeInDown.delay(350)} style={[styles.vehicleSection, { backgroundColor: colors.limeSoft }]}>
                             <ThemedText style={[styles.sectionTitle, { color: colors.primary }]}>Vehicle Specifications</ThemedText>
                             <View style={styles.row}>
                                 <FormInput
@@ -481,7 +481,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
 
                     {/* Switches */}
                     <Animated.View entering={FadeInDown.delay(450)} style={styles.switchGroup}>
-                        <View style={[styles.switchRow, { borderBottomColor: colors.border }]}>
+                        <View style={[styles.switchRow, { backgroundColor: colors.field }]}>
                             <View style={styles.switchLabelContainer}>
                                 <ThemedText style={[styles.switchLabel, { color: colors.text }]}>Negotiable Price</ThemedText>
                                 <ThemedText style={[styles.switchSub, { color: colors.textSecondary }]}>Allow buyers to negotiate prices</ThemedText>
@@ -489,7 +489,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             <Switch value={formData.negotiable} onValueChange={handleNegotiableToggle} trackColor={{ true: colors.primary }} />
                         </View>
 
-                        {/* <View style={[styles.switchRow, { borderBottomColor: colors.border }]}>
+                        {/* <View style={[styles.switchRow, { backgroundColor: colors.field }]}>
                             <View style={styles.switchLabelContainer}>
                                 <ThemedText style={[styles.switchLabel, { color: colors.text }]}>Show Contact Publicly</ThemedText>
                                 <ThemedText style={[styles.switchSub, { color: colors.textSecondary }]}>Let buyers see your number to call</ThemedText>
@@ -517,12 +517,12 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                                 <View key={imgUrl} style={styles.imageThumbnailContainer}>
                                     <Image source={{ uri: imgUrl }} style={styles.imageThumbnail} />
                                     <TouchableOpacity style={styles.removeImageBtn} onPress={() => removeImage(idx)}>
-                                        <Ionicons name="close-circle" size={30} color="#EF4444" />
+                                        <Ionicons name="close-circle" size={30} color="#FF5A5F" />
                                     </TouchableOpacity>
                                 </View>
                             ))}
                             {formData.images.length < 5 && (
-                                <TouchableOpacity style={[styles.addImagesBtn, { borderColor: colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' }]} onPress={pickImages} disabled={isUploadingImages}>
+                                <TouchableOpacity style={[styles.addImagesBtn, { backgroundColor: colors.cream }]} onPress={pickImages} disabled={isUploadingImages}>
                                     <Ionicons name="camera-outline" size={28} color={colors.primary} />
                                     <ThemedText style={[styles.addImagesText, { color: colors.primary }]}>{isUploadingImages ? 'Uploading...' : 'Add Photo'}</ThemedText>
                                 </TouchableOpacity>
@@ -533,7 +533,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                     {/* Footer Buttons inline */}
                     <Animated.View entering={FadeInUp.delay(600).springify()} style={styles.buttonsRow}>
                         <TouchableOpacity
-                            style={[styles.cancelButton, { backgroundColor: isDark ? '#334155' : '#F1F5F9' }]}
+                            style={[styles.cancelButton, { backgroundColor: colors.field }]}
                             onPress={onClose}
                             disabled={mutation.isPending || isUploadingImages}
                         >
@@ -542,10 +542,11 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             </ThemedText>
                         </TouchableOpacity>
                         <SubmitButton
-                            title={listingToEdit ? 'Update' : 'Post Now'}
+                            title={listingToEdit ? 'Update Listing' : 'Post Now'}
+                            variant="accent"
                             onPress={handleSubmit}
                             isLoading={mutation.isPending || isUploadingImages}
-                            style={{ width: 160, height: 40, borderRadius: 20 }}
+                            style={{ flex: 1, height: 52 }}
                         />
                     </Animated.View>
 
@@ -592,8 +593,8 @@ const styles = StyleSheet.create({
     },
     // ── Hero Header ──────────────────────────────────────────────────────
     header: {
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
         overflow: 'hidden',
         paddingBottom: 24,
     },
@@ -625,8 +626,8 @@ const styles = StyleSheet.create({
     heroIconWrap: {
         width: 64,
         height: 64,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.95)',
+        borderRadius: 32,
+        backgroundColor: '#FDEEB5',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
@@ -668,7 +669,7 @@ const styles = StyleSheet.create({
         marginLeft: 2,
     },
     required: {
-        color: '#EF4444',
+        color: '#FF5A5F',
     },
     row: {
         flexDirection: 'row',
@@ -679,9 +680,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: 12,
-        paddingHorizontal: 14,
-        height: 48,
+        borderRadius: 16,
+        paddingHorizontal: 16,
+        height: 52,
     },
     triggerContent: {
         flex: 1,
@@ -703,7 +704,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: 12,
-        borderBottomWidth: 1,
+        paddingHorizontal: 14,
+        borderRadius: 16,
     },
     switchLabelContainer: {
         flex: 1,
@@ -729,7 +731,7 @@ const styles = StyleSheet.create({
     imageThumbnail: {
         width: 90,
         height: 90,
-        borderRadius: 12,
+        borderRadius: 16,
     },
     removeImageBtn: {
         position: 'absolute',
@@ -742,22 +744,20 @@ const styles = StyleSheet.create({
     addImagesBtn: {
         width: 90,
         height: 90,
-        borderRadius: 12,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
     addImagesText: {
-        fontSize: 9,
-        fontWeight: '700',
+        fontSize: 10,
+        fontWeight: '800',
         marginTop: 4,
     },
 
     // ── Vehicle Section ──────────────────────────────────────────────────
     vehicleSection: {
-        borderRadius: 12,
-        padding: 12,
-        borderStyle: 'dashed',
-        borderWidth: 1,
+        borderRadius: 16,
+        padding: 14,
     },
     sectionTitle: {
         fontSize: 13,
@@ -774,9 +774,9 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     cancelButton: {
-        width: 120,
-        height: 40,
-        borderRadius: 20,
+        width: 110,
+        height: 52,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
     },

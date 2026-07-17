@@ -67,7 +67,7 @@ export const SurahCard = React.memo(({
             <Ionicons
                 name={isFav ? 'heart' : 'heart-outline'}
                 size={20}
-                color={isFav ? '#EF4444' : textSecondaryColor}
+                color={isFav ? '#FF5A5F' : textSecondaryColor}
             />
         </TouchableOpacity>
     </TouchableOpacity>

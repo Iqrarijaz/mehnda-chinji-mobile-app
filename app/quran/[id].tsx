@@ -378,7 +378,7 @@ export default function SurahDetailScreen() {
                 </View>
             ) : isError ? (
                 <View style={styles.centerContainer}>
-                    <Ionicons name="warning-outline" size={48} color="#EF4444" />
+                    <Ionicons name="warning-outline" size={48} color="#FF5A5F" />
                     <ThemedText style={styles.errorText}>Unable to load Surah verses</ThemedText>
                     <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => refetch()}>
                         <ThemedText style={{ color: '#fff', fontWeight: 'bold' }}>Retry</ThemedText>
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
         borderTopWidth: StyleSheet.hairlineWidth,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 3,
     },
     pageButton: {

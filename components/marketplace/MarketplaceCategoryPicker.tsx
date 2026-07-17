@@ -45,7 +45,7 @@ interface SectionData {
 }
 
 export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentCategory, currentType }: MarketplaceCategoryPickerProps) {
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const colors = Colors[theme];
 
     const { data: configData, isLoading } = useQuery({
@@ -78,7 +78,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
             <TouchableOpacity
                 style={[
                     styles.item,
-                    isSelected && { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.primary + '10' }
+                    isSelected && { backgroundColor: colors.limeSoft }
                 ]}
                 onPress={() => {
                     onSelect({
@@ -109,7 +109,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                 {/* Removed checkmark icon */}
             </TouchableOpacity>
         );
-    }, [currentCategory, currentType, isDark, colors.primary, colors.text, colors.icon, onSelect, onClose]);
+    }, [currentCategory, currentType, colors.limeSoft, colors.primary, colors.text, colors.icon, onSelect, onClose]);
 
     const renderSectionHeader = useCallback(({ section }: { section: SectionData }) => {
         return (
@@ -133,12 +133,13 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
     return (
         <Modal
             visible={visible}
-            animationType="fade"
+            animationType="slide"
             transparent={true}
             onRequestClose={onClose}
         >
             <View style={styles.modalOverlay}>
                 <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                    <View style={styles.grabHandle} />
                     <View style={styles.modalHeader}>
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Category</ThemedText>
                         {(currentCategory || currentType) && (
@@ -191,21 +192,25 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
+        backgroundColor: 'rgba(0,20,15,0.45)',
+        justifyContent: 'flex-end',
     },
     modalContent: {
-        width: '90%',
-        height: '60%',
-        borderRadius: Layout.borderRadius,
+        width: '100%',
+        height: '65%',
+        borderTopLeftRadius: Layout.headerBorderRadius,
+        borderTopRightRadius: Layout.headerBorderRadius,
         padding: 20,
+        paddingBottom: 28,
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
+    },
+    grabHandle: {
+        alignSelf: 'center',
+        width: 44,
+        height: 5,
+        borderRadius: 3,
+        backgroundColor: 'rgba(0,0,0,0.12)',
+        marginBottom: 14,
     },
     modalHeader: {
         flexDirection: 'row',
@@ -236,7 +241,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 12,
         paddingHorizontal: 12,
-        borderRadius: 8,
+        borderRadius: 14,
         marginBottom: 4,
     },
     labelContainer: {
@@ -259,13 +264,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     closePill: {
-        paddingHorizontal: 16,
-        paddingVertical: 6,
-        borderRadius: 16,
+        alignSelf: 'stretch',
+        height: 46,
+        borderRadius: 999,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     closePillText: {
         color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '700',
     },
 });

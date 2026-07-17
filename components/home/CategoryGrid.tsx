@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { ThemedText } from '@/components/ThemedText';
@@ -33,7 +33,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                 {CATEGORIES_CONFIG.map((cat, index) => (
                     <Animated.View
                         key={cat.id}
-                        entering={SlideInLeft.delay(100 + index * 80).duration(400)}
+                        entering={FadeInDown.delay(60 + index * 50).springify().damping(16)}
                         style={styles.gridItem}
                     >
                         <CategoryCard
@@ -46,7 +46,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
 
                 {MORE_CATEGORIES_CONFIG.length > 0 && (
                     <Animated.View
-                        entering={SlideInLeft.delay(100 + CATEGORIES_CONFIG.length * 80).duration(400)}
+                        entering={FadeInDown.delay(60 + CATEGORIES_CONFIG.length * 50).springify().damping(16)}
                         style={styles.gridItem}
                     >
                         <CategoryCard
@@ -60,12 +60,13 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
 
             <Modal
                 visible={isModalVisible}
-                animationType="fade"
+                animationType="slide"
                 transparent={true}
                 onRequestClose={() => setIsModalVisible(false)}
             >
                 <View style={styles.modalOverlay}>
                     <View style={[styles.modalCard, { backgroundColor: colors.card }]}>
+                        <View style={styles.grabHandle} />
                         <View style={styles.modalHeader}>
                             <ThemedText style={[styles.modalTitle, { color: colors.text }]}>More Categories</ThemedText>
                         </View>
@@ -73,7 +74,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                             {MORE_CATEGORIES_CONFIG.map((cat, index) => (
                                 <Animated.View
                                     key={cat.id}
-                                    entering={SlideInLeft.delay(index * 50).duration(300)}
+                                    entering={FadeInDown.delay(index * 40).springify().damping(16)}
                                     style={styles.gridItem}
                                 >
                                     <CategoryCard
@@ -125,20 +126,17 @@ const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: 'rgba(0,20,15,0.45)',
+        justifyContent: 'flex-end',
     },
     modalCard: {
-        width: '90%',
-        height: '60%',
-        borderRadius: Layout.borderRadius,
+        width: '100%',
+        height: '62%',
+        borderTopLeftRadius: Layout.headerBorderRadius,
+        borderTopRightRadius: Layout.headerBorderRadius,
         padding: 20,
+        paddingBottom: 28,
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
     },
     modalHeader: {
         flexDirection: 'row',
@@ -163,15 +161,23 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     closePill: {
-        width: 90,
-        height: 34,
-        borderRadius: 17,
+        alignSelf: 'stretch',
+        height: 46,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
     },
     closePillText: {
         color: '#FFFFFF',
-        fontSize: 13,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '700',
+    },
+    grabHandle: {
+        alignSelf: 'center',
+        width: 44,
+        height: 5,
+        borderRadius: 3,
+        backgroundColor: 'rgba(0,0,0,0.12)',
+        marginBottom: 14,
     },
 });

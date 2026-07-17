@@ -24,6 +24,8 @@ import { clientStorage } from '@/utils/storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { FormInput } from '@/components/common/FormInput';
+import { PressableScale } from '@/components/ui/PressableScale';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 // Removed global configuration
 
@@ -216,7 +218,10 @@ export const LoginForm = React.memo(function LoginForm() {
 
     return (
         <View style={styles.formContainer}>
-            <View style={[styles.formCard, { backgroundColor: colors.card }]}>
+            <Animated.View
+                entering={FadeInDown.delay(80).springify().damping(16)}
+                style={[styles.formCard, { backgroundColor: colors.card }]}
+            >
                 {/* Email/Phone Input */}
                 <View style={styles.inputField}>
                     <FormInput
@@ -233,13 +238,9 @@ export const LoginForm = React.memo(function LoginForm() {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         editable={!formData.loading}
-                        inputBoxStyle={{
-                            borderColor: errors.email && touched.email ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
                         rightAccessory={
                             touched.email && !errors.email && formData.email.length > 0 ? (
-                                <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
+                                <Ionicons name="checkmark-circle" size={18} color="#7BC043" style={{ marginLeft: 8 }} />
                             ) : undefined
                         }
                     />
@@ -263,14 +264,10 @@ export const LoginForm = React.memo(function LoginForm() {
                         onBlur={() => handleBlur('password')}
                         secureTextEntry={!formData.showPassword}
                         editable={!formData.loading}
-                        inputBoxStyle={{
-                            borderColor: errors.password && touched.password ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
                         rightAccessory={
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 {touched.password && !errors.password && formData.password.length > 0 && (
-                                    <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginRight: 8 }} />
+                                    <Ionicons name="checkmark-circle" size={18} color="#7BC043" style={{ marginRight: 8 }} />
                                 )}
                                 <TouchableOpacity
                                     onPress={() => setFormData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
@@ -279,7 +276,7 @@ export const LoginForm = React.memo(function LoginForm() {
                                     <Ionicons
                                         name={formData.showPassword ? 'eye-outline' : 'eye-off-outline'}
                                         size={20}
-                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
+                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'}
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -299,7 +296,7 @@ export const LoginForm = React.memo(function LoginForm() {
                         <Ionicons
                             name={formData.rememberMe ? 'checkbox' : 'square-outline'}
                             size={20}
-                            color={formData.rememberMe ? colors.primary : (isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B')}
+                            color={formData.rememberMe ? colors.primary : (isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73')}
                         />
                         <ThemedText style={[styles.optionText, { color: colors.text }]}>Remember me</ThemedText>
                     </TouchableOpacity>
@@ -312,38 +309,38 @@ export const LoginForm = React.memo(function LoginForm() {
                 </View>
 
                 {/* Login Button */}
-                <TouchableOpacity
-                    style={[styles.loginButton, { backgroundColor: colors.primary, shadowColor: colors.primary }]}
+                <PressableScale
+                    style={[styles.loginButton, { backgroundColor: colors.primary }]}
                     onPress={handleLogin}
                     disabled={formData.loading}
                 >
                     <ThemedText style={styles.loginButtonText}>Log In</ThemedText>
-                </TouchableOpacity>
+                </PressableScale>
 
                 {/* Google Login Button */}
-                <TouchableOpacity
-                    style={[styles.loginButton, { backgroundColor: '#F5F5F5', shadowColor: 'rgba(0,0,0,0.1)' }]}
+                <PressableScale
+                    style={[styles.loginButton, { backgroundColor: colors.field }]}
                     onPress={handleGoogleLogin}
                     disabled={formData.googleLoading}
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
-                        <ThemedText style={[styles.loginButtonText, { color: '#000000' }]}>Sign in with Google</ThemedText>
+                        <ThemedText style={[styles.loginButtonText, { color: colors.text }]}>Sign in with Google</ThemedText>
                     </View>
-                </TouchableOpacity>
+                </PressableScale>
 
 
 
                 {/* Footer */}
                 <View style={styles.footer}>
-                    <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
+                    <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#6B7B73' }]}>
                         Don't have an account?{' '}
                     </ThemedText>
                     <TouchableOpacity onPress={() => router.push('/(auth)/register' as any)}>
                         <ThemedText style={[styles.footerLink, { color: isDark ? colors.text : colors.primary }]}>Sign Up</ThemedText>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </Animated.View>
             <LoaderOverlay visible={formData.loading || formData.googleLoading} />
         </View>
     );
@@ -356,18 +353,14 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     formCard: {
-        borderRadius: Layout.borderRadius,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
+        borderRadius: Layout.cardBorderRadius,
+        padding: 20,
     },
     inputField: {
         marginBottom: 20,
     },
     errorText: {
-        color: '#EF4444',
+        color: '#FF5A5F',
         fontSize: 12,
         marginTop: 6,
         marginLeft: 4,
@@ -376,13 +369,13 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#475569',
+        color: '#4F5F57',
         letterSpacing: 0.5,
         marginBottom: 6,
         marginLeft: 0,
     },
     required: {
-        color: '#EF4444',
+        color: '#FF5A5F',
     },
     inputBox: {
         flexDirection: 'row',
@@ -417,20 +410,17 @@ const styles = StyleSheet.create({
     },
     loginButton: {
         height: 52,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 18,
+        marginBottom: 14,
         overflow: 'hidden',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
     },
     loginButtonText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 15,
         fontWeight: '700',
-        letterSpacing: 0.5,
+        letterSpacing: 0.3,
     },
     footer: {
         flexDirection: 'row',

@@ -65,7 +65,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
             <View style={styles.modalHeader}>
                 <ThemedText style={styles.modalTitle}>Delete Account</ThemedText>
                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                    <Ionicons name="close" size={18} color="#64748B" />
+                    <Ionicons name="close" size={18} color="#6B7B73" />
                 </TouchableOpacity>
             </View>
 
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     inputLabel: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#475569',
+        color: '#4F5F57',
         letterSpacing: 0.5,
         marginBottom: 4,
         marginLeft: 2,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0,
         shadowRadius: 5,
     },
     saveButtonText: {
@@ -196,12 +196,12 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 48 : 52,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: '#E2E8F0',
+        borderColor: '#ECECEC',
         borderRadius: Layout.borderRadius,
     },
     cancelText: {
         fontSize: 14,
-        color: '#94A3B8',
+        color: '#8FA79E',
         fontWeight: '600',
     },
 });

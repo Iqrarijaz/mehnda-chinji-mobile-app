@@ -22,6 +22,7 @@ import { resetPasswordSchema } from '@/utils/validation';
 import { resetPassword } from '@/apis/login/forgot-password';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 const ResetPasswordScreen = memo(function ResetPasswordScreen() {
     const router = useRouter();
@@ -102,7 +103,7 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
         >
             {/* Header / Top Section */}
             <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#003D36', zIndex: 1 }]}>
                     <TouchableOpacity
                         style={styles.backButton}
                         onPress={() => router.back()}
@@ -136,15 +137,15 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
 
                         {/* New Password Input */}
                         <View style={styles.inputField}>
-                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>NEW PASSWORD</ThemedText>
+                            <ThemedText style={[styles.label, isDark && { color: '#ECECEC' }]}>NEW PASSWORD</ThemedText>
                             <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F4F1',
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC'
                             }]}>
-                                <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
+                                <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'} style={{ marginRight: 12 }} />
                                 <TextInput
                                     placeholder="Enter new password"
-                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
+                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#8FA79E'}
                                     value={formData.newPassword}
                                     onChangeText={(newPassword) => setFormData(prev => ({ ...prev, newPassword }))}
                                     style={[styles.input, { color: colors.text }]}
@@ -157,7 +158,7 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
                                     <Ionicons
                                         name={formData.showPassword ? 'eye-outline' : 'eye-off-outline'}
                                         size={20}
-                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
+                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'}
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -167,15 +168,15 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
 
                         {/* Confirm Password Input */}
                         <View style={styles.inputField}>
-                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>CONFIRM PASSWORD</ThemedText>
+                            <ThemedText style={[styles.label, isDark && { color: '#ECECEC' }]}>CONFIRM PASSWORD</ThemedText>
                             <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F4F1',
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC'
                             }]}>
-                                <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
+                                <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'} style={{ marginRight: 12 }} />
                                 <TextInput
                                     placeholder="Confirm new password"
-                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
+                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#8FA79E'}
                                     value={formData.confirmPassword}
                                     onChangeText={(confirmPassword) => setFormData(prev => ({ ...prev, confirmPassword }))}
                                     style={[styles.input, { color: colors.text }]}
@@ -186,13 +187,13 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
                         </View>
 
                         {/* Submit Button */}
-                        <TouchableOpacity
-                            style={[styles.submitButton, { backgroundColor: '#006666' }]}
+                        <PressableScale
+                            style={[styles.submitButton, { backgroundColor: '#003D36' }]}
                             onPress={handleSubmit}
                             disabled={formData.loading}
                         >
                             <ThemedText style={styles.submitButtonText}>Set New Password</ThemedText>
-                        </TouchableOpacity>
+                        </PressableScale>
                     </View>
                 </View>
             </ScrollView>
@@ -252,7 +253,7 @@ const styles = StyleSheet.create({
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     inputField: {
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#475569',
+        color: '#4F5F57',
         letterSpacing: 0.5,
         marginBottom: 6,
         marginLeft: 0,
@@ -280,16 +281,12 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         height: 52,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 6,
         marginBottom: 18,
         overflow: 'hidden',
-        shadowColor: '#006666',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
     },
     submitButtonText: {
         color: '#FFFFFF',
@@ -311,7 +308,7 @@ const styles = StyleSheet.create({
         flex: 1,
         height: '100%',
         borderRadius: 2,
-        backgroundColor: '#E2E8F0',
+        backgroundColor: '#ECECEC',
     },
     strengthText: {
         fontSize: 11,

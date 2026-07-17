@@ -1,45 +1,58 @@
 import React from 'react';
-import { TouchableOpacity, TouchableOpacityProps, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { PressableProps, StyleProp, ViewStyle } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Radius } from '@/constants/layout';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 import { Ionicons } from '@expo/vector-icons';
 
-interface SubmitButtonProps extends TouchableOpacityProps {
+interface SubmitButtonProps extends PressableProps {
     title: string;
     isLoading?: boolean;
     icon?: keyof typeof Ionicons.glyphMap;
+    /** 'primary' = forest pill, 'accent' = lime pill, 'ghost' = soft field pill. */
+    variant?: 'primary' | 'accent' | 'ghost';
+    style?: StyleProp<ViewStyle>;
 }
 
-export function SubmitButton({ title, isLoading, disabled, style, icon, ...rest }: SubmitButtonProps) {
+export function SubmitButton({ title, isLoading, disabled, style, icon, variant = 'primary', ...rest }: SubmitButtonProps) {
     const isDisabled = disabled || isLoading;
     const { theme } = useTheme();
     const colors = Colors[theme];
 
+    const background =
+        variant === 'accent' ? colors.lime :
+        variant === 'ghost' ? colors.field :
+        colors.primary;
+    const labelColor = variant === 'ghost' ? colors.primary : '#FFFFFF';
+
     return (
-        <TouchableOpacity
-            style={[styles.updateButton, { backgroundColor: colors.primary }, isDisabled && { opacity: 0.6 }, style]}
+        <PressableScale
+            style={[styles.updateButton, { backgroundColor: background }, isDisabled && { opacity: 0.5 }, style]}
             disabled={isDisabled}
-            activeOpacity={0.8}
             {...rest}
         >
             <View style={styles.buttonContent}>
-                {icon && !isLoading && (
-                    <Ionicons name={icon} size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
-                )}
-                <ThemedText style={styles.updateButtonText}>
+                {isLoading ? (
+                    <ActivityIndicator size="small" color={labelColor} style={{ marginRight: 8 }} />
+                ) : icon ? (
+                    <Ionicons name={icon} size={16} color={labelColor} style={{ marginRight: 6 }} />
+                ) : null}
+                <ThemedText style={[styles.updateButtonText, { color: labelColor }]}>
                     {isLoading ? 'Processing...' : title}
                 </ThemedText>
             </View>
-        </TouchableOpacity>
+        </PressableScale>
     );
 }
 
 const styles = StyleSheet.create({
     updateButton: {
-        height: 40,
-        borderRadius: 20,
+        minHeight: 46,
+        borderRadius: Radius.pill,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',
@@ -48,11 +61,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 8,
+        paddingHorizontal: 12,
     },
     updateButtonText: {
-        color: '#FFFFFF',
-        fontSize: 14,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '700',
+        letterSpacing: 0.2,
     },
 });

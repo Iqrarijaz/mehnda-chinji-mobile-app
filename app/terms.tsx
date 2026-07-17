@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.04,
+        shadowOpacity: 0,
         shadowRadius: 16,
     },
     cardHeader: {
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
         right: 0,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 12,
         paddingHorizontal: 20,
         paddingTop: 16,
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     acceptButtonText: {

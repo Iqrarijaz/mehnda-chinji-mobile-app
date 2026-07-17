@@ -23,7 +23,7 @@ const NetworkRow = ({ icon, label, bytes, totalBytes, delay }: NetworkRowProps) 
     return (
         <Animated.View entering={SlideInLeft.delay(delay).duration(450)} style={styles.row}>
             <View style={styles.iconBox}>
-                <Ionicons name={icon as any} size={20} color="#64748B" />
+                <Ionicons name={icon as any} size={20} color="#6B7B73" />
             </View>
             <View style={styles.content}>
                 <View style={styles.rowTop}>
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 11,
         fontWeight: '800',
-        color: '#94A3B8',
+        color: '#8FA79E',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 8,
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
         padding: 12,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 10,
     },
     row: {

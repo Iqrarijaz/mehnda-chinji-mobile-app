@@ -69,7 +69,7 @@ const ToastLayout = ({
                 <Ionicons
                     name={isSuccess ? 'checkmark' : 'alert'}
                     size={18}
-                    color={isSuccess ? '#10B981' : '#EF4444'}
+                    color={isSuccess ? '#7BC043' : '#FF5A5F'}
                 />
             </View>
 
@@ -81,7 +81,7 @@ const ToastLayout = ({
 
             {/* Close */}
             <TouchableOpacity onPress={hide} style={styles.closeBtn}>
-                <Ionicons name="close" size={18} color="#64748B" />
+                <Ionicons name="close" size={18} color="#6B7B73" />
             </TouchableOpacity>
         </View>
     );
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 8,
         marginTop: 12,
         zIndex: 99999,

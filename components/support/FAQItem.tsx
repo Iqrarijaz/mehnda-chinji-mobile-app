@@ -52,7 +52,7 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
                     <Ionicons
                         name="chevron-down"
                         size={20}
-                        color={isOpen ? "#009688" : "#64748B"}
+                        color={isOpen ? "#009688" : "#6B7B73"}
                     />
                 </Animated.View>
             </TouchableOpacity>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
         // Shadow for premium feel
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.04,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     header: {
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     answer: {
         fontSize: 14,
         lineHeight: 22,
-        color: '#64748B',
+        color: '#6B7B73',
     },
 });
 

@@ -61,8 +61,8 @@ const TopperCard = React.memo(({ topper, primaryColor = '#3B82F6' }: TopperCardP
         ? ((topper.obtainedMarks || 0) / topper.totalMarks * 100).toFixed(1)
         : null;
     const pctColor = pct
-        ? (parseFloat(pct) >= 80 ? '#10B981' : parseFloat(pct) >= 60 ? '#F59E0B' : '#EF4444')
-        : '#94A3B8';
+        ? (parseFloat(pct) >= 80 ? '#7BC043' : parseFloat(pct) >= 60 ? '#F0803C' : '#FF5A5F')
+        : '#8FA79E';
 
     return (
         <View style={styles.container}>

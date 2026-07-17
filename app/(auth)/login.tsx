@@ -38,7 +38,7 @@ export default function LoginScreen() {
         >
             {/* Header / Top Section */}
             <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#003D36', zIndex: 1 }]}>
                     <View style={styles.headerContent}>
                         <Image
                             source={require('../../public/white_logo.svg')}
@@ -71,7 +71,7 @@ export default function LoginScreen() {
                 <View style={styles.modalOverlay}>
                     <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
                         <View style={styles.modalIconBox}>
-                            <Ionicons name="time-outline" size={40} color="#006666" />
+                            <Ionicons name="time-outline" size={40} color="#003D36" />
                         </View>
 
                         <ThemedText style={styles.modalTitle}>Session Expired</ThemedText>
@@ -127,19 +127,15 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '100%',
-        borderRadius: 24,
+        borderRadius: 28,
         padding: 24,
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
     },
     modalIconBox: {
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: 'rgba(0, 102, 102, 0.1)',
+        backgroundColor: 'rgba(0, 61, 54, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
@@ -153,16 +149,16 @@ const styles = StyleSheet.create({
     },
     modalSubtitle: {
         fontSize: 15,
-        color: '#64748B',
+        color: '#6B7B73',
         lineHeight: 22,
         textAlign: 'center',
         marginBottom: 24,
     },
     modalButton: {
-        backgroundColor: '#006666',
+        backgroundColor: '#003D36',
         width: '100%',
         height: 52,
-        borderRadius: 16,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
     },

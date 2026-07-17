@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 20,
     },
     modalHeader: {

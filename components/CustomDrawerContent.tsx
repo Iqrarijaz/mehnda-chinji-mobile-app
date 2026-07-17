@@ -19,7 +19,6 @@ import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { Layout } from '@/constants/layout';
 import { useRewardedAd } from '@/ads/hooks/useAds';
 
 interface MenuItem {
@@ -39,6 +38,10 @@ const MENU_ITEMS: MenuItem[] = [
     { label: 'Support & FAQ', icon: 'help-circle-outline', route: '/support', section: 'Support' },
 ];
 
+/**
+ * Forest-green drawer — premium reference design: white/lime content on a
+ * deep teal-green panel, active item as a lime pill.
+ */
 const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
     const { user, logout } = useAuth();
     const { theme } = useTheme();
@@ -75,8 +78,8 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
     }, {});
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.card }]}>
-            {/* Minimalist Centered Header */}
+        <View style={[styles.container, { backgroundColor: colors.primary }]}>
+            {/* Centered profile header on forest surface */}
             <Animated.View entering={FadeIn.duration(400)} style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }]}>
                 <View style={styles.headerTop}>
                     <TouchableOpacity
@@ -84,7 +87,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                         onPress={() => props.navigation.closeDrawer()}
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                        <Ionicons name="close" size={24} color={colors.textSecondary} />
+                        <Ionicons name="close" size={24} color={colors.onPrimaryMuted} />
                     </TouchableOpacity>
                 </View>
 
@@ -93,17 +96,19 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                     activeOpacity={0.8}
                     style={styles.avatarWrap}
                 >
-                    <Avatar
-                        uri={user?.user?.profileImage}
-                        name={user?.user?.name}
-                        size={56}
-                    />
-                    <View style={[styles.onlineBadge, { borderColor: colors.card }]} />
+                    <View style={[styles.avatarRing, { borderColor: colors.lime }]}>
+                        <Avatar
+                            uri={user?.user?.profileImage}
+                            name={user?.user?.name}
+                            size={64}
+                        />
+                    </View>
+                    <View style={[styles.onlineBadge, { backgroundColor: colors.lime, borderColor: colors.primary }]} />
                 </TouchableOpacity>
                 <View style={styles.headerTextWrap}>
-                    <ThemedText style={[styles.headerName, { color: colors.text }]}>{userName}</ThemedText>
+                    <ThemedText style={[styles.headerName, { color: colors.onPrimary }]}>{userName}</ThemedText>
                     {userEmail ? (
-                        <ThemedText style={[styles.headerEmail, { color: colors.textSecondary }]} numberOfLines={1}>{userEmail}</ThemedText>
+                        <ThemedText style={[styles.headerEmail, { color: colors.onPrimaryMuted }]} numberOfLines={1}>{userEmail}</ThemedText>
                     ) : null}
                 </View>
             </Animated.View>
@@ -120,7 +125,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                         entering={FadeInLeft.delay(100 + sectionIndex * 50).duration(300)}
                         style={styles.section}
                     >
-                        <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>{sectionName}</ThemedText>
+                        <ThemedText style={[styles.sectionLabel, { color: colors.onPrimaryMuted }]}>{sectionName}</ThemedText>
                         {items.map((item, index) => {
                             const isFocused =
                                 (item.route === '/(tabs)' && activeRoute === '(tabs)') ||
@@ -135,7 +140,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                                     disabled={isDisabled}
                                     style={[
                                         styles.menuItem,
-                                        isFocused && { backgroundColor: colors.primary + '12' },
+                                        isFocused && { backgroundColor: colors.lime },
                                         isDisabled && { opacity: 0.5 },
                                     ]}
                                     onPress={() => handleNavigation(item.route)}
@@ -143,13 +148,13 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                                     <Ionicons
                                         name={item.icon}
                                         size={20}
-                                        color={isFocused ? colors.primary : colors.textSecondary}
+                                        color={isFocused ? colors.primary : colors.onPrimaryMuted}
                                         style={styles.menuIcon}
                                     />
                                     <ThemedText style={[
                                         styles.menuLabel,
-                                        { color: isFocused ? colors.primary : colors.text },
-                                        isFocused && { fontWeight: '700' },
+                                        { color: isFocused ? colors.primary : colors.onPrimary },
+                                        isFocused && { fontWeight: '800' },
                                     ]}>
                                         {item.label}
                                     </ThemedText>
@@ -160,17 +165,17 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                 ))}
             </DrawerContentScrollView>
 
-            {/* Minimalist Footer */}
+            {/* Footer */}
             <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
                 <TouchableOpacity
                     activeOpacity={0.7}
                     onPress={logout}
                     style={styles.logoutBtn}
                 >
-                    <Ionicons name="log-out-outline" size={18} color={colors.textSecondary} style={{ marginRight: 8 }} />
-                    <ThemedText style={[styles.logoutText, { color: colors.textSecondary }]}>Sign Out</ThemedText>
+                    <Ionicons name="log-out-outline" size={18} color={colors.pink} style={{ marginRight: 8 }} />
+                    <ThemedText style={[styles.logoutText, { color: colors.onPrimary }]}>Sign Out</ThemedText>
                 </TouchableOpacity>
-                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.7'}</ThemedText>
+                <ThemedText style={[styles.versionText, { color: colors.onPrimaryMuted }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.7'}</ThemedText>
             </View>
         </View>
     );
@@ -185,11 +190,8 @@ const styles = StyleSheet.create({
     // Header
     header: {
         paddingHorizontal: 20,
-        paddingBottom: 16,
+        paddingBottom: 20,
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.03)',
-        borderBottomLeftRadius: Layout.borderRadius,
-        borderBottomRightRadius: Layout.borderRadius,
     },
     headerTop: {
         width: '100%',
@@ -203,16 +205,21 @@ const styles = StyleSheet.create({
     },
     avatarWrap: {
         position: 'relative',
-        marginBottom: 10,
+        marginBottom: 12,
+    },
+    avatarRing: {
+        borderWidth: 2,
+        borderRadius: 999,
+        padding: 3,
     },
     onlineBadge: {
         position: 'absolute',
-        bottom: 2,
-        right: 2,
+        bottom: 4,
+        right: 4,
         width: 14,
         height: 14,
         borderRadius: 7,
-        backgroundColor: '#10B981',
+        borderWidth: 2,
     },
     headerTextWrap: {
         alignItems: 'center',
@@ -225,7 +232,6 @@ const styles = StyleSheet.create({
     headerEmail: {
         fontSize: 12,
         fontWeight: '500',
-        opacity: 0.8,
     },
     // Scroll
     scrollContent: {
@@ -234,24 +240,24 @@ const styles = StyleSheet.create({
     },
     // Section
     section: {
-        marginBottom: 12,
+        marginBottom: 14,
     },
     sectionLabel: {
         fontSize: 10,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 1.5,
-        marginLeft: 10,
+        marginLeft: 12,
         marginBottom: 6,
-        opacity: 0.6,
+        opacity: 0.8,
     },
     // Menu Items
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-        borderRadius: Layout.borderRadius,
+        paddingVertical: 13,
+        paddingHorizontal: 14,
+        borderRadius: 16,
         marginBottom: 2,
     },
     menuIcon: {
@@ -260,7 +266,7 @@ const styles = StyleSheet.create({
     menuLabel: {
         flex: 1,
         fontSize: 14,
-        fontWeight: '500',
+        fontWeight: '600',
     },
     // Footer
     footer: {
@@ -272,21 +278,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 12,
+        paddingVertical: 13,
         paddingHorizontal: 24,
-        borderRadius: 16,
+        borderRadius: 999,
         width: '100%',
-        backgroundColor: 'rgba(0,0,0,0.03)',
-        marginBottom: 8,
+        backgroundColor: 'rgba(255,255,255,0.10)',
+        marginBottom: 10,
     },
     logoutText: {
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: '700',
     },
     versionText: {
         fontSize: 10,
         fontWeight: '500',
         textAlign: 'center',
-        opacity: 0.7,
+        opacity: 0.8,
     },
 });

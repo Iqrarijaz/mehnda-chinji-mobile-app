@@ -117,7 +117,7 @@ export default function SettingsScreen() {
                         </SectionCard>
 
                         <SectionCard title="Session" delay={200}>
-                            <SettingRowItem icon="log-out-outline" label="Logout" color="#EF4444" iconColor="#EF4444" iconBg="rgba(239, 68, 68, 0.08)" showChevron={false} onPress={handleLogout} isLast />
+                            <SettingRowItem icon="log-out-outline" label="Logout" color="#FF5A5F" iconColor="#FF5A5F" iconBg="rgba(239, 68, 68, 0.08)" showChevron={false} onPress={handleLogout} isLast />
                         </SectionCard>
 
                         <SectionCard title="Danger Zone" delay={300}>
@@ -247,7 +247,7 @@ export default function SettingsScreen() {
                                             value={newEmail}
                                             onChangeText={setNewEmail}
                                             placeholder="New Email Address"
-                                            placeholderTextColor={theme === 'dark' ? 'rgba(255,255,255,0.3)' : '#94A3B8'}
+                                            placeholderTextColor={theme === 'dark' ? 'rgba(255,255,255,0.3)' : '#8FA79E'}
                                             keyboardType="email-address"
                                             autoCapitalize="none"
                                         />

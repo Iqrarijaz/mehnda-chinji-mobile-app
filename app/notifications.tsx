@@ -217,7 +217,7 @@ export default function NotificationsScreen() {
                     contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 32 }]}
                     showsVerticalScrollIndicator={false}
                     refreshControl={
-                        <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor="#006666" />
+                        <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor="#003D36" />
                     }
                 />
             </View>
@@ -226,8 +226,8 @@ export default function NotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F5F6FA' },
+    container: { flex: 1, backgroundColor: '#F8FAF8' },
     list: { flexGrow: 1, paddingTop: 8 },
-    filtersWrap: { backgroundColor: '#F5F6FA', paddingBottom: 4 },
+    filtersWrap: { backgroundColor: '#F8FAF8', paddingBottom: 4 },
     sectionWrap: { paddingHorizontal: 16, marginTop: 12 },
 });

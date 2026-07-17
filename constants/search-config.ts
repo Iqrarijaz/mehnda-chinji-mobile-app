@@ -25,11 +25,11 @@ export const SEARCH_NAV_ITEMS: SearchNavResult[] = [
     { id: 'edit-profile', label: 'Edit Profile', subtitle: 'Update your personal info', route: '/profile', icon: 'person-circle-outline', color: '#3B82F6' },
     { id: 'change-password', label: 'Change Password', subtitle: 'Update your password', action: 'change-password', icon: 'lock-closed-outline', color: '#F59E0B' },
     // Settings sub-pages
-    { id: 'settings', label: 'Settings', subtitle: 'App preferences', route: '/settings', icon: 'settings-outline', color: '#64748B' },
+    { id: 'settings', label: 'Settings', subtitle: 'App preferences', route: '/settings', icon: 'settings-outline', color: '#6B7B73' },
     { id: 'notifications-settings', label: 'Notifications', subtitle: 'Manage alert preferences', route: '/manageNotifications', icon: 'notifications-outline', color: '#10B981' },
     { id: 'data-usage', label: 'Data Usage', subtitle: 'Monitor your data consumption', route: '/dataUsage', icon: 'cellular-outline', color: '#6366F1' },
     { id: 'privacy-policy', label: 'Privacy Policy', subtitle: 'How we handle your data', route: '/privacy', icon: 'shield-checkmark-outline', color: '#06B6D4' },
-    { id: 'terms', label: 'Terms & Conditions', subtitle: 'App usage terms', route: '/terms', icon: 'document-text-outline', color: '#64748B' },
+    { id: 'terms', label: 'Terms & Conditions', subtitle: 'App usage terms', route: '/terms', icon: 'document-text-outline', color: '#6B7B73' },
     // Category Shortcuts
     { id: 'nav-travel', label: 'Travel & Transport', subtitle: 'Bus timings and transport', route: '/listing/travel', icon: 'bus-outline', color: '#F59E0B' },
     { id: 'nav-banks', label: 'Banks & ATMs', subtitle: 'Find nearest bank or ATM', route: '/listing/banks', icon: 'card-outline', color: '#06B6D4' },

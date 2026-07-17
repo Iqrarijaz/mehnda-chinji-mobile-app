@@ -10,7 +10,7 @@ import Animated, {
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 
-const PRIMARY = '#006666';
+const PRIMARY = '#003D36';
 
 function getTypeStyle(type: string): { icon: string; color: string } {
     switch (type) {
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.06,
+        shadowOpacity: 0,
         shadowRadius: 10,
     },
     cardUnread: {
@@ -139,6 +139,6 @@ const styles = StyleSheet.create({
     title: { fontSize: 12, fontWeight: '600', color: '#0F172A', flex: 1 },
     titleUnread: { fontWeight: '800' },
     dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: PRIMARY, marginLeft: 6 },
-    body: { fontSize: 11, color: '#64748B', lineHeight: 16, marginBottom: 4 },
-    time: { fontSize: 11, color: '#94A3B8', fontWeight: '500' },
+    body: { fontSize: 11, color: '#6B7B73', lineHeight: 16, marginBottom: 4 },
+    time: { fontSize: 11, color: '#8FA79E', fontWeight: '500' },
 });

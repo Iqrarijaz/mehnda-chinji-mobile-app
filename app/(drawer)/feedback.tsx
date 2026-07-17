@@ -106,7 +106,7 @@ export default function FeedbackScreen() {
                             styles.statusText,
                             isSubmitted ? { color: '#D97706' } :
                                 isReviewed ? { color: '#2563EB' } :
-                                    { color: '#059669' }
+                                    { color: '#4B8B27' }
                         ]}>
                             {item.status.replace(/_/g, ' ')}
                         </ThemedText>
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     typeBadge: {
-        backgroundColor: '#E2E8F0',
+        backgroundColor: '#ECECEC',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 4,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     typeText: {
         fontSize: 10,
         fontWeight: '700',
-        color: '#475569',
+        color: '#4F5F57',
         textTransform: 'uppercase'
     },
     statusBadge: {

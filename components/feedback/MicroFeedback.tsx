@@ -68,7 +68,7 @@ export function MicroFeedback({ componentName }: MicroFeedbackProps) {
                     style={[styles.button, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}
                     onPress={() => handleFeedback(false)}
                 >
-                    <Ionicons name="thumbs-down-outline" size={24} color="#EF4444" />
+                    <Ionicons name="thumbs-down-outline" size={24} color="#FF5A5F" />
                 </TouchableOpacity>
             </View>
 
@@ -91,11 +91,11 @@ export function MicroFeedback({ componentName }: MicroFeedbackProps) {
                                 {
                                     backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F8FAFC',
                                     color: colors.text,
-                                    borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0'
+                                    borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#ECECEC'
                                 }
                             ]}
                             placeholder="Tell us what went wrong..."
-                            placeholderTextColor={theme === 'dark' ? 'rgba(255,255,255,0.4)' : '#94A3B8'}
+                            placeholderTextColor={theme === 'dark' ? 'rgba(255,255,255,0.4)' : '#8FA79E'}
                             multiline
                             numberOfLines={4}
                             value={feedbackText}
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
         padding: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 12,
 
     },

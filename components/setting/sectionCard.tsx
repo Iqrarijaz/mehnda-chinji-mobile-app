@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
         marginBottom: Platform.OS === 'android' ? 12 : 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 10,
     },
     sectionTitle: {

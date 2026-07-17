@@ -22,6 +22,7 @@ import { forgotPasswordSchema } from '@/utils/validation';
 import * as yup from 'yup';
 import { checkAccountDetails, sendOtp } from '@/apis/login/forgot-password';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 
@@ -132,7 +133,7 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
         >
             {/* Header / Top Section */}
             <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#003D36', zIndex: 1 }]}>
                     <View style={styles.headerContent}>
                         <Image
                             source={require('../../public/white_logo.svg')}
@@ -163,15 +164,15 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                             <>
                                 {/* Email/Phone Input */}
                                 <View style={styles.inputField}>
-                                    <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
+                                    <ThemedText style={[styles.label, isDark && { color: '#ECECEC' }]}>EMAIL ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
                                     <View style={[styles.inputBox, {
-                                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                        borderColor: errors.email && touched.email ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0')
+                                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F4F1',
+                                        borderColor: errors.email && touched.email ? '#FF5A5F' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC')
                                     }]}>
-                                        <Ionicons name="mail-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
+                                        <Ionicons name="mail-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'} style={{ marginRight: 12 }} />
                                         <TextInput
                                             placeholder="example@gmail.com"
-                                            placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
+                                            placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#8FA79E'}
                                             value={email}
                                             onChangeText={(text) => {
                                                 setEmail(text);
@@ -184,7 +185,7 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                                             editable={!loading}
                                         />
                                         {touched.email && !errors.email && email.length > 0 && (
-                                            <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
+                                            <Ionicons name="checkmark-circle" size={18} color="#7BC043" style={{ marginLeft: 8 }} />
                                         )}
                                     </View>
                                     {touched.email && errors.email ? (
@@ -193,13 +194,13 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                                 </View>
 
                                 {/* Find Account Button */}
-                                <TouchableOpacity
-                                    style={[styles.submitButton, { backgroundColor: '#006666' }]}
+                                <PressableScale
+                                    style={[styles.submitButton, { backgroundColor: '#003D36' }]}
                                     onPress={handleSubmit}
                                     disabled={loading}
                                 >
                                     <ThemedText style={styles.submitButtonText}>Find Account</ThemedText>
-                                </TouchableOpacity>
+                                </PressableScale>
                             </>
                         ) : (
                             <View style={styles.profileContainer}>
@@ -227,13 +228,13 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                                 </View>
 
                                 {/* Send OTP Button */}
-                                <TouchableOpacity
-                                    style={[styles.submitButton, styles.submitButtonHorizontal, { backgroundColor: '#006666', marginTop: 5 }]}
+                                <PressableScale
+                                    style={[styles.submitButton, styles.submitButtonHorizontal, { backgroundColor: '#003D36', marginTop: 5 }]}
                                     onPress={handleSendOtp}
                                     disabled={loading}
                                 >
                                     <ThemedText style={styles.submitButtonText}>Send OTP</ThemedText>
-                                </TouchableOpacity>
+                                </PressableScale>
 
                                 <TouchableOpacity
                                     style={styles.notMeButton}
@@ -249,11 +250,11 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
 
                         {/* Footer */}
                         <View style={styles.footer}>
-                            <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
+                            <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#6B7B73' }]}>
                                 Remember your password?{' '}
                             </ThemedText>
                             <TouchableOpacity onPress={() => router.back()}>
-                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#006666' }]}>Log In</ThemedText>
+                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#003D36' }]}>Log In</ThemedText>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -303,14 +304,14 @@ const styles = StyleSheet.create({
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     inputField: {
         marginBottom: 20,
     },
     errorText: {
-        color: '#EF4444',
+        color: '#FF5A5F',
         fontSize: 12,
         marginTop: 6,
         marginLeft: 4,
@@ -319,13 +320,13 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#475569',
+        color: '#4F5F57',
         letterSpacing: 0.5,
         marginBottom: 6,
         marginLeft: 0,
     },
     required: {
-        color: '#EF4444',
+        color: '#FF5A5F',
     },
     inputBox: {
         flexDirection: 'row',
@@ -341,15 +342,11 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         height: 52,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 18,
         overflow: 'hidden',
-        shadowColor: '#006666',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
     },
     submitButtonText: {
         color: '#FFFFFF',
@@ -385,7 +382,7 @@ const styles = StyleSheet.create({
         height: 80,
         borderRadius: 40,
         marginBottom: 10,
-        borderColor: '#00666620',
+        borderColor: '#003D3620',
     },
     profileAvatarPlaceholder: {
         width: 80,

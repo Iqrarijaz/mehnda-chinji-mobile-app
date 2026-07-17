@@ -147,7 +147,7 @@ export default function TicketDetailScreen() {
                     <View style={styles.headerTitleContainer}>
                         <ThemedText style={styles.headerTitle} numberOfLines={1}>{ticket.ticketId}</ThemedText>
                         <View style={styles.statusRow}>
-                            <View style={[styles.statusDot, { backgroundColor: ticket.status === 'open' ? '#F59E0B' : ticket.status === 'in-progress' ? '#3B82F6' : '#10B981' }]} />
+                            <View style={[styles.statusDot, { backgroundColor: ticket.status === 'open' ? '#F0803C' : ticket.status === 'in-progress' ? '#3B82F6' : '#7BC043' }]} />
                             <ThemedText style={styles.statusText}>{ticket.status.toUpperCase()}</ThemedText>
                         </View>
                     </View>

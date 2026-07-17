@@ -37,7 +37,7 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
     subtitle,
     onPress,
     color,
-    iconColor = '#006666',
+    iconColor = '#003D36',
     iconBg = 'rgba(0, 150, 136, 0.08)',
     showChevron = true,
     isToggle = false,

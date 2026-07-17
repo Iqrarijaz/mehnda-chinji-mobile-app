@@ -296,7 +296,7 @@ const EventForm = () => {
                                     <View key={idx} style={styles.imageWrapper}>
                                         <Image source={{ uri }} style={styles.eventImage} />
                                         <TouchableOpacity style={styles.deleteImgBtn} onPress={() => removeImage(idx)}>
-                                            <Ionicons name="close-circle" size={24} color="#EF4444" />
+                                            <Ionicons name="close-circle" size={24} color="#FF5A5F" />
                                         </TouchableOpacity>
                                     </View>
                                 ))}
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
         marginLeft: 2,
     },
-    required: { color: '#EF4444' },
+    required: { color: '#FF5A5F' },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         shadowColor: '#0D9488',
         shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.25,
+        shadowOpacity: 0,
         shadowRadius: 10,
     },
     buttonContent: {

@@ -105,9 +105,9 @@ const SessionCard = React.memo(({ session, delay, onRevoke, isRevoking, colors }
                         style={styles.revokeBtn}
                     >
                         {isRevoking ? (
-                            <ActivityIndicator size="small" color="#EF4444" />
+                            <ActivityIndicator size="small" color="#FF5A5F" />
                         ) : (
-                            <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+                            <Ionicons name="log-out-outline" size={18} color="#FF5A5F" />
                         )}
                     </TouchableOpacity>
                 )}
@@ -121,7 +121,7 @@ const SkeletonCard = React.memo(({ delay }: { delay: number }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const isDark = theme === 'dark';
-    const skeletonBg = isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0';
+    const skeletonBg = isDark ? 'rgba(255,255,255,0.05)' : '#ECECEC';
     const subBg = isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9';
 
     return (
@@ -255,19 +255,19 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     cardCurrent: {
-        backgroundColor: 'rgba(0,102,102,0.08)', // Using alpha for consistent branding
+        backgroundColor: 'rgba(0,61,54,0.08)', // Using alpha for consistent branding
     },
     iconCircle: {
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(0,102,102,0.08)',
+        backgroundColor: 'rgba(0,61,54,0.08)',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
     },
     iconCircleCurrent: {
-        backgroundColor: 'rgba(0,102,102,0.12)',
+        backgroundColor: 'rgba(0,61,54,0.12)',
     },
     info: { flex: 1 },
     nameRow: {
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
         flexShrink: 1,
     },
     badge: {
-        backgroundColor: 'rgba(0,102,102,0.14)',
+        backgroundColor: 'rgba(0,61,54,0.14)',
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: Layout.borderRadius,
@@ -291,13 +291,13 @@ const styles = StyleSheet.create({
     badgeText: {
         fontSize: 10,
         fontWeight: '700',
-        color: '#006666',
+        color: '#003D36',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     meta: {
         fontSize: 11,
-        color: '#94A3B8',
+        color: '#8FA79E',
         fontWeight: '500',
     },
     revokeBtn: {
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 11,
-        color: '#94A3B8',
+        color: '#8FA79E',
         fontWeight: '500',
     },
     footer: {

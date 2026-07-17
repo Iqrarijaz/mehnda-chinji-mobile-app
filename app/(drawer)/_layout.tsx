@@ -19,7 +19,7 @@ export default function DrawerLayout() {
                     headerShown: false,
                     swipeEnabled: isAuthenticated,
                     drawerType: 'front',
-                    drawerStyle: { backgroundColor: theme === 'dark' ? Colors[theme].card : Colors[theme].background },
+                    drawerStyle: { backgroundColor: Colors[theme].primary, width: 300 },
                 }}
             >
                 <Drawer.Screen

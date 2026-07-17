@@ -695,8 +695,8 @@ const PlaceSubmissionScreen = () => {
                         )}
                         <Animated.View entering={FadeInDown.delay(200)} style={styles.field}>
                             <View style={styles.labelRow}>
-                                <ThemedText style={styles.label}>NAME <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
-                                <ThemedText style={[styles.charCount, form.name.length >= 100 && { color: '#EF4444' }]}>
+                                <ThemedText style={styles.label}>NAME <ThemedText style={{ color: '#FF5A5F' }}>*</ThemedText></ThemedText>
+                                <ThemedText style={[styles.charCount, form.name.length >= 100 && { color: '#FF5A5F' }]}>
                                     {form.name.length}/100
                                 </ThemedText>
                             </View>
@@ -718,7 +718,7 @@ const PlaceSubmissionScreen = () => {
 
                         <View style={styles.field}>
                             <View style={styles.labelRow}>
-                                <ThemedText style={styles.label}>Select Type <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                <ThemedText style={styles.label}>Select Type <ThemedText style={{ color: '#FF5A5F' }}>*</ThemedText></ThemedText>
                             </View>
                             <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={{ gap: 12, paddingBottom: 8 }}>
                                 {typesToRender.map((t: any) => (
@@ -822,8 +822,8 @@ const PlaceSubmissionScreen = () => {
                         {!isTravel && (
                             <Animated.View entering={FadeInDown.delay(250)} style={styles.field}>
                                 <View style={styles.labelRow}>
-                                    <ThemedText style={styles.label}>ADDRESS <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
-                                    <ThemedText style={[styles.charCount, form.address.length >= 150 && { color: '#EF4444' }]}>
+                                    <ThemedText style={styles.label}>ADDRESS <ThemedText style={{ color: '#FF5A5F' }}>*</ThemedText></ThemedText>
+                                    <ThemedText style={[styles.charCount, form.address.length >= 150 && { color: '#FF5A5F' }]}>
                                         {form.address.length}/150
                                     </ThemedText>
                                 </View>
@@ -867,7 +867,7 @@ const PlaceSubmissionScreen = () => {
 
                         <Animated.View entering={FadeInDown.delay(350)} style={styles.field}>
                             <View style={styles.labelRow}>
-                                <ThemedText style={styles.label}>CONTACTS (MAX 3) <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                <ThemedText style={styles.label}>CONTACTS (MAX 3) <ThemedText style={{ color: '#FF5A5F' }}>*</ThemedText></ThemedText>
                                 {form.contact.length < 3 && (
                                     <TouchableOpacity onPress={addContact}>
                                         <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add</ThemedText>
@@ -913,7 +913,7 @@ const PlaceSubmissionScreen = () => {
                                                 onPress={() => removeContact(index)}
                                                 style={{ paddingTop: 16 }}
                                             >
-                                                <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                                                <Ionicons name="trash-outline" size={20} color="#FF5A5F" />
                                             </TouchableOpacity>
                                         )}
                                     </View>
@@ -957,7 +957,7 @@ const PlaceSubmissionScreen = () => {
 
                                             {index > 0 && (
                                                 <TouchableOpacity onPress={() => removeRoute(index)} style={{ padding: 4 }}>
-                                                    <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                                                    <Ionicons name="trash-outline" size={20} color="#FF5A5F" />
                                                 </TouchableOpacity>
                                             )}
                                         </View>
@@ -983,7 +983,7 @@ const PlaceSubmissionScreen = () => {
                             <View style={styles.field}>
                                 <View style={styles.labelRow}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                        <ThemedText style={styles.label}>Description {!isEmergency && <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>}</ThemedText>
+                                        <ThemedText style={styles.label}>Description {!isEmergency && <ThemedText style={{ color: '#FF5A5F' }}>*</ThemedText>}</ThemedText>
                                         <TouchableOpacity
                                             onPress={() => handleOptimizeText('description')}
                                             disabled={isOptimizingDesc || !form.name.trim() || !form.type}
@@ -994,7 +994,7 @@ const PlaceSubmissionScreen = () => {
                                                 paddingHorizontal: 8,
                                                 paddingVertical: 3,
                                                 borderRadius: 12,
-                                                backgroundColor: (isOptimizingDesc || !form.name.trim() || !form.type) ? (isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0') : (colors.primary + '12'),
+                                                backgroundColor: (isOptimizingDesc || !form.name.trim() || !form.type) ? (isDark ? 'rgba(255,255,255,0.05)' : '#ECECEC') : (colors.primary + '12'),
                                                 marginLeft: 4,
                                                 opacity: (isOptimizingDesc || !form.name.trim() || !form.type) ? 0.6 : 1
                                             }}
@@ -1009,7 +1009,7 @@ const PlaceSubmissionScreen = () => {
                                     </View>
                                     <ThemedText style={[
                                         styles.charCount,
-                                        (!isEmergency && form.description.length < 100) && { color: '#EF4444' }
+                                        (!isEmergency && form.description.length < 100) && { color: '#FF5A5F' }
                                     ]}>
                                         {form.description.length} chars {!isEmergency && '(Min 100)'}
                                     </ThemedText>
@@ -1085,7 +1085,7 @@ const PlaceSubmissionScreen = () => {
 
                         {(isHealth || isEducation || isGovt) && (
                             <Animated.View entering={FadeInDown.delay(440)} style={styles.field}>
-                                <ThemedText style={[styles.label, { marginBottom: 6 }]}>TIMING <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                                <ThemedText style={[styles.label, { marginBottom: 6 }]}>TIMING <ThemedText style={{ color: '#FF5A5F' }}>*</ThemedText></ThemedText>
                                 <View style={{ flexDirection: 'row', gap: 12 }}>
                                     <View style={{ flex: 1 }}>
                                         <ThemedText style={[styles.subLabel, { color: colors.icon }]}>OPENS AT</ThemedText>
@@ -1175,7 +1175,7 @@ const PlaceSubmissionScreen = () => {
                                                 paddingHorizontal: 8,
                                                 paddingVertical: 3,
                                                 borderRadius: 12,
-                                                backgroundColor: (isOptimizingServices || !form.name.trim() || !form.type) ? (isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0') : (colors.primary + '12'),
+                                                backgroundColor: (isOptimizingServices || !form.name.trim() || !form.type) ? (isDark ? 'rgba(255,255,255,0.05)' : '#ECECEC') : (colors.primary + '12'),
                                                 marginLeft: 4,
                                                 opacity: (isOptimizingServices || !form.name.trim() || !form.type) ? 0.6 : 1
                                             }}
@@ -1362,7 +1362,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2,
-        color: '#64748B',
+        color: '#6B7B73',
     },
     subLabel: {
         fontSize: 9,
@@ -1428,7 +1428,7 @@ const styles = StyleSheet.create({
     typeChipText: {
         fontSize: 10,
         fontWeight: 'bold',
-        color: '#64748B',
+        color: '#6B7B73',
         textAlign: 'center',
     },
 

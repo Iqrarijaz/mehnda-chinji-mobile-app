@@ -21,9 +21,9 @@ const ToggleRow = ({ label, description, value, onValueChange, delay }: ToggleRo
             <Switch
                 value={value}
                 onValueChange={onValueChange}
-                trackColor={{ false: '#E2E8F0', true: '#B2DFDB' }}
-                thumbColor={value ? '#009688' : '#94A3B8'}
-                ios_backgroundColor="#E2E8F0"
+                trackColor={{ false: '#ECECEC', true: '#B2DFDB' }}
+                thumbColor={value ? '#009688' : '#8FA79E'}
+                ios_backgroundColor="#ECECEC"
             />
         </Animated.View>
     );
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 11,
         fontWeight: '800',
-        color: '#94A3B8',
+        color: '#8FA79E',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 8,
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
         padding: 12,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 10,
     },
     row: {
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     },
     description: {
         fontSize: 11,
-        color: '#64748B',
+        color: '#6B7B73',
         fontWeight: '500',
         lineHeight: 16,
     },

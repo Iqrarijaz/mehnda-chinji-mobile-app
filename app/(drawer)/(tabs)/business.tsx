@@ -188,7 +188,7 @@ export default function BusinessScreen() {
                                 style={{ flex: 1 }}
                             />
                             <TouchableOpacity
-                                style={[styles.filterButton, { backgroundColor: hasActiveFilters ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                                style={[styles.filterButton, { backgroundColor: hasActiveFilters ? '#7BC043' : 'rgba(255, 255, 255, 0.15)' }]}
                                 onPress={() => setIsProfessionPickerVisible(true)}
                                 activeOpacity={0.7}
                             >
@@ -203,7 +203,7 @@ export default function BusinessScreen() {
                             </TouchableOpacity>
                             {/* My Business toggle — same as marketplace listing icon */}
                             <TouchableOpacity
-                                style={[styles.listingIconButton, { backgroundColor: isPortalTab ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                                style={[styles.listingIconButton, { backgroundColor: isPortalTab ? '#7BC043' : 'rgba(255, 255, 255, 0.15)' }]}
                                 onPress={() => setActiveTab(isPortalTab ? 'find' : 'portal')}
                                 activeOpacity={0.7}
                             >
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: -2,
         right: -2,
-        backgroundColor: '#EF4444',
+        backgroundColor: '#FF5A5F',
         borderRadius: 9,
         width: 18,
         height: 18,
@@ -348,13 +348,13 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         marginTop: Platform.OS === 'android' ? 14 : 16,
-        color: '#64748B',
+        color: '#6B7B73',
         fontSize: Platform.OS === 'android' ? 16 : 18,
         fontWeight: '700',
     },
     emptySubText: {
         marginTop: Platform.OS === 'android' ? 4 : 6,
-        color: '#94A3B8',
+        color: '#8FA79E',
         fontSize: Platform.OS === 'android' ? 12 : 14,
     }
 });

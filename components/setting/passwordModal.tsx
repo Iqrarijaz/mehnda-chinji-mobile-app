@@ -34,11 +34,11 @@ import { Layout } from '@/constants/layout';
 
 // ── Password strength ─────────────────────────────────────────────────────────
 function getStrength(pw: string): { level: number; label: string; color: string } {
-    if (!pw) return { level: 0, label: '', color: '#E2E8F0' };
-    if (pw.length < 6) return { level: 0.25, label: 'Weak', color: '#EF4444' };
-    if (pw.length < 8) return { level: 0.5, label: 'Fair', color: '#F59E0B' };
+    if (!pw) return { level: 0, label: '', color: '#ECECEC' };
+    if (pw.length < 6) return { level: 0.25, label: 'Weak', color: '#FF5A5F' };
+    if (pw.length < 8) return { level: 0.5, label: 'Fair', color: '#F0803C' };
     if (pw.length < 10) return { level: 0.75, label: 'Good', color: '#3B82F6' };
-    return { level: 1, label: 'Strong', color: '#006666' };
+    return { level: 1, label: 'Strong', color: '#003D36' };
 }
 
 // ── Animated Input ────────────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ const InputField = React.memo(({
             containerStyle={{ marginBottom: 16 }}
             rightAccessory={
                 <TouchableOpacity onPress={() => setSecure(s => !s)} activeOpacity={0.7} style={{ padding: 4 }}>
-                    <Ionicons name={secure ? 'eye-off-outline' : 'eye-outline'} size={18} color="#94A3B8" />
+                    <Ionicons name={secure ? 'eye-off-outline' : 'eye-outline'} size={18} color="#8FA79E" />
                 </TouchableOpacity>
             }
         />
@@ -224,7 +224,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
                         />
                     </View>
 
-                    <TouchableOpacity onPress={resetAndClose} style={[styles.cancelBtn, { borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }]} activeOpacity={0.7}>
+                    <TouchableOpacity onPress={resetAndClose} style={[styles.cancelBtn, { borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#ECECEC' }]} activeOpacity={0.7}>
                         <ThemedText style={styles.cancelText}>Cancel</ThemedText>
                     </TouchableOpacity>
                 </View>
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#94A3B8',
+        color: '#8FA79E',
         letterSpacing: 0.8,
         marginBottom: 4,
         marginLeft: 2,
@@ -274,12 +274,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        borderColor: '#E2E8F0', // Overridden in wrapStyle
+        borderColor: '#ECECEC', // Overridden in wrapStyle
         paddingHorizontal: 14,
         height: Platform.OS === 'android' ? 42 : 48,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.03,
+        shadowOpacity: 0,
         shadowRadius: 6,
     },
     inputIcon: { marginRight: 10 },
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 4,
         borderRadius: 2,
-        backgroundColor: '#E2E8F0',
+        backgroundColor: '#ECECEC',
         overflow: 'hidden',
     },
     strengthFill: {
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     // Mismatch
     mismatch: {
         fontSize: 11,
-        color: '#EF4444',
+        color: '#FF5A5F',
         fontWeight: '600',
         marginTop: -8,
         marginBottom: 10,
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     // Buttons
     actions: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 12 },
     primaryBtn: {
-        backgroundColor: '#006666',
+        backgroundColor: '#003D36',
         height: 40,
         borderRadius: 20,
         justifyContent: 'center',
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     },
     cancelText: {
         fontSize: 14,
-        color: '#94A3B8',
+        color: '#8FA79E',
         fontWeight: '600',
     },
 });

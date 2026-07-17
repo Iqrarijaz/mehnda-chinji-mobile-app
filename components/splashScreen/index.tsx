@@ -90,14 +90,14 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
     }, []);
 
     return (
-        <View style={[styles.container, { backgroundColor: isDark ? '#0F172A' : '#E6F4FE' }]}>
+        <View style={[styles.container, { backgroundColor: isDark ? '#0F172A' : '#F8FAF8' }]}>
             {/* Solid background matching native splash perfectly */}
 
-            {/* Glowing Aura/Halo behind logo */}
+            {/* Glowing Aura/Halo behind logo — fresh lime breathing halo */}
             <Animated.View
                 style={[
                     styles.glowAura,
-                    { backgroundColor: isDark ? 'rgba(16,185,129,0.12)' : 'rgba(16,185,129,0.06)' },
+                    { backgroundColor: isDark ? 'rgba(123,192,67,0.12)' : 'rgba(123,192,67,0.10)' },
                     glowStyle
                 ]}
             />
@@ -118,8 +118,8 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
                 />
             </Animated.View>
 
-            {/* Glowing active loading line */}
-            <View style={[styles.progressBarContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' }]}>
+            {/* Loading line — soft green track with forest fill */}
+            <View style={[styles.progressBarContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#E9F6DA' }]}>
                 <Animated.View style={[styles.progressBarActive, { backgroundColor: colors.primary }, progressStyle]} />
             </View>
 
@@ -142,7 +142,7 @@ const CustomSplashScreen = React.memo(function CustomSplashScreen() {
                                 key={`t-${index}`}
                                 style={[
                                     styles.footerText,
-                                    { color: isDark ? '#FFFFFF' : '#0F172A' },
+                                    { color: isDark ? '#FFFFFF' : '#003D36' },
                                     charStyle
                                 ]}
                             >
@@ -183,14 +183,14 @@ const styles = StyleSheet.create({
     progressBarContainer: {
         position: 'absolute',
         bottom: 110,
-        width: '55%',
-        height: 3,
-        borderRadius: 1.5,
+        width: '50%',
+        height: 5,
+        borderRadius: 999,
         overflow: 'hidden',
     },
     progressBarActive: {
         height: '100%',
-        borderRadius: 1.5,
+        borderRadius: 999,
     },
     footer: {
         position: 'absolute',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '900',
         marginHorizontal: 1,
-        letterSpacing: 2,
+        letterSpacing: 4,
     },
 });
 

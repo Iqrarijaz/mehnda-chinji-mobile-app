@@ -46,7 +46,7 @@ export default WeatherStats;
 const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius, padding: 18, marginBottom: 14,
-        shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12,
+        shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0, shadowRadius: 12,
     },
     grid: { flexDirection: 'row', justifyContent: 'space-between' },
     statItem: { flex: 1, alignItems: 'center', gap: 4 },

@@ -14,7 +14,7 @@ interface OfflineIndicatorProps {
     visible: boolean;
 }
 
-const OFFLINE_COLOR = '#F59E0B'; // Amber - classic warning color
+const OFFLINE_COLOR = '#F0803C'; // Amber - classic warning color
 
 const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({ visible }) => {
     const insets = useSafeAreaInsets();
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
             ios: {
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.2,
+                shadowOpacity: 0,
                 shadowRadius: 8,
             },
             android: {
