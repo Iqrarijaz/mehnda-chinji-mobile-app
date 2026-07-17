@@ -15,7 +15,7 @@ export const ClearCacheSection = ({ onClear }: { onClear: () => Promise<void> })
 
     return (
         <Animated.View
-            entering={FadeInDown.delay(600).duration(600).springify()}
+            entering={FadeInDown.delay(600).duration(600).duration(300)}
             style={styles.container}
         >
             <View style={styles.card}>

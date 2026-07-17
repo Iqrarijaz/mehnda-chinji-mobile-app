@@ -7,7 +7,7 @@ import { ThemedText } from '../ThemedText';
 export const DataUsageEmptyState = () => {
     return (
         <Animated.View entering={FadeIn.delay(300)} style={styles.container}>
-            <Animated.View entering={SlideInUp.delay(400).springify()} style={styles.iconWrapper}>
+            <Animated.View entering={SlideInUp.delay(400).duration(300)} style={styles.iconWrapper}>
                 <Ionicons name="stats-chart" size={60} color="#CBD5E1" />
             </Animated.View>
             <ThemedText style={styles.title}>No data recorded yet</ThemedText>

@@ -22,7 +22,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const EmptyMarketplace = memo(({ colors }: { colors: any }) => (
     <Animated.View
-        entering={FadeInDown.delay(80).springify().damping(16)}
+        entering={FadeInDown.delay(80).duration(300)}
         style={[styles.centered, { flex: 1, marginTop: 80 }]}
     >
         <View style={[styles.emptyIconWell, { backgroundColor: colors.cream }]}>
@@ -310,7 +310,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
 
             {/* Active multi-filter indicators row */}
             {hasActiveFilters && (
-                <Animated.View entering={FadeInDown.springify().damping(16)} style={styles.activeFiltersRow}>
+                <Animated.View entering={FadeInDown.duration(300)} style={styles.activeFiltersRow}>
                     <View style={[styles.activeFilterChip, { backgroundColor: colors.limeSoft }]}>
                         <Ionicons name="funnel" size={11} color={colors.limeDark} />
                         <ThemedText style={[styles.activeFiltersTitle, { color: colors.limeDark }]} numberOfLines={1}>

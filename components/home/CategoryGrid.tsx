@@ -33,7 +33,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                 {CATEGORIES_CONFIG.map((cat, index) => (
                     <Animated.View
                         key={cat.id}
-                        entering={FadeInDown.delay(60 + index * 50).springify().damping(16)}
+                        entering={FadeInDown.delay(60 + index * 50).duration(300)}
                         style={styles.gridItem}
                     >
                         <CategoryCard
@@ -46,7 +46,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
 
                 {MORE_CATEGORIES_CONFIG.length > 0 && (
                     <Animated.View
-                        entering={FadeInDown.delay(60 + CATEGORIES_CONFIG.length * 50).springify().damping(16)}
+                        entering={FadeInDown.delay(60 + CATEGORIES_CONFIG.length * 50).duration(300)}
                         style={styles.gridItem}
                     >
                         <CategoryCard
@@ -74,7 +74,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                             {MORE_CATEGORIES_CONFIG.map((cat, index) => (
                                 <Animated.View
                                     key={cat.id}
-                                    entering={FadeInDown.delay(index * 40).springify().damping(16)}
+                                    entering={FadeInDown.delay(index * 40).duration(300)}
                                     style={styles.gridItem}
                                 >
                                     <CategoryCard

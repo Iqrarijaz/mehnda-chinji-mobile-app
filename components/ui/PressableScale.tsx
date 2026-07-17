@@ -1,11 +1,14 @@
 import React from 'react';
 import { Pressable, PressableProps, StyleProp, ViewStyle } from 'react-native';
 import Animated, {
+    Easing,
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
     withTiming,
 } from 'react-native-reanimated';
+
+const PRESS_IN = { duration: 110, easing: Easing.out(Easing.quad) };
+const PRESS_OUT = { duration: 180, easing: Easing.out(Easing.cubic) };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -17,8 +20,9 @@ export interface PressableScaleProps extends PressableProps {
 }
 
 /**
- * Shared press micro-interaction: springs down on press-in and back on
- * release, with a subtle opacity dip. Runs entirely on the UI thread.
+ * Shared press micro-interaction: eases down on press-in and back on
+ * release, with a subtle opacity dip. Smooth timing curves (no bounce),
+ * running entirely on the UI thread.
  */
 export const PressableScale = React.memo(function PressableScale({
     pressedScale = 0.96,
@@ -40,13 +44,13 @@ export const PressableScale = React.memo(function PressableScale({
         <AnimatedPressable
             {...rest}
             onPressIn={(e) => {
-                scale.value = withSpring(pressedScale, { damping: 15, stiffness: 300 });
-                opacity.value = withTiming(0.9, { duration: 90 });
+                scale.value = withTiming(pressedScale, PRESS_IN);
+                opacity.value = withTiming(0.92, PRESS_IN);
                 onPressIn?.(e);
             }}
             onPressOut={(e) => {
-                scale.value = withSpring(1, { damping: 15, stiffness: 300 });
-                opacity.value = withTiming(1, { duration: 120 });
+                scale.value = withTiming(1, PRESS_OUT);
+                opacity.value = withTiming(1, PRESS_OUT);
                 onPressOut?.(e);
             }}
             style={[animatedStyle, style]}

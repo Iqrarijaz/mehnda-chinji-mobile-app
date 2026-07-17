@@ -73,7 +73,12 @@ function DrawerLayout() {
           screenOptions={{
             headerShown: false,
             animation: 'slide_from_right',
+            animationDuration: 260,
             gestureEnabled: true,
+            fullScreenGestureEnabled: true,
+            // Match scene background to the app background so transitions
+            // never flash white between screens.
+            contentStyle: { backgroundColor: Colors[theme].background },
           }}
         >
           <Stack.Screen name="index" />

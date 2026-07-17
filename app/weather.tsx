@@ -259,7 +259,7 @@ export default function WeatherScreen() {
                     }
                 >
                     {/* Header */}
-                    <View style={styles.topNav}>
+                    <View style={[styles.topNav, styles.padded]}>
                         <TouchableOpacity
                             activeOpacity={0.8}
                             style={styles.backBtn}
@@ -289,33 +289,40 @@ export default function WeatherScreen() {
                         </View>
                     </View>
 
-                    {/* Hero */}
-                    <WeatherHero
-                        weather={weather}
-                        isLoading={isLoading}
-                    />
-
-                    {/* Stats */}
-                    <WeatherStats
-                        weather={weather}
-                        forecast={forecast}
-                    />
-
-                    <NativeAd placement="weather" />
-
-                    {/* Hourly */}
-                    <WeatherHourly data={hourlyData} />
-
-                    {/* Daily */}
-                    <WeatherDaily data={dailyData} />
-
-                    {/* Sunrise */}
-                    {weather && (
-                        <WeatherSunrise
-                            sunrise={sunrise}
-                            sunset={sunset}
+                    {/* Hero — open display on the forest background */}
+                    <View style={styles.padded}>
+                        <WeatherHero
+                            weather={weather}
+                            isLoading={isLoading}
                         />
-                    )}
+                    </View>
+
+                    {/* Content sheet */}
+                    <View style={[styles.sheet, { backgroundColor: colors.background }]}>
+                        <View style={styles.grabHandle} />
+
+                        {/* Stats */}
+                        <WeatherStats
+                            weather={weather}
+                            forecast={forecast}
+                        />
+
+                        <NativeAd placement="weather" />
+
+                        {/* Hourly */}
+                        <WeatherHourly data={hourlyData} />
+
+                        {/* Daily */}
+                        <WeatherDaily data={dailyData} />
+
+                        {/* Sunrise */}
+                        {weather && (
+                            <WeatherSunrise
+                                sunrise={sunrise}
+                                sunset={sunset}
+                            />
+                        )}
+                    </View>
 
                 </ScrollView>
 
@@ -337,8 +344,30 @@ const styles = StyleSheet.create({
     },
 
     scrollContent: {
-        paddingHorizontal: 20,
         flexGrow: 1,
+    },
+
+    padded: {
+        paddingHorizontal: 20,
+    },
+
+    sheet: {
+        flexGrow: 1,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+        paddingHorizontal: 20,
+        paddingTop: 10,
+        paddingBottom: 8,
+        marginTop: 20,
+    },
+
+    grabHandle: {
+        alignSelf: 'center',
+        width: 44,
+        height: 5,
+        borderRadius: 3,
+        backgroundColor: 'rgba(0,0,0,0.12)',
+        marginBottom: 16,
     },
 
     topNav: {

@@ -219,7 +219,7 @@ export const LoginForm = React.memo(function LoginForm() {
     return (
         <View style={styles.formContainer}>
             <Animated.View
-                entering={FadeInDown.delay(80).springify().damping(16)}
+                entering={FadeInDown.delay(80).duration(300)}
                 style={[styles.formCard, { backgroundColor: colors.card }]}
             >
                 {/* Email/Phone Input */}
