@@ -7,7 +7,6 @@ import React, { useEffect } from 'react';
 import {
     Platform,
     StyleSheet,
-    Text,
     Pressable,
     View,
     useWindowDimensions,
@@ -76,20 +75,15 @@ const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, color, opt
         >
             <Animated.View style={[styles.iconWrap, animatedIconStyle]}>
                 {options.tabBarIcon ? (
-                    options.tabBarIcon({ focused: isFocused, color, size: 22 })
+                    options.tabBarIcon({ focused: isFocused, color, size: 24 })
                 ) : (
                     <Ionicons
                         name="square-outline"
-                        size={22}
+                        size={24}
                         color={color}
                     />
                 )}
             </Animated.View>
-            {!isFocused && (
-                <Text style={[styles.label, { color }]} numberOfLines={1}>
-                    {label}
-                </Text>
-            )}
         </Pressable>
     );
 });
@@ -277,10 +271,5 @@ const styles = StyleSheet.create({
     iconWrap: {
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    label: {
-        fontSize: 9,
-        fontWeight: '600',
-        marginTop: 2,
     },
 });

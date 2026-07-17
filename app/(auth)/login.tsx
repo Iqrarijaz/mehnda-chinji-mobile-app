@@ -127,13 +127,9 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '100%',
-        borderRadius: 24,
+        borderRadius: 28,
         padding: 24,
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0,
-        shadowRadius: 20,
     },
     modalIconBox: {
         width: 80,
@@ -162,7 +158,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#003D36',
         width: '100%',
         height: 52,
-        borderRadius: 16,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
     },

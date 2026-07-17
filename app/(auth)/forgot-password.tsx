@@ -22,6 +22,7 @@ import { forgotPasswordSchema } from '@/utils/validation';
 import * as yup from 'yup';
 import { checkAccountDetails, sendOtp } from '@/apis/login/forgot-password';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 
@@ -165,7 +166,7 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                                 <View style={styles.inputField}>
                                     <ThemedText style={[styles.label, isDark && { color: '#ECECEC' }]}>EMAIL ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
                                     <View style={[styles.inputBox, {
-                                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F4F1',
                                         borderColor: errors.email && touched.email ? '#FF5A5F' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC')
                                     }]}>
                                         <Ionicons name="mail-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'} style={{ marginRight: 12 }} />
@@ -193,13 +194,13 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                                 </View>
 
                                 {/* Find Account Button */}
-                                <TouchableOpacity
+                                <PressableScale
                                     style={[styles.submitButton, { backgroundColor: '#003D36' }]}
                                     onPress={handleSubmit}
                                     disabled={loading}
                                 >
                                     <ThemedText style={styles.submitButtonText}>Find Account</ThemedText>
-                                </TouchableOpacity>
+                                </PressableScale>
                             </>
                         ) : (
                             <View style={styles.profileContainer}>
@@ -227,13 +228,13 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                                 </View>
 
                                 {/* Send OTP Button */}
-                                <TouchableOpacity
+                                <PressableScale
                                     style={[styles.submitButton, styles.submitButtonHorizontal, { backgroundColor: '#003D36', marginTop: 5 }]}
                                     onPress={handleSendOtp}
                                     disabled={loading}
                                 >
                                     <ThemedText style={styles.submitButtonText}>Send OTP</ThemedText>
-                                </TouchableOpacity>
+                                </PressableScale>
 
                                 <TouchableOpacity
                                     style={styles.notMeButton}
@@ -341,15 +342,11 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         height: 52,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 18,
         overflow: 'hidden',
-        shadowColor: '#003D36',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0,
-        shadowRadius: 8,
     },
     submitButtonText: {
         color: '#FFFFFF',

@@ -24,6 +24,7 @@ import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { FormInput } from '@/components/common/FormInput';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 export const RegisterForm = React.memo(function RegisterForm() {
     const router = useRouter();
@@ -237,10 +238,6 @@ export const RegisterForm = React.memo(function RegisterForm() {
                             if (errors.fullName) validateField('fullName', fullName);
                         }}
                         onBlur={() => handleBlur('fullName')}
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
                         rightAccessory={renderValidationIcon('fullName')}
                     />
                     {touched.fullName && errors.fullName ? <ThemedText style={styles.errorText}>{errors.fullName}</ThemedText> : null}
@@ -261,10 +258,6 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         onBlur={() => handleBlur('email')}
                         keyboardType="email-address"
                         autoCapitalize="none"
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
                         rightAccessory={
                             checkingAccount.email ? (
                                 <ActivityIndicator size="small" color="#003D36" style={{ marginLeft: 8 }} />
@@ -290,10 +283,6 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         onBlur={() => handleBlur('phone')}
                         keyboardType="phone-pad"
                         maxLength={11}
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
                         rightAccessory={
                             checkingAccount.phone ? (
                                 <ActivityIndicator size="small" color="#003D36" style={{ marginLeft: 8 }} />
@@ -321,10 +310,6 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         onBlur={() => handleBlur('password')}
                         secureTextEntry={!formData.showPassword}
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
                         rightAccessory={
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 {renderValidationIcon('password')}
@@ -359,10 +344,6 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         onBlur={() => handleBlur('confirmPassword')}
                         secureTextEntry={!formData.showConfirmPassword}
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
                         rightAccessory={
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 {renderValidationIcon('confirmPassword')}
@@ -467,7 +448,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                 {errors.guidelinesAccepted && <ThemedText style={[styles.errorText, { marginTop: -12, marginBottom: 16 }]}>{errors.guidelinesAccepted}</ThemedText>}
 
                 {/* Register Button */}
-                <TouchableOpacity
+                <PressableScale
                     style={[
                         styles.registerButton,
                         { backgroundColor: isFormValid() ? '#003D36' : '#8FA79E' }
@@ -480,22 +461,22 @@ export const RegisterForm = React.memo(function RegisterForm() {
                     ) : (
                         <ThemedText style={styles.registerButtonText}>Sign Up</ThemedText>
                     )}
-                </TouchableOpacity>
+                </PressableScale>
 
                 {/* Google Login Button */}
-                <TouchableOpacity
+                <PressableScale
                     style={[
                         styles.registerButton,
-                        { backgroundColor: '#F5F5F5', shadowColor: 'rgba(0,0,0,0.1)', marginTop: 8, marginBottom: 8 }
+                        { backgroundColor: colors.field, marginTop: 8, marginBottom: 8 }
                     ]}
                     onPress={handleGoogleLogin}
                     disabled={formData.googleLoading}
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
-                        <ThemedText style={[styles.registerButtonText, { color: '#000000' }]}>Sign up with Google</ThemedText>
+                        <ThemedText style={[styles.registerButtonText, { color: colors.text }]}>Sign up with Google</ThemedText>
                     </View>
-                </TouchableOpacity>
+                </PressableScale>
 
 
                 {/* Footer */}
@@ -520,12 +501,8 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     formCard: {
-        borderRadius: Layout.borderRadius,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0,
-        shadowRadius: 8,
+        borderRadius: Layout.cardBorderRadius,
+        padding: 20,
     },
     inputField: {
         marginBottom: 20,
@@ -583,22 +560,18 @@ const styles = StyleSheet.create({
     },
     registerButton: {
         height: 52,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 8,
         marginBottom: 20,
         overflow: 'hidden',
-        shadowColor: '#003D36',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0,
-        shadowRadius: 8,
     },
     registerButtonText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 15,
         fontWeight: '700',
-        letterSpacing: 0.5,
+        letterSpacing: 0.3,
     },
     footer: {
         flexDirection: 'row',

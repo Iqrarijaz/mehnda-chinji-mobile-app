@@ -21,6 +21,7 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 export default function VerifyOtpScreen() {
     const router = useRouter();
@@ -201,7 +202,7 @@ export default function VerifyOtpScreen() {
                                         styles.otpInput,
                                         {
                                             color: colors.text,
-                                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F5F9',
+                                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F4F1',
                                         }
                                     ]}
                                     value={digit}
@@ -214,7 +215,7 @@ export default function VerifyOtpScreen() {
                             ))}
                         </View>
 
-                        <TouchableOpacity
+                        <PressableScale
                             style={[styles.submitButton, { backgroundColor: '#003D36' }]}
                             onPress={handleVerify}
                             disabled={loading}
@@ -224,7 +225,7 @@ export default function VerifyOtpScreen() {
                             ) : (
                                 <ThemedText style={styles.submitButtonText}>Verify OTP</ThemedText>
                             )}
-                        </TouchableOpacity>
+                        </PressableScale>
 
                         <View style={styles.footer}>
                             <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#6B7B73' }]}>
@@ -308,9 +309,9 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     otpInput: {
-        width: 40,
-        height: 40,
-        borderRadius: Layout.borderRadius,
+        width: 48,
+        height: 54,
+        borderRadius: 16,
         textAlign: 'center',
         fontSize: 24,
         fontWeight: '800',
@@ -353,13 +354,9 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         height: 52,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#003D36',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0,
-        shadowRadius: 8,
     },
     submitButtonText: {
         color: '#FFFFFF',

@@ -22,6 +22,7 @@ import { resetPasswordSchema } from '@/utils/validation';
 import { resetPassword } from '@/apis/login/forgot-password';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 const ResetPasswordScreen = memo(function ResetPasswordScreen() {
     const router = useRouter();
@@ -138,7 +139,7 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
                         <View style={styles.inputField}>
                             <ThemedText style={[styles.label, isDark && { color: '#ECECEC' }]}>NEW PASSWORD</ThemedText>
                             <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F4F1',
                                 borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC'
                             }]}>
                                 <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'} style={{ marginRight: 12 }} />
@@ -169,7 +170,7 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
                         <View style={styles.inputField}>
                             <ThemedText style={[styles.label, isDark && { color: '#ECECEC' }]}>CONFIRM PASSWORD</ThemedText>
                             <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F4F1',
                                 borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC'
                             }]}>
                                 <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'} style={{ marginRight: 12 }} />
@@ -186,13 +187,13 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
                         </View>
 
                         {/* Submit Button */}
-                        <TouchableOpacity
+                        <PressableScale
                             style={[styles.submitButton, { backgroundColor: '#003D36' }]}
                             onPress={handleSubmit}
                             disabled={formData.loading}
                         >
                             <ThemedText style={styles.submitButtonText}>Set New Password</ThemedText>
-                        </TouchableOpacity>
+                        </PressableScale>
                     </View>
                 </View>
             </ScrollView>
@@ -280,16 +281,12 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         height: 52,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 6,
         marginBottom: 18,
         overflow: 'hidden',
-        shadowColor: '#003D36',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0,
-        shadowRadius: 8,
     },
     submitButtonText: {
         color: '#FFFFFF',
