@@ -17,14 +17,24 @@ import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
 import NativeAd from '@/ads/components/NativeAd';
 import { PillsList } from '@/components/common/PillsList';
+import { MarketplaceGridSkeleton } from '@/components/common/CardSkeletons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const EmptyMarketplace = memo(({ colors }: { colors: any }) => (
-    <View style={[styles.centered, { flex: 1, marginTop: 100 }]}>
-        <Ionicons name="cart-outline" size={64} color="#CBD5E1" />
-        <ThemedText style={{ color: colors.textSecondary, marginTop: 12, fontSize: 16 }}>
+    <Animated.View
+        entering={FadeInDown.delay(80).springify().damping(16)}
+        style={[styles.centered, { flex: 1, marginTop: 80 }]}
+    >
+        <View style={[styles.emptyIconWell, { backgroundColor: colors.cream }]}>
+            <Ionicons name="cart-outline" size={36} color={colors.primary} />
+        </View>
+        <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>
             No items found
         </ThemedText>
-    </View>
+        <ThemedText style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+            Try a different search or category,{'\n'}or be the first to list something!
+        </ThemedText>
+    </Animated.View>
 ));
 
 const MarketplaceScreen = memo(function MarketplaceScreen() {
@@ -187,13 +197,13 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
         }
         if (!hasNextPage && rawListings.length > 0) {
             return (
-                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, paddingVertical: 20 }}>
-                    That's all
+                <ThemedText style={{ textAlign: 'center', color: colors.textSecondary, fontSize: 12, paddingVertical: 20 }}>
+                    You&apos;re all caught up
                 </ThemedText>
             );
         }
         return null;
-    }, [isFetchingNextPage, hasNextPage, rawListings.length, colors.primary]);
+    }, [isFetchingNextPage, hasNextPage, rawListings.length, colors.primary, colors.textSecondary]);
 
 
     const renderItem = useCallback(({ item }: { item: any }) => {
@@ -300,12 +310,15 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
 
             {/* Active multi-filter indicators row */}
             {hasActiveFilters && (
-                <View style={styles.activeFiltersRow}>
-                    <ThemedText style={[styles.activeFiltersTitle, { color: colors.textSecondary }]}>
-                        Active Filters:
-                    </ThemedText>
+                <Animated.View entering={FadeInDown.springify().damping(16)} style={styles.activeFiltersRow}>
+                    <View style={[styles.activeFilterChip, { backgroundColor: colors.limeSoft }]}>
+                        <Ionicons name="funnel" size={11} color={colors.limeDark} />
+                        <ThemedText style={[styles.activeFiltersTitle, { color: colors.limeDark }]} numberOfLines={1}>
+                            {[...selectedCategories, ...selectedItems].filter(Boolean).join(' • ') || 'Filters on'}
+                        </ThemedText>
+                    </View>
                     <TouchableOpacity
-                        style={[styles.clearFiltersBtn, { borderColor: colors.primary }]}
+                        style={[styles.clearFiltersBtn, { backgroundColor: colors.field }]}
                         onPress={() => {
                             setSelectedCategories([]);
                             setSelectedItems([]);
@@ -315,14 +328,12 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             Clear All
                         </ThemedText>
                     </TouchableOpacity>
-                </View>
+                </Animated.View>
             )}
 
             {/* Listings Grid/List */}
             {isLoading ? (
-                <View style={styles.centered}>
-                    <ActivityIndicator size="large" color={colors.primary} />
-                </View>
+                <MarketplaceGridSkeleton rows={3} />
             ) : (
                 <View style={{ flex: 1 }}>
                     <FlashList
@@ -461,15 +472,44 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         marginBottom: 8,
+        gap: 8,
+    },
+    activeFilterChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        borderRadius: 999,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        flexShrink: 1,
     },
     activeFiltersTitle: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '700',
+        flexShrink: 1,
     },
     clearFiltersBtn: {
-        borderRadius: 12,
-        paddingHorizontal: 10,
-        paddingVertical: 3,
+        borderRadius: 999,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+    },
+    emptyIconWell: {
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 14,
+    },
+    emptyTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        marginBottom: 6,
+    },
+    emptySubtitle: {
+        fontSize: 13,
+        lineHeight: 19,
+        textAlign: 'center',
     },
     listContent: {
         paddingHorizontal: 16,

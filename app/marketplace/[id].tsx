@@ -13,6 +13,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BannerAd from '@/ads/components/BannerAd';
 import { ActionMenu } from '@/components/common/ActionMenu';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
+import { PressableScale } from '@/components/ui/PressableScale';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 const { width } = Dimensions.get('window');
 
 export default function MarketplaceDetailsScreen() {
@@ -115,7 +117,7 @@ export default function MarketplaceDetailsScreen() {
                 <Ionicons name="arrow-back" size={20} color="#fff" />
             </TouchableOpacity>
             <ThemedText style={[styles.headerTitle, { color: '#fff' }]} numberOfLines={1}>
-                Details
+                Item Details
             </ThemedText>
             <View style={{ width: 36, alignItems: 'flex-end', justifyContent: 'center' }}>
                 {isOwner ? (
@@ -179,7 +181,7 @@ export default function MarketplaceDetailsScreen() {
         <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
             {renderHeader()}
 
-            <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 24 }}>
+            <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: (!isOwner && item.status === 'live' && item.sellerPhone) ? 120 : 24 }}>
                 {/* Images */}
                 {item.images && item.images.length > 0 ? (
                     <View>
@@ -222,54 +224,68 @@ export default function MarketplaceDetailsScreen() {
                     </View>
                 )}
 
-                <View style={styles.detailsSection}>
+                <Animated.View
+                    entering={FadeInDown.delay(60).springify().damping(17)}
+                    style={[styles.detailsSection, { backgroundColor: colors.card }]}
+                >
+                    <View style={styles.grabHandle} />
+
                     {/* Title & Price */}
                     <View style={styles.titleRow}>
                         <ThemedText style={[styles.title, { color: colors.text, textTransform: 'capitalize' }]} >
                             {item.title}
                         </ThemedText>
-                        <ThemedText style={[styles.price, { color: colors.primary }]}>
-                            Rs. {item.price ? item.price.toLocaleString() : '0'}
-                        </ThemedText>
+                        <View style={styles.priceLine}>
+                            <ThemedText style={[styles.price, { color: colors.primary }]}>
+                                Rs. {item.price ? item.price.toLocaleString() : '0'}
+                            </ThemedText>
+                            {item.negotiable ? (
+                                <View style={[styles.negotiablePill, { backgroundColor: colors.limeSoft }]}>
+                                    <ThemedText style={[styles.negotiablePillText, { color: colors.limeDark }]}>Negotiable</ThemedText>
+                                </View>
+                            ) : null}
+                        </View>
                     </View>
 
                     {/* Location & Date */}
                     <View style={styles.infoRow}>
                         <View style={styles.infoItem}>
-                            <Ionicons name="location-outline" size={16} color={colors.textSecondary} />
+                            <Ionicons name="location-outline" size={15} color={colors.textSecondary} />
                             <ThemedText style={[styles.infoText, { color: colors.textSecondary }]}>
                                 {item?.village ? `${item.village}, ${item.city}` : item?.city}
                             </ThemedText>
                         </View>
                         <View style={styles.infoItem}>
-                            <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
+                            <Ionicons name="calendar-outline" size={15} color={colors.textSecondary} />
                             <ThemedText style={[styles.infoText, { color: colors.textSecondary }]}>{formattedDate}</ThemedText>
                         </View>
                     </View>
 
-                    {/* Category & Type */}
-                    <View style={styles.infoRow}>
-                        {item.category && (
-                            <View style={styles.infoItem}>
-                                <Ionicons name="grid-outline" size={16} color={colors.textSecondary} />
-                                <ThemedText style={[styles.infoText, { color: colors.textSecondary, textTransform: 'capitalize' }]}>
-                                    {typeof item.category === 'object' ? (item.category.en || item.category.ur) : item.category}
-                                </ThemedText>
-                            </View>
-                        )}
-                        {item.type && (
-                            <View style={styles.infoItem}>
-                                <Ionicons name="pricetag-outline" size={16} color={colors.textSecondary} />
-                                <ThemedText style={[styles.infoText, { color: colors.textSecondary, textTransform: 'capitalize' }]}>
-                                    {typeof item.type === 'object' ? (item.type.en || item.type.ur) : item.type}
-                                </ThemedText>
-                            </View>
-                        )}
-                    </View>
+                    {/* Category & Type — soft chips */}
+                    {(item.category || item.type) && (
+                        <View style={styles.chipsRow}>
+                            {item.category && (
+                                <View style={[styles.chip, { backgroundColor: colors.field }]}>
+                                    <Ionicons name="grid-outline" size={13} color={colors.primary} />
+                                    <ThemedText style={[styles.chipText, { color: colors.text, textTransform: 'capitalize' }]}>
+                                        {typeof item.category === 'object' ? (item.category.en || item.category.ur) : item.category}
+                                    </ThemedText>
+                                </View>
+                            )}
+                            {item.type && (
+                                <View style={[styles.chip, { backgroundColor: colors.field }]}>
+                                    <Ionicons name="pricetag-outline" size={13} color={colors.primary} />
+                                    <ThemedText style={[styles.chipText, { color: colors.text, textTransform: 'capitalize' }]}>
+                                        {typeof item.type === 'object' ? (item.type.en || item.type.ur) : item.type}
+                                    </ThemedText>
+                                </View>
+                            )}
+                        </View>
+                    )}
 
                     {/* Metadata tags */}
                     {item.metadata && Object.keys(item.metadata).length > 0 && (
-                        <View style={[styles.metadataContainer, { backgroundColor: colors.card }]}>
+                        <View style={[styles.metadataContainer, { backgroundColor: colors.field }]}>
                             {Object.entries(item.metadata).map(([key, val]) => (
                                 <View key={key} style={styles.metadataTag}>
                                     <ThemedText style={[styles.metaTagKey, { color: colors.textSecondary }]}>
@@ -302,7 +318,7 @@ export default function MarketplaceDetailsScreen() {
                                 {parsedOtherItems.map((otherItem: any) => (
                                     <TouchableOpacity
                                         key={otherItem._id}
-                                        style={[styles.smallCard, { backgroundColor: colors.card }]}
+                                        style={[styles.smallCard, { backgroundColor: colors.field }]}
                                         onPress={() => {
                                             const isOtherItemOwner = user?.user?._id && otherItem.sellerId && otherItem.sellerId.toString() === user.user._id.toString();
                                             if (!isOtherItemOwner) {
@@ -321,10 +337,24 @@ export default function MarketplaceDetailsScreen() {
                             </ScrollView>
                         </View>
                     )}
-                </View>
+                </Animated.View>
             </ScrollView>
 
-
+            {/* Sticky contact bar — buyers only, live items */}
+            {!isOwner && item.status === 'live' && item.sellerPhone ? (
+                <Animated.View
+                    entering={FadeInUp.delay(200).springify().damping(17)}
+                    style={[styles.contactBar, { backgroundColor: colors.card, paddingBottom: insets.bottom + 12 }]}
+                >
+                    <PressableScale
+                        style={[styles.callButton, { backgroundColor: colors.lime }]}
+                        onPress={handleCall}
+                    >
+                        <Ionicons name="call" size={18} color="#FFFFFF" />
+                        <ThemedText style={styles.callButtonText}>Call Seller</ThemedText>
+                    </PressableScale>
+                </Animated.View>
+            ) : null}
 
             {/* Image Viewer Modal */}
             <Modal visible={viewerVisible} transparent={true} animationType="fade" onRequestClose={() => setViewerVisible(false)}>
@@ -442,9 +472,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 12,
         left: 12,
-        paddingHorizontal: 8,
+        paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 4,
+        borderRadius: 999,
         zIndex: 5,
     },
     statusTabText: {
@@ -460,12 +490,12 @@ const styles = StyleSheet.create({
     },
     pagination: {
         position: 'absolute',
-        bottom: 12,
-        right: 12,
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        bottom: 36,
+        right: 16,
+        backgroundColor: 'rgba(0,20,15,0.55)',
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 12,
+        borderRadius: 999,
     },
     paginationText: {
         color: '#fff',
@@ -473,48 +503,120 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     detailsSection: {
-        padding: 16,
+        padding: 20,
+        paddingTop: 10,
+        marginTop: -24,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+        minHeight: 400,
+    },
+    grabHandle: {
+        alignSelf: 'center',
+        width: 44,
+        height: 5,
+        borderRadius: 3,
+        backgroundColor: 'rgba(0,0,0,0.12)',
+        marginBottom: 16,
     },
     titleRow: {
-        marginBottom: 12,
+        marginBottom: 14,
     },
     title: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 8,
+        fontSize: 21,
+        fontWeight: '800',
+        marginBottom: 6,
+        letterSpacing: -0.3,
+    },
+    priceLine: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        flexWrap: 'wrap',
     },
     price: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: '900',
+        letterSpacing: -0.5,
+    },
+    negotiablePill: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 999,
+    },
+    negotiablePillText: {
+        fontSize: 11,
+        fontWeight: '800',
     },
     infoRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 16,
+        marginBottom: 14,
     },
     infoItem: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     infoText: {
-        fontSize: 14,
-        marginLeft: 6,
+        fontSize: 13,
+        marginLeft: 5,
+    },
+    chipsRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+        marginBottom: 16,
+    },
+    chip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingHorizontal: 12,
+        paddingVertical: 7,
+        borderRadius: 999,
+    },
+    chipText: {
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    contactBar: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 20,
+        paddingTop: 12,
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+    },
+    callButton: {
+        height: 52,
+        borderRadius: 999,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    callButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '800',
+        letterSpacing: 0.2,
     },
     metadataContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         padding: 12,
-        borderRadius: 8,
+        borderRadius: 16,
         marginBottom: 16,
         gap: 8,
     },
     metadataTag: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
+        backgroundColor: 'rgba(255,255,255,0.85)',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 999,
         alignItems: 'center',
     },
     metaTagKey: {
@@ -530,9 +632,10 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 17,
+        fontWeight: '800',
         marginBottom: 8,
+        letterSpacing: -0.2,
     },
     description: {
         fontSize: 15,
@@ -570,7 +673,7 @@ const styles = StyleSheet.create({
     },
     smallCard: {
         width: 140,
-        borderRadius: 12,
+        borderRadius: 16,
         overflow: 'hidden',
     },
     smallCardImage: {

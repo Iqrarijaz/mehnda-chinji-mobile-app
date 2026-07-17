@@ -1,7 +1,8 @@
 import React, { memo, useState } from 'react';
-import { StyleSheet, View, Image, TouchableOpacity, Linking, Alert } from 'react-native';
+import { StyleSheet, View, Image, Linking, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../ThemedText';
+import { PressableScale } from '../ui/PressableScale';
 import { useAuth } from '@/context/AuthContext';
 import { ActionMenu, ActionMenuItem } from '../common/ActionMenu';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
@@ -161,9 +162,9 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
 
     return (
         <>
-            <TouchableOpacity
+            <PressableScale
                 style={[styles.container, { backgroundColor: colors.card }]}
-                activeOpacity={0.9}
+                pressedScale={0.97}
                 onPress={handlePress}
             >
 
@@ -174,62 +175,54 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
                         {(isOwner && showActions) && renderStatusBadge()}
                         {item.images.length > 1 && (
                             <View style={styles.imageBadge}>
-                                <ThemedText style={styles.imageBadgeText}>+{item.images.length - 1} photos</ThemedText>
+                                <Ionicons name="images-outline" size={10} color="#FFFFFF" />
+                                <ThemedText style={styles.imageBadgeText}>{item.images.length}</ThemedText>
                             </View>
                         )}
                     </View>
                 ) : (
-                    <View style={[styles.imagePlaceholder, { backgroundColor: colors.background }]}>
-                        <Ionicons name="images-outline" size={48} color={colors.textSecondary} />
-                        <ThemedText style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>No Images Available</ThemedText>
+                    <View style={[styles.imagePlaceholder, { backgroundColor: colors.field }]}>
+                        <Ionicons name="images-outline" size={36} color={colors.textSecondary} />
+                        <ThemedText style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>No Images</ThemedText>
                         {(isOwner && showActions) && renderStatusBadge()}
                     </View>
                 )}
 
                 {/* Content Details */}
                 <View style={styles.detailsContainer}>
+                    <ThemedText style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+                        {item.title}
+                    </ThemedText>
 
-                    <View style={{ marginTop: 4, marginBottom: 4 }}>
-                        <ThemedText style={[styles.title, { color: colors.primary }]}>
-                            {item.title}
+                    {/* Price row — the hero of the card */}
+                    <View style={styles.priceRow}>
+                        <ThemedText style={[styles.priceText, { color: colors.primary }]} numberOfLines={1}>
+                            {item.price != null ? `Rs. ${Number(item.price).toLocaleString()}` : 'Price on call'}
                         </ThemedText>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, paddingRight: 8 }}>
-                                <Ionicons name="location-outline" size={12} color={colors.textSecondary} />
-                                <ThemedText style={{ color: colors.textSecondary, fontSize: 11, marginLeft: 4 }} numberOfLines={1}>
-                                    {item.village ? `${item.village}, ${item.city}` : item.city}
-                                </ThemedText>
+                        {item.negotiable ? (
+                            <View style={[styles.negotiableBadge, { backgroundColor: colors.limeSoft }]}>
+                                <ThemedText style={[styles.negotiableText, { color: colors.limeDark }]}>Negotiable</ThemedText>
                             </View>
-                            {isOwner && showActions ? (
-                                <ActionMenu actions={actions} />
-                            ) : formattedDate ? (
-                                <ThemedText style={{ color: colors.textSecondary, fontSize: 10, marginLeft: 8 }}>
-                                    {formattedDate}
-                                </ThemedText>
-                            ) : null}
-                        </View>
+                        ) : null}
                     </View>
 
-                    {/* Metadata details rendering for Vehicles */}
-                    {/* {item.metadata && Object.keys(item.metadata).filter(key => key.toLowerCase() !== 'model' && key.toLowerCase() !== 'year').length > 0 && (
-                        <View style={[styles.metadataContainer, { backgroundColor: colors.background }]}>
-                            {Object.entries(item.metadata)
-                                .filter(([key]) => key.toLowerCase() !== 'model' && key.toLowerCase() !== 'year')
-                                .map(([key, val]) => (
-                                    <View key={key} style={styles.metadataTag}>
-                                        <ThemedText style={[styles.metaTagKey, { color: colors.textSecondary }]}>
-                                            {key.toUpperCase()}:
-                                        </ThemedText>
-                                        <ThemedText style={[styles.metaTagVal, { color: colors.text }]}>
-                                            {String(val)}
-                                        </ThemedText>
-                                    </View>
-                                ))}
+                    <View style={styles.footerRow}>
+                        <View style={styles.locationWrap}>
+                            <Ionicons name="location-outline" size={12} color={colors.textSecondary} />
+                            <ThemedText style={[styles.locationText, { color: colors.textSecondary }]} numberOfLines={1}>
+                                {item.village ? `${item.village}, ${item.city}` : item.city}
+                            </ThemedText>
                         </View>
-                    )} */}
-
+                        {isOwner && showActions ? (
+                            <ActionMenu actions={actions} />
+                        ) : formattedDate ? (
+                            <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>
+                                {formattedDate}
+                            </ThemedText>
+                        ) : null}
+                    </View>
                 </View>
-            </TouchableOpacity>
+            </PressableScale>
             <ConfirmationModal
                 visible={showDeleteConfirm}
                 onClose={() => setShowDeleteConfirm(false)}
@@ -260,23 +253,13 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
 
 const styles = StyleSheet.create({
     container: {
-        borderRadius: 16,
+        borderRadius: 22,
         marginBottom: 16,
         overflow: 'hidden',
         flex: 1,
     },
-    header: {
-        position: 'absolute',
-        top: 8,
-        right: 8,
-        zIndex: 10,
-    },
-    dateText: {
-        fontSize: 10,
-    },
-
     imageContainer: {
-        height: 130,
+        height: 140,
         width: '100%',
         position: 'relative',
     },
@@ -286,155 +269,94 @@ const styles = StyleSheet.create({
     },
     imageBadge: {
         position: 'absolute',
-        bottom: 10,
-        right: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        bottom: 8,
+        right: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
+        backgroundColor: 'rgba(0, 20, 15, 0.55)',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 4,
+        borderRadius: 999,
     },
     imageBadgeText: {
         color: '#fff',
-        fontSize: 11,
-        fontWeight: '600',
+        fontSize: 10,
+        fontWeight: '700',
     },
     statusTab: {
         position: 'absolute',
         top: 8,
         left: 8,
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 999,
         zIndex: 5,
     },
     statusTabText: {
         color: '#fff',
-        fontSize: 10,
-        fontWeight: '700',
+        fontSize: 9,
+        fontWeight: '800',
         letterSpacing: 0.5,
     },
     imagePlaceholder: {
-        height: 180,
+        height: 140,
         justifyContent: 'center',
         alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.05)',
     },
     imagePlaceholderText: {
-        fontSize: 12,
-        marginTop: 8,
+        fontSize: 11,
+        marginTop: 6,
     },
     detailsContainer: {
-        paddingHorizontal: 6,
+        paddingHorizontal: 12,
+        paddingTop: 10,
+        paddingBottom: 12,
     },
-    categoryRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    categoryBadge: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 4,
-    },
-    categoryText: {
-        fontSize: 10,
+    title: {
+        fontSize: 13,
         fontWeight: '600',
-    },
-    statusBadge: {
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 4,
-    },
-    statusText: {
-        fontSize: 10,
-        fontWeight: '700',
+        textTransform: 'capitalize',
     },
     priceRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 8,
+        marginTop: 4,
+        flexWrap: 'wrap',
+        gap: 6,
     },
     priceText: {
         fontSize: 16,
         fontWeight: '800',
+        letterSpacing: -0.2,
     },
     negotiableBadge: {
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        paddingHorizontal: 6,
+        paddingHorizontal: 7,
         paddingVertical: 2,
-        borderRadius: 4,
-        marginLeft: 8,
+        borderRadius: 999,
     },
     negotiableText: {
-        color: '#7BC043',
-        fontSize: 10,
-        fontWeight: '700',
+        fontSize: 9,
+        fontWeight: '800',
     },
-    title: {
-        fontSize: 14,
-        fontWeight: '700',
-        marginTop: 2,
-        textTransform: 'capitalize',
-    },
-    description: {
-        fontSize: 12,
-        marginTop: 4,
-        lineHeight: 18,
-    },
-    locationContainer: {
+    footerRow: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: 8,
     },
+    locationWrap: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+        paddingRight: 8,
+    },
     locationText: {
         fontSize: 11,
-        marginLeft: 4,
-    },
-    metadataContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        padding: 8,
-        borderRadius: 6,
-        marginTop: 10,
-        gap: 6,
-    },
-    metadataTag: {
-        flexDirection: 'row',
-        backgroundColor: 'rgba(0,0,0,0.03)',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 4,
-        alignItems: 'center',
-    },
-    metaTagKey: {
-        fontSize: 9,
-        fontWeight: '700',
-    },
-    metaTagVal: {
-        fontSize: 10,
-        fontWeight: '600',
-        marginLeft: 2,
-    },
-    actionRow: {
-        flexDirection: 'row',
-        marginTop: 12,
-        gap: 8,
-    },
-    actionButton: {
+        marginLeft: 3,
         flex: 1,
-        height: 38,
-        borderRadius: 8,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 4,
     },
-    chatButton: {
-    },
-    callButton: {},
-    actionButtonText: {
-        fontSize: 12,
-        fontWeight: '700',
+    dateText: {
+        fontSize: 10,
     },
 });

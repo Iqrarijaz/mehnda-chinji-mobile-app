@@ -80,6 +80,38 @@ export const RequestCardSkeleton = () => {
 
 
 
+
+/**
+ * MarketplaceCardSkeleton — matches the layout of MarketplaceCard
+ * (image block, title, price, location row).
+ */
+export const MarketplaceCardSkeleton = () => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+    return (
+        <View style={[styles.marketplaceCard, { backgroundColor: colors.card }]}>
+            <Skeleton width="100%" height={140} borderRadius={0} />
+            <View style={styles.marketplaceContent}>
+                <Skeleton width="80%" height={13} borderRadius={6} style={{ marginBottom: 8 }} />
+                <Skeleton width="55%" height={16} borderRadius={6} style={{ marginBottom: 10 }} />
+                <Skeleton width="70%" height={11} borderRadius={6} />
+            </View>
+        </View>
+    );
+};
+
+/** Two-column skeleton grid shown while marketplace listings load. */
+export const MarketplaceGridSkeleton = ({ rows = 3 }: { rows?: number }) => (
+    <View style={styles.marketplaceGrid}>
+        {Array.from({ length: rows }).map((_, r) => (
+            <View key={r} style={styles.marketplaceRow}>
+                <MarketplaceCardSkeleton />
+                <MarketplaceCardSkeleton />
+            </View>
+        ))}
+    </View>
+);
+
 const styles = StyleSheet.create({
     businessCard: {
         borderRadius: 16,
@@ -114,6 +146,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 8,
         borderTopWidth: StyleSheet.hairlineWidth,
+    },
+    marketplaceCard: {
+        flex: 1,
+        borderRadius: 22,
+        overflow: 'hidden',
+    },
+    marketplaceContent: {
+        paddingHorizontal: 12,
+        paddingVertical: 12,
+    },
+    marketplaceGrid: {
+        paddingHorizontal: 16,
+        paddingTop: 16,
+    },
+    marketplaceRow: {
+        flexDirection: 'row',
+        gap: 12,
+        marginBottom: 16,
     },
     requestCard: {
         borderRadius: 20,
