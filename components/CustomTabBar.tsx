@@ -9,40 +9,63 @@ import {
     StyleSheet,
     Pressable,
     View,
-    useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withSpring,
+    withTiming,
     interpolate,
     Extrapolate,
     useAnimatedKeyboard,
 } from 'react-native-reanimated';
 
 const isAndroid = Platform.OS === 'android';
-const BAR_HEIGHT = isAndroid ? 62 : 64;
-const ACTIVE_CIRCLE = 44;
+/** Content height of the bar (safe-area padding is added below it). */
+const BAR_HEIGHT = 58;
+/** Soft highlight pill behind the active icon. */
+const PILL_WIDTH = 52;
+const PILL_HEIGHT = 30;
+/** Springs tuned for a quiet, iOS-like response. */
+const SPRING = { damping: 18, stiffness: 240 };
 
 interface TabItemProps {
     route: any;
     isFocused: boolean;
     onPress: (routeName: string, routeKey: string, isFocused: boolean, params: any) => void;
     onLongPress: (routeKey: string) => void;
-    color: string;
+    activeColor: string;
+    inactiveColor: string;
     options: any;
 }
 
-const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, color, options }: TabItemProps) => {
-    const focusScale = useSharedValue(isFocused ? 1 : 0.92);
+/**
+ * Single tab: icon over an always-present label.
+ * Focus animates icon scale and label rise; press gives a soft scale dip.
+ */
+const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, activeColor, inactiveColor, options }: TabItemProps) => {
+    const focus = useSharedValue(isFocused ? 1 : 0);
+    const pressScale = useSharedValue(1);
 
     useEffect(() => {
-        focusScale.value = withSpring(isFocused ? 1.06 : 0.92, { damping: 14, stiffness: 260 });
-    }, [isFocused, focusScale]);
+        focus.value = withSpring(isFocused ? 1 : 0, SPRING);
+    }, [isFocused, focus]);
+
+    const animatedItemStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: pressScale.value }],
+    }));
 
     const animatedIconStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: focusScale.value }],
+        transform: [
+            { scale: interpolate(focus.value, [0, 1], [1, 1.08]) },
+            { translateY: interpolate(focus.value, [0, 1], [0, -1]) },
+        ],
+    }));
+
+    const animatedLabelStyle = useAnimatedStyle(() => ({
+        opacity: interpolate(focus.value, [0, 1], [0.7, 1]),
+        transform: [{ translateY: interpolate(focus.value, [0, 1], [2, 0]) }],
     }));
 
     const handlePress = () => {
@@ -60,6 +83,8 @@ const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, color, opt
             ? options.title
             : route.name;
 
+    const color = isFocused ? activeColor : inactiveColor;
+
     return (
         <Pressable
             accessibilityRole="button"
@@ -68,101 +93,115 @@ const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, color, opt
             testID={options.tabBarButtonTestID}
             onPress={handlePress}
             onLongPress={handleLongPress}
-            style={({ pressed }) => [
-                styles.tabItem,
-                { opacity: pressed ? 0.7 : 1 }
-            ]}
+            onPressIn={() => { pressScale.value = withSpring(0.94, SPRING); }}
+            onPressOut={() => { pressScale.value = withSpring(1, SPRING); }}
+            style={styles.tabItem}
         >
-            <Animated.View style={[styles.iconWrap, animatedIconStyle]}>
-                {options.tabBarIcon ? (
-                    options.tabBarIcon({ focused: isFocused, color, size: 24 })
-                ) : (
-                    <Ionicons
-                        name="square-outline"
-                        size={24}
-                        color={color}
-                    />
-                )}
+            <Animated.View style={[styles.tabItemInner, animatedItemStyle]}>
+                <Animated.View style={[styles.iconWrap, animatedIconStyle]}>
+                    {options.tabBarIcon ? (
+                        options.tabBarIcon({ focused: isFocused, color, size: 22 })
+                    ) : (
+                        <Ionicons name="square-outline" size={22} color={color} />
+                    )}
+                </Animated.View>
+                <Animated.Text
+                    numberOfLines={1}
+                    style={[
+                        styles.label,
+                        { color, fontWeight: isFocused ? '700' : '500' },
+                        animatedLabelStyle,
+                    ]}
+                >
+                    {label}
+                </Animated.Text>
             </Animated.View>
         </Pressable>
     );
 });
 
+TabItem.displayName = 'TabItem';
+
 /**
- * Floating white pill tab bar — active tab sits in a soft-green circle
- * that springs between positions (reference design language).
+ * Integrated iOS-style tab bar: full-width surface with softly rounded top
+ * corners, a lime-soft highlight that springs behind the active icon, and
+ * spring icon/label motion. No borders, shadows, or elevation — hierarchy
+ * comes from the surface contrast against the off-white background.
  */
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const { theme } = useTheme();
     const insets = useSafeAreaInsets();
     const colors = Colors[theme];
-    const { width: windowWidth } = useWindowDimensions();
 
-    // ─── Consolidated Route & Dimensions Selector ────────────────────────────
-    const { visibleRoutes, tabWidth, FULL_WIDTH } = React.useMemo(() => {
+    const [barWidth, setBarWidth] = React.useState(0);
+
+    // ─── Visible Routes (unchanged filtering logic) ──────────────────────────
+    const visibleRoutes = React.useMemo(() => {
         // Routes hidden from the tab bar (registered with href: null in _layout)
         const HIDDEN_ROUTES = new Set<string>([]);
-        const routes = state.routes.filter((route) => {
+        return state.routes.filter((route) => {
             if (HIDDEN_ROUTES.has(route.name)) return false;
             const { options } = descriptors[route.key];
             if ((options as any).href === null) return false;
             return true;
         });
-        const baseWidth = isAndroid ? windowWidth - 40 : windowWidth - 36;
-        const fWidth = Math.min(baseWidth, 600);
-        const tWidth = routes.length > 0 ? fWidth / routes.length : 0;
-        return {
-            visibleRoutes: routes,
-            tabWidth: tWidth,
-            FULL_WIDTH: fWidth,
-        };
-    }, [state.routes, descriptors, windowWidth]);
+    }, [state.routes, descriptors]);
+
+    const tabWidth = visibleRoutes.length > 0 && barWidth > 0
+        ? (barWidth - styles.container.paddingHorizontal * 2) / visibleRoutes.length
+        : 0;
 
     // ─── Shared Values (UI Thread Animations) ─────────────────────────────────
     const indicatorX = useSharedValue(0);
+    const indicatorShown = useSharedValue(0);
     // ─── JSI-Powered UI-Thread Keyboard Height Tracking ────────────────────────
     const keyboard = useAnimatedKeyboard();
 
-    // ─── Active Route Tracking (for sliding active circle) ───────────────────
+    // ─── Active Route Tracking (sliding soft highlight) ──────────────────────
     useEffect(() => {
         const activeIndex = visibleRoutes.findIndex(
             (route) => route.key === state.routes[state.index].key,
         );
         if (activeIndex !== -1 && tabWidth > 0) {
-            indicatorX.value = withSpring(
-                activeIndex * tabWidth + (tabWidth - ACTIVE_CIRCLE) / 2,
-                { damping: 16, stiffness: 220 },
-            );
+            const target = styles.container.paddingHorizontal
+                + activeIndex * tabWidth
+                + (tabWidth - PILL_WIDTH) / 2;
+            if (indicatorShown.value === 0) {
+                // First layout: place without animating, then fade in.
+                indicatorX.value = target;
+                indicatorShown.value = withTiming(1, { duration: 180 });
+            } else {
+                indicatorX.value = withSpring(target, SPRING);
+            }
         }
-    }, [state.index, tabWidth, visibleRoutes, indicatorX]);
+    }, [state.index, tabWidth, visibleRoutes, indicatorX, indicatorShown]);
 
     // ─── UI-Thread Animated Styles ───────────────────────────────────────────
+    const bottomPadding = Math.max(insets.bottom, isAndroid ? 10 : 8);
+
     const animatedContainerStyle = useAnimatedStyle(() => {
         const keyboardY = interpolate(
             keyboard.height.value,
             [0, 100], // Start sliding down as keyboard opens
-            [0, BAR_HEIGHT + insets.bottom + 30],
+            [0, BAR_HEIGHT + bottomPadding + 30],
             Extrapolate.CLAMP
         );
 
         return {
-            transform: [
-                { translateY: keyboardY }
-            ],
+            transform: [{ translateY: keyboardY }],
             opacity: interpolate(
                 keyboardY,
-                [0, BAR_HEIGHT + insets.bottom + 30],
+                [0, BAR_HEIGHT + bottomPadding + 30],
                 [1, 0],
                 Extrapolate.CLAMP
             ),
         };
     });
 
-    const animatedIndicatorStyle = useAnimatedStyle(() => {
-        return {
-            transform: [{ translateX: indicatorX.value }],
-        };
-    });
+    const animatedIndicatorStyle = useAnimatedStyle(() => ({
+        opacity: indicatorShown.value,
+        transform: [{ translateX: indicatorX.value }],
+    }));
 
     // ─── Stable Press Handlers to Maintain Memoization ────────────────────────
     const handlePress = React.useCallback((routeName: string, routeKey: string, isFocused: boolean, params: any) => {
@@ -180,29 +219,21 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
         navigation.emit({ type: 'tabLongPress', target: routeKey });
     }, [navigation]);
 
-    const bottomPadding = isAndroid ? insets.bottom + 6 : insets.bottom + 8;
-
     return (
-        <View
-            style={[
-                styles.outerContainer,
-                { paddingBottom: bottomPadding },
-            ]}
-            pointerEvents="box-none"
-        >
+        <View style={styles.outerContainer} pointerEvents="box-none">
             <Animated.View
+                onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
                 style={[
                     styles.container,
                     {
                         backgroundColor: colors.card,
-                        width: FULL_WIDTH,
-                        borderRadius: BAR_HEIGHT / 2,
+                        paddingBottom: bottomPadding,
                     },
                     animatedContainerStyle,
                 ]}
                 pointerEvents="auto"
             >
-                {/* Sliding active circle */}
+                {/* Soft highlight that springs behind the active icon */}
                 {tabWidth > 0 && (
                     <Animated.View
                         style={[
@@ -217,7 +248,6 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                 {visibleRoutes.map((route) => {
                     const { options } = descriptors[route.key];
                     const isFocused = state.routes[state.index].key === route.key;
-                    const color = isFocused ? colors.primary : colors.textSecondary;
 
                     return (
                         <TabItem
@@ -226,7 +256,8 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                             isFocused={isFocused}
                             onPress={handlePress}
                             onLongPress={handleLongPress}
-                            color={color}
+                            activeColor={colors.primary}
+                            inactiveColor={colors.textSecondary}
                             options={options}
                         />
                     );
@@ -242,34 +273,47 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        alignItems: 'center',
         backgroundColor: 'transparent',
         zIndex: 999, // Ensure it floats above the content
     },
     container: {
         flexDirection: 'row',
-        height: BAR_HEIGHT,
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        alignItems: 'stretch',
+        width: '100%',
+        height: undefined,
+        minHeight: BAR_HEIGHT,
+        paddingHorizontal: 12,
+        paddingTop: 8,
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
         overflow: 'hidden',
     },
     indicator: {
         position: 'absolute',
+        top: 8,
         left: 0,
-        top: (BAR_HEIGHT - ACTIVE_CIRCLE) / 2,
-        width: ACTIVE_CIRCLE,
-        height: ACTIVE_CIRCLE,
-        borderRadius: ACTIVE_CIRCLE / 2,
+        width: PILL_WIDTH,
+        height: PILL_HEIGHT,
+        borderRadius: PILL_HEIGHT / 2,
     },
     tabItem: {
         flex: 1,
+        minHeight: 50,
+    },
+    tabItemInner: {
+        flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        width: '100%',
+        justifyContent: 'flex-start',
     },
     iconWrap: {
+        width: PILL_WIDTH,
+        height: PILL_HEIGHT,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    label: {
+        fontSize: 10,
+        marginTop: 3,
+        letterSpacing: 0.1,
     },
 });
