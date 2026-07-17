@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         gap: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.06,
+        shadowOpacity: 0,
         shadowRadius: 12,
         marginBottom: 12,
     },
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     unit: {
         fontSize: 10,
         fontWeight: '700',
-        color: '#64748B',
+        color: '#6B7B73',
         textTransform: 'uppercase',
     },
     infoContainer: {
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     },
     dateLabel: {
         fontSize: 11,
-        color: '#94A3B8',
+        color: '#8FA79E',
         fontWeight: '500',
     },
 });

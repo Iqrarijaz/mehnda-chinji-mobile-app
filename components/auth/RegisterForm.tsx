@@ -212,14 +212,14 @@ export const RegisterForm = React.memo(function RegisterForm() {
 
     const renderValidationIcon = (field: string) => {
         if (touched[field] && !errors[field] && (formData as any)[field]?.length > 0) {
-            return <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />;
+            return <Ionicons name="checkmark-circle" size={18} color="#7BC043" style={{ marginLeft: 8 }} />;
         }
         return null;
     };
 
     const strength = getPasswordStrength(formData.password);
     const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-    const strengthColors = ['', '#EF4444', '#F59E0B', '#10B981', '#059669'];
+    const strengthColors = ['', '#FF5A5F', '#F0803C', '#7BC043', '#4B8B27'];
 
     return (
         <View style={styles.formContainer}>
@@ -238,7 +238,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         onBlur={() => handleBlur('fullName')}
                         inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
                         }}
                         rightAccessory={renderValidationIcon('fullName')}
@@ -262,12 +262,12 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
                         }}
                         rightAccessory={
                             checkingAccount.email ? (
-                                <ActivityIndicator size="small" color="#006666" style={{ marginLeft: 8 }} />
+                                <ActivityIndicator size="small" color="#003D36" style={{ marginLeft: 8 }} />
                             ) : renderValidationIcon('email')
                         }
                     />
@@ -291,12 +291,12 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         keyboardType="phone-pad"
                         maxLength={11}
                         inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
                         }}
                         rightAccessory={
                             checkingAccount.phone ? (
-                                <ActivityIndicator size="small" color="#006666" style={{ marginLeft: 8 }} />
+                                <ActivityIndicator size="small" color="#003D36" style={{ marginLeft: 8 }} />
                             ) : renderValidationIcon('phone')
                         }
                     />
@@ -322,7 +322,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         onBlur={() => handleBlur('password')}
                         secureTextEntry={!formData.showPassword}
                         inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
                         }}
                         rightAccessory={
@@ -335,7 +335,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                                     <Ionicons
                                         name={formData.showPassword ? 'eye-outline' : 'eye-off-outline'}
                                         size={20}
-                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
+                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'}
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -360,7 +360,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         onBlur={() => handleBlur('confirmPassword')}
                         secureTextEntry={!formData.showConfirmPassword}
                         inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC',
                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
                         }}
                         rightAccessory={
@@ -373,7 +373,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                                     <Ionicons
                                         name={formData.showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
                                         size={20}
-                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
+                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'}
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -395,7 +395,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                             {formData.ageVerified && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
                         </View>
                     </TouchableOpacity>
-                    <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
+                    <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#6B7B73' }]}>
                         I confirm that I am at least 13 years old. <ThemedText style={styles.required}>*</ThemedText>
                     </ThemedText>
                 </View>
@@ -415,7 +415,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         </View>
                     </TouchableOpacity>
                     <View style={{ flex: 1 }}>
-                        <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
+                        <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#6B7B73' }]}>
                             I agree to the {' '}
                             <ThemedText
                                 style={{ color: colors.primary, fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
@@ -446,15 +446,15 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, formData.guidelinesAccepted && { backgroundColor: '#006666', borderColor: '#006666' }]}>
+                        <View style={[styles.checkbox, formData.guidelinesAccepted && { backgroundColor: '#003D36', borderColor: '#003D36' }]}>
                             {formData.guidelinesAccepted && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
                         </View>
                     </TouchableOpacity>
                     <View style={{ flex: 1 }}>
-                        <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
+                        <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#6B7B73' }]}>
                             I agree to follow the {' '}
                             <ThemedText
-                                style={{ color: '#006666', fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
+                                style={{ color: '#003D36', fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
                                 onPress={() => {
                                     router.push('/communityGuidelines' as any);
                                 }}
@@ -470,7 +470,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                 <TouchableOpacity
                     style={[
                         styles.registerButton,
-                        { backgroundColor: isFormValid() ? '#006666' : '#94A3B8' }
+                        { backgroundColor: isFormValid() ? '#003D36' : '#8FA79E' }
                     ]}
                     onPress={handleRegister}
                     disabled={formData.loading || !isFormValid()}
@@ -500,11 +500,11 @@ export const RegisterForm = React.memo(function RegisterForm() {
 
                 {/* Footer */}
                 <View style={styles.footer}>
-                    <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
+                    <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#6B7B73' }]}>
                         Already have an account?{' '}
                     </ThemedText>
                     <TouchableOpacity onPress={() => router.push('/login' as any)}>
-                        <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#006666', fontWeight: 'bold' }]}>Log In</ThemedText>
+                        <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#003D36', fontWeight: 'bold' }]}>Log In</ThemedText>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -524,14 +524,14 @@ const styles = StyleSheet.create({
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     inputField: {
         marginBottom: 20,
     },
     errorText: {
-        color: '#EF4444',
+        color: '#FF5A5F',
         fontSize: 12,
         marginTop: 6,
         marginLeft: 4,
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
         flex: 1,
         height: '100%',
         borderRadius: 2,
-        backgroundColor: '#E2E8F0',
+        backgroundColor: '#ECECEC',
     },
     strengthText: {
         fontSize: 11,
@@ -561,13 +561,13 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#475569',
+        color: '#4F5F57',
         letterSpacing: 0.5,
         marginBottom: 8,
         marginLeft: 2,
     },
     required: {
-        color: '#EF4444',
+        color: '#FF5A5F',
     },
     inputBox: {
         flexDirection: 'row',
@@ -589,9 +589,9 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 20,
         overflow: 'hidden',
-        shadowColor: '#006666',
+        shadowColor: '#003D36',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     registerButtonText: {
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
         width: 22,
         height: 22,
         borderRadius: 6,
-        borderColor: '#E2E8F0',
+        borderColor: '#ECECEC',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 10,

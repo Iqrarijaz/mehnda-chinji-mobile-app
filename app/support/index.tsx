@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 10,
     },
     actionIcon: {
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#64748B',
+        color: '#6B7B73',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 16,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     },
     footerNote: {
         fontSize: 12,
-        color: '#94A3B8',
+        color: '#8FA79E',
         textAlign: 'center',
         marginTop: 24,
         lineHeight: 18,

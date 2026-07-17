@@ -134,7 +134,7 @@ export default function VerifyOtpScreen() {
         >
             {/* Header */}
             <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#003D36', zIndex: 1 }]}>
                     <TouchableOpacity
                         style={styles.backButton}
                         onPress={() => router.back()}
@@ -215,7 +215,7 @@ export default function VerifyOtpScreen() {
                         </View>
 
                         <TouchableOpacity
-                            style={[styles.submitButton, { backgroundColor: '#006666' }]}
+                            style={[styles.submitButton, { backgroundColor: '#003D36' }]}
                             onPress={handleVerify}
                             disabled={loading}
                         >
@@ -227,7 +227,7 @@ export default function VerifyOtpScreen() {
                         </TouchableOpacity>
 
                         <View style={styles.footer}>
-                            <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
+                            <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#6B7B73' }]}>
                                 {timer > 0 ? `Resend code in ${timer}s` : "Didn't receive the code? "}
                             </ThemedText>
                             {timer === 0 && (
@@ -238,7 +238,7 @@ export default function VerifyOtpScreen() {
                         </View>
 
                         <View style={[styles.footer, { marginTop: 15 }]}>
-                            <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
+                            <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#6B7B73' }]}>
                                 Back to{' '}
                             </ThemedText>
                             <TouchableOpacity onPress={() => router.replace('/(auth)/login' as any)}>
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     otpContainer: {
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     profileName: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#006666',
+        color: '#003D36',
         marginBottom: 2,
     },
     profileEmail: {
@@ -356,9 +356,9 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#006666',
+        shadowColor: '#003D36',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     submitButtonText: {

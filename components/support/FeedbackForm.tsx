@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#64748B',
+        color: '#6B7B73',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 16,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
         padding: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 15,
     },
     inputContainer: {
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         shadowColor: '#009688',
         shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 4,
     },
     inputIcon: {
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
         shadowColor: '#009688',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     submitButtonDisabled: {

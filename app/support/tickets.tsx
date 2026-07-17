@@ -100,9 +100,9 @@ export default function TicketListScreen() {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'open': return '#F59E0B'; // Orange
+            case 'open': return '#F0803C'; // Orange
             case 'in-progress': return '#3B82F6'; // Blue
-            case 'closed': return '#10B981'; // Green
+            case 'closed': return '#7BC043'; // Green
             default: return colors.textSecondary;
         }
     };
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
+        shadowOpacity: 0,
         shadowRadius: 4,
     },
     accentStrip: {
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     createButtonText: {

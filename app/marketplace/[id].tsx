@@ -104,9 +104,9 @@ export default function MarketplaceDetailsScreen() {
     const ownerActions = [
         ...(item?.status !== 'sold' ? [
             { label: 'Edit Listing', icon: 'create-outline' as const, onPress: handleEdit },
-            { label: 'Mark Sold', icon: 'checkmark-circle-outline' as const, color: '#10B981', onPress: confirmMarkSold }
+            { label: 'Mark Sold', icon: 'checkmark-circle-outline' as const, color: '#7BC043', onPress: confirmMarkSold }
         ] : []),
-        { label: 'Delete', icon: 'trash-outline' as const, color: '#EF4444', onPress: confirmDelete, destructive: true }
+        { label: 'Delete', icon: 'trash-outline' as const, color: '#FF5A5F', onPress: confirmDelete, destructive: true }
     ];
 
     const renderHeader = () => (
@@ -161,11 +161,11 @@ export default function MarketplaceDetailsScreen() {
 
     const getStatusColor = (status: string) => {
         switch (status?.toLowerCase()) {
-            case 'sold': return '#EF4444';
-            case 'pending': return '#F59E0B';
+            case 'sold': return '#FF5A5F';
+            case 'pending': return '#F0803C';
             case 'live':
             default:
-                return '#10B981';
+                return '#7BC043';
         }
     };
 

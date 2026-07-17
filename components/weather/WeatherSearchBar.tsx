@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         zIndex: 9999,
         shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.12,
+        shadowOpacity: 0,
         shadowRadius: 16,
         overflow: 'hidden',
     },

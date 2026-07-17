@@ -169,7 +169,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                     {/* Header Section */}
                     <View style={styles.header}>
                         <View style={styles.headerLeft}>
-                            <Ionicons name="warning-outline" size={24} color="#EF4444" style={styles.headerIcon} />
+                            <Ionicons name="warning-outline" size={24} color="#FF5A5F" style={styles.headerIcon} />
                             <View>
                                 <ThemedText style={styles.title}>Report</ThemedText>
                                 <ThemedText style={styles.subtitle}>Help us understand the issue</ThemedText>
@@ -194,7 +194,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                                     style={[
                                         styles.reasonCard,
                                         {
-                                            borderColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'),
+                                            borderColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#ECECEC'),
                                             backgroundColor: isSelected ? `${colors.primary}10` : (isDark ? 'rgba(255,255,255,0.03)' : '#FFFFFF')
                                         }
                                     ]}
@@ -225,7 +225,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                                 {
                                     color: colors.text,
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
-                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'
+                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#ECECEC'
                                 }
                             ]}
                             placeholder="Please provide any extra context..."
@@ -248,7 +248,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                             styles.submitButton,
                             {
                                 backgroundColor: colors.primary,
-                                shadowOpacity: selectedReason ? 0.3 : 0.05,
+                                shadowOpacity: 0,
                                 marginTop: 10,
                                 marginBottom: 30,
                                 opacity: isSubmitting ? 0.6 : 1
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     submitButtonText: {

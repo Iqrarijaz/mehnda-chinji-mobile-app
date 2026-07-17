@@ -174,8 +174,8 @@ const BusinessDetailScreen = () => {
                             onPress={() => reportModalRef.current?.present()}
                             activeOpacity={0.8}
                         >
-                            <Ionicons name="flag-outline" size={20} color="#EF4444" />
-                            <ThemedText style={[styles.actionBtnTextSec, { color: '#EF4444' }]}>Report</ThemedText>
+                            <Ionicons name="flag-outline" size={20} color="#FF5A5F" />
+                            <ThemedText style={[styles.actionBtnTextSec, { color: '#FF5A5F' }]}>Report</ThemedText>
                         </TouchableOpacity>
                     </View>
 

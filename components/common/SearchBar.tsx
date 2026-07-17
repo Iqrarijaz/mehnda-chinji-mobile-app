@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import { Colors } from '@/constants/colors';
-import { Layout } from '@/constants/layout';
+import { Radius } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 
 interface SearchBarProps {
@@ -31,6 +31,7 @@ interface SearchBarProps {
     inputRef?: React.Ref<TextInput>;
 }
 
+/** Flat white pill search field — premium grocery look. */
 export function SearchBar({
     value,
     onChangeText,
@@ -46,20 +47,20 @@ export function SearchBar({
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    const inner = (
+    const inner = (withOuterStyle: boolean) => (
         <View
             style={[
                 styles.container,
-                { backgroundColor: colors.card, borderColor: colors.border },
-                style,
+                { backgroundColor: colors.card },
+                withOuterStyle ? style : undefined,
             ]}
         >
-            <Ionicons name="search" size={20} color="#94A3B8" style={styles.icon} />
+            <Ionicons name="search" size={18} color={colors.textSecondary} style={styles.icon} />
             <TextInput
                 ref={inputRef}
                 style={[styles.input, { color: colors.text }]}
                 placeholder={placeholder}
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={colors.textSecondary}
                 value={value}
                 onChangeText={onChangeText}
                 returnKeyType={returnKeyType}
@@ -78,37 +79,12 @@ export function SearchBar({
     if (onPress) {
         return (
             <TouchableOpacity activeOpacity={1} onPress={onPress} style={style}>
-                {/* Re-render inner without outer style to avoid double apply */}
-                <View
-                    style={[
-                        styles.container,
-                        { backgroundColor: colors.card, borderColor: colors.border },
-                    ]}
-                >
-                    <Ionicons name="search" size={20} color="#94A3B8" style={styles.icon} />
-                    <TextInput
-                        ref={inputRef}
-                        style={[styles.input, { color: colors.text }]}
-                        placeholder={placeholder}
-                        placeholderTextColor="#94A3B8"
-                        value={value}
-                        onChangeText={onChangeText}
-                        returnKeyType={returnKeyType}
-                        clearButtonMode="while-editing"
-                        onFocus={onFocus}
-                        onBlur={onBlur}
-                    />
-                    {rightAction && (
-                        <View style={styles.rightAction}>
-                            {rightAction}
-                        </View>
-                    )}
-                </View>
+                {inner(false)}
             </TouchableOpacity>
         );
     }
 
-    return inner;
+    return inner(true);
 }
 
 const styles = StyleSheet.create({
@@ -116,9 +92,9 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        height: 42,
-        paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        borderRadius: Layout.borderRadius,
+        height: 46,
+        paddingHorizontal: Platform.OS === 'android' ? 16 : 18,
+        borderRadius: Radius.pill,
     },
     icon: {
         marginRight: 10,
@@ -131,9 +107,6 @@ const styles = StyleSheet.create({
     },
     rightAction: {
         marginLeft: 8,
-        paddingLeft: 10,
-        borderLeftWidth: 1,
-        borderLeftColor: '#E2E8F0',
         justifyContent: 'center',
     },
 });

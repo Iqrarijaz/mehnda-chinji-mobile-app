@@ -234,12 +234,12 @@ export const LoginForm = React.memo(function LoginForm() {
                         autoCapitalize="none"
                         editable={!formData.loading}
                         inputBoxStyle={{
-                            borderColor: errors.email && touched.email ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
+                            borderColor: errors.email && touched.email ? '#FF5A5F' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC'),
                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
                         }}
                         rightAccessory={
                             touched.email && !errors.email && formData.email.length > 0 ? (
-                                <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
+                                <Ionicons name="checkmark-circle" size={18} color="#7BC043" style={{ marginLeft: 8 }} />
                             ) : undefined
                         }
                     />
@@ -264,13 +264,13 @@ export const LoginForm = React.memo(function LoginForm() {
                         secureTextEntry={!formData.showPassword}
                         editable={!formData.loading}
                         inputBoxStyle={{
-                            borderColor: errors.password && touched.password ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
+                            borderColor: errors.password && touched.password ? '#FF5A5F' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#ECECEC'),
                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
                         }}
                         rightAccessory={
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 {touched.password && !errors.password && formData.password.length > 0 && (
-                                    <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginRight: 8 }} />
+                                    <Ionicons name="checkmark-circle" size={18} color="#7BC043" style={{ marginRight: 8 }} />
                                 )}
                                 <TouchableOpacity
                                     onPress={() => setFormData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
@@ -279,7 +279,7 @@ export const LoginForm = React.memo(function LoginForm() {
                                     <Ionicons
                                         name={formData.showPassword ? 'eye-outline' : 'eye-off-outline'}
                                         size={20}
-                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
+                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73'}
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -299,7 +299,7 @@ export const LoginForm = React.memo(function LoginForm() {
                         <Ionicons
                             name={formData.rememberMe ? 'checkbox' : 'square-outline'}
                             size={20}
-                            color={formData.rememberMe ? colors.primary : (isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B')}
+                            color={formData.rememberMe ? colors.primary : (isDark ? 'rgba(255, 255, 255, 0.5)' : '#6B7B73')}
                         />
                         <ThemedText style={[styles.optionText, { color: colors.text }]}>Remember me</ThemedText>
                     </TouchableOpacity>
@@ -336,7 +336,7 @@ export const LoginForm = React.memo(function LoginForm() {
 
                 {/* Footer */}
                 <View style={styles.footer}>
-                    <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
+                    <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#6B7B73' }]}>
                         Don't have an account?{' '}
                     </ThemedText>
                     <TouchableOpacity onPress={() => router.push('/(auth)/register' as any)}>
@@ -360,14 +360,14 @@ const styles = StyleSheet.create({
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     inputField: {
         marginBottom: 20,
     },
     errorText: {
-        color: '#EF4444',
+        color: '#FF5A5F',
         fontSize: 12,
         marginTop: 6,
         marginLeft: 4,
@@ -376,13 +376,13 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#475569',
+        color: '#4F5F57',
         letterSpacing: 0.5,
         marginBottom: 6,
         marginLeft: 0,
     },
     required: {
-        color: '#EF4444',
+        color: '#FF5A5F',
     },
     inputBox: {
         flexDirection: 'row',
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
         marginBottom: 18,
         overflow: 'hidden',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     loginButtonText: {

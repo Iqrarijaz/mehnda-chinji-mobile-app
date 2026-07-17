@@ -40,9 +40,9 @@ const MyRegisteredBusinessCard = React.memo(({
 
     // Status-based colors
     const statusColor =
-        status === 'APPROVED' ? '#10B981' :
-            status === 'REJECTED' ? '#EF4444' :
-                '#F59E0B'; // PENDING
+        status === 'APPROVED' ? '#7BC043' :
+            status === 'REJECTED' ? '#FF5A5F' :
+                '#F0803C'; // PENDING
 
     const primaryColor = colors.text;
     const softBg = isDark ? 'rgba(255,255,255,0.05)' : (primaryColor + '08');
@@ -155,7 +155,7 @@ const MyRegisteredBusinessCard = React.memo(({
                             <View style={{ position: 'relative', zIndex: 100 }}>
                                 {isDeleting ? (
                                     <View style={styles.moreBtn}>
-                                        <ActivityIndicator size="small" color="#EF4444" />
+                                        <ActivityIndicator size="small" color="#FF5A5F" />
                                     </View>
                                 ) : (
                                     <View style={styles.moreBtn}>

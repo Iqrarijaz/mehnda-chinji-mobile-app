@@ -21,7 +21,7 @@ interface AnimatedToggleProps {
 export const AnimatedToggle: React.FC<AnimatedToggleProps> = ({
     value,
     onValueChange,
-    primaryColor = '#006666',
+    primaryColor = '#003D36',
 }) => {
     const offset = useSharedValue(value ? THUMB_TRAVEL : 0);
     const bgProgress = useSharedValue(value ? 1 : 0);

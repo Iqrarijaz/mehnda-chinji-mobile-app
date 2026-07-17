@@ -38,13 +38,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#475569',
+        color: '#4F5F57',
         textAlign: 'center',
         marginBottom: 8,
     },
     subtitle: {
         fontSize: 11,
-        color: '#94A3B8',
+        color: '#8FA79E',
         textAlign: 'center',
         lineHeight: 22,
         fontWeight: '500',

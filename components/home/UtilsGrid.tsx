@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { Layout } from '@/constants/layout';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 interface UtilItem {
     id: string;
@@ -58,29 +59,33 @@ export function UtilsGrid() {
                         {category.title}
                     </ThemedText>
                     <View style={styles.grid}>
-                        {category.items.map((util) => (
-                            <View key={util.id} style={styles.gridItem}>
-                                <TouchableOpacity
+                        {category.items.map((util, index) => (
+                            <Animated.View
+                                key={util.id}
+                                entering={FadeInDown.delay(120 + index * 60).springify().damping(16)}
+                                style={styles.gridItem}
+                            >
+                                <PressableScale
                                     onPress={() => router.push(util.route as any)}
-                                    activeOpacity={0.7}
+                                    pressedScale={0.92}
                                     style={styles.touchable}
                                 >
-                                    <View style={[styles.card, { backgroundColor: colors.card }]}>
-                                        {util.image ? (
-                                            <Image
-                                                source={util.image}
-                                                style={styles.icon}
-                                                resizeMode="contain"
-                                            />
-                                        ) : (
-                                            <View style={[styles.iconContainer, { backgroundColor: colors.primary + '12' }]}>
+                                    <View style={styles.card}>
+                                        <View style={[styles.iconContainer, { backgroundColor: colors.cream }]}>
+                                            {util.image ? (
+                                                <Image
+                                                    source={util.image}
+                                                    style={styles.icon}
+                                                    resizeMode="contain"
+                                                />
+                                            ) : (
                                                 <Ionicons
                                                     name={util.icon as any}
-                                                    size={28}
+                                                    size={26}
                                                     color={colors.primary}
                                                 />
-                                            </View>
-                                        )}
+                                            )}
+                                        </View>
                                         <ThemedText
                                             style={[styles.label, { color: colors.text }]}
                                             numberOfLines={2}
@@ -90,8 +95,8 @@ export function UtilsGrid() {
                                             {util.label}
                                         </ThemedText>
                                     </View>
-                                </TouchableOpacity>
-                            </View>
+                                </PressableScale>
+                            </Animated.View>
                         ))}
                     </View>
                 </View>
@@ -110,11 +115,10 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     sectionTitle: {
-        fontSize: 16,
+        fontSize: 17,
         fontWeight: '700',
         marginLeft: 6,
         marginBottom: 12,
-        opacity: 0.85,
     },
     grid: {
         flexDirection: 'row',
@@ -128,24 +132,23 @@ const styles = StyleSheet.create({
         margin: 6,
     },
     card: {
-        borderRadius: Layout.borderRadius,
-        padding: 8,
+        paddingVertical: 8,
         alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: 90,
+        justifyContent: 'flex-start',
+        minHeight: 88,
     },
     icon: {
-        width: 50,
-        height: 50,
-        marginBottom: 4,
+        width: 38,
+        height: 38,
     },
     iconContainer: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 4,
+        marginBottom: 8,
+        overflow: 'hidden',
     },
     label: {
         fontSize: 11,

@@ -253,7 +253,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             style={{ flex: 1 }}
                         />
                         <TouchableOpacity
-                            style={[styles.filterButton, { backgroundColor: hasActiveFilters ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                            style={[styles.filterButton, { backgroundColor: hasActiveFilters ? '#7BC043' : 'rgba(255, 255, 255, 0.15)' }]}
                             onPress={() => setIsFilterVisible(true)}
                             activeOpacity={0.7}
                         >
@@ -267,7 +267,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             )}
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={[styles.filterButton, { backgroundColor: isMineTab ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                            style={[styles.filterButton, { backgroundColor: isMineTab ? '#7BC043' : 'rgba(255, 255, 255, 0.15)' }]}
                             onPress={() => {
                                 if (isMineTab) {
                                     setSelectedTab('');
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: -2,
         right: -2,
-        backgroundColor: '#EF4444',
+        backgroundColor: '#FF5A5F',
         borderRadius: 9,
         width: 18,
         height: 18,

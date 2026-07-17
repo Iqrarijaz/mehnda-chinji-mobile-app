@@ -39,8 +39,8 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
                 return {
                     bg: '#FEF2F2',
                     icon: 'alert-circle' as const,
-                    color: '#EF4444',
-                    btnBg: '#EF4444'
+                    color: '#FF5A5F',
+                    btnBg: '#FF5A5F'
                 };
             case 'success':
                 return {
@@ -53,8 +53,8 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
                 return {
                     bg: '#FFFBEB',
                     icon: 'warning' as const,
-                    color: '#F59E0B',
-                    btnBg: '#F59E0B'
+                    color: '#F0803C',
+                    btnBg: '#F0803C'
                 };
             case 'info':
             default:
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 20,
     },
     header: {
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     },
     message: {
         fontSize: 13,
-        color: '#64748B',
+        color: '#6B7B73',
         textAlign: 'center',
         lineHeight: 20,
         marginBottom: 24,
@@ -182,12 +182,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 20,
         backgroundColor: '#F8FAFC',
-        borderColor: '#E2E8F0',
+        borderColor: '#ECECEC',
     },
     cancelText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#64748B',
+        color: '#6B7B73',
     },
     confirmBtnWrapper: {
         flex: 1,
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     confirmBtnText: {

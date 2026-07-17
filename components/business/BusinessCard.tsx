@@ -58,7 +58,7 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
             );
         }
         return (
-            <ThemedText style={[styles.avatarLetter, { color: isDark ? colors.text : '#94A3B8' }]}>
+            <ThemedText style={[styles.avatarLetter, { color: isDark ? colors.text : '#8FA79E' }]}>
                 {businessName?.charAt(0)?.toUpperCase()}
             </ThemedText>
         );

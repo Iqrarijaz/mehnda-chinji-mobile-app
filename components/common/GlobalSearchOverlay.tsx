@@ -134,7 +134,7 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
 
         } else if (item.type === 'place') {
             icon = 'location';
-            color = '#10B981';
+            color = '#7BC043';
         }
 
         return (
@@ -173,7 +173,7 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
                     <TextInput
                         autoFocus
                         placeholder="Search everything..."
-                        placeholderTextColor={isDark ? 'rgba(255,255,255,0.4)' : '#94A3B8'}
+                        placeholderTextColor={isDark ? 'rgba(255,255,255,0.4)' : '#8FA79E'}
                         value={searchQuery}
                         onChangeText={onSearchChange}
                         style={[styles.input, { color: colors.text }]}

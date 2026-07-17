@@ -16,16 +16,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
-    withTiming,
     withSpring,
     interpolate,
     Extrapolate,
-    ReduceMotion,
     useAnimatedKeyboard,
 } from 'react-native-reanimated';
 
 const isAndroid = Platform.OS === 'android';
-const BAR_HEIGHT = isAndroid ? 56 : 60;
+const BAR_HEIGHT = isAndroid ? 62 : 64;
+const ACTIVE_CIRCLE = 44;
 
 interface TabItemProps {
     route: any;
@@ -37,6 +36,16 @@ interface TabItemProps {
 }
 
 const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, color, options }: TabItemProps) => {
+    const focusScale = useSharedValue(isFocused ? 1 : 0.92);
+
+    useEffect(() => {
+        focusScale.value = withSpring(isFocused ? 1.06 : 0.92, { damping: 14, stiffness: 260 });
+    }, [isFocused, focusScale]);
+
+    const animatedIconStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: focusScale.value }],
+    }));
+
     const handlePress = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => { });
         onPress(route.name, route.key, isFocused, route.params);
@@ -56,7 +65,7 @@ const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, color, opt
         <Pressable
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
+            accessibilityLabel={options.tabBarAccessibilityLabel ?? label}
             testID={options.tabBarButtonTestID}
             onPress={handlePress}
             onLongPress={handleLongPress}
@@ -65,34 +74,35 @@ const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, color, opt
                 { opacity: pressed ? 0.7 : 1 }
             ]}
         >
-            {options.tabBarIcon ? (
-                options.tabBarIcon({ focused: isFocused, color, size: 22 })
-            ) : (
-                <Ionicons
-                    name="square-outline"
-                    size={22}
-                    color={color}
-                    style={{ marginBottom: 2 }}
-                />
+            <Animated.View style={[styles.iconWrap, animatedIconStyle]}>
+                {options.tabBarIcon ? (
+                    options.tabBarIcon({ focused: isFocused, color, size: 22 })
+                ) : (
+                    <Ionicons
+                        name="square-outline"
+                        size={22}
+                        color={color}
+                    />
+                )}
+            </Animated.View>
+            {!isFocused && (
+                <Text style={[styles.label, { color }]} numberOfLines={1}>
+                    {label}
+                </Text>
             )}
-            <Text
-                style={[
-                    styles.label,
-                    { color, fontWeight: isFocused ? '700' : '500' },
-                ]}
-            >
-                {label}
-            </Text>
         </Pressable>
     );
 });
 
+/**
+ * Floating white pill tab bar — active tab sits in a soft-green circle
+ * that springs between positions (reference design language).
+ */
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const { theme } = useTheme();
     const insets = useSafeAreaInsets();
     const colors = Colors[theme];
     const { width: windowWidth } = useWindowDimensions();
-
 
     // ─── Consolidated Route & Dimensions Selector ────────────────────────────
     const { visibleRoutes, tabWidth, FULL_WIDTH } = React.useMemo(() => {
@@ -119,22 +129,21 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     // ─── JSI-Powered UI-Thread Keyboard Height Tracking ────────────────────────
     const keyboard = useAnimatedKeyboard();
 
-    // ─── Active Route Tracking (for sliding indicator) ───────────────────────
+    // ─── Active Route Tracking (for sliding active circle) ───────────────────
     useEffect(() => {
         const activeIndex = visibleRoutes.findIndex(
             (route) => route.key === state.routes[state.index].key,
         );
         if (activeIndex !== -1 && tabWidth > 0) {
-            indicatorX.value = withTiming(activeIndex * tabWidth, {
-                duration: 250,
-            });
+            indicatorX.value = withSpring(
+                activeIndex * tabWidth + (tabWidth - ACTIVE_CIRCLE) / 2,
+                { damping: 16, stiffness: 220 },
+            );
         }
-    }, [state.index, tabWidth, visibleRoutes]);
+    }, [state.index, tabWidth, visibleRoutes, indicatorX]);
 
     // ─── UI-Thread Animated Styles ───────────────────────────────────────────
     const animatedContainerStyle = useAnimatedStyle(() => {
-        const slideDownY = 0; // Removed chat slide logic
-
         const keyboardY = interpolate(
             keyboard.height.value,
             [0, 100], // Start sliding down as keyboard opens
@@ -142,14 +151,12 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
             Extrapolate.CLAMP
         );
 
-        const combinedTranslateY = Math.max(slideDownY, keyboardY);
-
         return {
             transform: [
-                { translateY: combinedTranslateY }
+                { translateY: keyboardY }
             ],
             opacity: interpolate(
-                combinedTranslateY,
+                keyboardY,
                 [0, BAR_HEIGHT + insets.bottom + 30],
                 [1, 0],
                 Extrapolate.CLAMP
@@ -179,20 +186,6 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
         navigation.emit({ type: 'tabLongPress', target: routeKey });
     }, [navigation]);
 
-    const homeRoute = visibleRoutes[0];
-    const onHomePress = React.useCallback(() => {
-        if (!homeRoute) return;
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => { });
-        const event = navigation.emit({
-            type: 'tabPress',
-            target: homeRoute.key,
-            canPreventDefault: true,
-        });
-        if (!event.defaultPrevented) {
-            navigation.navigate(homeRoute.name, homeRoute.params);
-        }
-    }, [homeRoute, navigation]);
-
     const bottomPadding = isAndroid ? insets.bottom + 6 : insets.bottom + 8;
 
     return (
@@ -207,23 +200,20 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                 style={[
                     styles.container,
                     {
-                        backgroundColor: colors.primary,
+                        backgroundColor: colors.card,
                         width: FULL_WIDTH,
-                        borderRadius: isAndroid ? 29 : 30,
+                        borderRadius: BAR_HEIGHT / 2,
                     },
                     animatedContainerStyle,
                 ]}
                 pointerEvents="auto"
             >
-                {/* Sliding indicator */}
+                {/* Sliding active circle */}
                 {tabWidth > 0 && (
                     <Animated.View
                         style={[
                             styles.indicator,
-                            {
-                                width: tabWidth,
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            },
+                            { backgroundColor: colors.limeSoft },
                             animatedIndicatorStyle,
                         ]}
                     />
@@ -233,7 +223,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                 {visibleRoutes.map((route) => {
                     const { options } = descriptors[route.key];
                     const isFocused = state.routes[state.index].key === route.key;
-                    const color = isFocused ? colors.white : 'rgba(255, 255, 255, 0.6)';
+                    const color = isFocused ? colors.primary : colors.textSecondary;
 
                     return (
                         <TabItem
@@ -260,7 +250,7 @@ const styles = StyleSheet.create({
         right: 0,
         alignItems: 'center',
         backgroundColor: 'transparent',
-        zIndex: 999, // Ensure it floats above the chat content
+        zIndex: 999, // Ensure it floats above the content
     },
     container: {
         flexDirection: 'row',
@@ -271,10 +261,11 @@ const styles = StyleSheet.create({
     },
     indicator: {
         position: 'absolute',
-        top: 0,
         left: 0,
-        height: '100%',
-        borderRadius: isAndroid ? 29 : 30,
+        top: (BAR_HEIGHT - ACTIVE_CIRCLE) / 2,
+        width: ACTIVE_CIRCLE,
+        height: ACTIVE_CIRCLE,
+        borderRadius: ACTIVE_CIRCLE / 2,
     },
     tabItem: {
         flex: 1,
@@ -283,7 +274,13 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%',
     },
+    iconWrap: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     label: {
-        fontSize: 10,
+        fontSize: 9,
+        fontWeight: '600',
+        marginTop: 2,
     },
 });

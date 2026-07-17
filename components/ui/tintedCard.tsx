@@ -26,10 +26,7 @@ export const TintedCard = React.memo(({
     return (
         <View style={[
             styles.card,
-            {
-                backgroundColor: background || colors.card,
-                shadowColor: isDark ? 'transparent' : '#000',
-            },
+            { backgroundColor: background || colors.card },
             style
         ]}>
             <View style={styles.content}>
@@ -41,11 +38,8 @@ export const TintedCard = React.memo(({
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.cardBorderRadius,
         overflow: 'hidden',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
     },
     blob: {
         position: 'absolute',

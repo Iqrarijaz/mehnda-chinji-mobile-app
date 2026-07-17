@@ -317,7 +317,7 @@ const PlaceDetailScreen = () => {
                             onPress={() => reportModalRef.current?.present()}
                             activeOpacity={0.8}
                         >
-                            <Ionicons name="flag-outline" size={18} color="#EF4444" />
+                            <Ionicons name="flag-outline" size={18} color="#FF5A5F" />
                         </TouchableOpacity>
                         {isOwner && (
                             <TouchableOpacity
@@ -451,8 +451,8 @@ const PlaceDetailScreen = () => {
 
                             {place.timing && (
                                 <View style={styles.infoListItem}>
-                                    <View style={[styles.infoListIcon, { backgroundColor: '#F59E0B10' }]}>
-                                        <Ionicons name="time" size={12} color="#F59E0B" />
+                                    <View style={[styles.infoListIcon, { backgroundColor: '#F0803C10' }]}>
+                                        <Ionicons name="time" size={12} color="#F0803C" />
                                     </View>
                                     <View style={styles.infoListContent}>
                                         <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Operational Hours</ThemedText>

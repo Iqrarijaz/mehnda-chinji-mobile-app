@@ -84,10 +84,10 @@ export default function ReportsScreen() {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'PENDING': return '#F59E0B';
+            case 'PENDING': return '#F0803C';
             case 'REVIEWED': return '#3B82F6';
-            case 'RESOLVED': return '#10B981';
-            default: return '#64748B';
+            case 'RESOLVED': return '#7BC043';
+            default: return '#6B7B73';
         }
     };
 
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 10,
     },
     cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },

@@ -41,7 +41,7 @@ const NotificationHeader = React.memo(({
                         <View style={[styles.tooltipPill, { backgroundColor: theme === 'dark' ? '#1E293B' : '#FFFFFF' }]}>
                             <ThemedText style={styles.tooltipText}>← Swipe left to delete Notification</ThemedText>
                             <TouchableOpacity onPress={onCloseTooltip} style={styles.tooltipClose}>
-                                <Ionicons name="close-circle" size={18} color="#64748B" />
+                                <Ionicons name="close-circle" size={18} color="#6B7B73" />
                             </TouchableOpacity>
                         </View>
                     }
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 10,
         borderColor: 'rgba(0,0,0,0.05)',
         gap: 12,

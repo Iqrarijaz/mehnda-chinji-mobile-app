@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
         padding: 6,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
+        shadowOpacity: 0,
         shadowRadius: 12,
     },
     menuItem: {
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
         gap: 8,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0,
         shadowRadius: 4,
     },
     addBtnText: {
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
 
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0,
         shadowRadius: 5,
     },
     bannerContainer: {

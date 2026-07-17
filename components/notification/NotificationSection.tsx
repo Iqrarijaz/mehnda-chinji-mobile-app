@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#94A3B8',
+        color: '#8FA79E',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 10,

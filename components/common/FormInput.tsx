@@ -35,7 +35,7 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
     rightAccessory,
     ...rest
 }, ref) => {
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const colors = Colors[theme];
 
     const AnimatedView = delay > 0 ? Animated.View : View;
@@ -52,18 +52,18 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                         {label} {required && <ThemedText style={styles.required}>*</ThemedText>}
                     </ThemedText>
                     {showCharCount && maxLength && (
-                        <ThemedText style={[styles.charCount, isOverLimit ? { color: '#EF4444' } : { color: colors.icon }]}>
+                        <ThemedText style={[styles.charCount, isOverLimit ? { color: '#FF5A5F' } : { color: colors.icon }]}>
                             {valueLength}/{maxLength}
                         </ThemedText>
                     )}
                 </View>
             )}
-            <View 
+            <View
                 style={[
-                    styles.inputBox, 
-                    { 
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                        minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52)
+                    styles.inputBox,
+                    {
+                        backgroundColor: colors.field,
+                        minHeight: multiline ? 100 : (Platform.OS === 'android' ? 50 : 52)
                     },
                     multiline && { alignItems: 'flex-start', paddingVertical: 12 },
                     inputBoxStyle
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     required: {
-        color: '#EF4444',
+        color: '#FF5A5F',
     },
     charCount: {
         fontSize: 10,
@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 12,
-        paddingHorizontal: 14,
+        borderRadius: 16,
+        paddingHorizontal: 16,
     },
     textInput: {
         flex: 1,

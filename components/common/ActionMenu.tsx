@@ -40,7 +40,7 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
                     const isDestructive = action.destructive;
                     const textColor = isDestructive ? '#FFFFFF' : (action.color || colors.text);
                     const iconColor = isDestructive ? '#FFFFFF' : (action.color || colors.text);
-                    const bgColor = isDestructive ? '#EF4444' : 'rgba(128, 128, 128, 0.1)';
+                    const bgColor = isDestructive ? '#FF5A5F' : 'rgba(128, 128, 128, 0.1)';
 
                     return (
                         <MenuOption key={index} onSelect={action.onPress} style={{ marginBottom: index !== actions.length - 1 ? 1 : 0 }}>

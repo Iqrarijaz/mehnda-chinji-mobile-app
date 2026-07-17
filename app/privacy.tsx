@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.04,
+        shadowOpacity: 0,
         shadowRadius: 16,
     },
     cardHeader: {
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 12,
         lineHeight: 18,
-        color: '#64748B',
+        color: '#6B7B73',
     },
     divider: {
         height: 1,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     bodyText: {
         fontSize: 11,
         lineHeight: 18,
-        color: '#475569',
+        color: '#4F5F57',
     },
 
     // Sticky Footer
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 12,
         paddingHorizontal: 20,
         paddingTop: 16,
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     acceptButtonText: {
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     modalBody: {
         fontSize: 11,
         lineHeight: 18,
-        color: '#475569',
+        color: '#4F5F57',
         textAlign: 'center',
         marginBottom: 24,
     },

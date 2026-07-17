@@ -20,7 +20,7 @@ const SkimBox = React.memo(({ w, h, radius = 8 }: { w: number | string; h: numbe
     const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
     return (
         <Animated.View
-            style={[{ width: w as any, height: h, borderRadius: radius, backgroundColor: '#E2E8F0' }, style]}
+            style={[{ width: w as any, height: h, borderRadius: radius, backgroundColor: '#ECECEC' }, style]}
         />
     );
 });
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 8,
     },
     lines: { flex: 1, marginLeft: 14 },

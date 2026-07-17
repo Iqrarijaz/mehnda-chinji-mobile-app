@@ -4,7 +4,7 @@ import Animated, { SlideInLeft, useAnimatedStyle, withSpring } from 'react-nativ
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 
-const PRIMARY = '#006666';
+const PRIMARY = '#003D36';
 
 const FILTERS = [
     { label: 'All', value: 'ALL' },
@@ -68,10 +68,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 6,
     },
     chipActive: { backgroundColor: PRIMARY },
-    label: { fontSize: 11, fontWeight: '600', color: '#64748B' },
+    label: { fontSize: 11, fontWeight: '600', color: '#6B7B73' },
     labelActive: { color: '#FFFFFF', fontWeight: '700' },
 });

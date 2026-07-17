@@ -49,7 +49,7 @@ export default WeatherHourly;
 const styles = StyleSheet.create({
     wrapper: {
         borderRadius: Layout.borderRadius, padding: 18, marginBottom: 14,
-        shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12,
+        shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0, shadowRadius: 12,
     },
     title: { fontSize: 14, fontWeight: '700', letterSpacing: 0.3, marginBottom: 14 },
     scroll: { gap: 10, paddingBottom: 4 },

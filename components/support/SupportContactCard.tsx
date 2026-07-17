@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         padding: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0,
         shadowRadius: 12,
     },
     iconContainer: {
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 12,
-        color: '#64748B',
+        color: '#6B7B73',
         marginBottom: 4,
     },
     value: {

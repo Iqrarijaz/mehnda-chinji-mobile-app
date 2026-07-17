@@ -104,12 +104,12 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
 
     const getStatusColor = (status: string) => {
         switch (status?.toLowerCase()) {
-            case 'sold': return '#EF4444';
-            case 'pending': return '#F59E0B';
+            case 'sold': return '#FF5A5F';
+            case 'pending': return '#F0803C';
             case 'offline': return '#6B7280';
             case 'live':
             default:
-                return '#10B981';
+                return '#7BC043';
         }
     };
 
@@ -132,7 +132,7 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
 
     const actions = React.useMemo(() => {
         const baseActions: ActionMenuItem[] = [
-            { label: 'Delete', icon: 'trash-outline', color: '#EF4444', onPress: confirmDelete, destructive: true }
+            { label: 'Delete', icon: 'trash-outline', color: '#FF5A5F', onPress: confirmDelete, destructive: true }
         ];
         if (item.status !== 'sold') {
             if (item.status === 'live') {
@@ -143,7 +143,7 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
 
             baseActions.unshift(
                 { label: 'Edit Listing', icon: 'create-outline', onPress: () => onEdit?.(item) },
-                { label: 'Mark Sold', icon: 'checkmark-circle-outline', color: '#10B981', onPress: confirmMarkSold }
+                { label: 'Mark Sold', icon: 'checkmark-circle-outline', color: '#7BC043', onPress: confirmMarkSold }
             );
         }
         return baseActions;
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     negotiableText: {
-        color: '#10B981',
+        color: '#7BC043',
         fontSize: 10,
         fontWeight: '700',
     },

@@ -68,14 +68,14 @@ export const AppUpdateModal = ({
                             {isMandatory ? "Update Required" : "New Version Available"}
                         </ThemedText>
 
-                        <ThemedText style={[styles.subtitle, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
+                        <ThemedText style={[styles.subtitle, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#6B7B73' }]}>
                             A new version {latestVersion} is available. {isMandatory ? "Please update to continue using the app." : "Would you like to update now?"}
                         </ThemedText>
 
                         {releaseNotes ? (
                             <View style={[styles.notesContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC' }]}>
                                 <ThemedText style={styles.notesTitle}>What's New:</ThemedText>
-                                <ThemedText style={[styles.notesText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#475569' }]}>
+                                <ThemedText style={[styles.notesText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#4F5F57' }]}>
                                     {releaseNotes}
                                 </ThemedText>
                             </View>

@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
         paddingBottom: isAndroid ? 24 : 36,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -10 },
-        shadowOpacity: 0.15,
+        shadowOpacity: 0,
         shadowRadius: 24,
     },
     sheetCentered: {

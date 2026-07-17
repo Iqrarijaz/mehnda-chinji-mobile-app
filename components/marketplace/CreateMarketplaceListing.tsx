@@ -517,7 +517,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                                 <View key={imgUrl} style={styles.imageThumbnailContainer}>
                                     <Image source={{ uri: imgUrl }} style={styles.imageThumbnail} />
                                     <TouchableOpacity style={styles.removeImageBtn} onPress={() => removeImage(idx)}>
-                                        <Ionicons name="close-circle" size={30} color="#EF4444" />
+                                        <Ionicons name="close-circle" size={30} color="#FF5A5F" />
                                     </TouchableOpacity>
                                 </View>
                             ))}
@@ -668,7 +668,7 @@ const styles = StyleSheet.create({
         marginLeft: 2,
     },
     required: {
-        color: '#EF4444',
+        color: '#FF5A5F',
     },
     row: {
         flexDirection: 'row',

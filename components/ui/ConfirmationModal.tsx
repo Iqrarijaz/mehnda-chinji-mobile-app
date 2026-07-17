@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(0, 0, 0, 0.08)',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0,
         shadowRadius: 20,
     },
     header: {

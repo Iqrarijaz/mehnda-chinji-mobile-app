@@ -380,7 +380,7 @@ export default function ProfileScreen() {
 
                             {/* Why complete profile? */}
                             <View style={styles.infoTip}>
-                                <Ionicons name="information-circle-outline" size={16} color="#64748B" />
+                                <Ionicons name="information-circle-outline" size={16} color="#6B7B73" />
                                 <ThemedText style={styles.infoText}>A complete profile helps other community members find you more easily.</ThemedText>
                             </View>
 
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
         marginLeft: 2,
     },
     required: {
-        color: '#EF4444',
+        color: '#FF5A5F',
     },
     charCount: {
         fontSize: 10,
@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
     genderText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#64748B',
+        color: '#6B7B73',
     },
     infoTip: {
         flexDirection: 'row',
@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
     },
     infoText: {
         fontSize: 11,
-        color: '#64748B',
+        color: '#6B7B73',
         flex: 1,
         lineHeight: 18,
     },
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         shadowColor: '#0D9488',
         shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.25,
+        shadowOpacity: 0,
         shadowRadius: 10,
     },
     buttonContent: {

@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
         width: 14,
         height: 14,
         borderRadius: 7,
-        backgroundColor: '#10B981',
+        backgroundColor: '#7BC043',
     },
     headerTextWrap: {
         alignItems: 'center',

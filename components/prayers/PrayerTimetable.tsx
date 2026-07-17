@@ -49,7 +49,7 @@ const getPrayerTheme = (name: string, isDark: boolean = false) => {
         case 'isha':
             return { bg: isDark ? '#12102A' : '#EAEAF6', accent: isDark ? '#8E44AD' : '#512DA8', icon: '🌌' };
         default:
-            return { bg: isDark ? '#1E293B' : '#F0FDF4', accent: isDark ? '#004D4D' : '#047857', icon: 'time' };
+            return { bg: isDark ? '#1E293B' : '#F0FDF4', accent: isDark ? '#0C4F47' : '#047857', icon: 'time' };
     }
 };
 

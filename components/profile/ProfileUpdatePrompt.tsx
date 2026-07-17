@@ -47,7 +47,7 @@ export const ProfileUpdatePrompt = React.memo(({
                     />
                 </View>
 
-                <ThemedText style={[styles.description, { color: isDark ? '#94A3B8' : '#64748B', textAlign: 'center' }]}>
+                <ThemedText style={[styles.description, { color: isDark ? '#8FA79E' : '#6B7B73', textAlign: 'center' }]}>
                     Please set your phone number, city, and village in your profile for a better experience.
                 </ThemedText>
 
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 48 : 52,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: '#E2E8F0',
+        borderColor: '#ECECEC',
         borderRadius: Layout.borderRadius,
     },
     cancelText: {

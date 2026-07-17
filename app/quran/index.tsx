@@ -180,7 +180,7 @@ export default function QuranListScreen() {
                                 {tab === 'favourites' && favourites.size > 0 && (
                                     <View style={[
                                         styles.favBadge,
-                                        { backgroundColor: isActive ? '#ffffff' : '#EF4444' }
+                                        { backgroundColor: isActive ? '#ffffff' : '#FF5A5F' }
                                     ]}>
                                         <ThemedText style={[
                                             styles.favBadgeText,
@@ -204,7 +204,7 @@ export default function QuranListScreen() {
                 </View>
             ) : isError ? (
                 <View style={styles.errorContainer}>
-                    <Ionicons name="warning-outline" size={48} color="#EF4444" />
+                    <Ionicons name="warning-outline" size={48} color="#FF5A5F" />
                     <ThemedText style={styles.errorText}>Unable to load Surah list</ThemedText>
                     <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => refetch()}>
                         <ThemedText style={{ color: '#fff', fontWeight: 'bold' }}>Retry</ThemedText>
