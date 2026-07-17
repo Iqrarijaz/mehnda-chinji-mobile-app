@@ -1,16 +1,14 @@
 import { ThemedText } from '@/components/ThemedText';
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
 import {
     KeyboardAvoidingView,
-    Platform,
     ScrollView,
     StyleSheet,
     View
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
-import { Layout } from '../../constants/layout';
 import { useTheme } from '../../context/ThemeContext';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { Ionicons } from '@expo/vector-icons';
@@ -34,31 +32,36 @@ export default function LoginScreen() {
     return (
         <KeyboardAvoidingView
             behavior="padding"
-            style={[styles.container, { backgroundColor: colors.background }]}
+            style={styles.container}
         >
-            {/* Header / Top Section */}
-            <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#003D36', zIndex: 1 }]}>
-                    <View style={styles.headerContent}>
-                        <Image
-                            source={require('../../public/white_logo.svg')}
-                            style={{ width: 200, height: 50, marginBottom: 12 }}
-                            contentFit="contain"
-                        />
-                        <ThemedText style={styles.headerTitle}>Sign in to your Account</ThemedText>
-                        <ThemedText style={styles.headerSubtitle}>Welcome back! Please enter your details</ThemedText>
-                    </View>
-                </View>
-            </View>
-
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                style={{ flex: 1, backgroundColor: colors.background }}
-                contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.background }}
+                style={styles.flex}
+                contentContainerStyle={styles.scroll}
                 bounces={false}
                 keyboardShouldPersistTaps="handled"
             >
-                <LoginForm />
+                {/* ── Forest hero with brand lockup ─────────────────────── */}
+                <View style={[styles.hero, { paddingTop: insets.top + 32 }]}>
+                    <Image
+                        source={require('../../public/white_logo.png')}
+                        style={styles.brandLogo}
+                        contentFit="contain"
+                    />
+                </View>
+
+                {/* ── Rounded content sheet ─────────────────────────────── */}
+                <Animated.View
+                    entering={FadeInDown.duration(450)}
+                    style={[styles.sheet, { backgroundColor: colors.background, paddingBottom: insets.bottom + 32 }]}
+                >
+                    <ThemedText style={[styles.heading, { color: colors.text }]}>Welcome back</ThemedText>
+                    <ThemedText style={[styles.subheading, { color: colors.textSecondary }]}>
+                        Sign in to your account to continue
+                    </ThemedText>
+
+                    <LoginForm />
+                </Animated.View>
             </ScrollView>
 
             {/* Session Expired Modal */}
@@ -95,32 +98,43 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#003D36',
     },
-    headerSection: {
-        paddingBottom: 38,
-        borderBottomLeftRadius: Layout.headerBorderRadius,
-        borderBottomRightRadius: Layout.headerBorderRadius,
-        overflow: 'hidden',
+    flex: {
+        flex: 1,
     },
-    headerContent: {
+    scroll: {
+        flexGrow: 1,
+    },
+    hero: {
+        alignItems: 'center',
+        paddingBottom: 36,
+        paddingHorizontal: 24,
+    },
+    brandLogo: {
+        width: 210,
+        height: 52,
+    },
+    sheet: {
+        flexGrow: 1,
+        borderTopLeftRadius: 36,
+        borderTopRightRadius: 36,
         paddingHorizontal: 22,
-        paddingTop: 38,
+        paddingTop: 30,
     },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: '800',
-        color: '#FFFFFF',
-        lineHeight: 40,
-        marginBottom: 4,
+    heading: {
+        fontSize: 26,
+        fontWeight: '900',
+        letterSpacing: -0.4,
     },
-    headerSubtitle: {
-        fontSize: 15,
-        color: 'rgba(255, 255, 255, 0.9)',
-        lineHeight: 22,
+    subheading: {
+        fontSize: 14.5,
+        marginTop: 4,
+        marginBottom: 8,
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: 'rgba(0,20,15,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 24,
@@ -143,7 +157,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#0F172A',
+        color: '#0C2B26',
         marginBottom: 12,
         textAlign: 'center',
     },
