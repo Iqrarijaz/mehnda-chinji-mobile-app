@@ -123,16 +123,18 @@ export const HeaderIconBtn = React.memo(function HeaderIconBtn({
     style,
     size = 20,
     badge,
+    iconColor = '#FFFFFF',
 }: {
     name: keyof typeof Ionicons.glyphMap;
     onPress: () => void;
     style?: ViewStyle;
     size?: number;
     badge?: React.ReactNode;
+    iconColor?: string;
 }) {
     return (
         <TouchableOpacity onPress={onPress} style={[styles.iconBtn, { marginRight: 12 }, style]}>
-            <Ionicons name={name} size={size} color="#FFFFFF" />
+            <Ionicons name={name} size={size} color={iconColor} />
             {badge}
         </TouchableOpacity>
     );

@@ -69,12 +69,12 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F8FAF8",
-          "image": "./public/logo_with_text.png",
-          "imageWidth": 220,
+          "backgroundColor": "#003D36",
+          "image": "./public/white_logo.png",
+          "imageWidth": 240,
           "dark": {
-            "image": "./public/logo_with_text.png",
-            "backgroundColor": "#0F172A"
+            "image": "./public/white_logo.png",
+            "backgroundColor": "#003D36"
           }
         }
       ],

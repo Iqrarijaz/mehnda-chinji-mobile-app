@@ -249,12 +249,14 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                     <HeaderIconBtn
                         name="add"
                         size={22}
+                        iconColor={colors.primary}
+                        style={{ backgroundColor: '#FFFFFF' }}
                         onPress={() => router.push('/listing/create')}
                     />
                 }
             >
                 {/* Search Bar & filters */}
-                <View style={styles.searchSection}>
+                <Animated.View entering={FadeInDown.delay(60).duration(320)} style={styles.searchSection}>
                     <View style={styles.searchRow}>
                         <SearchBar
                             value={searchQuery}
@@ -292,20 +294,22 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             <Ionicons name="list-outline" size={20} color="#FFFFFF" />
                         </TouchableOpacity>
                     </View>
-                </View>
+                </Animated.View>
             </ScreenHeader>
 
             {/* Category Filter Tabs */}
             {!isMineTab && (
-                <PillsList
+                <Animated.View entering={FadeInDown.delay(140).duration(320)}>
+                    <PillsList
                     data={tabs}
                     selectedId={selectedCategories.length === 0 ? selectedTab : ''}
-                    onSelect={(id) => {
-                        setSelectedTab(id);
-                        setSelectedCategories([]);
-                        setSelectedItems([]);
-                    }}
-                />
+                        onSelect={(id) => {
+                            setSelectedTab(id);
+                            setSelectedCategories([]);
+                            setSelectedItems([]);
+                        }}
+                    />
+                </Animated.View>
             )}
 
             {/* Active multi-filter indicators row */}
