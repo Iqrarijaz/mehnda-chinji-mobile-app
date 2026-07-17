@@ -224,7 +224,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
 
     return (
         <View style={styles.formContainer}>
-            <View style={[styles.formCard, { backgroundColor: colors.card }]}>
+            <View style={styles.formCard}>
                 {/* Full Name */}
                 <View style={styles.inputField}>
                     <FormInput
@@ -496,14 +496,10 @@ export const RegisterForm = React.memo(function RegisterForm() {
 
 const styles = StyleSheet.create({
     formContainer: {
-        paddingHorizontal: 20,
-        paddingTop: 32,
-        paddingBottom: 40,
+        paddingTop: 16,
+        paddingBottom: 12,
     },
-    formCard: {
-        borderRadius: Layout.cardBorderRadius,
-        padding: 20,
-    },
+    formCard: {},
     inputField: {
         marginBottom: 20,
     },

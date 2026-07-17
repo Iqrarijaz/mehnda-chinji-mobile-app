@@ -220,7 +220,7 @@ export const LoginForm = React.memo(function LoginForm() {
         <View style={styles.formContainer}>
             <Animated.View
                 entering={FadeInDown.delay(80).duration(300)}
-                style={[styles.formCard, { backgroundColor: colors.card }]}
+                style={styles.formCard}
             >
                 {/* Email/Phone Input */}
                 <View style={styles.inputField}>
@@ -334,7 +334,7 @@ export const LoginForm = React.memo(function LoginForm() {
                 {/* Footer */}
                 <View style={styles.footer}>
                     <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#6B7B73' }]}>
-                        Don't have an account?{' '}
+                        Don&apos;t have an account?{' '}
                     </ThemedText>
                     <TouchableOpacity onPress={() => router.push('/(auth)/register' as any)}>
                         <ThemedText style={[styles.footerLink, { color: isDark ? colors.text : colors.primary }]}>Sign Up</ThemedText>
@@ -348,14 +348,10 @@ export const LoginForm = React.memo(function LoginForm() {
 
 const styles = StyleSheet.create({
     formContainer: {
-        paddingHorizontal: 18,
-        paddingTop: 30,
-        paddingBottom: 40,
+        paddingTop: 16,
+        paddingBottom: 12,
     },
-    formCard: {
-        borderRadius: Layout.cardBorderRadius,
-        padding: 20,
-    },
+    formCard: {},
     inputField: {
         marginBottom: 20,
     },

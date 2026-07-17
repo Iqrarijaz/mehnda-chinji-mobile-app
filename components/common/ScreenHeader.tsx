@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.14)',
+        backgroundColor: '#0C4F47', // forestLight — dairy-style header buttons
         justifyContent: 'center',
         alignItems: 'center',
     },
