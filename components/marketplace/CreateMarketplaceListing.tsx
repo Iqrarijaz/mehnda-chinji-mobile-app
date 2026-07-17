@@ -83,6 +83,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
         city: '',
         village: '',
         showPhoneNumber: true,
+        phone: '',
         description: '',
         images: [] as string[],
         model: '',
@@ -101,6 +102,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     const handleNegotiableToggle = React.useCallback((val: boolean) => updateForm('negotiable', val), [updateForm]);
     const handleCitySelect = React.useCallback((city: string) => updateForm('city', city), [updateForm]);
     const handleVillageSelect = React.useCallback((village: string) => updateForm('village', village), [updateForm]);
+    const handlePhoneChange = React.useCallback((val: string) => updateForm('phone', val.replace(/[^0-9]/g, '')), [updateForm]);
 
     const [isPickerVisible, setIsPickerVisible] = useState(false);
     const [isUploadingImages, setIsUploadingImages] = useState(false);
@@ -119,6 +121,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 city: listingToEdit.city || '',
                 village: listingToEdit.village || '',
                 showPhoneNumber: listingToEdit.showPhoneNumber !== false,
+                phone: listingToEdit.sellerPhone || user?.user?.phone || '',
                 description: listingToEdit.description || '',
                 images: Array.isArray(listingToEdit.images)
                     ? [...listingToEdit.images]
@@ -139,13 +142,14 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 city: '',
                 village: '',
                 showPhoneNumber: true,
+                phone: user?.user?.phone || '',
                 description: '',
                 images: [],
                 model: '',
                 year: ''
             });
         }
-    }, [visible, listingToEdit]);
+    }, [visible, listingToEdit, user]);
 
     const pickImages = async () => {
         if (formData.images.length >= 5) {
@@ -243,16 +247,16 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     });
 
     const handleSubmit = async () => {
-        const { title, price, city, village, categoryEn, typeEn, description, images, negotiable, showPhoneNumber, categoryUr, typeUr, model, year } = formData;
-        const sellerPhone = user?.user?.phone || '';
+        const { title, price, city, village, categoryEn, typeEn, description, images, negotiable, showPhoneNumber, categoryUr, typeUr, model, year, phone } = formData;
+        const sellerPhone = phone || user?.user?.phone || '';
 
-        if (!title.trim() || !price.trim() || !city.trim() || !village.trim() || !categoryEn || !typeEn || !description.trim()) {
+        if (!title.trim() || !price.trim() || !city.trim() || !village.trim() || !categoryEn || !typeEn || !description.trim() || !sellerPhone.trim()) {
             Toast.show({ type: 'error', text1: 'Validation Error', text2: 'Please fill all required fields.' });
             return;
         }
 
         if (!sellerPhone || sellerPhone.length !== 11 || !sellerPhone.startsWith('03')) {
-            Toast.show({ type: 'error', text1: 'Validation Error', text2: 'Valid phone number required from profile.' });
+            Toast.show({ type: 'error', text1: 'Validation Error', text2: 'Valid phone number required.' });
             return;
         }
 
@@ -415,6 +419,20 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             placeholder="Select Village"
                             value={formData.village}
                             onPress={() => setVillagePickerVisible(true)}
+                        />
+                    </Animated.View>
+
+                    {/* Phone Number */}
+                    <Animated.View entering={FadeInDown.delay(280)} style={styles.inputField}>
+                        <FormInput
+                            label="MOBILE NUMBER"
+                            required
+                            icon="call-outline"
+                            keyboardType="phone-pad"
+                            placeholder="e.g. 03001234567"
+                            value={formData.phone}
+                            onChangeText={handlePhoneChange}
+                            maxLength={11}
                         />
                     </Animated.View>
 

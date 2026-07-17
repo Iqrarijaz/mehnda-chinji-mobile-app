@@ -1,7 +1,7 @@
 import React, { useState, useCallback, memo, useRef, useEffect, useMemo } from 'react';
 import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { Stack, useFocusEffect, useRouter } from 'expo-router';
+import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -67,6 +67,14 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
     const [selectedTab, setSelectedTab] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
+
+    const params = useLocalSearchParams();
+    
+    useEffect(() => {
+        if (params.tab === 'mine') {
+            setSelectedTab('mine');
+        }
+    }, [params.tab]);
 
     // Multi-select filters states
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);

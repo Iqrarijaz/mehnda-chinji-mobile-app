@@ -12,7 +12,7 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { getUserReports, updateReport, deleteReport, ReportPayload } from '@/apis/report';
 import Toast from 'react-native-toast-message';
-import { format } from 'date-fns';
+import dayjs from '@/utils/dayjs';
 
 export default function ReportsScreen() {
     const router = useRouter();
@@ -183,7 +183,7 @@ export default function ReportsScreen() {
 
                                 <View style={[styles.cardFooter, { borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
                                     <ThemedText style={[styles.dateText, { color: colors.icon }]}>
-                                        {format(new Date(report.createdAt), 'MMM dd, yyyy • hh:mm a')}
+                                        {dayjs(report.createdAt).format('MMM DD, YYYY • hh:mm A')}
                                     </ThemedText>
                                     {actions.length > 0 && (
                                         <View style={{ position: 'relative' }}>

@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import moment from '@/utils/dayjs';
 
 /**
@@ -53,8 +52,8 @@ export const formatRelativeTime = (date: Date | string | number): string => {
     // Older than 2 days - show actual date
     // If same year, omit year, otherwise show year
     if (d.getFullYear() === now.getFullYear()) {
-        return format(d, 'MMM d, h:mm a');
+        return moment(d).format('MMM D, h:mm A');
     }
 
-    return format(d, 'MMM d, yyyy');
+    return moment(d).format('MMM D, YYYY');
 };
