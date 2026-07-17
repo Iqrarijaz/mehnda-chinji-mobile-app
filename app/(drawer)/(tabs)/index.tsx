@@ -5,7 +5,7 @@ import { GlobalSearchOverlay } from '@/components/common/GlobalSearchOverlay';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { UtilsGrid } from '@/components/home/UtilsGrid';
 import { HomeHeader } from '@/components/home/HomeHeader';
-import { PasswordModal } from '@/components/setting/PasswordModal';
+import { PasswordModal } from '@/components/setting/passwordModal';
 import BannerAd from '@/ads/components/BannerAd';
 import { ThemedView } from '@/components/ThemedView';
 import { ScrollView } from 'react-native-gesture-handler';

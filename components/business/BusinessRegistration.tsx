@@ -26,7 +26,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { CleanConfirmationModal } from '../common/CleanConfirmationModal';
 
-import MyRegisteredBusinessCard from './MyRegisteredBusinessCard';
+import MyRegisteredBusinessCard from './myRegisteredBusinessCard';
 
 const BusinessRegistration = React.memo(() => {
     const { user } = useAuth();
