@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
+import { View, StyleSheet, ViewStyle } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { ThemedText } from '@/components/ThemedText';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 
@@ -36,25 +37,30 @@ export const PillsList = React.memo(function PillsList({
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 data={data}
+                extraData={selectedId}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => {
                     const isActive = selectedId === item.id;
                     return (
-                        <TouchableOpacity
+                        <PressableScale
+                            intensity={0.06}
+                            onPress={() => onSelect(item.id)}
+                            containerStyle={styles.tabWrap}
                             style={[
                                 styles.tab,
-                                { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)' },
-                                isActive && { backgroundColor: resolvedActiveColor }
+                                { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' },
+                                isActive && { backgroundColor: resolvedActiveColor },
                             ]}
-                            onPress={() => onSelect(item.id)}
                         >
+                            {isActive && <View style={[styles.activeDot, { backgroundColor: colors.lime }]} />}
                             <ThemedText style={[
                                 styles.tabText,
-                                { color: isActive ? '#FFF' : colors.textSecondary }
+                                { color: isActive ? '#FFF' : colors.textSecondary },
+                                isActive && styles.tabTextActive,
                             ]}>
                                 {item.label}
                             </ThemedText>
-                        </TouchableOpacity>
+                        </PressableScale>
                     );
                 }}
                 contentContainerStyle={styles.tabsList}
@@ -70,16 +76,29 @@ const styles = StyleSheet.create({
     tabsList: {
         paddingHorizontal: 12,
     },
-    tab: {
-        paddingHorizontal: 24,
-        paddingVertical: 6,
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
+    tabWrap: {
         marginRight: 8,
+    },
+    tab: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingHorizontal: 18,
+        paddingVertical: 7,
+        borderRadius: 999,
+        justifyContent: 'center',
+    },
+    activeDot: {
+        width: 5,
+        height: 5,
+        borderRadius: 2.5,
     },
     tabText: {
         fontSize: 12,
         fontWeight: '700',
+    },
+    tabTextActive: {
+        fontWeight: '800',
+        letterSpacing: 0.2,
     },
 });

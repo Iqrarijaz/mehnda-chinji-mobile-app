@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Platform,
     StyleSheet,
@@ -8,6 +8,11 @@ import {
     View,
     ViewStyle,
 } from 'react-native';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+} from 'react-native-reanimated';
 
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -46,15 +51,41 @@ export function SearchBar({
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    const inner = (
-        <View
+    // Focus gives the bar a gentle lift: a small spring scale plus a
+    // primary-tinted search icon.
+    const [focused, setFocused] = useState(false);
+    const focus = useSharedValue(0);
+
+    const focusStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: 1 + focus.value * 0.015 }],
+    }));
+
+    const handleFocus = () => {
+        setFocused(true);
+        focus.value = withSpring(1, { damping: 18, stiffness: 220 });
+        onFocus?.();
+    };
+    const handleBlur = () => {
+        setFocused(false);
+        focus.value = withSpring(0, { damping: 18, stiffness: 220 });
+        onBlur?.();
+    };
+
+    const inner = (applyOuterStyle: boolean) => (
+        <Animated.View
             style={[
                 styles.container,
-                { backgroundColor: colors.card, borderColor: colors.border },
-                style,
+                { backgroundColor: colors.card },
+                applyOuterStyle ? style : null,
+                focusStyle,
             ]}
         >
-            <Ionicons name="search" size={20} color="#94A3B8" style={styles.icon} />
+            <Ionicons
+                name="search"
+                size={20}
+                color={focused ? colors.primary : '#94A3B8'}
+                style={styles.icon}
+            />
             <TextInput
                 ref={inputRef}
                 style={[styles.input, { color: colors.text }]}
@@ -64,51 +95,26 @@ export function SearchBar({
                 onChangeText={onChangeText}
                 returnKeyType={returnKeyType}
                 clearButtonMode="while-editing"
-                onFocus={onFocus}
-                onBlur={onBlur}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
             />
             {rightAction && (
                 <View style={styles.rightAction}>
                     {rightAction}
                 </View>
             )}
-        </View>
+        </Animated.View>
     );
 
     if (onPress) {
         return (
             <TouchableOpacity activeOpacity={1} onPress={onPress} style={style}>
-                {/* Re-render inner without outer style to avoid double apply */}
-                <View
-                    style={[
-                        styles.container,
-                        { backgroundColor: colors.card, borderColor: colors.border },
-                    ]}
-                >
-                    <Ionicons name="search" size={20} color="#94A3B8" style={styles.icon} />
-                    <TextInput
-                        ref={inputRef}
-                        style={[styles.input, { color: colors.text }]}
-                        placeholder={placeholder}
-                        placeholderTextColor="#94A3B8"
-                        value={value}
-                        onChangeText={onChangeText}
-                        returnKeyType={returnKeyType}
-                        clearButtonMode="while-editing"
-                        onFocus={onFocus}
-                        onBlur={onBlur}
-                    />
-                    {rightAction && (
-                        <View style={styles.rightAction}>
-                            {rightAction}
-                        </View>
-                    )}
-                </View>
+                {inner(false)}
             </TouchableOpacity>
         );
     }
 
-    return inner;
+    return inner(true);
 }
 
 const styles = StyleSheet.create({
@@ -130,10 +136,7 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     rightAction: {
-        marginLeft: 8,
-        paddingLeft: 10,
-        borderLeftWidth: 1,
-        borderLeftColor: '#E2E8F0',
+        marginLeft: 10,
         justifyContent: 'center',
     },
 });

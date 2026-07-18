@@ -1,20 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import {
-    StyleSheet,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import { ThemedText } from '@/components/ThemedText';
+import { ListingCard } from '@/components/listing/ListingCard';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { ListingCard } from '@/components/listing/ListingCard';
 
 interface Contact {
     name: string;
@@ -41,6 +38,7 @@ interface PlaceData {
     contact?: Contact[];
     images?: string[];
     type?: string;
+    route?: { city: string; time: string }[];
     createdBy?: string | { _id: string };
 }
 
@@ -49,18 +47,18 @@ interface PlaceCardProps {
     category: string;
     color?: string;
     onReport?: () => void;
+    /** List position, used only to stagger the entrance animation. */
+    index?: number;
 }
 
-const PlaceCard = React.memo(({ data, category, color, onReport }: PlaceCardProps) => {
+const TILE_SIZE = 84;
+
+const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardProps) => {
     const { theme } = useTheme();
-    const isDark = theme === 'dark';
     const colors = Colors[theme];
     const router = useRouter();
 
     const primaryColor = color || colors.primary;
-
-    const primaryAlpha10 = primaryColor + '1A';
-    const primaryAlpha20 = primaryColor + '33';
 
     const { data: essentialsConfig } = useQuery({
         queryKey: ['configuration', 'ESSENTIALS_ICONS'],
@@ -107,79 +105,80 @@ const PlaceCard = React.memo(({ data, category, color, onReport }: PlaceCardProp
     const typeLabel = typeConfig?.label || capitalize(data.type || '');
     const defaultIcon = categoryConfig?.icon || 'business';
 
+    const isTravel = category?.toLowerCase() === 'travel';
+    const route = Array.isArray(data.route) ? data.route : [];
+    const routePreview =
+        isTravel && route.length > 0
+            ? route.length > 1
+                ? `${capitalize(route[0]?.city)}  →  ${capitalize(route[route.length - 1]?.city)}`
+                : capitalize(route[0]?.city)
+            : '';
+
     return (
-        <TouchableOpacity
-            activeOpacity={0.92}
-            onPress={() => router.push({
-                pathname: '/place/[id]',
-                params: {
-                    id: data._id,
-                    placeData: JSON.stringify(data),
-                    color: primaryColor,
-                    category: capitalize(category)
-                }
-            })}
-        >
-            <ListingCard>
-                {/* Hero */}
-                <View style={styles.heroSection}>
-                    {placeImage ? (
-                        <Image
-                            source={{ uri: placeImage }}
-                            style={styles.heroImage}
-                            contentFit="cover"
-                            transition={400}
-                        />
-                    ) : (
-                        <LinearGradient
-                            colors={[
-                                isDark ? '#0F1420' : primaryAlpha10,
-                                isDark ? '#1A2035' : '#F8FAFF',
-                            ]}
-                            style={styles.placeholderContainer}
-                        >
-                            <View style={[styles.ring, styles.ringOuter, { borderColor: primaryAlpha20 }]} />
-                            <View style={[styles.ring, styles.ringInner, { borderColor: primaryAlpha20 }]} />
-                            <View style={[styles.iconCircle, { backgroundColor: primaryAlpha20 }]}>
-                                <Ionicons name={defaultIcon as any} size={28} color={primaryColor} />
+        <Animated.View entering={FadeInDown.delay(Math.min(index, 6) * 55).duration(350)}>
+            <PressableScale
+                intensity={0.02}
+                onPress={() => router.push({
+                    pathname: '/place/[id]',
+                    params: {
+                        id: data._id,
+                        placeData: JSON.stringify(data),
+                        color: primaryColor,
+                        category: capitalize(category)
+                    }
+                })}
+            >
+                <ListingCard style={styles.card}>
+                    <View style={styles.row}>
+                        {/* Image / icon tile */}
+                        {placeImage ? (
+                            <Image
+                                source={{ uri: placeImage }}
+                                style={styles.tile}
+                                contentFit="cover"
+                                transition={300}
+                            />
+                        ) : (
+                            <View style={[styles.tile, styles.tilePlaceholder, { backgroundColor: `${primaryColor}0D` }]}>
+                                <View style={[styles.tileHalo, { backgroundColor: `${primaryColor}14` }]} />
+                                <View style={[styles.tileIconCircle, { backgroundColor: `${primaryColor}1F` }]}>
+                                    <Ionicons name={defaultIcon as any} size={24} color={primaryColor} />
+                                </View>
                             </View>
-                        </LinearGradient>
-                    )}
+                        )}
 
-                    <LinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.55)']}
-                        style={[StyleSheet.absoluteFillObject, styles.bottomFade]}
-                    />
-
-                    {typeLabel ? (
-                        <View style={[styles.typePill, { backgroundColor: colors.secondary }]}>
-                            <Ionicons name="ribbon" size={9} color="#fff" style={{ marginRight: 3 }} />
-                            <ThemedText style={styles.typePillText}>{typeLabel}</ThemedText>
-                        </View>
-                    ) : null}
-                </View>
-
-                {/* Content */}
-                <View style={[styles.contentSection, { backgroundColor: colors.card }]}>
-                    <ThemedText style={[styles.placeName, { color: colors.text }]} numberOfLines={2}>
-                        {placeName}
-                    </ThemedText>
-
-
-
-                    {category?.toLowerCase() !== 'travel' && (
-                        <View style={styles.locationRow}>
-                            <View style={[styles.locationIconWrap, { backgroundColor: primaryAlpha10 }]}>
-                                <Ionicons name="location" size={13} color={primaryColor} />
-                            </View>
-                            <ThemedText style={[styles.locationText, { color: colors.icon }]} numberOfLines={2}>
-                                {address}
+                        {/* Info */}
+                        <View style={styles.info}>
+                            {typeLabel ? (
+                                <View style={[styles.typeChip, { backgroundColor: `${colors.lime}20` }]}>
+                                    <ThemedText style={[styles.typeChipText, { color: colors.primary }]}>
+                                        {typeLabel}
+                                    </ThemedText>
+                                </View>
+                            ) : null}
+                            <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+                                {placeName}
                             </ThemedText>
+                            <View style={styles.metaRow}>
+                                <Ionicons
+                                    name={isTravel && routePreview ? 'navigate' : 'location'}
+                                    size={12}
+                                    color={colors.secondary}
+                                />
+                                <ThemedText style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={1}>
+                                    {isTravel && routePreview ? routePreview : address}
+                                </ThemedText>
+                            </View>
                         </View>
-                    )}
-                </View>
-            </ListingCard>
-        </TouchableOpacity>
+
+                        {/* CTA indicator */}
+                        <View style={[styles.chevron, { backgroundColor: `${primaryColor}10` }]}>
+                            <Ionicons name="arrow-forward" size={15} color={primaryColor} />
+                        </View>
+                    </View>
+                </ListingCard>
+            </PressableScale>
+        </Animated.View>
     );
 });
 
@@ -188,127 +187,76 @@ PlaceCard.displayName = 'PlaceCard';
 export default PlaceCard;
 
 const styles = StyleSheet.create({
-    heroSection: {
-        height: 110,
-        width: '100%',
-        position: 'relative',
-        backgroundColor: '#E2E8F0',
+    card: {
+        marginBottom: 12,
     },
-    heroImage: {
-        width: '100%',
-        height: '100%',
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        gap: 12,
     },
-    placeholderContainer: {
-        flex: 1,
+    tile: {
+        width: TILE_SIZE,
+        height: TILE_SIZE,
+        borderRadius: 14,
+    },
+    tilePlaceholder: {
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
     },
-    ring: {
+    tileHalo: {
         position: 'absolute',
-        borderRadius: 999,
-        borderWidth: 1,
+        width: TILE_SIZE * 0.82,
+        height: TILE_SIZE * 0.82,
+        borderRadius: TILE_SIZE * 0.41,
     },
-    ringOuter: {
-        width: 140,
-        height: 140,
-        opacity: 0.5,
-    },
-    ringInner: {
-        width: 90,
-        height: 90,
-        opacity: 0.8,
-    },
-    iconCircle: {
-        width: 54,
-        height: 54,
-        borderRadius: 27,
+    tileIconCircle: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    bottomFade: {
-        top: '40%',
-        height: '60%',
+    info: {
+        flex: 1,
+        gap: 4,
     },
-    topActions: {
-        position: 'absolute',
-        top: 12,
-        left: 12,
-        right: 12,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-    },
-    actionBtn: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    typePill: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        flexDirection: 'row',
-        alignItems: 'center',
+    typeChip: {
+        alignSelf: 'flex-start',
         paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderTopRightRadius: 16,
-        borderBottomLeftRadius: 12,
+        paddingVertical: 2.5,
+        borderRadius: 999,
     },
-    typePillText: {
-        color: '#FFFFFF',
-        fontSize: 10,
-        fontWeight: '700',
+    typeChipText: {
+        fontSize: 9,
+        fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
-    imageLabel: {
-        position: 'absolute',
-        bottom: 12,
-        left: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 12,
-        gap: 4,
-    },
-    imageLabelText: {
-        color: 'rgba(255,255,255,0.9)',
-        fontSize: 10,
-        fontWeight: '600',
-    },
-    contentSection: {
-        padding: 12,
-    },
-    placeName: {
-        fontSize: 14,
+    name: {
+        fontSize: 14.5,
         fontWeight: '800',
-        lineHeight: 20,
-        marginBottom: 8,
+        letterSpacing: 0.1,
     },
-
-    locationRow: {
+    metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingRight: 16,
+        gap: 5,
+        paddingRight: 8,
     },
-    locationIconWrap: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
+    metaText: {
+        fontSize: 11.5,
+        fontWeight: '500',
+        flexShrink: 1,
+    },
+    chevron: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: 8,
-    },
-    locationText: {
-        fontSize: 12,
-        fontWeight: '500',
-        flex: 1,
-        lineHeight: 16,
+        marginRight: 4,
     },
 });

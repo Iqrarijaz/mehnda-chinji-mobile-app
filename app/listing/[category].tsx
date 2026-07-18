@@ -2,14 +2,15 @@ import NativeAd from '@/ads/components/NativeAd';
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import { deleteRequest, ESSENTIAL_SUBMISSION_QUERY_KEYS, ESSENTIALS_QUERY_KEYS, getEssentialsList, getMyRequests } from '@/apis/essentials';
 import BusinessCard from '@/components/business/BusinessCard';
-import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
+import { LoadingDots } from '@/components/common/LoadingDots';
 import { PillsList } from '@/components/common/PillsList';
 import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
 import { HeaderIconBtn, ScreenHeader } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
 import PlaceCard from '@/components/essentials/PlaceCard';
 import EmptyListingState from '@/components/listing/EmptyListingState';
+import { ListingCardSkeleton } from '@/components/listing/ListingCardSkeleton';
 import RequestCard from '@/components/places/RequestCard';
 import { ThemedText } from '@/components/ThemedText';
 import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
@@ -22,7 +23,6 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-    ActivityIndicator,
     Alert,
     Platform,
     StyleSheet,
@@ -198,6 +198,15 @@ const CategoryListingScreen = React.memo(() => {
     const businesses = (infiniteData as any)?.pages?.flatMap((page: any) => Array.isArray(page?.data) ? page.data : []) || [];
     const myRequests = (myRequestsData as any)?.pages?.flatMap((page: any) => page.data || []) || [];
 
+    // Total result count when the API reports one (display only).
+    const firstPagePagination = (infiniteData as any)?.pages?.[0]?.pagination;
+    const totalResults: number | null =
+        typeof firstPagePagination?.totalItems === 'number'
+            ? firstPagePagination.totalItems
+            : typeof firstPagePagination?.total === 'number'
+                ? firstPagePagination.total
+                : null;
+
     const loading = activeTab === 'all' ? (queryLoading || isRefetching) : (myRequestsLoading || myRequestsRefetching);
     const rawData = activeTab === 'all' ? businesses : myRequests;
 
@@ -222,7 +231,7 @@ const CategoryListingScreen = React.memo(() => {
 
     // --- Render Items ---
 
-    const renderItem = React.useCallback(({ item }: { item: any }) => {
+    const renderItem = React.useCallback(({ item, index }: { item: any; index: number }) => {
         if (item.isAd) {
             return <NativeAd placement={`listing-${category}`} />;
         }
@@ -234,7 +243,7 @@ const CategoryListingScreen = React.memo(() => {
         };
 
         if (['religious', 'health', 'education', 'emergency', 'govt', 'travel', 'banks'].includes(category || '')) {
-            return <PlaceCard {...commonProps} category={category || ''} />;
+            return <PlaceCard {...commonProps} category={category || ''} index={index} />;
         }
         return <BusinessCard business={item} onReport={() => handleReport(item._id)} />;
     }, [category, headerColor, handleReport]);
@@ -303,7 +312,7 @@ const CategoryListingScreen = React.memo(() => {
                             style={{ flex: 1 }}
                         />
                         <TouchableOpacity
-                            style={[styles.filterButton, { backgroundColor: activeTab === 'requests' ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                            style={[styles.filterButton, { backgroundColor: activeTab === 'requests' ? colors.lime : 'rgba(255, 255, 255, 0.15)' }]}
                             onPress={() => setActiveTab(activeTab === 'requests' ? 'all' : 'requests')}
                             activeOpacity={0.7}
                         >
@@ -324,12 +333,22 @@ const CategoryListingScreen = React.memo(() => {
                 />
             )}
 
+            {/* Result count (shown only when the API reports a total) */}
+            {activeTab === 'all' && !loading && totalResults != null && rawData.length > 0 && (
+                <View style={styles.resultCountRow}>
+                    <View style={[styles.resultCountDot, { backgroundColor: colors.lime }]} />
+                    <ThemedText style={[styles.resultCountText, { color: colors.textSecondary }]}>
+                        {totalResults} {totalResults === 1 ? 'result' : 'results'}
+                    </ThemedText>
+                </View>
+            )}
+
             {/* Content */}
             <View style={styles.content}>
                 {loading && rawData.length === 0 ? (
                     <View style={styles.listContent}>
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <BusinessCardSkeleton key={i} />
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <ListingCardSkeleton key={i} />
                         ))}
                     </View>
                 ) : (
@@ -353,7 +372,7 @@ const CategoryListingScreen = React.memo(() => {
                                         if (isFetching) {
                                             return (
                                                 <View style={styles.footerLoader}>
-                                                    <ActivityIndicator color={colors.primary} />
+                                                    <LoadingDots />
                                                 </View>
                                             );
                                         }
@@ -362,9 +381,11 @@ const CategoryListingScreen = React.memo(() => {
                                             return (
                                                 <View style={styles.endOfListContainer}>
                                                     <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
+                                                    <View style={[styles.endOfListDot, { backgroundColor: colors.lime }]} />
                                                     <ThemedText style={[styles.endOfListText, { color: colors.icon }]}>
-                                                        You've reached the end of the list
+                                                        {"You're all caught up"}
                                                     </ThemedText>
+                                                    <View style={[styles.endOfListDot, { backgroundColor: colors.lime }]} />
                                                     <View style={[styles.endOfListLine, { backgroundColor: colors.border }]} />
                                                 </View>
                                             );
@@ -374,7 +395,11 @@ const CategoryListingScreen = React.memo(() => {
                                     }
                                 }
                                 ListEmptyComponent={
-                                    <EmptyListingState activeTab={activeTab} categoryTitle={categoryTitle} />
+                                    <EmptyListingState
+                                        activeTab={activeTab}
+                                        categoryTitle={categoryTitle}
+                                        onAdd={() => router.push({ pathname: '/(drawer)/place-submission', params: { category: category } })}
+                                    />
                                 }
                             />
                         </View>
@@ -427,6 +452,11 @@ const styles = StyleSheet.create({
         flex: 1,
         opacity: 0.3,
     },
+    endOfListDot: {
+        width: 5,
+        height: 5,
+        borderRadius: 2.5,
+    },
     endOfListText: {
         fontSize: 13,
         fontWeight: '600',
@@ -451,6 +481,24 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
+    },
+    resultCountRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingHorizontal: 20,
+        paddingBottom: 6,
+    },
+    resultCountDot: {
+        width: 5,
+        height: 5,
+        borderRadius: 2.5,
+    },
+    resultCountText: {
+        fontSize: 10.5,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+        letterSpacing: 0.6,
     },
     filterButton: {
         width: 42,
