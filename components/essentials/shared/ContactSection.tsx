@@ -46,6 +46,9 @@ const iconForContact = (name?: string): ContactIcon => {
     if (n.includes('lab')) return { set: 'mci', name: 'test-tube' };
     if (n.includes('emergency') || n.includes('helpline')) return { set: 'ion', name: 'medkit' };
     if (n.includes('reception') || n.includes('appointment') || n.includes('desk')) return { set: 'ion', name: 'calendar' };
+    if (n.includes('admission')) return { set: 'ion', name: 'school' };
+    if (n.includes('principal') || n.includes('head')) return { set: 'mci', name: 'account-tie' };
+    if (n.includes('admin')) return { set: 'ion', name: 'briefcase' };
     if (n.includes('office')) return { set: 'ion', name: 'business' };
     if (n.includes('mobile') || n.includes('cell')) return { set: 'ion', name: 'phone-portrait' };
     if (n.includes('email') || n.includes('mail')) return { set: 'ion', name: 'mail' };
