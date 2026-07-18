@@ -1,53 +1,48 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, {
-    FadeInDown,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from 'react-native-reanimated';
+import { StyleSheet, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { PressableScale } from './PressableScale';
+import { SectionHeading } from './SectionHeading';
 
-interface EmergencyLocationCardProps {
+interface LocationSectionProps {
     place: any;
     address: string;
     /** Existing directions handler from the page, passed through unchanged. */
-    onDirections: () => void;
-    hasDirections: boolean;
+    onDirections?: () => void;
+    hasDirections?: boolean;
+    title?: string;
+    /** Label for the place.timing row, e.g. "Availability" or "Working Hours". */
+    timingLabel?: string;
+    /** Pre-formatted distance string when the caller has one. */
+    distance?: string;
 }
 
 /**
- * Location, availability hours, and the existing directions action as one
- * calm, scannable card.
+ * Reusable location card shared by every category detail page: address,
+ * area, hours, optional distance, and the page's existing directions action.
  */
-export function EmergencyLocationCard({
+export function LocationSection({
     place,
     address,
     onDirections,
-    hasDirections,
-}: EmergencyLocationCardProps) {
+    hasDirections = false,
+    title = 'Location & Directions',
+    timingLabel = 'Working Hours',
+    distance,
+}: LocationSectionProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
-    const pressed = useSharedValue(0);
-
-    const pressStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 - pressed.value * 0.03 }],
-    }));
 
     const subArea = [place?.village, place?.city].filter(Boolean).join(', ');
 
     return (
         <View style={styles.section}>
-            <View style={styles.headingRow}>
-                <Ionicons name="location" size={12} color={colors.secondary} />
-                <ThemedText style={[styles.heading, { color: colors.textSecondary }]}>
-                    Location & Directions
-                </ThemedText>
-            </View>
+            <SectionHeading icon="location" label={title} pill={distance} />
 
             <Animated.View
                 entering={FadeInDown.delay(80).duration(400)}
@@ -82,7 +77,7 @@ export function EmergencyLocationCard({
                         </View>
                         <View style={styles.info}>
                             <ThemedText style={[styles.label, { color: colors.textSecondary }]}>
-                                Availability
+                                {timingLabel}
                             </ThemedText>
                             <ThemedText style={[styles.value, { color: colors.text }]}>
                                 {place.timing}
@@ -91,18 +86,14 @@ export function EmergencyLocationCard({
                     </View>
                 ) : null}
 
-                {hasDirections && (
-                    <Animated.View style={pressStyle}>
-                        <Pressable
-                            onPress={onDirections}
-                            onPressIn={() => (pressed.value = withTiming(1, { duration: 100 }))}
-                            onPressOut={() => (pressed.value = withTiming(0, { duration: 160 }))}
-                            style={[styles.directionsBtn, { backgroundColor: colors.primary }]}
-                        >
-                            <Ionicons name="navigate" size={15} color="#FFFFFF" />
-                            <ThemedText style={styles.directionsText}>Get Directions</ThemedText>
-                        </Pressable>
-                    </Animated.View>
+                {hasDirections && onDirections && (
+                    <PressableScale
+                        onPress={onDirections}
+                        style={[styles.directionsBtn, { backgroundColor: colors.primary }]}
+                    >
+                        <Ionicons name="navigate" size={15} color="#FFFFFF" />
+                        <ThemedText style={styles.directionsText}>Get Directions</ThemedText>
+                    </PressableScale>
                 )}
             </Animated.View>
         </View>
@@ -112,17 +103,6 @@ export function EmergencyLocationCard({
 const styles = StyleSheet.create({
     section: {
         gap: 8,
-    },
-    headingRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5,
-    },
-    heading: {
-        fontSize: 10,
-        fontWeight: '800',
-        textTransform: 'uppercase',
-        letterSpacing: 0.8,
     },
     card: {
         borderRadius: 18,

@@ -33,13 +33,12 @@ import { TravelRoute } from '@/components/essentials/TravelRoute';
 import { ContactAndLocation } from '@/components/essentials/ContactAndLocation';
 import { ContactEssentialDetails } from '@/components/essentials/ContactEssentialDetails';
 import { TravelHeroHeader } from '@/components/essentials/travel/TravelHeroHeader';
-import { TravelContactDetails } from '@/components/essentials/travel/TravelContactDetails';
-import { TravelTags } from '@/components/essentials/travel/TravelTags';
 import { EmergencyHeroHeader } from '@/components/essentials/emergency/EmergencyHeroHeader';
-import { EmergencyQuickActions } from '@/components/essentials/emergency/EmergencyQuickActions';
-import { EmergencyContactDetails } from '@/components/essentials/emergency/EmergencyContactDetails';
-import { EmergencyTags } from '@/components/essentials/emergency/EmergencyTags';
-import { EmergencyLocationCard } from '@/components/essentials/emergency/EmergencyLocationCard';
+import { HealthHeroHeader } from '@/components/essentials/health/HealthHeroHeader';
+import { ContactSection } from '@/components/essentials/shared/ContactSection';
+import { LocationSection } from '@/components/essentials/shared/LocationSection';
+import { TagChips } from '@/components/essentials/shared/TagChips';
+import { QuickActionsBar } from '@/components/essentials/shared/QuickActionsBar';
 import { capitalizeString } from '@/utils/string';
 
 const PlaceDetailScreen = () => {
@@ -242,6 +241,7 @@ const PlaceDetailScreen = () => {
     const placeImage = place.images && place.images.length > 0 ? place.images[0] : null;
     const isTravel = category.toLowerCase() === 'travel';
     const isEmergency = category.toLowerCase() === 'emergency';
+    const isHealth = category.toLowerCase() === 'health';
 
     return (
         <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
@@ -259,6 +259,15 @@ const PlaceDetailScreen = () => {
                 />
             ) : isEmergency ? (
                 <EmergencyHeroHeader
+                    place={place}
+                    placeName={placeName}
+                    isOwner={!!isOwner}
+                    onBack={() => router.back()}
+                    onReport={() => reportModalRef.current?.present()}
+                    onEdit={handleEdit}
+                />
+            ) : isHealth ? (
+                <HealthHeroHeader
                     place={place}
                     placeName={placeName}
                     isOwner={!!isOwner}
@@ -328,8 +337,8 @@ const PlaceDetailScreen = () => {
                 <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', flex: 1 }]}>
 
                     {/* Quick Interactive Actions Row */}
-                    {isEmergency ? (
-                        <EmergencyQuickActions
+                    {isEmergency || isHealth ? (
+                        <QuickActionsBar
                             onCall={() => handleCall(contacts[0]?.number)}
                             onDirections={handleNavigate}
                             hasContact={!!contacts[0]?.number}
@@ -371,21 +380,29 @@ const PlaceDetailScreen = () => {
 
                         {/* Contacts List */}
                         {isTravel ? (
-                            <TravelContactDetails contacts={contacts} />
+                            <ContactSection contacts={contacts} />
                         ) : isEmergency ? (
-                            <EmergencyContactDetails contacts={contacts} />
+                            <ContactSection
+                                contacts={contacts}
+                                title="Emergency Contacts"
+                                hint="Tap to call"
+                                size="large"
+                                iconTint="secondary"
+                            />
+                        ) : isHealth ? (
+                            <ContactSection contacts={contacts} />
                         ) : (
                             <ContactEssentialDetails contacts={contacts} primaryColor={primaryColor} />
                         )}
 
                         {/* Section: Tags */}
                         {isTravel && place.tags && place.tags.length > 0 && (
-                            <TravelTags tags={place.tags} />
+                            <TagChips tags={place.tags} accentDots />
                         )}
-                        {isEmergency && place.tags && place.tags.length > 0 && (
-                            <EmergencyTags tags={place.tags} />
+                        {(isEmergency || isHealth) && place.tags && place.tags.length > 0 && (
+                            <TagChips tags={place.tags} highlightAvailability />
                         )}
-                        {!isTravel && !isEmergency && place.tags && place.tags.length > 0 && (
+                        {!isTravel && !isEmergency && !isHealth && place.tags && place.tags.length > 0 && (
                             <View style={styles.detailSection}>
                                 <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
                                     Tags
@@ -438,14 +455,24 @@ const PlaceDetailScreen = () => {
 
                         {/* Section: Contact & Location */}
                         {isEmergency && (
-                            <EmergencyLocationCard
+                            <LocationSection
                                 place={place}
                                 address={address}
                                 onDirections={handleNavigate}
                                 hasDirections={!!hasDirections}
+                                timingLabel="Availability"
                             />
                         )}
-                        {!isTravel && !isEmergency && (
+                        {isHealth && (
+                            <LocationSection
+                                place={place}
+                                address={address}
+                                onDirections={handleNavigate}
+                                hasDirections={!!hasDirections}
+                                timingLabel="Working Hours"
+                            />
+                        )}
+                        {!isTravel && !isEmergency && !isHealth && (
                             <ContactAndLocation place={place} address={address} primaryColor={primaryColor} />
                         )}
                     </View>

@@ -1,81 +1,57 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, {
-    FadeInDown,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from 'react-native-reanimated';
+import { StyleSheet, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { PressableScale } from './PressableScale';
 
-interface EmergencyQuickActionsProps {
-    /** Existing call handler from the page; receives the primary number. */
-    onCall: () => void;
+interface QuickActionsBarProps {
+    /** Existing call handler from the page; hidden when absent. */
+    onCall?: () => void;
+    hasContact?: boolean;
+    callLabel?: string;
     /** Existing directions handler from the page. */
     onDirections: () => void;
-    hasContact: boolean;
     hasDirections: boolean;
 }
 
-function PressScale({
-    onPress,
-    disabled,
-    style,
-    children,
-}: {
-    onPress?: () => void;
-    disabled?: boolean;
-    style: any;
-    children: React.ReactNode;
-}) {
-    const pressed = useSharedValue(0);
-    const animStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 - pressed.value * 0.04 }],
-    }));
-    return (
-        <Animated.View style={[{ flex: 1 }, animStyle]}>
-            <Pressable
-                onPress={disabled ? undefined : onPress}
-                onPressIn={() => !disabled && (pressed.value = withTiming(1, { duration: 100 }))}
-                onPressOut={() => (pressed.value = withTiming(0, { duration: 160 }))}
-                style={style}
-            >
-                {children}
-            </Pressable>
-        </Animated.View>
-    );
-}
-
 /**
- * Redesigned presentation of the page's existing actions (call + directions).
- * No new functionality — the handlers come from the screen unchanged.
+ * The page's existing primary actions (call + directions) as a premium
+ * button row. No new functionality — handlers pass through unchanged.
  */
-export function EmergencyQuickActions({
+export function QuickActionsBar({
     onCall,
+    hasContact = false,
+    callLabel = 'Call Now',
     onDirections,
-    hasContact,
     hasDirections,
-}: EmergencyQuickActionsProps) {
+}: QuickActionsBarProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
     return (
         <Animated.View entering={FadeInDown.duration(400)} style={styles.row}>
-            {hasContact && (
-                <PressScale onPress={onCall} style={[styles.primaryBtn, { backgroundColor: colors.primary }]}>
+            {hasContact && onCall && (
+                <PressableScale
+                    onPress={onCall}
+                    intensity={0.04}
+                    containerStyle={styles.flex}
+                    style={[styles.primaryBtn, { backgroundColor: colors.primary }]}
+                >
                     <View style={[styles.primaryIcon, { backgroundColor: colors.lime }]}>
                         <Ionicons name="call" size={15} color="#FFFFFF" />
                     </View>
-                    <ThemedText style={styles.primaryText}>Call Now</ThemedText>
-                </PressScale>
+                    <ThemedText style={styles.primaryText}>{callLabel}</ThemedText>
+                </PressableScale>
             )}
-            <PressScale
+            <PressableScale
                 onPress={onDirections}
                 disabled={!hasDirections}
+                intensity={0.04}
+                containerStyle={styles.flex}
                 style={[
                     styles.secondaryBtn,
                     { backgroundColor: `${colors.primary}10`, opacity: hasDirections ? 1 : 0.5 },
@@ -89,7 +65,7 @@ export function EmergencyQuickActions({
                 <ThemedText style={[styles.secondaryText, { color: colors.primary }]}>
                     {hasDirections ? 'Directions' : 'No Directions'}
                 </ThemedText>
-            </PressScale>
+            </PressableScale>
         </Animated.View>
     );
 }
@@ -99,6 +75,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         gap: 10,
         marginBottom: 12,
+    },
+    flex: {
+        flex: 1,
     },
     primaryBtn: {
         flexDirection: 'row',

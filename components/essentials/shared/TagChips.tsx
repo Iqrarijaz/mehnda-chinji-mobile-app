@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -7,11 +6,18 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
+import { SectionHeading } from './SectionHeading';
 
-interface EmergencyTagsProps {
+interface TagChipsProps {
     tags: any[];
+    title?: string;
+    /** Cycle brand-color accent dots through the chips. */
+    accentDots?: boolean;
+    /** Give availability-style tags (24 hours, open, available) the lime treatment. */
+    highlightAvailability?: boolean;
 }
 
+/** Handles both string tags and {eng/en, ur} bilingual tag objects. */
 const tagText = (tag: any): string => {
     if (typeof tag === 'string') return capitalizeString(tag);
     const en = tag?.eng || tag?.en;
@@ -22,28 +28,36 @@ const tagText = (tag: any): string => {
     return '';
 };
 
-// Tags that signal availability get the lime "positive status" treatment.
-const isAvailabilityTag = (text: string) => /24|hour|available|open/i.test(text);
+const isAvailabilityTag = (text: string) => /24|hour|available|open|emergency/i.test(text);
 
-export function EmergencyTags({ tags }: EmergencyTagsProps) {
+/**
+ * Reusable animated tag chips shared by every category detail page.
+ */
+export function TagChips({
+    tags,
+    title = 'Tags',
+    accentDots = false,
+    highlightAvailability = false,
+}: TagChipsProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
     if (!Array.isArray(tags) || tags.length === 0) return null;
 
+    const accents = [colors.primary, colors.secondary, colors.lime];
+
     return (
         <View style={styles.section}>
-            <View style={styles.headingRow}>
-                <Ionicons name="pricetags" size={12} color={colors.secondary} />
-                <ThemedText style={[styles.heading, { color: colors.textSecondary }]}>
-                    Tags
-                </ThemedText>
-            </View>
+            <SectionHeading icon="pricetags" label={title} />
             <View style={styles.chipWrap}>
                 {tags.map((tag, index) => {
                     const text = tagText(tag);
                     if (!text) return null;
-                    const highlight = isAvailabilityTag(text);
+                    const highlight = highlightAvailability && isAvailabilityTag(text);
+                    const showDot = highlight || accentDots;
+                    const dotColor = highlight
+                        ? colors.lime
+                        : accents[index % accents.length];
                     return (
                         <Animated.View
                             key={index}
@@ -53,15 +67,17 @@ export function EmergencyTags({ tags }: EmergencyTagsProps) {
                                 .damping(16)}
                             style={[
                                 styles.chip,
-                                { backgroundColor: highlight ? `${colors.lime}1E` : `${colors.primary}10` },
+                                {
+                                    backgroundColor: highlight
+                                        ? `${colors.lime}1E`
+                                        : `${colors.primary}10`,
+                                },
                             ]}
                         >
-                            {highlight && (
-                                <View style={[styles.chipDot, { backgroundColor: colors.lime }]} />
+                            {showDot && (
+                                <View style={[styles.chipDot, { backgroundColor: dotColor }]} />
                             )}
-                            <ThemedText
-                                style={[styles.chipText, { color: colors.primary }]}
-                            >
+                            <ThemedText style={[styles.chipText, { color: colors.primary }]}>
                                 {text}
                             </ThemedText>
                         </Animated.View>
@@ -75,17 +91,6 @@ export function EmergencyTags({ tags }: EmergencyTagsProps) {
 const styles = StyleSheet.create({
     section: {
         gap: 8,
-    },
-    headingRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5,
-    },
-    heading: {
-        fontSize: 10,
-        fontWeight: '800',
-        textTransform: 'uppercase',
-        letterSpacing: 0.8,
     },
     chipWrap: {
         flexDirection: 'row',

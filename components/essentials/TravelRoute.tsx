@@ -12,6 +12,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { FlowingLine } from './travel/FlowingLine';
+import { SectionHeading } from './shared/SectionHeading';
 
 interface TravelRouteProps {
     route: any[];
@@ -119,24 +120,15 @@ function RouteStop({
 }
 
 export function TravelRoute({ route }: TravelRouteProps) {
-    const { theme } = useTheme();
-    const colors = Colors[theme];
-
     if (!Array.isArray(route) || route.length === 0) return null;
 
     return (
         <View style={styles.section}>
-            <View style={styles.headingRow}>
-                <Ionicons name="bus" size={12} color={colors.secondary} />
-                <ThemedText style={[styles.heading, { color: colors.textSecondary }]}>
-                    Travel Schedule
-                </ThemedText>
-                <View style={[styles.countPill, { backgroundColor: `${colors.lime}22` }]}>
-                    <ThemedText style={[styles.countText, { color: colors.primary }]}>
-                        {route.length} {route.length === 1 ? 'Stop' : 'Stops'}
-                    </ThemedText>
-                </View>
-            </View>
+            <SectionHeading
+                icon="bus"
+                label="Travel Schedule"
+                pill={`${route.length} ${route.length === 1 ? 'Stop' : 'Stops'}`}
+            />
 
             <View style={styles.timeline}>
                 {route.map((stop: any, idx: number) => (
@@ -156,28 +148,6 @@ export function TravelRoute({ route }: TravelRouteProps) {
 const styles = StyleSheet.create({
     section: {
         gap: 10,
-    },
-    headingRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5,
-    },
-    heading: {
-        fontSize: 10,
-        fontWeight: '800',
-        textTransform: 'uppercase',
-        letterSpacing: 0.8,
-    },
-    countPill: {
-        marginLeft: 'auto',
-        paddingHorizontal: 9,
-        paddingVertical: 3,
-        borderRadius: 999,
-    },
-    countText: {
-        fontSize: 10,
-        fontWeight: '800',
-        letterSpacing: 0.3,
     },
     timeline: {
         marginTop: 2,
