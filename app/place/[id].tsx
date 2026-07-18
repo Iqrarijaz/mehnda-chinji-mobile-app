@@ -32,6 +32,9 @@ import BannerAd from '@/ads/components/BannerAd';
 import { TravelRoute } from '@/components/essentials/TravelRoute';
 import { ContactAndLocation } from '@/components/essentials/ContactAndLocation';
 import { ContactEssentialDetails } from '@/components/essentials/ContactEssentialDetails';
+import { TravelHeroHeader } from '@/components/essentials/travel/TravelHeroHeader';
+import { TravelContactDetails } from '@/components/essentials/travel/TravelContactDetails';
+import { TravelTags } from '@/components/essentials/travel/TravelTags';
 import { capitalizeString } from '@/utils/string';
 
 const PlaceDetailScreen = () => {
@@ -232,12 +235,23 @@ const PlaceDetailScreen = () => {
 
     const contacts = place.contact || (place.phone ? [{ name: 'Primary', number: place.phone }] : []);
     const placeImage = place.images && place.images.length > 0 ? place.images[0] : null;
+    const isTravel = category.toLowerCase() === 'travel';
 
     return (
         <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
             {/* ── Hero Header ─────────────────────────────────────────── */}
+            {isTravel ? (
+                <TravelHeroHeader
+                    place={place}
+                    placeName={placeName}
+                    isOwner={!!isOwner}
+                    onBack={() => router.back()}
+                    onReport={() => reportModalRef.current?.present()}
+                    onEdit={handleEdit}
+                />
+            ) : (
             <Animated.View entering={FadeInUp.duration(500)} style={styles.heroHeader}>
                 <LinearGradient
                     colors={[primaryColor, primaryColor + 'dd']}
@@ -288,6 +302,7 @@ const PlaceDetailScreen = () => {
                     </ThemedText>
                 </Animated.View>
             </Animated.View>
+            )}
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -331,10 +346,17 @@ const PlaceDetailScreen = () => {
                     <View style={styles.sectionsContainer}>
 
                         {/* Contacts List */}
-                        <ContactEssentialDetails contacts={contacts} primaryColor={primaryColor} />
+                        {isTravel ? (
+                            <TravelContactDetails contacts={contacts} />
+                        ) : (
+                            <ContactEssentialDetails contacts={contacts} primaryColor={primaryColor} />
+                        )}
 
                         {/* Section: Tags */}
-                        {place.tags && place.tags.length > 0 && (
+                        {isTravel && place.tags && place.tags.length > 0 && (
+                            <TravelTags tags={place.tags} />
+                        )}
+                        {!isTravel && place.tags && place.tags.length > 0 && (
                             <View style={styles.detailSection}>
                                 <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
                                     Tags
