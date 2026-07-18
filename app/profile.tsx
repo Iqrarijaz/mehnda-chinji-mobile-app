@@ -31,6 +31,7 @@ import {
     View
 } from 'react-native';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import Svg, { Circle, Path } from 'react-native-svg';
 import Animated, {
 
     FadeInDown,
@@ -189,28 +190,60 @@ export default function ProfileScreen() {
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                {/* Animated Header */}
-                <Animated.View entering={FadeInUp.duration(600)} style={styles.header}>
+                {/* Animated Header — premium account dashboard hero */}
+                <Animated.View entering={FadeInUp.duration(450)} style={styles.header}>
                     <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
+                    {/* Soft decor: circles, shield, brand accent dots */}
+                    <Svg
+                        style={StyleSheet.absoluteFill}
+                        viewBox="0 0 375 220"
+                        preserveAspectRatio="xMinYMin slice"
+                    >
+                        <Circle cx={355} cy={0} r={95} fill="rgba(255,255,255,0.06)" />
+                        <Circle cx={5} cy={220} r={70} fill="rgba(255,255,255,0.05)" />
+                        <Path
+                            d="M300 140 l22 -9 l22 9 v16 c0 13 -10 23 -22 28 c-12 -5 -22 -15 -22 -28 z"
+                            stroke="rgba(255,255,255,0.10)"
+                            strokeWidth={2}
+                            fill="none"
+                        />
+                        <Circle cx={120} cy={50} r={3.5} fill={colors.lime} opacity={0.5} />
+                        <Circle cx={250} cy={72} r={3.5} fill={colors.secondary} opacity={0.55} />
+                    </Svg>
+
                     <View style={[styles.headerTop, { paddingTop: insets.top + 10 }]}>
                         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                            <Ionicons name="arrow-back" size={24} color={theme === 'dark' ? colors.text : '#FFFFFF'} />
+                            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
                         </TouchableOpacity>
-                        <ThemedText style={[styles.headerTitle, { color: theme === 'dark' ? colors.text : '#FFFFFF' }]}>Update Profile</ThemedText>
+                        <ThemedText style={styles.headerTitle}>My Account</ThemedText>
                         <View style={{ width: 42 }} />
                     </View>
 
-                    <ProfileAvatar
-                        uri={user?.user?.profileImage}
-                        name={user?.user?.name}
-                        isUploading={uploadImageMutation.isPending}
-                        isDeleting={deleteImageMutation.isPending}
-                        onPickImage={pickImage}
-                        onDeleteImage={() => deleteImageMutation.mutate()}
-                        onPreviewOpen={() => setPreviewVisible(true)}
-                    />
-                    <ThemedText style={[styles.welcomeText, { color: theme === 'dark' ? colors.text : '#FFFFFF' }]}>Complete Your Profile</ThemedText>
-                    <ThemedText style={[styles.subtitleText, { color: theme === 'dark' ? colors.textSecondary : 'rgba(255,255,255,0.8)' }]}>Maintain your profile for better community trust</ThemedText>
+                    <Animated.View entering={FadeInDown.delay(120).duration(450)} style={styles.headerIdentity}>
+                        <ProfileAvatar
+                            uri={user?.user?.profileImage}
+                            name={user?.user?.name}
+                            isUploading={uploadImageMutation.isPending}
+                            isDeleting={deleteImageMutation.isPending}
+                            onPickImage={pickImage}
+                            onDeleteImage={() => deleteImageMutation.mutate()}
+                            onPreviewOpen={() => setPreviewVisible(true)}
+                        />
+                        <View style={styles.nameRow}>
+                            <ThemedText style={styles.userName} numberOfLines={1}>
+                                {currentData.name || 'Welcome'}
+                            </ThemedText>
+                            {(currentData.otpVerified || currentData.emailVerified) && (
+                                <View style={[styles.verifiedChip, { backgroundColor: colors.lime }]}>
+                                    <Ionicons name="checkmark-circle" size={11} color="#1E293B" />
+                                    <ThemedText style={styles.verifiedText}>Verified</ThemedText>
+                                </View>
+                            )}
+                        </View>
+                        <ThemedText style={styles.subtitleText}>
+                            Keep your profile complete for better community trust
+                        </ThemedText>
+                    </Animated.View>
                 </Animated.View>
 
                 <KeyboardAvoidingView
@@ -369,10 +402,43 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        height: Platform.OS === 'android' ? 260 : 280,
+        paddingBottom: 18,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
+    },
+    headerIdentity: {
+        alignItems: 'center',
+        marginTop: 2,
+    },
+    nameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 8,
+        paddingHorizontal: 24,
+    },
+    userName: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: 0.2,
+        flexShrink: 1,
+    },
+    verifiedChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 999,
+    },
+    verifiedText: {
+        fontSize: 9.5,
+        fontWeight: '800',
+        color: '#1E293B',
+        textTransform: 'uppercase',
+        letterSpacing: 0.4,
     },
     headerTop: {
         flexDirection: 'row',
@@ -394,18 +460,10 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         textAlign: 'center',
     },
-    welcomeText: {
-        fontSize: 14,
-        fontWeight: '800',
-        color: '#FFFFFF',
-        marginTop: 6,
-        marginBottom: 6,
-        textAlign: 'center',
-    },
     subtitleText: {
         fontSize: 11,
         color: 'rgba(255,255,255,0.8)',
-        marginTop: 2,
+        marginTop: 4,
         textAlign: 'center',
         paddingHorizontal: 20,
     },

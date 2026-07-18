@@ -1,8 +1,11 @@
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import BusinessCard from '@/components/business/BusinessCard';
+import { BusinessHero } from '@/components/business/BusinessHero';
 import { BusinessRegistration } from '@/components/business/BusinessRegistration';
-import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { LoadingDots } from '@/components/common/LoadingDots';
+import EmptyListingState from '@/components/essentials/EmptyListingState';
+import { ListingCardSkeleton } from '@/components/essentials/ListingCardSkeleton';
 import { ProfessionPicker } from '@/components/common/ProfessionPicker';
 import { HeaderIconBtn, ScreenHeader } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
@@ -17,7 +20,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useBusinessAPI } from '@/hooks/useBusinessAPI';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
     Platform,
     StyleSheet,
     TextInput,
@@ -82,6 +84,15 @@ export default function BusinessScreen() {
     const businesses = (infiniteData as any)?.pages?.flatMap((page: any) => Array.isArray(page?.data) ? page.data : []) || [];
     const loading = queryLoading || isRefetching;
 
+    // Business count for the hero pill, only when the API reports a total.
+    const firstPagePagination = (infiniteData as any)?.pages?.[0]?.pagination;
+    const totalBusinesses: number | null =
+        typeof firstPagePagination?.totalItems === 'number'
+            ? firstPagePagination.totalItems
+            : typeof firstPagePagination?.total === 'number'
+                ? firstPagePagination.total
+                : null;
+
     // Track results viewed - only once per new search query
     useEffect(() => {
         if (!loading && businesses.length > 0 && debouncedSearch && lastTrackedQuery.current !== debouncedSearch) {
@@ -103,16 +114,17 @@ export default function BusinessScreen() {
     const hasActiveFilters = selectedCategory !== 'All';
 
 
-    const renderItem = React.useCallback(({ item }: { item: any }) => {
+    const renderItem = React.useCallback(({ item, index }: { item: any; index: number }) => {
         const isBank = item?.category?.toLowerCase() === 'banks' || item?.categoryEn?.toLowerCase() === 'banks';
         return isBank ? (
             <PlaceCard
                 data={item}
                 category="banks"
                 color={colors.primary}
+                index={index}
             />
         ) : (
-            <BusinessCard business={item} />
+            <BusinessCard business={item} index={index} />
         );
     }, [colors.primary]);
     const keyExtractor = React.useCallback((item: any) => item._id?.$oid || item._id?.toString() || Math.random().toString(), []);
@@ -126,28 +138,28 @@ export default function BusinessScreen() {
     const renderFooter = useCallback(() => {
         if (isFetchingNextPage) {
             return (
-                <View style={{ paddingVertical: 20 }}>
-                    <ActivityIndicator color={colors.primary} />
+                <View style={{ paddingVertical: 24 }}>
+                    <LoadingDots />
                 </View>
             );
         }
         if (!hasNextPage && businesses.length > 0) {
             return (
-                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, paddingVertical: 20 }}>
-                    End of directory
+                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: '600', letterSpacing: 0.4, paddingVertical: 20 }}>
+                    {"You're all caught up"}
                 </ThemedText>
             );
         }
         return null;
-    }, [isFetchingNextPage, hasNextPage, businesses.length, colors.primary]);
+    }, [isFetchingNextPage, hasNextPage, businesses.length]);
 
     const renderEmpty = useCallback(() => (
-        <View style={styles.emptyContainer}>
-            <Ionicons name="business-outline" size={64} color={colors.icon} />
-            <ThemedText style={[styles.emptyText, { color: colors.text }]}>No businesses found.</ThemedText>
-            <ThemedText style={[styles.emptySubText, { color: colors.icon }]}>Try adjusting your search criteria</ThemedText>
-        </View>
-    ), [colors.icon, colors.text]);
+        <EmptyListingState
+            activeTab="all"
+            categoryTitle="Businesses"
+            onAdd={() => router.push('/(drawer)/business-registration')}
+        />
+    ), [router]);
 
     return (
         <ErrorBoundary>
@@ -174,7 +186,7 @@ export default function BusinessScreen() {
                                 style={{ flex: 1 }}
                             />
                             <TouchableOpacity
-                                style={[styles.filterButton, { backgroundColor: hasActiveFilters ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                                style={[styles.filterButton, { backgroundColor: hasActiveFilters ? colors.lime : 'rgba(255, 255, 255, 0.15)' }]}
                                 onPress={() => setIsProfessionPickerVisible(true)}
                                 activeOpacity={0.7}
                             >
@@ -189,7 +201,7 @@ export default function BusinessScreen() {
                             </TouchableOpacity>
                             {/* My Business toggle — same as marketplace listing icon */}
                             <TouchableOpacity
-                                style={[styles.listingIconButton, { backgroundColor: isPortalTab ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                                style={[styles.listingIconButton, { backgroundColor: isPortalTab ? colors.lime : 'rgba(255, 255, 255, 0.15)' }]}
                                 onPress={() => setActiveTab(isPortalTab ? 'find' : 'portal')}
                                 activeOpacity={0.7}
                             >
@@ -206,13 +218,23 @@ export default function BusinessScreen() {
                     </View>
                 </ScreenHeader>
 
+                {/* Business hero band — same component as the Submit screen */}
+                <BusinessHero
+                    band
+                    title={isPortalTab ? 'My Business' : 'Local Businesses'}
+                    subtitle={isPortalTab
+                        ? 'Manage your listings in the community directory'
+                        : 'Trusted shops & services from your community'}
+                    countLabel={!isPortalTab && totalBusinesses != null ? `${totalBusinesses}` : undefined}
+                />
+
                 {/* Find Service Section */}
                 <View style={[styles.content, { display: activeTab === 'find' ? 'flex' : 'none' }]}>
                     {/* Listing */}
                     {loading && businesses.length === 0 ? (
                         <View style={styles.listContent}>
                             {[1, 2, 3, 4, 5].map((i) => (
-                                <BusinessCardSkeleton key={i} />
+                                <ListingCardSkeleton key={i} />
                             ))}
                         </View>
                     ) : (

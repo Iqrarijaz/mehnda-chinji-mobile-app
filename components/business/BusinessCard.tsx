@@ -1,23 +1,25 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React, { useMemo } from 'react';
-import {
-    StyleSheet,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
-import { ThemedText } from '@/components/ThemedText';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
+import { ThemedText } from '@/components/ThemedText';
+import { ListingCard } from '@/components/essentials/ListingCard';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useRouter } from 'expo-router';
-import { ListingCard } from '@/components/essentials/ListingCard';
 
 interface BusinessCardProps {
     business: any;
     onReport?: () => void;
+    /** List position, used only to stagger the entrance animation. */
+    index?: number;
 }
+
+const TILE_SIZE = 84;
 
 const capitalize = (str?: string) =>
     str
@@ -28,8 +30,8 @@ const capitalize = (str?: string) =>
             .join(' ')
         : '';
 
-const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
-    const { theme, isDark } = useTheme();
+const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => {
+    const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
 
@@ -46,117 +48,166 @@ const BusinessCard = React.memo(({ business }: BusinessCardProps) => {
 
     const businessImage = business?.logo || business?.images?.[0];
 
-    const avatarContent = useMemo(() => {
-        if (businessImage) {
-            return (
-                <Image
-                    source={{ uri: businessImage }}
-                    style={styles.avatarImage}
-                    contentFit="cover"
-                    transition={200}
-                />
-            );
-        }
-        return (
-            <ThemedText style={[styles.avatarLetter, { color: isDark ? colors.text : '#94A3B8' }]}>
-                {businessName?.charAt(0)?.toUpperCase()}
-            </ThemedText>
-        );
-    }, [businessImage, businessName, isDark, colors.text]);
-
     return (
-        <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => {
-                analyticsService.trackEvent(AnalyticsEvents.BUSINESS_CARD_CLICKED, { businessId: business._id, action: 'view' });
-                router.push({
-                    pathname: '/business/[id]',
-                    params: {
-                        id: business._id,
-                        businessData: JSON.stringify(business)
-                    }
-                });
-            }}
-            style={styles.cardWrapper}
-        >
-            <ListingCard style={{ padding: 8 }}>
-                <View style={styles.topRow}>
-                    {/* Business Image/Avatar */}
-                    <View style={[styles.avatarContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.primary + '10' }]}>
-                        {avatarContent}
-                    </View>
+        <Animated.View entering={FadeInDown.delay(Math.min(index, 6) * 55).duration(350)}>
+            <PressableScale
+                intensity={0.02}
+                onPress={() => {
+                    analyticsService.trackEvent(AnalyticsEvents.BUSINESS_CARD_CLICKED, { businessId: business._id, action: 'view' });
+                    router.push({
+                        pathname: '/business/[id]',
+                        params: {
+                            id: business._id,
+                            businessData: JSON.stringify(business)
+                        }
+                    });
+                }}
+            >
+                <ListingCard style={styles.card}>
+                    <View style={styles.row}>
+                        {/* Logo / initial tile */}
+                        {businessImage ? (
+                            <Image
+                                source={{ uri: businessImage }}
+                                style={styles.tile}
+                                contentFit="cover"
+                                transition={300}
+                            />
+                        ) : (
+                            <View style={[styles.tile, styles.tilePlaceholder, { backgroundColor: `${colors.primary}0D` }]}>
+                                <View style={[styles.tileHalo, { backgroundColor: `${colors.primary}14` }]} />
+                                <View style={[styles.initialCircle, { backgroundColor: `${colors.primary}1F` }]}>
+                                    <ThemedText style={[styles.initialText, { color: colors.primary }]}>
+                                        {businessName?.charAt(0)?.toUpperCase() || 'B'}
+                                    </ThemedText>
+                                </View>
+                            </View>
+                        )}
 
-                    <View style={styles.content}>
-                        <ThemedText style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-                            {businessName}
-                        </ThemedText>
-
-                        {categoryLineText ? (
-                            <ThemedText style={[styles.categoryLine, { color: colors.primary }]} numberOfLines={1}>
-                                {categoryLineText}
+                        {/* Info */}
+                        <View style={styles.info}>
+                            {categoryLineText ? (
+                                <View style={[styles.categoryChip, { backgroundColor: `${colors.lime}20` }]}>
+                                    <ThemedText
+                                        style={[styles.categoryChipText, { color: colors.primary }]}
+                                        numberOfLines={1}
+                                    >
+                                        {categoryLineText}
+                                    </ThemedText>
+                                </View>
+                            ) : null}
+                            <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+                                {businessName}
                             </ThemedText>
-                        ) : null}
+                            {address ? (
+                                <View style={styles.metaRow}>
+                                    <Ionicons name="location" size={12} color={colors.secondary} />
+                                    <ThemedText style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={1}>
+                                        {address}
+                                    </ThemedText>
+                                </View>
+                            ) : null}
+                            {business?.phone ? (
+                                <View style={styles.metaRow}>
+                                    <Ionicons name="call" size={11} color={colors.lime} />
+                                    <ThemedText style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={1}>
+                                        {business.phone}
+                                    </ThemedText>
+                                </View>
+                            ) : null}
+                        </View>
 
-                        <View style={styles.locationRow}>
-                            <Ionicons name="location-outline" size={11} color={colors.textSecondary} />
-                            <ThemedText style={[styles.location, { color: colors.textSecondary }]} numberOfLines={1}>
-                                {address}
-                            </ThemedText>
+                        {/* CTA indicator */}
+                        <View style={[styles.chevron, { backgroundColor: `${colors.primary}10` }]}>
+                            <Ionicons name="arrow-forward" size={15} color={colors.primary} />
                         </View>
                     </View>
-                </View>
-            </ListingCard>
-        </TouchableOpacity>
+                </ListingCard>
+            </PressableScale>
+        </Animated.View>
     );
 });
+
+BusinessCard.displayName = 'BusinessCard';
 
 export default BusinessCard;
 
 const styles = StyleSheet.create({
-    cardWrapper: {
-        flex: 1,
+    card: {
+        marginBottom: 12,
     },
-    topRow: {
+    row: {
         flexDirection: 'row',
         alignItems: 'center',
+        padding: 10,
+        gap: 12,
     },
-    avatarContainer: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        justifyContent: 'center',
+    tile: {
+        width: TILE_SIZE,
+        height: TILE_SIZE,
+        borderRadius: 14,
+    },
+    tilePlaceholder: {
         alignItems: 'center',
-        marginRight: 16,
+        justifyContent: 'center',
         overflow: 'hidden',
     },
-    avatarImage: {
-        width: '100%',
-        height: '100%',
+    tileHalo: {
+        position: 'absolute',
+        width: TILE_SIZE * 0.82,
+        height: TILE_SIZE * 0.82,
+        borderRadius: TILE_SIZE * 0.41,
     },
-    avatarLetter: {
-        fontSize: 16,
-        fontWeight: '700',
-    },
-    content: {
-        flex: 1,
+    initialCircle: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        alignItems: 'center',
         justifyContent: 'center',
+    },
+    initialText: {
+        fontSize: 18,
+        fontWeight: '800',
+    },
+    info: {
+        flex: 1,
         gap: 4,
     },
-    title: {
-        fontSize: 14,
-        fontWeight: '700',
+    categoryChip: {
+        alignSelf: 'flex-start',
+        maxWidth: '100%',
+        paddingHorizontal: 8,
+        paddingVertical: 2.5,
+        borderRadius: 999,
     },
-    categoryLine: {
-        fontSize: 10,
-        fontWeight: '600',
+    categoryChipText: {
+        fontSize: 9,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
-    locationRow: {
+    name: {
+        fontSize: 14.5,
+        fontWeight: '800',
+        letterSpacing: 0.1,
+    },
+    metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: 5,
+        paddingRight: 8,
     },
-    location: {
-        fontSize: 11,
+    metaText: {
+        fontSize: 11.5,
         fontWeight: '500',
+        flexShrink: 1,
+    },
+    chevron: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 4,
     },
 });
