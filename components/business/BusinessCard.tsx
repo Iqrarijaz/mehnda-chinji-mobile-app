@@ -86,16 +86,6 @@ const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => 
 
                         {/* Info */}
                         <View style={styles.info}>
-                            {categoryLineText ? (
-                                <View style={[styles.categoryChip, { backgroundColor: `${colors.lime}20` }]}>
-                                    <ThemedText
-                                        style={[styles.categoryChipText, { color: colors.primary }]}
-                                        numberOfLines={1}
-                                    >
-                                        {categoryLineText}
-                                    </ThemedText>
-                                </View>
-                            ) : null}
                             <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={1}>
                                 {businessName}
                             </ThemedText>
@@ -114,6 +104,15 @@ const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => 
                             <Ionicons name="arrow-forward" size={15} color={colors.primary} />
                         </View>
                     </View>
+
+                    {/* Category badge — top-right absolute, like PlaceCard */}
+                    {categoryLineText ? (
+                        <View style={[styles.typeBadge, { backgroundColor: colors.secondary }]}>
+                            <ThemedText style={styles.typeBadgeText} numberOfLines={1}>
+                                {categoryLineText}
+                            </ThemedText>
+                        </View>
+                    ) : null}
                 </ListingCard>
             </PressableScale>
         </Animated.View>
@@ -165,18 +164,22 @@ const styles = StyleSheet.create({
         flex: 1,
         gap: 4,
     },
-    categoryChip: {
-        alignSelf: 'flex-start',
-        maxWidth: '100%',
-        paddingHorizontal: 8,
-        paddingVertical: 2.5,
-        borderRadius: 999,
+    typeBadge: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        maxWidth: '60%',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderTopRightRadius: 12,
+        borderBottomLeftRadius: 12,
     },
-    categoryChipText: {
+    typeBadgeText: {
         fontSize: 9,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
+        color: '#FFFFFF',
     },
     name: {
         fontSize: 14.5,
