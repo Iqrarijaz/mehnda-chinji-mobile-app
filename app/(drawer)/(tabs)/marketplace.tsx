@@ -237,12 +237,6 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
             {/* Header */}
             <ScreenHeader
                 decor="marketplace"
-                hero={{
-                    title: isMineTab ? 'My Listings' : 'Marketplace',
-                    subtitle: isMineTab
-                        ? 'Manage the items you have listed for sale'
-                        : 'Buy & sell with people in your community',
-                }}
                 rightActions={
                     <HeaderIconBtn
                         name="add"

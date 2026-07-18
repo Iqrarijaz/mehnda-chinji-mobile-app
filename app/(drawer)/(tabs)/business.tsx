@@ -83,15 +83,6 @@ export default function BusinessScreen() {
     const businesses = (infiniteData as any)?.pages?.flatMap((page: any) => Array.isArray(page?.data) ? page.data : []) || [];
     const loading = queryLoading || isRefetching;
 
-    // Business count for the hero pill, only when the API reports a total.
-    const firstPagePagination = (infiniteData as any)?.pages?.[0]?.pagination;
-    const totalBusinesses: number | null =
-        typeof firstPagePagination?.totalItems === 'number'
-            ? firstPagePagination.totalItems
-            : typeof firstPagePagination?.total === 'number'
-                ? firstPagePagination.total
-                : null;
-
     // Track results viewed - only once per new search query
     useEffect(() => {
         if (!loading && businesses.length > 0 && debouncedSearch && lastTrackedQuery.current !== debouncedSearch) {
@@ -166,13 +157,6 @@ export default function BusinessScreen() {
                 {/* Top Bar Area */}
                 <ScreenHeader
                     decor="business"
-                    hero={{
-                        title: isPortalTab ? 'My Business' : 'Local Businesses',
-                        subtitle: isPortalTab
-                            ? 'Manage your listings in the community directory'
-                            : 'Trusted shops & services from your community',
-                        countLabel: !isPortalTab && totalBusinesses != null ? `${totalBusinesses}` : undefined,
-                    }}
                     rightActions={
                         <HeaderIconBtn
                             name="add"
