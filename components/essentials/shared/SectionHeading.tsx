@@ -17,7 +17,7 @@ interface SectionHeadingProps {
  * Uppercase section heading with a secondary-accent icon, shared by all
  * category detail sections.
  */
-export function SectionHeading({ icon, label, pill }: SectionHeadingProps) {
+export const SectionHeading = React.memo(({ icon, label, pill }: SectionHeadingProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -36,7 +36,9 @@ export function SectionHeading({ icon, label, pill }: SectionHeadingProps) {
             ) : null}
         </View>
     );
-}
+});
+
+SectionHeading.displayName = 'SectionHeading';
 
 const styles = StyleSheet.create({
     row: {

@@ -27,19 +27,24 @@ import { ThemedText } from '@/components/ThemedText';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
+import { CancelButton } from '@/components/common/CancelButton';
+import { BusinessRegistrationHeroHeader } from '@/components/business/BusinessRegistrationHeroHeader';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
+import * as yup from 'yup';
+import { businessSchema } from '@/utils/validation';
+
 const BusinessRegistrationScreen = () => {
     const router = useRouter();
     const { editData: editDataParam } = useLocalSearchParams<{ editData?: string }>();
-    const insets = useSafeAreaInsets();
     const { user } = useAuth();
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const queryClient = useQueryClient();
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const editData = editDataParam ? JSON.parse(editDataParam) : null;
 
@@ -168,30 +173,40 @@ const BusinessRegistrationScreen = () => {
         }
     });
 
-    const handleSubmit = () => {
-        const { name, category, phone, address } = form;
+    const handleSubmit = async () => {
+        try {
+            await businessSchema.validate(form, { abortEarly: false });
+            setErrors({});
 
-        if (!name || !category || !phone || !address) {
-            Toast.show({ type: 'error', text1: 'Fields Required', text2: 'Please fill all fields marked with *' });
-            return;
-        }
+            const { name, category, phone, address } = form;
 
-        const payload = {
-            name,
-            categoryEn: category.name_eng,
-            categoryUr: category.name_ur,
-            description: form.description,
-            phone,
-            address,
-            logo: category.icon || null,
-            tags: form.tags.map((t: any) => ({ eng: t.eng, ur: t.ur })),
-            timing: `${openTime} - ${closeTime}`,
-        };
+            const payload = {
+                name,
+                categoryEn: category.name_eng,
+                categoryUr: category.name_ur,
+                description: form.description,
+                phone,
+                address,
+                logo: category.icon || null,
+                tags: form.tags.map((t: any) => ({ eng: t.eng, ur: t.ur })),
+                timing: `${openTime} - ${closeTime}`,
+            };
 
-        if (editData) {
-            updateMutation.mutate({ ...payload, businessId: editData._id });
-        } else {
-            registerMutation.mutate(payload);
+            if (editData) {
+                updateMutation.mutate({ ...payload, businessId: editData._id });
+            } else {
+                registerMutation.mutate(payload);
+            }
+        } catch (err: any) {
+            if (err instanceof yup.ValidationError) {
+                const newErrors: { [key: string]: string } = {};
+                err.inner.forEach((validationError) => {
+                    if (validationError.path) {
+                        newErrors[validationError.path] = validationError.message;
+                    }
+                });
+                setErrors(newErrors);
+            }
         }
     };
 
@@ -228,35 +243,10 @@ const BusinessRegistrationScreen = () => {
             </ThankYouModal>
 
             {/* ── Hero Header ─────────────────────────────────────────── */}
-            <Animated.View entering={FadeInUp.duration(500)} style={styles.header}>
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
-
-                {/* Nav row */}
-                <View style={[styles.headerTop, { paddingTop: insets.top + 8 }]}>
-                    <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <Animated.View entering={FadeIn.delay(200).duration(400)} style={{ flex: 1, alignItems: 'center' }}>
-                        <ThemedText style={styles.headerNavTitle}>
-                            {editData ? 'Update Business' : 'Register Business'}
-                        </ThemedText>
-                    </Animated.View>
-                    <View style={{ width: 42 }} />
-                </View>
-
-                {/* Hero icon + text */}
-                <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
-                    <View style={styles.heroIconWrap}>
-                        <Ionicons name="storefront" size={32} color="#0D9488" />
-                    </View>
-                    <ThemedText style={styles.heroTitle}>
-                        {editData ? 'Update Your Listing' : 'Grow Your Business'}
-                    </ThemedText>
-                    <ThemedText style={styles.heroSubtitle}>
-                        Fill in the details below to list your business in the community directory
-                    </ThemedText>
-                </Animated.View>
-            </Animated.View>
+            <BusinessRegistrationHeroHeader
+                isEditing={!!editData}
+                onBack={handleGoBack}
+            />
 
             {/* ── Form ────────────────────────────────────────────────── */}
             <KeyboardAvoidingView
@@ -282,7 +272,12 @@ const BusinessRegistrationScreen = () => {
                             icon="storefront-outline"
                             placeholder="Your business name"
                             value={form.name}
-                            onChangeText={(text) => setForm(prev => ({ ...prev, name: text }))}
+                            onChangeText={(text) => {
+                                const cleanedText = text.replace(/[^a-zA-Z\s]/g, '');
+                                setForm(prev => ({ ...prev, name: cleanedText }));
+                                setErrors(prev => ({ ...prev, name: '' }));
+                            }}
+                            error={errors.name}
                         />
 
                         {/* Category */}
@@ -294,6 +289,8 @@ const BusinessRegistrationScreen = () => {
                                 style={[styles.dropdownTrigger, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
                                     height: Platform.OS === 'android' ? 48 : 52,
+                                    borderColor: errors.category ? '#EF4444' : 'transparent',
+                                    borderWidth: errors.category ? 1 : 0,
                                 }]}
                                 onPress={() => setProfessionModalVisible(true)}
                                 activeOpacity={0.7}
@@ -316,6 +313,11 @@ const BusinessRegistrationScreen = () => {
                                 </View>
                                 <Ionicons name="chevron-down" size={16} color={colors.icon} />
                             </TouchableOpacity>
+                            {errors.category ? (
+                                <ThemedText style={{ color: '#EF4444', fontSize: 11, marginLeft: 4, marginTop: 2 }}>
+                                    {errors.category}
+                                </ThemedText>
+                            ) : null}
                         </Animated.View>
 
                         {/* Address */}
@@ -326,7 +328,11 @@ const BusinessRegistrationScreen = () => {
                             icon="map-outline"
                             placeholder="Shop #, Street, Area"
                             value={form.address}
-                            onChangeText={(text) => setForm(prev => ({ ...prev, address: text }))}
+                            onChangeText={(text) => {
+                                setForm(prev => ({ ...prev, address: text }));
+                                setErrors(prev => ({ ...prev, address: '' }));
+                            }}
+                            error={errors.address}
                         />
 
                         {/* Phone */}
@@ -337,8 +343,12 @@ const BusinessRegistrationScreen = () => {
                             icon="call-outline"
                             placeholder="e.g. 03xx xxxxxxx"
                             value={form.phone}
-                            onChangeText={(text) => setForm(prev => ({ ...prev, phone: text }))}
+                            onChangeText={(text) => {
+                                setForm(prev => ({ ...prev, phone: text }));
+                                setErrors(prev => ({ ...prev, phone: '' }));
+                            }}
                             keyboardType="phone-pad"
+                            error={errors.phone}
                         />
 
                         {/* Timings */}
@@ -388,7 +398,7 @@ const BusinessRegistrationScreen = () => {
                             </View>
                         </Animated.View>
 
-                        {/* Tags */}
+{/* Tags */}
                         {availableTags && availableTags.length > 0 && (
                             <Animated.View entering={FadeInDown.delay(450)} style={styles.inputField}>
                                 <ThemedText style={[styles.label, { color: colors.text }]}>SELECT SERVICES / TAGS</ThemedText>
@@ -402,8 +412,8 @@ const BusinessRegistrationScreen = () => {
                                                     styles.tagChip,
                                                     {
                                                         backgroundColor: isSelected
-                                                            ? colors.primary
-                                                            : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)'),
+                                                            ? `${colors.primary}1E`
+                                                            : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.035)'),
                                                     }
                                                 ]}
                                                 onPress={() => {
@@ -421,15 +431,13 @@ const BusinessRegistrationScreen = () => {
                                                 }}
                                                 activeOpacity={0.8}
                                             >
-                                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                                    {isSelected && <Ionicons name="checkmark" size={12} color="#FFFFFF" />}
-                                                    <ThemedText style={[
-                                                        styles.tagChipText,
-                                                        { color: isSelected ? '#FFFFFF' : colors.text, fontWeight: isSelected ? '700' : '600' }
-                                                    ]}>
-                                                        {tag.eng} | {tag.ur}
-                                                    </ThemedText>
-                                                </View>
+                                                {isSelected && <View style={[styles.tagChipDot, { backgroundColor: colors.primary }]} />}
+                                                <ThemedText style={[
+                                                    styles.tagChipText,
+                                                    { color: isSelected ? colors.primary : colors.textSecondary, fontWeight: isSelected ? '700' : '600' }
+                                                ]}>
+                                                    {tag.eng} | {tag.ur}
+                                                </ThemedText>
                                             </TouchableOpacity>
                                         );
                                     })}
@@ -437,21 +445,15 @@ const BusinessRegistrationScreen = () => {
                             </Animated.View>
                         )}
 
-                        {/* Buttons row — Cancel left | Register right */}
                         <Animated.View entering={FadeInDown.delay(500)} style={styles.buttonsRow}>
-                            <TouchableOpacity
+                            <CancelButton
                                 onPress={handleGoBack}
-                                style={[styles.cancelButton, { borderColor: colors.border }]}
-                                activeOpacity={0.7}
-                            >
-                                <ThemedText style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</ThemedText>
-                            </TouchableOpacity>
+                            />
 
                             <SubmitButton
                                 title={editData ? 'Update' : 'Register'}
                                 onPress={handleSubmit}
                                 isLoading={isPending}
-                                style={{ width: 160, height: 40, borderRadius: 20 }}
                             />
                         </Animated.View>
 
@@ -465,6 +467,7 @@ const BusinessRegistrationScreen = () => {
                 onClose={() => setProfessionModalVisible(false)}
                 onSelect={(cat: any) => {
                     setForm(prev => ({ ...prev, category: cat, tags: [] }));
+                    setErrors(prev => ({ ...prev, category: '' }));
                     setProfessionModalVisible(false);
                 }}
             />
@@ -619,12 +622,21 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     tagChip: {
-        borderRadius: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
         paddingHorizontal: 12,
-        paddingVertical: 7,
+        paddingVertical: 6,
+        borderRadius: 999,
     },
     tagChipText: {
-        fontSize: 12,
+        fontSize: 11.5,
+        letterSpacing: 0.2,
+    },
+    tagChipDot: {
+        width: 5,
+        height: 5,
+        borderRadius: 2.5,
     },
 
     // ── Buttons row ──────────────────────────────────────────────────────

@@ -26,7 +26,7 @@ interface LocationSectionProps {
  * Reusable location card shared by every category detail page: address,
  * area, hours, optional distance, and the page's existing directions action.
  */
-export function LocationSection({
+export const LocationSection = React.memo(({
     place,
     address,
     onDirections,
@@ -34,7 +34,7 @@ export function LocationSection({
     title = 'Location & Directions',
     timingLabel = 'Working Hours',
     distance,
-}: LocationSectionProps) {
+}: LocationSectionProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -59,7 +59,7 @@ export function LocationSection({
                         <ThemedText style={[styles.label, { color: colors.textSecondary }]}>
                             Address
                         </ThemedText>
-                        <ThemedText style={[styles.value, { color: colors.text }]}>
+                        <ThemedText style={[styles.value, { color: colors.text }]} numberOfLines={2}>
                             {address}
                         </ThemedText>
                         {subArea ? (
@@ -72,8 +72,8 @@ export function LocationSection({
 
                 {place?.timing ? (
                     <View style={styles.infoRow}>
-                        <View style={[styles.iconTile, { backgroundColor: `${colors.lime}1E` }]}>
-                            <Ionicons name="time" size={18} color={colors.lime} />
+                        <View style={[styles.iconTile, { backgroundColor: '#F59E0B14' }]}>
+                            <Ionicons name="time" size={18} color="#F59E0B" />
                         </View>
                         <View style={styles.info}>
                             <ThemedText style={[styles.label, { color: colors.textSecondary }]}>
@@ -98,7 +98,9 @@ export function LocationSection({
             </Animated.View>
         </View>
     );
-}
+});
+
+LocationSection.displayName = 'LocationSection';
 
 const styles = StyleSheet.create({
     section: {

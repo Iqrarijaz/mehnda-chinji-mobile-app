@@ -33,12 +33,12 @@ const isAvailabilityTag = (text: string) => /24|hour|available|open|emergency/i.
 /**
  * Reusable animated tag chips shared by every category detail page.
  */
-export function TagChips({
+export const TagChips = React.memo(({
     tags,
     title = 'Tags',
     accentDots = false,
     highlightAvailability = false,
-}: TagChipsProps) {
+}: TagChipsProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -86,7 +86,9 @@ export function TagChips({
             </View>
         </View>
     );
-}
+});
+
+TagChips.displayName = 'TagChips';
 
 const styles = StyleSheet.create({
     section: {

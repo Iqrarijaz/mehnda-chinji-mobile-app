@@ -25,7 +25,7 @@ const capitalize = (str: string) => {
     return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
-function StopNode({ kind }: { kind: 'origin' | 'stop' | 'destination' }) {
+const StopNode = React.memo(({ kind }: { kind: 'origin' | 'stop' | 'destination' }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -48,9 +48,11 @@ function StopNode({ kind }: { kind: 'origin' | 'stop' | 'destination' }) {
             <View style={[styles.stopNodeInner, { backgroundColor: colors.lime }]} />
         </View>
     );
-}
+});
 
-function RouteStop({
+StopNode.displayName = 'StopNode';
+
+function RouteStopComponent({
     stop,
     index,
     isFirst,
@@ -119,7 +121,10 @@ function RouteStop({
     );
 }
 
-export function TravelRoute({ route }: TravelRouteProps) {
+const RouteStop = React.memo(RouteStopComponent);
+RouteStop.displayName = 'RouteStop';
+
+export const TravelRoute = React.memo(({ route }: TravelRouteProps) => {
     if (!Array.isArray(route) || route.length === 0) return null;
 
     return (
@@ -143,7 +148,9 @@ export function TravelRoute({ route }: TravelRouteProps) {
             </View>
         </View>
     );
-}
+});
+
+TravelRoute.displayName = 'TravelRoute';
 
 const styles = StyleSheet.create({
     section: {

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -21,6 +21,14 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import { TravelHeroHeader } from '@/components/essentials/travel/TravelHeroHeader';
+import { EmergencyHeroHeader } from '@/components/essentials/emergency/EmergencyHeroHeader';
+import { HealthHeroHeader } from '@/components/essentials/health/HealthHeroHeader';
+import { ReligiousHeroHeader } from '@/components/essentials/religious/ReligiousHeroHeader';
+import { BankHeroHeader } from '@/components/essentials/bank/BankHeroHeader';
+import { GovtHeroHeader } from '@/components/essentials/govt/GovtHeroHeader';
+import { EducationHeroHeader } from '@/components/essentials/education/EducationHeroHeader';
+
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import { uploadUserImage } from '@/apis/essentials';
 import { ThankYouModal } from '@/components/common/ThankYou';
@@ -38,7 +46,6 @@ const PlaceSubmissionScreen = () => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const isDark = theme === 'dark';
-    const queryClient = useQueryClient();
     const { user } = useAuth();
 
     const editData = editDataParam ? JSON.parse(editDataParam) : null;
@@ -172,10 +179,25 @@ const PlaceSubmissionScreen = () => {
         }
     };
 
-    const isReligious = category?.toLowerCase() === 'religious' || category?.toLowerCase() === 'mosque';
-    const isGovt = category?.toLowerCase() === 'govt' || category?.toLowerCase() === 'govt office';
+    const isReligious = category?.toLowerCase() === 'religious';
+    const isGovt = category?.toLowerCase() === 'govt';
     const isEmergency = category?.toLowerCase() === 'emergency';
+    const isHealth = category?.toLowerCase() === 'health';
+    const isTravel = category?.toLowerCase() === 'travel';
+    const isEducation = category?.toLowerCase() === 'education';
+    const isBank = category?.toLowerCase() === 'bank';
     const isNoPhotoCategory = isReligious || isGovt;
+
+    // Fake place object for hero headers (they only need name, type, images, timing)
+    const heroPlace = {
+        type: editData?.type || '',
+        timing: editData?.timing || '',
+        images: selectedImage ? [selectedImage] : [],
+        village: '',
+        city: '',
+    };
+    const heroPlaceName = isEditing ? (editData?.name || 'Edit Submission') : `Add ${category ? category.charAt(0).toUpperCase() + category.slice(1) : 'Place'}`;
+    const noop = () => { };
 
     const handleThankYouClose = () => {
         setShowThankYou(false);
@@ -206,31 +228,97 @@ const PlaceSubmissionScreen = () => {
                 </ThemedText>
             </ThankYouModal>
 
-            <Animated.View entering={FadeInUp.duration(500)} style={styles.headerWrap}>
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
-                <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
-                    <TouchableOpacity onPress={handleGoBack} style={styles.backBtn}>
-                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <View style={{ width: 42 }} />
-                </View>
-
-                <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
-                    <View style={styles.heroIconWrap}>
-                        {!isEmergency && !isNoPhotoCategory && selectedImage ? (
-                            <Image source={{ uri: selectedImage }} style={{ width: 32, height: 32, borderRadius: 10 }} contentFit="cover" />
-                        ) : (
-                            <Ionicons name="location" size={24} color="#0D9488" />
-                        )}
+            {/* ── Category Hero Header ─────────────────────────────────── */}
+            {isTravel ? (
+                <TravelHeroHeader
+                    place={heroPlace}
+                    placeName={heroPlaceName}
+                    isOwner={false}
+                    onBack={handleGoBack}
+                    onReport={noop}
+                    onEdit={noop}
+                />
+            ) : isEmergency ? (
+                <EmergencyHeroHeader
+                    place={heroPlace}
+                    placeName={heroPlaceName}
+                    isOwner={false}
+                    onBack={handleGoBack}
+                    onReport={noop}
+                    onEdit={noop}
+                />
+            ) : isHealth ? (
+                <HealthHeroHeader
+                    place={heroPlace}
+                    placeName={heroPlaceName}
+                    isOwner={false}
+                    onBack={handleGoBack}
+                    onReport={noop}
+                    onEdit={noop}
+                />
+            ) : isReligious ? (
+                <ReligiousHeroHeader
+                    place={heroPlace}
+                    placeName={heroPlaceName}
+                    isOwner={false}
+                    onBack={handleGoBack}
+                    onReport={noop}
+                    onEdit={noop}
+                />
+            ) : isBank ? (
+                <BankHeroHeader
+                    place={heroPlace}
+                    placeName={heroPlaceName}
+                    isOwner={false}
+                    onBack={handleGoBack}
+                    onReport={noop}
+                    onEdit={noop}
+                />
+            ) : isGovt ? (
+                <GovtHeroHeader
+                    place={heroPlace}
+                    placeName={heroPlaceName}
+                    isOwner={false}
+                    onBack={handleGoBack}
+                    onReport={noop}
+                    onEdit={noop}
+                />
+            ) : isEducation ? (
+                <EducationHeroHeader
+                    place={heroPlace}
+                    placeName={heroPlaceName}
+                    isOwner={false}
+                    onBack={handleGoBack}
+                    onReport={noop}
+                    onEdit={noop}
+                />
+            ) : (
+                <Animated.View entering={FadeInUp.duration(500)} style={styles.headerWrap}>
+                    <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
+                    <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
+                        <TouchableOpacity onPress={handleGoBack} style={styles.backBtn}>
+                            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+                        </TouchableOpacity>
+                        <View style={{ width: 42 }} />
                     </View>
-                    <ThemedText style={styles.heroTitle}>
-                        {isEditing ? 'Update Your Submission' : 'Submit a Place'}
-                    </ThemedText>
-                    <ThemedText style={styles.heroSubtitle}>
-                        Fill in the details below to list this place in the community directory
-                    </ThemedText>
+
+                    <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
+                        <View style={styles.heroIconWrap}>
+                            {selectedImage ? (
+                                <Image source={{ uri: selectedImage }} style={{ width: 32, height: 32, borderRadius: 10 }} contentFit="cover" />
+                            ) : (
+                                <Ionicons name="location" size={24} color="#0D9488" />
+                            )}
+                        </View>
+                        <ThemedText style={styles.heroTitle}>
+                            {isEditing ? 'Update Your Submission' : 'Submit a Place'}
+                        </ThemedText>
+                        <ThemedText style={styles.heroSubtitle}>
+                            Fill in the details below to list this place in the community directory
+                        </ThemedText>
+                    </Animated.View>
                 </Animated.View>
-            </Animated.View>
+            )}
 
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

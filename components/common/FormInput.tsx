@@ -18,6 +18,7 @@ export interface FormInputProps extends TextInputProps {
     inputBoxStyle?: any;
     labelStyle?: any;
     rightAccessory?: React.ReactNode;
+    error?: string;
 }
 
 export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
@@ -33,6 +34,7 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
     labelStyle,
     multiline,
     rightAccessory,
+    error,
     ...rest
 }, ref) => {
     const { theme, isDark } = useTheme();
@@ -63,7 +65,9 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                     styles.inputBox, 
                     { 
                         backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                        minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52)
+                        minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52),
+                        borderColor: error ? '#EF4444' : 'transparent',
+                        borderWidth: error ? 1 : 0,
                     },
                     multiline && { alignItems: 'flex-start', paddingVertical: 12 },
                     inputBoxStyle
@@ -92,6 +96,11 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                 />
                 {rightAccessory}
             </View>
+            {error ? (
+                <ThemedText style={styles.errorText}>
+                    {error}
+                </ThemedText>
+            ) : null}
         </AnimatedView>
     );
 });
@@ -132,5 +141,11 @@ const styles = StyleSheet.create({
         fontSize: 14,
         padding: 0,
         margin: 0,
+    },
+    errorText: {
+        color: '#EF4444',
+        fontSize: 11,
+        marginLeft: 4,
+        marginTop: 2,
     },
 });

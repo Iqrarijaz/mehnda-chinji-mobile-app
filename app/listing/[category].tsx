@@ -1,12 +1,10 @@
 import NativeAd from '@/ads/components/NativeAd';
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
-import { deleteRequest, ESSENTIAL_SUBMISSION_QUERY_KEYS, ESSENTIALS_QUERY_KEYS, getEssentialsList, getMyRequests } from '@/apis/essentials';
 import BusinessCard from '@/components/business/BusinessCard';
 import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
 import { LoadingDots } from '@/components/common/LoadingDots';
 import { PillsList } from '@/components/common/PillsList';
 import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
-import { HeaderIconBtn, ScreenHeader } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
 import PlaceCard from '@/components/essentials/PlaceCard';
 import EmptyListingState from '@/components/listing/EmptyListingState';
@@ -19,7 +17,8 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEssentialsAPI } from '@/hooks/useEssentialsAPI';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
@@ -31,6 +30,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const CategoryListingScreen = React.memo(() => {
     const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();
@@ -100,13 +100,32 @@ const CategoryListingScreen = React.memo(() => {
         return PLACE_CATEGORY_MAPPING[category || ''] || 'Listing';
     }, [category]);
 
-    const headerColor = useMemo(() => {
+    // Category-specific header background (matches detail hero headers)
+    const headerBg = useMemo(() => {
+        const cat = (category || '').toLowerCase();
+        if (cat === 'emergency') return '#b91c1c';   // deep red
+        if (cat === 'health') return colors.primary;  // theme primary (teal)
+        if (cat === 'religious') return '#1a5c3a'; // Islamic green
+        if (cat === 'banks') return '#1a2d4a'; // deep navy
+        if (cat === 'govt') return '#1e2e4a'; // slate-blue
+        if (cat === 'travel') return '#0f172a';        // dark slate
+        if (cat === 'education') return '#312e81';     // deep indigo
         return colors.primary;
-    }, [colors.primary]);
+    }, [category, colors.primary]);
 
-    // --- Queries ---
+    // --- API Hook ---
+    const {
+        infiniteQuery,
+        myRequestsQuery,
+        deleteMutation,
+    } = useEssentialsAPI({
+        category,
+        search: debouncedSearch,
+        type: selectedType,
+        activeTab,
+        onDeleteSuccess: () => setDeleteTarget(null),
+    });
 
-    // 1. All Places
     const {
         data: infiniteData,
         isLoading: queryLoading,
@@ -115,27 +134,8 @@ const CategoryListingScreen = React.memo(() => {
         fetchNextPage,
         isFetchingNextPage,
         refetch
-    } = useInfiniteQuery({
-        queryKey: ESSENTIALS_QUERY_KEYS.list({ category, search: debouncedSearch, type: selectedType }),
-        queryFn: ({ pageParam = 0 }) => getEssentialsList({
-            category: category,
-            search: debouncedSearch,
-            type: selectedType,
-            skip: (pageParam as number) * 20,
-            limit: 20
-        }),
-        getNextPageParam: (lastPage: any) => {
-            const pagination = lastPage?.pagination;
-            if (pagination && pagination.currentPage < pagination.totalPages) {
-                return pagination.currentPage + 1;
-            }
-            return undefined;
-        },
-        initialPageParam: 0,
-        enabled: !!category && activeTab === 'all',
-    });
+    } = infiniteQuery;
 
-    // 2. My Requests
     const {
         data: myRequestsData,
         isLoading: myRequestsLoading,
@@ -144,37 +144,8 @@ const CategoryListingScreen = React.memo(() => {
         fetchNextPage: myRequestsFetchNextPage,
         isFetchingNextPage: myRequestsFetchingNextPage,
         refetch: myRequestsRefetch
-    } = useInfiniteQuery({
-        queryKey: ESSENTIAL_SUBMISSION_QUERY_KEYS.myRequests({ page: 1, category: category }),
-        queryFn: ({ pageParam = 1 }) => getMyRequests({ page: pageParam, category: category }),
-        getNextPageParam: (lastPage: any) => {
-            const pagination = lastPage?.pagination;
-            if (pagination && pagination.page < pagination.pages) {
-                return pagination.page + 1;
-            }
-            return undefined;
-        },
-        initialPageParam: 1,
-        enabled: !!category && activeTab === 'requests',
-    });
+    } = myRequestsQuery;
 
-    // --- Mutations ---
-
-    const deleteMutation = useMutation({
-        mutationFn: deleteRequest,
-        onSuccess: () => {
-            Toast.show({
-                type: 'success',
-                text1: 'Deleted',
-                text2: 'Request deleted successfully.',
-            });
-            setDeleteTarget(null);
-            queryClient.invalidateQueries({ queryKey: ['my-essential-requests'] });
-        },
-        onError: (error: any) => {
-            Alert.alert('Error', error);
-        }
-    });
 
     const handleDelete = (id: string, name: string) => {
         setDeleteTarget({ id, name });
@@ -238,27 +209,27 @@ const CategoryListingScreen = React.memo(() => {
 
         const commonProps = {
             data: item,
-            color: headerColor,
+            color: headerBg,
             onReport: () => handleReport(item._id)
         };
 
-        if (['religious', 'health', 'education', 'emergency', 'govt', 'travel', 'banks'].includes(category || '')) {
+        if (['religious', 'health', 'education', 'emergency', 'govt', 'travel', 'banks', 'bank'].includes(category || '')) {
             return <PlaceCard {...commonProps} category={category || ''} index={index} />;
         }
         return <BusinessCard business={item} onReport={() => handleReport(item._id)} />;
-    }, [category, headerColor, handleReport]);
+    }, [category, headerBg, handleReport]);
 
 
 
     const renderRequestItem = React.useCallback(({ item }: { item: any }) => (
         <RequestCard
             item={item}
-            categoryColor={headerColor}
+            categoryColor={headerBg}
             isDeleting={deleteMutation.isPending && deleteMutation.variables === item._id}
             onEdit={handleEdit}
             onDelete={handleDelete}
         />
-    ), [headerColor, deleteMutation.isPending, deleteMutation.variables, handleEdit, handleDelete]);
+    ), [headerBg, deleteMutation.isPending, deleteMutation.variables, handleEdit, handleDelete]);
 
     const keyExtractor = React.useCallback((item: any) => item._id, []);
 
@@ -291,18 +262,34 @@ const CategoryListingScreen = React.memo(() => {
                 isLoading={deleteMutation.isPending}
             />
 
-            {/* Header Component */}
-            <ScreenHeader
-                showMenuIcon={false}
-                rightActions={
-                    <HeaderIconBtn
-                        name="add"
-                        size={22}
-                        onPress={() => router.push({ pathname: '/(drawer)/place-submission', params: { category: category } })}
-                    />
-                }
-            >
-                {/* Search Bar & actions */}
+            {/* Category-Aware Hero Header */}
+            <View style={[styles.header, { backgroundColor: headerBg, paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }]}>
+                {/* Nav row */}
+                <View style={styles.headerRow}>
+                    <TouchableOpacity
+                        style={styles.headerIconBtn}
+                        onPress={() => router.back()}
+                        activeOpacity={0.8}
+                    >
+                        <Ionicons name="arrow-back" size={20} color={headerBg} />
+                    </TouchableOpacity>
+
+                    <Animated.View entering={FadeInDown.delay(80).duration(350)} style={styles.headerTitleWrap}>
+                        <ThemedText style={styles.headerTitle} numberOfLines={1}>{categoryTitle}</ThemedText>
+                    </Animated.View>
+
+                    <View style={styles.headerRight}>
+                        <TouchableOpacity
+                            style={styles.headerIconBtn}
+                            onPress={() => router.push({ pathname: '/(drawer)/place-submission', params: { category: category } })}
+                            activeOpacity={0.8}
+                        >
+                            <Ionicons name="add" size={22} color={headerBg} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                {/* Search Bar & tab toggle */}
                 <View style={styles.searchSection}>
                     <View style={styles.searchRow}>
                         <SearchBar
@@ -319,9 +306,8 @@ const CategoryListingScreen = React.memo(() => {
                             <Ionicons name="list-outline" size={20} color="#FFFFFF" />
                         </TouchableOpacity>
                     </View>
-
                 </View>
-            </ScreenHeader>
+            </View>
 
             {/* Category Filter Tabs */}
             {activeTab === 'all' && typesToRender.length > 0 && (
@@ -329,7 +315,7 @@ const CategoryListingScreen = React.memo(() => {
                     data={typesToRender.map((t: any) => ({ id: t.key, label: t.label }))}
                     selectedId={selectedType}
                     onSelect={setSelectedType}
-                    activeColor={headerColor}
+                    activeColor={headerBg}
                 />
             )}
 
@@ -503,7 +489,44 @@ const styles = StyleSheet.create({
     filterButton: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    header: {
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24,
+        paddingHorizontal: 16,
+        paddingBottom: 14,
+        zIndex: 10,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 12,
+    },
+    headerTitleWrap: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    headerTitle: {
+        fontSize: 17,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: 0.3,
+        textTransform: 'capitalize',
+    },
+    headerRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    headerIconBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
     },

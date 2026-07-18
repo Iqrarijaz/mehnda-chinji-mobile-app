@@ -25,7 +25,7 @@ interface EssentialSubmitFormProps {
     onCancel: () => void;
 }
 
-export default function EssentialSubmitForm({
+const EssentialSubmitForm = React.memo(({
     category,
     editData,
     typesToRender,
@@ -33,7 +33,7 @@ export default function EssentialSubmitForm({
     isUploading,
     onSuccess,
     onCancel
-}: EssentialSubmitFormProps) {
+}: EssentialSubmitFormProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const isDark = theme === 'dark';
@@ -626,7 +626,11 @@ export default function EssentialSubmitForm({
             </Animated.View>
         </View>
     );
-}
+});
+
+EssentialSubmitForm.displayName = 'EssentialSubmitForm';
+
+export default EssentialSubmitForm;
 
 const styles = StyleSheet.create({
     container: {

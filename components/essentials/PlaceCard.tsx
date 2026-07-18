@@ -149,14 +149,7 @@ const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardPro
 
                         {/* Info */}
                         <View style={styles.info}>
-                            {typeLabel ? (
-                                <View style={[styles.typeChip, { backgroundColor: `${colors.lime}20` }]}>
-                                    <ThemedText style={[styles.typeChipText, { color: colors.primary }]}>
-                                        {typeLabel}
-                                    </ThemedText>
-                                </View>
-                            ) : null}
-                            <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+                            <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={2}>
                                 {placeName}
                             </ThemedText>
                             <View style={styles.metaRow}>
@@ -176,6 +169,13 @@ const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardPro
                             <Ionicons name="arrow-forward" size={15} color={primaryColor} />
                         </View>
                     </View>
+
+                    {/* Type badge — top-right absolute */}
+                    {typeLabel ? (
+                        <View style={[styles.typeBadge, { backgroundColor: colors.secondary }]}>
+                            <ThemedText style={styles.typeBadgeText}>{typeLabel}</ThemedText>
+                        </View>
+                    ) : null}
                 </ListingCard>
             </PressableScale>
         </Animated.View>
@@ -189,6 +189,7 @@ export default PlaceCard;
 const styles = StyleSheet.create({
     card: {
         marginBottom: 12,
+        overflow: 'hidden',
     },
     row: {
         flexDirection: 'row',
@@ -234,6 +235,25 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
+    },
+    typeBadge: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 999,
+        borderTopRightRadius: 12,
+        borderBottomLeftRadius: 12,
+        borderTopLeftRadius: 0,
+        borderBottomRightRadius: 12,
+    },
+    typeBadgeText: {
+        fontSize: 9,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        color: '#FFFFFF',
     },
     name: {
         fontSize: 14.5,

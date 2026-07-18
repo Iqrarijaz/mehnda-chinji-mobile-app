@@ -1,0 +1,314 @@
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useEffect } from 'react';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image } from 'expo-image';
+import Svg, { Circle, Path, Rect, Line } from 'react-native-svg';
+import Animated, {
+    Easing,
+    FadeInDown,
+    FadeInUp,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { ThemedText } from '@/components/ThemedText';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
+import { capitalizeString } from '@/utils/string';
+
+interface GovtHeroHeaderProps {
+    place: any;
+    placeName: string;
+    isOwner: boolean;
+    onBack: () => void;
+    onReport: () => void;
+    onEdit: () => void;
+}
+
+/**
+ * Authoritative govt-office hero header: deep slate-blue surface, faint
+ * civic decor (pillars, shield, seal rings), a slow-pulse icon tile —
+ * all presentation-only, actions pass through.
+ */
+export function GovtHeroHeader({
+    place,
+    placeName,
+    isOwner,
+    onBack,
+    onReport,
+    onEdit,
+}: GovtHeroHeaderProps) {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+    const insets = useSafeAreaInsets();
+
+    const typeLabel = place?.type ? capitalizeString(place.type) : 'Govt Office';
+    const timing = typeof place?.timing === 'string' ? place.timing.trim() : '';
+    const area = [place?.village, place?.city].filter(Boolean).map(capitalizeString).join(', ');
+    const placeImage = place?.images?.length > 0 ? place.images[0] : null;
+
+    const pulse = useSharedValue(0);
+
+    useEffect(() => {
+        pulse.value = withRepeat(
+            withTiming(1, { duration: 2400, easing: Easing.inOut(Easing.sin) }),
+            -1,
+            true
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const haloStyle = useAnimatedStyle(() => ({
+        opacity: 0.16 + pulse.value * 0.13,
+        transform: [{ scale: 1.07 + pulse.value * 0.1 }],
+    }));
+
+    const tileStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: 1 + pulse.value * 0.02 }],
+    }));
+
+    const BG = '#1e2e4a'; // slate-blue government feel
+
+    return (
+        <Animated.View
+            entering={FadeInUp.duration(450)}
+            style={[styles.container, { backgroundColor: BG }]}
+        >
+            {/* Civic / institutional decor */}
+            <Svg
+                style={StyleSheet.absoluteFill}
+                viewBox="0 0 375 185"
+                preserveAspectRatio="xMinYMin slice"
+            >
+                {/* Seal rings (top-right) */}
+                <Circle cx={360} cy={-5} r={95} fill="rgba(255,255,255,0.04)" />
+                <Circle cx={360} cy={-5} r={65} fill="rgba(255,255,255,0.04)" />
+                <Circle cx={360} cy={-5} r={38} fill="rgba(255,255,255,0.05)" />
+
+                {/* Pillar silhouettes (left) */}
+                <Rect x={22} y={85} width={9} height={90} rx={3} fill="rgba(255,255,255,0.07)" />
+                <Rect x={36} y={85} width={9} height={90} rx={3} fill="rgba(255,255,255,0.07)" />
+                <Rect x={50} y={85} width={9} height={90} rx={3} fill="rgba(255,255,255,0.07)" />
+                {/* Pillar cap */}
+                <Rect x={16} y={80} width={50} height={7} rx={2} fill="rgba(255,255,255,0.09)" />
+                {/* Pediment triangle */}
+                <Path d="M16 80 L41 55 L66 80 Z" fill="rgba(255,255,255,0.07)" />
+
+                {/* Shield outline (center-right) */}
+                <Path
+                    d="M230 50 L258 50 L258 78 Q244 92 230 78 Z"
+                    stroke="rgba(255,255,255,0.09)"
+                    strokeWidth={1.5}
+                    fill="rgba(255,255,255,0.04)"
+                />
+                {/* Horizontal rule inside shield */}
+                <Line x1={234} y1={64} x2={254} y2={64} stroke="rgba(255,255,255,0.09)" strokeWidth={1} />
+
+                {/* Accent dots */}
+                <Circle cx={160} cy={42} r={3} fill={colors.lime} opacity={0.45} />
+                <Circle cx={290} cy={130} r={2.5} fill="rgba(255,255,255,0.18)" />
+                <Circle cx={195} cy={22} r={2} fill="rgba(255,255,255,0.12)" />
+            </Svg>
+
+            {/* Nav row */}
+            <View
+                style={[
+                    styles.navRow,
+                    { paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 8) },
+                ]}
+            >
+                <TouchableOpacity onPress={onBack} style={styles.navButton} activeOpacity={0.8}>
+                    <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
+                </TouchableOpacity>
+                <View style={styles.navActions}>
+                    <TouchableOpacity
+                        style={[styles.navButton, { backgroundColor: '#FFFFFF' }]}
+                        onPress={onReport}
+                        activeOpacity={0.8}
+                    >
+                        <Ionicons name="flag" size={18} color="#EF4444" />
+                    </TouchableOpacity>
+                    {isOwner && (
+                        <TouchableOpacity
+                            style={[styles.navButton, { backgroundColor: '#FFFFFF' }]}
+                            onPress={onEdit}
+                            activeOpacity={0.8}
+                        >
+                            <Ionicons name="pencil" size={18} color={BG} />
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </View>
+
+            {/* Identity row */}
+            <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.identityRow}>
+                <View style={styles.identityText}>
+                    <View style={styles.chipRow}>
+                        <View style={[styles.typeChip, { backgroundColor: colors.lime }]}>
+                            <MaterialCommunityIcons name="office-building" size={11} color="#1E293B" />
+                            <ThemedText style={styles.typeChipText}>{typeLabel}</ThemedText>
+                        </View>
+                        {timing ? (
+                            <View style={styles.timingChip}>
+                                <View style={[styles.timingDot, { backgroundColor: colors.lime }]} />
+                                <ThemedText style={styles.timingText} numberOfLines={1}>
+                                    {timing}
+                                </ThemedText>
+                            </View>
+                        ) : null}
+                    </View>
+
+                    <ThemedText style={styles.title} numberOfLines={2}>
+                        {placeName}
+                    </ThemedText>
+
+                    <View style={styles.subtitleRow}>
+                        <MaterialCommunityIcons name="shield-check-outline" size={12} color="rgba(255,255,255,0.65)" />
+                        <ThemedText style={styles.subtitle} numberOfLines={1}>
+                            {area ? `Serving ${area}` : 'Government Public Services'}
+                        </ThemedText>
+                    </View>
+                </View>
+
+                <View style={styles.tileWrap}>
+                    <Animated.View style={[styles.halo, haloStyle]} />
+                    <Animated.View style={[styles.serviceTile, tileStyle]}>
+                        {placeImage ? (
+                            <Image source={{ uri: placeImage }} style={styles.serviceImage} contentFit="cover" />
+                        ) : (
+                            <MaterialCommunityIcons name="office-building" size={28} color="#FFFFFF" />
+                        )}
+                    </Animated.View>
+                </View>
+            </Animated.View>
+
+            {/* Bottom accent line */}
+            <Animated.View entering={FadeInDown.delay(200).duration(450)} style={styles.accentLine}>
+                <Svg width="100%" height={12} viewBox="0 0 375 12" preserveAspectRatio="none">
+                    <Path
+                        d="M0 6 Q94 0 187 6 Q281 12 375 6"
+                        stroke="rgba(255,255,255,0.11)"
+                        strokeWidth={1.5}
+                        fill="none"
+                    />
+                </Svg>
+            </Animated.View>
+        </Animated.View>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        width: '100%',
+        paddingBottom: 12,
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
+        overflow: 'hidden',
+    },
+    navRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingBottom: 4,
+    },
+    navActions: { flexDirection: 'row', gap: 8 },
+    navButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    identityRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        marginTop: 10,
+        gap: 14,
+    },
+    identityText: { flex: 1 },
+    chipRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 8,
+        flexWrap: 'wrap',
+    },
+    typeChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 999,
+    },
+    typeChipText: {
+        fontSize: 10,
+        fontWeight: '800',
+        color: '#1E293B',
+        textTransform: 'uppercase',
+        letterSpacing: 0.6,
+    },
+    timingChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        paddingHorizontal: 9,
+        paddingVertical: 4,
+        borderRadius: 999,
+        backgroundColor: 'rgba(255,255,255,0.14)',
+        flexShrink: 1,
+    },
+    timingDot: { width: 6, height: 6, borderRadius: 3 },
+    timingText: {
+        fontSize: 10,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        letterSpacing: 0.4,
+        textTransform: 'uppercase',
+        flexShrink: 1,
+    },
+    title: {
+        fontSize: 21,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: 0.2,
+        lineHeight: 26,
+    },
+    subtitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        marginTop: 5,
+    },
+    subtitle: {
+        fontSize: 12.5,
+        color: 'rgba(255,255,255,0.78)',
+        fontWeight: '600',
+        flexShrink: 1,
+    },
+    tileWrap: { width: 58, height: 58, justifyContent: 'center', alignItems: 'center' },
+    halo: {
+        position: 'absolute',
+        width: 58,
+        height: 58,
+        borderRadius: 29,
+        backgroundColor: 'rgba(255,255,255,0.25)',
+    },
+    serviceTile: {
+        width: 58,
+        height: 58,
+        borderRadius: 29,
+        backgroundColor: 'rgba(255,255,255,0.14)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+    },
+    serviceImage: { width: '100%', height: '100%' },
+    accentLine: { marginTop: 12, paddingHorizontal: 20 },
+});

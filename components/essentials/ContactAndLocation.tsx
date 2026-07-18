@@ -11,7 +11,7 @@ interface ContactAndLocationProps {
     primaryColor: string;
 }
 
-export function ContactAndLocation({ place, address, primaryColor }: ContactAndLocationProps) {
+export const ContactAndLocation = React.memo(({ place, address, primaryColor }: ContactAndLocationProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -49,7 +49,9 @@ export function ContactAndLocation({ place, address, primaryColor }: ContactAndL
             )}
         </View>
     );
-}
+});
+
+ContactAndLocation.displayName = 'ContactAndLocation';
 
 const styles = StyleSheet.create({
     detailSection: {

@@ -22,7 +22,7 @@ interface PressableScaleProps {
  * Press-feedback wrapper shared by all category detail pages: the surface
  * gently scales down while pressed. Pure transform, runs on the UI thread.
  */
-export function PressableScale({
+function PressableScaleComponent({
     onPress,
     disabled,
     intensity = 0.03,
@@ -49,3 +49,6 @@ export function PressableScale({
         </Animated.View>
     );
 }
+
+export const PressableScale = React.memo(PressableScaleComponent);
+PressableScale.displayName = 'PressableScale';

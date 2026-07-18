@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
@@ -16,7 +17,7 @@ interface ContactEssentialDetailsProps {
     primaryColor: string;
 }
 
-export function ContactEssentialDetails({ contacts, primaryColor }: ContactEssentialDetailsProps) {
+export const ContactEssentialDetails = React.memo(({ contacts, primaryColor }: ContactEssentialDetailsProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -56,7 +57,9 @@ export function ContactEssentialDetails({ contacts, primaryColor }: ContactEssen
             ))}
         </View>
     );
-}
+});
+
+ContactEssentialDetails.displayName = 'ContactEssentialDetails';
 
 const styles = StyleSheet.create({
     detailSection: {

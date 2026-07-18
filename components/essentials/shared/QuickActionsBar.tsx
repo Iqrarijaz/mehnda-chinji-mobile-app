@@ -22,13 +22,13 @@ interface QuickActionsBarProps {
  * The page's existing primary actions (call + directions) as a premium
  * button row. No new functionality — handlers pass through unchanged.
  */
-export function QuickActionsBar({
+export const QuickActionsBar = React.memo(({
     onCall,
     hasContact = false,
     callLabel = 'Call Now',
     onDirections,
     hasDirections,
-}: QuickActionsBarProps) {
+}: QuickActionsBarProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -68,7 +68,9 @@ export function QuickActionsBar({
             </PressableScale>
         </Animated.View>
     );
-}
+});
+
+QuickActionsBar.displayName = 'QuickActionsBar';
 
 const styles = StyleSheet.create({
     row: {

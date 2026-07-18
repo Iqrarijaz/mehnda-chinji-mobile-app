@@ -56,7 +56,7 @@ const iconForContact = (name?: string): ContactIcon => {
     return { set: 'ion', name: 'call' };
 };
 
-function ContactCard({
+const ContactCard = React.memo(({
     contact,
     index,
     size,
@@ -66,7 +66,7 @@ function ContactCard({
     index: number;
     size: 'regular' | 'large';
     iconTint: 'primary' | 'secondary';
-}) {
+}) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const large = size === 'large';
@@ -143,20 +143,22 @@ function ContactCard({
             </PressableScale>
         </Animated.View>
     );
-}
+});
+
+ContactCard.displayName = 'ContactCard';
 
 /**
  * Reusable contact list shared by every category detail page. Rows are
  * whole-card call targets; calling behavior (tel: link + toast) is identical
  * to the original implementation.
  */
-export function ContactSection({
+export const ContactSection = React.memo(({
     contacts,
     title = 'Contact Details',
     hint,
     size = 'regular',
     iconTint = 'primary',
-}: ContactSectionProps) {
+}: ContactSectionProps) => {
     if (!contacts || contacts.length === 0) return null;
 
     return (
@@ -175,7 +177,9 @@ export function ContactSection({
             </View>
         </View>
     );
-}
+});
+
+ContactSection.displayName = 'ContactSection';
 
 const styles = StyleSheet.create({
     section: {

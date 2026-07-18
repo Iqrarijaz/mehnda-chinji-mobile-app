@@ -1,6 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useRef, useMemo, useState } from 'react';
+import React, { useCallback, useRef, useMemo } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -25,8 +25,6 @@ import { useTheme } from '@/context/ThemeContext';
 import { ReportModal } from '@/components/common/ReportModal';
 import { ThemedText } from '@/components/ThemedText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import TopperCard from '@/components/places/TopperCard';
-import EventCard from '@/components/places/EventCard';
 import { useAuth } from '@/context/AuthContext';
 import BannerAd from '@/ads/components/BannerAd';
 import { TravelRoute } from '@/components/essentials/TravelRoute';
@@ -35,6 +33,9 @@ import { ContactEssentialDetails } from '@/components/essentials/ContactEssentia
 import { TravelHeroHeader } from '@/components/essentials/travel/TravelHeroHeader';
 import { EmergencyHeroHeader } from '@/components/essentials/emergency/EmergencyHeroHeader';
 import { HealthHeroHeader } from '@/components/essentials/health/HealthHeroHeader';
+import { ReligiousHeroHeader } from '@/components/essentials/religious/ReligiousHeroHeader';
+import { BankHeroHeader } from '@/components/essentials/bank/BankHeroHeader';
+import { GovtHeroHeader } from '@/components/essentials/govt/GovtHeroHeader';
 import { EducationHeroHeader } from '@/components/essentials/education/EducationHeroHeader';
 import { ContactSection } from '@/components/essentials/shared/ContactSection';
 import { LocationSection } from '@/components/essentials/shared/LocationSection';
@@ -56,7 +57,6 @@ const PlaceDetailScreen = () => {
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
     const reportModalRef = useRef<any>(null);
-    const [eduTab, setEduTab] = useState<'toppers' | 'events'>('toppers');
 
     const currentUserId = authData?.user?._id;
 
@@ -152,18 +152,6 @@ const PlaceDetailScreen = () => {
         });
     }, [colors]);
 
-    const sortedToppers = useMemo(() => {
-        if (!place?.toppers?.length) return [];
-        return [...place.toppers].sort((a: any, b: any) => parseInt(b.passingYear) - parseInt(a.passingYear));
-    }, [place?.toppers]);
-
-    const sortedEvents = useMemo(() => {
-        if (!place?.events?.length) return [];
-        return [...place.events].sort((a: any, b: any) => {
-            if (!a.date || !b.date) return 0;
-            return new Date(b.date).getTime() - new Date(a.date).getTime();
-        });
-    }, [place?.events]);
 
     const placeName = useMemo(() => capitalizeString(place?.name), [place?.name]);
     const address = capitalizeString(place?.address || place?.village || 'N/A');
@@ -244,6 +232,9 @@ const PlaceDetailScreen = () => {
     const isEmergency = category.toLowerCase() === 'emergency';
     const isHealth = category.toLowerCase() === 'health';
     const isEducation = category.toLowerCase() === 'education';
+    const isReligious = category.toLowerCase() === 'religious' || category.toLowerCase() === 'mosque';
+    const isBank = category.toLowerCase() === 'bank';
+    const isGovt = category.toLowerCase() === 'govt' || category.toLowerCase() === 'govt office';
 
     return (
         <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
@@ -270,6 +261,33 @@ const PlaceDetailScreen = () => {
                 />
             ) : isHealth ? (
                 <HealthHeroHeader
+                    place={place}
+                    placeName={placeName}
+                    isOwner={!!isOwner}
+                    onBack={() => router.back()}
+                    onReport={() => reportModalRef.current?.present()}
+                    onEdit={handleEdit}
+                />
+            ) : isReligious ? (
+                <ReligiousHeroHeader
+                    place={place}
+                    placeName={placeName}
+                    isOwner={!!isOwner}
+                    onBack={() => router.back()}
+                    onReport={() => reportModalRef.current?.present()}
+                    onEdit={handleEdit}
+                />
+            ) : isBank ? (
+                <BankHeroHeader
+                    place={place}
+                    placeName={placeName}
+                    isOwner={!!isOwner}
+                    onBack={() => router.back()}
+                    onReport={() => reportModalRef.current?.present()}
+                    onEdit={handleEdit}
+                />
+            ) : isGovt ? (
+                <GovtHeroHeader
                     place={place}
                     placeName={placeName}
                     isOwner={!!isOwner}
@@ -348,7 +366,7 @@ const PlaceDetailScreen = () => {
                 <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', flex: 1 }]}>
 
                     {/* Quick Interactive Actions Row */}
-                    {isEmergency || isHealth || isEducation ? (
+                    {isEmergency || isHealth || isEducation || isReligious || isBank || isGovt ? (
                         <QuickActionsBar
                             onCall={() => handleCall(contacts[0]?.number)}
                             onDirections={handleNavigate}
@@ -400,64 +418,20 @@ const PlaceDetailScreen = () => {
                                 size="large"
                                 iconTint="secondary"
                             />
-                        ) : isHealth || isEducation ? (
+                        ) : isHealth || isEducation || isReligious || isBank || isGovt ? (
                             <ContactSection contacts={contacts} />
                         ) : (
                             <ContactEssentialDetails contacts={contacts} primaryColor={primaryColor} />
                         )}
 
-                        {/* Section: Tags */}
-                        {(isTravel || isEducation) && place.tags && place.tags.length > 0 && (
-                            <TagChips tags={place.tags} accentDots />
+                        {/* Section: Tags — shown for all categories */}
+                        {place.tags && place.tags.length > 0 && (
+                            <TagChips
+                                tags={place.tags}
+                                accentDots={!isEmergency && !isHealth}
+                                highlightAvailability={isEmergency || isHealth}
+                            />
                         )}
-                        {(isEmergency || isHealth) && place.tags && place.tags.length > 0 && (
-                            <TagChips tags={place.tags} highlightAvailability />
-                        )}
-                        {!isTravel && !isEmergency && !isHealth && !isEducation && place.tags && place.tags.length > 0 && (
-                            <View style={styles.detailSection}>
-                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                    Tags
-                                </ThemedText>
-                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-                                    {place.tags.map((tag: any, index: number) => {
-                                        let displayText = '';
-                                        if (typeof tag === 'string') {
-                                            displayText = capitalizeString(tag);
-                                        } else {
-                                            const en = tag.eng || tag.en;
-                                            const ur = tag.ur;
-                                            if (en && ur) {
-                                                displayText = `${capitalizeString(en)} | ${ur}`;
-                                            } else if (en) {
-                                                displayText = capitalizeString(en);
-                                            } else if (ur) {
-                                                displayText = ur;
-                                            }
-                                        }
-                                        if (!displayText) return null;
-                                        return (
-                                            <View key={index} style={{ backgroundColor: primaryColor + '15', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
-                                                <ThemedText style={{ color: primaryColor, fontSize: 11, fontWeight: '600' }}>{displayText}</ThemedText>
-                                            </View>
-                                        );
-                                    })}
-                                </View>
-                            </View>
-                        )}
-
-                        {/* Section: Description/About */}
-                        {place.description && (
-                            <View style={styles.detailSection}>
-                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                    About Place
-                                </ThemedText>
-                                <View style={{ gap: 4 }}>
-                                    {renderFormattedText(place.description)}
-                                </View>
-                            </View>
-                        )}
-
-
 
                         {/* Travel Specific Fields */}
                         {category.toLowerCase() === 'travel' && (
@@ -492,89 +466,39 @@ const PlaceDetailScreen = () => {
                                 timingLabel="Office Hours"
                             />
                         )}
-                        {!isTravel && !isEmergency && !isHealth && !isEducation && (
+                        {isReligious && (
+                            <LocationSection
+                                place={place}
+                                address={address}
+                                onDirections={handleNavigate}
+                                hasDirections={!!hasDirections}
+                                timingLabel="Prayer Times"
+                            />
+                        )}
+                        {isBank && (
+                            <LocationSection
+                                place={place}
+                                address={address}
+                                onDirections={handleNavigate}
+                                hasDirections={!!hasDirections}
+                                timingLabel="Banking Hours"
+                            />
+                        )}
+                        {isGovt && (
+                            <LocationSection
+                                place={place}
+                                address={address}
+                                onDirections={handleNavigate}
+                                hasDirections={!!hasDirections}
+                                timingLabel="Office Hours"
+                            />
+                        )}
+                        {!isTravel && !isEmergency && !isHealth && !isEducation && !isReligious && !isBank && !isGovt && (
                             <ContactAndLocation place={place} address={address} primaryColor={primaryColor} />
                         )}
                     </View>
                 </View>
 
-                {/* Education: Toppers & Events — Separate Card */}
-                {category.toLowerCase() === 'education' && (sortedToppers.length > 0 || sortedEvents.length > 0) && (
-                    <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', marginTop: 12, borderTopLeftRadius: 0, borderTopRightRadius: 0, paddingVertical: 16, flex: 0 }]}>
-
-                        {/* Tab Switcher */}
-                        <View style={[styles.eduTabContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9', borderColor: 'transparent' }]}>
-                            <TouchableOpacity
-                                onPress={() => setEduTab('toppers')}
-                                style={[
-                                    styles.eduTab,
-                                    eduTab === 'toppers' && { backgroundColor: primaryColor }
-                                ]}
-                                activeOpacity={0.7}
-                            >
-                                <Ionicons name="trophy" size={15} color={eduTab === 'toppers' ? '#FFFFFF' : colors.textSecondary} />
-                                <ThemedText style={[styles.eduTabText, { color: eduTab === 'toppers' ? '#FFFFFF' : colors.textSecondary, fontWeight: eduTab === 'toppers' ? '700' : '500' }]}>
-                                    Toppers{sortedToppers.length > 0 ? ` (${sortedToppers.length})` : ''}
-                                </ThemedText>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => setEduTab('events')}
-                                style={[
-                                    styles.eduTab,
-                                    eduTab === 'events' && { backgroundColor: primaryColor }
-                                ]}
-                                activeOpacity={0.7}
-                            >
-                                <Ionicons name="calendar" size={15} color={eduTab === 'events' ? '#FFFFFF' : colors.textSecondary} />
-                                <ThemedText style={[styles.eduTabText, { color: eduTab === 'events' ? '#FFFFFF' : colors.textSecondary, fontWeight: eduTab === 'events' ? '700' : '500' }]}>
-                                    Events{sortedEvents.length > 0 ? ` (${sortedEvents.length})` : ''}
-                                </ThemedText>
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* Toppers Tab Content */}
-                        {eduTab === 'toppers' && (
-                            <View style={styles.eduContentWrap}>
-                                {sortedToppers.length > 0 ? (
-                                    sortedToppers.map((topper: any, idx: number) => (
-                                        <React.Fragment key={topper._id || idx}>
-                                            <TopperCard topper={topper} primaryColor={primaryColor} />
-                                            {idx < sortedToppers.length - 1 && (
-                                                <View style={[styles.itemDivider, { backgroundColor: colors.border }]} />
-                                            )}
-                                        </React.Fragment>
-                                    ))
-                                ) : (
-                                    <View style={styles.eduEmptyState}>
-                                        <Ionicons name="trophy-outline" size={32} color={colors.textSecondary} />
-                                        <ThemedText style={[styles.eduEmptyText, { color: colors.textSecondary }]}>No toppers added yet</ThemedText>
-                                    </View>
-                                )}
-                            </View>
-                        )}
-
-                        {/* Events Tab Content */}
-                        {eduTab === 'events' && (
-                            <View style={styles.eduContentWrap}>
-                                {sortedEvents.length > 0 ? (
-                                    sortedEvents.map((event: any, idx: number) => (
-                                        <React.Fragment key={event._id || idx}>
-                                            <EventCard event={event} primaryColor={primaryColor} />
-                                            {idx < sortedEvents.length - 1 && (
-                                                <View style={[styles.itemDivider, { backgroundColor: colors.border }]} />
-                                            )}
-                                        </React.Fragment>
-                                    ))
-                                ) : (
-                                    <View style={styles.eduEmptyState}>
-                                        <Ionicons name="calendar-outline" size={32} color={colors.textSecondary} />
-                                        <ThemedText style={[styles.eduEmptyText, { color: colors.textSecondary }]}>No events added yet</ThemedText>
-                                    </View>
-                                )}
-                            </View>
-                        )}
-                    </View>
-                )}
             </ScrollView>
 
             <ReportModal

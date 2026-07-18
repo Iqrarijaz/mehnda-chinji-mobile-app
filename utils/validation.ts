@@ -62,3 +62,20 @@ export const getPasswordStrength = (password: string): number => {
     if (password.length < 10) return 3;
     return 4;
 };
+
+export const businessSchema = yup.object().shape({
+    name: yup.string()
+        .matches(/^[a-zA-Z\s]+$/, 'Name must contain only alphabets')
+        .min(5, 'Name must be at least 5 characters')
+        .max(50, 'Name must not exceed 50 characters')
+        .required('Business Name is required'),
+    address: yup.string()
+        .min(10, 'Address must be at least 10 characters')
+        .max(50, 'Address must not exceed 50 characters')
+        .required('Address is required'),
+    phone: yup.string()
+        .length(11, 'Phone number must be exactly 11 digits')
+        .matches(/^03[0-9]{9}$/, 'Phone number must start with 03 and contain only digits')
+        .required('Phone is required'),
+    category: yup.object().nullable().required('Category is required'),
+});
