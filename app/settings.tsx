@@ -1,6 +1,4 @@
 import { updateProfile } from '@/apis/profile';
-import { DeleteAccountModal } from '@/components/setting/DeleteAccountModal';
-import { PasswordModal } from '@/components/setting/PasswordModal';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -28,10 +26,13 @@ import {
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { SettingRowItem } from '@/components/setting/SettingRow';
-import { ActiveSessionsModal } from '@/components/setting/ActiveSessionsModal';
-import { SectionCard } from '@/components/setting/SectionCard';
+
+import { ActiveSessionsModal } from '@/components/setting/activeSessionsModal';
+import { SectionCard } from '@/components/setting/sectionCard';
+import { SettingRowItem } from '@/components/setting/settingRow';
 import { ScreenHeader } from '@/components/common/ScreenHeader';
+import { PasswordModal } from '@/components/setting/passwordModal';
+import { DeleteAccountModal } from '@/components/setting/deleteAccountModal';
 
 export default function SettingsScreen() {
     const { theme, toggleTheme, isDark } = useTheme();

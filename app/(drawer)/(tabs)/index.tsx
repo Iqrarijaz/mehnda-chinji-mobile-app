@@ -5,11 +5,11 @@ import { GlobalSearchOverlay } from '@/components/common/GlobalSearchOverlay';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { UtilsGrid } from '@/components/home/UtilsGrid';
 import { HomeHeader } from '@/components/home/HomeHeader';
-import { PasswordModal } from '@/components/setting/PasswordModal';
 import BannerAd from '@/ads/components/BannerAd';
 import { ThemedView } from '@/components/ThemedView';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { PasswordModal } from '@/components/setting/passwordModal';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();

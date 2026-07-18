@@ -3,8 +3,10 @@ import { Platform, InteractionManager } from 'react-native';
 import { fetchAppVersionInfo } from '@/apis/app-info';
 import { checkUpdateStatus } from '@/utils/versioning';
 import { clientStorage } from '@/utils/storage';
+import { useAuth } from '@/context/AuthContext';
 
 export const useAppUpdate = () => {
+  const { isAuthenticated } = useAuth();
   const [updateInfo, setUpdateInfo] = useState<{
     visible: boolean;
     isMandatory: boolean;
@@ -22,6 +24,8 @@ export const useAppUpdate = () => {
   const hideUpdateModal = () => setUpdateInfo(prev => ({ ...prev, visible: false }));
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const checkUpdate = async () => {
       try {
         const lastCheckStr = await clientStorage.getItem('last_update_check');
@@ -61,7 +65,7 @@ export const useAppUpdate = () => {
     });
 
     return () => task.cancel();
-  }, []);
+  }, [isAuthenticated]);
 
   return {
     updateInfo,

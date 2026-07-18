@@ -122,13 +122,6 @@ export default function MarketplaceDetailsScreen() {
                     <View style={styles.headerActionsRight}>
                         <ActionMenu actions={ownerActions} triggerIconColor="#fff" triggerIconSize={24} />
                     </View>
-                ) : item?.status === 'live' ? (
-                    <View style={styles.headerActionsRight}>
-
-                        <TouchableOpacity onPress={handleCall} style={styles.headerIconButton}>
-                            <Ionicons name="call-outline" size={20} color="#fff" />
-                        </TouchableOpacity>
-                    </View>
                 ) : null}
             </View>
         </View>
@@ -228,9 +221,21 @@ export default function MarketplaceDetailsScreen() {
                         <ThemedText style={[styles.title, { color: colors.text, textTransform: 'capitalize' }]} >
                             {item.title}
                         </ThemedText>
-                        <ThemedText style={[styles.price, { color: colors.primary }]}>
-                            Rs. {item.price ? item.price.toLocaleString() : '0'}
-                        </ThemedText>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, gap: 12 }}>
+                            <ThemedText style={[styles.price, { color: colors.primary, flex: 1 }]}>
+                                Rs. {item.price ? item.price.toLocaleString() : '0'}
+                            </ThemedText>
+                            {!isOwner && item?.status === 'live' && (
+                                <TouchableOpacity
+                                    style={[styles.actionBtnPrimary, { backgroundColor: colors.primary, flex: 1 }]}
+                                    onPress={handleCall}
+                                    activeOpacity={0.8}
+                                >
+                                    <Ionicons name="call" size={20} color="#FFFFFF" />
+                                    <ThemedText style={styles.actionBtnTextPrimary}>Call Seller</ThemedText>
+                                </TouchableOpacity>
+                            )}
+                        </View>
                     </View>
 
                     {/* Location & Date */}
@@ -590,5 +595,18 @@ const styles = StyleSheet.create({
     smallCardPrice: {
         fontSize: 14,
         fontWeight: 'bold',
+    },
+    actionBtnPrimary: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        borderRadius: 12,
+    },
+    actionBtnTextPrimary: {
+        color: '#FFFFFF',
+        fontFamily: 'Outfit_600SemiBold',
+        fontSize: 16,
+        marginLeft: 8,
     },
 });

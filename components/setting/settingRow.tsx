@@ -10,7 +10,7 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
-import { AnimatedToggle } from './AnimatedToggle';
+import { AnimatedToggle } from './animatedToggle';
 
 
 export interface SettingRowItemProps {
