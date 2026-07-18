@@ -29,6 +29,13 @@ import TopperCard from '@/components/places/TopperCard';
 import EventCard from '@/components/places/EventCard';
 import { useAuth } from '@/context/AuthContext';
 import BannerAd from '@/ads/components/BannerAd';
+import { TravelRoute } from '@/components/essentials/TravelRoute';
+import { ContactAndLocation } from '@/components/essentials/ContactAndLocation';
+import { ContactEssentialDetails } from '@/components/essentials/ContactEssentialDetails';
+import { TravelHeroHeader } from '@/components/essentials/travel/TravelHeroHeader';
+import { TravelContactDetails } from '@/components/essentials/travel/TravelContactDetails';
+import { TravelTags } from '@/components/essentials/travel/TravelTags';
+import { capitalizeString } from '@/utils/string';
 
 const PlaceDetailScreen = () => {
     const { id, placeData, color, category: categoryParam } = useLocalSearchParams<{
@@ -59,14 +66,6 @@ const PlaceDetailScreen = () => {
 
     const primaryColor = color || colors.primary;
 
-    const capitalize = (str?: string) =>
-        str
-            ? str
-                .toLowerCase()
-                .split(' ')
-                .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-                .join(' ')
-            : '';
 
     const renderFormattedText = useCallback((text?: string) => {
         if (!text) return null;
@@ -161,9 +160,9 @@ const PlaceDetailScreen = () => {
         });
     }, [place?.events]);
 
-    const placeName = useMemo(() => capitalize(place?.name), [place?.name]);
-    const address = capitalize(place?.address || place?.village || 'N/A');
-    const category = categoryParam || capitalize(place?.category?.en || place?.category || '');
+    const placeName = useMemo(() => capitalizeString(place?.name), [place?.name]);
+    const address = capitalizeString(place?.address || place?.village || 'N/A');
+    const category = categoryParam || capitalizeString(place?.category?.en || place?.category || '');
     const coordinates = place?.location?.coordinates;
     const hasValidCoordinates = coordinates && (coordinates[0] !== 0 || coordinates[1] !== 0);
     const hasDirections = !!(place?.googleAddress?.trim()) || hasValidCoordinates;
@@ -236,12 +235,23 @@ const PlaceDetailScreen = () => {
 
     const contacts = place.contact || (place.phone ? [{ name: 'Primary', number: place.phone }] : []);
     const placeImage = place.images && place.images.length > 0 ? place.images[0] : null;
+    const isTravel = category.toLowerCase() === 'travel';
 
     return (
         <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
             {/* ── Hero Header ─────────────────────────────────────────── */}
+            {isTravel ? (
+                <TravelHeroHeader
+                    place={place}
+                    placeName={placeName}
+                    isOwner={!!isOwner}
+                    onBack={() => router.back()}
+                    onReport={() => reportModalRef.current?.present()}
+                    onEdit={handleEdit}
+                />
+            ) : (
             <Animated.View entering={FadeInUp.duration(500)} style={styles.heroHeader}>
                 <LinearGradient
                     colors={[primaryColor, primaryColor + 'dd']}
@@ -251,10 +261,28 @@ const PlaceDetailScreen = () => {
                 />
 
                 {/* Nav row */}
-                <View style={[styles.heroHeaderTop, { paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 8) }]}>
+                <View style={[styles.heroHeaderTop, { justifyContent: 'space-between', paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 8) }]}>
                     <TouchableOpacity onPress={() => router.back()} style={styles.heroBackButton}>
                         <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
                     </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                        <TouchableOpacity
+                            style={[styles.heroBackButton, { backgroundColor: '#FFFFFF' }]}
+                            onPress={() => reportModalRef.current?.present()}
+                            activeOpacity={0.8}
+                        >
+                            <Ionicons name="flag" size={18} color="#EF4444" />
+                        </TouchableOpacity>
+                        {isOwner && (
+                            <TouchableOpacity
+                                style={[styles.heroBackButton, { backgroundColor: '#FFFFFF' }]}
+                                onPress={handleEdit}
+                                activeOpacity={0.8}
+                            >
+                                <Ionicons name="pencil" size={18} color={primaryColor} />
+                            </TouchableOpacity>
+                        )}
+                    </View>
                 </View>
 
                 {/* Hero icon + text */}
@@ -270,10 +298,11 @@ const PlaceDetailScreen = () => {
                         {placeName}
                     </ThemedText>
                     <ThemedText style={styles.heroSubtitle} numberOfLines={2}>
-                        {category} {place.type ? `| ${capitalize(place.type)}` : ''}
+                        {category} {place.type ? `| ${capitalizeString(place.type)}` : ''}
                     </ThemedText>
                 </Animated.View>
             </Animated.View>
+            )}
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -285,49 +314,27 @@ const PlaceDetailScreen = () => {
 
                     {/* Quick Interactive Actions Row */}
                     <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
-                        {contacts.length > 0 && (
-                            <TouchableOpacity
-                                style={[styles.actionBtnPrimary, { backgroundColor: primaryColor }]}
-                                onPress={() => handleCall(contacts[0].number)}
-                                activeOpacity={0.8}
-                            >
-                                <Ionicons name="call" size={16} color="#FFFFFF" />
-                                <ThemedText style={styles.actionBtnTextPrimary}>Call</ThemedText>
-                            </TouchableOpacity>
+
+
+                        {category.toLowerCase() !== 'travel' && (
+                            hasDirections ? (
+                                <TouchableOpacity
+                                    style={[styles.actionBtnPrimary, { backgroundColor: primaryColor }]}
+                                    onPress={handleNavigate}
+                                    activeOpacity={0.8}
+                                >
+                                    <Ionicons name="navigate" size={16} color="#FFFFFF" />
+                                    <ThemedText style={styles.actionBtnTextPrimary}>Directions</ThemedText>
+                                </TouchableOpacity>
+                            ) : (
+                                <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
+                                    <Ionicons name="navigate-outline" size={16} color={colors.textSecondary} />
+                                    <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Directions</ThemedText>
+                                </View>
+                            )
                         )}
 
-                        {hasDirections ? (
-                            <TouchableOpacity
-                                style={[styles.actionBtnPrimary, { backgroundColor: primaryColor }]}
-                                onPress={handleNavigate}
-                                activeOpacity={0.8}
-                            >
-                                <Ionicons name="navigate" size={16} color="#FFFFFF" />
-                                <ThemedText style={styles.actionBtnTextPrimary}>Directions</ThemedText>
-                            </TouchableOpacity>
-                        ) : (
-                            <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
-                                <Ionicons name="navigate-outline" size={16} color={colors.textSecondary} />
-                                <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Directions</ThemedText>
-                            </View>
-                        )}
 
-                        <TouchableOpacity
-                            style={[styles.actionBtnIconOnly, { backgroundColor: isDark ? '#334155' : '#f1f5f9' }]}
-                            onPress={() => reportModalRef.current?.present()}
-                            activeOpacity={0.8}
-                        >
-                            <Ionicons name="flag-outline" size={18} color="#EF4444" />
-                        </TouchableOpacity>
-                        {isOwner && (
-                            <TouchableOpacity
-                                style={[styles.actionBtnIconOnly, { backgroundColor: isDark ? '#334155' : '#f1f5f9' }]}
-                                onPress={handleEdit}
-                                activeOpacity={0.8}
-                            >
-                                <Ionicons name="pencil" size={18} color={primaryColor} />
-                            </TouchableOpacity>
-                        )}
                     </View>
 
                     {/* Banner Ad */}
@@ -337,6 +344,49 @@ const PlaceDetailScreen = () => {
 
                     {/* Details Sections */}
                     <View style={styles.sectionsContainer}>
+
+                        {/* Contacts List */}
+                        {isTravel ? (
+                            <TravelContactDetails contacts={contacts} />
+                        ) : (
+                            <ContactEssentialDetails contacts={contacts} primaryColor={primaryColor} />
+                        )}
+
+                        {/* Section: Tags */}
+                        {isTravel && place.tags && place.tags.length > 0 && (
+                            <TravelTags tags={place.tags} />
+                        )}
+                        {!isTravel && place.tags && place.tags.length > 0 && (
+                            <View style={styles.detailSection}>
+                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+                                    Tags
+                                </ThemedText>
+                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                                    {place.tags.map((tag: any, index: number) => {
+                                        let displayText = '';
+                                        if (typeof tag === 'string') {
+                                            displayText = capitalizeString(tag);
+                                        } else {
+                                            const en = tag.eng || tag.en;
+                                            const ur = tag.ur;
+                                            if (en && ur) {
+                                                displayText = `${capitalizeString(en)} | ${ur}`;
+                                            } else if (en) {
+                                                displayText = capitalizeString(en);
+                                            } else if (ur) {
+                                                displayText = ur;
+                                            }
+                                        }
+                                        if (!displayText) return null;
+                                        return (
+                                            <View key={index} style={{ backgroundColor: primaryColor + '15', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
+                                                <ThemedText style={{ color: primaryColor, fontSize: 11, fontWeight: '600' }}>{displayText}</ThemedText>
+                                            </View>
+                                        );
+                                    })}
+                                </View>
+                            </View>
+                        )}
 
                         {/* Section: Description/About */}
                         {place.description && (
@@ -350,117 +400,17 @@ const PlaceDetailScreen = () => {
                             </View>
                         )}
 
-                        {/* Education Specific Metadata */}
-                        {category.toLowerCase() === 'education' && (place.metadata?.principalName || place.metadata?.totalStudents || place.metadata?.totalTeachers) && (
-                            <View style={styles.detailSection}>
-                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                    Institution Stats
-                                </ThemedText>
-                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16, paddingTop: 4 }}>
-                                    {place.metadata?.principalName && (
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                            <View>
-                                                <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Principal</ThemedText>
-                                                <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
-                                                    {capitalize(place.metadata.principalName)}
-                                                </ThemedText>
-                                            </View>
-                                        </View>
-                                    )}
 
-                                    {place.metadata?.totalStudents && (
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                            <View>
-                                                <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Students</ThemedText>
-                                                <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
-                                                    {place.metadata.totalStudents}
-                                                </ThemedText>
-                                            </View>
-                                        </View>
-                                    )}
-
-                                    {place.metadata?.totalTeachers && (
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                            <View>
-                                                <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Teachers</ThemedText>
-                                                <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
-                                                    {place.metadata.totalTeachers}
-                                                </ThemedText>
-                                            </View>
-                                        </View>
-                                    )}
-                                </View>
-                            </View>
-                        )}
 
                         {/* Travel Specific Fields */}
-                        {category.toLowerCase() === 'travel' && Array.isArray(place.route) && place.route.length > 0 && (
-                            <View style={styles.detailSection}>
-                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                    Travel Route
-                                </ThemedText>
-                                <View style={styles.routeContainer}>
-                                    {place.route.map((r: any, idx: number) => (
-                                        <View key={idx} style={styles.routeItem}>
-                                            <View style={styles.routeDotContainer}>
-                                                <View style={[styles.routeDot, { backgroundColor: primaryColor }]} />
-                                                {idx !== place.route.length - 1 && <View style={[styles.routeLine, { backgroundColor: colors.border }]} />}
-                                            </View>
-                                            <View style={styles.routeInfo}>
-                                                <ThemedText style={[styles.routeCity, { color: colors.text }]}>{capitalize(r.city)}</ThemedText>
-                                                <ThemedText style={[styles.routeTime, { color: colors.textSecondary }]}>{r.time}</ThemedText>
-                                            </View>
-                                        </View>
-                                    ))}
-                                </View>
-                            </View>
-                        )}
-
-                        {/* Section: Services */}
-                        {place.services && (
-                            <View style={styles.detailSection}>
-                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                    Services Offered
-                                </ThemedText>
-                                <View style={{ gap: 4 }}>
-                                    {renderFormattedText(place.services)}
-                                </View>
-                            </View>
+                        {category.toLowerCase() === 'travel' && (
+                            <TravelRoute route={place.route} primaryColor={primaryColor} />
                         )}
 
                         {/* Section: Contact & Location */}
-                        <View style={styles.detailSection}>
-                            <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                Contact & Location
-                            </ThemedText>
-
-                            <View style={styles.infoListItem}>
-                                <View style={[styles.infoListIcon, { backgroundColor: primaryColor + '10' }]}>
-                                    <Ionicons name="location" size={12} color={primaryColor} />
-                                </View>
-                                <View style={styles.infoListContent}>
-                                    <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Address</ThemedText>
-                                    <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{address}</ThemedText>
-                                    {(place.village || place.city) && (
-                                        <ThemedText style={[styles.infoListSub, { color: colors.textSecondary }]}>
-                                            {[place.village, place.city].filter(Boolean).join(', ')}
-                                        </ThemedText>
-                                    )}
-                                </View>
-                            </View>
-
-                            {place.timing && (
-                                <View style={styles.infoListItem}>
-                                    <View style={[styles.infoListIcon, { backgroundColor: '#F59E0B10' }]}>
-                                        <Ionicons name="time" size={12} color="#F59E0B" />
-                                    </View>
-                                    <View style={styles.infoListContent}>
-                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Operational Hours</ThemedText>
-                                        <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{place.timing}</ThemedText>
-                                    </View>
-                                </View>
-                            )}
-                        </View>
+                        {category.toLowerCase() !== 'travel' && (
+                            <ContactAndLocation place={place} address={address} primaryColor={primaryColor} />
+                        )}
                     </View>
                 </View>
 

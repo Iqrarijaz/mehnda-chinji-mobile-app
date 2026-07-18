@@ -6,30 +6,28 @@ import { Colors } from '@/constants/colors';
 
 import { Ionicons } from '@expo/vector-icons';
 
-interface SubmitButtonProps extends TouchableOpacityProps {
-    title: string;
-    isLoading?: boolean;
+interface CancelButtonProps extends TouchableOpacityProps {
+    title?: string;
     icon?: keyof typeof Ionicons.glyphMap;
 }
 
-export function SubmitButton({ title, isLoading, disabled, style, icon, ...rest }: SubmitButtonProps) {
-    const isDisabled = disabled || isLoading;
+export function CancelButton({ title = 'Cancel', disabled, style, icon, ...rest }: CancelButtonProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
     return (
         <TouchableOpacity
-            style={[styles.updateButton, { backgroundColor: colors.lime }, isDisabled && { opacity: 0.6 }, style]}
-            disabled={isDisabled}
-            activeOpacity={0.8}
+            style={[styles.cancelButton, { borderColor: colors.border }, disabled && { opacity: 0.6 }, style]}
+            disabled={disabled}
+            activeOpacity={0.7}
             {...rest}
         >
             <View style={styles.buttonContent}>
-                {icon && !isLoading && (
-                    <Ionicons name={icon} size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                {icon && (
+                    <Ionicons name={icon} size={16} color={colors.textSecondary} style={{ marginRight: 6 }} />
                 )}
-                <ThemedText style={styles.updateButtonText}>
-                    {isLoading ? 'Processing...' : title}
+                <ThemedText style={[styles.cancelButtonText, { color: colors.textSecondary }]}>
+                    {title}
                 </ThemedText>
             </View>
         </TouchableOpacity>
@@ -37,7 +35,7 @@ export function SubmitButton({ title, isLoading, disabled, style, icon, ...rest 
 }
 
 const styles = StyleSheet.create({
-    updateButton: {
+    cancelButton: {
         height: 46,
         borderRadius: 24,
         overflow: 'hidden',
@@ -45,6 +43,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         alignSelf: 'flex-start',
         paddingHorizontal: 24,
+        borderWidth: 1,
+        backgroundColor: 'transparent',
     },
     buttonContent: {
         flexDirection: 'row',
@@ -52,8 +52,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 8,
     },
-    updateButtonText: {
-        color: '#FFFFFF',
+    cancelButtonText: {
         fontSize: 14,
         fontWeight: '600',
     },

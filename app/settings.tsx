@@ -11,6 +11,7 @@ import { ReviewService } from '@/utils/review';
 import { fetchAppVersionInfo } from '@/apis/app-info';
 import { checkUpdateStatus } from '@/utils/versioning';
 import { ThankYouModal } from '@/components/common/ThankYou';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -45,6 +46,7 @@ export default function SettingsScreen() {
     const [isEmailModalVisible, setIsEmailModalVisible] = useState(false);
     const [isSessionsModalVisible, setIsSessionsModalVisible] = useState(false);
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [newEmail, setNewEmail] = useState(user?.user?.email || '');
     const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
     const [updateCheckState, setUpdateCheckState] = useState({ visible: false, isAvailable: false, updateUrl: '' });
@@ -96,8 +98,15 @@ export default function SettingsScreen() {
 
     const [activeTab, setActiveTab] = useState<'account' | 'app' | 'legal'>('account');
 
-    const handleLogout = useCallback(() => {
-        logout();
+    const handleLogout = useCallback(async () => {
+        setIsLoggingOut(true);
+        try {
+            await logout();
+        } catch (error) {
+            console.error('Logout failed', error);
+        } finally {
+            setIsLoggingOut(false);
+        }
     }, [logout]);
 
     const tabs = [
@@ -226,6 +235,7 @@ export default function SettingsScreen() {
             <PasswordModal visible={isPasswordModalVisible} onClose={() => setIsPasswordModalVisible(false)} />
             <ActiveSessionsModal visible={isSessionsModalVisible} onClose={() => setIsSessionsModalVisible(false)} />
             <DeleteAccountModal visible={isDeleteModalVisible} onClose={() => setIsDeleteModalVisible(false)} colors={colors} />
+            <LoaderOverlay visible={isLoggingOut} text="Logging out..." />
 
             <Modal visible={isEmailModalVisible} transparent animationType="slide" onRequestClose={() => setIsEmailModalVisible(false)}>
                 <View style={styles.modalOverlay}>

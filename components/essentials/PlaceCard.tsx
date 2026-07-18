@@ -14,7 +14,7 @@ import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { ListingCard } from './ListingCard';
+import { ListingCard } from '@/components/listing/ListingCard';
 
 interface Contact {
     name: string;
@@ -151,15 +151,12 @@ const PlaceCard = React.memo(({ data, category, color, onReport }: PlaceCardProp
                         style={[StyleSheet.absoluteFillObject, styles.bottomFade]}
                     />
 
-                    <View style={[styles.topActions, !typeLabel && { justifyContent: 'flex-end' }]}>
-                        {typeLabel ? (
-                            <View style={[styles.typePill, { backgroundColor: primaryColor }]}>
-                                <Ionicons name="ribbon" size={9} color="#fff" style={{ marginRight: 3 }} />
-                                <ThemedText style={styles.typePillText}>{typeLabel}</ThemedText>
-                            </View>
-                        ) : null}
-
-                    </View>
+                    {typeLabel ? (
+                        <View style={[styles.typePill, { backgroundColor: colors.secondary }]}>
+                            <Ionicons name="ribbon" size={9} color="#fff" style={{ marginRight: 3 }} />
+                            <ThemedText style={styles.typePillText}>{typeLabel}</ThemedText>
+                        </View>
+                    ) : null}
                 </View>
 
                 {/* Content */}
@@ -170,14 +167,16 @@ const PlaceCard = React.memo(({ data, category, color, onReport }: PlaceCardProp
 
 
 
-                    <View style={styles.locationRow}>
-                        <View style={[styles.locationIconWrap, { backgroundColor: primaryAlpha10 }]}>
-                            <Ionicons name="location" size={13} color={primaryColor} />
+                    {category?.toLowerCase() !== 'travel' && (
+                        <View style={styles.locationRow}>
+                            <View style={[styles.locationIconWrap, { backgroundColor: primaryAlpha10 }]}>
+                                <Ionicons name="location" size={13} color={primaryColor} />
+                            </View>
+                            <ThemedText style={[styles.locationText, { color: colors.icon }]} numberOfLines={2}>
+                                {address}
+                            </ThemedText>
                         </View>
-                        <ThemedText style={[styles.locationText, { color: colors.icon }]} numberOfLines={2}>
-                            {address}
-                        </ThemedText>
-                    </View>
+                    )}
                 </View>
             </ListingCard>
         </TouchableOpacity>
@@ -249,11 +248,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     typePill: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 12,
+        borderTopRightRadius: 16,
+        borderBottomLeftRadius: 12,
     },
     typePillText: {
         color: '#FFFFFF',

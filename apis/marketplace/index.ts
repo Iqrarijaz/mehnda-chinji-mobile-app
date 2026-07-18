@@ -72,14 +72,14 @@ export const markMarketplaceListingAsSold = async (listingId: string) => {
     return apiClient.post('/api/user/v1/marketplace/mark-sold', { listingId });
 };
 
-export const incrementMarketplaceInquiry = async (listingId: string) => {
-    return apiClient.post(`/api/user/v1/marketplace/inquiry/${listingId}`);
-};
-
 export const deleteMarketplaceListing = async (listingId: string) => {
     return apiClient.post('/api/user/v1/marketplace/delete', { listingId });
 };
 
 export const toggleMarketplaceListingStatus = async (listingId: string, status: 'live' | 'offline') => {
     return apiClient.post('/api/user/v1/marketplace/toggle-status', { listingId, status });
+};
+
+export const incrementMarketplaceInquiry = async (listingId: string) => {
+    return apiClient.post('/api/user/v1/marketplace/increment-inquiry', { listingId });
 };

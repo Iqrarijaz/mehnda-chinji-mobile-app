@@ -1,4 +1,5 @@
 import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
 import { Image } from 'expo-image';
 import * as ExpoSplashScreen from 'expo-splash-screen';
 import React, { useCallback, useEffect, useRef } from 'react';
@@ -18,7 +19,7 @@ import Animated, {
 const LOGO_SIZE = 128;
 const logoImg = require('../../public/logo.png');
 
-const BACKGROUND = { light: '#E6F4FE', dark: '#0F172A' };
+const BACKGROUND = '#FFFFFF';
 
 
 
@@ -33,7 +34,8 @@ type Props = {
 
 function CustomSplashScreen({ isAppReady, onFinish }: Props) {
     const { theme } = useTheme();
-    const isDark = theme === 'dark';
+    // Splash screen background is forced to white, so we always use light colors
+    const colors = Colors.light;
 
     // First frame renders the logo exactly where the native splash draws it,
     // so hiding the native splash is imperceptible. The intro only starts
@@ -137,7 +139,7 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
             pointerEvents="none"
             style={[
                 styles.container,
-                { backgroundColor: isDark ? BACKGROUND.dark : BACKGROUND.light },
+                { backgroundColor: BACKGROUND },
                 containerStyle,
             ]}
         >
@@ -154,26 +156,26 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
 
             <View style={styles.wordmarkContainer}>
                 <Animated.Text
-                    style={[styles.wordmark, { color: isDark ? '#F8FAFC' : '#0F172A' }, wordmarkStyle]}
+                    style={[styles.wordmark, { color: colors.text }, wordmarkStyle]}
                 >
                     Rehbar
                 </Animated.Text>
                 <Animated.Text
-                    style={[styles.tagline, { color: isDark ? '#94A3B8' : '#64748B' }, taglineStyle]}
+                    style={[styles.tagline, { color: colors.secondary }, taglineStyle]}
                 >
                     Everything Local
                 </Animated.Text>
                 <Animated.View
                     style={[
                         styles.progressBarContainer,
-                        { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,102,102,0.10)' },
+                        { backgroundColor: `${colors.lime}20` },
                         barContainerStyle,
                     ]}
                 >
                     <Animated.View
                         style={[
                             styles.progressBar,
-                            { backgroundColor: isDark ? '#2DD4BF' : '#006666' },
+                            { backgroundColor: colors.lime },
                             progressStyle,
                         ]}
                     />
