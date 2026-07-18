@@ -1,212 +1,143 @@
-import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Image } from 'expo-image';
-import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
 import * as ExpoSplashScreen from 'expo-splash-screen';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { StyleSheet, Text } from 'react-native';
 import Animated, {
     Easing,
+    runOnJS,
     useAnimatedStyle,
     useSharedValue,
     withDelay,
-    withRepeat,
-    withTiming
+    withTiming,
 } from 'react-native-reanimated';
-const LOGO_SIZE = 220;
-const logoImg = require('../../public/logo_with_text.png');
 
-const CustomSplashScreen = React.memo(function CustomSplashScreen() {
+// Must match the native splash: imageWidth in app.json / app.config.js and the
+// 128dp badge baked into android/.../drawable-*/splashscreen_logo.png.
+const LOGO_SIZE = 128;
+const logoImg = require('../../public/logo.png');
+
+const BACKGROUND = { light: '#E6F4FE', dark: '#0F172A' };
+
+type Props = {
+    /** When true the splash fades out and calls onFinish. */
+    isAppReady: boolean;
+    /** Called after the fade-out completes so the overlay can unmount. */
+    onFinish: () => void;
+};
+
+function CustomSplashScreen({ isAppReady, onFinish }: Props) {
     const { theme } = useTheme();
-    const colors = Colors[theme];
     const isDark = theme === 'dark';
 
-    // Split words into character arrays for staggered typewriter animation
-    const titleText = "RAHBAR";
+    // First frame renders the logo exactly where the native splash draws it,
+    // so hiding the native splash is imperceptible. The intro only starts
+    // after the handoff.
+    const logoTranslateY = useSharedValue(0);
+    const logoScale = useSharedValue(1);
+    const wordmarkOpacity = useSharedValue(0);
+    const wordmarkTranslateY = useSharedValue(12);
+    const containerOpacity = useSharedValue(1);
 
-    const titleChars = titleText.split("");
-    // Shared values for animations
-    const logoScale = useSharedValue(1); // Start fully scaled
-    const logoOpacity = useSharedValue(1); // Start fully visible
-    const logoTranslateY = useSharedValue(0); // Start at rest
+    const handoffDone = useRef(false);
 
-    const glowScale = useSharedValue(0.85);
-    const glowOpacity = useSharedValue(0);
+    const startHandoff = useCallback(() => {
+        if (handoffDone.current) return;
+        handoffDone.current = true;
 
-    const progressWidth = useSharedValue(0);
+        ExpoSplashScreen.hideAsync().catch(() => { });
 
-    // Stagger progress animation controllers
-    const titleProgress = useSharedValue(0);
-    const subtitleProgress = useSharedValue(0);
-
-    useEffect(() => {
-
-        // 2. Repeating breathing glow halo behind the logo
-        glowScale.value = withRepeat(
-            withTiming(1.3, { duration: 2400, easing: Easing.bezier(0.4, 0, 0.2, 1) }),
-            -1,
-            true
-        );
-        glowOpacity.value = withRepeat(
-            withTiming(0.4, { duration: 2400, easing: Easing.bezier(0.4, 0, 0.2, 1) }),
-            -1,
-            true
-        );
-
-        // 3. Fill loading progress bar
-        progressWidth.value = withTiming(1, {
-            duration: 2000, // Slowed down
-            easing: Easing.bezier(0.2, 0.8, 0.2, 1)
-        });
-
-        // 4. Staggered character typing start
-        titleProgress.value = withDelay(200, withTiming(1, { duration: 800, easing: Easing.out(Easing.quad) })); // Sped up
-        subtitleProgress.value = withDelay(1000, withTiming(1, { duration: 900, easing: Easing.out(Easing.quad) })); // Sped up
+        const settle = Easing.bezier(0.22, 1, 0.36, 1);
+        logoTranslateY.value = withDelay(250, withTiming(-30, { duration: 650, easing: settle }));
+        logoScale.value = withDelay(250, withTiming(1.04, { duration: 650, easing: settle }));
+        wordmarkOpacity.value = withDelay(450, withTiming(1, { duration: 450, easing: Easing.out(Easing.cubic) }));
+        wordmarkTranslateY.value = withDelay(450, withTiming(0, { duration: 450, easing: settle }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Animated Styles
+    useEffect(() => {
+        // Fallback in case the image onLoad never fires.
+        const timer = setTimeout(startHandoff, 600);
+        return () => clearTimeout(timer);
+    }, [startHandoff]);
+
+    useEffect(() => {
+        if (!isAppReady) return;
+        containerOpacity.value = withTiming(
+            0,
+            { duration: 350, easing: Easing.out(Easing.quad) },
+            () => {
+                runOnJS(onFinish)();
+            }
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAppReady]);
+
+    const containerStyle = useAnimatedStyle(() => ({
+        opacity: containerOpacity.value,
+    }));
+
     const logoStyle = useAnimatedStyle(() => ({
         transform: [
+            { translateY: logoTranslateY.value },
             { scale: logoScale.value },
-            { translateY: logoTranslateY.value }
         ],
-        opacity: logoOpacity.value,
     }));
 
-    const glowStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: glowScale.value }],
-        opacity: glowOpacity.value,
+    const wordmarkStyle = useAnimatedStyle(() => ({
+        opacity: wordmarkOpacity.value,
+        transform: [{ translateY: wordmarkTranslateY.value }],
     }));
-
-    const progressStyle = useAnimatedStyle(() => ({
-        width: `${progressWidth.value * 100}%`,
-    }));
-
-    useEffect(() => {
-        // Fallback in case onLoad doesn't fire
-        const timer = setTimeout(() => {
-            ExpoSplashScreen.hideAsync().catch(() => { });
-        }, 800);
-        return () => clearTimeout(timer);
-    }, []);
 
     return (
-        <View style={[styles.container, { backgroundColor: isDark ? '#0F172A' : '#E6F4FE' }]}>
-            {/* Solid background matching native splash perfectly */}
-
-            {/* Glowing Aura/Halo behind logo */}
-            <Animated.View
-                style={[
-                    styles.glowAura,
-                    { backgroundColor: isDark ? 'rgba(16,185,129,0.12)' : 'rgba(16,185,129,0.06)' },
-                    glowStyle
-                ]}
-            />
-
-            {/* Logo Emblem */}
-            <Animated.View style={[styles.logoContainer, logoStyle]}>
+        <Animated.View
+            pointerEvents="none"
+            style={[
+                styles.container,
+                { backgroundColor: isDark ? BACKGROUND.dark : BACKGROUND.light },
+                containerStyle,
+            ]}
+        >
+            <Animated.View style={logoStyle}>
                 <Image
                     source={logoImg}
                     style={styles.logo}
                     contentFit="contain"
-                    onLoad={async () => {
-                        try {
-                            await ExpoSplashScreen.hideAsync();
-                        } catch (e) {
-                            console.warn(e);
-                        }
-                    }}
+                    transition={0}
+                    onLoad={startHandoff}
                 />
             </Animated.View>
 
-            {/* Glowing active loading line */}
-            <View style={[styles.progressBarContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' }]}>
-                <Animated.View style={[styles.progressBarActive, { backgroundColor: colors.primary }, progressStyle]} />
-            </View>
-
-            {/* Branded Footer with Character Animations */}
-            <View style={styles.footer}>
-                {/* RAHBAR Title */}
-                <View style={styles.charRow}>
-                    {titleChars.map((char, index) => {
-                        const charStyle = useAnimatedStyle(() => {
-                            const start = index / titleChars.length;
-                            const end = (index + 1.5) / titleChars.length;
-                            const opacity = Math.min(Math.max((titleProgress.value - start) / (end - start), 0), 1);
-                            return {
-                                opacity,
-                                transform: [{ translateY: (1 - opacity) * 6 }]
-                            };
-                        });
-                        return (
-                            <Animated.Text
-                                key={`t-${index}`}
-                                style={[
-                                    styles.footerText,
-                                    { color: isDark ? '#FFFFFF' : '#0F172A' },
-                                    charStyle
-                                ]}
-                            >
-                                {char}
-                            </Animated.Text>
-                        );
-                    })}
-                </View>
-
-
-            </View>
-        </View>
+            <Animated.View style={[styles.wordmarkContainer, wordmarkStyle]}>
+                <Text style={[styles.wordmark, { color: isDark ? '#F8FAFC' : '#0F172A' }]}>
+                    Rehbar
+                </Text>
+            </Animated.View>
+        </Animated.View>
     );
-});
+}
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    glowAura: {
-        position: 'absolute',
-        width: LOGO_SIZE * 0.9,
-        height: LOGO_SIZE * 0.9,
-        borderRadius: (LOGO_SIZE * 0.9) / 2,
-    },
-    logoContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 40,
-        zIndex: 2,
+        zIndex: 10,
     },
     logo: {
         width: LOGO_SIZE,
         height: LOGO_SIZE,
     },
-    progressBarContainer: {
+    wordmarkContainer: {
         position: 'absolute',
-        bottom: 110,
-        width: '55%',
-        height: 3,
-        borderRadius: 1.5,
-        overflow: 'hidden',
-    },
-    progressBarActive: {
-        height: '100%',
-        borderRadius: 1.5,
-    },
-    footer: {
-        position: 'absolute',
-        bottom: 50,
+        top: '50%',
+        marginTop: LOGO_SIZE / 2 + 6,
         alignItems: 'center',
     },
-    charRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    footerText: {
-        fontSize: 18,
-        fontWeight: '900',
-        marginHorizontal: 1,
-        letterSpacing: 2,
+    wordmark: {
+        fontSize: 26,
+        fontWeight: '700',
+        letterSpacing: 0.5,
     },
 });
 

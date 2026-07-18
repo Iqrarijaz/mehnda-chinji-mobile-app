@@ -7,6 +7,7 @@
     "icon": "./public/icon.png",
     "scheme": "rehbarcommunityapp",
     "userInterfaceStyle": "light",
+    "backgroundColor": "#E6F4FE",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -70,10 +71,10 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#E6F4FE",
-          "image": "./public/logo_with_text.png",
-          "imageWidth": 220,
+          "image": "./public/logo.png",
+          "imageWidth": 128,
           "dark": {
-            "image": "./public/logo_with_text.png",
+            "image": "./public/logo.png",
             "backgroundColor": "#0F172A"
           }
         }

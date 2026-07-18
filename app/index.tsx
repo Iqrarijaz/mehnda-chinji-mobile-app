@@ -37,6 +37,7 @@ export default function IndexScreen() {
         }
     }, [loading]);
 
-    // Return a blank view with the theme background color to prevent flashing white
-    return <View style={{ flex: 1, backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF' }} />;
+    // Blank view matching the splash background so the splash fade-out lands
+    // on the same color instead of flashing white
+    return <View style={{ flex: 1, backgroundColor: theme === 'dark' ? '#0F172A' : '#E6F4FE' }} />;
 }

@@ -5,6 +5,18 @@ module.exports = ({ config }) => {
             "expo-router",
             "expo-secure-store",
             "@react-native-firebase/app",
+            [
+                "expo-splash-screen",
+                {
+                    "backgroundColor": "#E6F4FE",
+                    "image": "./public/logo.png",
+                    "imageWidth": 128,
+                    "dark": {
+                        "image": "./public/logo.png",
+                        "backgroundColor": "#0F172A"
+                    }
+                }
+            ],
             "@react-native-community/datetimepicker",
             [
                 "expo-notifications",
