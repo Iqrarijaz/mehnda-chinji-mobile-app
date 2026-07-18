@@ -11,15 +11,16 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import Svg, { Circle, Path } from 'react-native-svg';
 import Animated, { FadeIn, FadeInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import Avatar from '@/components/ui/avatar';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { Layout } from '@/constants/layout';
 import { useRewardedAd } from '@/ads/hooks/useAds';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
@@ -39,6 +40,85 @@ const MENU_ITEMS: MenuItem[] = [
     { label: 'Give Feedback', icon: 'chatbubble-ellipses-outline', route: '/(drawer)/feedback', section: 'Support' },
     { label: 'Support & FAQ', icon: 'help-circle-outline', route: '/support', section: 'Support' },
 ];
+
+// Presentation-only, time-based greeting for the header.
+const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+};
+
+interface DrawerRowProps {
+    item: MenuItem;
+    isFocused: boolean;
+    isDisabled: boolean;
+    delay: number;
+    colors: typeof Colors.light;
+    onPress: () => void;
+}
+
+const DrawerRow = memo(function DrawerRow({
+    item,
+    isFocused,
+    isDisabled,
+    delay,
+    colors,
+    onPress,
+}: DrawerRowProps) {
+    return (
+        <Animated.View entering={FadeInLeft.delay(delay).duration(300)}>
+            <PressableScale
+                intensity={0.03}
+                disabled={isDisabled}
+                onPress={onPress}
+                style={[
+                    styles.menuItem,
+                    isFocused && { backgroundColor: `${colors.primary}0F` },
+                    isDisabled && { opacity: 0.5 },
+                ]}
+            >
+                {/* Active accent bar */}
+                {isFocused && <View style={[styles.activeBar, { backgroundColor: colors.lime }]} />}
+
+                {/* Icon tile */}
+                <View
+                    style={[
+                        styles.iconTile,
+                        {
+                            backgroundColor: isFocused
+                                ? colors.primary
+                                : `${colors.primary}0D`,
+                        },
+                    ]}
+                >
+                    <Ionicons
+                        name={item.icon}
+                        size={18}
+                        color={isFocused ? '#FFFFFF' : colors.textSecondary}
+                    />
+                </View>
+
+                <ThemedText
+                    style={[
+                        styles.menuLabel,
+                        { color: isFocused ? colors.primary : colors.text },
+                        isFocused && { fontWeight: '800' },
+                    ]}
+                    numberOfLines={1}
+                >
+                    {item.label}
+                </ThemedText>
+
+                <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color={isFocused ? colors.primary : `${colors.textSecondary}66`}
+                />
+            </PressableScale>
+        </Animated.View>
+    );
+});
 
 const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
     const { user, logout } = useAuth();
@@ -78,7 +158,6 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
 
     const userEmail = user?.user?.email || '';
 
-
     // Group items by section
     const sections = MENU_ITEMS.reduce<Record<string, MenuItem[]>>((acc, item) => {
         const section = item.section || 'Other';
@@ -87,108 +166,135 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
         return acc;
     }, {});
 
+    // Running index so menu rows stagger in continuously across sections.
+    let rowIndex = 0;
+
     return (
         <View style={[styles.container, { backgroundColor: colors.card }]}>
-            {/* Minimalist Centered Header */}
-            <Animated.View entering={FadeIn.duration(400)} style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }]}>
+            {/* ── Premium hero header ─────────────────────────────────── */}
+            <Animated.View
+                entering={FadeIn.duration(400)}
+                style={[
+                    styles.header,
+                    {
+                        backgroundColor: colors.primary,
+                        paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20),
+                    },
+                ]}
+            >
+                {/* Faint community decor */}
+                <Svg style={StyleSheet.absoluteFill} viewBox="0 0 300 200" preserveAspectRatio="xMinYMin slice">
+                    <Circle cx={290} cy={10} r={70} fill="rgba(255,255,255,0.05)" />
+                    <Circle cx={10} cy={190} r={55} fill="rgba(255,255,255,0.04)" />
+                    <Path
+                        d="M40 150 C 100 120, 180 175, 280 115"
+                        stroke="rgba(255,255,255,0.08)"
+                        strokeWidth={2}
+                        strokeDasharray="4 8"
+                        strokeLinecap="round"
+                        fill="none"
+                    />
+                    <Path
+                        d="M230 60 l10 -8 l10 8 v14 h-20 z"
+                        fill="none"
+                        stroke="rgba(255,255,255,0.09)"
+                        strokeWidth={2}
+                        strokeLinejoin="round"
+                    />
+                    <Circle cx={60} cy={70} r={3} fill={colors.lime} opacity={0.55} />
+                    <Circle cx={200} cy={150} r={2.5} fill={colors.secondary} opacity={0.6} />
+                </Svg>
+
                 <View style={styles.headerTop}>
                     <TouchableOpacity
                         style={styles.closeBtn}
                         onPress={() => props.navigation.closeDrawer()}
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                        <Ionicons name="close" size={24} color={colors.textSecondary} />
+                        <Ionicons name="close" size={20} color="#FFFFFF" />
                     </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity
                     onPress={() => handleNavigation('/profile')}
-                    activeOpacity={0.8}
-                    style={styles.avatarWrap}
+                    activeOpacity={0.85}
+                    style={styles.identityRow}
                 >
-                    <Avatar
-                        uri={user?.user?.profileImage}
-                        name={user?.user?.name}
-                        size={56}
-                    />
-                    <View style={[styles.onlineBadge, { borderColor: colors.card }]} />
+                    <View style={styles.avatarWrap}>
+                        <Avatar
+                            uri={user?.user?.profileImage}
+                            name={user?.user?.name}
+                            size={54}
+                        />
+                        <View style={[styles.onlineBadge, { backgroundColor: colors.lime, borderColor: colors.primary }]} />
+                    </View>
+
+                    <View style={styles.identityText}>
+                        <ThemedText style={styles.greeting}>{getGreeting()}</ThemedText>
+                        <ThemedText style={styles.headerName} numberOfLines={1}>{userName}</ThemedText>
+                        {user?.user?.isPremium ? (
+                            <View style={[styles.premiumBadge, { backgroundColor: colors.lime }]}>
+                                <Ionicons name="star" size={10} color="#1E293B" style={{ marginRight: 3 }} />
+                                <ThemedText style={styles.premiumText}>PREMIUM</ThemedText>
+                            </View>
+                        ) : userEmail ? (
+                            <ThemedText style={styles.headerEmail} numberOfLines={1}>{userEmail}</ThemedText>
+                        ) : null}
+                    </View>
+
+                    <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.7)" />
                 </TouchableOpacity>
-                <View style={styles.headerTextWrap}>
-                    <ThemedText style={[styles.headerName, { color: colors.text }]}>{userName}</ThemedText>
-                    {userEmail ? (
-                        <ThemedText style={[styles.headerEmail, { color: colors.textSecondary }]} numberOfLines={1}>{userEmail}</ThemedText>
-                    ) : null}
-                    {user?.user?.isPremium && (
-                        <View style={[styles.premiumBadge, { backgroundColor: colors.primary + '20' }]}>
-                            <Ionicons name="star" size={12} color={colors.primary} style={{ marginRight: 4 }} />
-                            <ThemedText style={[styles.premiumText, { color: colors.primary }]}>PREMIUM</ThemedText>
-                        </View>
-                    )}
-                </View>
             </Animated.View>
 
-            {/* Menu */}
+            {/* ── Menu ────────────────────────────────────────────────── */}
             <DrawerContentScrollView
                 {...props}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
                 {Object.entries(sections).map(([sectionName, items], sectionIndex) => (
-                    <Animated.View
-                        key={sectionName}
-                        entering={FadeInLeft.delay(100 + sectionIndex * 50).duration(300)}
-                        style={styles.section}
-                    >
-                        <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>{sectionName}</ThemedText>
-                        {items.map((item, index) => {
+                    <View key={sectionName} style={styles.section}>
+                        <Animated.View entering={FadeInLeft.delay(80 + sectionIndex * 40).duration(300)}>
+                            <View style={styles.sectionLabelRow}>
+                                <View style={[styles.sectionDot, { backgroundColor: colors.secondary }]} />
+                                <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>{sectionName}</ThemedText>
+                            </View>
+                        </Animated.View>
+                        {items.map((item) => {
                             const isFocused =
                                 (item.route === '/(tabs)' && activeRoute === '(tabs)') ||
                                 item.route === `/${activeRoute}`;
 
                             const isDisabled = item.route === 'REWARDED_AD' && !isAdLoaded;
+                            const delay = 120 + rowIndex * 40;
+                            rowIndex += 1;
 
                             return (
-                                <TouchableOpacity
-                                    key={index}
-                                    activeOpacity={0.7}
-                                    disabled={isDisabled}
-                                    style={[
-                                        styles.menuItem,
-                                        isFocused && { backgroundColor: colors.primary + '12' },
-                                        isDisabled && { opacity: 0.5 },
-                                    ]}
+                                <DrawerRow
+                                    key={item.route}
+                                    item={item}
+                                    isFocused={isFocused}
+                                    isDisabled={isDisabled}
+                                    delay={delay}
+                                    colors={colors}
                                     onPress={() => handleNavigation(item.route)}
-                                >
-                                    <Ionicons
-                                        name={item.icon}
-                                        size={20}
-                                        color={isFocused ? colors.primary : colors.textSecondary}
-                                        style={styles.menuIcon}
-                                    />
-                                    <ThemedText style={[
-                                        styles.menuLabel,
-                                        { color: isFocused ? colors.primary : colors.text },
-                                        isFocused && { fontWeight: '700' },
-                                    ]}>
-                                        {item.label}
-                                    </ThemedText>
-                                </TouchableOpacity>
+                                />
                             );
                         })}
-                    </Animated.View>
+                    </View>
                 ))}
             </DrawerContentScrollView>
 
-            {/* Minimalist Footer */}
+            {/* ── Footer ──────────────────────────────────────────────── */}
             <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
-                <TouchableOpacity
-                    activeOpacity={0.7}
+                <PressableScale
+                    intensity={0.03}
                     onPress={handleLogout}
-                    style={styles.logoutBtn}
+                    style={[styles.logoutBtn, { backgroundColor: `${colors.secondary}12` }]}
                 >
-                    <Ionicons name="log-out-outline" size={18} color={colors.textSecondary} style={{ marginRight: 8 }} />
-                    <ThemedText style={[styles.logoutText, { color: colors.textSecondary }]}>Sign Out</ThemedText>
-                </TouchableOpacity>
+                    <Ionicons name="log-out-outline" size={18} color={colors.secondary} style={{ marginRight: 8 }} />
+                    <ThemedText style={[styles.logoutText, { color: colors.secondary }]}>Sign Out</ThemedText>
+                </PressableScale>
                 <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.0'}</ThemedText>
             </View>
             <LoaderOverlay visible={isLoggingOut} text="Logging out..." />
@@ -205,95 +311,136 @@ const styles = StyleSheet.create({
     // Header
     header: {
         paddingHorizontal: 20,
-        paddingBottom: 16,
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.03)',
-        borderBottomLeftRadius: Layout.borderRadius,
-        borderBottomRightRadius: Layout.borderRadius,
+        paddingBottom: 20,
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
+        overflow: 'hidden',
     },
     headerTop: {
         width: '100%',
         alignItems: 'flex-end',
-        height: 38,
+        height: 32,
         justifyContent: 'center',
-        marginBottom: 4,
     },
     closeBtn: {
-        padding: 4,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.18)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    identityRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 14,
+        marginTop: 8,
     },
     avatarWrap: {
         position: 'relative',
-        marginBottom: 10,
     },
     onlineBadge: {
         position: 'absolute',
-        bottom: 2,
-        right: 2,
+        bottom: 0,
+        right: 0,
         width: 14,
         height: 14,
         borderRadius: 7,
-        backgroundColor: '#10B981',
+        borderWidth: 2,
     },
-    headerTextWrap: {
-        alignItems: 'center',
+    identityText: {
+        flex: 1,
+    },
+    greeting: {
+        fontSize: 11,
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.8)',
+        letterSpacing: 0.3,
     },
     headerName: {
         fontSize: 18,
         fontWeight: '800',
-        marginBottom: 2,
+        color: '#FFFFFF',
+        letterSpacing: 0.2,
+        marginTop: 2,
     },
     headerEmail: {
-        fontSize: 12,
+        fontSize: 11.5,
         fontWeight: '500',
-        opacity: 0.8,
+        color: 'rgba(255,255,255,0.75)',
+        marginTop: 3,
     },
     premiumBadge: {
         flexDirection: 'row',
         alignItems: 'center',
+        alignSelf: 'flex-start',
         paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 12,
+        paddingVertical: 3,
+        borderRadius: 999,
         marginTop: 6,
     },
     premiumText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800',
         letterSpacing: 0.5,
+        color: '#1E293B',
     },
     // Scroll
     scrollContent: {
-        paddingTop: 4,
-        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingHorizontal: 14,
     },
     // Section
     section: {
-        marginBottom: 12,
+        marginBottom: 14,
+    },
+    sectionLabelRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginLeft: 6,
+        marginBottom: 8,
+    },
+    sectionDot: {
+        width: 5,
+        height: 5,
+        borderRadius: 2.5,
     },
     sectionLabel: {
         fontSize: 10,
         fontWeight: '800',
         textTransform: 'uppercase',
-        letterSpacing: 1.5,
-        marginLeft: 10,
-        marginBottom: 6,
-        opacity: 0.6,
+        letterSpacing: 1.2,
     },
     // Menu Items
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
+        paddingVertical: 8,
         paddingHorizontal: 10,
-        borderRadius: Layout.borderRadius,
-        marginBottom: 2,
+        borderRadius: 16,
+        marginBottom: 4,
+        gap: 12,
     },
-    menuIcon: {
-        marginRight: 12,
+    activeBar: {
+        position: 'absolute',
+        left: 0,
+        top: 14,
+        bottom: 14,
+        width: 3,
+        borderRadius: 2,
+    },
+    iconTile: {
+        width: 38,
+        height: 38,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     menuLabel: {
         flex: 1,
         fontSize: 14,
-        fontWeight: '500',
+        fontWeight: '600',
     },
     // Footer
     footer: {
@@ -305,16 +452,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 12,
+        paddingVertical: 13,
         paddingHorizontal: 24,
-        borderRadius: 16,
+        borderRadius: 18,
         width: '100%',
-        backgroundColor: 'rgba(0,0,0,0.03)',
-        marginBottom: 8,
+        marginBottom: 10,
     },
     logoutText: {
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: '700',
     },
     versionText: {
         fontSize: 10,
