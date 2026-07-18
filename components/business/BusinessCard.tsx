@@ -107,14 +107,6 @@ const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => 
                                     </ThemedText>
                                 </View>
                             ) : null}
-                            {business?.phone ? (
-                                <View style={styles.metaRow}>
-                                    <Ionicons name="call" size={11} color={colors.lime} />
-                                    <ThemedText style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={1}>
-                                        {business.phone}
-                                    </ThemedText>
-                                </View>
-                            ) : null}
                         </View>
 
                         {/* CTA indicator */}
