@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
         right: 0,
         maxWidth: '60%',
         paddingHorizontal: 10,
-        paddingVertical: 4,
+        paddingVertical: 3,
         borderTopRightRadius: 12,
         borderBottomLeftRadius: 12,
     },
