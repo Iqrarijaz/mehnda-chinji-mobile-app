@@ -27,7 +27,7 @@ export function NotificationIcon({
     const colors = Colors[theme];
     const router = useRouter();
 
-    const iconColor = color || colors.white;
+    const iconColor = color || colors.primary;
 
     const { data: notificationsData } = useQuery({
         queryKey: ['notifications-badge'],
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
     },

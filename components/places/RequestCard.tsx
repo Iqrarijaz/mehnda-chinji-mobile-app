@@ -145,7 +145,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
                         )}
 
                         {/* Category Chip Overlay */}
-                        <View style={[styles.categoryBadge, { backgroundColor: categoryColor }]}>
+                        <View style={[styles.categoryBadge, { backgroundColor: colors.secondary }]}>
                             <ThemedText style={styles.categoryText} numberOfLines={1}>
                                 {(item.category?.en || item.category || 'Place').split(' ')[0]}
                             </ThemedText>
@@ -228,12 +228,13 @@ const styles = StyleSheet.create({
     },
     categoryBadge: {
         position: 'absolute',
-        bottom: 0,
-        left: 0,
+        top: 0,
         right: 0,
-        paddingVertical: 2,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
         alignItems: 'center',
-        opacity: 0.9,
+        borderTopRightRadius: 16,
+        borderBottomLeftRadius: 12,
     },
     categoryText: {
         color: '#FFFFFF',

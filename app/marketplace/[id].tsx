@@ -3,7 +3,9 @@ import { View, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicato
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { getMarketplaceDetails, MARKETPLACE_QUERY_KEYS, incrementMarketplaceInquiry, deleteMarketplaceListing, markMarketplaceListingAsSold, toggleMarketplaceListingStatus } from '@/apis/marketplace';
+import { getMarketplaceDetails, MARKETPLACE_QUERY_KEYS, deleteMarketplaceListing, markMarketplaceListingAsSold, toggleMarketplaceListingStatus } from '@/apis/marketplace';
+import { trackEntityInquiry } from '@/apis/inquiries';
+import { trackEntityView } from '@/apis/views';
 import Toast from 'react-native-toast-message';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
@@ -44,6 +46,13 @@ export default function MarketplaceDetailsScreen() {
     const item = response?.data;
     const isOwner = user?.user?._id && item?.sellerId && (item.sellerId._id || item.sellerId).toString() === user.user._id.toString();
 
+    React.useEffect(() => {
+        if (id && user?.user?._id) {
+            // Track view when component mounts and ID is available
+            trackEntityView(id as string, 'Marketplace').catch(() => {});
+        }
+    }, [id, user?.user?._id]);
+
     const formattedDate = React.useMemo(() => {
         if (!item?.createdAt) return null;
         try {
@@ -57,6 +66,9 @@ export default function MarketplaceDetailsScreen() {
 
     const handleCall = () => {
         if (item?.sellerPhone) {
+            if (!isOwner) {
+                trackEntityInquiry(id as string, 'Marketplace').catch(() => {});
+            }
             Linking.openURL(`tel:${item.sellerPhone}`);
         } else {
             Alert.alert("Error", "Phone number not available");
@@ -185,7 +197,7 @@ export default function MarketplaceDetailsScreen() {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
             {renderHeader()}
-            <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.content} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                 {item.images && item.images.length > 0 ? (
                     <View style={styles.imageContainer}>
                         {isOwner && renderStatusBadge()}
@@ -227,7 +239,7 @@ export default function MarketplaceDetailsScreen() {
                     </View>
                 )}
 
-                <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
+                <View style={[styles.detailsCard, { flex: 1, backgroundColor: isDark ? '#1e293b' : '#FFFFFF', paddingBottom: 40 + insets.bottom }]}>
                     
                     {/* Title */}
                     <View style={styles.titleWrapper}>
@@ -356,6 +368,33 @@ export default function MarketplaceDetailsScreen() {
                                     </View>
                                 </View>
                             )}
+
+                            {isOwner && item?.recentViewers && item.recentViewers.length > 0 && (
+                                <View style={styles.infoListItem}>
+                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
+                                        <Ionicons name="people" size={12} color={colors.primary} />
+                                    </View>
+                                    <View style={[styles.infoListContent, { paddingVertical: 4 }]}>
+                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary, marginBottom: 8 }]}>Recent Viewers (Premium)</ThemedText>
+                                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+                                            {item.recentViewers.map((viewerLog: any, index: number) => (
+                                                <View key={index} style={{ alignItems: 'center', width: 50 }}>
+                                                    <Image 
+                                                        source={{ uri: viewerLog.viewerId?.profileImage || 'https://via.placeholder.com/40' }} 
+                                                        style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#eee' }} 
+                                                    />
+                                                    <ThemedText style={{ fontSize: 9, color: colors.text, textAlign: 'center', marginTop: 4 }} numberOfLines={1}>
+                                                        {viewerLog.viewerId?.name?.split(' ')[0] || 'User'}
+                                                    </ThemedText>
+                                                    <ThemedText style={{ fontSize: 8, color: colors.primary, textAlign: 'center', fontWeight: 'bold' }}>
+                                                        {viewerLog.viewCount} {viewerLog.viewCount === 1 ? 'view' : 'views'}
+                                                    </ThemedText>
+                                                </View>
+                                            ))}
+                                        </ScrollView>
+                                    </View>
+                                </View>
+                            )}
                         </View>
 
                         {/* Metadata tags */}
@@ -396,7 +435,7 @@ export default function MarketplaceDetailsScreen() {
                                             onPress={() => {
                                                 const isOtherItemOwner = user?.user?._id && otherItem.sellerId && otherItem.sellerId.toString() === user.user._id.toString();
                                                 if (!isOtherItemOwner) {
-                                                    incrementMarketplaceInquiry(otherItem._id).catch(console.error);
+                                                    trackEntityInquiry(otherItem._id, 'Marketplace').catch(console.error);
                                                 }
                                                 router.push(`/marketplace/${otherItem._id}` as any);
                                             }}

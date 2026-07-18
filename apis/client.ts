@@ -192,7 +192,12 @@ apiClient.interceptors.response.use(
         const data = error.response?.data;
 
         if (__DEV__) {
-            console.warn('⚠️ API Error Data:', JSON.stringify(data).slice(0, 500));
+            try {
+                const dataStr = data ? (typeof data === 'string' ? data : JSON.stringify(data)) : 'No data';
+                console.warn('⚠️ API Error Data:', dataStr ? String(dataStr).slice(0, 500) : 'No data');
+            } catch (e) {
+                console.warn('⚠️ API Error Data: [Unserializable data]');
+            }
         }
 
         const apiError = new ApiError(message, status, code, data);
@@ -203,7 +208,7 @@ apiClient.interceptors.response.use(
             status,
             endpoint: config?.url,
             method: config?.method,
-            message: message.slice(0, 100), // Cap length
+            message: String(message).slice(0, 100), // Cap length
         });
 
         // Performance Tracking: SLOW_API_RESPONSE (even on error)
@@ -224,4 +229,5 @@ apiClient.interceptors.response.use(
     }
 );
 
+export const privateAxios = apiClient;
 export default apiClient;

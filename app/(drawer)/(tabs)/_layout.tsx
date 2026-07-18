@@ -11,24 +11,32 @@ import { useTheme } from '@/context/ThemeContext';
 import { AppState, AppStateStatus } from 'react-native';
 import { CustomTabBar } from '@/components/CustomTabBar';
 
+let globalHasShownProfilePrompt = false;
+
 export default function TabLayout() {
   const { theme } = useTheme();
   const { user } = useAuth();
   const navigation = useNavigation();
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
-  const hasShownPrompt = React.useRef(false);
 
   const checkProfile = React.useCallback(() => {
-    if (user?.user && (!user.user.city || !user.user.phone) && !hasShownPrompt.current) {
-      // Show prompt with 30 second delay as requested
-      const timer = setTimeout(() => {
-        if (!hasShownPrompt.current) {
+    if (user?.user && (!user.user.city || !user.user.phone) && !globalHasShownProfilePrompt) {
+      if ((global as any).profilePromptTimer) {
+        clearTimeout((global as any).profilePromptTimer);
+      }
+      (global as any).profilePromptTimer = setTimeout(() => {
+        if (!globalHasShownProfilePrompt) {
+          globalHasShownProfilePrompt = true;
           setModalVisible(true);
-          hasShownPrompt.current = true;
         }
       }, 3000);
-      return () => clearTimeout(timer);
+      return () => {
+        if ((global as any).profilePromptTimer) {
+          clearTimeout((global as any).profilePromptTimer);
+          (global as any).profilePromptTimer = null;
+        }
+      };
     }
     return () => { };
   }, [user]);

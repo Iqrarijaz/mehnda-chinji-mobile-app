@@ -133,9 +133,9 @@ export const useFcmNotifications = () => {
         messagingInstance.getInitialNotification().then(remoteMessage => {
             if (remoteMessage) {
                 if (__DEV__) console.log('👉 FCM Notification caused app to open from quit state:', remoteMessage);
-                if (remoteMessage.data?.route) {
+                if (remoteMessage.data && remoteMessage.data.route) {
                     setTimeout(() => {
-                        router.push(remoteMessage.data.route as any);
+                        router.push(remoteMessage.data!.route as any);
                     }, 1000);
                 }
             }

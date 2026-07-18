@@ -7,7 +7,7 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ProfessionPicker } from '@/components/common/ProfessionPicker';
 import { HeaderIconBtn, ScreenHeader } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
-import PlaceCard from '@/components/listing/PlaceCard';
+import PlaceCard from '@/components/essentials/PlaceCard';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';

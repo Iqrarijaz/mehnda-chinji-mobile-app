@@ -69,7 +69,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                 <View style={styles.leftSide}>
                     {showMenuIcon ? (
                         <TouchableOpacity onPress={openDrawer} style={styles.iconBtn}>
-                            <Ionicons name="grid-outline" size={20} color="#FFFFFF" />
+                            <Ionicons name="grid-outline" size={20} color={colors.primary} />
                         </TouchableOpacity>
                     ) : (
                         <TouchableOpacity
@@ -79,7 +79,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                             }}
                             style={styles.iconBtn}
                         >
-                            <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
+                            <Ionicons name="arrow-back" size={20} color={colors.primary} />
                         </TouchableOpacity>
                     )}
                     {leftActions}
@@ -130,9 +130,11 @@ export const HeaderIconBtn = React.memo(function HeaderIconBtn({
     size?: number;
     badge?: React.ReactNode;
 }) {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     return (
         <TouchableOpacity onPress={onPress} style={[styles.iconBtn, { marginRight: 12 }, style]}>
-            <Ionicons name={name} size={size} color="#FFFFFF" />
+            <Ionicons name={name} size={size} color={colors.primary} />
             {badge}
         </TouchableOpacity>
     );
@@ -166,7 +168,7 @@ const styles = StyleSheet.create({
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
     },

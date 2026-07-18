@@ -71,9 +71,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
     },
     tab: {
-        paddingHorizontal: 12,
+        paddingHorizontal: 24,
         paddingVertical: 6,
-        borderRadius: 16,
+        borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 8,

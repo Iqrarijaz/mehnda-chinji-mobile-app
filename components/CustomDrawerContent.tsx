@@ -21,6 +21,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { useRewardedAd } from '@/ads/hooks/useAds';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
 interface MenuItem {
     label: string;
@@ -46,6 +47,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { showAd, isAdLoaded } = useRewardedAd();
+    const [isLoggingOut, setIsLoggingOut] = React.useState(false);
 
     const activeRoute = props.state.routes[props.state.index].name;
 
@@ -58,6 +60,17 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
         }
         router.navigate(route as any);
     }, [router, showAd]);
+
+    const handleLogout = useCallback(async () => {
+        setIsLoggingOut(true);
+        try {
+            await logout();
+        } catch (error) {
+            console.error('Logout failed', error);
+        } finally {
+            setIsLoggingOut(false);
+        }
+    }, [logout]);
 
     const userName = user?.user?.name
         ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
@@ -170,7 +183,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
             <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
                 <TouchableOpacity
                     activeOpacity={0.7}
-                    onPress={logout}
+                    onPress={handleLogout}
                     style={styles.logoutBtn}
                 >
                     <Ionicons name="log-out-outline" size={18} color={colors.textSecondary} style={{ marginRight: 8 }} />
@@ -178,6 +191,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                 </TouchableOpacity>
                 <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.0'}</ThemedText>
             </View>
+            <LoaderOverlay visible={isLoggingOut} text="Logging out..." />
         </View>
     );
 };
