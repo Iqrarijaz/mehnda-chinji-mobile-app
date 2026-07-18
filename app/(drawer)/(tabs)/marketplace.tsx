@@ -15,7 +15,6 @@ import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
 import NativeAd from '@/ads/components/NativeAd';
 import { PillsList } from '@/components/common/PillsList';
-import { MarketplaceHero } from '@/components/marketplace/MarketplaceHero';
 import { LoadingDots } from '@/components/common/LoadingDots';
 
 const EmptyMarketplace = memo(({ colors }: { colors: any }) => (
@@ -237,6 +236,13 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
 
             {/* Header */}
             <ScreenHeader
+                decor="marketplace"
+                hero={{
+                    title: isMineTab ? 'My Listings' : 'Marketplace',
+                    subtitle: isMineTab
+                        ? 'Manage the items you have listed for sale'
+                        : 'Buy & sell with people in your community',
+                }}
                 rightActions={
                     <HeaderIconBtn
                         name="add"
@@ -286,15 +292,6 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                     </View>
                 </View>
             </ScreenHeader>
-
-            {/* Marketplace hero band — same component as the Sell Item screen */}
-            <MarketplaceHero
-                band
-                title={isMineTab ? 'My Listings' : 'Marketplace'}
-                subtitle={isMineTab
-                    ? 'Manage the items you have listed for sale'
-                    : 'Buy & sell with people in your community'}
-            />
 
             {/* Category Filter Tabs */}
             {!isMineTab && (

@@ -1,6 +1,5 @@
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import BusinessCard from '@/components/business/BusinessCard';
-import { BusinessHero } from '@/components/business/BusinessHero';
 import { BusinessRegistration } from '@/components/business/BusinessRegistration';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { LoadingDots } from '@/components/common/LoadingDots';
@@ -166,6 +165,14 @@ export default function BusinessScreen() {
             <View style={[styles.container, { backgroundColor: colors.background }]}>
                 {/* Top Bar Area */}
                 <ScreenHeader
+                    decor="business"
+                    hero={{
+                        title: isPortalTab ? 'My Business' : 'Local Businesses',
+                        subtitle: isPortalTab
+                            ? 'Manage your listings in the community directory'
+                            : 'Trusted shops & services from your community',
+                        countLabel: !isPortalTab && totalBusinesses != null ? `${totalBusinesses}` : undefined,
+                    }}
                     rightActions={
                         <HeaderIconBtn
                             name="add"
@@ -217,16 +224,6 @@ export default function BusinessScreen() {
                         />
                     </View>
                 </ScreenHeader>
-
-                {/* Business hero band — same component as the Submit screen */}
-                <BusinessHero
-                    band
-                    title={isPortalTab ? 'My Business' : 'Local Businesses'}
-                    subtitle={isPortalTab
-                        ? 'Manage your listings in the community directory'
-                        : 'Trusted shops & services from your community'}
-                    countLabel={!isPortalTab && totalBusinesses != null ? `${totalBusinesses}` : undefined}
-                />
 
                 {/* Find Service Section */}
                 <View style={[styles.content, { display: activeTab === 'find' ? 'flex' : 'none' }]}>

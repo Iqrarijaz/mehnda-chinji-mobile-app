@@ -18,7 +18,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
-import { MarketplaceHero } from './MarketplaceHero';
+import { ScreenHeader } from '@/components/common/ScreenHeader';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { createMarketplaceListing, updateMarketplaceListing, MARKETPLACE_QUERY_KEYS } from '@/apis/marketplace';
@@ -329,14 +329,19 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                     Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{user?.user?.name ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Seller'}</ThemedText>, {listingToEdit ? 'your item details have been updated successfully.' : 'thank you for listing your item! Our team will review and approve it shortly.'}
                 </ThemedText>
             </ThankYouModal>
-            {/* ── Hero Header — same shared component as Marketplace Home ── */}
-            <MarketplaceHero
-                title={listingToEdit ? 'Update Your Listing' : 'Sell An Item'}
-                subtitle={listingToEdit
-                    ? 'Update your item details'
-                    : 'List your item in the marketplace and reach local buyers'}
-                onBack={onClose}
+            {/* ── Hero Header — the shared ScreenHeader, marketplace theme ── */}
+            <ScreenHeader
+                showMenuIcon={false}
+                onBackPress={onClose}
                 backIcon="close"
+                hideAccountActions
+                decor="marketplace"
+                hero={{
+                    title: listingToEdit ? 'Update Your Listing' : 'Sell An Item',
+                    subtitle: listingToEdit
+                        ? 'Update your item details'
+                        : 'List your item in the marketplace and reach local buyers',
+                }}
             />
 
             {/* ── Form ────────────────────────────────────────────────── */}

@@ -1,18 +1,23 @@
-import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import * as ExpoSplashScreen from 'expo-splash-screen';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 import Animated, {
     Easing,
     runOnJS,
+    useAnimatedProps,
     useAnimatedStyle,
     useSharedValue,
     withDelay,
     withRepeat,
     withTiming,
+    ZoomIn,
 } from 'react-native-reanimated';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 // Must match the native splash: imageWidth in app.json / app.config.js and the
 // 128dp badge baked into android/.../drawable-*/splashscreen_logo.png.
@@ -21,9 +26,29 @@ const logoImg = require('../../public/logo.png');
 
 const BACKGROUND = '#FFFFFF';
 
-
-
 const TRACK_WIDTH = 160;
+
+// Connected-community illustration: local services orbit the Rehbar logo on
+// a dashed ring — everything local, linked through one place.
+const RING_BOX = 264;
+const RING_RADIUS = 118;
+const RING_DASH = 3;
+const RING_GAP = 9;
+const NODE_SIZE = 34;
+
+type ServiceNode = {
+    icon: keyof typeof Ionicons.glyphMap;
+    angle: number; // degrees, 0 = right, -90 = top
+};
+
+const SERVICE_NODES: ServiceNode[] = [
+    { icon: 'home', angle: -90 },
+    { icon: 'medkit', angle: -30 },
+    { icon: 'school', angle: 30 },
+    { icon: 'bus', angle: 90 },
+    { icon: 'storefront', angle: 150 },
+    { icon: 'pricetag', angle: 210 },
+];
 
 type Props = {
     /** When true the splash fades out and calls onFinish. */
@@ -33,15 +58,16 @@ type Props = {
 };
 
 function CustomSplashScreen({ isAppReady, onFinish }: Props) {
-    const { theme } = useTheme();
     // Splash screen background is forced to white, so we always use light colors
     const colors = Colors.light;
 
     // First frame renders the logo exactly where the native splash draws it,
     // so hiding the native splash is imperceptible. The intro only starts
     // after the handoff.
-    const logoTranslateY = useSharedValue(0);
+    const groupTranslateY = useSharedValue(0);
     const logoScale = useSharedValue(1);
+    const ringOpacity = useSharedValue(0);
+    const ringFlow = useSharedValue(0);
 
     const wordmarkOpacity = useSharedValue(0);
     const wordmarkTranslateY = useSharedValue(12);
@@ -61,11 +87,18 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
 
         const settle = Easing.bezier(0.22, 1, 0.36, 1);
 
-        // Logo settles upward.
-        logoTranslateY.value = withDelay(100, withTiming(-40, { duration: 400, easing: settle }));
+        // Logo + service ring settle upward together.
+        groupTranslateY.value = withDelay(100, withTiming(-40, { duration: 400, easing: settle }));
         logoScale.value = withDelay(100, withTiming(1.04, { duration: 400, easing: settle }));
 
-
+        // The community ring fades in and its dashes drift slowly — services
+        // connected through Rehbar, gently in motion.
+        ringOpacity.value = withDelay(300, withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) }));
+        ringFlow.value = withRepeat(
+            withTiming(1, { duration: 6000, easing: Easing.linear }),
+            -1,
+            false
+        );
 
         // Staggered reveal: wordmark, tagline, then progress bar.
         wordmarkOpacity.value = withDelay(250, withTiming(1, { duration: 300, easing: Easing.out(Easing.cubic) }));
@@ -105,14 +138,21 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
         opacity: containerOpacity.value,
     }));
 
-    const logoStyle = useAnimatedStyle(() => ({
-        transform: [
-            { translateY: logoTranslateY.value },
-            { scale: logoScale.value },
-        ],
+    const groupStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: groupTranslateY.value }],
     }));
 
+    const logoStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: logoScale.value }],
+    }));
 
+    const ringStyle = useAnimatedStyle(() => ({
+        opacity: ringOpacity.value,
+    }));
+
+    const ringProps = useAnimatedProps(() => ({
+        strokeDashoffset: -ringFlow.value * (RING_DASH + RING_GAP) * 6,
+    }));
 
     const wordmarkStyle = useAnimatedStyle(() => ({
         opacity: wordmarkOpacity.value,
@@ -134,6 +174,8 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
         transform: [{ translateX: -TRACK_WIDTH * (1 - progress.value) }],
     }));
 
+    const nodeAccents = [colors.primary, colors.secondary, colors.lime];
+
     return (
         <Animated.View
             pointerEvents="none"
@@ -143,15 +185,54 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
                 containerStyle,
             ]}
         >
+            {/* Logo + connected-community ring settle together */}
+            <Animated.View style={[styles.group, groupStyle]}>
+                {/* Dashed orbit ring with slowly drifting dashes */}
+                <Animated.View style={[StyleSheet.absoluteFill, styles.ringWrap, ringStyle]}>
+                    <Svg width={RING_BOX} height={RING_BOX} viewBox={`0 0 ${RING_BOX} ${RING_BOX}`}>
+                        <AnimatedCircle
+                            cx={RING_BOX / 2}
+                            cy={RING_BOX / 2}
+                            r={RING_RADIUS}
+                            stroke={`${colors.primary}30`}
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeDasharray={`${RING_DASH} ${RING_GAP}`}
+                            fill="none"
+                            animatedProps={ringProps}
+                        />
+                    </Svg>
 
-            <Animated.View style={logoStyle}>
-                <Image
-                    source={logoImg}
-                    style={styles.logo}
-                    contentFit="contain"
-                    transition={0}
-                    onLoad={startHandoff}
-                />
+                    {/* Service nodes on the ring */}
+                    {SERVICE_NODES.map((node, i) => {
+                        const rad = (node.angle * Math.PI) / 180;
+                        const cx = RING_BOX / 2 + RING_RADIUS * Math.cos(rad) - NODE_SIZE / 2;
+                        const cy = RING_BOX / 2 + RING_RADIUS * Math.sin(rad) - NODE_SIZE / 2;
+                        const accent = nodeAccents[i % nodeAccents.length];
+                        return (
+                            <Animated.View
+                                key={node.icon}
+                                entering={ZoomIn.delay(500 + i * 90).duration(350)}
+                                style={[
+                                    styles.node,
+                                    { left: cx, top: cy, backgroundColor: accent },
+                                ]}
+                            >
+                                <Ionicons name={node.icon} size={16} color="#FFFFFF" />
+                            </Animated.View>
+                        );
+                    })}
+                </Animated.View>
+
+                <Animated.View style={logoStyle}>
+                    <Image
+                        source={logoImg}
+                        style={styles.logo}
+                        contentFit="contain"
+                        transition={0}
+                        onLoad={startHandoff}
+                    />
+                </Animated.View>
             </Animated.View>
 
             <View style={styles.wordmarkContainer}>
@@ -185,23 +266,30 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
     );
 }
 
-// Deterministic centering for the absolutely-positioned circles.
-const centered = (size: number) => ({
-    width: size,
-    height: size,
-    borderRadius: size / 2,
-    left: '50%' as const,
-    top: '50%' as const,
-    marginLeft: -size / 2,
-    marginTop: -size / 2,
-});
-
 const styles = StyleSheet.create({
     container: {
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 10,
+    },
+    group: {
+        width: RING_BOX,
+        height: RING_BOX,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    ringWrap: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    node: {
+        position: 'absolute',
+        width: NODE_SIZE,
+        height: NODE_SIZE,
+        borderRadius: NODE_SIZE / 2,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     logo: {
         width: LOGO_SIZE,
@@ -210,7 +298,7 @@ const styles = StyleSheet.create({
     wordmarkContainer: {
         position: 'absolute',
         top: '50%',
-        marginTop: LOGO_SIZE / 2 + 6,
+        marginTop: LOGO_SIZE / 2 + 60,
         alignItems: 'center',
     },
     wordmark: {

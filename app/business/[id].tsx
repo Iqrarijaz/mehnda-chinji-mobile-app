@@ -116,7 +116,7 @@ const BusinessDetailScreen = () => {
 
             {/* ── Business Hero ───────────────────────────────────────── */}
             <Animated.View entering={FadeInUp.duration(450)} style={[styles.heroHeader, { backgroundColor: colors.primary }]}>
-                {/* Storefront decor, matching the shared BusinessHero */}
+                {/* Storefront decor, matching the business header theme */}
                 <Svg
                     style={StyleSheet.absoluteFill}
                     viewBox="0 0 375 170"

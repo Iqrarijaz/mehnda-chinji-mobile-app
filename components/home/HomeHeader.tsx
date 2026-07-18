@@ -14,6 +14,7 @@ export const HomeHeader = React.memo(({ setIsSearchActive }: HomeHeaderProps) =>
     return (
         <View style={styles.headerWrapper}>
             <ScreenHeader
+                decor="community"
                 rightActions={
                     <HeaderIconBtn
                         name="search-outline"
