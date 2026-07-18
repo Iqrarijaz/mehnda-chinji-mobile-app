@@ -9,7 +9,7 @@ import BannerAd from '@/ads/components/BannerAd';
 import { ThemedView } from '@/components/ThemedView';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PasswordModal } from '@/components/setting/passwordModal';
+import { PasswordModal } from '@/components/setting/PasswordModal';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();

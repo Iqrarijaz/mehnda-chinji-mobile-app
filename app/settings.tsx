@@ -27,12 +27,12 @@ import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { ActiveSessionsModal } from '@/components/setting/activeSessionsModal';
-import { SectionCard } from '@/components/setting/sectionCard';
-import { SettingRowItem } from '@/components/setting/settingRow';
+import { ActiveSessionsModal } from '@/components/setting/ActiveSessionsModal';
+import { SectionCard } from '@/components/setting/SectionCard';
+import { SettingRowItem } from '@/components/setting/SettingRow';
 import { ScreenHeader } from '@/components/common/ScreenHeader';
-import { PasswordModal } from '@/components/setting/passwordModal';
-import { DeleteAccountModal } from '@/components/setting/deleteAccountModal';
+import { PasswordModal } from '@/components/setting/PasswordModal';
+import { DeleteAccountModal } from '@/components/setting/DeleteAccountModal';
 
 export default function SettingsScreen() {
     const { theme, toggleTheme, isDark } = useTheme();
