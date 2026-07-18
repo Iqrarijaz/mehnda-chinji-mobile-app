@@ -1,6 +1,8 @@
 import React, { memo, useState } from 'react';
-import { StyleSheet, View, Image, TouchableOpacity, Linking, Alert } from 'react-native';
+import { StyleSheet, View, Image, Linking, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { ThemedText } from '../ThemedText';
 import { useAuth } from '@/context/AuthContext';
 import { ActionMenu, ActionMenuItem } from '../common/ActionMenu';
@@ -161,9 +163,11 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
 
     return (
         <>
-            <TouchableOpacity
+            <Animated.View entering={FadeInDown.duration(350)} style={{ flex: 1 }}>
+            <PressableScale
+                intensity={0.025}
+                containerStyle={{ flex: 1 }}
                 style={[styles.container, { backgroundColor: colors.card }]}
-                activeOpacity={0.9}
                 onPress={handlePress}
             >
 
@@ -189,8 +193,18 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
                 {/* Content Details */}
                 <View style={styles.detailsContainer}>
 
-                    <View style={{ marginTop: 4, marginBottom: 4 }}>
-                        <ThemedText style={[styles.title, { color: colors.primary }]}>
+                    <View style={{ marginTop: 6, marginBottom: 6 }}>
+                        <View style={styles.priceRow}>
+                            <ThemedText style={[styles.priceText, { color: colors.lime }]} numberOfLines={1}>
+                                Rs. {typeof item.price === 'number' ? item.price.toLocaleString() : item.price || '—'}
+                            </ThemedText>
+                            {item.negotiable ? (
+                                <View style={[styles.negotiableBadge, { backgroundColor: `${colors.lime}1E` }]}>
+                                    <ThemedText style={[styles.negotiableText, { color: colors.primary }]}>NEG</ThemedText>
+                                </View>
+                            ) : null}
+                        </View>
+                        <ThemedText style={[styles.title, { color: colors.text }]} numberOfLines={1}>
                             {item.title}
                         </ThemedText>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
@@ -229,7 +243,8 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
                     )} */}
 
                 </View>
-            </TouchableOpacity>
+            </PressableScale>
+            </Animated.View>
             <ConfirmationModal
                 visible={showDeleteConfirm}
                 onClose={() => setShowDeleteConfirm(false)}
@@ -258,10 +273,12 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
     );
 });
 
+MarketplaceCard.displayName = 'MarketplaceCard';
+
 const styles = StyleSheet.create({
     container: {
-        borderRadius: 16,
-        marginBottom: 16,
+        borderRadius: 18,
+        marginBottom: 14,
         overflow: 'hidden',
         flex: 1,
     },
@@ -286,12 +303,12 @@ const styles = StyleSheet.create({
     },
     imageBadge: {
         position: 'absolute',
-        bottom: 10,
-        right: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        bottom: 8,
+        right: 8,
+        backgroundColor: 'rgba(0, 0, 0, 0.55)',
         paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 4,
+        paddingVertical: 3,
+        borderRadius: 999,
     },
     imageBadgeText: {
         color: '#fff',
@@ -302,9 +319,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 8,
         left: 8,
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 999,
         zIndex: 5,
     },
     statusTabText: {
@@ -314,18 +331,16 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     imagePlaceholder: {
-        height: 180,
+        height: 130,
         justifyContent: 'center',
         alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.05)',
     },
     imagePlaceholderText: {
         fontSize: 12,
         marginTop: 8,
     },
     detailsContainer: {
-        paddingHorizontal: 6,
+        paddingHorizontal: 10,
     },
     categoryRow: {
         flexDirection: 'row',
@@ -353,23 +368,23 @@ const styles = StyleSheet.create({
     priceRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 8,
+        gap: 6,
     },
     priceText: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '800',
+        letterSpacing: 0.2,
+        flexShrink: 1,
     },
     negotiableBadge: {
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
         paddingHorizontal: 6,
         paddingVertical: 2,
-        borderRadius: 4,
-        marginLeft: 8,
+        borderRadius: 999,
     },
     negotiableText: {
-        color: '#10B981',
-        fontSize: 10,
-        fontWeight: '700',
+        fontSize: 8.5,
+        fontWeight: '800',
+        letterSpacing: 0.4,
     },
     title: {
         fontSize: 14,

@@ -11,6 +11,8 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BannerAd from '@/ads/components/BannerAd';
+import { SectionHeading } from '@/components/essentials/shared/SectionHeading';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { ActionMenu } from '@/components/common/ActionMenu';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
@@ -211,23 +213,33 @@ export default function MarketplaceDetailsScreen() {
                         <ThemedText style={[styles.heroTitle, { color: colors.text, textAlign: 'left', textTransform: 'capitalize' }]} >
                             {item.title}
                         </ThemedText>
-                        <ThemedText style={[styles.price, { color: colors.primary }]}>
-                            Rs. {item.price ? item.price.toLocaleString() : '0'}
-                        </ThemedText>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <ThemedText style={[styles.price, { color: colors.lime }]}>
+                                Rs. {item.price ? item.price.toLocaleString() : '0'}
+                            </ThemedText>
+                            {item.negotiable ? (
+                                <View style={{ backgroundColor: `${colors.lime}1E`, paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999 }}>
+                                    <ThemedText style={{ color: colors.primary, fontSize: 10, fontWeight: '800', letterSpacing: 0.4 }}>NEGOTIABLE</ThemedText>
+                                </View>
+                            ) : null}
+                        </View>
                     </View>
 
                     {/* Quick Interactive Actions Row */}
                     {!isOwner && item?.status === 'live' && (
                         <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
                             {item.sellerPhone ? (
-                                <TouchableOpacity
+                                <PressableScale
+                                    intensity={0.04}
+                                    containerStyle={{ flex: 1 }}
                                     style={[styles.actionBtnPrimary, { backgroundColor: colors.primary }]}
                                     onPress={handleCall}
-                                    activeOpacity={0.8}
                                 >
-                                    <Ionicons name="call" size={20} color="#FFFFFF" />
+                                    <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.lime, alignItems: 'center', justifyContent: 'center' }}>
+                                        <Ionicons name="call" size={14} color="#FFFFFF" />
+                                    </View>
                                     <ThemedText style={styles.actionBtnTextPrimary}>Call Seller</ThemedText>
-                                </TouchableOpacity>
+                                </PressableScale>
                             ) : (
                                 <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
                                     <Ionicons name="call-outline" size={20} color={colors.textSecondary} />
@@ -257,9 +269,7 @@ export default function MarketplaceDetailsScreen() {
                         {/* Section: Description */}
                         {item.description && (
                             <View style={styles.detailSection}>
-                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                    Description
-                                </ThemedText>
+                                <SectionHeading icon="reader" label="Description" />
                                 <ThemedText style={[styles.descriptionText, { color: colors.text }]}>
                                     {item.description}
                                 </ThemedText>
@@ -268,9 +278,7 @@ export default function MarketplaceDetailsScreen() {
 
                         {/* Section: Details & Location */}
                         <View style={styles.detailSection}>
-                            <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                Item Details
-                            </ThemedText>
+                            <SectionHeading icon="pricetags" label="Item Details" />
 
                             <View style={styles.infoListItem}>
                                 <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>

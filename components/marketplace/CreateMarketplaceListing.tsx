@@ -11,14 +11,14 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
+import { MarketplaceHero } from './MarketplaceHero';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { createMarketplaceListing, updateMarketplaceListing, MARKETPLACE_QUERY_KEYS } from '@/apis/marketplace';
@@ -51,7 +51,6 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     const colors = Colors[theme];
     const { user } = useAuth();
     const queryClient = useQueryClient();
-    const insets = useSafeAreaInsets();
 
     const { data: citiesConfigData } = useQuery({
         queryKey: CONFIG_QUERY_KEYS.cities,
@@ -330,38 +329,15 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                     Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{user?.user?.name ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Seller'}</ThemedText>, {listingToEdit ? 'your item details have been updated successfully.' : 'thank you for listing your item! Our team will review and approve it shortly.'}
                 </ThemedText>
             </ThankYouModal>
-            {/* ── Hero Header ─────────────────────────────────────────── */}
-            <Animated.View entering={FadeInUp.duration(500)} style={styles.header}>
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
-
-                {/* Nav row */}
-                <View style={[styles.headerTop, { paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 8) }]}>
-                    <TouchableOpacity onPress={onClose} style={styles.backButton}>
-                        <Ionicons name="close" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <Animated.View entering={FadeIn.delay(200).duration(400)} style={{ flex: 1, alignItems: 'center' }}>
-                        <ThemedText style={styles.headerNavTitle}>
-                            {listingToEdit ? 'Edit Listing' : 'Sell Item'}
-                        </ThemedText>
-                    </Animated.View>
-                    <View style={{ width: 42 }} />
-                </View>
-
-                {/* Hero icon + text */}
-                <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
-                    <View style={styles.heroIconWrap}>
-                        <Ionicons name="pricetag" size={32} color="#0D9488" />
-                    </View>
-                    <ThemedText style={styles.heroTitle}>
-                        {listingToEdit ? 'Update Your Listing' : 'Sell An Item'}
-                    </ThemedText>
-                    <ThemedText style={styles.heroSubtitle}>
-                        {listingToEdit
-                            ? 'Update your item details'
-                            : 'List your item in the marketplace and reach local buyers'}
-                    </ThemedText>
-                </Animated.View>
-            </Animated.View>
+            {/* ── Hero Header — same shared component as Marketplace Home ── */}
+            <MarketplaceHero
+                title={listingToEdit ? 'Update Your Listing' : 'Sell An Item'}
+                subtitle={listingToEdit
+                    ? 'Update your item details'
+                    : 'List your item in the marketplace and reach local buyers'}
+                onBack={onClose}
+                backIcon="close"
+            />
 
             {/* ── Form ────────────────────────────────────────────────── */}
             <ScrollView
@@ -585,6 +561,8 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
         </KeyboardAvoidingView>
     );
 });
+
+CreateMarketplaceListing.displayName = 'CreateMarketplaceListing';
 
 const styles = StyleSheet.create({
     container: {

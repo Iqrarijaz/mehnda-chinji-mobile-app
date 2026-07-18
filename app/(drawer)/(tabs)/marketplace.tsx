@@ -15,6 +15,8 @@ import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
 import NativeAd from '@/ads/components/NativeAd';
 import { PillsList } from '@/components/common/PillsList';
+import { MarketplaceHero } from '@/components/marketplace/MarketplaceHero';
+import { LoadingDots } from '@/components/common/LoadingDots';
 
 const EmptyMarketplace = memo(({ colors }: { colors: any }) => (
     <View style={[styles.centered, { flex: 1, marginTop: 100 }]}>
@@ -24,6 +26,8 @@ const EmptyMarketplace = memo(({ colors }: { colors: any }) => (
         </ThemedText>
     </View>
 ));
+
+EmptyMarketplace.displayName = 'EmptyMarketplace';
 
 const MarketplaceScreen = memo(function MarketplaceScreen() {
     const router = useRouter();
@@ -178,20 +182,20 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
     const renderFooter = useCallback(() => {
         if (isFetchingNextPage) {
             return (
-                <View style={{ paddingVertical: 20 }}>
-                    <ActivityIndicator color={colors.primary} />
+                <View style={{ paddingVertical: 24 }}>
+                    <LoadingDots />
                 </View>
             );
         }
         if (!hasNextPage && rawListings.length > 0) {
             return (
-                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, paddingVertical: 20 }}>
-                    That's all
+                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: '600', letterSpacing: 0.4, paddingVertical: 20 }}>
+                    {"You're all caught up"}
                 </ThemedText>
             );
         }
         return null;
-    }, [isFetchingNextPage, hasNextPage, rawListings.length, colors.primary]);
+    }, [isFetchingNextPage, hasNextPage, rawListings.length]);
 
 
     const renderItem = useCallback(({ item }: { item: any }) => {
@@ -251,7 +255,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             style={{ flex: 1 }}
                         />
                         <TouchableOpacity
-                            style={[styles.filterButton, { backgroundColor: hasActiveFilters ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                            style={[styles.filterButton, { backgroundColor: hasActiveFilters ? colors.lime : 'rgba(255, 255, 255, 0.15)' }]}
                             onPress={() => setIsFilterVisible(true)}
                             activeOpacity={0.7}
                         >
@@ -265,7 +269,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             )}
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={[styles.filterButton, { backgroundColor: isMineTab ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }]}
+                            style={[styles.filterButton, { backgroundColor: isMineTab ? colors.lime : 'rgba(255, 255, 255, 0.15)' }]}
                             onPress={() => {
                                 if (isMineTab) {
                                     setSelectedTab('');
@@ -282,6 +286,15 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                     </View>
                 </View>
             </ScreenHeader>
+
+            {/* Marketplace hero band — same component as the Sell Item screen */}
+            <MarketplaceHero
+                band
+                title={isMineTab ? 'My Listings' : 'Marketplace'}
+                subtitle={isMineTab
+                    ? 'Manage the items you have listed for sale'
+                    : 'Buy & sell with people in your community'}
+            />
 
             {/* Category Filter Tabs */}
             {!isMineTab && (
