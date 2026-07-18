@@ -2,7 +2,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Image } from 'expo-image';
 import * as ExpoSplashScreen from 'expo-splash-screen';
 import React, { useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
     Easing,
     runOnJS,
@@ -38,6 +38,7 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
     const wordmarkOpacity = useSharedValue(0);
     const wordmarkTranslateY = useSharedValue(12);
     const containerOpacity = useSharedValue(1);
+    const progressWidth = useSharedValue(0);
 
     const handoffDone = useRef(false);
 
@@ -48,24 +49,29 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
         ExpoSplashScreen.hideAsync().catch(() => { });
 
         const settle = Easing.bezier(0.22, 1, 0.36, 1);
-        logoTranslateY.value = withDelay(250, withTiming(-30, { duration: 650, easing: settle }));
-        logoScale.value = withDelay(250, withTiming(1.04, { duration: 650, easing: settle }));
-        wordmarkOpacity.value = withDelay(450, withTiming(1, { duration: 450, easing: Easing.out(Easing.cubic) }));
-        wordmarkTranslateY.value = withDelay(450, withTiming(0, { duration: 450, easing: settle }));
+        logoTranslateY.value = withDelay(100, withTiming(-40, { duration: 400, easing: settle }));
+        logoScale.value = withDelay(100, withTiming(1.04, { duration: 400, easing: settle }));
+        wordmarkOpacity.value = withDelay(250, withTiming(1, { duration: 300, easing: Easing.out(Easing.cubic) }));
+        wordmarkTranslateY.value = withDelay(250, withTiming(0, { duration: 300, easing: settle }));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         // Fallback in case the image onLoad never fires.
-        const timer = setTimeout(startHandoff, 600);
+        const timer = setTimeout(startHandoff, 400);
+
+        // Start progress bar animation
+        progressWidth.value = withTiming(85, { duration: 1500, easing: Easing.out(Easing.cubic) });
+
         return () => clearTimeout(timer);
     }, [startHandoff]);
 
     useEffect(() => {
         if (!isAppReady) return;
+        progressWidth.value = withTiming(100, { duration: 200 });
         containerOpacity.value = withTiming(
             0,
-            { duration: 350, easing: Easing.out(Easing.quad) },
+            { duration: 250, easing: Easing.out(Easing.quad) },
             () => {
                 runOnJS(onFinish)();
             }
@@ -87,6 +93,10 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
     const wordmarkStyle = useAnimatedStyle(() => ({
         opacity: wordmarkOpacity.value,
         transform: [{ translateY: wordmarkTranslateY.value }],
+    }));
+
+    const progressStyle = useAnimatedStyle(() => ({
+        width: `${progressWidth.value}%`,
     }));
 
     return (
@@ -112,6 +122,12 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
                 <Text style={[styles.wordmark, { color: isDark ? '#F8FAFC' : '#0F172A' }]}>
                     Rehbar
                 </Text>
+                <Text style={[styles.tagline, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+                    Every thing local
+                </Text>
+                <View style={[styles.progressBarContainer, { backgroundColor: isDark ? '#1E293B' : '#E2E8F0' }]}>
+                    <Animated.View style={[styles.progressBar, { backgroundColor: isDark ? '#38BDF8' : '#0284C7' }, progressStyle]} />
+                </View>
             </Animated.View>
         </Animated.View>
     );
@@ -138,6 +154,22 @@ const styles = StyleSheet.create({
         fontSize: 26,
         fontWeight: '700',
         letterSpacing: 0.5,
+    },
+    tagline: {
+        fontSize: 14,
+        marginTop: 4,
+        fontWeight: '500',
+    },
+    progressBarContainer: {
+        width: 150,
+        height: 4,
+        borderRadius: 2,
+        marginTop: 16,
+        overflow: 'hidden',
+    },
+    progressBar: {
+        height: '100%',
+        borderRadius: 2,
     },
 });
 
