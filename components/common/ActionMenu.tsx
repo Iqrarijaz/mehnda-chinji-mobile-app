@@ -65,13 +65,11 @@ const styles = StyleSheet.create({
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 4,
         paddingHorizontal: 4,
         borderRadius: 4,
     },
     menuText: {
-        marginLeft: 6,
-        fontSize: 11,
-        fontWeight: '500',
+        fontSize: 13,
+        fontWeight: '600',
     },
 });

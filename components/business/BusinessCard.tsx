@@ -12,7 +12,7 @@ import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useRouter } from 'expo-router';
-import { ListingCard } from '@/components/listing/ListingCard';
+import { ListingCard } from '@/components/essentials/ListingCard';
 
 interface BusinessCardProps {
     business: any;

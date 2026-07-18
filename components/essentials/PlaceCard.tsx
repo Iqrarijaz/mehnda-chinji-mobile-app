@@ -8,7 +8,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import { ThemedText } from '@/components/ThemedText';
-import { ListingCard } from '@/components/listing/ListingCard';
+import { ListingCard } from '@/components/essentials/ListingCard';
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';

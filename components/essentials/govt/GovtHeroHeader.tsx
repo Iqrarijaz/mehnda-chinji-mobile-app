@@ -26,6 +26,7 @@ interface GovtHeroHeaderProps {
     onBack: () => void;
     onReport: () => void;
     onEdit: () => void;
+    primaryColor?: string;
 }
 
 /**
@@ -40,6 +41,7 @@ export function GovtHeroHeader({
     onBack,
     onReport,
     onEdit,
+    primaryColor,
 }: GovtHeroHeaderProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -70,7 +72,7 @@ export function GovtHeroHeader({
         transform: [{ scale: 1 + pulse.value * 0.02 }],
     }));
 
-    const BG = '#1e2e4a'; // slate-blue government feel
+    const BG = primaryColor || '#1e2e4a'; // slate-blue government feel
 
     return (
         <Animated.View

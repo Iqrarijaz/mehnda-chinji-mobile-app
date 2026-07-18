@@ -19,6 +19,7 @@ interface EssentialsTypePillsProps {
     selectedTags: Tag[];
     onToggleTag: (tag: Tag) => void;
     isSingleSelect?: boolean;
+    activeColor?: string;
 }
 
 export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = ({
@@ -26,6 +27,7 @@ export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = ({
     selectedTags,
     onToggleTag,
     isSingleSelect = false,
+    activeColor,
 }) => {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
@@ -44,6 +46,7 @@ export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = ({
 
                 const label = tag.label || tag.eng;
                 const subLabel = tag.ur;
+                const resolvedActiveColor = activeColor || colors.lime;
 
                 return (
                     <TouchableOpacity
@@ -51,7 +54,7 @@ export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = ({
                         style={[
                             styles.tagChip,
                             {
-                                backgroundColor: isSelected ? colors.lime : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)'),
+                                backgroundColor: isSelected ? resolvedActiveColor : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)'),
                             }
                         ]}
                         onPress={() => onToggleTag(tag)}

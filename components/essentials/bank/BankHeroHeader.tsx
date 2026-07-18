@@ -26,6 +26,7 @@ interface BankHeroHeaderProps {
     onBack: () => void;
     onReport: () => void;
     onEdit: () => void;
+    primaryColor?: string;
 }
 
 /**
@@ -40,6 +41,7 @@ export function BankHeroHeader({
     onBack,
     onReport,
     onEdit,
+    primaryColor,
 }: BankHeroHeaderProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -71,7 +73,7 @@ export function BankHeroHeader({
         transform: [{ scale: 1 + shimmer.value * 0.022 }],
     }));
 
-    const BG = '#1a2d4a'; // deep navy
+    const BG = primaryColor || '#1a2d4a'; // deep navy
 
     return (
         <Animated.View

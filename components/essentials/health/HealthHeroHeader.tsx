@@ -33,6 +33,7 @@ interface HealthHeroHeaderProps {
     onBack: () => void;
     onReport: () => void;
     onEdit: () => void;
+    primaryColor?: string;
 }
 
 /**
@@ -47,6 +48,7 @@ export function HealthHeroHeader({
     onBack,
     onReport,
     onEdit,
+    primaryColor,
 }: HealthHeroHeaderProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -89,10 +91,12 @@ export function HealthHeroHeader({
         strokeDashoffset: -ECG_SWEEP * sweep.value,
     }));
 
+    const BG = primaryColor || colors.primary;
+
     return (
         <Animated.View
             entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: colors.primary }]}
+            style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Healthcare decor: faint circles, cross, stethoscope curve */}
             <Svg

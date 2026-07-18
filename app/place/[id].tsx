@@ -69,7 +69,18 @@ const PlaceDetailScreen = () => {
         }
     }, [placeData]);
 
-    const primaryColor = color || colors.primary;
+    const primaryColor = useMemo(() => {
+        if (color) return color;
+        const cat = (categoryParam || place?.category || '').toLowerCase();
+        if (cat === 'emergency') return '#b91c1c';   // deep red
+        if (cat === 'health') return colors.primary;  // theme primary (teal)
+        if (cat === 'religious') return '#1a5c3a'; // Islamic green
+        if (cat === 'banks' || cat === 'bank') return '#1a2d4a'; // deep navy
+        if (cat === 'govt') return '#1e2e4a'; // slate-blue
+        if (cat === 'travel') return '#0f172a';        // dark slate
+        if (cat === 'education') return '#312e81';     // deep indigo
+        return colors.primary;
+    }, [color, categoryParam, place?.category, colors.primary]);
 
 
     const renderFormattedText = useCallback((text?: string) => {
@@ -249,6 +260,7 @@ const PlaceDetailScreen = () => {
                     onBack={() => router.back()}
                     onReport={() => reportModalRef.current?.present()}
                     onEdit={handleEdit}
+                    primaryColor={primaryColor}
                 />
             ) : isEmergency ? (
                 <EmergencyHeroHeader
@@ -258,6 +270,7 @@ const PlaceDetailScreen = () => {
                     onBack={() => router.back()}
                     onReport={() => reportModalRef.current?.present()}
                     onEdit={handleEdit}
+                    primaryColor={primaryColor}
                 />
             ) : isHealth ? (
                 <HealthHeroHeader
@@ -267,6 +280,7 @@ const PlaceDetailScreen = () => {
                     onBack={() => router.back()}
                     onReport={() => reportModalRef.current?.present()}
                     onEdit={handleEdit}
+                    primaryColor={primaryColor}
                 />
             ) : isReligious ? (
                 <ReligiousHeroHeader
@@ -276,6 +290,7 @@ const PlaceDetailScreen = () => {
                     onBack={() => router.back()}
                     onReport={() => reportModalRef.current?.present()}
                     onEdit={handleEdit}
+                    primaryColor={primaryColor}
                 />
             ) : isBank ? (
                 <BankHeroHeader
@@ -285,6 +300,7 @@ const PlaceDetailScreen = () => {
                     onBack={() => router.back()}
                     onReport={() => reportModalRef.current?.present()}
                     onEdit={handleEdit}
+                    primaryColor={primaryColor}
                 />
             ) : isGovt ? (
                 <GovtHeroHeader
@@ -294,6 +310,7 @@ const PlaceDetailScreen = () => {
                     onBack={() => router.back()}
                     onReport={() => reportModalRef.current?.present()}
                     onEdit={handleEdit}
+                    primaryColor={primaryColor}
                 />
             ) : isEducation ? (
                 <EducationHeroHeader
@@ -303,6 +320,7 @@ const PlaceDetailScreen = () => {
                     onBack={() => router.back()}
                     onReport={() => reportModalRef.current?.present()}
                     onEdit={handleEdit}
+                    primaryColor={primaryColor}
                 />
             ) : (
             <Animated.View entering={FadeInUp.duration(500)} style={styles.heroHeader}>

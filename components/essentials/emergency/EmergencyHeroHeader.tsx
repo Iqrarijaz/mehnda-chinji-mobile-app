@@ -35,6 +35,7 @@ interface EmergencyHeroHeaderProps {
     onBack: () => void;
     onReport: () => void;
     onEdit: () => void;
+    primaryColor?: string;
 }
 
 /**
@@ -48,6 +49,7 @@ export function EmergencyHeroHeader({
     onBack,
     onReport,
     onEdit,
+    primaryColor,
 }: EmergencyHeroHeaderProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -93,10 +95,12 @@ export function EmergencyHeroHeader({
         };
     });
 
+    const BG = primaryColor || '#b91c1c';
+
     return (
         <Animated.View
             entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: colors.primary }]}
+            style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Emergency-themed decor: faint shield, cross, and circles */}
             <Svg

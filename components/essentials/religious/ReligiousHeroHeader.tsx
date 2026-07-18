@@ -26,6 +26,7 @@ interface ReligiousHeroHeaderProps {
     onBack: () => void;
     onReport: () => void;
     onEdit: () => void;
+    primaryColor?: string;
 }
 
 /**
@@ -40,6 +41,7 @@ export function ReligiousHeroHeader({
     onBack,
     onReport,
     onEdit,
+    primaryColor,
 }: ReligiousHeroHeaderProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -72,7 +74,7 @@ export function ReligiousHeroHeader({
     }));
 
     // Hero bg: deep Islamic green
-    const BG = '#1a5c3a';
+    const BG = primaryColor || '#1a5c3a';
 
     return (
         <Animated.View

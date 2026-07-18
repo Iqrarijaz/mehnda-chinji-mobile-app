@@ -344,10 +344,12 @@ const BusinessRegistrationScreen = () => {
                             placeholder="e.g. 03xx xxxxxxx"
                             value={form.phone}
                             onChangeText={(text) => {
-                                setForm(prev => ({ ...prev, phone: text }));
+                                const sanitized = text.replace(/[^0-9]/g, '');
+                                setForm(prev => ({ ...prev, phone: sanitized }));
                                 setErrors(prev => ({ ...prev, phone: '' }));
                             }}
                             keyboardType="phone-pad"
+                            maxLength={11}
                             error={errors.phone}
                         />
 

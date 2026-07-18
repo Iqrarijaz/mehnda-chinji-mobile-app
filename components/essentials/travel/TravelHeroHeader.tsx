@@ -27,6 +27,7 @@ interface TravelHeroHeaderProps {
     onBack: () => void;
     onReport: () => void;
     onEdit: () => void;
+    primaryColor?: string;
 }
 
 /**
@@ -40,6 +41,7 @@ export function TravelHeroHeader({
     onBack,
     onReport,
     onEdit,
+    primaryColor,
 }: TravelHeroHeaderProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -66,10 +68,12 @@ export function TravelHeroHeader({
         transform: [{ translateY: -3 + bob.value * 6 }],
     }));
 
+    const BG = primaryColor || '#0f172a';
+
     return (
         <Animated.View
             entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: colors.primary }]}
+            style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Route-inspired background decor */}
             <Svg

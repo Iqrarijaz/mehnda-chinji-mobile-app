@@ -26,6 +26,7 @@ interface EducationHeroHeaderProps {
     onBack: () => void;
     onReport: () => void;
     onEdit: () => void;
+    primaryColor?: string;
 }
 
 /**
@@ -40,6 +41,7 @@ export function EducationHeroHeader({
     onBack,
     onReport,
     onEdit,
+    primaryColor,
 }: EducationHeroHeaderProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -69,10 +71,12 @@ export function EducationHeroHeader({
         ],
     }));
 
+    const BG = primaryColor || '#312e81';
+
     return (
         <Animated.View
             entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: colors.primary }]}
+            style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Education decor: faint circles, graduation cap, open book */}
             <Svg

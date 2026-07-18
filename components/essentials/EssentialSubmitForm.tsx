@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Platform, StyleSheet, TextInput, TouchableOpacity, View, ActivityIndicator, ScrollView } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
@@ -38,6 +38,18 @@ const EssentialSubmitForm = React.memo(({
     const colors = Colors[theme];
     const isDark = theme === 'dark';
     const isEditing = !!editData;
+
+    const activeColor = useMemo(() => {
+        const cat = (category || '').toLowerCase();
+        if (cat === 'emergency') return '#b91c1c';   // deep red
+        if (cat === 'health') return colors.primary;  // theme primary (teal)
+        if (cat === 'religious') return '#1a5c3a'; // Islamic green
+        if (cat === 'banks') return '#1a2d4a'; // deep navy
+        if (cat === 'govt') return '#1e2e4a'; // slate-blue
+        if (cat === 'travel') return '#0f172a';        // dark slate
+        if (cat === 'education') return '#312e81';     // deep indigo
+        return colors.primary;
+    }, [category, colors.primary]);
 
     const [form, setForm] = useState({
         name: editData?.name || '',
@@ -293,6 +305,7 @@ const EssentialSubmitForm = React.memo(({
                             }));
                         }}
                         isSingleSelect={true}
+                        activeColor={activeColor}
                     />
                 </ScrollView>
                 {errors['type'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors['type']}</ThemedText>}
@@ -319,6 +332,7 @@ const EssentialSubmitForm = React.memo(({
                             }
                             setErrors(prev => ({ ...prev, tags: '' }));
                         }}
+                        activeColor={activeColor}
                     />
                     {errors['tags'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors['tags']}</ThemedText>}
                 </View>

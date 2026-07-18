@@ -7,9 +7,8 @@ import { PillsList } from '@/components/common/PillsList';
 import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
 import { SearchBar } from '@/components/common/SearchBar';
 import PlaceCard from '@/components/essentials/PlaceCard';
-import EmptyListingState from '@/components/listing/EmptyListingState';
-import { ListingCardSkeleton } from '@/components/listing/ListingCardSkeleton';
-import RequestCard from '@/components/places/RequestCard';
+import EmptyListingState from '@/components/essentials/EmptyListingState';
+import { ListingCardSkeleton } from '@/components/essentials/ListingCardSkeleton';
 import { ThemedText } from '@/components/ThemedText';
 import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 import { getCategoryTypes } from '@/constants/categoryTypes';
@@ -22,15 +21,14 @@ import { useEssentialsAPI } from '@/hooks/useEssentialsAPI';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-    Alert,
     Platform,
     StyleSheet,
     TouchableOpacity,
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import RequestCard from '@/components/essentials/shared/RequestCard';
 
 const CategoryListingScreen = React.memo(() => {
     const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();
