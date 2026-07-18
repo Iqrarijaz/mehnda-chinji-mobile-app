@@ -35,6 +35,11 @@ import { ContactEssentialDetails } from '@/components/essentials/ContactEssentia
 import { TravelHeroHeader } from '@/components/essentials/travel/TravelHeroHeader';
 import { TravelContactDetails } from '@/components/essentials/travel/TravelContactDetails';
 import { TravelTags } from '@/components/essentials/travel/TravelTags';
+import { EmergencyHeroHeader } from '@/components/essentials/emergency/EmergencyHeroHeader';
+import { EmergencyQuickActions } from '@/components/essentials/emergency/EmergencyQuickActions';
+import { EmergencyContactDetails } from '@/components/essentials/emergency/EmergencyContactDetails';
+import { EmergencyTags } from '@/components/essentials/emergency/EmergencyTags';
+import { EmergencyLocationCard } from '@/components/essentials/emergency/EmergencyLocationCard';
 import { capitalizeString } from '@/utils/string';
 
 const PlaceDetailScreen = () => {
@@ -236,6 +241,7 @@ const PlaceDetailScreen = () => {
     const contacts = place.contact || (place.phone ? [{ name: 'Primary', number: place.phone }] : []);
     const placeImage = place.images && place.images.length > 0 ? place.images[0] : null;
     const isTravel = category.toLowerCase() === 'travel';
+    const isEmergency = category.toLowerCase() === 'emergency';
 
     return (
         <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
@@ -244,6 +250,15 @@ const PlaceDetailScreen = () => {
             {/* ── Hero Header ─────────────────────────────────────────── */}
             {isTravel ? (
                 <TravelHeroHeader
+                    place={place}
+                    placeName={placeName}
+                    isOwner={!!isOwner}
+                    onBack={() => router.back()}
+                    onReport={() => reportModalRef.current?.present()}
+                    onEdit={handleEdit}
+                />
+            ) : isEmergency ? (
+                <EmergencyHeroHeader
                     place={place}
                     placeName={placeName}
                     isOwner={!!isOwner}
@@ -313,6 +328,14 @@ const PlaceDetailScreen = () => {
                 <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', flex: 1 }]}>
 
                     {/* Quick Interactive Actions Row */}
+                    {isEmergency ? (
+                        <EmergencyQuickActions
+                            onCall={() => handleCall(contacts[0]?.number)}
+                            onDirections={handleNavigate}
+                            hasContact={!!contacts[0]?.number}
+                            hasDirections={!!hasDirections}
+                        />
+                    ) : (
                     <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
 
 
@@ -336,6 +359,7 @@ const PlaceDetailScreen = () => {
 
 
                     </View>
+                    )}
 
                     {/* Banner Ad */}
                     <View style={styles.detailAdWrapper}>
@@ -348,6 +372,8 @@ const PlaceDetailScreen = () => {
                         {/* Contacts List */}
                         {isTravel ? (
                             <TravelContactDetails contacts={contacts} />
+                        ) : isEmergency ? (
+                            <EmergencyContactDetails contacts={contacts} />
                         ) : (
                             <ContactEssentialDetails contacts={contacts} primaryColor={primaryColor} />
                         )}
@@ -356,7 +382,10 @@ const PlaceDetailScreen = () => {
                         {isTravel && place.tags && place.tags.length > 0 && (
                             <TravelTags tags={place.tags} />
                         )}
-                        {!isTravel && place.tags && place.tags.length > 0 && (
+                        {isEmergency && place.tags && place.tags.length > 0 && (
+                            <EmergencyTags tags={place.tags} />
+                        )}
+                        {!isTravel && !isEmergency && place.tags && place.tags.length > 0 && (
                             <View style={styles.detailSection}>
                                 <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
                                     Tags
@@ -408,7 +437,15 @@ const PlaceDetailScreen = () => {
                         )}
 
                         {/* Section: Contact & Location */}
-                        {category.toLowerCase() !== 'travel' && (
+                        {isEmergency && (
+                            <EmergencyLocationCard
+                                place={place}
+                                address={address}
+                                onDirections={handleNavigate}
+                                hasDirections={!!hasDirections}
+                            />
+                        )}
+                        {!isTravel && !isEmergency && (
                             <ContactAndLocation place={place} address={address} primaryColor={primaryColor} />
                         )}
                     </View>
