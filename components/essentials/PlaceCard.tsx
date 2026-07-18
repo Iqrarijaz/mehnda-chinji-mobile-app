@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
         top: 0,
         right: 0,
         paddingHorizontal: 10,
-        paddingVertical: 3,
+        paddingVertical: 2,
         borderRadius: 999,
         borderTopRightRadius: 12,
         borderBottomLeftRadius: 12,
