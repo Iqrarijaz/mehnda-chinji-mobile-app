@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
 import {
     submitEssential,
@@ -10,6 +10,7 @@ import {
     getEssentialsList,
     getMyRequests
 } from '@/apis/essentials';
+import { getAuthenticatedConfiguration } from '@/apis/configuration';
 
 interface UseEssentialsAPIOptions {
     category?: string;
@@ -26,6 +27,12 @@ export function useEssentialsAPI(options?: UseEssentialsAPIOptions) {
     const type = options?.type;
     const activeTab = options?.activeTab;
     const onDeleteSuccess = options?.onDeleteSuccess;
+
+    const essentialsConfigQuery = useQuery({
+        queryKey: ['configuration', 'ESSENTIALS_ICONS'],
+        queryFn: () => getAuthenticatedConfiguration('ESSENTIALS_ICONS'),
+        staleTime: 0, // Force fresh fetch to get newly added tags configuration
+    });
 
     const submitMutation = useMutation({
         mutationFn: async ({ payload, isEditing, id }: { payload: any; isEditing: boolean; id?: string }) => {
@@ -123,6 +130,7 @@ export function useEssentialsAPI(options?: UseEssentialsAPIOptions) {
     });
 
     return {
+        essentialsConfigQuery,
         submitMutation,
         uploadImageMutation,
         infiniteQuery,

@@ -1,7 +1,3 @@
-import { AUTH_QUERY_KEYS } from '@/apis/login';
-import { uploadProfileImage, deleteProfileImage, updateProfile } from '@/apis/profile';
-import { getAuthenticatedConfiguration, CONFIG_QUERY_KEYS } from '@/apis/configuration';
-import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { profileSchema } from '@/utils/validation';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { ImageViewerModal } from '@/components/common/ImageViewerModal';
@@ -19,7 +15,7 @@ import citiesDataFallback from '@/data/cities.json';
 import villagesDataFallback from '@/data/villages.json';
 import { Ionicons } from '@expo/vector-icons';
 import { useBackHandler } from '@/hooks/useBackHandler';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useProfileAPI } from '@/hooks/useProfileAPI';
 
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -27,12 +23,10 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import {
-    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
     StyleSheet,
-    TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
@@ -41,9 +35,6 @@ import Animated, {
 
     FadeInDown,
     FadeInUp,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -54,20 +45,16 @@ export default function ProfileScreen() {
     const { user, updateUser } = useAuth();
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const queryClient = useQueryClient();
+    const {
+        citiesConfigQuery,
+        villagesConfigQuery,
+        profileMutation,
+        uploadImageMutation,
+        deleteImageMutation
+    } = useProfileAPI({ updateUser });
 
-    // Fetch cities and villages dynamically from configuration API
-    const { data: citiesConfigData } = useQuery({
-        queryKey: CONFIG_QUERY_KEYS.cities,
-        queryFn: () => getAuthenticatedConfiguration('CITIES'),
-        staleTime: 1000 * 60 * 60 * 24, // 24 hours
-    });
-
-    const { data: villagesConfigData } = useQuery({
-        queryKey: CONFIG_QUERY_KEYS.villages,
-        queryFn: () => getAuthenticatedConfiguration('VILLAGES'),
-        staleTime: 1000 * 60 * 60 * 24, // 24 hours
-    });
+    const { data: citiesConfigData } = citiesConfigQuery;
+    const { data: villagesConfigData } = villagesConfigQuery;
 
     const citiesData: string[] = useMemo(
         () => citiesConfigData?.data?.data || citiesDataFallback,
@@ -125,45 +112,6 @@ export default function ProfileScreen() {
         formData.city !== currentData.city ||
         formData.village !== currentData.village;
 
-    const profileMutation = useMutation({
-        mutationFn: updateProfile,
-        onSuccess: async (response) => {
-            if (response) {
-                analyticsService.trackEvent(AnalyticsEvents.PROFILE_UPDATED);
-                await updateUser(response);
-                queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
-                Toast.show({
-                    type: 'success',
-                    text1: 'Success!',
-                    text2: 'Profile updated successfully',
-                });
-                router.replace('/(drawer)/(tabs)' as any);
-            }
-        },
-        onError: (error: any) => {
-            Toast.show({
-                type: 'error',
-                text1: 'Update Failed',
-                text2: error?.response?.data?.message || 'Something went wrong',
-            });
-        }
-    });
-
-    const uploadImageMutation = useMutation({
-        mutationFn: uploadProfileImage,
-        onSuccess: async (response) => {
-            const newUrl = response?.data?.profileImage;
-            if (newUrl) {
-                analyticsService.trackEvent(AnalyticsEvents.AVATAR_CHANGED, { action: 'upload' });
-                await updateUser({ profileImage: newUrl });
-                queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
-                Toast.show({ type: 'success', text1: 'Success', text2: 'Profile image updated' });
-            }
-        },
-        onError: (error: any) => {
-            Toast.show({ type: 'error', text1: 'Upload Failed', text2: 'Failed to upload image' });
-        }
-    });
 
     const pickImage = useCallback(async () => {
         if (Platform.OS === 'ios') {
@@ -210,22 +158,7 @@ export default function ProfileScreen() {
         }
     }, [user?.user?._id, uploadImageMutation]);
 
-    const deleteImageMutation = useMutation({
-        mutationFn: deleteProfileImage,
-        onSuccess: async () => {
-            analyticsService.trackEvent(AnalyticsEvents.AVATAR_CHANGED, { action: 'delete' });
-            await updateUser({ profileImage: null });
-            queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
-            Toast.show({ type: 'success', text1: 'Success', text2: 'Profile image removed' });
-        },
-        onError: (error: any) => {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: error.response?.data?.message || 'Failed to remove image'
-            });
-        }
-    });
+
 
 
 
@@ -385,13 +318,13 @@ export default function ProfileScreen() {
                             </View>
 
                             {/* Update Button (Now Scrollable) */}
-                            <View style={{ marginTop: 24, alignItems: 'center' }}>
+                            <View style={{ marginTop: 12, alignItems: 'center' }}>
                                 <SubmitButton
                                     title="Update Profile"
                                     onPress={handleUpdate}
                                     disabled={!isModified}
                                     isLoading={profileMutation.isPending}
-                                    style={{ width: 140, height: 40, borderRadius: 20 }}
+                                    style={{ alignSelf: 'center' }}
                                 />
                             </View>
                         </View>

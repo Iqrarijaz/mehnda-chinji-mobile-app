@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -18,8 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
-import { BUSINESS_QUERY_KEYS, registerBusiness, updateBusiness } from '@/apis/business';
-import { getAuthenticatedConfiguration, CONFIG_QUERY_KEYS } from '@/apis/configuration';
+import { useBusinessAPI } from '@/hooks/useBusinessAPI';
 import { ProfessionPicker } from '@/components/common/ProfessionPicker';
 import { TimePicker } from '@/components/common/TimePicker';
 import { ThankYouModal } from '@/components/common/ThankYou';
@@ -43,16 +41,19 @@ const BusinessRegistrationScreen = () => {
     const { user } = useAuth();
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
-    const queryClient = useQueryClient();
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const editData = editDataParam ? JSON.parse(editDataParam) : null;
 
-    const { data: configData } = useQuery({
-        queryKey: CONFIG_QUERY_KEYS.professions,
-        queryFn: () => getAuthenticatedConfiguration('PROFESSIONS'),
-        staleTime: 1000 * 60 * 60 * 24,
+    const {
+        professionsConfigQuery,
+        registerMutation,
+        updateMutation
+    } = useBusinessAPI({
+        enabledList: false
     });
+
+    const { data: configData } = professionsConfigQuery;
 
     const professionsList = configData?.data?.data || [];
 
@@ -143,36 +144,6 @@ const BusinessRegistrationScreen = () => {
         }
     }, [editDataParam, user]);
 
-    const registerMutation = useMutation({
-        mutationFn: registerBusiness,
-        onSuccess: (res: any) => {
-            if (res.success) {
-                analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_SUCCESS, { action: 'create' });
-                queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
-                Toast.show({ type: 'success', text1: 'Success', text2: 'Business registered!' });
-                setShowThankYou(true);
-            }
-        },
-        onError: (err: any) => {
-            Toast.show({ type: 'error', text1: 'Error', text2: err.message || 'Registration failed' });
-        }
-    });
-
-    const updateMutation = useMutation({
-        mutationFn: updateBusiness,
-        onSuccess: (res: any) => {
-            if (res.success) {
-                analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_SUCCESS, { action: 'update' });
-                queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
-                Toast.show({ type: 'success', text1: 'Success', text2: 'Business updated!' });
-                handleGoBack();
-            }
-        },
-        onError: (err: any) => {
-            Toast.show({ type: 'error', text1: 'Error', text2: err.message || 'Update failed' });
-        }
-    });
-
     const handleSubmit = async () => {
         try {
             await businessSchema.validate(form, { abortEarly: false });
@@ -193,9 +164,23 @@ const BusinessRegistrationScreen = () => {
             };
 
             if (editData) {
-                updateMutation.mutate({ ...payload, businessId: editData._id });
+                updateMutation.mutate({ ...payload, businessId: editData._id }, {
+                    onSuccess: (res: any) => {
+                        if (res.success) {
+                            analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_SUCCESS, { action: 'update' });
+                            handleGoBack();
+                        }
+                    }
+                });
             } else {
-                registerMutation.mutate(payload);
+                registerMutation.mutate(payload, {
+                    onSuccess: (res: any) => {
+                        if (res.success) {
+                            analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_SUCCESS, { action: 'create' });
+                            setShowThankYou(true);
+                        }
+                    }
+                });
             }
         } catch (err: any) {
             if (err instanceof yup.ValidationError) {

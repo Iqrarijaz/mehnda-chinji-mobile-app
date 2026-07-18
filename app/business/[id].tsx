@@ -28,6 +28,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BannerAd from '@/ads/components/BannerAd';
 import InterstitialService from '@/ads/interstitial.service';
+import { capitalizeString } from '@/utils/string';
 
 
 const BusinessDetailScreen = () => {
@@ -58,19 +59,10 @@ const BusinessDetailScreen = () => {
 
     const primaryColor = colors.primary;
 
-    const capitalize = (str?: string) =>
-        str
-            ? str
-                .toLowerCase()
-                .split(' ')
-                .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-                .join(' ')
-            : '';
-
-    const businessName = useMemo(() => capitalize(business?.name), [business?.name]);
-    const ownerName = useMemo(() => capitalize(business?.userId?.name || 'Owner'), [business?.userId?.name]);
-    const address = capitalize(business?.address || business?.village || 'N/A');
-    const category = capitalize(business?.categoryEn || '');
+    const businessName = useMemo(() => capitalizeString(business?.name), [business?.name]);
+    const ownerName = useMemo(() => capitalizeString(business?.userId?.name || 'Owner'), [business?.userId?.name]);
+    const address = capitalizeString(business?.address || business?.village || 'N/A');
+    const category = capitalizeString(business?.categoryEn || '');
     const urduCategory = business?.categoryUr;
 
     const handleCall = useCallback(() => {
@@ -80,19 +72,6 @@ const BusinessDetailScreen = () => {
             Alert.alert('No Phone', 'Phone number not available.');
         }
     }, [business?.phone]);
-
-    const handleShare = useCallback(async () => {
-        try {
-            await Share.share({
-                message: `Check out ${businessName} on Rehbar!\n📍 ${address}\n📞 ${business?.phone || 'Contact for details'}`,
-                title: businessName,
-            });
-        } catch (error: any) {
-            Alert.alert(error.message);
-        }
-    }, [businessName, address, business?.phone]);
-
-    // Animations removed for Hero Header
 
     if (!business) {
         return (

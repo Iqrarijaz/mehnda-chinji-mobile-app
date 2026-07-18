@@ -1,5 +1,4 @@
 import { AnalyticsEvents, analyticsService } from '@/analytics';
-import { BUSINESS_QUERY_KEYS, getBusinessesList } from '@/apis/business';
 import BusinessCard from '@/components/business/BusinessCard';
 import { BusinessRegistration } from '@/components/business/BusinessRegistration';
 import { BusinessCardSkeleton } from '@/components/common/CardSkeletons';
@@ -14,8 +13,8 @@ import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { useInfiniteQuery } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useBusinessAPI } from '@/hooks/useBusinessAPI';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
@@ -49,8 +48,6 @@ export default function BusinessScreen() {
     const [isProfessionPickerVisible, setIsProfessionPickerVisible] = useState(false);
     const lastTrackedQuery = React.useRef<string>('');
 
-    const categories = ['All', 'Doctors', 'Vendors', 'Pharmacies', 'Mechanics', 'Tailors', 'Restaurants'];
-
     // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -62,6 +59,16 @@ export default function BusinessScreen() {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
+    const businessFilters = React.useMemo(() => ({
+        text: debouncedSearch || undefined,
+        categoryEn: selectedCategory === 'All' ? undefined : selectedCategory
+    }), [debouncedSearch, selectedCategory]);
+
+    const { infiniteQuery } = useBusinessAPI({
+        filters: businessFilters,
+        enabledList: activeTab === 'find'
+    });
+
     const {
         data: infiniteData,
         isLoading: queryLoading,
@@ -70,28 +77,7 @@ export default function BusinessScreen() {
         fetchNextPage,
         isFetchingNextPage,
         refetch
-    } = useInfiniteQuery({
-        queryKey: BUSINESS_QUERY_KEYS.list({ text: debouncedSearch || undefined, categoryEn: selectedCategory === 'All' ? undefined : selectedCategory }),
-        queryFn: ({ pageParam = 1 }) => getBusinessesList({
-            text: debouncedSearch || undefined,
-            categoryEn: selectedCategory === 'All' ? undefined : selectedCategory,
-            currentPage: pageParam
-        }),
-        getNextPageParam: (lastPage: any, allPages: any[]) => {
-            const pagination = lastPage?.pagination;
-            if (pagination && pagination.currentPage < pagination.totalPages) {
-                return pagination.currentPage + 1;
-            }
-            // Fallback for security
-            const currentData = lastPage?.data;
-            if (Array.isArray(currentData) && currentData.length === 20) {
-                return (Array.isArray(allPages) ? allPages.length : 0) + 1;
-            }
-            return undefined;
-        },
-        initialPageParam: 1,
-        enabled: activeTab === 'find',
-    });
+    } = infiniteQuery;
 
     const businesses = (infiniteData as any)?.pages?.flatMap((page: any) => Array.isArray(page?.data) ? page.data : []) || [];
     const loading = queryLoading || isRefetching;

@@ -1,13 +1,12 @@
-import { getNotifications } from '@/apis/notifications';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useNotificationsAPI } from '@/hooks/useNotificationsAPI';
 
 interface NotificationIconProps {
     color?: string;
@@ -26,20 +25,25 @@ export function NotificationIcon({
     const { isAuthenticated } = useAuth();
     const colors = Colors[theme];
     const router = useRouter();
+    const pathname = usePathname();
 
     const iconColor = color || colors.primary;
 
-    const { data: notificationsData } = useQuery({
-        queryKey: ['notifications-badge'],
-        queryFn: () => getNotifications({ limit: 1 }),
-        enabled: isAuthenticated,
+    const { badgeQuery } = useNotificationsAPI({
+        enabled: isAuthenticated
     });
+
+    const { data: notificationsData } = badgeQuery;
 
     const unreadCount = notificationsData?.unreadCount || 0;
 
     return (
         <TouchableOpacity
-            onPress={() => router.push('/notifications')}
+            onPress={() => {
+                if (pathname !== '/notifications') {
+                    router.push('/notifications');
+                }
+            }}
             style={[styles.iconButton, containerStyle]}
         >
             <Ionicons name="notifications-outline" size={size} color={iconColor} />

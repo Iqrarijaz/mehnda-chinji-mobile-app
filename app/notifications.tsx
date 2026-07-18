@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -10,13 +9,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FlashList } from '@shopify/flash-list';
-
-import {
-    getNotifications,
-    markAllNotificationsAsRead,
-    markNotificationAsRead,
-    deleteNotification,
-} from '@/apis/notifications';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNotificationsAPI } from '@/hooks/useNotificationsAPI';
 
 import NotificationEmptyState from '@/components/notification/NotificationEmptyState';
 import NotificationFilterTabs from '@/components/notification/NotificationFilterTabs';
@@ -64,11 +58,17 @@ export default function NotificationsScreen() {
     const viewedTooltips = useTooltipStore(state => state.viewedTooltips);
     const markAsViewed = useTooltipStore(state => state.markAsViewed);
 
-    const { data: response, isLoading, isFetching, refetch } = useQuery<any>({
-        queryKey: ['notifications', activeFilter],
-        queryFn: () => getNotifications({ type: activeFilter }),
-        enabled: isAuthenticated,
+    const {
+        notificationsQuery,
+        markAsReadMutation,
+        markAllReadMutation,
+        deleteMutation
+    } = useNotificationsAPI({
+        activeFilter,
+        enabled: isAuthenticated
     });
+
+    const { data: response, isLoading, isFetching, refetch } = notificationsQuery;
 
     const notifications = response?.data || [];
     const unreadCount = response?.unreadCount || 0;
@@ -88,49 +88,20 @@ export default function NotificationsScreen() {
         setShowSwipeTooltip(false);
     }, [markAsViewed]);
 
-    const markAsReadMutation = useMutation({
-        mutationFn: markNotificationAsRead,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-            queryClient.invalidateQueries({ queryKey: ['notifications-badge'] });
-        },
-    });
-
-    const markAllReadMutation = useMutation({
-        mutationFn: markAllNotificationsAsRead,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-            queryClient.invalidateQueries({ queryKey: ['notifications-badge'] });
-        },
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: (id: string) => deleteNotification(id),
-        onMutate: (id: string) => {
-            setDeletingId(id);
-        },
-        onSuccess: (_data, id) => {
-            // Instantly remove from cache
-            queryClient.setQueryData(['notifications', activeFilter], (old: any) => {
-                if (!old) return old;
-                return { ...old, data: old.data.filter((n: any) => n._id !== id) };
-            });
-            // Then invalidate to sync with server
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-            queryClient.invalidateQueries({ queryKey: ['notifications-badge'] });
-        },
-        onError: () => {
-            // Rollback by refetching
-            queryClient.invalidateQueries({ queryKey: ['notifications', activeFilter] });
-        },
-        onSettled: () => {
-            setDeletingId(null);
-        },
-    });
-
     const handleDelete = useCallback((id: string) => {
-        deleteMutation.mutate(id);
-    }, [deleteMutation]);
+        setDeletingId(id);
+        deleteMutation.mutate(id, {
+            onSuccess: () => {
+                queryClient.setQueryData(['notifications', activeFilter], (old: any) => {
+                    if (!old) return old;
+                    return { ...old, data: old.data.filter((n: any) => n._id !== id) };
+                });
+            },
+            onSettled: () => {
+                setDeletingId(null);
+            }
+        });
+    }, [deleteMutation, activeFilter, queryClient]);
 
     const handlePress = useCallback((item: any) => {
         if (!item.isRead) markAsReadMutation.mutate(item._id);

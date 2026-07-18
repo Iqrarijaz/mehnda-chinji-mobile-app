@@ -8,11 +8,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { ThemedText } from '@/components/ThemedText';
-import { useQuery } from '@tanstack/react-query';
-import { getAuthenticatedConfiguration, CONFIG_QUERY_KEYS } from '@/apis/configuration';
 import { MarketplaceCard } from '@/components/marketplace/MarketplaceCard';
 import { MarketplaceCategoryPicker } from '@/components/marketplace/MarketplaceCategoryPicker';
-import { useInfiniteMarketplace, useInfiniteMyMarketplace } from '@/hooks/useMarketplace';
+import { useMarketplaceAPI } from '@/hooks/useMarketplaceAPI';
 import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
 import NativeAd from '@/ads/components/NativeAd';
@@ -33,43 +31,12 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
 
-    // Fetch categories configuration dynamically
-    const { data: configData, refetch: refetchCategories } = useQuery({
-        queryKey: CONFIG_QUERY_KEYS.marketplaceCategories,
-        queryFn: () => getAuthenticatedConfiguration('MARKETPLACE_CATEGORIES'),
-        staleTime: 1000 * 60 * 60 * 12, // 24 hours
-    });
-
-    useFocusEffect(
-        useCallback(() => {
-            refetchCategories();
-        }, [refetchCategories])
-    );
-
-    const tabs = useMemo(() => {
-        const baseTabs = [
-            { id: '', label: 'All Items' }
-        ];
-
-        let apiCats: any[] = [];
-        if (configData) {
-            if (Array.isArray(configData)) apiCats = configData;
-            else if (Array.isArray(configData.data)) apiCats = configData.data;
-            else if (Array.isArray(configData.data?.data)) apiCats = configData.data.data;
-        }
-        const dynamicCats = apiCats.map((cat: any) => ({
-            id: cat.title.en,
-            label: cat.title.en
-        }));
-        return [...baseTabs, ...dynamicCats];
-    }, [configData]);
-
     const [selectedTab, setSelectedTab] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
 
     const params = useLocalSearchParams();
-    
+
     useEffect(() => {
         if (params.tab === 'mine') {
             setSelectedTab('mine');
@@ -103,11 +70,42 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
         };
     }, [selectedTab, debouncedSearch, isMineTab, selectedCategories, selectedItems]);
 
-    // Use appropriate infinite query depending on selected tab (public list or personal listings)
-    const publicQuery = useInfiniteMarketplace(marketplaceFilters);
-    const personalQuery = useInfiniteMyMarketplace({ status: undefined }); // Fetch all my listings
+    const {
+        categoriesConfigQuery,
+        infiniteQuery,
+        myListQuery,
+    } = useMarketplaceAPI({
+        filters: marketplaceFilters,
+        isMineTab,
+    });
 
-    const activeQuery = isMineTab ? personalQuery : publicQuery;
+    const { data: configData, refetch: refetchCategories } = categoriesConfigQuery;
+
+    useFocusEffect(
+        useCallback(() => {
+            refetchCategories();
+        }, [refetchCategories])
+    );
+
+    const tabs = useMemo(() => {
+        const baseTabs = [
+            { id: '', label: 'All Items' }
+        ];
+
+        let apiCats: any[] = [];
+        if (configData) {
+            if (Array.isArray(configData)) apiCats = configData;
+            else if (Array.isArray(configData.data)) apiCats = configData.data;
+            else if (Array.isArray(configData.data?.data)) apiCats = configData.data.data;
+        }
+        const dynamicCats = apiCats.map((cat: any) => ({
+            id: cat.title.en,
+            label: cat.title.en
+        }));
+        return [...baseTabs, ...dynamicCats];
+    }, [configData]);
+
+    const activeQuery = isMineTab ? myListQuery : infiniteQuery;
 
     const {
         data: infiniteData,
@@ -138,7 +136,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                 sellerId: i.sellerId?._id || i.sellerId
             }));
             const precomputedOtherItemsStr = minimalOtherItems.length > 0 ? JSON.stringify(minimalOtherItems) : undefined;
-            
+
             currentRow.push({ ...item, precomputedOtherItemsStr });
 
             if (currentRow.length === 2 || index === rawListings.length - 1) {

@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -12,12 +11,7 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import {
-    BUSINESS_QUERY_KEYS,
-    deleteBusiness,
-    getBusinessStatus,
-    manageBusinessSearch
-} from '@/apis/business';
+import { useBusinessAPI } from '@/hooks/useBusinessAPI';
 import { ThemedText } from '@/components/ThemedText';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { Colors } from '@/constants/colors';
@@ -32,7 +26,6 @@ const BusinessRegistration = React.memo(() => {
     const { user } = useAuth();
     const { theme } = useTheme();
     const colors = Colors[theme];
-    const queryClient = useQueryClient();
     const router = useRouter();
 
     // UI State
@@ -41,53 +34,29 @@ const BusinessRegistration = React.memo(() => {
     const [showVisibilityModal, setShowVisibilityModal] = useState(false);
     const [visibilityTarget, setVisibilityTarget] = useState<{ id: string; name: string; nextValue: boolean } | null>(null);
 
-    // Queries
-    const { data: statusRes, isLoading: loading, refetch, isRefetching } = useQuery({
-        queryKey: BUSINESS_QUERY_KEYS.myBusiness(),
-        queryFn: getBusinessStatus,
+    const {
+        myBusinessQuery,
+        deleteMutation,
+        manageSearchMutation
+    } = useBusinessAPI({
+        enabledList: false
     });
 
+    const { data: statusRes, isLoading: loading, refetch, isRefetching } = myBusinessQuery;
     const businesses = statusRes?.data || [];
-
-    // Mutations
-    const deleteMutation = useMutation({
-        mutationFn: deleteBusiness,
-        onSuccess: (res: any) => {
-            if (res.success) {
-                queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.all });
-                setShowDeleteModal(false);
-                setBusinessToDelete(null);
-                Toast.show({
-                    type: 'success',
-                    text1: 'Deleted',
-                    text2: 'Business registration removed.',
-                });
-            }
-        },
-    });
-
-    const manageSearchMutation = useMutation({
-        mutationFn: ({ businessId, search }: { businessId: string; search: boolean }) =>
-            manageBusinessSearch(businessId, search),
-        onSuccess: (res: any) => {
-            if (res.success) {
-                queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.all });
-                setShowVisibilityModal(false);
-                setVisibilityTarget(null);
-                Toast.show({
-                    type: 'success',
-                    text1: 'Status Updated',
-                    text2: 'Business visibility updated.',
-                });
-            }
-        },
-    });
 
     const isDeleting = deleteMutation.isPending;
 
     const confirmDelete = () => {
         if (businessToDelete) {
-            deleteMutation.mutate(businessToDelete);
+            deleteMutation.mutate(businessToDelete, {
+                onSuccess: (res: any) => {
+                    if (res.success) {
+                        setShowDeleteModal(false);
+                        setBusinessToDelete(null);
+                    }
+                }
+            });
         }
     };
 
@@ -197,6 +166,13 @@ const BusinessRegistration = React.memo(() => {
                         manageSearchMutation.mutate({
                             businessId: visibilityTarget.id,
                             search: visibilityTarget.nextValue
+                        }, {
+                            onSuccess: (res: any) => {
+                                if (res.success) {
+                                    setShowVisibilityModal(false);
+                                    setVisibilityTarget(null);
+                                }
+                            }
                         });
                     }
                 }}

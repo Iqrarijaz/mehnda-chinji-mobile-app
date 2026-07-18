@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Modal, Linking, Alert, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { getMarketplaceDetails, MARKETPLACE_QUERY_KEYS, deleteMarketplaceListing, markMarketplaceListingAsSold, toggleMarketplaceListingStatus } from '@/apis/marketplace';
 import { trackEntityInquiry } from '@/apis/inquiries';
 import { trackEntityView } from '@/apis/views';
 import Toast from 'react-native-toast-message';
@@ -16,6 +14,7 @@ import BannerAd from '@/ads/components/BannerAd';
 import { ActionMenu } from '@/components/common/ActionMenu';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { useMarketplaceAPI } from '@/hooks/useMarketplaceAPI';
 const { width } = Dimensions.get('window');
 
 export default function MarketplaceDetailsScreen() {
@@ -28,7 +27,6 @@ export default function MarketplaceDetailsScreen() {
 
     const [viewerVisible, setViewerVisible] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
-    const queryClient = useQueryClient();
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showSoldConfirm, setShowSoldConfirm] = useState(false);
 
@@ -37,11 +35,14 @@ export default function MarketplaceDetailsScreen() {
         try { return JSON.parse(otherItems); } catch { return []; }
     }, [otherItems]);
 
-    const { data: response, isLoading, isError } = useQuery({
-        queryKey: MARKETPLACE_QUERY_KEYS.details(id as string),
-        queryFn: () => getMarketplaceDetails(id as string),
-        enabled: !!id,
-    });
+    const {
+        detailsQuery,
+        markSoldMutation,
+        deleteMutation,
+        toggleStatusMutation
+    } = useMarketplaceAPI({ id: id as string });
+
+    const { data: response, isLoading, isError } = detailsQuery;
 
     const item = response?.data;
     const isOwner = user?.user?._id && item?.sellerId && (item.sellerId._id || item.sellerId).toString() === user.user._id.toString();
@@ -74,42 +75,6 @@ export default function MarketplaceDetailsScreen() {
             Alert.alert("Error", "Phone number not available");
         }
     };
-
-    const markSoldMutation = useMutation({
-        mutationFn: () => markMarketplaceListingAsSold(item?._id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.all });
-            queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.details(id as string) });
-            Toast.show({ type: 'success', text1: 'Success', text2: 'Item marked as sold!' });
-        },
-        onError: (err: any) => {
-            Toast.show({ type: 'error', text1: 'Error', text2: err.message || 'Failed to update listing' });
-        }
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: () => deleteMarketplaceListing(item?._id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.all });
-            Toast.show({ type: 'success', text1: 'Deleted', text2: 'Listing deleted successfully!' });
-            router.back();
-        },
-        onError: (err: any) => {
-            Toast.show({ type: 'error', text1: 'Error', text2: err.message || 'Failed to delete listing' });
-        }
-    });
-
-    const toggleStatusMutation = useMutation({
-        mutationFn: (newStatus: 'live' | 'offline') => toggleMarketplaceListingStatus(item?._id, newStatus),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.all });
-            queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.details(id as string) });
-            Toast.show({ type: 'success', text1: 'Success', text2: 'Listing status updated!' });
-        },
-        onError: (err: any) => {
-            Toast.show({ type: 'error', text1: 'Error', text2: err.message || 'Failed to update status' });
-        }
-    });
 
     const confirmMarkSold = () => {
         setShowSoldConfirm(true);
