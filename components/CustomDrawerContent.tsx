@@ -290,6 +290,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                 <PressableScale
                     intensity={0.03}
                     onPress={handleLogout}
+                    containerStyle={styles.logoutBtnWrap}
                     style={[styles.logoutBtn, { backgroundColor: `${colors.secondary}12` }]}
                 >
                     <Ionicons name="log-out-outline" size={18} color={colors.secondary} style={{ marginRight: 8 }} />
@@ -448,6 +449,10 @@ const styles = StyleSheet.create({
         paddingTop: 12,
         alignItems: 'center',
     },
+    logoutBtnWrap: {
+        width: '100%',
+        marginBottom: 10,
+    },
     logoutBtn: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -456,7 +461,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         borderRadius: 18,
         width: '100%',
-        marginBottom: 10,
     },
     logoutText: {
         fontSize: 14,
