@@ -342,6 +342,20 @@ export default function MarketplaceDetailsScreen() {
                                     </ThemedText>
                                 </View>
                             </View>
+
+                            {isOwner && item?.viewsCount !== undefined && (
+                                <View style={styles.infoListItem}>
+                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
+                                        <Ionicons name="eye" size={12} color={colors.primary} />
+                                    </View>
+                                    <View style={styles.infoListContent}>
+                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Total Views</ThemedText>
+                                        <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
+                                            {item.viewsCount}
+                                        </ThemedText>
+                                    </View>
+                                </View>
+                            )}
                         </View>
 
                         {/* Metadata tags */}
@@ -584,29 +598,29 @@ const styles = StyleSheet.create({
     },
     actionBtnPrimary: {
         flex: 1,
-        height: 48,
-        borderRadius: 24,
+        height: 40,
+        borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 8,
+        gap: 6,
     },
     actionBtnTextPrimary: {
         color: '#FFFFFF',
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '700',
     },
     actionBtnSec: {
         flex: 1,
-        height: 48,
-        borderRadius: 24,
+        height: 40,
+        borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 8,
+        gap: 6,
     },
     actionBtnTextSec: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '700',
     },
     detailAdWrapper: {

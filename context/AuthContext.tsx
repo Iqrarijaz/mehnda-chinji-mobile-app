@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const segments = useSegments();
     const { initializePreferences } = useNotificationStore();
-    const setUserRole = useAdsStore(state => state.setUserRole);
+    const setIsPremium = useAdsStore(state => state.setIsPremium);
 
     useEffect(() => {
         const loadUser = async () => {
@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     // Populate in-memory cache immediately — interceptor uses this from now on
                     if (parsed.token) tokenCache.set(parsed.token);
                     setUser(parsed);
-                    setUserRole(parsed.user?.role || null);
+                    setIsPremium(parsed.user?.isPremium || false);
                     if (parsed.user?.notificationPreferences) {
                         initializePreferences(parsed.user.notificationPreferences);
                     }
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
         };
         loadUser();
-    }, [setUserRole]);
+    }, [setIsPremium]);
 
     // Reactive Session Expiry: Listen for token clearance from API client
     useEffect(() => {
@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Cache token in memory — interceptor reads from here, no more disk I/O per request
         if (authData.token) tokenCache.set(authData.token);
         setUser(authData);
-        setUserRole(userData.role || null);
+        setIsPremium(userData.isPremium || false);
 
         if (userData.notificationPreferences) {
             initializePreferences(userData.notificationPreferences);
@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Clear in-memory token immediately so in-flight retries don't send a stale token
         tokenCache.clear();
         setUser(null);
-        setUserRole(null);
+        setIsPremium(false);
         await secureStorage.removeItem('userData');
         // @ts-ignore
         router.replace('/(auth)/login');
@@ -146,7 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (finalUserData.notificationPreferences) {
                     initializePreferences(finalUserData.notificationPreferences);
                 }
-                setUserRole(finalUserData.role || null);
+                setIsPremium(finalUserData.isPremium || false);
                 secureStorage.setItem('userData', JSON.stringify(updatedAuthData)).catch(console.error);
             }, 0);
             

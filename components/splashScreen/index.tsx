@@ -20,13 +20,7 @@ const logoImg = require('../../public/logo.png');
 
 const BACKGROUND = { light: '#E6F4FE', dark: '#0F172A' };
 
-// Concentric ambient circles behind the logo (innermost first).
-const RING_SIZES = [200, 290, 390];
-const RING_COLORS = {
-    light: ['rgba(0,102,102,0.055)', 'rgba(0,102,102,0.038)', 'rgba(0,102,102,0.026)'],
-    dark: ['rgba(45,212,191,0.055)', 'rgba(45,212,191,0.038)', 'rgba(45,212,191,0.026)'],
-};
-const RIPPLE_SIZE = 170;
+
 
 const TRACK_WIDTH = 160;
 
@@ -46,11 +40,7 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
     // after the handoff.
     const logoTranslateY = useSharedValue(0);
     const logoScale = useSharedValue(1);
-    const ringsOpacity = useSharedValue(0);
-    const breathe1 = useSharedValue(0);
-    const breathe2 = useSharedValue(0);
-    const breathe3 = useSharedValue(0);
-    const ripple = useSharedValue(0);
+
     const wordmarkOpacity = useSharedValue(0);
     const wordmarkTranslateY = useSharedValue(12);
     const taglineOpacity = useSharedValue(0);
@@ -73,18 +63,7 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
         logoTranslateY.value = withDelay(100, withTiming(-40, { duration: 400, easing: settle }));
         logoScale.value = withDelay(100, withTiming(1.04, { duration: 400, easing: settle }));
 
-        // Ambient circles fade in behind the logo, then breathe slowly.
-        // Staggered durations keep the rings out of phase with each other.
-        ringsOpacity.value = withDelay(250, withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) }));
-        const breatheEasing = Easing.inOut(Easing.sin);
-        breathe1.value = withRepeat(withTiming(1, { duration: 2600, easing: breatheEasing }), -1, true);
-        breathe2.value = withRepeat(withTiming(1, { duration: 3200, easing: breatheEasing }), -1, true);
-        breathe3.value = withRepeat(withTiming(1, { duration: 3800, easing: breatheEasing }), -1, true);
-        // A soft ring ripples outward from the logo and dissolves.
-        ripple.value = withDelay(
-            600,
-            withRepeat(withTiming(1, { duration: 2400, easing: Easing.out(Easing.quad) }), -1, false)
-        );
+
 
         // Staggered reveal: wordmark, tagline, then progress bar.
         wordmarkOpacity.value = withDelay(250, withTiming(1, { duration: 300, easing: Easing.out(Easing.cubic) }));
@@ -131,23 +110,7 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
         ],
     }));
 
-    // Rings follow the logo's settle and gently breathe around it.
-    const ring1Style = useAnimatedStyle(() => ({
-        opacity: ringsOpacity.value,
-        transform: [{ translateY: logoTranslateY.value }, { scale: 1 + breathe1.value * 0.05 }],
-    }));
-    const ring2Style = useAnimatedStyle(() => ({
-        opacity: ringsOpacity.value,
-        transform: [{ translateY: logoTranslateY.value }, { scale: 1 + breathe2.value * 0.06 }],
-    }));
-    const ring3Style = useAnimatedStyle(() => ({
-        opacity: ringsOpacity.value,
-        transform: [{ translateY: logoTranslateY.value }, { scale: 1 + breathe3.value * 0.07 }],
-    }));
-    const rippleStyle = useAnimatedStyle(() => ({
-        opacity: ringsOpacity.value * (1 - ripple.value) * 0.35,
-        transform: [{ translateY: logoTranslateY.value }, { scale: 0.75 + ripple.value * 0.85 }],
-    }));
+
 
     const wordmarkStyle = useAnimatedStyle(() => ({
         opacity: wordmarkOpacity.value,
@@ -169,8 +132,6 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
         transform: [{ translateX: -TRACK_WIDTH * (1 - progress.value) }],
     }));
 
-    const ringColors = isDark ? RING_COLORS.dark : RING_COLORS.light;
-
     return (
         <Animated.View
             pointerEvents="none"
@@ -180,29 +141,6 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
                 containerStyle,
             ]}
         >
-            {[ring3Style, ring2Style, ring1Style].map((style, i) => {
-                const size = RING_SIZES[2 - i];
-                return (
-                    <Animated.View
-                        key={size}
-                        style={[
-                            styles.circle,
-                            centered(size),
-                            { backgroundColor: ringColors[2 - i] },
-                            style,
-                        ]}
-                    />
-                );
-            })}
-            <Animated.View
-                style={[
-                    styles.circle,
-                    styles.rippleRing,
-                    centered(RIPPLE_SIZE),
-                    { borderColor: isDark ? '#2DD4BF' : '#006666' },
-                    rippleStyle,
-                ]}
-            />
 
             <Animated.View style={logoStyle}>
                 <Image
@@ -262,13 +200,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 10,
-    },
-    circle: {
-        position: 'absolute',
-    },
-    rippleRing: {
-        backgroundColor: 'transparent',
-        borderWidth: 1.5,
     },
     logo: {
         width: LOGO_SIZE,

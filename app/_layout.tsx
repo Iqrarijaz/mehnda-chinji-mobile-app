@@ -30,6 +30,12 @@ import * as Application from 'expo-application';
 import { useNotificationStore } from '@/store/notificationStore';
 import { getMessaging, subscribeToTopic, unsubscribeFromTopic } from '@react-native-firebase/messaging';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
+
+// Register background handler for FCM outside of the component tree
+getMessaging().setBackgroundMessageHandler(async remoteMessage => {
+  console.log('Background FCM message received!', remoteMessage);
+});
+
 import { RatingModal } from '@/components/common/RatingModal';
 import { ReviewService } from '@/utils/review';
 import { Stack } from 'expo-router';
@@ -238,7 +244,7 @@ function RootLayout() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinimumTimeElapsed(true);
-    }, 1500);
+    }, 400);
 
     initializeDeviceInfo().catch(err => console.error('Failed to initialize device info', err));
 

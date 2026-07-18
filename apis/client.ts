@@ -191,6 +191,10 @@ apiClient.interceptors.response.use(
         const code = (error.response?.data as any)?.code;
         const data = error.response?.data;
 
+        if (__DEV__) {
+            console.warn('⚠️ API Error Data:', JSON.stringify(data).slice(0, 500));
+        }
+
         const apiError = new ApiError(message, status, code, data);
         errorLogger.logApiError(apiError);
 

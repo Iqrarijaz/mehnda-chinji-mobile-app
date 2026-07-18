@@ -82,6 +82,8 @@ class AdMobService {
         await remoteConfig().fetchAndActivate();
         setLastFetchedAt(now);
         console.log('[AdMobService] Remote Config fetched and activated successfully.');
+      } else {
+        await remoteConfig().activate();
       }
 
       const configKey = (__DEV__ && !FORCE_PROD_ADS_IN_DEV) ? 'test_ads' : 'prod_ads';

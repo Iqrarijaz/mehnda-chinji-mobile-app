@@ -9,13 +9,12 @@ import InterstitialService from '../interstitial.service';
 export const useAds = () => {
   const config = useAdsStore((state) => state.adsConfig);
   const isLoading = useAdsStore((state) => state.isLoading);
-  const userRole = useAdsStore((state) => state.userRole);
+  const isPremium = useAdsStore((state) => state.isPremium);
 
   return {
     config,
     isLoading,
-    userRole,
-    isAdFree: userRole === 'APP_ADMIN',
+    isAdFree: isPremium,
   };
 };
 

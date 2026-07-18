@@ -18,7 +18,7 @@ export interface AdsState {
     appOpen: boolean;
   };
   lastFetchedAt: number | null;
-  userRole: string | null;
+  isPremium: boolean;
   lastAppOpenShowTime: number;
   isShowingAppOpen: boolean;
   
@@ -26,7 +26,7 @@ export interface AdsState {
   setLoading: (loading: boolean) => void;
   setAdLoaded: (type: 'interstitial' | 'rewarded' | 'appOpen', loaded: boolean) => void;
   setLastFetchedAt: (timestamp: number) => void;
-  setUserRole: (role: string | null) => void;
+  setIsPremium: (isPremium: boolean) => void;
   setLastAppOpenShowTime: (time: number) => void;
   setAppOpenShowing: (showing: boolean) => void;
 }

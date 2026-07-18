@@ -105,6 +105,12 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                     {userEmail ? (
                         <ThemedText style={[styles.headerEmail, { color: colors.textSecondary }]} numberOfLines={1}>{userEmail}</ThemedText>
                     ) : null}
+                    {user?.user?.isPremium && (
+                        <View style={[styles.premiumBadge, { backgroundColor: colors.primary + '20' }]}>
+                            <Ionicons name="star" size={12} color={colors.primary} style={{ marginRight: 4 }} />
+                            <ThemedText style={[styles.premiumText, { color: colors.primary }]}>PREMIUM</ThemedText>
+                        </View>
+                    )}
                 </View>
             </Animated.View>
 
@@ -170,7 +176,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                     <Ionicons name="log-out-outline" size={18} color={colors.textSecondary} style={{ marginRight: 8 }} />
                     <ThemedText style={[styles.logoutText, { color: colors.textSecondary }]}>Sign Out</ThemedText>
                 </TouchableOpacity>
-                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.7'}</ThemedText>
+                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.0'}</ThemedText>
             </View>
         </View>
     );
@@ -226,6 +232,19 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '500',
         opacity: 0.8,
+    },
+    premiumBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        marginTop: 6,
+    },
+    premiumText: {
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 0.5,
     },
     // Scroll
     scrollContent: {

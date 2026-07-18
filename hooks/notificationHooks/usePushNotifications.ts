@@ -84,15 +84,17 @@ export const usePushNotifications = () => {
 
     const syncTokenWithBackend = useCallback(async (token: string) => {
         try {
-            if (__DEV__) console.log('🌍 Syncing push token with backend...');
-            await savePushToken({ pushToken: token });
+            if (__DEV__) console.log('🌍 Saving push token locally...');
+            // The backend uses FCM tokens for remote pushes, so we do not need to send the 
+            // Expo Push Token to the backend. Additionally, Cloudflare WAF often blocks 
+            // "ExponentPushToken[...]" strings because of the brackets.
             await updateUser({ pushToken: token });
 
-            if (__DEV__) console.log('✅ Push token synced successfully.');
+            if (__DEV__) console.log('✅ Push token saved locally.');
         } catch (error) {
-            if (__DEV__) console.error('❌ Failed to sync push token:', error);
+            if (__DEV__) console.error('❌ Failed to save push token locally:', error);
         }
-    }, []);
+    }, [updateUser]);
 
     useEffect(() => {
         let isMounted = true;

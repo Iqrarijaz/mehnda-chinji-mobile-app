@@ -14,7 +14,7 @@ export const useAdsStore = create<AdsState>()(
         appOpen: false,
       },
       lastFetchedAt: null,
-      userRole: null,
+      isPremium: false,
       lastAppOpenShowTime: 0,
       isShowingAppOpen: false,
 
@@ -24,7 +24,7 @@ export const useAdsStore = create<AdsState>()(
         isAdLoaded: { ...state.isAdLoaded, [type]: loaded }
       })),
       setLastFetchedAt: (timestamp: number) => set({ lastFetchedAt: timestamp }),
-      setUserRole: (role: string | null) => set({ userRole: role }),
+      setIsPremium: (isPremium: boolean) => set({ isPremium }),
       setLastAppOpenShowTime: (time: number) => set({ lastAppOpenShowTime: time }),
       setAppOpenShowing: (showing: boolean) => set({ isShowingAppOpen: showing }),
     }),
@@ -34,7 +34,7 @@ export const useAdsStore = create<AdsState>()(
       partialize: (state) => ({
         adsConfig: state.adsConfig,
         lastFetchedAt: state.lastFetchedAt,
-        userRole: state.userRole,
+        isPremium: state.isPremium,
         lastAppOpenShowTime: state.lastAppOpenShowTime,
       }),
     }
@@ -42,10 +42,10 @@ export const useAdsStore = create<AdsState>()(
 );
 
 // Helper selectors for permission checks
-const isNotAdmin = (state: any) => state.userRole !== 'APP_ADMIN';
+const isNotPremium = (state: any) => !state.isPremium;
 
-export const selectCanShowBanner = (state: any) => isNotAdmin(state) && state.adsConfig.enabled && state.adsConfig.banner;
-export const selectCanShowInterstitial = (state: any) => isNotAdmin(state) && state.adsConfig.enabled && state.adsConfig.interstitial;
-export const selectCanShowRewarded = (state: any) => isNotAdmin(state) && state.adsConfig.enabled && state.adsConfig.rewarded;
-export const selectCanShowNative = (state: any) => isNotAdmin(state) && state.adsConfig.enabled && state.adsConfig.native;
-export const selectCanShowAppOpen = (state: any) => isNotAdmin(state) && state.adsConfig.enabled && state.adsConfig.appOpen;
+export const selectCanShowBanner = (state: any) => isNotPremium(state) && state.adsConfig.enabled && state.adsConfig.banner;
+export const selectCanShowInterstitial = (state: any) => isNotPremium(state) && state.adsConfig.enabled && state.adsConfig.interstitial;
+export const selectCanShowRewarded = (state: any) => isNotPremium(state) && state.adsConfig.enabled && state.adsConfig.rewarded;
+export const selectCanShowNative = (state: any) => isNotPremium(state) && state.adsConfig.enabled && state.adsConfig.native;
+export const selectCanShowAppOpen = (state: any) => isNotPremium(state) && state.adsConfig.enabled && state.adsConfig.appOpen;

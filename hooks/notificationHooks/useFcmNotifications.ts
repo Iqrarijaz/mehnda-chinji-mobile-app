@@ -11,10 +11,13 @@ import {
 import { Platform } from 'react-native';
 import { saveFcmToken } from '@/apis/profile';
 import { useAuth } from '@/context/AuthContext';
+import * as Notifications from 'expo-notifications';
+import { useRouter } from 'expo-router';
 
 export const useFcmNotifications = () => {
     const [fcmToken, setFcmToken] = useState<string | null>(null);
     const { isAuthenticated, updateUser } = useAuth();
+    const router = useRouter();
 
     const requestUserPermission = async () => {
         try {
@@ -104,15 +107,45 @@ export const useFcmNotifications = () => {
         // Handle foreground messages
         const unsubscribeOnMessage = onMessage(messagingInstance, async (remoteMessage) => {
             if (__DEV__) console.log('📩 A new FCM message arrived in foreground!', remoteMessage);
-            // Firebase messages in the foreground do not automatically show a system notification alert.
-            // Since they want to keep the app notification as they are, we can let local state handle it,
-            // or trigger a local notification if needed. For now, we log the message.
+            
+            // Trigger a local notification so the user sees the FCM message in the foreground
+            if (remoteMessage.notification) {
+                await Notifications.scheduleNotificationAsync({
+                    content: {
+                        title: remoteMessage.notification.title,
+                        body: remoteMessage.notification.body,
+                        data: remoteMessage.data,
+                    },
+                    trigger: null, // Show immediately
+                });
+            }
+        });
+
+        // Handle background taps
+        const unsubscribeOnNotificationOpenedApp = messagingInstance.onNotificationOpenedApp(remoteMessage => {
+            if (__DEV__) console.log('👉 FCM Notification caused app to open from background:', remoteMessage);
+            if (remoteMessage.data?.route) {
+                router.push(remoteMessage.data.route as any);
+            }
+        });
+
+        // Handle quit state taps
+        messagingInstance.getInitialNotification().then(remoteMessage => {
+            if (remoteMessage) {
+                if (__DEV__) console.log('👉 FCM Notification caused app to open from quit state:', remoteMessage);
+                if (remoteMessage.data?.route) {
+                    setTimeout(() => {
+                        router.push(remoteMessage.data.route as any);
+                    }, 1000);
+                }
+            }
         });
 
         return () => {
             isMounted = false;
             unsubscribeTokenRefresh();
             unsubscribeOnMessage();
+            unsubscribeOnNotificationOpenedApp();
         };
     }, [isAuthenticated, syncFcmTokenWithBackend]);
 
