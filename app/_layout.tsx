@@ -46,6 +46,10 @@ import { AppUpdateModal } from '@/components/common/AppUpdateModal';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+// Fade the native splash out instead of cutting, so the handoff to the
+// custom splash reads as one continuous screen (fade flag is iOS-only;
+// Android uses duration for its hide animation).
+SplashScreen.setOptions({ duration: 350, fade: true });
 
 // Disable global font scaling to prevent UI breakage on devices with large accessibility fonts
 
@@ -229,7 +233,7 @@ function RootLayout() {
   const fontsLoaded = useAppFonts();
   const [configLoaded, setConfigLoaded] = useState(false);
   const [minimumTimeElapsed, setMinimumTimeElapsed] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
+  const [splashVisible, setSplashVisible] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -254,13 +258,6 @@ function RootLayout() {
 
   const isAppReady = fontsLoaded && configLoaded && minimumTimeElapsed;
 
-
-  useEffect(() => {
-    if (isAppReady) {
-      setShowSplash(false);
-    }
-  }, [isAppReady]);
-
   return (
     <ErrorBoundary>
       <PersistQueryClientProvider
@@ -276,14 +273,18 @@ function RootLayout() {
                     <MenuProvider>
                       <StatusBar style="dark" />
 
-                      {showSplash ? (
-                        <CustomSplashScreen />
-                      ) : (
+                      {isAppReady && (
                         <>
                           <AppInitializer />
                           <DrawerLayout />
                           <NetworkMonitor />
                         </>
+                      )}
+                      {splashVisible && (
+                        <CustomSplashScreen
+                          isAppReady={isAppReady}
+                          onFinish={() => setSplashVisible(false)}
+                        />
                       )}
                     </MenuProvider>
                   </SocketProvider>
