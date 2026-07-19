@@ -244,7 +244,7 @@ function RootLayout() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinimumTimeElapsed(true);
-    }, 400);
+    }, 1500);
 
     initializeDeviceInfo().catch(err => console.error('Failed to initialize device info', err));
 
