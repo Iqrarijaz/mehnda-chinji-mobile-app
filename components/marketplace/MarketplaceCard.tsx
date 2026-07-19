@@ -1,16 +1,18 @@
-import React, { memo, useState } from 'react';
-import { StyleSheet, View, Image, Linking, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import { deleteMarketplaceListing, MARKETPLACE_QUERY_KEYS, markMarketplaceListingAsSold, toggleMarketplaceListingStatus } from '@/apis/marketplace';
+import { trackEntityView } from '@/apis/views';
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
-import { ThemedText } from '../ThemedText';
 import { useAuth } from '@/context/AuthContext';
-import { ActionMenu, ActionMenuItem } from '../common/ActionMenu';
-import { ConfirmationModal } from '../ui/ConfirmationModal';
-import { useRouter } from 'expo-router';
-import Toast from 'react-native-toast-message';
+import { capitalizeString } from '@/utils/string';
+import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteMarketplaceListing, markMarketplaceListingAsSold, incrementMarketplaceInquiry, toggleMarketplaceListingStatus, MARKETPLACE_QUERY_KEYS } from '@/apis/marketplace';
+import { useRouter } from 'expo-router';
+import React, { memo, useState } from 'react';
+import { Alert, Image, Linking, StyleSheet, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
+import { ActionMenu, ActionMenuItem } from '../common/ActionMenu';
+import { ThemedText } from '../ThemedText';
+import { ConfirmationModal } from '../ui/ConfirmationModal';
 
 interface MarketplaceCardProps {
     item: any;
@@ -27,17 +29,11 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
     const [showPhoneErrorModal, setShowPhoneErrorModal] = useState(false);
 
     const isOwner = user?.user?._id && item.sellerId && (item.sellerId._id || item.sellerId).toString() === user.user._id.toString();
-
-    const formattedDate = React.useMemo(() => {
-        if (!item.createdAt) return null;
-        try {
-            const date = new Date(item.createdAt);
-            if (isNaN(date.getTime())) return null;
-            return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-        } catch {
-            return null;
-        }
-    }, [item.createdAt]);
+    const capitalizedTitle = React.useMemo(() => capitalizeString(item.title || ''), [item.title]);
+    const capitalizedLocation = React.useMemo(
+        () => capitalizeString(item.village ? `${item.village}, ${item.city}` : item.city || ''),
+        [item.village, item.city]
+    );
 
     // Handle Contact / Phone Dial
     const handleCall = React.useCallback(async () => {
@@ -48,7 +44,7 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
         }
         try {
             // Register inquiry metric
-            incrementMarketplaceInquiry(item._id).catch(err => console.log("Failed to log inquiry:", err));
+            trackEntityView(item._id, 'Marketplace').catch(err => console.log("Failed to log inquiry:", err));
 
             const url = `tel:${phone}`;
             const supported = await Linking.canOpenURL(url);
@@ -152,7 +148,7 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
 
     const handlePress = React.useCallback(() => {
         if (!isOwner) {
-            incrementMarketplaceInquiry(item._id).catch(console.error);
+            trackEntityView(item._id, 'Marketplace').catch(console.error);
         }
         router.push(`/marketplace/${item._id}` as any);
     }, [isOwner, item._id, router]);
@@ -188,36 +184,16 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
 
                 {/* Content Details */}
                 <View style={styles.detailsContainer}>
-
-                    <View style={{ marginTop: 6, marginBottom: 6 }}>
+                    <View style={styles.contentBlock}>
                         <View style={styles.priceRow}>
                             <ThemedText style={[styles.priceText, { color: colors.lime }]} numberOfLines={1}>
                                 Rs. {typeof item.price === 'number' ? item.price.toLocaleString() : item.price || '—'}
                             </ThemedText>
-                            {item.negotiable ? (
-                                <View style={[styles.negotiableBadge, { backgroundColor: `${colors.lime}1E` }]}>
-                                    <ThemedText style={[styles.negotiableText, { color: colors.primary }]}>NEG</ThemedText>
-                                </View>
-                            ) : null}
                         </View>
                         <ThemedText style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-                            {item.title}
+                            {capitalizedTitle}
                         </ThemedText>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, paddingRight: 8 }}>
-                                <Ionicons name="location-outline" size={12} color={colors.textSecondary} />
-                                <ThemedText style={{ color: colors.textSecondary, fontSize: 11, marginLeft: 4 }} numberOfLines={1}>
-                                    {item.village ? `${item.village}, ${item.city}` : item.city}
-                                </ThemedText>
-                            </View>
-                            {isOwner && showActions ? (
-                                <ActionMenu actions={actions} />
-                            ) : formattedDate ? (
-                                <ThemedText style={{ color: colors.textSecondary, fontSize: 10, marginLeft: 8 }}>
-                                    {formattedDate}
-                                </ThemedText>
-                            ) : null}
-                        </View>
+                        {isOwner && showActions ? <View style={styles.actionsWrapper}><ActionMenu actions={actions} /></View> : null}
                     </View>
 
                     {/* Metadata details rendering for Vehicles */}
@@ -337,6 +313,12 @@ const styles = StyleSheet.create({
     },
     detailsContainer: {
         paddingHorizontal: 10,
+        paddingTop: 6,
+        paddingBottom: 8,
+    },
+    contentBlock: {
+        marginTop: 0,
+        marginBottom: 0,
     },
     categoryRow: {
         flexDirection: 'row',
@@ -364,12 +346,12 @@ const styles = StyleSheet.create({
     priceRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        marginBottom: 1,
     },
     priceText: {
-        fontSize: 15,
+        fontSize: 13.5,
         fontWeight: '800',
-        letterSpacing: 0.2,
+        letterSpacing: 0.15,
         flexShrink: 1,
     },
     negotiableBadge: {
@@ -383,23 +365,31 @@ const styles = StyleSheet.create({
         letterSpacing: 0.4,
     },
     title: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700',
-        marginTop: 2,
-        textTransform: 'capitalize',
+        marginTop: 0,
+        lineHeight: 14,
     },
     description: {
         fontSize: 12,
         marginTop: 4,
         lineHeight: 18,
     },
-    locationContainer: {
+    locationRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 0,
+    },
+    locationContent: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 8,
+        flex: 1,
+        paddingRight: 8,
     },
     locationText: {
-        fontSize: 11,
+        color: '#9CA3AF',
+        fontSize: 10.5,
         marginLeft: 4,
     },
     metadataContainer: {

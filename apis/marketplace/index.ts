@@ -80,6 +80,3 @@ export const toggleMarketplaceListingStatus = async (listingId: string, status: 
     return apiClient.post('/api/user/v1/marketplace/toggle-status', { listingId, status });
 };
 
-export const incrementMarketplaceInquiry = async (listingId: string) => {
-    return apiClient.post('/api/user/v1/marketplace/increment-inquiry', { listingId });
-};

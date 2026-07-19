@@ -1,8 +1,8 @@
-import React from 'react';
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { memo } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 interface AyahItemProps {
     index: number;
@@ -17,7 +17,7 @@ interface AyahItemProps {
     cardColor: string;
 }
 
-export const AyahItem = React.memo(({
+export const AyahItem = memo(({
     index,
     arabicText,
     englishText,

@@ -1,28 +1,28 @@
-import React, { useCallback, memo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
     DrawerContentComponentProps,
     DrawerContentScrollView,
 } from '@react-navigation/drawer';
 import { useRouter } from 'expo-router';
+import React, { memo, useCallback } from 'react';
 import {
     Platform,
     StyleSheet,
     TouchableOpacity,
     View,
 } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
 import Animated, { FadeIn, FadeInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Circle, Path } from 'react-native-svg';
 
+import { useRewardedAd } from '@/ads/hooks/useAds';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { ThemedText } from '@/components/ThemedText';
 import Avatar from '@/components/ui/avatar';
-import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { useRewardedAd } from '@/ads/hooks/useAds';
-import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
 interface MenuItem {
     label: string;
@@ -34,7 +34,7 @@ interface MenuItem {
 const MENU_ITEMS: MenuItem[] = [
     { label: 'Home', icon: 'home-outline', route: '/(drawer)/(tabs)', section: 'Main' },
     { label: 'Bazaar', icon: 'storefront-outline', route: '/(drawer)/(tabs)/marketplace', section: 'Main' },
-    { label: 'Business Directory', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },
+    { label: 'Business', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },
     { label: 'Profile', icon: 'person-outline', route: '/profile', section: 'Account' },
     { label: 'Settings', icon: 'settings-outline', route: '/settings', section: 'Account' },
     { label: 'Give Feedback', icon: 'chatbubble-ellipses-outline', route: '/(drawer)/feedback', section: 'Support' },
@@ -296,7 +296,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                     <Ionicons name="log-out-outline" size={18} color={colors.secondary} style={{ marginRight: 8 }} />
                     <ThemedText style={[styles.logoutText, { color: colors.secondary }]}>Sign Out</ThemedText>
                 </PressableScale>
-                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.1'}</ThemedText>
+                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.2'}</ThemedText>
             </View>
             <LoaderOverlay visible={isLoggingOut} text="Logging out..." />
         </View>

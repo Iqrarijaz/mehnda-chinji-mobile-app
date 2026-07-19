@@ -28,7 +28,12 @@ export const registerSchema = yup.object().shape({
 });
 
 export const profileSchema = yup.object().shape({
-    name: yup.string().min(3, 'Name must be at least 3 characters').required('Full Name is required'),
+    name: yup.string()
+        .transform((value) => (typeof value === 'string' ? value.trim() : value))
+        .matches(/^[A-Za-z]+(?: [A-Za-z]+)*$/, 'Name must contain only alphabets')
+        .min(3, 'Name must be at least 3 characters')
+        .max(30, 'Name must not exceed 30 characters')
+        .required('Full Name is required'),
     phone: yup.string()
         .length(11, 'Phone number must be exactly 11 digits')
         .matches(/^03[0-9]{9}$/, 'Phone number must start with 03 and contain only digits')

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Modal, StyleSheet, TouchableOpacity, View, SafeAreaView, Platform, Dimensions } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
+import { Modal, StyleSheet, TouchableOpacity, View, SafeAreaView, Platform, Dimensions, FlatList } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import Avatar from '@/components/ui/avatar';
@@ -63,7 +62,7 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
 
                     {images.length > 0 ? (
                         <View style={{ flex: 1 }}>
-                            <FlashList
+                            <FlatList
                                 data={images}
                                 horizontal
                                 pagingEnabled
@@ -72,6 +71,11 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
                                 onViewableItemsChanged={onViewableItemsChanged}
                                 viewabilityConfig={viewabilityConfig}
                                 keyExtractor={(_, index) => `viewer-${index}`}
+                                getItemLayout={(_, index) => ({
+                                    length: Dimensions.get('window').width,
+                                    offset: Dimensions.get('window').width * index,
+                                    index,
+                                })}
                                 renderItem={({ item }) => (
                                     <View style={styles.listImageWrapper}>
                                         <Image
@@ -132,13 +136,13 @@ const styles = StyleSheet.create({
     },
     listImageWrapper: {
         width: Dimensions.get('window').width,
-        height: '100%',
+        height: Dimensions.get('window').height,
         justifyContent: 'center',
         alignItems: 'center',
     },
     image: {
-        width: '100%',
-        height: '100%',
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
     },
     placeholderAvatar: {
     },

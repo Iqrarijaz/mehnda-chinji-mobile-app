@@ -144,7 +144,7 @@ export function TravelHeroHeader({
                         <View style={styles.subtitleRow}>
                             <Ionicons name="navigate" size={12} color={colors.secondary} />
                             <ThemedText style={styles.subtitle} numberOfLines={1}>
-                                {destination ? `${origin}  →  ${destination}` : origin || capitalizeString(place?.village)}
+                                {destination ? `${origin}  ${Array.isArray(place?.returnRoute) && place.returnRoute.length > 0 ? '↔' : '→'}  ${destination}` : origin || capitalizeString(place?.village)}
                             </ThemedText>
                         </View>
                     )}

@@ -10,6 +10,7 @@ import { ListingCard } from '@/components/essentials/ListingCard';
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { capitalizeString } from '@/utils/string';
 import { useRouter } from 'expo-router';
 
 interface BusinessCardProps {
@@ -21,26 +22,17 @@ interface BusinessCardProps {
 
 const TILE_SIZE = 84;
 
-const capitalize = (str?: string) =>
-    str
-        ? str
-            .toLowerCase()
-            .split(' ')
-            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-            .join(' ')
-        : '';
-
 const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
 
-    const businessName = useMemo(() => capitalize(business?.name), [business?.name]);
-    const address = useMemo(() => capitalize(business?.address || business?.village || ''), [business?.address, business?.village]);
+    const businessName = useMemo(() => capitalizeString(business?.name), [business?.name]);
+    const address = useMemo(() => capitalizeString(business?.address || business?.village || ''), [business?.address, business?.village]);
 
     const categoryLineText = useMemo(() => {
         const parts = [];
-        const engCat = capitalize(business?.categoryEn || '');
+        const engCat = capitalizeString(business?.categoryEn || '');
         if (engCat) parts.push(engCat);
         if (business?.categoryUr) parts.push(business.categoryUr);
         return parts.join(' | ');
@@ -86,13 +78,13 @@ const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => 
 
                         {/* Info */}
                         <View style={styles.info}>
-                            <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+                            <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={2}>
                                 {businessName}
                             </ThemedText>
                             {address ? (
                                 <View style={styles.metaRow}>
                                     <Ionicons name="location" size={12} color={colors.secondary} />
-                                    <ThemedText style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={1}>
+                                    <ThemedText style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={2}>
                                         {address}
                                     </ThemedText>
                                 </View>
@@ -157,7 +149,8 @@ const styles = StyleSheet.create({
     },
     info: {
         flex: 1,
-        gap: 4,
+        gap: 2,
+        paddingTop: 10,
     },
     typeBadge: {
         position: 'absolute',
@@ -165,7 +158,6 @@ const styles = StyleSheet.create({
         right: 0,
         maxWidth: '60%',
         paddingHorizontal: 10,
-        paddingVertical: 1,
         borderTopRightRadius: 12,
         borderBottomLeftRadius: 12,
     },
@@ -184,7 +176,7 @@ const styles = StyleSheet.create({
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 5,
+        gap: 2,
         paddingRight: 8,
     },
     metaText: {

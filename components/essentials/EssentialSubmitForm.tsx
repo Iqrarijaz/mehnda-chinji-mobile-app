@@ -60,6 +60,7 @@ const EssentialSubmitForm = React.memo(({
         tags: editData?.tags || [] as { eng: string; ur: string }[],
         contact: editData?.contact?.length ? editData.contact : [{ name: '', number: '' }] as { name: string; number: string }[],
         route: editData?.route?.length ? editData.route : [{ city: '', time: '' }] as { city: string; time: string }[],
+        returnRoute: (editData?.returnRoute?.length ? editData.returnRoute : []) as { city: string; time: string }[],
         metadata: {
             principalName: editData?.metadata?.principalName || '',
             totalStudents: editData?.metadata?.totalStudents?.toString() || '',
@@ -88,6 +89,7 @@ const EssentialSubmitForm = React.memo(({
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [routePickerIndex, setRoutePickerIndex] = useState<number | null>(null);
+    const [returnRoutePickerIndex, setReturnRoutePickerIndex] = useState<number | null>(null);
 
 
     const { submitMutation } = useEssentialsAPI();
@@ -151,6 +153,24 @@ const EssentialSubmitForm = React.memo(({
         setForm(prev => ({ ...prev, route: newRoute }));
     };
 
+    const handleReturnRouteChange = (index: number, key: 'city' | 'time', value: string) => {
+        const newRoute = [...form.returnRoute];
+        newRoute[index] = { ...newRoute[index], [key]: value };
+        setForm(prev => ({ ...prev, returnRoute: newRoute }));
+    };
+
+    const addReturnRoute = () => {
+        if (form.returnRoute.length < 10) {
+            setForm(prev => ({ ...prev, returnRoute: [...prev.returnRoute, { city: '', time: '' }] }));
+            setErrors(prev => ({ ...prev, returnRoute: '' }));
+        }
+    };
+
+    const removeReturnRoute = (index: number) => {
+        const newRoute = form.returnRoute.filter((_: any, i: number) => i !== index);
+        setForm(prev => ({ ...prev, returnRoute: newRoute }));
+    };
+
     const hasChanges = React.useMemo(() => {
         if (!isEditing) return true;
 
@@ -165,6 +185,7 @@ const EssentialSubmitForm = React.memo(({
             form.type !== (editData.type || '') ||
             JSON.stringify(form.tags) !== JSON.stringify(editData.tags || []) ||
             JSON.stringify(form.route) !== JSON.stringify(editData.route || [{ city: '', time: '' }]) ||
+            JSON.stringify(form.returnRoute) !== JSON.stringify(editData.returnRoute || []) ||
             JSON.stringify(form.metadata) !== JSON.stringify(editData.metadata || { principalName: '', totalStudents: '', totalTeachers: '' });
 
         if (isMainChanged) return true;
@@ -209,10 +230,10 @@ const EssentialSubmitForm = React.memo(({
             }
         }
 
-        if (isTravel) {
+        if (isTravel && form.type?.toLowerCase() === 'bus') {
             const validRoutes = form.route.filter((r: any) => r.city.trim() !== '');
-            if (validRoutes.length === 0) {
-                newErrors.route = 'At least one route stop is required.';
+            if (validRoutes.length < 2) {
+                newErrors.route = 'Bus route requires at least an origin and destination stop.';
             }
         }
 
@@ -253,8 +274,11 @@ const EssentialSubmitForm = React.memo(({
             category: category,
             images: uploadedImage ? [uploadedImage] : [],
             tags: (form.tags || []).map((t: any) => ({ eng: t.eng, ur: t.ur })),
+            route: form.route.filter((r: any) => r.city.trim() !== ''),
+            returnRoute: isTravel ? form.returnRoute.filter((r: any) => r.city.trim() !== '') : [],
             metadata: isEducation ? form.metadata : {},
         };
+
 
         submitMutation.mutate({ payload, isEditing, id: editData?._id }, {
             onSuccess: () => {
@@ -626,7 +650,144 @@ const EssentialSubmitForm = React.memo(({
                 </Animated.View>
             )}
 
+            {/* ── Travel: Departure Route ────────────────────────────── */}
+            {isTravel && (
+                <Animated.View entering={FadeInDown.delay(450)} style={styles.field}>
+                    <View style={styles.labelRow}>
+                        <ThemedText style={styles.label}>
+                            DEPARTURE ROUTE{' '}
+                            {form.type?.toLowerCase() === 'bus'
+                                ? <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
+                                : <ThemedText style={{ color: '#94A3B8' }}>(OPTIONAL)</ThemedText>
+                            }
+                        </ThemedText>
+                        {form.route.length < 10 && (
+                            <TouchableOpacity onPress={() => {
+                                if (form.route.length < 10) {
+                                    setForm(prev => ({ ...prev, route: [...prev.route, { city: '', time: '' }] }));
+                                    setErrors(prev => ({ ...prev, route: '' }));
+                                }
+                            }}>
+                                <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add Stop</ThemedText>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                    {errors['route'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginBottom: 8 }}>{errors['route']}</ThemedText>}
+
+                    {form.route.map((r: any, index: number) => (
+                        <View key={index} style={{ marginBottom: 10 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <View style={[styles.inputBox, { flex: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                    <Ionicons name="location-outline" size={16} color={colors.icon} style={{ marginRight: 8 }} />
+                                    <TextInput
+                                        style={[styles.inputText, { color: colors.text }]}
+                                        placeholder={index === 0 ? 'From' : index === form.route.length - 1 ? 'To' : `Stop ${index + 1}`}
+                                        placeholderTextColor={colors.icon}
+                                        value={r.city}
+                                        onChangeText={(val) => {
+                                            const newRoute = [...form.route];
+                                            newRoute[index] = { ...newRoute[index], city: val };
+                                            setForm(prev => ({ ...prev, route: newRoute }));
+                                        }}
+                                    />
+                                </View>
+                                <TouchableOpacity
+                                    onPress={() => setRoutePickerIndex(index)}
+                                    style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}
+                                >
+                                    <Ionicons name="time-outline" size={16} color={colors.icon} style={{ marginRight: 6 }} />
+                                    <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 13, fontWeight: '600' }}>
+                                        {r.time || 'Time'}
+                                    </ThemedText>
+                                </TouchableOpacity>
+
+                                {index > 0 && (
+                                    <TouchableOpacity onPress={() => {
+                                        const newRoute = form.route.filter((_: any, i: number) => i !== index);
+                                        setForm(prev => ({ ...prev, route: newRoute }));
+                                    }} style={{ padding: 4 }}>
+                                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        </View>
+                    ))}
+
+                    <TimePicker
+                        visible={routePickerIndex !== null}
+                        onClose={() => setRoutePickerIndex(null)}
+                        onSelect={(val) => {
+                            if (routePickerIndex !== null) {
+                                const newRoute = [...form.route];
+                                newRoute[routePickerIndex] = { ...newRoute[routePickerIndex], time: val };
+                                setForm(prev => ({ ...prev, route: newRoute }));
+                            }
+                            setRoutePickerIndex(null);
+                        }}
+                        title="Departure Time"
+                        currentValue={routePickerIndex !== null ? form.route[routePickerIndex]?.time : ''}
+                    />
+
+                    {/* Return Route Section */}
+                    <View style={[styles.labelRow, { marginTop: 16 }]}>
+                        <ThemedText style={styles.label}>RETURN ROUTE (OPTIONAL)</ThemedText>
+                        {form.returnRoute.length < 10 && (
+                            <TouchableOpacity onPress={addReturnRoute}>
+                                <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add Stop</ThemedText>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                    {errors['returnRoute'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginBottom: 8 }}>{errors['returnRoute']}</ThemedText>}
+
+                    {form.returnRoute.map((r: any, index: number) => (
+                        <View key={index} style={{ marginBottom: 10 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <View style={[styles.inputBox, { flex: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                    <Ionicons name="location-outline" size={16} color={colors.icon} style={{ marginRight: 8 }} />
+                                    <TextInput
+                                        style={[styles.inputText, { color: colors.text }]}
+                                        placeholder={index === 0 ? 'Return origin' : index === form.returnRoute.length - 1 ? 'Final stop' : `Stop ${index + 1}`}
+                                        placeholderTextColor={colors.icon}
+                                        value={r.city}
+                                        onChangeText={(val) => handleReturnRouteChange(index, 'city', val)}
+                                    />
+                                </View>
+                                <TouchableOpacity
+                                    onPress={() => setReturnRoutePickerIndex(index)}
+                                    style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}
+                                >
+                                    <Ionicons name="time-outline" size={16} color={colors.icon} style={{ marginRight: 6 }} />
+                                    <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 13, fontWeight: '600' }}>
+                                        {r.time || 'Time'}
+                                    </ThemedText>
+                                </TouchableOpacity>
+
+                                {index > 0 && (
+                                    <TouchableOpacity onPress={() => removeReturnRoute(index)} style={{ padding: 4 }}>
+                                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        </View>
+                    ))}
+
+                    <TimePicker
+                        visible={returnRoutePickerIndex !== null}
+                        onClose={() => setReturnRoutePickerIndex(null)}
+                        onSelect={(val) => {
+                            if (returnRoutePickerIndex !== null) {
+                                handleReturnRouteChange(returnRoutePickerIndex, 'time', val);
+                            }
+                            setReturnRoutePickerIndex(null);
+                        }}
+                        title="Return Departure Time"
+                        currentValue={returnRoutePickerIndex !== null ? form.returnRoute[returnRoutePickerIndex]?.time : ''}
+                    />
+                </Animated.View>
+            )}
+
             <Animated.View entering={FadeInDown.delay(500)} style={styles.footer}>
+
                 <CancelButton
                     onPress={onCancel}
                 />

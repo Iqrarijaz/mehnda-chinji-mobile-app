@@ -4,12 +4,12 @@ import { Tabs, useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
+import { CustomTabBar } from '@/components/CustomTabBar';
 import { ProfileUpdatePrompt } from '@/components/profile/ProfileUpdatePrompt';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { AppState, AppStateStatus } from 'react-native';
-import { CustomTabBar } from '@/components/CustomTabBar';
 
 let globalHasShownProfilePrompt = false;
 
@@ -117,11 +117,11 @@ export default function TabLayout() {
         <Tabs.Screen
           name="business"
           options={{
-            title: 'Directory',
+            title: 'Business',
             headerShown: false,
-            tabBarLabel: 'Directory',
+            tabBarLabel: 'Business',
             tabBarIcon: ({ focused, color, size }: { focused: boolean; color: string; size: number }) => (
-              <Ionicons name={focused ? 'search' : 'search-outline'} size={size} color={color} />
+              <Ionicons name={focused ? 'briefcase' : 'briefcase-outline'} size={size} color={color} />
             ),
             unmountOnBlur: true,
           } as any}

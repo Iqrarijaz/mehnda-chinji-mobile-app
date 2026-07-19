@@ -1,11 +1,11 @@
-import React, { useRef } from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, GestureResponderEvent, LayoutChangeEvent } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import type { SurahListItem } from '@/apis/quran';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import type { SurahListItem } from '@/apis/quran';
+import { Ionicons } from '@expo/vector-icons';
+import { memo, useRef } from 'react';
+import { ActivityIndicator, GestureResponderEvent, LayoutChangeEvent, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 interface MiniAudioPlayerProps {
     surah: SurahListItem;
@@ -27,7 +27,7 @@ interface MiniAudioPlayerProps {
  * Bottom media-player bar for inline Surah audio: play/pause, verse
  * navigation, a seekable progress line, and close. Lives above the tab bar.
  */
-export const MiniAudioPlayer = React.memo(({
+export const MiniAudioPlayer = memo(({
     surah,
     isPlaying,
     isLoading,

@@ -1,27 +1,28 @@
-import { profileSchema } from '@/utils/validation';
-import { SearchableDropdown } from '@/components/common/SearchableDropdown';
+import { FormInput } from '@/components/common/FormInput';
 import { ImageViewerModal } from '@/components/common/ImageViewerModal';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
+import { SearchableDropdown } from '@/components/common/SearchableDropdown';
+import { SubmitButton } from '@/components/common/SubmitButton';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { ThemedText } from '@/components/ThemedText';
-import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Colors } from '@/constants/colors';
-import { FormInput } from '@/components/common/FormInput';
-import { SubmitButton } from '@/components/common/SubmitButton';
-import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import citiesDataFallback from '@/data/cities.json';
 import villagesDataFallback from '@/data/villages.json';
-import { Ionicons } from '@expo/vector-icons';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import { useProfileAPI } from '@/hooks/useProfileAPI';
+import { profileSchema } from '@/utils/validation';
+import { Ionicons } from '@expo/vector-icons';
 
-import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
+import * as ImagePicker from 'expo-image-picker';
 
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     KeyboardAvoidingView,
     Platform,
@@ -30,14 +31,12 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import Svg, { Circle, Path } from 'react-native-svg';
 import Animated, {
-
     FadeInDown,
     FadeInUp,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Circle, Path } from 'react-native-svg';
 import Toast from 'react-native-toast-message';
 
 export default function ProfileScreen() {
@@ -71,6 +70,11 @@ export default function ProfileScreen() {
         return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
     }, []);
 
+    const sanitizeName = useCallback((value: string) => {
+        const cleaned = value.replace(/[^A-Za-z\s]/g, '').slice(0, 30);
+        return cleaned.replace(/\s{2,}/g, ' ').trimStart();
+    }, []);
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -85,6 +89,7 @@ export default function ProfileScreen() {
     const [cityPickerVisible, setCityPickerVisible] = useState(false);
     const [villagePickerVisible, setVillagePickerVisible] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
+    const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
     // Derive stable baseline data from user object
     const currentData = useMemo(() => {
@@ -165,17 +170,22 @@ export default function ProfileScreen() {
 
     const handleUpdate = useCallback(async () => {
         try {
-            await profileSchema.validate(formData);
+            setValidationErrors({});
+            await profileSchema.validate(formData, { abortEarly: false });
             profileMutation.mutate({
                 ...formData,
                 gender: formData.gender || null
             });
         } catch (error: any) {
-            Toast.show({
-                type: 'error',
-                text1: 'Validation Error',
-                text2: error.message
-            });
+            if (error?.inner) {
+                const errs = error.inner.reduce((acc: Record<string, string>, item: any) => {
+                    if (item.path) acc[item.path] = item.message;
+                    return acc;
+                }, {});
+                setValidationErrors(errs);
+            } else {
+                setValidationErrors({ form: error.message || 'Please fix the highlighted fields.' });
+            }
         }
     }, [formData, profileMutation]);
 
@@ -271,8 +281,15 @@ export default function ProfileScreen() {
                                     icon="person-outline"
                                     placeholder="Enter your name"
                                     value={formData.name}
-                                    onChangeText={(val) => setFormData(p => ({ ...p, name: toTitleCase(val) }))}
+                                    onChangeText={(val) => {
+                                        const sanitized = sanitizeName(val);
+                                        setFormData(p => ({ ...p, name: toTitleCase(sanitized) }));
+                                        setValidationErrors(prev => ({ ...prev, name: '' }));
+                                    }}
                                     maxLength={30}
+                                    autoCapitalize="words"
+                                    autoCorrect={false}
+                                    error={validationErrors.name}
                                 />
                             </Animated.View>
 
@@ -296,8 +313,12 @@ export default function ProfileScreen() {
                                     placeholder="03*********"
                                     keyboardType="phone-pad"
                                     value={formData.phone}
-                                    onChangeText={(val) => setFormData(p => ({ ...p, phone: val }))}
+                                    onChangeText={(val) => {
+                                        setFormData(p => ({ ...p, phone: val }));
+                                        setValidationErrors(prev => ({ ...prev, phone: '' }));
+                                    }}
                                     maxLength={11}
+                                    error={validationErrors.phone}
                                 />
                             </Animated.View>
 
@@ -323,26 +344,36 @@ export default function ProfileScreen() {
                             </Animated.View>
 
                             {/* City Picker */}
-                            <ModalPickerTrigger
-                                label="CITY"
-                                required
-                                icon="location-outline"
-                                value={formData.city}
-                                placeholder="Select your city"
-                                onPress={() => setCityPickerVisible(true)}
-                                delay={500}
-                            />
+                            <View>
+                                <ModalPickerTrigger
+                                    label="CITY"
+                                    required
+                                    icon="location-outline"
+                                    value={formData.city}
+                                    placeholder="Select your city"
+                                    onPress={() => setCityPickerVisible(true)}
+                                    delay={500}
+                                />
+                                {validationErrors.city ? (
+                                    <ThemedText style={styles.errorText}>{validationErrors.city}</ThemedText>
+                                ) : null}
+                            </View>
 
                             {/* Village Field */}
-                            <ModalPickerTrigger
-                                label="VILLAGE / TOWN"
-                                required
-                                icon="business-outline"
-                                value={formData.village}
-                                placeholder="Select your village/town"
-                                onPress={() => setVillagePickerVisible(true)}
-                                delay={550}
-                            />
+                            <View>
+                                <ModalPickerTrigger
+                                    label="VILLAGE / TOWN"
+                                    required
+                                    icon="business-outline"
+                                    value={formData.village}
+                                    placeholder="Select your village/town"
+                                    onPress={() => setVillagePickerVisible(true)}
+                                    delay={550}
+                                />
+                                {validationErrors.village ? (
+                                    <ThemedText style={styles.errorText}>{validationErrors.village}</ThemedText>
+                                ) : null}
+                            </View>
 
                             {/* Why complete profile? */}
                             <View style={styles.infoTip}>
@@ -367,7 +398,10 @@ export default function ProfileScreen() {
                 <SearchableDropdown
                     visible={cityPickerVisible}
                     onClose={() => setCityPickerVisible(false)}
-                    onSelect={(city) => setFormData(prev => ({ ...prev, city }))}
+                    onSelect={(city) => {
+                        setFormData(prev => ({ ...prev, city }));
+                        setValidationErrors(prev => ({ ...prev, city: '' }));
+                    }}
                     currentValue={formData.city}
                     options={citiesData}
                     title="Select City"
@@ -377,7 +411,10 @@ export default function ProfileScreen() {
                 <SearchableDropdown
                     visible={villagePickerVisible}
                     onClose={() => setVillagePickerVisible(false)}
-                    onSelect={(village) => setFormData(prev => ({ ...prev, village }))}
+                    onSelect={(village) => {
+                        setFormData(prev => ({ ...prev, village }));
+                        setValidationErrors(prev => ({ ...prev, village: '' }));
+                    }}
                     currentValue={formData.village}
                     options={villagesData}
                     title="Select Village"
@@ -492,6 +529,12 @@ const styles = StyleSheet.create({
     },
     required: {
         color: '#EF4444',
+    },
+    errorText: {
+        color: '#EF4444',
+        fontSize: 11,
+        marginLeft: 4,
+        marginTop: 2,
     },
     charCount: {
         fontSize: 10,

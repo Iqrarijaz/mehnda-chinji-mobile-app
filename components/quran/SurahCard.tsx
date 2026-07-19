@@ -1,12 +1,12 @@
-import React from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import type { SurahListItem } from '@/apis/quran';
 import { ThemedText } from '@/components/ThemedText';
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import type { SurahListItem } from '@/apis/quran';
+import { Ionicons } from '@expo/vector-icons';
+import { memo } from 'react';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 interface SurahCardProps {
     item: SurahListItem;
@@ -26,7 +26,7 @@ interface SurahCardProps {
 const capitalize = (str: string) =>
     str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
 
-export const SurahCard = React.memo(({
+export const SurahCard = memo(({
     item,
     index,
     isFav,

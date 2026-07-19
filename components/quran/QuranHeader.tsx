@@ -1,11 +1,11 @@
-import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import Svg, { Circle, Path } from 'react-native-svg';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
+import React, { memo } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 interface QuranHeaderProps {
     title: string;
@@ -28,7 +28,7 @@ interface QuranHeaderProps {
  * The title sits centered at the top with the back button on the left; any
  * controls (reader Play/Auto/EN) render as a centered row below.
  */
-export const QuranHeader = React.memo(({
+export const QuranHeader = memo(({
     title,
     subtitle,
     paddingTop,

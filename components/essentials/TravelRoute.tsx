@@ -16,6 +16,7 @@ import { SectionHeading } from './shared/SectionHeading';
 
 interface TravelRouteProps {
     route: any[];
+    returnRoute?: any[];
     primaryColor?: string;
 }
 
@@ -124,14 +125,16 @@ function RouteStopComponent({
 const RouteStop = React.memo(RouteStopComponent);
 RouteStop.displayName = 'RouteStop';
 
-export const TravelRoute = React.memo(({ route }: TravelRouteProps) => {
+export const TravelRoute = React.memo(({ route, returnRoute }: TravelRouteProps) => {
+    const hasReturn = Array.isArray(returnRoute) && returnRoute.length > 0;
+
     if (!Array.isArray(route) || route.length === 0) return null;
 
     return (
         <View style={styles.section}>
             <SectionHeading
                 icon="bus"
-                label="Travel Schedule"
+                label="Departure Route"
                 pill={`${route.length} ${route.length === 1 ? 'Stop' : 'Stops'}`}
             />
 
@@ -146,6 +149,27 @@ export const TravelRoute = React.memo(({ route }: TravelRouteProps) => {
                     />
                 ))}
             </View>
+
+            {hasReturn && (
+                <>
+                    <SectionHeading
+                        icon="return-up-back"
+                        label="Return Route"
+                        pill={`${returnRoute!.length} ${returnRoute!.length === 1 ? 'Stop' : 'Stops'}`}
+                    />
+                    <View style={styles.timeline}>
+                        {returnRoute!.map((stop: any, idx: number) => (
+                            <RouteStop
+                                key={`ret-${idx}`}
+                                stop={stop}
+                                index={idx}
+                                isFirst={idx === 0}
+                                isLast={idx === returnRoute!.length - 1}
+                            />
+                        ))}
+                    </View>
+                </>
+            )}
         </View>
     );
 });

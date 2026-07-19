@@ -12,6 +12,7 @@ import { ListingCard } from '@/components/essentials/ListingCard';
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { capitalizeString } from '@/utils/string';
 
 interface Contact {
     name: string;
@@ -39,6 +40,7 @@ interface PlaceData {
     images?: string[];
     type?: string;
     route?: { city: string; time: string }[];
+    returnRoute?: { city: string; time: string }[];
     createdBy?: string | { _id: string };
 }
 
@@ -87,31 +89,26 @@ const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardPro
         return categoryConfig.types.find((t: any) => normalize(t.key) === normalizedType || normalize(t.label) === normalizedType);
     }, [data.type, categoryConfig]);
 
-    const capitalize = (str: string) => {
-        if (!str || typeof str !== 'string') return '';
-        const words = str.toLowerCase().split(' ');
-        return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    };
-
     const getString = (val: any) => {
         if (!val) return '';
         if (typeof val === 'string') return val;
         return val.en;
     };
 
-    const placeName = capitalize(getString(data.name));
-    const address = capitalize(getString(data.village) || getString(data.address) || 'Address not available');
+    const placeName = capitalizeString(getString(data.name));
+    const address = capitalizeString(getString(data.village) || getString(data.address) || 'Address not available');
     const placeImage = data.images?.[0];
-    const typeLabel = typeConfig?.label || capitalize(data.type || '');
+    const typeLabel = typeConfig?.label || capitalizeString(data.type || '');
     const defaultIcon = categoryConfig?.icon || 'business';
 
     const isTravel = category?.toLowerCase() === 'travel';
     const route = Array.isArray(data.route) ? data.route : [];
+    const hasReturn = Array.isArray(data.returnRoute) && data.returnRoute.length > 0;
     const routePreview =
         isTravel && route.length > 0
             ? route.length > 1
-                ? `${capitalize(route[0]?.city)}  →  ${capitalize(route[route.length - 1]?.city)}`
-                : capitalize(route[0]?.city)
+                ? `${capitalizeString(route[0]?.city)}  ${hasReturn ? '↔' : '→'}  ${capitalizeString(route[route.length - 1]?.city)}`
+                : capitalizeString(route[0]?.city)
             : '';
 
     return (
@@ -124,7 +121,7 @@ const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardPro
                         id: data._id,
                         placeData: JSON.stringify(data),
                         color: primaryColor,
-                        category: capitalize(category)
+                        category: capitalizeString(category)
                     }
                 })}
             >
@@ -158,7 +155,7 @@ const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardPro
                                     size={12}
                                     color={colors.secondary}
                                 />
-                                <ThemedText style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={1}>
+                                <ThemedText style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={2}>
                                     {isTravel && routePreview ? routePreview : address}
                                 </ThemedText>
                             </View>
@@ -236,7 +233,6 @@ const styles = StyleSheet.create({
         top: 0,
         right: 0,
         paddingHorizontal: 10,
-        paddingVertical: 1,
         borderRadius: 999,
         borderTopRightRadius: 12,
         borderBottomLeftRadius: 12,

@@ -1,29 +1,30 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Linking, Platform } from 'react-native';
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Dimensions, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
+import BannerAd from '@/ads/components/BannerAd';
 import { trackEntityInquiry } from '@/apis/inquiries';
 import { trackEntityView } from '@/apis/views';
+import { ActionMenu } from '@/components/common/ActionMenu';
+import { ImageViewerModal } from '@/components/common/ImageViewerModal';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { ContactItem, ContactSection } from '@/components/essentials/shared/ContactSection';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
+import { SectionHeading } from '@/components/essentials/shared/SectionHeading';
+import { MarketplaceDetailsSkeleton } from '@/components/marketplace/MarketplaceDetailsSkeleton';
 import { ThemedText } from '@/components/ThemedText';
-import { useTheme } from '@/context/ThemeContext';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import BannerAd from '@/ads/components/BannerAd';
-import { SectionHeading } from '@/components/essentials/shared/SectionHeading';
-import { PressableScale } from '@/components/essentials/shared/PressableScale';
-import { ContactSection, ContactItem } from '@/components/essentials/shared/ContactSection';
-import { ActionMenu } from '@/components/common/ActionMenu';
-import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
-import { LoaderOverlay } from '@/components/common/LoaderOverlay';
-import { ImageViewerModal } from '@/components/common/ImageViewerModal';
-import { MarketplaceDetailsSkeleton } from '@/components/marketplace/MarketplaceDetailsSkeleton';
+import { useTheme } from '@/context/ThemeContext';
 import { useMarketplaceAPI } from '@/hooks/useMarketplaceAPI';
 import { useMarketplaceStore } from '@/store/marketplaceStore';
+import { capitalizeString } from '@/utils/string';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -149,12 +150,18 @@ export default function MarketplaceDetailsScreen() {
 
     const similarItems = getSimilarItems(id as string, category);
 
+    const formattedCondition = capitalizeString(item.condition || 'Used');
+    const formattedType = type ? capitalizeString(String(type)) : '';
+    const formattedCategory = category ? capitalizeString(String(category)) : '';
+    const formattedLocation = location ? capitalizeString(String(location)) : '';
+    const formattedDateLabel = formattedDate ? capitalizeString(formattedDate) : '';
+
     // Modern info rows.
     const infoRows: { icon: keyof typeof Ionicons.glyphMap; label: string; value: string }[] = [
-        { icon: 'sparkles', label: 'Condition', value: `${item.condition || 'Used'}${type ? ` • ${type}` : ''}` },
-        ...(category ? [{ icon: 'grid' as const, label: 'Category', value: String(category) }] : []),
-        ...(location ? [{ icon: 'location' as const, label: 'Location', value: String(location) }] : []),
-        ...(formattedDate ? [{ icon: 'calendar' as const, label: 'Posted', value: formattedDate }] : []),
+        { icon: 'sparkles', label: 'Condition', value: `${formattedCondition}${formattedType ? ` • ${formattedType}` : ''}` },
+        ...(formattedCategory ? [{ icon: 'grid' as const, label: 'Category', value: formattedCategory }] : []),
+        ...(formattedLocation ? [{ icon: 'location' as const, label: 'Location', value: formattedLocation }] : []),
+        ...(formattedDateLabel ? [{ icon: 'calendar' as const, label: 'Posted', value: formattedDateLabel }] : []),
         ...(isOwner && item?.viewsCount !== undefined ? [{ icon: 'eye' as const, label: 'Views', value: String(item.viewsCount) }] : []),
     ];
 
@@ -209,9 +216,9 @@ export default function MarketplaceDetailsScreen() {
                             </View>
                         )}
 
-                        <View style={styles.expandBtn}>
+                        <TouchableOpacity style={styles.expandBtn} onPress={() => setViewerVisible(true)} activeOpacity={0.8}>
                             <Ionicons name="expand" size={16} color="#FFFFFF" />
-                        </View>
+                        </TouchableOpacity>
                     </Animated.View>
                 ) : (
                     <View style={[styles.noImage, { backgroundColor: colors.card, width }]}>
@@ -229,11 +236,6 @@ export default function MarketplaceDetailsScreen() {
                             <ThemedText style={[styles.price, { color: colors.lime }]}>
                                 Rs. {item.price ? item.price.toLocaleString() : '0'}
                             </ThemedText>
-                            {item.negotiable ? (
-                                <View style={[styles.negChip, { backgroundColor: `${colors.lime}1E` }]}>
-                                    <ThemedText style={[styles.negText, { color: colors.primary }]}>NEGOTIABLE</ThemedText>
-                                </View>
-                            ) : null}
                         </View>
                     </Animated.View>
 
@@ -321,7 +323,7 @@ export default function MarketplaceDetailsScreen() {
                                     {Object.entries(item.metadata).map(([key, val], index) => (
                                         <View key={index} style={[styles.metaChip, { backgroundColor: `${colors.primary}10` }]}>
                                             <ThemedText style={[styles.metaChipText, { color: colors.primary }]}>
-                                                {key.toUpperCase()}: {String(val)}
+                                                {capitalizeString(String(key))}: {capitalizeString(String(val))}
                                             </ThemedText>
                                         </View>
                                     ))}

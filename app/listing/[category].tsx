@@ -6,18 +6,21 @@ import { LoadingDots } from '@/components/common/LoadingDots';
 import { PillsList } from '@/components/common/PillsList';
 import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
 import { SearchBar } from '@/components/common/SearchBar';
-import PlaceCard from '@/components/essentials/PlaceCard';
 import EmptyListingState from '@/components/essentials/EmptyListingState';
 import { ListingCardSkeleton } from '@/components/essentials/ListingCardSkeleton';
+import PlaceCard from '@/components/essentials/PlaceCard';
+import RequestCard from '@/components/essentials/shared/RequestCard';
 import { ThemedText } from '@/components/ThemedText';
 import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 import { getCategoryTypes } from '@/constants/categoryTypes';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { useAuth } from '@/context/AuthContext';
+import { useEssentialsAPI } from '@/hooks/useEssentialsAPI';
+import Avatar from '@/components/ui/avatar';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEssentialsAPI } from '@/hooks/useEssentialsAPI';
+import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
@@ -26,19 +29,18 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import RequestCard from '@/components/essentials/shared/RequestCard';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const CategoryListingScreen = React.memo(() => {
     const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();
     const { theme, isDark } = useTheme();
     const router = useRouter();
-    const queryClient = useQueryClient();
 
 
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
+    const { user } = useAuth();
     const [search, setSearch] = React.useState('');
     const [debouncedSearch, setDebouncedSearch] = React.useState('');
     const [activeTab, setActiveTab] = useState<'all' | 'requests'>(tab === 'requests' ? 'requests' : 'all');
@@ -284,6 +286,24 @@ const CategoryListingScreen = React.memo(() => {
                         >
                             <Ionicons name="add" size={22} color={headerBg} />
                         </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.headerIconBtn}
+                            onPress={() => router.push('/notifications' as any)}
+                            activeOpacity={0.8}
+                        >
+                            <Ionicons name="notifications-outline" size={20} color={headerBg} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.headerIconBtn}
+                            onPress={() => router.push('/profile' as any)}
+                            activeOpacity={0.8}
+                        >
+                            <Avatar
+                                uri={user?.user?.profileImage}
+                                name={user?.user?.name}
+                                size={32}
+                            />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
@@ -487,7 +507,7 @@ const styles = StyleSheet.create({
     filterButton: {
         width: 42,
         height: 42,
-        borderRadius: 12,
+        borderRadius: 21,
         justifyContent: 'center',
         alignItems: 'center',
     },
