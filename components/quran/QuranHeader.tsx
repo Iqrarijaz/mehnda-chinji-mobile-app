@@ -93,9 +93,6 @@ export const QuranHeader = React.memo(({
 
             {/* Identity row */}
             <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.identityRow}>
-                <Animated.View style={[styles.iconTile, floatStyle]}>
-                    <Ionicons name="book" size={22} color="#FFFFFF" />
-                </Animated.View>
                 <View style={styles.identityText}>
                     <ThemedText
                         style={[styles.title, arabicTitle && styles.titleArabic]}
