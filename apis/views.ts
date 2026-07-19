@@ -4,7 +4,7 @@ export type EntityType = 'Marketplace' | 'Business' | 'Essential';
 
 export const trackEntityView = async (entityId: string, entityType: EntityType) => {
     try {
-        const response = await privateAxios.post('/user/v1/views/track', {
+        const response = await privateAxios.post('/api/user/v1/views/track', {
             entityId,
             entityType
         });

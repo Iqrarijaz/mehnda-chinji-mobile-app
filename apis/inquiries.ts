@@ -3,7 +3,7 @@ import { EntityType } from './views';
 
 export const trackEntityInquiry = async (entityId: string, entityType: EntityType) => {
     try {
-        const response = await privateAxios.post('/user/v1/inquiries/track', {
+        const response = await privateAxios.post('/api/user/v1/inquiries/track', {
             entityId,
             entityType
         });

@@ -323,56 +323,56 @@ const PlaceDetailScreen = () => {
                     primaryColor={primaryColor}
                 />
             ) : (
-            <Animated.View entering={FadeInUp.duration(500)} style={styles.heroHeader}>
-                <LinearGradient
-                    colors={[primaryColor, primaryColor + 'dd']}
-                    style={StyleSheet.absoluteFill}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                />
+                <Animated.View entering={FadeInUp.duration(500)} style={styles.heroHeader}>
+                    <LinearGradient
+                        colors={[primaryColor, primaryColor + 'dd']}
+                        style={StyleSheet.absoluteFill}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                    />
 
-                {/* Nav row */}
-                <View style={[styles.heroHeaderTop, { justifyContent: 'space-between', paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 8) }]}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.heroBackButton}>
-                        <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <View style={{ flexDirection: 'row', gap: 8 }}>
-                        <TouchableOpacity
-                            style={[styles.heroBackButton, { backgroundColor: '#FFFFFF' }]}
-                            onPress={() => reportModalRef.current?.present()}
-                            activeOpacity={0.8}
-                        >
-                            <Ionicons name="flag" size={18} color="#EF4444" />
+                    {/* Nav row */}
+                    <View style={[styles.heroHeaderTop, { justifyContent: 'space-between', paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 8) }]}>
+                        <TouchableOpacity onPress={() => router.back()} style={styles.heroBackButton}>
+                            <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
                         </TouchableOpacity>
-                        {isOwner && (
+                        <View style={{ flexDirection: 'row', gap: 8 }}>
                             <TouchableOpacity
                                 style={[styles.heroBackButton, { backgroundColor: '#FFFFFF' }]}
-                                onPress={handleEdit}
+                                onPress={() => reportModalRef.current?.present()}
                                 activeOpacity={0.8}
                             >
-                                <Ionicons name="pencil" size={18} color={primaryColor} />
+                                <Ionicons name="flag" size={18} color="#EF4444" />
                             </TouchableOpacity>
-                        )}
+                            {isOwner && (
+                                <TouchableOpacity
+                                    style={[styles.heroBackButton, { backgroundColor: '#FFFFFF' }]}
+                                    onPress={handleEdit}
+                                    activeOpacity={0.8}
+                                >
+                                    <Ionicons name="pencil" size={18} color={primaryColor} />
+                                </TouchableOpacity>
+                            )}
+                        </View>
                     </View>
-                </View>
 
-                {/* Hero icon + text */}
-                <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
-                    <View style={styles.heroIconWrap}>
-                        {placeImage ? (
-                            <Image source={{ uri: placeImage }} style={styles.heroBusinessLogo} contentFit="cover" />
-                        ) : (
-                            <Ionicons name="location" size={32} color={primaryColor} />
-                        )}
-                    </View>
-                    <ThemedText style={styles.heroTitle} numberOfLines={2}>
-                        {placeName}
-                    </ThemedText>
-                    <ThemedText style={styles.heroSubtitle} numberOfLines={2}>
-                        {category} {place.type ? `| ${capitalizeString(place.type)}` : ''}
-                    </ThemedText>
+                    {/* Hero icon + text */}
+                    <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
+                        <View style={styles.heroIconWrap}>
+                            {placeImage ? (
+                                <Image source={{ uri: placeImage }} style={styles.heroBusinessLogo} contentFit="cover" />
+                            ) : (
+                                <Ionicons name="location" size={32} color={primaryColor} />
+                            )}
+                        </View>
+                        <ThemedText style={styles.heroTitle} numberOfLines={2}>
+                            {placeName}
+                        </ThemedText>
+                        <ThemedText style={styles.heroSubtitle} numberOfLines={2}>
+                            {category} {place.type ? `| ${capitalizeString(place.type)}` : ''}
+                        </ThemedText>
+                    </Animated.View>
                 </Animated.View>
-            </Animated.View>
             )}
 
             <ScrollView
@@ -392,29 +392,29 @@ const PlaceDetailScreen = () => {
                             hasDirections={!!hasDirections}
                         />
                     ) : (
-                    <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
+                        <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
 
 
-                        {category.toLowerCase() !== 'travel' && (
-                            hasDirections ? (
-                                <TouchableOpacity
-                                    style={[styles.actionBtnPrimary, { backgroundColor: primaryColor }]}
-                                    onPress={handleNavigate}
-                                    activeOpacity={0.8}
-                                >
-                                    <Ionicons name="navigate" size={16} color="#FFFFFF" />
-                                    <ThemedText style={styles.actionBtnTextPrimary}>Directions</ThemedText>
-                                </TouchableOpacity>
-                            ) : (
-                                <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
-                                    <Ionicons name="navigate-outline" size={16} color={colors.textSecondary} />
-                                    <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Directions</ThemedText>
-                                </View>
-                            )
-                        )}
+                            {category.toLowerCase() !== 'travel' && (
+                                hasDirections ? (
+                                    <TouchableOpacity
+                                        style={[styles.actionBtnPrimary, { backgroundColor: primaryColor }]}
+                                        onPress={handleNavigate}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Ionicons name="navigate" size={16} color="#FFFFFF" />
+                                        <ThemedText style={styles.actionBtnTextPrimary}>Directions</ThemedText>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
+                                        <Ionicons name="navigate-outline" size={16} color={colors.textSecondary} />
+                                        <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Directions</ThemedText>
+                                    </View>
+                                )
+                            )}
 
 
-                    </View>
+                        </View>
                     )}
 
                     {/* Banner Ad */}
