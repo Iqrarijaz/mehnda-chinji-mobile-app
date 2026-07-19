@@ -16,6 +16,7 @@ import { SearchBar } from '@/components/common/SearchBar';
 import NativeAd from '@/ads/components/NativeAd';
 import { PillsList } from '@/components/common/PillsList';
 import { LoadingDots } from '@/components/common/LoadingDots';
+import { useMarketplaceStore } from '@/store/marketplaceStore';
 
 const EmptyMarketplace = memo(({ colors }: { colors: any }) => (
     <View style={[styles.centered, { flex: 1, marginTop: 100 }]}>
@@ -124,23 +125,22 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
         return infiniteData?.pages?.flatMap(page => Array.isArray(page?.data) ? page.data : []) || [];
     }, [infiniteData]);
 
+    // Feed the global store so the details screen can derive Similar Items
+    // without relying on navigation params.
+    const setMarketItems = useMarketplaceStore((s) => s.setItems);
+    useEffect(() => {
+        if (!isMineTab && rawListings.length) {
+            setMarketItems(rawListings);
+        }
+    }, [rawListings, isMineTab, setMarketItems]);
+
     const listingsRows = useMemo(() => {
         const rows: any[] = [];
         const adInterval = 6;
         let currentRow: any[] = [];
 
         rawListings.forEach((item: any, index: number) => {
-            const otherItems = rawListings.slice(0, 9).filter(l => l._id !== item._id).slice(0, 8);
-            const minimalOtherItems = otherItems.map(i => ({
-                _id: i._id,
-                title: i.title,
-                price: i.price,
-                image: i.images?.[0],
-                sellerId: i.sellerId?._id || i.sellerId
-            }));
-            const precomputedOtherItemsStr = minimalOtherItems.length > 0 ? JSON.stringify(minimalOtherItems) : undefined;
-
-            currentRow.push({ ...item, precomputedOtherItemsStr });
+            currentRow.push(item);
 
             if (currentRow.length === 2 || index === rawListings.length - 1) {
                 rows.push({ _id: `row-${index}`, isRow: true, items: currentRow });
@@ -213,7 +213,6 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                         <View key={subItem._id} style={{ flex: 1 }}>
                             <MarketplaceCard
                                 item={subItem}
-                                otherItemsStr={subItem.precomputedOtherItemsStr}
                                 colors={colors}
                                 onEdit={handleEdit}
                                 showActions={isMineTab}

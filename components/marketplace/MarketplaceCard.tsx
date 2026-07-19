@@ -14,13 +14,12 @@ import { deleteMarketplaceListing, markMarketplaceListingAsSold, incrementMarket
 
 interface MarketplaceCardProps {
     item: any;
-    otherItemsStr?: string;
     colors: any;
     onEdit?: (item: any) => void;
     showActions?: boolean;
 }
 
-export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, showActions }: MarketplaceCardProps) => {
+export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: MarketplaceCardProps) => {
     const { user } = useAuth();
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -155,11 +154,8 @@ export const MarketplaceCard = memo(({ item, otherItemsStr, colors, onEdit, show
         if (!isOwner) {
             incrementMarketplaceInquiry(item._id).catch(console.error);
         }
-        router.push({
-            pathname: `/marketplace/${item._id}`,
-            params: otherItemsStr ? { otherItems: otherItemsStr } : {}
-        } as any)
-    }, [isOwner, item._id, otherItemsStr, router]);
+        router.push(`/marketplace/${item._id}` as any);
+    }, [isOwner, item._id, router]);
 
     return (
         <>

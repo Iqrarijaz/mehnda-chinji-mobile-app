@@ -35,18 +35,26 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
             <MenuTrigger style={styles.trigger}>
                 <Ionicons name={triggerIcon} size={triggerIconSize} color={triggerIconColor || colors.textSecondary} />
             </MenuTrigger>
-            <MenuOptions customStyles={{ optionsContainer: { backgroundColor: colors.card, borderRadius: 6, paddingHorizontal: 2, width: 120, paddingVertical: 2 } }}>
+            <MenuOptions customStyles={{
+                optionsContainer: {
+                    backgroundColor: colors.card,
+                    borderRadius: 18,
+                    padding: 6,
+                    width: 190,
+                    marginTop: 34,
+                },
+            }}>
                 {actions.map((action, index) => {
                     const isDestructive = action.destructive;
-                    const textColor = isDestructive ? '#FFFFFF' : (action.color || colors.text);
-                    const iconColor = isDestructive ? '#FFFFFF' : (action.color || colors.text);
-                    const bgColor = isDestructive ? '#EF4444' : 'rgba(128, 128, 128, 0.1)';
+                    const accent = isDestructive ? '#EF4444' : (action.color || colors.primary);
 
                     return (
-                        <MenuOption key={index} onSelect={action.onPress} style={{ marginBottom: index !== actions.length - 1 ? 1 : 0 }}>
-                            <View style={[styles.menuItem, { backgroundColor: bgColor }]}>
-                                <Ionicons name={action.icon} size={14} color={iconColor} />
-                                <ThemedText style={[styles.menuText, { color: textColor }]}>
+                        <MenuOption key={index} onSelect={action.onPress}>
+                            <View style={styles.menuItem}>
+                                <View style={[styles.menuIconTile, { backgroundColor: `${accent}18` }]}>
+                                    <Ionicons name={action.icon} size={15} color={accent} />
+                                </View>
+                                <ThemedText style={[styles.menuText, { color: isDestructive ? '#EF4444' : colors.text }]}>
                                     {action.label}
                                 </ThemedText>
                             </View>
@@ -65,11 +73,20 @@ const styles = StyleSheet.create({
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 4,
-        borderRadius: 4,
+        gap: 10,
+        paddingVertical: 8,
+        paddingHorizontal: 8,
+        borderRadius: 12,
+    },
+    menuIconTile: {
+        width: 30,
+        height: 30,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     menuText: {
-        fontSize: 13,
-        fontWeight: '600',
+        fontSize: 13.5,
+        fontWeight: '700',
     },
 });

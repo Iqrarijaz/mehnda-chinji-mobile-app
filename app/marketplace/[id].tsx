@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Modal, Linking, Alert, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Linking, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+
 import { trackEntityInquiry } from '@/apis/inquiries';
 import { trackEntityView } from '@/apis/views';
-import Toast from 'react-native-toast-message';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -13,14 +16,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BannerAd from '@/ads/components/BannerAd';
 import { SectionHeading } from '@/components/essentials/shared/SectionHeading';
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
+import { ContactSection, ContactItem } from '@/components/essentials/shared/ContactSection';
 import { ActionMenu } from '@/components/common/ActionMenu';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { ImageViewerModal } from '@/components/common/ImageViewerModal';
+import { MarketplaceDetailsSkeleton } from '@/components/marketplace/MarketplaceDetailsSkeleton';
 import { useMarketplaceAPI } from '@/hooks/useMarketplaceAPI';
+import { useMarketplaceStore } from '@/store/marketplaceStore';
+
 const { width } = Dimensions.get('window');
 
 export default function MarketplaceDetailsScreen() {
-    const { id, otherItems } = useLocalSearchParams<{ id: string, otherItems?: string }>();
+    const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
@@ -32,16 +40,13 @@ export default function MarketplaceDetailsScreen() {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showSoldConfirm, setShowSoldConfirm] = useState(false);
 
-    const parsedOtherItems = React.useMemo(() => {
-        if (!otherItems) return [];
-        try { return JSON.parse(otherItems); } catch { return []; }
-    }, [otherItems]);
+    const getSimilarItems = useMarketplaceStore((s) => s.getSimilarItems);
 
     const {
         detailsQuery,
         markSoldMutation,
         deleteMutation,
-        toggleStatusMutation
+        toggleStatusMutation,
     } = useMarketplaceAPI({ id: id as string });
 
     const { data: response, isLoading, isError } = detailsQuery;
@@ -51,8 +56,7 @@ export default function MarketplaceDetailsScreen() {
 
     React.useEffect(() => {
         if (id && user?.user?._id) {
-            // Track view when component mounts and ID is available
-            trackEntityView(id as string, 'Marketplace').catch(() => {});
+            trackEntityView(id as string, 'Marketplace').catch(() => { });
         }
     }, [id, user?.user?._id]);
 
@@ -67,44 +71,32 @@ export default function MarketplaceDetailsScreen() {
         }
     }, [item?.createdAt]);
 
-    const handleCall = () => {
-        if (item?.sellerPhone) {
-            if (!isOwner) {
-                trackEntityInquiry(id as string, 'Marketplace').catch(() => {});
-            }
-            Linking.openURL(`tel:${item.sellerPhone}`);
-        } else {
-            Alert.alert("Error", "Phone number not available");
+    // Track an inquiry when the buyer calls or messages the seller.
+    const handleContactAction = React.useCallback((_method: 'call' | 'whatsapp', _contact: ContactItem) => {
+        if (!isOwner) {
+            trackEntityInquiry(id as string, 'Marketplace').catch(() => { });
         }
-    };
-
-    const confirmMarkSold = () => {
-        setShowSoldConfirm(true);
-    };
-
-    const confirmDelete = () => {
-        setShowDeleteConfirm(true);
-    };
+    }, [isOwner, id]);
 
     const handleEdit = () => {
         router.push({
             pathname: '/listing/create',
-            params: { listing: JSON.stringify(item) }
+            params: { listing: JSON.stringify(item) },
         });
     };
 
     const ownerActions = [
         ...(item?.status !== 'sold' ? [
             { label: 'Edit Listing', icon: 'create-outline' as const, onPress: handleEdit },
-            { label: 'Mark Sold', icon: 'checkmark-circle-outline' as const, color: '#10B981', onPress: confirmMarkSold },
+            { label: 'Mark Sold', icon: 'checkmark-circle-outline' as const, color: colors.lime, onPress: () => setShowSoldConfirm(true) },
             ...(item?.status === 'live' ? [
-                { label: 'Go Offline', icon: 'eye-off-outline' as const, color: '#F59E0B', onPress: () => toggleStatusMutation.mutate('offline') }
+                { label: 'Go Offline', icon: 'eye-off-outline' as const, color: colors.secondary, onPress: () => toggleStatusMutation.mutate('offline') },
             ] : []),
             ...(item?.status === 'offline' ? [
-                { label: 'Go Live', icon: 'eye-outline' as const, color: '#10B981', onPress: () => toggleStatusMutation.mutate('live') }
-            ] : [])
+                { label: 'Go Live', icon: 'eye-outline' as const, color: colors.lime, onPress: () => toggleStatusMutation.mutate('live') },
+            ] : []),
         ] : []),
-        { label: 'Delete', icon: 'trash-outline' as const, color: '#EF4444', onPress: confirmDelete, destructive: true }
+        { label: 'Delete', icon: 'trash-outline' as const, color: '#EF4444', onPress: () => setShowDeleteConfirm(true), destructive: true },
     ];
 
     const renderHeader = () => (
@@ -112,45 +104,35 @@ export default function MarketplaceDetailsScreen() {
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={20} color="#fff" />
             </TouchableOpacity>
-            <ThemedText style={styles.headerTitle} numberOfLines={1}>
-                Marketplace Item
-            </ThemedText>
-            <View style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}>
-                {isOwner && item?.status !== 'sold' ? (
-                    <ActionMenu actions={ownerActions} triggerIconColor="#fff" triggerIconSize={24} />
+            <ThemedText style={styles.headerTitle} numberOfLines={1}>Marketplace</ThemedText>
+            <View style={styles.headerAction}>
+                {isOwner ? (
+                    <ActionMenu actions={ownerActions} triggerIconColor="#fff" triggerIconSize={22} />
                 ) : null}
             </View>
         </View>
     );
 
-    const renderStatusBadge = () => {
-        if (!item?.status) return null;
-        const isActive = item.status === 'live';
-        return (
-            <View style={[styles.statusTab, { backgroundColor: isActive ? '#10B981' : '#6B7280' }]}>
-                <ThemedText style={styles.statusTabText}>{isActive ? 'LIVE' : item.status.toUpperCase()}</ThemedText>
-            </View>
-        );
-    };
-
     if (isLoading) {
         return (
-            <View style={[styles.loaderContainer, { backgroundColor: colors.background }]}>
-                <Stack.Screen options={{ title: 'Loading...', headerShown: false }} />
-                <ActivityIndicator size="large" color={colors.primary} />
+            <View style={[styles.container, { backgroundColor: colors.background }]}>
+                <Stack.Screen options={{ headerShown: false }} />
+                {renderHeader()}
+                <MarketplaceDetailsSkeleton />
             </View>
         );
     }
 
     if (isError || !item) {
         return (
-            <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+            <View style={[styles.container, { backgroundColor: colors.background }]}>
                 <Stack.Screen options={{ headerShown: false }} />
                 {renderHeader()}
                 <View style={styles.centered}>
-                    <ThemedText style={{ color: colors.text }}>Item not found</ThemedText>
-                    <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 20 }}>
-                        <ThemedText style={{ color: colors.primary }}>Go Back</ThemedText>
+                    <Ionicons name="alert-circle-outline" size={48} color={colors.textSecondary} />
+                    <ThemedText style={{ color: colors.text, marginTop: 12, fontWeight: '700' }}>Item not found</ThemedText>
+                    <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 16 }}>
+                        <ThemedText style={{ color: colors.primary, fontWeight: '700' }}>Go Back</ThemedText>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -159,103 +141,113 @@ export default function MarketplaceDetailsScreen() {
 
     const category = typeof item.category === 'object' ? (item.category.en || item.category.ur) : item.category;
     const type = typeof item.type === 'object' ? (item.type.en || item.type.ur) : item.type;
+    const images: string[] = Array.isArray(item.images) ? item.images : [];
+    const location = item?.village ? `${item.village}, ${item.city}` : item?.city;
+
+    const sellerName = item?.sellerId?.name || 'Seller';
+    const contacts: ContactItem[] = item?.sellerPhone ? [{ name: sellerName, number: item.sellerPhone }] : [];
+
+    const similarItems = getSimilarItems(id as string, category);
+
+    // Modern info rows.
+    const infoRows: { icon: keyof typeof Ionicons.glyphMap; label: string; value: string }[] = [
+        { icon: 'sparkles', label: 'Condition', value: `${item.condition || 'Used'}${type ? ` • ${type}` : ''}` },
+        ...(category ? [{ icon: 'grid' as const, label: 'Category', value: String(category) }] : []),
+        ...(location ? [{ icon: 'location' as const, label: 'Location', value: String(location) }] : []),
+        ...(formattedDate ? [{ icon: 'calendar' as const, label: 'Posted', value: formattedDate }] : []),
+        ...(isOwner && item?.viewsCount !== undefined ? [{ icon: 'eye' as const, label: 'Views', value: String(item.viewsCount) }] : []),
+    ];
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
             {renderHeader()}
+
             <ScrollView style={styles.content} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-                {item.images && item.images.length > 0 ? (
-                    <View style={styles.imageContainer}>
-                        {isOwner && renderStatusBadge()}
+                {/* ── Image hero ─────────────────────────────────────────── */}
+                {images.length > 0 ? (
+                    <Animated.View entering={FadeIn.duration(350)} style={styles.imageContainer}>
                         <ScrollView
                             horizontal
                             pagingEnabled
                             showsHorizontalScrollIndicator={false}
-                            onMomentumScrollEnd={(e) => {
-                                const index = Math.round(e.nativeEvent.contentOffset.x / width);
-                                setActiveImageIndex(index);
-                            }}
+                            onMomentumScrollEnd={(e) => setActiveImageIndex(Math.round(e.nativeEvent.contentOffset.x / width))}
                         >
-                            {item.images.map((img: string, idx: number) => (
+                            {images.map((img, idx) => (
                                 <TouchableOpacity
                                     key={idx}
-                                    activeOpacity={0.9}
-                                    onPress={() => {
-                                        setActiveImageIndex(idx);
-                                        setViewerVisible(true);
-                                    }}
+                                    activeOpacity={0.95}
+                                    onPress={() => { setActiveImageIndex(idx); setViewerVisible(true); }}
                                 >
-                                    <Image source={{ uri: img }} style={[styles.mainImage, { width }]} resizeMode="cover" />
+                                    <Image source={{ uri: img }} style={[styles.mainImage, { width }]} contentFit="cover" transition={250} />
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>
-                        {item.images.length > 1 && (
-                            <View style={styles.pagination}>
-                                <ThemedText style={styles.paginationText}>
-                                    {activeImageIndex + 1} / {item.images.length}
-                                </ThemedText>
+
+                        {/* subtle top gradient for status/legibility */}
+                        <LinearGradient colors={['rgba(0,0,0,0.28)', 'transparent']} style={styles.imageTopFade} pointerEvents="none" />
+
+                        {item?.status && item.status !== 'live' && (
+                            <View style={[styles.statusTab, { backgroundColor: item.status === 'sold' ? '#EF4444' : '#6B7280' }]}>
+                                <ThemedText style={styles.statusTabText}>{item.status.toUpperCase()}</ThemedText>
                             </View>
                         )}
-                    </View>
+
+                        {images.length > 1 && (
+                            <View style={styles.dotsRow}>
+                                {images.map((_, i) => (
+                                    <View
+                                        key={i}
+                                        style={[
+                                            styles.dot,
+                                            i === activeImageIndex
+                                                ? { backgroundColor: colors.lime, width: 18 }
+                                                : { backgroundColor: 'rgba(255,255,255,0.7)' },
+                                        ]}
+                                    />
+                                ))}
+                            </View>
+                        )}
+
+                        <View style={styles.expandBtn}>
+                            <Ionicons name="expand" size={16} color="#FFFFFF" />
+                        </View>
+                    </Animated.View>
                 ) : (
                     <View style={[styles.noImage, { backgroundColor: colors.card, width }]}>
-                        {isOwner && renderStatusBadge()}
                         <Ionicons name="images-outline" size={48} color={colors.textSecondary} />
                         <ThemedText style={{ color: colors.textSecondary, marginTop: 8 }}>No Images</ThemedText>
                     </View>
                 )}
 
-                <View style={[styles.detailsCard, { flex: 1, backgroundColor: isDark ? '#1e293b' : '#FFFFFF', paddingBottom: 40 + insets.bottom }]}>
-                    
-                    {/* Title */}
-                    <View style={styles.titleWrapper}>
-                        <ThemedText style={[styles.heroTitle, { color: colors.text, textAlign: 'left', textTransform: 'capitalize' }]} >
-                            {item.title}
-                        </ThemedText>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                {/* ── Details card ───────────────────────────────────────── */}
+                <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', paddingBottom: 40 + insets.bottom }]}>
+                    {/* Title + price */}
+                    <Animated.View entering={FadeInDown.duration(400)} style={styles.titleWrapper}>
+                        <ThemedText style={[styles.title, { color: colors.text }]}>{item.title}</ThemedText>
+                        <View style={styles.priceRow}>
                             <ThemedText style={[styles.price, { color: colors.lime }]}>
                                 Rs. {item.price ? item.price.toLocaleString() : '0'}
                             </ThemedText>
                             {item.negotiable ? (
-                                <View style={{ backgroundColor: `${colors.lime}1E`, paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999 }}>
-                                    <ThemedText style={{ color: colors.primary, fontSize: 10, fontWeight: '800', letterSpacing: 0.4 }}>NEGOTIABLE</ThemedText>
+                                <View style={[styles.negChip, { backgroundColor: `${colors.lime}1E` }]}>
+                                    <ThemedText style={[styles.negText, { color: colors.primary }]}>NEGOTIABLE</ThemedText>
                                 </View>
                             ) : null}
                         </View>
-                    </View>
+                    </Animated.View>
 
-                    {/* Quick Interactive Actions Row */}
-                    {!isOwner && item?.status === 'live' && (
-                        <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
-                            {item.sellerPhone ? (
-                                <PressableScale
-                                    intensity={0.04}
-                                    containerStyle={{ flex: 1 }}
-                                    style={[styles.actionBtnPrimary, { backgroundColor: colors.primary }]}
-                                    onPress={handleCall}
-                                >
-                                    <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.lime, alignItems: 'center', justifyContent: 'center' }}>
-                                        <Ionicons name="call" size={14} color="#FFFFFF" />
-                                    </View>
-                                    <ThemedText style={styles.actionBtnTextPrimary}>Call Seller</ThemedText>
-                                </PressableScale>
-                            ) : (
-                                <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
-                                    <Ionicons name="call-outline" size={20} color={colors.textSecondary} />
-                                    <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Phone</ThemedText>
-                                </View>
-                            )}
-
-                            <TouchableOpacity
-                                style={[styles.actionBtnSec, { backgroundColor: isDark ? '#334155' : '#f1f5f9' }]}
-                                onPress={() => {}}
-                                activeOpacity={0.8}
-                            >
-                                <Ionicons name="share-social" size={20} color={colors.textSecondary} />
-                                <ThemedText style={[styles.actionBtnTextSec, { color: colors.textSecondary }]}>Share</ThemedText>
-                            </TouchableOpacity>
-                        </View>
+                    {/* Seller contact — shared ContactSection (Call + WhatsApp) */}
+                    {!isOwner && item?.status === 'live' && contacts.length > 0 && (
+                        <Animated.View entering={FadeInDown.delay(60).duration(400)} style={{ marginBottom: 16 }}>
+                            <ContactSection
+                                contacts={contacts}
+                                title="Contact Seller"
+                                hint="Tap to call"
+                                iconTint="secondary"
+                                onContactAction={handleContactAction}
+                            />
+                        </Animated.View>
                     )}
 
                     {/* Banner Ad */}
@@ -263,129 +255,72 @@ export default function MarketplaceDetailsScreen() {
                         <BannerAd placement="marketplace-details" />
                     </View>
 
-                    {/* Details Sections */}
                     <View style={styles.sectionsContainer}>
-
-                        {/* Section: Description */}
+                        {/* Description */}
                         {item.description && (
-                            <View style={styles.detailSection}>
+                            <Animated.View entering={FadeInDown.delay(80).duration(400)} style={styles.detailSection}>
                                 <SectionHeading icon="reader" label="Description" />
-                                <ThemedText style={[styles.descriptionText, { color: colors.text }]}>
+                                <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]}>
                                     {item.description}
                                 </ThemedText>
+                            </Animated.View>
+                        )}
+
+                        {/* Item details — modern info grid */}
+                        <Animated.View entering={FadeInDown.delay(120).duration(400)} style={styles.detailSection}>
+                            <SectionHeading icon="pricetags" label="Item Details" />
+                            <View style={styles.infoGrid}>
+                                {infoRows.map((row) => (
+                                    <View
+                                        key={row.label}
+                                        style={[styles.infoCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.background }]}
+                                    >
+                                        <View style={[styles.infoIconTile, { backgroundColor: `${colors.secondary}16` }]}>
+                                            <Ionicons name={row.icon} size={16} color={colors.secondary} />
+                                        </View>
+                                        <View style={{ flex: 1 }}>
+                                            <ThemedText style={[styles.infoLabel, { color: colors.textSecondary }]}>{row.label}</ThemedText>
+                                            <ThemedText style={[styles.infoValue, { color: colors.text }]} numberOfLines={1}>
+                                                {row.value}
+                                            </ThemedText>
+                                        </View>
+                                    </View>
+                                ))}
+                            </View>
+                        </Animated.View>
+
+                        {/* Recent viewers (owner premium) */}
+                        {isOwner && item?.recentViewers && item.recentViewers.length > 0 && (
+                            <View style={styles.detailSection}>
+                                <SectionHeading icon="people" label="Recent Viewers" pill="Premium" />
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingVertical: 4 }}>
+                                    {item.recentViewers.map((viewerLog: any, index: number) => (
+                                        <View key={index} style={{ alignItems: 'center', width: 54 }}>
+                                            <Image
+                                                source={{ uri: viewerLog.viewerId?.profileImage || 'https://via.placeholder.com/40' }}
+                                                style={styles.viewerAvatar}
+                                                contentFit="cover"
+                                            />
+                                            <ThemedText style={{ fontSize: 9, color: colors.text, textAlign: 'center', marginTop: 4 }} numberOfLines={1}>
+                                                {viewerLog.viewerId?.name?.split(' ')[0] || 'User'}
+                                            </ThemedText>
+                                            <ThemedText style={{ fontSize: 8, color: colors.primary, textAlign: 'center', fontWeight: 'bold' }}>
+                                                {viewerLog.viewCount} {viewerLog.viewCount === 1 ? 'view' : 'views'}
+                                            </ThemedText>
+                                        </View>
+                                    ))}
+                                </ScrollView>
                             </View>
                         )}
 
-                        {/* Section: Details & Location */}
-                        <View style={styles.detailSection}>
-                            <SectionHeading icon="pricetags" label="Item Details" />
-
-                            <View style={styles.infoListItem}>
-                                <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
-                                    <Ionicons name="pricetag" size={12} color={colors.primary} />
-                                </View>
-                                <View style={styles.infoListContent}>
-                                    <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Condition / Type</ThemedText>
-                                    <ThemedText style={[styles.infoListVal, { color: colors.text, textTransform: 'capitalize' }]}>
-                                        {item.condition || 'Used'} {type ? `• ${type}` : ''}
-                                    </ThemedText>
-                                </View>
-                            </View>
-
-                            {category && (
-                                <View style={styles.infoListItem}>
-                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
-                                        <Ionicons name="grid" size={12} color={colors.primary} />
-                                    </View>
-                                    <View style={styles.infoListContent}>
-                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Category</ThemedText>
-                                        <ThemedText style={[styles.infoListVal, { color: colors.text, textTransform: 'capitalize' }]}>
-                                            {category}
-                                        </ThemedText>
-                                    </View>
-                                </View>
-                            )}
-
-                            <View style={styles.infoListItem}>
-                                <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
-                                    <Ionicons name="calendar" size={12} color={colors.primary} />
-                                </View>
-                                <View style={styles.infoListContent}>
-                                    <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Date Posted</ThemedText>
-                                    <ThemedText style={[styles.infoListVal, { color: colors.text }]}>{formattedDate}</ThemedText>
-                                </View>
-                            </View>
-
-                            <View style={styles.infoListItem}>
-                                <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
-                                    <Ionicons name="location" size={12} color={colors.primary} />
-                                </View>
-                                <View style={styles.infoListContent}>
-                                    <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Location</ThemedText>
-                                    <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
-                                        {item?.village ? `${item.village}, ${item.city}` : item?.city}
-                                    </ThemedText>
-                                </View>
-                            </View>
-
-                            {isOwner && item?.viewsCount !== undefined && (
-                                <View style={styles.infoListItem}>
-                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
-                                        <Ionicons name="eye" size={12} color={colors.primary} />
-                                    </View>
-                                    <View style={styles.infoListContent}>
-                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary }]}>Total Views</ThemedText>
-                                        <ThemedText style={[styles.infoListVal, { color: colors.text }]}>
-                                            {item.viewsCount}
-                                        </ThemedText>
-                                    </View>
-                                </View>
-                            )}
-
-                            {isOwner && item?.recentViewers && item.recentViewers.length > 0 && (
-                                <View style={styles.infoListItem}>
-                                    <View style={[styles.infoListIcon, { backgroundColor: colors.primary + '10' }]}>
-                                        <Ionicons name="people" size={12} color={colors.primary} />
-                                    </View>
-                                    <View style={[styles.infoListContent, { paddingVertical: 4 }]}>
-                                        <ThemedText style={[styles.infoListLabel, { color: colors.textSecondary, marginBottom: 8 }]}>Recent Viewers (Premium)</ThemedText>
-                                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
-                                            {item.recentViewers.map((viewerLog: any, index: number) => (
-                                                <View key={index} style={{ alignItems: 'center', width: 50 }}>
-                                                    <Image 
-                                                        source={{ uri: viewerLog.viewerId?.profileImage || 'https://via.placeholder.com/40' }} 
-                                                        style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#eee' }} 
-                                                    />
-                                                    <ThemedText style={{ fontSize: 9, color: colors.text, textAlign: 'center', marginTop: 4 }} numberOfLines={1}>
-                                                        {viewerLog.viewerId?.name?.split(' ')[0] || 'User'}
-                                                    </ThemedText>
-                                                    <ThemedText style={{ fontSize: 8, color: colors.primary, textAlign: 'center', fontWeight: 'bold' }}>
-                                                        {viewerLog.viewCount} {viewerLog.viewCount === 1 ? 'view' : 'views'}
-                                                    </ThemedText>
-                                                </View>
-                                            ))}
-                                        </ScrollView>
-                                    </View>
-                                </View>
-                            )}
-                        </View>
-
-                        {/* Metadata tags */}
+                        {/* Additional info (metadata) */}
                         {item.metadata && Object.keys(item.metadata).length > 0 && (
                             <View style={styles.detailSection}>
-                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                    Additional Info
-                                </ThemedText>
-                                <View style={styles.detailsTagsContainer}>
+                                <SectionHeading icon="information-circle" label="Additional Info" />
+                                <View style={styles.chipWrap}>
                                     {Object.entries(item.metadata).map(([key, val], index) => (
-                                        <View
-                                            key={index}
-                                            style={[
-                                                styles.detailTagChip,
-                                                { backgroundColor: colors.primary + '15' }
-                                            ]}
-                                        >
-                                            <ThemedText style={[styles.detailTagText, { color: colors.primary }]}>
+                                        <View key={index} style={[styles.metaChip, { backgroundColor: `${colors.primary}10` }]}>
+                                            <ThemedText style={[styles.metaChipText, { color: colors.primary }]}>
                                                 {key.toUpperCase()}: {String(val)}
                                             </ThemedText>
                                         </View>
@@ -394,31 +329,38 @@ export default function MarketplaceDetailsScreen() {
                             </View>
                         )}
 
-                        {/* Other Items */}
-                        {parsedOtherItems.length > 0 && (
-                            <View style={[styles.detailSection, { marginTop: 16 }]}>
-                                <ThemedText style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-                                    Other Items by Seller
-                                </ThemedText>
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.otherItemsScroll} contentContainerStyle={{ gap: 12, paddingRight: 16 }}>
-                                    {parsedOtherItems.map((otherItem: any) => (
-                                        <TouchableOpacity
-                                            key={otherItem._id}
-                                            style={[styles.smallCard, { backgroundColor: colors.card }]}
-                                            onPress={() => {
-                                                const isOtherItemOwner = user?.user?._id && otherItem.sellerId && otherItem.sellerId.toString() === user.user._id.toString();
-                                                if (!isOtherItemOwner) {
-                                                    trackEntityInquiry(otherItem._id, 'Marketplace').catch(console.error);
-                                                }
-                                                router.push(`/marketplace/${otherItem._id}` as any);
-                                            }}
-                                        >
-                                            <Image source={{ uri: otherItem.image || 'https://via.placeholder.com/150' }} style={styles.smallCardImage} />
-                                            <View style={styles.smallCardInfo}>
-                                                <ThemedText style={[styles.smallCardTitle, { color: colors.text }]} numberOfLines={1}>{otherItem.title}</ThemedText>
-                                                <ThemedText style={[styles.smallCardPrice, { color: colors.primary }]}>Rs. {otherItem.price}</ThemedText>
-                                            </View>
-                                        </TouchableOpacity>
+                        {/* Similar items — from global store */}
+                        {similarItems.length > 0 && (
+                            <View style={[styles.detailSection, { marginTop: 4 }]}>
+                                <SectionHeading icon="albums" label="Similar Items" />
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 16, paddingVertical: 4 }}>
+                                    {similarItems.map((sim: any, idx: number) => (
+                                        <Animated.View key={sim._id} entering={FadeInDown.delay(idx * 50).duration(300)}>
+                                            <PressableScale
+                                                intensity={0.03}
+                                                onPress={() => {
+                                                    const simOwner = user?.user?._id && sim.sellerId && (sim.sellerId._id || sim.sellerId).toString() === user.user._id.toString();
+                                                    if (!simOwner) trackEntityInquiry(sim._id, 'Marketplace').catch(() => { });
+                                                    router.push(`/marketplace/${sim._id}` as any);
+                                                }}
+                                                style={[styles.simCard, { backgroundColor: colors.card }]}
+                                            >
+                                                <Image
+                                                    source={{ uri: sim.images?.[0] || sim.image || 'https://via.placeholder.com/150' }}
+                                                    style={styles.simImage}
+                                                    contentFit="cover"
+                                                    transition={200}
+                                                />
+                                                <View style={styles.simInfo}>
+                                                    <ThemedText style={[styles.simTitle, { color: colors.text }]} numberOfLines={1}>
+                                                        {sim.title}
+                                                    </ThemedText>
+                                                    <ThemedText style={[styles.simPrice, { color: colors.lime }]}>
+                                                        Rs. {typeof sim.price === 'number' ? sim.price.toLocaleString() : sim.price}
+                                                    </ThemedText>
+                                                </View>
+                                            </PressableScale>
+                                        </Animated.View>
                                     ))}
                                 </ScrollView>
                             </View>
@@ -427,43 +369,18 @@ export default function MarketplaceDetailsScreen() {
                 </View>
             </ScrollView>
 
-            {/* Image Viewer Modal */}
-            <Modal visible={viewerVisible} transparent={true} animationType="fade" onRequestClose={() => setViewerVisible(false)}>
-                <View style={styles.viewerContainer}>
-                    <TouchableOpacity style={styles.viewerClose} onPress={() => setViewerVisible(false)}>
-                        <Ionicons name="close" size={30} color="#fff" />
-                    </TouchableOpacity>
-                    <ScrollView
-                        horizontal
-                        pagingEnabled
-                        showsHorizontalScrollIndicator={false}
-                        contentOffset={{ x: activeImageIndex * width, y: 0 }}
-                        onMomentumScrollEnd={(e) => {
-                            const index = Math.round(e.nativeEvent.contentOffset.x / width);
-                            setActiveImageIndex(index);
-                        }}
-                    >
-                        {item.images?.map((img: string, idx: number) => (
-                            <View key={idx} style={{ width, justifyContent: 'center', alignItems: 'center' }}>
-                                <Image source={{ uri: img }} style={{ width: '100%', height: '80%' }} resizeMode="contain" />
-                            </View>
-                        ))}
-                    </ScrollView>
-                    <View style={styles.viewerPagination}>
-                        <ThemedText style={styles.viewerPaginationText}>
-                            {activeImageIndex + 1} / {item.images?.length || 0}
-                        </ThemedText>
-                    </View>
-                </View>
-            </Modal>
+            {/* Full-screen image viewer (shared component) */}
+            <ImageViewerModal
+                visible={viewerVisible}
+                onClose={() => setViewerVisible(false)}
+                images={images}
+                initialIndex={activeImageIndex}
+            />
 
             <ConfirmationModal
                 visible={showDeleteConfirm}
                 onClose={() => setShowDeleteConfirm(false)}
-                onConfirm={() => {
-                    setShowDeleteConfirm(false);
-                    deleteMutation.mutate();
-                }}
+                onConfirm={() => { setShowDeleteConfirm(false); deleteMutation.mutate(); }}
                 title="Delete Listing"
                 message="Are you sure you want to remove this listing? This action cannot be undone."
                 type="danger"
@@ -474,10 +391,7 @@ export default function MarketplaceDetailsScreen() {
             <ConfirmationModal
                 visible={showSoldConfirm}
                 onClose={() => setShowSoldConfirm(false)}
-                onConfirm={() => {
-                    setShowSoldConfirm(false);
-                    markSoldMutation.mutate();
-                }}
+                onConfirm={() => { setShowSoldConfirm(false); markSoldMutation.mutate(); }}
                 title="Mark as Sold"
                 message="Mark this item as sold? It will no longer be visible in public listings."
                 type="info"
@@ -491,262 +405,118 @@ export default function MarketplaceDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    centered: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    loaderContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+    container: { flex: 1 },
+    centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingBottom: 12,
     },
     backButton: {
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'rgba(255,255,255,0.2)',
         alignItems: 'center',
         justifyContent: 'center',
     },
     headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 17,
+        fontWeight: '800',
         flex: 1,
         textAlign: 'center',
         color: '#fff',
+        letterSpacing: 0.2,
     },
-    headerActionsRight: {
-        position: 'absolute',
-        right: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    content: {
-        flex: 1,
-    },
-    imageContainer: {
-        position: 'relative',
-    },
-    mainImage: {
-        height: 300,
-    },
+    headerAction: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+    content: { flex: 1 },
+    imageContainer: { position: 'relative' },
+    mainImage: { height: 300 },
+    imageTopFade: { position: 'absolute', top: 0, left: 0, right: 0, height: 60 },
     statusTab: {
         position: 'absolute',
         top: 12,
         left: 12,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 4,
-        zIndex: 5,
-    },
-    statusTabText: {
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: '700',
-        letterSpacing: 0.5,
-    },
-    noImage: {
-        height: 300,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    pagination: {
-        position: 'absolute',
-        bottom: 28,
-        right: 12,
-        backgroundColor: 'rgba(0,0,0,0.6)',
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 12,
+        borderRadius: 999,
     },
-    paginationText: {
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: '600',
+    statusTabText: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
+    dotsRow: {
+        position: 'absolute',
+        bottom: 32,
+        alignSelf: 'center',
+        flexDirection: 'row',
+        gap: 5,
     },
+    dot: { width: 6, height: 6, borderRadius: 3 },
+    expandBtn: {
+        position: 'absolute',
+        bottom: 28,
+        right: 14,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    noImage: { height: 300, alignItems: 'center', justifyContent: 'center' },
     detailsCard: {
-        paddingHorizontal: 16,
-        paddingTop: 24,
         flex: 1,
-        marginTop: -16,
+        marginTop: -20,
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
+        paddingHorizontal: 16,
+        paddingTop: 20,
     },
-    titleWrapper: {
-        marginBottom: 16,
-    },
-    heroTitle: {
-        fontSize: 22,
-        fontWeight: '800',
-        color: '#FFFFFF',
-        letterSpacing: 0.2,
-        marginBottom: 4,
-    },
-    price: {
-        fontSize: 24,
-        fontWeight: '900',
-    },
-    actionRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 12,
-        paddingBottom: 16,
-        paddingTop: 4,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.05)',
-        marginBottom: 16,
-    },
-    actionBtnPrimary: {
-        flex: 1,
-        height: 40,
-        borderRadius: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-    },
-    actionBtnTextPrimary: {
-        color: '#FFFFFF',
-        fontSize: 14,
-        fontWeight: '700',
-    },
-    actionBtnSec: {
-        flex: 1,
-        height: 40,
-        borderRadius: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-    },
-    actionBtnTextSec: {
-        fontSize: 14,
-        fontWeight: '700',
-    },
-    detailAdWrapper: {
-        marginBottom: 16,
-        alignItems: 'center',
-    },
-    sectionsContainer: {
-        gap: 16,
-    },
-    detailSection: {
-        gap: 6,
-    },
-    sectionHeading: {
-        fontSize: 11,
-        fontWeight: '800',
-        textTransform: 'uppercase',
-        letterSpacing: 0.8,
-        marginBottom: 4,
-    },
-    descriptionText: {
-        fontSize: 14,
-        lineHeight: 22,
-    },
-    infoListItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 4,
-        gap: 12,
-    },
-    infoListIcon: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    infoListContent: {
-        flex: 1,
-    },
-    infoListLabel: {
-        fontSize: 10,
-        fontWeight: '600',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-        marginBottom: 2,
-    },
-    infoListVal: {
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    detailsTagsContainer: {
+    titleWrapper: { marginBottom: 16 },
+    title: { fontSize: 20, fontWeight: '800', textTransform: 'capitalize', letterSpacing: 0.2, lineHeight: 26 },
+    priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
+    price: { fontSize: 22, fontWeight: '800', letterSpacing: 0.3 },
+    negChip: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999 },
+    negText: { fontSize: 10, fontWeight: '800', letterSpacing: 0.4 },
+    detailAdWrapper: { marginBottom: 16, alignItems: 'center' },
+    sectionsContainer: { gap: 20 },
+    detailSection: { gap: 10 },
+    descriptionText: { fontSize: 13, lineHeight: 20 },
+    infoGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 8,
-        marginTop: 4,
+        gap: 10,
     },
-    detailTagChip: {
-        borderRadius: 16,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
+    infoCard: {
+        width: (width - 32 - 10) / 2,
         flexDirection: 'row',
         alignItems: 'center',
+        gap: 10,
+        padding: 12,
+        borderRadius: 16,
     },
-    detailTagText: {
-        fontSize: 12,
-        fontWeight: '600',
+    infoIconTile: {
+        width: 34,
+        height: 34,
+        borderRadius: 11,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    viewerContainer: {
-        flex: 1,
-        backgroundColor: '#000',
+    infoLabel: {
+        fontSize: 9.5,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        letterSpacing: 0.4,
+        marginBottom: 2,
     },
-    viewerClose: {
-        position: 'absolute',
-        top: 50,
-        right: 20,
-        zIndex: 20,
-        padding: 8,
-    },
-    viewerPagination: {
-        position: 'absolute',
-        bottom: 50,
-        alignSelf: 'center',
-    },
-    viewerPaginationText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    otherItemsScroll: {
-        marginTop: 8,
-        marginHorizontal: -16,
-        paddingHorizontal: 16,
-    },
-    smallCard: {
-        width: 140,
-        borderRadius: 12,
-        overflow: 'hidden',
-    },
-    smallCardImage: {
-        width: '100%',
-        height: 100,
-        backgroundColor: '#eee',
-    },
-    smallCardInfo: {
-        padding: 8,
-    },
-    smallCardTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        marginBottom: 4,
-        textTransform: 'capitalize',
-    },
-    smallCardPrice: {
-        fontSize: 14,
-        fontWeight: 'bold',
-    },
+    infoValue: { fontSize: 13, fontWeight: '700', textTransform: 'capitalize' },
+    viewerAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#eee' },
+    chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    metaChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
+    metaChipText: { fontSize: 11.5, fontWeight: '700' },
+    simCard: { width: 150, borderRadius: 16, overflow: 'hidden' },
+    simImage: { width: 150, height: 110, backgroundColor: '#eee' },
+    simInfo: { padding: 10, gap: 3 },
+    simTitle: { fontSize: 13, fontWeight: '700', textTransform: 'capitalize' },
+    simPrice: { fontSize: 13.5, fontWeight: '800' },
 });

@@ -1,6 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Linking, TouchableOpacity, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
@@ -8,6 +8,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
+import { toWhatsAppNumber } from '@/utils/phone';
 import { PressableScale } from './PressableScale';
 import { SectionHeading } from './SectionHeading';
 
@@ -26,6 +27,8 @@ interface ContactSectionProps {
     size?: 'regular' | 'large';
     /** Color family for the leading icon tile. */
     iconTint?: 'primary' | 'secondary';
+    /** Fired before a call/whatsapp action opens (e.g. to track an inquiry). */
+    onContactAction?: (method: 'call' | 'whatsapp', contact: ContactItem) => void;
 }
 
 type ContactIcon =
@@ -61,11 +64,13 @@ const ContactCard = React.memo(({
     index,
     size,
     iconTint,
+    onContactAction,
 }: {
     contact: ContactItem;
     index: number;
     size: 'regular' | 'large';
     iconTint: 'primary' | 'secondary';
+    onContactAction?: (method: 'call' | 'whatsapp', contact: ContactItem) => void;
 }) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
@@ -74,6 +79,7 @@ const ContactCard = React.memo(({
 
     const handleCall = () => {
         if (contact.number) {
+            onContactAction?.('call', contact);
             Linking.openURL(`tel:${contact.number}`);
         } else {
             Toast.show({
@@ -82,6 +88,19 @@ const ContactCard = React.memo(({
                 text2: 'Phone number not available.',
             });
         }
+    };
+
+    const waNumber = toWhatsAppNumber(contact.number);
+    const handleWhatsApp = () => {
+        if (!waNumber) return;
+        onContactAction?.('whatsapp', contact);
+        Linking.openURL(`https://wa.me/${waNumber}`).catch(() => {
+            Toast.show({
+                type: 'error',
+                text1: 'WhatsApp unavailable',
+                text2: 'Could not open WhatsApp for this number.',
+            });
+        });
     };
 
     const icon = iconForContact(contact.name);
@@ -131,14 +150,30 @@ const ContactCard = React.memo(({
                         </ThemedText>
                     ) : null}
                 </View>
-                <View
-                    style={[
-                        styles.callButton,
-                        large && styles.callButtonLarge,
-                        { backgroundColor: colors.lime },
-                    ]}
-                >
-                    <Ionicons name="call" size={large ? 17 : 16} color="#FFFFFF" />
+                <View style={styles.actions}>
+                    {waNumber ? (
+                        <TouchableOpacity
+                            onPress={handleWhatsApp}
+                            activeOpacity={0.85}
+                            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                            style={[
+                                styles.actionBtn,
+                                large && styles.actionBtnLarge,
+                                { backgroundColor: colors.lime },
+                            ]}
+                        >
+                            <Ionicons name="logo-whatsapp" size={large ? 18 : 17} color="#FFFFFF" />
+                        </TouchableOpacity>
+                    ) : null}
+                    <View
+                        style={[
+                            styles.actionBtn,
+                            large && styles.actionBtnLarge,
+                            { backgroundColor: colors.primary },
+                        ]}
+                    >
+                        <Ionicons name="call" size={large ? 17 : 16} color="#FFFFFF" />
+                    </View>
                 </View>
             </PressableScale>
         </Animated.View>
@@ -158,6 +193,7 @@ export const ContactSection = React.memo(({
     hint,
     size = 'regular',
     iconTint = 'primary',
+    onContactAction,
 }: ContactSectionProps) => {
     if (!contacts || contacts.length === 0) return null;
 
@@ -172,6 +208,7 @@ export const ContactSection = React.memo(({
                         index={idx}
                         size={size}
                         iconTint={iconTint}
+                        onContactAction={onContactAction}
                     />
                 ))}
             </View>
@@ -236,14 +273,19 @@ const styles = StyleSheet.create({
         fontSize: 11,
         marginTop: 1,
     },
-    callButton: {
+    actions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    actionBtn: {
         width: 38,
         height: 38,
         borderRadius: 19,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    callButtonLarge: {
+    actionBtnLarge: {
         width: 42,
         height: 42,
         borderRadius: 21,
