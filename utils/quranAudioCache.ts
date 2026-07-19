@@ -93,6 +93,57 @@ export const startSurahDownload = async (
     }
 };
 
+// Read the set of Surah numbers that have a completed download recorded in
+// the manifest — used to auto-detect already-downloaded Surahs on the list.
+export const getDownloadedSurahSet = async (): Promise<Set<number>> => {
+    try {
+        const manifestStr = await AsyncStorage.getItem(MANIFEST_KEY);
+        if (!manifestStr) return new Set();
+        const manifest: CacheManifest = JSON.parse(manifestStr);
+        return new Set(Object.keys(manifest).map((k) => parseInt(k, 10)));
+    } catch {
+        return new Set();
+    }
+};
+
+export const isSurahDownloaded = async (surahNumber: number): Promise<boolean> => {
+    const set = await getDownloadedSurahSet();
+    return set.has(surahNumber);
+};
+
+// Awaitable Surah download with progress reporting. Skips ayahs that are
+// already cached, then records the manifest entry on completion so the
+// Surah is detected as downloaded for offline playback.
+export const downloadSurahAudio = async (
+    surahNumber: number,
+    ayahs: any[],
+    onProgress?: (completed: number, total: number) => void
+): Promise<void> => {
+    await ensureCacheDir();
+    const total = ayahs.length;
+
+    for (let i = 0; i < total; i++) {
+        const audioUrl = ayahs[i]?.audio;
+        if (audioUrl) {
+            const fileUri = getLocalAyahUri(surahNumber, i);
+            try {
+                const fileInfo = await FileSystem.getInfoAsync(fileUri);
+                if (!fileInfo.exists) {
+                    await FileSystem.downloadAsync(audioUrl, fileUri);
+                }
+            } catch (e) {
+                console.error(`Error downloading Surah ${surahNumber} Ayah ${i}:`, e);
+            }
+        }
+        onProgress?.(i + 1, total);
+    }
+
+    const manifestStr = await AsyncStorage.getItem(MANIFEST_KEY);
+    const manifest: CacheManifest = manifestStr ? JSON.parse(manifestStr) : {};
+    manifest[surahNumber.toString()] = Date.now();
+    await AsyncStorage.setItem(MANIFEST_KEY, JSON.stringify(manifest));
+};
+
 // Cleanup files older than 1 month
 export const cleanupExpiredCache = async (): Promise<void> => {
     try {

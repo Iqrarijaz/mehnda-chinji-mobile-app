@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 
 interface AyahItemProps {
@@ -11,7 +11,7 @@ interface AyahItemProps {
     isBuffering: boolean;
     primaryColor: string;
     textSecondaryColor: string;
-    borderColor: string;
+    borderColor?: string;
     cardColor: string;
 }
 
@@ -24,37 +24,35 @@ export const AyahItem = React.memo(({
     isBuffering,
     primaryColor,
     textSecondaryColor,
-    borderColor,
-    cardColor,
 }: AyahItemProps) => (
     <View style={[
         styles.rowContainer,
-        {
-            borderBottomColor: borderColor,
-        }
+        isPlaying && { backgroundColor: `${primaryColor}0D` },
     ]}>
-        {/* Controls Column (Badge Only) */}
+        {/* Verse number badge */}
         <View style={styles.leftControls}>
             <View style={[
                 styles.badge,
-                {
-                    backgroundColor: isPlaying ? primaryColor : (primaryColor + '12'),
-                }
+                { backgroundColor: isPlaying ? primaryColor : `${primaryColor}12` },
             ]}>
-                <ThemedText style={[
-                    styles.badgeText,
-                    { color: isPlaying ? '#FFFFFF' : primaryColor }
-                ]}>
-                    {index + 1}
-                </ThemedText>
+                {isBuffering ? (
+                    <ActivityIndicator size="small" color={isPlaying ? '#FFFFFF' : primaryColor} />
+                ) : (
+                    <ThemedText style={[
+                        styles.badgeText,
+                        { color: isPlaying ? '#FFFFFF' : primaryColor },
+                    ]}>
+                        {index + 1}
+                    </ThemedText>
+                )}
             </View>
         </View>
 
-        {/* Text Content Column */}
+        {/* Text content */}
         <View style={styles.textContent}>
             <ThemedText style={[
                 styles.arabicText,
-                { color: isPlaying ? primaryColor : undefined }
+                { color: isPlaying ? primaryColor : undefined },
             ]}>
                 {arabicText.replace(/\s+/g, '   ')}
             </ThemedText>
@@ -73,34 +71,37 @@ AyahItem.displayName = 'AyahItem';
 const styles = StyleSheet.create({
     rowContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 8,
-        borderBottomWidth: StyleSheet.hairlineWidth,
+        alignItems: 'flex-start',
+        paddingVertical: 14,
+        paddingHorizontal: 12,
+        borderRadius: 16,
+        marginBottom: 6,
     },
     leftControls: {
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
-        width: 32,
+        width: 30,
+        paddingTop: 6,
     },
     badge: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
+        width: 28,
+        height: 28,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
     },
     badgeText: {
-        fontSize: 9,
-        fontWeight: 'bold'
+        fontSize: 11,
+        fontWeight: '800',
     },
     textContent: {
         flex: 1,
         justifyContent: 'center',
     },
     arabicText: {
-        fontSize: 22,
-        lineHeight: 38,
+        fontSize: 24,
+        lineHeight: 46,
         paddingVertical: 4,
         textAlign: 'right',
         writingDirection: 'rtl',
@@ -108,10 +109,10 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     translationText: {
-        fontSize: 12,
-        lineHeight: 18,
+        fontSize: 13,
+        lineHeight: 20,
         textAlign: 'left',
-        marginTop: 6,
+        marginTop: 8,
         width: '100%',
     },
 });

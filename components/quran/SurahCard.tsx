@@ -1,130 +1,226 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
-import { Layout } from '@/constants/layout';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import type { SurahListItem } from '@/apis/quran';
 
 interface SurahCardProps {
     item: SurahListItem;
+    index: number;
     isFav: boolean;
-    primaryColor: string;
-    textSecondaryColor: string;
-    cardColor: string;
-    textColor: string;
+    isDownloaded: boolean;
+    isDownloading: boolean;
+    downloadProgress: number; // 0..1
     onPress: () => void;
     onFavToggle: () => void;
+    onPlay: () => void;
+    onDownload: () => void;
 }
+
+const capitalize = (str: string) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
 
 export const SurahCard = React.memo(({
     item,
+    index,
     isFav,
-    primaryColor,
-    textSecondaryColor,
-    cardColor,
-    textColor,
+    isDownloaded,
+    isDownloading,
+    downloadProgress,
     onPress,
     onFavToggle,
-}: SurahCardProps) => (
-    <TouchableOpacity
-        activeOpacity={0.7}
-        style={[styles.card, { backgroundColor: cardColor }]}
-        onPress={onPress}
-    >
-        {/* Left: badge + metadata */}
-        <View style={styles.cardLeft}>
-            <View style={[styles.numberBadge, { backgroundColor: primaryColor + '12' }]}>
-                <ThemedText style={[styles.numberText, { color: primaryColor }]}>
-                    {item.number}
-                </ThemedText>
-            </View>
-            <View style={styles.infoContainer}>
-                <View style={styles.metadataRow}>
-                    <ThemedText style={[styles.metadataText, { color: textSecondaryColor }]}>
-                        {item.revelationType}
-                    </ThemedText>
-                    <View style={[styles.dot, { backgroundColor: textSecondaryColor }]} />
-                    <ThemedText style={[styles.metadataText, { color: textSecondaryColor }]}>
-                        {item.numberOfAyahs} Verses
+    onPlay,
+    onDownload,
+}: SurahCardProps) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
+    return (
+        <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(320)}>
+            <PressableScale
+                intensity={0.02}
+                onPress={onPress}
+                style={[styles.card, { backgroundColor: colors.card }]}
+            >
+                {/* Top row: number, names, arabic */}
+                <View style={styles.topRow}>
+                    <View style={[styles.numberTile, { backgroundColor: `${colors.primary}12` }]}>
+                        <ThemedText style={[styles.numberText, { color: colors.primary }]}>
+                            {item.number}
+                        </ThemedText>
+                    </View>
+
+                    <View style={styles.info}>
+                        <ThemedText style={[styles.englishName, { color: colors.text }]} numberOfLines={1}>
+                            {item.englishName}
+                        </ThemedText>
+                        <View style={styles.metaRow}>
+                            <ThemedText style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={1}>
+                                {capitalize(item.revelationType)}
+                            </ThemedText>
+                            <View style={[styles.dot, { backgroundColor: colors.textSecondary }]} />
+                            <ThemedText style={[styles.metaText, { color: colors.textSecondary }]}>
+                                {item.numberOfAyahs} verses
+                            </ThemedText>
+                        </View>
+                    </View>
+
+                    <ThemedText style={[styles.arabicName, { color: colors.primary }]} numberOfLines={1}>
+                        {item.name}
                     </ThemedText>
                 </View>
-            </View>
-        </View>
 
-        {/* Centre-right: Arabic name */}
-        <View style={styles.cardRight}>
-            <ThemedText style={[styles.arabicName, { color: primaryColor }]}>
-                {item.name}
-            </ThemedText>
-        </View>
+                {/* Action row: Play, Download, Favourite */}
+                <View style={styles.actionRow}>
+                    <TouchableOpacity
+                        onPress={onPlay}
+                        activeOpacity={0.85}
+                        style={[styles.playBtn, { backgroundColor: colors.primary }]}
+                        hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
+                    >
+                        <Ionicons name="play" size={13} color="#FFFFFF" />
+                        <ThemedText style={styles.playBtnText}>Play</ThemedText>
+                    </TouchableOpacity>
 
-        {/* Far right: heart */}
-        <TouchableOpacity
-            onPress={onFavToggle}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            style={styles.favButton}
-        >
-            <Ionicons
-                name={isFav ? 'heart' : 'heart-outline'}
-                size={20}
-                color={isFav ? '#EF4444' : textSecondaryColor}
-            />
-        </TouchableOpacity>
-    </TouchableOpacity>
-));
+                    <TouchableOpacity
+                        onPress={isDownloaded || isDownloading ? undefined : onDownload}
+                        disabled={isDownloaded || isDownloading}
+                        activeOpacity={0.85}
+                        style={[
+                            styles.downloadBtn,
+                            {
+                                backgroundColor: isDownloaded ? `${colors.lime}1E` : `${colors.primary}0D`,
+                            },
+                        ]}
+                        hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
+                    >
+                        {isDownloading ? (
+                            <>
+                                <ActivityIndicator size="small" color={colors.primary} />
+                                <ThemedText style={[styles.downloadText, { color: colors.primary }]}>
+                                    {Math.round(downloadProgress * 100)}%
+                                </ThemedText>
+                            </>
+                        ) : isDownloaded ? (
+                            <>
+                                <Ionicons name="checkmark-circle" size={14} color={colors.lime} />
+                                <ThemedText style={[styles.downloadText, { color: colors.primary }]}>
+                                    Saved
+                                </ThemedText>
+                            </>
+                        ) : (
+                            <>
+                                <Ionicons name="download-outline" size={14} color={colors.primary} />
+                                <ThemedText style={[styles.downloadText, { color: colors.primary }]}>
+                                    Download
+                                </ThemedText>
+                            </>
+                        )}
+                    </TouchableOpacity>
+
+                    <View style={{ flex: 1 }} />
+
+                    <TouchableOpacity
+                        onPress={onFavToggle}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        style={styles.favButton}
+                    >
+                        <Ionicons
+                            name={isFav ? 'heart' : 'heart-outline'}
+                            size={20}
+                            color={isFav ? '#EF4444' : colors.textSecondary}
+                        />
+                    </TouchableOpacity>
+                </View>
+            </PressableScale>
+        </Animated.View>
+    );
+});
 
 SurahCard.displayName = 'SurahCard';
 
 const styles = StyleSheet.create({
     card: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: Layout.borderRadius,
-        paddingVertical: 16,
-        paddingHorizontal: 10,
-        marginBottom: 16,
+        borderRadius: 18,
+        padding: 14,
+        marginBottom: 12,
+        gap: 12,
     },
-    cardLeft: {
+    topRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        flex: 1,
+        gap: 12,
     },
-    numberBadge: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
+    numberTile: {
+        width: 40,
+        height: 40,
+        borderRadius: 13,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 10,
     },
-    numberText: { fontSize: 11, fontWeight: 'bold' },
-    infoContainer: { flex: 1 },
-    metadataRow: {
+    numberText: { fontSize: 13, fontWeight: '800' },
+    info: { flex: 1 },
+    englishName: {
+        fontSize: 15,
+        fontWeight: '800',
+        letterSpacing: 0.1,
+    },
+    metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 3,
     },
-    metadataText: { fontSize: 9 },
+    metaText: { fontSize: 11, fontWeight: '500' },
     dot: {
         width: 3,
         height: 3,
         borderRadius: 1.5,
-        marginHorizontal: 4,
+        marginHorizontal: 6,
         opacity: 0.5,
     },
-    cardRight: {
-        alignItems: 'flex-end',
-        marginHorizontal: 8,
-    },
     arabicName: {
-        fontSize: 16,
+        fontSize: 18,
         fontFamily: 'NotoNastaliqUrdu-Regular',
         fontWeight: 'bold',
         textAlign: 'right',
+        maxWidth: 120,
+    },
+    actionRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    playBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        paddingHorizontal: 14,
+        height: 32,
+        borderRadius: 999,
+    },
+    playBtnText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '800',
+        letterSpacing: 0.2,
+    },
+    downloadBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        paddingHorizontal: 12,
+        height: 32,
+        borderRadius: 999,
+    },
+    downloadText: {
+        fontSize: 12,
+        fontWeight: '700',
     },
     favButton: {
         padding: 4,
-        marginLeft: 4,
     },
 });

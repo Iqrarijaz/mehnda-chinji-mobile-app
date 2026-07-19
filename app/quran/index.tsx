@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, RefreshControl, ActivityIndicator, ImageBackground } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,12 +7,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { listSurahs, SurahListItem } from '@/apis/quran';
+import Toast from 'react-native-toast-message';
+
+import { listSurahs, getSurah, SurahListItem } from '@/apis/quran';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
+import { getDownloadedSurahSet, downloadSurahAudio } from '@/utils/quranAudioCache';
 
 // Import memoized components
 import { SurahCard } from '@/components/quran/SurahCard';
@@ -30,6 +32,52 @@ export default function QuranListScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<TabType>('all');
     const [favourites, setFavourites] = useState<Set<number>>(new Set());
+
+    // Offline audio download state
+    const [downloadedSet, setDownloadedSet] = useState<Set<number>>(new Set());
+    const [downloadingSet, setDownloadingSet] = useState<Set<number>>(new Set());
+    const [progressMap, setProgressMap] = useState<Record<number, number>>({});
+
+    // Detect already-downloaded Surahs from the cache manifest on mount.
+    useEffect(() => {
+        getDownloadedSurahSet().then(setDownloadedSet).catch(() => { });
+    }, []);
+
+    const handlePlay = useCallback((item: SurahListItem) => {
+        router.push(`/quran/${item.number}?autoplay=1` as any);
+    }, [router]);
+
+    const handleDownload = useCallback(async (item: SurahListItem) => {
+        const n = item.number;
+        setDownloadingSet((prev) => {
+            if (prev.has(n)) return prev;
+            const next = new Set(prev);
+            next.add(n);
+            return next;
+        });
+        setProgressMap((prev) => ({ ...prev, [n]: 0 }));
+        try {
+            const res = await getSurah(n, { edition: 'ar.alafasy' });
+            const d: any = res?.data;
+            const audioSurah = Array.isArray(d) ? d[0] : d;
+            const audioAyahs = audioSurah?.ayahs || [];
+            if (!audioAyahs.length) throw new Error('No audio available');
+            await downloadSurahAudio(n, audioAyahs, (completed, total) => {
+                setProgressMap((prev) => ({ ...prev, [n]: total ? completed / total : 0 }));
+            });
+            setDownloadedSet((prev) => new Set(prev).add(n));
+            Toast.show({ type: 'success', text1: 'Downloaded', text2: `${item.englishName} saved for offline listening.` });
+        } catch (e) {
+            console.error('Surah download failed', e);
+            Toast.show({ type: 'error', text1: 'Download failed', text2: 'Please check your connection and try again.' });
+        } finally {
+            setDownloadingSet((prev) => {
+                const next = new Set(prev);
+                next.delete(n);
+                return next;
+            });
+        }
+    }, []);
 
     const saveFavourites = useCallback(async (next: Set<number>) => {
         try {
@@ -87,21 +135,22 @@ export default function QuranListScreen() {
         return list;
     }, [searchQuery, surahs, activeTab, favourites]);
 
-    const renderSurahCard = useCallback(({ item }: { item: SurahListItem }) => {
-        const isFav = favourites.has(item.number);
+    const renderSurahCard = useCallback(({ item, index }: { item: SurahListItem; index: number }) => {
         return (
             <SurahCard
                 item={item}
-                isFav={isFav}
-                primaryColor={colors.primary}
-                textSecondaryColor={colors.textSecondary}
-                cardColor={colors.card}
-                textColor={colors.text}
+                index={index}
+                isFav={favourites.has(item.number)}
+                isDownloaded={downloadedSet.has(item.number)}
+                isDownloading={downloadingSet.has(item.number)}
+                downloadProgress={progressMap[item.number] ?? 0}
                 onPress={() => router.push(`/quran/${item.number}` as any)}
                 onFavToggle={() => toggleFavourite(item.number)}
+                onPlay={() => handlePlay(item)}
+                onDownload={() => handleDownload(item)}
             />
         );
-    }, [favourites, colors, router, toggleFavourite]);
+    }, [favourites, downloadedSet, downloadingSet, progressMap, router, toggleFavourite, handlePlay, handleDownload]);
 
     const handleBack = useCallback(() => {
         if (router.canGoBack()) {

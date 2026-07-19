@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Alert, ImageBackground } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,7 +9,6 @@ import { Audio } from 'expo-av';
 
 import { getSurah } from '@/apis/quran';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
@@ -20,7 +19,7 @@ import { QuranHeader } from '@/components/quran/QuranHeader';
 import { startSurahDownload, getPlayableAyahUri, cleanupExpiredCache } from '@/utils/quranAudioCache';
 
 export default function SurahDetailScreen() {
-    const { id } = useLocalSearchParams();
+    const { id, autoplay } = useLocalSearchParams<{ id: string; autoplay?: string }>();
     const surahNumber = parseInt(Array.isArray(id) ? id[0] : id || '1', 10);
     const router = useRouter();
     const insets = useSafeAreaInsets();
@@ -58,7 +57,9 @@ export default function SurahDetailScreen() {
 
     const surahInfo = arabicEdition;
     const headerTitle = surahInfo?.name || 'Loading...';
-    const headerSubtitle = '';
+    const headerSubtitle = surahInfo
+        ? `${surahInfo.englishName} · ${surahInfo.numberOfAyahs} verses`
+        : 'Loading verses…';
     const ayahs = arabicEdition?.ayahs || [];
 
     // Keep references updated for audio playback callback to avoid re-creating it
@@ -227,6 +228,15 @@ export default function SurahDetailScreen() {
         router.back();
     }, [stopAudio, router]);
 
+    // Auto-start playback when opened via the "Play" button on a Surah card.
+    const autoplayTriggered = useRef(false);
+    useEffect(() => {
+        if (autoplay === '1' && !autoplayTriggered.current && audioEdition?.ayahs?.length) {
+            autoplayTriggered.current = true;
+            handlePlaySurah();
+        }
+    }, [autoplay, audioEdition, handlePlaySurah]);
+
     const renderAyahItem = useCallback(({ item, index }: { item: any; index: number }) => {
         const arabicText = item.text;
         const englishText = englishEdition?.ayahs?.[index]?.text || '';
@@ -285,11 +295,8 @@ export default function SurahDetailScreen() {
             <QuranHeader
                 title={headerTitle}
                 subtitle={headerSubtitle}
+                arabicTitle
                 paddingTop={insets.top + 16}
-                borderColor={colors.border}
-                cardColor={colors.card}
-                textColor={colors.text}
-                textSecondaryColor={colors.textSecondary}
                 onBack={handleBack}
                 rightSlot={
                     <View style={styles.headerControlsContainer}>
@@ -298,25 +305,21 @@ export default function SurahDetailScreen() {
                             onPress={handlePlaySurah}
                             style={[
                                 styles.headerToggle,
-                                {
-                                    backgroundColor: playingIndex !== null ? colors.primary : colors.card,
-                                    borderColor: playingIndex !== null ? colors.primary : colors.border,
-                                    marginRight: 8
-                                }
+                                { backgroundColor: playingIndex !== null ? '#FFFFFF' : 'rgba(255,255,255,0.18)', marginRight: 8 }
                             ]}
-                            activeOpacity={0.7}
+                            activeOpacity={0.8}
                         >
                             <Ionicons
-                                name={playingIndex !== null ? "pause" : "play"}
+                                name={playingIndex !== null ? 'pause' : 'play'}
                                 size={12}
-                                color={playingIndex !== null ? '#FFFFFF' : colors.text}
+                                color={playingIndex !== null ? colors.primary : '#FFFFFF'}
                                 style={{ marginRight: 4 }}
                             />
                             <ThemedText style={[
                                 styles.headerToggleText,
-                                { color: playingIndex !== null ? '#FFFFFF' : colors.text }
+                                { color: playingIndex !== null ? colors.primary : '#FFFFFF' }
                             ]}>
-                                {playingIndex !== null ? "Pause" : "Play"}
+                                {playingIndex !== null ? 'Pause' : 'Play'}
                             </ThemedText>
                         </TouchableOpacity>
 
@@ -325,23 +328,19 @@ export default function SurahDetailScreen() {
                             onPress={() => setIsAutoPlay(prev => !prev)}
                             style={[
                                 styles.headerToggle,
-                                {
-                                    backgroundColor: isAutoPlay ? colors.primary : colors.card,
-                                    borderColor: isAutoPlay ? colors.primary : colors.border,
-                                    marginRight: 8
-                                }
+                                { backgroundColor: isAutoPlay ? '#FFFFFF' : 'rgba(255,255,255,0.18)', marginRight: 8 }
                             ]}
-                            activeOpacity={0.7}
+                            activeOpacity={0.8}
                         >
                             <Ionicons
-                                name={isAutoPlay ? "play-circle" : "play-circle-outline"}
+                                name={isAutoPlay ? 'play-circle' : 'play-circle-outline'}
                                 size={14}
-                                color={isAutoPlay ? '#FFFFFF' : colors.text}
+                                color={isAutoPlay ? colors.primary : '#FFFFFF'}
                                 style={{ marginRight: 4 }}
                             />
                             <ThemedText style={[
                                 styles.headerToggleText,
-                                { color: isAutoPlay ? '#FFFFFF' : colors.text }
+                                { color: isAutoPlay ? colors.primary : '#FFFFFF' }
                             ]}>
                                 Auto
                             </ThemedText>
@@ -352,16 +351,13 @@ export default function SurahDetailScreen() {
                             onPress={() => setShowTranslation(prev => !prev)}
                             style={[
                                 styles.headerToggle,
-                                {
-                                    backgroundColor: showTranslation ? colors.primary : colors.card,
-                                    borderColor: showTranslation ? colors.primary : colors.border
-                                }
+                                { backgroundColor: showTranslation ? '#FFFFFF' : 'rgba(255,255,255,0.18)' }
                             ]}
-                            activeOpacity={0.7}
+                            activeOpacity={0.8}
                         >
                             <ThemedText style={[
                                 styles.headerToggleText,
-                                { color: showTranslation ? '#FFFFFF' : colors.text }
+                                { color: showTranslation ? colors.primary : '#FFFFFF' }
                             ]}>
                                 EN
                             </ThemedText>
