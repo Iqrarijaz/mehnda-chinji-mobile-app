@@ -15,6 +15,8 @@ interface SurahCardProps {
     isDownloaded: boolean;
     isDownloading: boolean;
     downloadProgress: number; // 0..1
+    /** True when this surah is the one currently playing in the mini player. */
+    isActivePlaying: boolean;
     onPress: () => void;
     onFavToggle: () => void;
     onPlay: () => void;
@@ -31,6 +33,7 @@ export const SurahCard = React.memo(({
     isDownloaded,
     isDownloading,
     downloadProgress,
+    isActivePlaying,
     onPress,
     onFavToggle,
     onPlay,
@@ -48,8 +51,8 @@ export const SurahCard = React.memo(({
             >
                 {/* Top row: number, names, arabic */}
                 <View style={styles.topRow}>
-                    <View style={[styles.numberTile, { backgroundColor: `${colors.primary}12` }]}>
-                        <ThemedText style={[styles.numberText, { color: colors.primary }]}>
+                    <View style={[styles.numberTile, { backgroundColor: `${colors.secondary}1A` }]}>
+                        <ThemedText style={[styles.numberText, { color: colors.secondary }]}>
                             {item.number}
                         </ThemedText>
                     </View>
@@ -82,8 +85,8 @@ export const SurahCard = React.memo(({
                         style={[styles.playBtn, { backgroundColor: colors.primary }]}
                         hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                     >
-                        <Ionicons name="play" size={13} color="#FFFFFF" />
-                        <ThemedText style={styles.playBtnText}>Play</ThemedText>
+                        <Ionicons name={isActivePlaying ? 'pause' : 'play'} size={13} color="#FFFFFF" />
+                        <ThemedText style={styles.playBtnText}>{isActivePlaying ? 'Pause' : 'Play'}</ThemedText>
                     </TouchableOpacity>
 
                     <TouchableOpacity

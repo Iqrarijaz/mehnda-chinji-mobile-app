@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
 interface AyahItemProps {
     index: number;
@@ -24,11 +26,18 @@ export const AyahItem = React.memo(({
     isBuffering,
     primaryColor,
     textSecondaryColor,
-}: AyahItemProps) => (
+}: AyahItemProps) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
+    return (
     <View style={[
         styles.rowContainer,
         isPlaying && { backgroundColor: `${primaryColor}0D` },
     ]}>
+        {/* Lime accent bar while playing */}
+        {isPlaying && <View style={[styles.playingAccent, { backgroundColor: colors.lime }]} />}
+
         {/* Verse number badge */}
         <View style={styles.leftControls}>
             <View style={[
@@ -36,7 +45,7 @@ export const AyahItem = React.memo(({
                 { backgroundColor: isPlaying ? primaryColor : `${primaryColor}12` },
             ]}>
                 {isBuffering ? (
-                    <ActivityIndicator size="small" color={isPlaying ? '#FFFFFF' : primaryColor} />
+                    <ActivityIndicator size="small" color={isPlaying ? '#FFFFFF' : colors.secondary} />
                 ) : (
                     <ThemedText style={[
                         styles.badgeText,
@@ -64,7 +73,8 @@ export const AyahItem = React.memo(({
             ) : null}
         </View>
     </View>
-));
+    );
+});
 
 AyahItem.displayName = 'AyahItem';
 
@@ -76,6 +86,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderRadius: 16,
         marginBottom: 6,
+    },
+    playingAccent: {
+        position: 'absolute',
+        left: 0,
+        top: 16,
+        bottom: 16,
+        width: 3,
+        borderRadius: 2,
     },
     leftControls: {
         justifyContent: 'center',

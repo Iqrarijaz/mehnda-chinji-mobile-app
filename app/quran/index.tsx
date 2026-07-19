@@ -16,9 +16,12 @@ import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { getDownloadedSurahSet, downloadSurahAudio } from '@/utils/quranAudioCache';
 
+import { useSurahPlayer } from '@/hooks/useSurahPlayer';
+
 // Import memoized components
 import { SurahCard } from '@/components/quran/SurahCard';
 import { QuranHeader } from '@/components/quran/QuranHeader';
+import { MiniAudioPlayer } from '@/components/quran/MiniAudioPlayer';
 
 const FAV_STORAGE_KEY = 'quran_favourites';
 type TabType = 'all' | 'favourites';
@@ -43,9 +46,25 @@ export default function QuranListScreen() {
         getDownloadedSurahSet().then(setDownloadedSet).catch(() => { });
     }, []);
 
+    // Inline audio player (plays without navigating to the reader).
+    const player = useSurahPlayer();
+    const { surah: playingSurah, isPlaying, playSurah, toggle, stop: stopPlayer } = player;
+
+    // Play button on a card: start (or pause/resume) audio inline.
     const handlePlay = useCallback((item: SurahListItem) => {
-        router.push(`/quran/${item.number}?autoplay=1` as any);
-    }, [router]);
+        if (playingSurah?.number === item.number) {
+            toggle();
+        } else {
+            playSurah(item);
+        }
+    }, [playingSurah, toggle, playSurah]);
+
+    // Tapping the card opens the reader; stop the inline player first so
+    // the two audio engines never overlap.
+    const handleOpen = useCallback((item: SurahListItem) => {
+        stopPlayer();
+        router.push(`/quran/${item.number}` as any);
+    }, [stopPlayer, router]);
 
     const handleDownload = useCallback(async (item: SurahListItem) => {
         const n = item.number;
@@ -144,13 +163,14 @@ export default function QuranListScreen() {
                 isDownloaded={downloadedSet.has(item.number)}
                 isDownloading={downloadingSet.has(item.number)}
                 downloadProgress={progressMap[item.number] ?? 0}
-                onPress={() => router.push(`/quran/${item.number}` as any)}
+                isActivePlaying={playingSurah?.number === item.number && isPlaying}
+                onPress={() => handleOpen(item)}
                 onFavToggle={() => toggleFavourite(item.number)}
                 onPlay={() => handlePlay(item)}
                 onDownload={() => handleDownload(item)}
             />
         );
-    }, [favourites, downloadedSet, downloadingSet, progressMap, router, toggleFavourite, handlePlay, handleDownload]);
+    }, [favourites, downloadedSet, downloadingSet, progressMap, playingSurah, isPlaying, handleOpen, toggleFavourite, handlePlay, handleDownload]);
 
     const handleBack = useCallback(() => {
         if (router.canGoBack()) {
@@ -169,15 +189,7 @@ export default function QuranListScreen() {
                 title="The Holy Quran"
                 subtitle="Read & listen to the verses"
                 paddingTop={insets.top + 16}
-                borderColor={colors.border}
-                cardColor={colors.card}
-                textColor={colors.text}
-                textSecondaryColor={colors.textSecondary}
                 onBack={handleBack}
-                rightSlot={
-                    // Render additional tab items right inside/below or we can put the tabs row here
-                    null
-                }
             />
 
             <View style={styles.headerAddon}>
@@ -205,35 +217,37 @@ export default function QuranListScreen() {
                         return (
                             <TouchableOpacity
                                 key={tab}
+                                activeOpacity={0.85}
                                 onPress={() => setActiveTab(tab)}
                                 style={[
                                     styles.segmentedTab,
-                                    isActive && { backgroundColor: colors.primary }
+                                    isActive && { backgroundColor: colors.primary },
                                 ]}
                             >
+                                {isActive && <View style={[styles.activeDot, { backgroundColor: colors.lime }]} />}
                                 {tab === 'favourites' && (
                                     <Ionicons
-                                        name="heart"
+                                        name={isActive ? 'heart' : 'heart-outline'}
                                         size={14}
-                                        color={isActive ? '#ffffff' : colors.textSecondary}
+                                        color={isActive ? '#FFFFFF' : colors.secondary}
                                         style={{ marginRight: 6 }}
                                     />
                                 )}
                                 <ThemedText style={[
                                     styles.segmentedTabText,
-                                    { color: isActive ? '#ffffff' : colors.textSecondary },
-                                    isActive && { fontWeight: '700' }
+                                    { color: isActive ? '#FFFFFF' : colors.textSecondary },
+                                    isActive && { fontWeight: '800' },
                                 ]}>
                                     {tab === 'all' ? 'All Surahs' : 'Favourites'}
                                 </ThemedText>
                                 {tab === 'favourites' && favourites.size > 0 && (
                                     <View style={[
                                         styles.favBadge,
-                                        { backgroundColor: isActive ? '#ffffff' : '#EF4444' }
+                                        { backgroundColor: isActive ? '#FFFFFF' : colors.lime },
                                     ]}>
                                         <ThemedText style={[
                                             styles.favBadgeText,
-                                            { color: isActive ? colors.primary : '#ffffff' }
+                                            { color: isActive ? colors.primary : '#1E293B' },
                                         ]}>
                                             {favourites.size}
                                         </ThemedText>
@@ -292,6 +306,25 @@ export default function QuranListScreen() {
                     />
                 </View>
             )}
+
+            {/* Inline audio media player */}
+            {playingSurah ? (
+                <MiniAudioPlayer
+                    surah={playingSurah}
+                    isPlaying={isPlaying}
+                    isLoading={player.isLoading}
+                    ayahIndex={player.ayahIndex}
+                    total={player.total}
+                    position={player.position}
+                    duration={player.duration}
+                    onToggle={toggle}
+                    onNext={player.next}
+                    onPrev={player.prev}
+                    onSeek={player.seek}
+                    onClose={stopPlayer}
+                    bottomInset={insets.bottom}
+                />
+            ) : null}
         </View>
     );
 }
@@ -326,8 +359,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        gap: 6,
         paddingVertical: 10,
         borderRadius: 10,
+    },
+    activeDot: {
+        width: 5,
+        height: 5,
+        borderRadius: 2.5,
     },
     segmentedTabText: {
         fontSize: 13,
