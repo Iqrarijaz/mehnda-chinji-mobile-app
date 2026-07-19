@@ -207,7 +207,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
         }
 
         return (
-            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 2 }}>
+            <View style={{ flexDirection: 'row', gap: 14, marginBottom: 6 }}>
                 {item.items.map((subItem: any) => {
                     return (
                         <View key={subItem._id} style={{ flex: 1 }}>

@@ -163,11 +163,6 @@ const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardPro
                                 </ThemedText>
                             </View>
                         </View>
-
-                        {/* CTA indicator */}
-                        <View style={[styles.chevron, { backgroundColor: `${primaryColor}10` }]}>
-                            <Ionicons name="arrow-forward" size={15} color={primaryColor} />
-                        </View>
                     </View>
 
                     {/* Type badge — top-right absolute */}
@@ -188,13 +183,13 @@ export default PlaceCard;
 
 const styles = StyleSheet.create({
     card: {
-        marginBottom: 12,
+        marginBottom: 16,
         overflow: 'hidden',
     },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 10,
+        padding: 12,
         gap: 12,
     },
     tile: {
@@ -270,13 +265,5 @@ const styles = StyleSheet.create({
         fontSize: 11.5,
         fontWeight: '500',
         flexShrink: 1,
-    },
-    chevron: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 4,
     },
 });

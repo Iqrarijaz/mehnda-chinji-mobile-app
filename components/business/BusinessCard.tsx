@@ -98,11 +98,6 @@ const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => 
                                 </View>
                             ) : null}
                         </View>
-
-                        {/* CTA indicator */}
-                        <View style={[styles.chevron, { backgroundColor: `${colors.primary}10` }]}>
-                            <Ionicons name="arrow-forward" size={15} color={colors.primary} />
-                        </View>
                     </View>
 
                     {/* Category badge — top-right absolute, like PlaceCard */}
@@ -125,12 +120,12 @@ export default BusinessCard;
 
 const styles = StyleSheet.create({
     card: {
-        marginBottom: 12,
+        marginBottom: 16,
     },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 10,
+        padding: 12,
         gap: 12,
     },
     tile: {
@@ -196,13 +191,5 @@ const styles = StyleSheet.create({
         fontSize: 11.5,
         fontWeight: '500',
         flexShrink: 1,
-    },
-    chevron: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 4,
     },
 });
