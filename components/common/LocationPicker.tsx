@@ -280,6 +280,9 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
                             mapStyle={OSM_STYLE_JSON}
                             logoEnabled={false}
                             attributionEnabled={true}
+                            compassEnabled={true}
+                            compassViewPosition={3} // 3 = bottom-right
+                            compassViewMargins={{ x: 24, y: Math.max(insets.bottom, 20) + 72 }}
                             onPress={handleMapPress}
                             onRegionDidChange={handleRegionChange}
                         >
