@@ -53,7 +53,7 @@ interface PlaceCardProps {
     index?: number;
 }
 
-const TILE_SIZE = 84;
+const TILE_SIZE = 72;
 
 const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardProps) => {
     const { theme } = useTheme();
@@ -180,14 +180,14 @@ export default PlaceCard;
 
 const styles = StyleSheet.create({
     card: {
-        marginBottom: 16,
+        marginBottom: 10,
         overflow: 'hidden',
     },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 12,
-        gap: 12,
+        padding: 10,
+        gap: 10,
     },
     tile: {
         width: TILE_SIZE,

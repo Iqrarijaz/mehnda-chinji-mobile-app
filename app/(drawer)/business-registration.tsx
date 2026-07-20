@@ -324,22 +324,54 @@ const BusinessRegistrationScreen = () => {
                         </Animated.View>
 
                         {/* Address */}
-                        <FormInput
-                            delay={300}
-                            label="ADDRESS"
-                            required
-                            icon="map-outline"
-                            placeholder="Shop #, Street, Area"
-                            value={form.address}
-                            onChangeText={(text) => {
-                                setForm(prev => ({ ...prev, address: text }));
-                                setErrors(prev => ({ ...prev, address: '' }));
-                            }}
-                            error={errors.address}
-                        />
-
-                        {/* Location (optional) */}
-                        <LocationPicker delay={320} value={location} onChange={setLocation} />
+                        <Animated.View entering={FadeInDown.delay(300)} style={styles.inputField}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                    <ThemedText style={[styles.label, { color: colors.text }]}>ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
+                                    <LocationPicker
+                                        label='Open Map'
+                                        value={location}
+                                        variant="button"
+                                        onChange={(loc) => {
+                                            setLocation(loc);
+                                            if (loc?.address) {
+                                                setForm(prev => ({ ...prev, address: loc.address }));
+                                                setErrors(prev => ({ ...prev, address: '' }));
+                                            }
+                                        }}
+                                    />
+                                </View>
+                                <ThemedText style={[{ fontSize: 10, fontWeight: '700', color: colors.icon }, form.address.length >= 150 && { color: '#EF4444' }]}>
+                                    {form.address.length}/150
+                                </ThemedText>
+                            </View>
+                            <View style={[styles.inputBox, {
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
+                                minHeight: 80,
+                                alignItems: 'flex-start',
+                                paddingVertical: 12,
+                                borderColor: errors.address ? '#EF4444' : 'transparent',
+                                borderWidth: errors.address ? 1 : 0,
+                            }]}>
+                                <TextInput
+                                    style={[styles.textInput, { color: colors.text, textAlignVertical: 'top', minHeight: 60, fontSize: 14 }]}
+                                    placeholder="Shop #, Street, Area"
+                                    placeholderTextColor={colors.icon}
+                                    value={form.address}
+                                    onChangeText={(text) => {
+                                        setForm(prev => ({ ...prev, address: text }));
+                                        setErrors(prev => ({ ...prev, address: '' }));
+                                    }}
+                                    maxLength={150}
+                                    multiline
+                                />
+                            </View>
+                            {errors.address ? (
+                                <ThemedText style={{ color: '#EF4444', fontSize: 11, marginLeft: 4, marginTop: 2 }}>
+                                    {errors.address}
+                                </ThemedText>
+                            ) : null}
+                        </Animated.View>
 
                         {/* Phone */}
                         <FormInput

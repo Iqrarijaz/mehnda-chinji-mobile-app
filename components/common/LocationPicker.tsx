@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import MapLibreGL, { MapView, Camera, MarkerView } from '@maplibre/maplibre-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -62,6 +63,7 @@ interface LocationPickerProps {
 export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0, variant = 'default' }: LocationPickerProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
+    const insets = useSafeAreaInsets();
 
     const [modalVisible, setModalVisible] = useState(false);
     const [query, setQuery] = useState('');
@@ -230,11 +232,10 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
             <Modal visible={modalVisible} animationType="slide" transparent={true} onRequestClose={closeModal}>
                 <View style={[styles.modalOverlayFS, { backgroundColor: colors.background }]}>
                     {/* Header */}
-                    <View style={[styles.modalHeaderFS, { backgroundColor: colors.background }]}>
-                        <TouchableOpacity onPress={closeModal} hitSlop={8} style={{ padding: 4 }}>
-                            <Ionicons name="arrow-back" size={24} color={colors.text} />
+                    <View style={[styles.modalHeaderFS, { backgroundColor: 'transparent', paddingTop: Math.max(insets.top, 20) }]}>
+                        <TouchableOpacity onPress={closeModal} hitSlop={8} style={{ padding: 8, backgroundColor: '#FFF', borderRadius: 24, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 }}>
+                            <Ionicons name="arrow-back" size={24} color="#000" />
                         </TouchableOpacity>
-                        <ThemedText style={[styles.modalTitle, { color: colors.text, flex: 1, marginLeft: 16 }]}>Select Location</ThemedText>
                         <SubmitButton
                             title="Done"
                             onPress={handleConfirm}
@@ -272,8 +273,8 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
                         </MapView>
 
                         {/* Floating Search overlay */}
-                        <View style={styles.floatingSearchContainer}>
-                            <View style={[styles.searchBoxFS, { backgroundColor: inputBg, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 }]}>
+                        <View style={[styles.floatingSearchContainer, { top: Math.max(insets.top, 20) + 60 }]}>
+                            <View style={[styles.searchBoxFS, { backgroundColor: colors.background, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 }]}>
                                 <Ionicons name="search" size={18} color={colors.icon} style={{ marginRight: 8 }} />
                                 <TextInput
                                     style={[styles.searchInput, { color: colors.text }]}
@@ -310,7 +311,7 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
 
                         {/* Floating Current Location Button */}
                         <TouchableOpacity
-                            style={styles.floatingCurrentLocBtn}
+                            style={[styles.floatingCurrentLocBtn, { bottom: Math.max(insets.bottom, 20) + 10 }]}
                             onPress={useCurrentLocation}
                             activeOpacity={0.8}
                         >
@@ -361,13 +362,16 @@ const styles = StyleSheet.create({
     },
     modalHeaderFS: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingTop: Platform.OS === 'ios' ? 50 : 20,
+        paddingTop: Platform.OS === 'ios' ? 16 : 16,
         paddingBottom: 12,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(0,0,0,0.1)',
-        zIndex: 10,
+        zIndex: 30,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
     },
     modalTitle: {
         fontSize: 18,
@@ -375,7 +379,7 @@ const styles = StyleSheet.create({
     },
     floatingSearchContainer: {
         position: 'absolute',
-        top: 16,
+        top: 70,
         left: 16,
         right: 16,
         zIndex: 20,

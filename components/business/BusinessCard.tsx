@@ -20,7 +20,7 @@ interface BusinessCardProps {
     index?: number;
 }
 
-const TILE_SIZE = 84;
+const TILE_SIZE = 72;
 
 const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => {
     const { theme } = useTheme();
@@ -112,13 +112,13 @@ export default BusinessCard;
 
 const styles = StyleSheet.create({
     card: {
-        marginBottom: 16,
+        marginBottom: 10,
     },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 12,
-        gap: 12,
+        padding: 10,
+        gap: 10,
     },
     tile: {
         width: TILE_SIZE,

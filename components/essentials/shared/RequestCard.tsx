@@ -106,7 +106,7 @@ const RequestCard = React.memo(({
                 {address ? (
                     <View style={styles.infoRow}>
                         <Ionicons name="location" size={13} color={categoryColor} style={{ opacity: 0.6, paddingTop: isAndroid ? 2 : 3 }} />
-                        <ThemedText style={[styles.infoText, { color: colors.text, opacity: 0.8 }]} numberOfLines={1}>
+                        <ThemedText style={[styles.infoText, { color: colors.text, opacity: 0.8 }]}>
                             {address}
                         </ThemedText>
                     </View>
@@ -151,12 +151,12 @@ export default RequestCard;
 
 const styles = StyleSheet.create({
     card: {
-        paddingHorizontal: isAndroid ? 14 : 16,
-        paddingVertical: isAndroid ? 10 : 12,
-        marginBottom: isAndroid ? 10 : 12,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        marginBottom: 10,
     },
     cardHeader: {
-        marginBottom: 8,
+        marginBottom: 6,
     },
     nameStatusRow: {
         flexDirection: 'row',

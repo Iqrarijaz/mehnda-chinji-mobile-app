@@ -305,7 +305,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             }}
                             activeOpacity={0.7}
                         >
-                            <Ionicons name="person-outline" size={20} color="#FFFFFF" />
+                            <Ionicons name="list-outline" size={20} color="#FFFFFF" />
                         </TouchableOpacity>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
