@@ -62,6 +62,8 @@ export interface ScreenHeaderProps {
     decor?: ScreenHeaderDecor;
     /** Optional hero band (pulsing tile, title, subtitle) below the children. */
     hero?: ScreenHeaderHero;
+    /** Trims the vertical spacing for a shorter header. */
+    compact?: boolean;
 }
 
 const DECOR_ICON: Record<ScreenHeaderDecor, keyof typeof Ionicons.glyphMap> = {
@@ -174,6 +176,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
     hideAccountActions = false,
     decor,
     hero,
+    compact = false,
 }: ScreenHeaderProps) {
     const { theme } = useTheme();
     const { user } = useAuth();
@@ -216,13 +219,14 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                     backgroundColor: colors.primary,
                     paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20),
                 },
+                compact && { paddingBottom: Platform.OS === 'android' ? 4 : 8 },
                 containerStyle,
             ]}
         >
             {decor && <DecorLayer decor={decor} lime={colors.lime} secondary={colors.secondary} />}
 
             {/* ── Icon row ────────────────────────────────────────────────── */}
-            <View style={styles.row}>
+            <View style={[styles.row, compact && { marginBottom: Platform.OS === 'android' ? 10 : 12 }]}>
                 {/* Left side: menu/back + optional extras */}
                 <View style={styles.leftSide}>
                     {showMenuIcon ? (
@@ -279,8 +283,8 @@ export const ScreenHeader = React.memo(function ScreenHeader({
 
             {/* ── Optional hero band ──────────────────────────────────────── */}
             {hero && (
-                <Animated.View entering={FadeInDown.delay(120).duration(450)} style={styles.heroBand}>
-                    <View style={styles.heroIconWrap}>
+                <Animated.View entering={FadeInDown.delay(120).duration(450)} style={[styles.heroBand, compact && { paddingTop: 2 }]}>
+                    <View style={[styles.heroIconWrap, compact && { width: 40, height: 40, marginBottom: 2 }]}>
                         <Animated.View style={[styles.heroHalo, haloStyle]} />
                         <Animated.View style={[styles.heroTile, tileStyle]}>
                             <Ionicons name={heroIcon} size={20} color={colors.primary} />

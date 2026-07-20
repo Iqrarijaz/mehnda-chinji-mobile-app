@@ -376,6 +376,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 onBackPress={onClose}
                 backIcon="close"
                 hideAccountActions
+                compact
                 decor="marketplace"
                 hero={{
                     title: listingToEdit ? 'Update Your Listing' : 'Sell An Item',
@@ -444,9 +445,39 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                         />
                     </Animated.View>
 
-                    {/* Location Picker (optional) */}
+                    {/* Location — same map picker/logic as the essentials form */}
                     <Animated.View entering={FadeInDown.delay(270)} style={styles.inputField}>
-                        <LocationPicker value={location} onChange={setLocation} />
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                <ThemedText style={[styles.label, { color: colors.text }]}>LOCATION</ThemedText>
+                                <LocationPicker
+                                    label="Open Map"
+                                    value={location}
+                                    variant="button"
+                                    onChange={(loc) => setLocation(loc)}
+                                />
+                            </View>
+                            {location ? (
+                                <TouchableOpacity onPress={() => setLocation(null)} hitSlop={8}>
+                                    <ThemedText style={{ color: '#EF4444', fontSize: 12, fontWeight: '700' }}>Remove</ThemedText>
+                                </TouchableOpacity>
+                            ) : null}
+                        </View>
+                        <View style={[styles.dropdownTrigger, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' }]}>
+                            <Ionicons
+                                name={location ? 'location' : 'location-outline'}
+                                size={18}
+                                color={location ? colors.primary : colors.icon}
+                                style={{ marginRight: 10 }}
+                            />
+                            <ThemedText style={{ flex: 1, color: location ? colors.text : colors.icon, fontSize: 13 }} numberOfLines={2}>
+                                {location?.address
+                                    ? location.address
+                                    : location
+                                        ? `${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`
+                                        : 'Tap "Open Map" to pin your location'}
+                            </ThemedText>
+                        </View>
                     </Animated.View>
 
                     {/* Phone Number */}
