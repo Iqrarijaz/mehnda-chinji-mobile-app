@@ -14,6 +14,8 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useEssentialsAPI } from '@/hooks/useEssentialsAPI';
 import { LinearGradient } from 'expo-linear-gradient';
+import { LocationPicker, LocationValue } from '@/components/common/LocationPicker';
+import { resolveLocationForSubmit } from '@/utils/locationService';
 
 interface EssentialSubmitFormProps {
     category: string;
@@ -90,6 +92,13 @@ const EssentialSubmitForm = React.memo(({
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [routePickerIndex, setRoutePickerIndex] = useState<number | null>(null);
     const [returnRoutePickerIndex, setReturnRoutePickerIndex] = useState<number | null>(null);
+    const [location, setLocation] = useState<LocationValue | null>(() => {
+        const coords = editData?.location?.coordinates;
+        if (Array.isArray(coords) && coords.length === 2 && !(coords[0] === 0 && coords[1] === 0)) {
+            return { latitude: coords[1], longitude: coords[0] };
+        }
+        return null;
+    });
 
 
     const { submitMutation } = useEssentialsAPI();
@@ -205,10 +214,15 @@ const EssentialSubmitForm = React.memo(({
 
         if (uploadedImage !== initialImage) return true;
 
-        return false;
-    }, [form, uploadedImage, editData, isEditing]);
+        const initialCoords = editData.location?.coordinates;
+        const initialLat = (Array.isArray(initialCoords) && initialCoords.length === 2 && !(initialCoords[0] === 0 && initialCoords[1] === 0)) ? initialCoords[1] : null;
+        const initialLng = (Array.isArray(initialCoords) && initialCoords.length === 2 && !(initialCoords[0] === 0 && initialCoords[1] === 0)) ? initialCoords[0] : null;
+        if ((location?.latitude ?? null) !== initialLat || (location?.longitude ?? null) !== initialLng) return true;
 
-    const handleSubmit = () => {
+        return false;
+    }, [form, uploadedImage, editData, isEditing, location]);
+
+    const handleSubmit = async () => {
         if (isUploading) {
             Toast.show({
                 type: 'info',
@@ -283,6 +297,14 @@ const EssentialSubmitForm = React.memo(({
             returnRoute: isTravel ? form.returnRoute.filter((r: any) => r.city.trim() !== '') : [],
             metadata: isEducation ? form.metadata : {},
         };
+
+        // Attach coordinates: manual selection, else silent current-location
+        // capture (only if permission already granted). Absent → saved without.
+        const coords = await resolveLocationForSubmit(location);
+        if (coords) {
+            payload.latitude = coords.latitude;
+            payload.longitude = coords.longitude;
+        }
 
 
         submitMutation.mutate({ payload, isEditing, id: editData?._id }, {
@@ -413,6 +435,10 @@ const EssentialSubmitForm = React.memo(({
                     </View>
                 </Animated.View>
             )}
+
+            <Animated.View entering={FadeInDown.delay(340)} style={styles.field}>
+                <LocationPicker value={location} onChange={setLocation} />
+            </Animated.View>
 
             <Animated.View entering={FadeInDown.delay(350)} style={styles.field}>
                 <View style={styles.labelRow}>

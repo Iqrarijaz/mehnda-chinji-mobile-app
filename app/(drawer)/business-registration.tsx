@@ -27,6 +27,8 @@ import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { CancelButton } from '@/components/common/CancelButton';
 import { BusinessRegistrationHeroHeader } from '@/components/business/BusinessRegistrationHeroHeader';
+import { LocationPicker, LocationValue } from '@/components/common/LocationPicker';
+import { resolveLocationForSubmit } from '@/utils/locationService';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -69,6 +71,7 @@ const BusinessRegistrationScreen = () => {
 
     const [professionModalVisible, setProfessionModalVisible] = useState(false);
     const [showThankYou, setShowThankYou] = useState(false);
+    const [location, setLocation] = useState<LocationValue | null>(null);
 
     const [openTime, setOpenTime] = useState('09:00 AM');
     const [closeTime, setCloseTime] = useState('09:00 PM');
@@ -129,6 +132,12 @@ const BusinessRegistrationScreen = () => {
                 tags: editData.tags || [],
                 timing: editData.timing || '',
             });
+            const coords = editData.location?.coordinates;
+            if (Array.isArray(coords) && coords.length === 2 && !(coords[0] === 0 && coords[1] === 0)) {
+                setLocation({ latitude: coords[1], longitude: coords[0] });
+            } else {
+                setLocation(null);
+            }
         } else {
             setOpenTime('09:00 AM');
             setCloseTime('09:00 PM');
@@ -141,6 +150,7 @@ const BusinessRegistrationScreen = () => {
                 tags: [],
                 timing: '',
             });
+            setLocation(null);
         }
     }, [editDataParam, user]);
 
@@ -151,7 +161,7 @@ const BusinessRegistrationScreen = () => {
 
             const { name, category, phone, address } = form;
 
-            const payload = {
+            const payload: any = {
                 name,
                 categoryEn: category.name_eng,
                 categoryUr: category.name_ur,
@@ -162,6 +172,14 @@ const BusinessRegistrationScreen = () => {
                 tags: form.tags.map((t: any) => ({ eng: t.eng, ur: t.ur })),
                 timing: `${openTime} - ${closeTime}`,
             };
+
+            // Attach coordinates: manual selection, else silent current-location
+            // capture (only if permission already granted). Absent → saved without.
+            const coords = await resolveLocationForSubmit(location);
+            if (coords) {
+                payload.latitude = coords.latitude;
+                payload.longitude = coords.longitude;
+            }
 
             if (editData) {
                 updateMutation.mutate({ ...payload, businessId: editData._id }, {
@@ -319,6 +337,9 @@ const BusinessRegistrationScreen = () => {
                             }}
                             error={errors.address}
                         />
+
+                        {/* Location (optional) */}
+                        <LocationPicker delay={320} value={location} onChange={setLocation} />
 
                         {/* Phone */}
                         <FormInput
