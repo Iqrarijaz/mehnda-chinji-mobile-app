@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import MapLibreGL, { MapView, Camera } from '@maplibre/maplibre-react-native';
+import MapLibreGL, { MapView, Camera, Logger } from '@maplibre/maplibre-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -31,6 +31,11 @@ import { LocationLoadingModal } from './LocationLoadingModal';
 // Mapbox-compatible API surface.
 MapLibreGL?.setAccessToken?.(null);
 
+// MapLibre logs a benign per-tile "Request failed … Canceled" warning whenever
+// the viewport changes before a tile finishes loading (normal while panning).
+// Raise the log level so these don't spam the console.
+Logger?.setLogLevel?.('error');
+
 // Free OpenStreetMap raster tiles — no API key, no Google dependency.
 const OSM_STYLE = {
     version: 8,
@@ -45,6 +50,10 @@ const OSM_STYLE = {
     },
     layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
 };
+
+// Stable stringified style — passing a fresh string each render makes MapView
+// reload the style, which resets the camera and cancels tile requests.
+const OSM_STYLE_JSON = JSON.stringify(OSM_STYLE);
 
 export interface LocationValue {
     latitude: number;
@@ -71,6 +80,7 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
     const [searching, setSearching] = useState(false);
     const [locating, setLocating] = useState(false);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const skipSearchRef = useRef(false);
 
     const cameraRef = useRef<Camera>(null);
     const [selectedCoord, setSelectedCoord] = useState<{ latitude: number; longitude: number } | null>(
@@ -93,6 +103,12 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
     // Debounced Nominatim search.
     useEffect(() => {
         if (debounceRef.current) clearTimeout(debounceRef.current);
+        // Skip the search that a programmatic setQuery (e.g. picking a result)
+        // would otherwise trigger — it would re-open the dropdown over the map.
+        if (skipSearchRef.current) {
+            skipSearchRef.current = false;
+            return;
+        }
         if (query.trim().length < 3) {
             setResults([]);
             setSearching(false);
@@ -142,6 +158,7 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
         setSelectedCoord({ latitude: place.latitude, longitude: place.longitude });
         moveCamera(place.latitude, place.longitude, 14);
         setResults([]);
+        skipSearchRef.current = true;
         setQuery(place.displayName);
     };
 
@@ -260,9 +277,12 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
                     <View style={{ flex: 1, position: 'relative' }}>
                         <MapView
                             style={{ flex: 1 }}
-                            mapStyle={JSON.stringify(OSM_STYLE)}
+                            mapStyle={OSM_STYLE_JSON}
                             logoEnabled={false}
                             attributionEnabled={true}
+                            compassEnabled={true}
+                            compassViewPosition={3} // 3 = bottom-right
+                            compassViewMargins={{ x: 24, y: Math.max(insets.bottom, 20) + 72 }}
                             onPress={handleMapPress}
                             onRegionDidChange={handleRegionChange}
                         >
