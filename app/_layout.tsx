@@ -25,6 +25,7 @@ import NetworkMonitor from '@/components/common/NetworkMonitor';
 import { usePrayerCalendar } from '@/hooks/usePrayerTimes';
 import { usePrayerNotifications } from '@/hooks/notificationHooks/usePrayerNotifications';
 import { useWeatherNotifications } from '@/hooks/notificationHooks/useWeatherNotifications';
+import { useLocationSync } from '@/hooks/useLocationSync';
 import { useWeatherCity } from '@/context/WeatherContext';
 import * as Application from 'expo-application';
 import { useNotificationStore } from '@/store/notificationStore';
@@ -125,6 +126,12 @@ function DeferredHooks() {
   const weatherEnabled = preferences?.weather;
   const lastWeatherTopicRef = useRef<string | null>(null);
 
+  // Coordinate-based weather sync. When active, the backend pushes weather
+  // directly to this device based on live coordinates, so we unsubscribe from
+  // the city weather topic to avoid duplicate notifications. When inactive
+  // (permission denied / services off), we keep the topic-based flow below.
+  const { locationActive } = useLocationSync();
+
   useEffect(() => {
     const updateWeatherSubscription = async () => {
       try {
@@ -140,13 +147,14 @@ function DeferredHooks() {
           lastWeatherTopicRef.current = null;
         }
 
-        if (weatherEnabled) {
+        if (weatherEnabled && !locationActive) {
           await subscribeToTopic(messagingInstance, newTopic);
           lastWeatherTopicRef.current = newTopic;
           if (__DEV__) console.log(`📡 Subscribed to weather topic: ${newTopic}`);
         } else {
-          // If disabled, ensure we are unsubscribed from the topic
+          // Disabled, or location-based weather is active → rely on direct push.
           await unsubscribeFromTopic(messagingInstance, newTopic);
+          if (lastWeatherTopicRef.current === newTopic) lastWeatherTopicRef.current = null;
           if (__DEV__) console.log(`📡 Unsubscribed from weather topic: ${newTopic}`);
         }
       } catch (err) {
@@ -155,7 +163,7 @@ function DeferredHooks() {
     };
 
     updateWeatherSubscription();
-  }, [selectedCity, weatherEnabled]);
+  }, [selectedCity, weatherEnabled, locationActive]);
 
   useEffect(() => {
     Notifications.setNotificationHandler({

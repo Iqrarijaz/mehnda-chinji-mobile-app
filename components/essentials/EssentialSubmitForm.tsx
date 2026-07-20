@@ -60,7 +60,7 @@ const EssentialSubmitForm = React.memo(({
         tags: editData?.tags || [] as { eng: string; ur: string }[],
         contact: editData?.contact?.length ? editData.contact : [{ name: '', number: '' }] as { name: string; number: string }[],
         route: editData?.route?.length ? editData.route : [{ city: '', time: '' }] as { city: string; time: string }[],
-        returnRoute: (editData?.returnRoute?.length ? editData.returnRoute : []) as { city: string; time: string }[],
+        returnRoute: (editData?.returnRoute?.length ? editData.returnRoute : [{ city: '', time: '' }]) as { city: string; time: string }[],
         metadata: {
             principalName: editData?.metadata?.principalName || '',
             totalStudents: editData?.metadata?.totalStudents?.toString() || '',
@@ -185,7 +185,7 @@ const EssentialSubmitForm = React.memo(({
             form.type !== (editData.type || '') ||
             JSON.stringify(form.tags) !== JSON.stringify(editData.tags || []) ||
             JSON.stringify(form.route) !== JSON.stringify(editData.route || [{ city: '', time: '' }]) ||
-            JSON.stringify(form.returnRoute) !== JSON.stringify(editData.returnRoute || []) ||
+            JSON.stringify(form.returnRoute) !== JSON.stringify(editData.returnRoute?.length ? editData.returnRoute : [{ city: '', time: '' }]) ||
             JSON.stringify(form.metadata) !== JSON.stringify(editData.metadata || { principalName: '', totalStudents: '', totalTeachers: '' });
 
         if (isMainChanged) return true;
@@ -234,6 +234,11 @@ const EssentialSubmitForm = React.memo(({
             const validRoutes = form.route.filter((r: any) => r.city.trim() !== '');
             if (validRoutes.length < 2) {
                 newErrors.route = 'Bus route requires at least an origin and destination stop.';
+            }
+
+            const validReturnRoutes = form.returnRoute.filter((r: any) => r.city.trim() !== '');
+            if (validReturnRoutes.length < 2) {
+                newErrors.returnRoute = 'Bus return route requires at least an origin and destination stop.';
             }
         }
 
@@ -730,7 +735,13 @@ const EssentialSubmitForm = React.memo(({
 
                     {/* Return Route Section */}
                     <View style={[styles.labelRow, { marginTop: 16 }]}>
-                        <ThemedText style={styles.label}>RETURN ROUTE (OPTIONAL)</ThemedText>
+                        <ThemedText style={styles.label}>
+                            RETURN ROUTE{' '}
+                            {form.type?.toLowerCase() === 'bus'
+                                ? <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
+                                : <ThemedText style={{ color: '#94A3B8' }}>(OPTIONAL)</ThemedText>
+                            }
+                        </ThemedText>
                         {form.returnRoute.length < 10 && (
                             <TouchableOpacity onPress={addReturnRoute}>
                                 <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add Stop</ThemedText>
