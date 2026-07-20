@@ -28,7 +28,7 @@ import { BG_GRADIENT } from '@/components/weather/weatherUtils';
 
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { useWeatherCity } from '@/context/WeatherContext';
+import { useWeatherLocation } from '@/hooks/useWeatherLocation';
 import { useWeather } from '@/hooks/useWeather';
 
 export default function WeatherScreen() {
@@ -38,14 +38,22 @@ export default function WeatherScreen() {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    const { selectedCity: city, setSelectedCity: setCity } = useWeatherCity();
+    // Same resolution as the home widget: current GPS location when permission
+    // is granted, otherwise the profile city. Keeps the two screens in sync.
+    const { coords, fallbackCity } = useWeatherLocation();
+    // A city the user explicitly searched/picked here overrides the location.
+    const [manualCity, setManualCity] = useState<string | null>(null);
+
+    const useCoords = !!coords && !manualCity;
+    const effectiveCity = manualCity || fallbackCity;
+    const effectiveCoords = useCoords ? { lat: coords!.latitude, lon: coords!.longitude } : null;
 
     const [searchInput, setSearchInput] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
     const [filteredCities, setFilteredCities] = useState<string[]>([]);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
-    const { weather, forecast, isLoading, refetch } = useWeather(city);
+    const { weather, forecast, isLoading, refetch } = useWeather(effectiveCity, effectiveCoords);
 
     // ─────────────────────────────────────────────────────────────
     // Search
@@ -54,18 +62,18 @@ export default function WeatherScreen() {
     const handleSubmit = useCallback(() => {
         if (!searchInput.trim()) return;
 
-        setCity(searchInput.trim());
+        setManualCity(searchInput.trim());
         setSearchInput('');
         setShowDropdown(false);
-    }, [searchInput, setCity]);
+    }, [searchInput]);
 
     const handleSelectCity = useCallback(
         (selectedCity: string) => {
-            setCity(`${selectedCity}, PK`);
+            setManualCity(`${selectedCity}, PK`);
             setSearchInput('');
             setShowDropdown(false);
         },
-        [setCity]
+        []
     );
 
     const handleChangeText = useCallback((text: string) => {
@@ -89,6 +97,8 @@ export default function WeatherScreen() {
     const handleClear = useCallback(() => {
         setSearchInput('');
         setShowDropdown(false);
+        // Clearing the search returns to the current-location default.
+        setManualCity(null);
     }, []);
 
     // ─────────────────────────────────────────────────────────────
