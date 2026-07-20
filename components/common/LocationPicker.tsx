@@ -11,9 +11,10 @@ import {
     KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import MapLibreGL, { MapView, Camera, MarkerView } from '@maplibre/maplibre-react-native';
+import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing, cancelAnimation } from 'react-native-reanimated';
+import MapLibreGL, { MapView, Camera } from '@maplibre/maplibre-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -57,6 +58,69 @@ interface LocationPickerProps {
     onChange: (value: LocationValue | null) => void;
     delay?: number;
     variant?: 'default' | 'icon' | 'button';
+}
+
+const LOADING_TIPS = [
+    'Getting your location…',
+    'Hold tight, almost there',
+    'Pinpointing your exact spot',
+    'Fetching a strong GPS signal',
+    'Almost done, hang on',
+];
+
+const TRACK_WIDTH = 240;
+const SEGMENT_WIDTH = 96;
+
+/**
+ * Full-map overlay shown while the device location is being fetched. Rotates
+ * reassuring tips and animates an indeterminate tri-color (primary → secondary
+ * → lime) progress bar so the user stays on the screen.
+ */
+function LocationLoadingOverlay({ colors }: { colors: any }) {
+    const [tipIndex, setTipIndex] = useState(0);
+    const progress = useSharedValue(0);
+
+    useEffect(() => {
+        progress.value = withRepeat(
+            withTiming(1, { duration: 1300, easing: Easing.inOut(Easing.ease) }),
+            -1,
+            false,
+        );
+        const id = setInterval(() => {
+            setTipIndex((i) => (i + 1) % LOADING_TIPS.length);
+        }, 1600);
+        return () => {
+            cancelAnimation(progress);
+            clearInterval(id);
+        };
+    }, []);
+
+    const segmentStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: progress.value * (TRACK_WIDTH + SEGMENT_WIDTH) - SEGMENT_WIDTH }],
+    }));
+
+    return (
+        <View style={styles.loadingOverlay}>
+            <View style={[styles.loadingCard, { backgroundColor: colors.background }]}>
+                <View style={[styles.loadingTrack, { backgroundColor: 'rgba(128,128,128,0.18)' }]}>
+                    <Animated.View style={[styles.loadingSegmentWrap, segmentStyle]}>
+                        <LinearGradient
+                            colors={[colors.primary, colors.secondary, colors.lime]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.loadingSegment}
+                        />
+                    </Animated.View>
+                </View>
+                <ThemedText style={[styles.loadingTip, { color: colors.text }]}>
+                    {LOADING_TIPS[tipIndex]}
+                </ThemedText>
+                <ThemedText style={[styles.loadingSub, { color: colors.icon }]}>
+                    Please stay on this screen
+                </ThemedText>
+            </View>
+        </View>
+    );
 }
 
 
@@ -110,18 +174,30 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
         };
     }, [query]);
 
-    const moveCamera = (latitude: number, longitude: number, zoomLevel = 14) => {
+    const moveCamera = (latitude: number, longitude: number, zoomLevel?: number) => {
         cameraRef.current?.setCamera({
             centerCoordinate: [longitude, latitude], // MapLibre uses [lng, lat]
-            zoomLevel,
+            ...(zoomLevel != null ? { zoomLevel } : {}), // omit to preserve current zoom
             animationDuration: 600,
         });
     };
 
+    // Tapping the map recenters the camera there; the fixed center pin (and
+    // selectedCoord, via onRegionDidChange) then reflects that exact point.
     const handleMapPress = (feature: any) => {
         const coords = feature?.geometry?.coordinates;
         if (Array.isArray(coords) && coords.length === 2) {
             setResults([]);
+            setSelectedCoord({ latitude: coords[1], longitude: coords[0] });
+            moveCamera(coords[1], coords[0]);
+        }
+    };
+
+    // Keep the selection locked to whatever is under the center pin as the map
+    // moves (pan, fly-to, current location). Guarantees the marker is centered.
+    const handleRegionChange = (feature: any) => {
+        const coords = feature?.geometry?.coordinates;
+        if (Array.isArray(coords) && coords.length === 2) {
             setSelectedCoord({ latitude: coords[1], longitude: coords[0] });
         }
     };
@@ -252,6 +328,7 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
                             logoEnabled={false}
                             attributionEnabled={true}
                             onPress={handleMapPress}
+                            onRegionDidChange={handleRegionChange}
                         >
                             <Camera
                                 ref={cameraRef}
@@ -262,15 +339,22 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
                                     zoomLevel: value ? 13 : 4,
                                 }}
                             />
-                            {selectedCoord && (
-                                <MarkerView
-                                    coordinate={[selectedCoord.longitude, selectedCoord.latitude]}
-                                    anchor={{ x: 0.5, y: 1 }}
-                                >
-                                    <Ionicons name="location" size={40} color={colors.primary} />
-                                </MarkerView>
-                            )}
                         </MapView>
+
+                        {/* Fixed center pin — the selection is always whatever the
+                            map is centered on, so the marker is guaranteed centered. */}
+                        <View pointerEvents="none" style={styles.centerPinWrap}>
+                            <Ionicons
+                                name="location"
+                                size={44}
+                                color={colors.primary}
+                                style={{ transform: [{ translateY: -22 }] }}
+                            />
+                        </View>
+
+                        {locating && (
+                            <LocationLoadingOverlay colors={colors} />
+                        )}
 
                         {/* Floating Search overlay */}
                         <View style={[styles.floatingSearchContainer, { top: Math.max(insets.top, 20) + 60 }]}>
@@ -410,5 +494,54 @@ const styles = StyleSheet.create({
         bottom: 30,
         right: 20,
         zIndex: 10,
+    },
+    centerPinWrap: {
+        ...StyleSheet.absoluteFillObject,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 5,
+    },
+    loadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.35)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 30,
+    },
+    loadingCard: {
+        width: 280,
+        paddingVertical: 22,
+        paddingHorizontal: 20,
+        borderRadius: 16,
+        alignItems: 'center',
+        gap: 12,
+        shadowColor: '#000',
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+        elevation: 6,
+    },
+    loadingTrack: {
+        width: TRACK_WIDTH,
+        height: 6,
+        borderRadius: 3,
+        overflow: 'hidden',
+    },
+    loadingSegmentWrap: {
+        width: SEGMENT_WIDTH,
+        height: 6,
+    },
+    loadingSegment: {
+        flex: 1,
+        height: 6,
+        borderRadius: 3,
+    },
+    loadingTip: {
+        fontSize: 14,
+        fontWeight: '700',
+        textAlign: 'center',
+    },
+    loadingSub: {
+        fontSize: 12,
+        textAlign: 'center',
     },
 });
