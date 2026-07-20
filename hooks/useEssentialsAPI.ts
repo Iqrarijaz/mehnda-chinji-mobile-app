@@ -17,6 +17,8 @@ interface UseEssentialsAPIOptions {
     search?: string;
     type?: string;
     activeTab?: 'all' | 'requests';
+    lat?: number;
+    lng?: number;
     onDeleteSuccess?: () => void;
 }
 
@@ -26,6 +28,8 @@ export function useEssentialsAPI(options?: UseEssentialsAPIOptions) {
     const search = options?.search;
     const type = options?.type;
     const activeTab = options?.activeTab;
+    const lat = options?.lat;
+    const lng = options?.lng;
     const onDeleteSuccess = options?.onDeleteSuccess;
 
     const essentialsConfigQuery = useQuery({
@@ -74,11 +78,13 @@ export function useEssentialsAPI(options?: UseEssentialsAPIOptions) {
 
     // 1. All Places
     const infiniteQuery = useInfiniteQuery({
-        queryKey: ESSENTIALS_QUERY_KEYS.list({ category, search, type }),
+        queryKey: ESSENTIALS_QUERY_KEYS.list({ category, search, type, lat, lng }),
         queryFn: ({ pageParam = 0 }) => getEssentialsList({
             category,
             search,
             type,
+            lat,
+            lng,
             skip: (pageParam as number) * 20,
             limit: 20
         }),

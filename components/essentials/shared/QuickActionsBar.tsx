@@ -38,11 +38,10 @@ export const QuickActionsBar = React.memo(({
                 <PressableScale
                     onPress={onCall}
                     intensity={0.04}
-                    containerStyle={styles.flex}
                     style={[styles.primaryBtn, { backgroundColor: colors.primary }]}
                 >
                     <View style={[styles.primaryIcon, { backgroundColor: colors.lime }]}>
-                        <Ionicons name="call" size={15} color="#FFFFFF" />
+                        <Ionicons name="call" size={14} color="#FFFFFF" />
                     </View>
                     <ThemedText style={styles.primaryText}>{callLabel}</ThemedText>
                 </PressableScale>
@@ -51,7 +50,6 @@ export const QuickActionsBar = React.memo(({
                 onPress={onDirections}
                 disabled={!hasDirections}
                 intensity={0.04}
-                containerStyle={styles.flex}
                 style={[
                     styles.secondaryBtn,
                     { backgroundColor: `${colors.primary}10`, opacity: hasDirections ? 1 : 0.5 },
@@ -59,7 +57,7 @@ export const QuickActionsBar = React.memo(({
             >
                 <Ionicons
                     name={hasDirections ? 'navigate' : 'navigate-outline'}
-                    size={16}
+                    size={14}
                     color={colors.primary}
                 />
                 <ThemedText style={[styles.secondaryText, { color: colors.primary }]}>
@@ -75,40 +73,40 @@ QuickActionsBar.displayName = 'QuickActionsBar';
 const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
-        gap: 10,
-        marginBottom: 12,
-    },
-    flex: {
-        flex: 1,
+        justifyContent: 'center',
+        gap: 12,
+        marginBottom: 16,
     },
     primaryBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 8,
-        height: 52,
-        borderRadius: 26,
+        gap: 6,
+        height: 42,
+        borderRadius: 21,
+        paddingHorizontal: 24,
     },
     primaryIcon: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
+        width: 24,
+        height: 24,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
     },
     primaryText: {
         color: '#FFFFFF',
-        fontSize: 15,
-        fontWeight: '800',
-        letterSpacing: 0.3,
+        fontSize: 14,
+        fontWeight: '700',
+        letterSpacing: 0.2,
     },
     secondaryBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 7,
-        height: 52,
-        borderRadius: 26,
+        gap: 6,
+        height: 42,
+        borderRadius: 21,
+        paddingHorizontal: 24,
     },
     secondaryText: {
         fontSize: 14,

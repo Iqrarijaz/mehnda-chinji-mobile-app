@@ -54,7 +54,7 @@ export default function SettingsScreen() {
     const handleCheckUpdate = async () => {
         try {
             const info = await fetchAppVersionInfo();
-            const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.1';
+            const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.3';
             const { isOptional, isMandatory } = checkUpdateStatus(currentVersion, info.latestVersion, info.minRequiredVersion);
             const isAvailable = isOptional || isMandatory;
 

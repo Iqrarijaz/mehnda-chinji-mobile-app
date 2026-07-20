@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     infoListItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 8,
+        paddingVertical: 4,
         gap: 12,
     },
     infoListIcon: {
@@ -85,11 +85,11 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
-        marginBottom: 1,
     },
     infoListVal: {
         fontSize: 12,
         fontWeight: '500',
+        marginTop: -2,
     },
     infoListSub: {
         fontSize: 11,

@@ -116,6 +116,45 @@ const BusinessDetailScreen = () => {
 
     const waNumber = toWhatsAppNumber(business.phone);
 
+    const lat = business?.latitude ?? business?.location?.coordinates?.[1];
+    const lng = business?.longitude ?? business?.location?.coordinates?.[0];
+    const hasValidCoordinates = lat !== undefined && lng !== undefined && (lat !== 0 || lng !== 0);
+    const hasDirections = !!(business?.googleAddress?.trim()) || hasValidCoordinates;
+
+    const handleNavigate = useCallback(() => {
+        if (business?.googleAddress?.trim()) {
+            const url = business.googleAddress.trim();
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+                Linking.openURL(url).catch(err => {
+                    console.error("Failed to open URL", err);
+                    Alert.alert('Error', 'Could not open the directions link.');
+                });
+            } else {
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(url)}`;
+                Linking.openURL(mapsUrl).catch(err => {
+                    console.error("Failed to open maps query", err);
+                    Alert.alert('Error', 'Could not open Google Maps.');
+                });
+            }
+            return;
+        }
+
+        if (hasValidCoordinates) {
+            const url = Platform.select({
+                ios: `maps:0,0?q=${lat},${lng}(${business.name})`,
+                android: `geo:0,0?q=${lat},${lng}(${business.name})`,
+            });
+            if (url) Linking.openURL(url);
+        } else {
+            const query = encodeURIComponent(business.address || business.name);
+            const url = Platform.select({
+                ios: `maps:0,0?q=${query}`,
+                android: `geo:0,0?q=${query}`,
+            });
+            if (url) Linking.openURL(url);
+        }
+    }, [hasValidCoordinates, lat, lng, business?.address, business?.name, business?.googleAddress]);
+
     // Capitalized area for the location card (address is already capitalized above).
     const businessForLocation = {
         ...business,
@@ -215,11 +254,10 @@ const BusinessDetailScreen = () => {
                                 <PressableScale
                                     onPress={handleCall}
                                     intensity={0.04}
-                                    containerStyle={{ flex: 1 }}
                                     style={[styles.callButton, { backgroundColor: colors.primary }]}
                                 >
                                     <View style={[styles.callIcon, { backgroundColor: colors.lime }]}>
-                                        <Ionicons name="call" size={15} color="#FFFFFF" />
+                                        <Ionicons name="call" size={14} color="#FFFFFF" />
                                     </View>
                                     <ThemedText style={styles.callButtonText}>Call</ThemedText>
                                 </PressableScale>
@@ -228,19 +266,18 @@ const BusinessDetailScreen = () => {
                                     <PressableScale
                                         onPress={handleWhatsApp}
                                         intensity={0.04}
-                                        containerStyle={{ flex: 1 }}
                                         style={[styles.callButton, { backgroundColor: colors.lime }]}
                                     >
                                         <View style={[styles.callIcon, { backgroundColor: 'rgba(255,255,255,0.28)' }]}>
-                                            <Ionicons name="logo-whatsapp" size={16} color="#FFFFFF" />
+                                            <Ionicons name="logo-whatsapp" size={14} color="#FFFFFF" />
                                         </View>
                                         <ThemedText style={styles.callButtonText}>WhatsApp</ThemedText>
                                     </PressableScale>
                                 ) : null}
                             </>
                         ) : (
-                            <View style={[styles.callButton, { flex: 1, backgroundColor: `${colors.primary}10`, opacity: 0.6 }]}>
-                                <Ionicons name="call-outline" size={16} color={colors.primary} />
+                            <View style={[styles.callButton, { backgroundColor: `${colors.primary}10`, opacity: 0.6 }]}>
+                                <Ionicons name="call-outline" size={14} color={colors.primary} />
                                 <ThemedText style={[styles.callButtonText, { color: colors.primary }]}>No Phone</ThemedText>
                             </View>
                         )}
@@ -269,6 +306,8 @@ const BusinessDetailScreen = () => {
                             place={businessForLocation}
                             address={address}
                             timingLabel="Business Hours"
+                            onDirections={handleNavigate}
+                            hasDirections={hasDirections}
                         />
 
                         {/* Specialties & services */}
@@ -398,29 +437,31 @@ const styles = StyleSheet.create({
     },
     actionRow: {
         flexDirection: 'row',
-        gap: 10,
-        marginBottom: 12,
+        justifyContent: 'center',
+        gap: 12,
+        marginBottom: 16,
     },
     callButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 8,
-        height: 52,
-        borderRadius: 26,
+        gap: 6,
+        height: 42,
+        borderRadius: 21,
+        paddingHorizontal: 24,
     },
     callIcon: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
+        width: 24,
+        height: 24,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
     },
     callButtonText: {
         color: '#FFFFFF',
-        fontSize: 15,
-        fontWeight: '800',
-        letterSpacing: 0.3,
+        fontSize: 14,
+        fontWeight: '700',
+        letterSpacing: 0.2,
     },
     detailAdWrapper: {
         marginBottom: 10,

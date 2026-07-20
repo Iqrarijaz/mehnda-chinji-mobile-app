@@ -28,7 +28,9 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
+    Switch
 } from 'react-native';
+import * as Location from 'expo-location';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -55,6 +57,29 @@ const CategoryListingScreen = React.memo(() => {
         setReportTarget({ id, type: 'PLACE' });
         reportModalRef.current?.present();
     }, []);
+
+    const [isNearbyEnabled, setIsNearbyEnabled] = useState(false);
+    const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
+
+    const toggleNearby = async (value: boolean) => {
+        setIsNearbyEnabled(value);
+        if (value) {
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    setIsNearbyEnabled(false);
+                    return;
+                }
+                const loc = await Location.getCurrentPositionAsync({});
+                setUserLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+            } catch (err) {
+                console.error(err);
+                setIsNearbyEnabled(false);
+            }
+        } else {
+            setUserLocation(null);
+        }
+    };
 
     // Fetch configuration for categories/types
     const { data: essentialsConfig } = useQuery({
@@ -123,6 +148,8 @@ const CategoryListingScreen = React.memo(() => {
         search: debouncedSearch,
         type: selectedType,
         activeTab,
+        lat: isNearbyEnabled && userLocation ? userLocation.lat : undefined,
+        lng: isNearbyEnabled && userLocation ? userLocation.lng : undefined,
         onDeleteSuccess: () => setDeleteTarget(null),
     });
 
@@ -324,6 +351,16 @@ const CategoryListingScreen = React.memo(() => {
                             <Ionicons name="list-outline" size={20} color="#FFFFFF" />
                         </TouchableOpacity>
                     </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
+                        <ThemedText style={{ color: '#FFFFFF', fontSize: 13, marginRight: 8 }}>Search Nearby (15km)</ThemedText>
+                        <Switch
+                            value={isNearbyEnabled}
+                            onValueChange={toggleNearby}
+                            trackColor={{ false: 'rgba(255,255,255,0.3)', true: colors.lime }}
+                            thumbColor={'#FFFFFF'}
+                            ios_backgroundColor="rgba(255,255,255,0.3)"
+                        />
+                    </View>
                 </View>
             </View>
 
@@ -362,7 +399,7 @@ const CategoryListingScreen = React.memo(() => {
                                 data={listData}
                                 renderItem={activeTab === 'all' ? renderItem : renderRequestItem}
                                 keyExtractor={keyExtractor}
-                                contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20 }]}
+                                contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 70 }]}
                                 onRefresh={handleRefresh}
                                 refreshing={loading && !isFetchingNextPage && !myRequestsFetchingNextPage}
                                 onEndReached={handleLoadMore}

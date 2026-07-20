@@ -1,5 +1,6 @@
 import React, { useState, useCallback, memo, useRef, useEffect, useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Platform, Switch } from 'react-native';
+import * as Location from 'expo-location';
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -59,6 +60,29 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
+    const [isNearbyEnabled, setIsNearbyEnabled] = useState(false);
+    const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+
+    const toggleNearby = async (value: boolean) => {
+        setIsNearbyEnabled(value);
+        if (value) {
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    setIsNearbyEnabled(false);
+                    return;
+                }
+                const loc = await Location.getCurrentPositionAsync({});
+                setUserLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+            } catch (err) {
+                console.error(err);
+                setIsNearbyEnabled(false);
+            }
+        } else {
+            setUserLocation(null);
+        }
+    };
+
     // Construct filters based on selected tab and search
     const isMineTab = selectedTab === 'mine';
 
@@ -71,8 +95,9 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
             categories: selectedCategories.length > 0 ? selectedCategories.join(',') : undefined,
             types: selectedItems.length > 0 ? selectedItems.join(',') : undefined,
             search: debouncedSearch || undefined,
+            ...(isNearbyEnabled && userLocation ? { latitude: userLocation.lat, longitude: userLocation.lng, radius: 15 } : {})
         };
-    }, [selectedTab, debouncedSearch, isMineTab, selectedCategories, selectedItems]);
+    }, [selectedTab, debouncedSearch, isMineTab, selectedCategories, selectedItems, isNearbyEnabled, userLocation]);
 
     const {
         categoriesConfigQuery,
@@ -280,8 +305,18 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             }}
                             activeOpacity={0.7}
                         >
-                            <Ionicons name="list-outline" size={20} color="#FFFFFF" />
+                            <Ionicons name="person-outline" size={20} color="#FFFFFF" />
                         </TouchableOpacity>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
+                        <ThemedText style={{ color: '#FFFFFF', fontSize: 13, marginRight: 8 }}>Search Nearby (15km)</ThemedText>
+                        <Switch
+                            value={isNearbyEnabled}
+                            onValueChange={toggleNearby}
+                            trackColor={{ false: 'rgba(255,255,255,0.3)', true: colors.lime }}
+                            thumbColor={'#FFFFFF'}
+                            ios_backgroundColor="rgba(255,255,255,0.3)"
+                        />
                     </View>
                 </View>
             </ScreenHeader>

@@ -83,92 +83,13 @@ const PlaceDetailScreen = () => {
     }, [color, categoryParam, place?.category, colors.primary]);
 
 
-    const renderFormattedText = useCallback((text?: string) => {
-        if (!text) return null;
-        return text.split('\n').map((line, index) => {
-            const trimmed = line.trim();
-
-            // Match Heading 2 first because ## starts with #
-            const h2Match = trimmed.match(/^##\s*(.+)/);
-            if (h2Match) {
-                return (
-                    <ThemedText
-                        key={index}
-                        style={[
-                            styles.descriptionText,
-                            {
-                                color: colors.text,
-                                fontSize: 13,
-                                fontWeight: '700',
-                                marginTop: index > 0 ? 10 : 4,
-                                marginBottom: 4,
-                                lineHeight: 18,
-                            },
-                        ]}
-                    >
-                        {h2Match[1]}
-                    </ThemedText>
-                );
-            }
-
-            const h1Match = trimmed.match(/^#\s*(.+)/);
-            if (h1Match) {
-                return (
-                    <ThemedText
-                        key={index}
-                        style={[
-                            styles.descriptionText,
-                            {
-                                color: colors.text,
-                                fontSize: 15,
-                                fontWeight: '800',
-                                marginTop: index > 0 ? 12 : 4,
-                                marginBottom: 6,
-                                lineHeight: 20,
-                            },
-                        ]}
-                    >
-                        {h1Match[1]}
-                    </ThemedText>
-                );
-            }
-
-            const bulletMatch = trimmed.match(/^[*•-]\s*(.+)/);
-            if (bulletMatch) {
-                return (
-                    <View key={index} style={{ flexDirection: 'row', alignItems: 'flex-start', marginLeft: 8, marginVertical: 3 }}>
-                        <ThemedText style={[styles.descriptionText, { color: colors.textSecondary, marginRight: 8, fontSize: 12 }]}>•</ThemedText>
-                        <ThemedText style={[styles.descriptionText, { color: colors.textSecondary, flex: 1, lineHeight: 18 }]}>
-                            {bulletMatch[1]}
-                        </ThemedText>
-                    </View>
-                );
-            }
-
-            return (
-                <ThemedText
-                    key={index}
-                    style={[
-                        styles.descriptionText,
-                        {
-                            color: colors.textSecondary,
-                            lineHeight: 18,
-                            marginBottom: trimmed === '' ? 8 : 4,
-                        },
-                    ]}
-                >
-                    {line}
-                </ThemedText>
-            );
-        });
-    }, [colors]);
-
 
     const placeName = useMemo(() => capitalizeString(place?.name), [place?.name]);
     const address = capitalizeString(place?.address || place?.village || 'N/A');
     const category = categoryParam || capitalizeString(place?.category?.en || place?.category || '');
-    const coordinates = place?.location?.coordinates;
-    const hasValidCoordinates = coordinates && (coordinates[0] !== 0 || coordinates[1] !== 0);
+    const lat = place?.latitude ?? place?.location?.coordinates?.[1];
+    const lng = place?.longitude ?? place?.location?.coordinates?.[0];
+    const hasValidCoordinates = lat !== undefined && lng !== undefined && (lat !== 0 || lng !== 0);
     const hasDirections = !!(place?.googleAddress?.trim()) || hasValidCoordinates;
 
     const handleCall = useCallback((phoneNumber: string) => {
@@ -199,8 +120,7 @@ const PlaceDetailScreen = () => {
             return;
         }
 
-        if (coordinates) {
-            const [lng, lat] = coordinates;
+        if (hasValidCoordinates) {
             const url = Platform.select({
                 ios: `maps:0,0?q=${lat},${lng}(${place.name})`,
                 android: `geo:0,0?q=${lat},${lng}(${place.name})`,
@@ -214,7 +134,7 @@ const PlaceDetailScreen = () => {
             });
             if (url) Linking.openURL(url);
         }
-    }, [coordinates, place.address, place.name, place?.googleAddress]);
+    }, [hasValidCoordinates, lat, lng, place.address, place.name, place?.googleAddress]);
 
     const handleEdit = useCallback(() => {
         router.push({
@@ -619,9 +539,9 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     actionBtnPrimary: {
-        flex: 1,
-        height: 40,
-        borderRadius: 20,
+        height: 42,
+        borderRadius: 21,
+        paddingHorizontal: 24,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -766,3 +686,4 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
 });
+

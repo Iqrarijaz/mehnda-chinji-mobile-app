@@ -22,6 +22,7 @@ import {
     getCurrentCoords,
     PlaceResult,
 } from '@/utils/locationService';
+import { SubmitButton } from './SubmitButton';
 
 export interface LocationValue {
     latitude: number;
@@ -185,21 +186,13 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0 
                             {searching ? <ActivityIndicator size="small" color={colors.primary} /> : null}
                         </View>
 
-                        <TouchableOpacity
-                            style={[styles.currentLocationBtn, { borderColor: colors.primary }]}
+                        <SubmitButton
+                            title="Use Current Location"
+                            icon="navigate"
+                            isLoading={locating}
                             onPress={useCurrentLocation}
-                            disabled={locating}
-                            activeOpacity={0.7}
-                        >
-                            {locating ? (
-                                <ActivityIndicator size="small" color={colors.primary} />
-                            ) : (
-                                <Ionicons name="navigate" size={18} color={colors.primary} />
-                            )}
-                            <ThemedText style={[styles.currentLocationText, { color: colors.primary }]}>
-                                {locating ? 'Getting your location…' : 'Use Current Location'}
-                            </ThemedText>
-                        </TouchableOpacity>
+                            style={{ alignSelf: 'center', marginBottom: 16 }}
+                        />
 
                         <FlatList
                             data={results}
@@ -295,17 +288,6 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     searchInput: { flex: 1, fontSize: 14 },
-    currentLocationBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        borderWidth: 1.5,
-        borderRadius: 12,
-        paddingVertical: 12,
-        marginBottom: 12,
-    },
-    currentLocationText: { fontSize: 14, fontWeight: '700' },
     resultsList: { flex: 1 },
     resultRow: {
         flexDirection: 'row',

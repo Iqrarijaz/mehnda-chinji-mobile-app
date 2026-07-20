@@ -17,13 +17,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useBusinessAPI } from '@/hooks/useBusinessAPI';
+import * as Location from 'expo-location';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     Platform,
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View
+    View,
+    Switch
 } from 'react-native';
 
 
@@ -49,6 +51,29 @@ export default function BusinessScreen() {
     const [isProfessionPickerVisible, setIsProfessionPickerVisible] = useState(false);
     const lastTrackedQuery = React.useRef<string>('');
 
+    const [isNearbyEnabled, setIsNearbyEnabled] = useState(false);
+    const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
+
+    const toggleNearby = async (value: boolean) => {
+        setIsNearbyEnabled(value);
+        if (value) {
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    setIsNearbyEnabled(false);
+                    return;
+                }
+                const loc = await Location.getCurrentPositionAsync({});
+                setUserLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+            } catch (err) {
+                console.error(err);
+                setIsNearbyEnabled(false);
+            }
+        } else {
+            setUserLocation(null);
+        }
+    };
+
     // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -62,8 +87,9 @@ export default function BusinessScreen() {
 
     const businessFilters = React.useMemo(() => ({
         text: debouncedSearch || undefined,
-        categoryEn: selectedCategory === 'All' ? undefined : selectedCategory
-    }), [debouncedSearch, selectedCategory]);
+        categoryEn: selectedCategory === 'All' ? undefined : selectedCategory,
+        ...(isNearbyEnabled && userLocation ? { lat: userLocation.lat, lng: userLocation.lng } : {})
+    }), [debouncedSearch, selectedCategory, isNearbyEnabled, userLocation]);
 
     const { infiniteQuery } = useBusinessAPI({
         filters: businessFilters,
@@ -198,6 +224,17 @@ export default function BusinessScreen() {
                             >
                                 <Ionicons name="list-outline" size={20} color="#FFFFFF" />
                             </TouchableOpacity>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
+                            <ThemedText style={{ color: '#FFFFFF', fontSize: 13, marginRight: 8 }}>Search Nearby (15km)</ThemedText>
+                            <Switch
+                                value={isNearbyEnabled}
+                                onValueChange={toggleNearby}
+                                trackColor={{ false: 'rgba(255,255,255,0.3)', true: colors.lime }}
+                                thumbColor={'#FFFFFF'}
+                                ios_backgroundColor="rgba(255,255,255,0.3)"
+                            />
                         </View>
 
                         <ProfessionPicker

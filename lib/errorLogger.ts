@@ -17,8 +17,17 @@ export interface ErrorDetails {
 class ErrorLogger {
   log(error: Error | any, details: ErrorDetails = {}) {
     const timestamp = new Date().toISOString();
-    const message = error instanceof Error ? error.message : String(error);
-    const stack = error instanceof Error ? error.stack : undefined;
+    let message;
+    let stack;
+    
+    if (error instanceof Error) {
+        message = error.message;
+        stack = error.stack;
+    } else {
+        // Handle Axios errors or other object errors gracefully
+        message = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+        stack = undefined;
+    }
 
     if (__DEV__) {
       console.error(`[ErrorLogger] ${timestamp}`, {

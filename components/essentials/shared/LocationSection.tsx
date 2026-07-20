@@ -107,9 +107,9 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     card: {
-        borderRadius: 18,
-        padding: 12,
-        gap: 12,
+        borderRadius: 16,
+        padding: 10,
+        gap: 10,
     },
     infoRow: {
         flexDirection: 'row',
@@ -145,10 +145,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 7,
-        height: 46,
-        borderRadius: 23,
-        marginTop: 2,
+        gap: 6,
+        height: 40,
+        borderRadius: 20,
+        marginTop: 4,
     },
     directionsText: {
         color: '#FFFFFF',
