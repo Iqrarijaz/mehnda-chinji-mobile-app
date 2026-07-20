@@ -453,7 +453,7 @@ const PlaceDetailScreen = () => {
 
                         {/* Travel Specific Fields */}
                         {category.toLowerCase() === 'travel' && (
-                            <TravelRoute route={place.route} primaryColor={primaryColor} />
+                            <TravelRoute route={place.route} returnRoute={place.returnRoute} primaryColor={primaryColor} />
                         )}
 
                         {/* Section: Contact & Location */}

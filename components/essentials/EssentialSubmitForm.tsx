@@ -681,12 +681,12 @@ const EssentialSubmitForm = React.memo(({
                 </Animated.View>
             )}
 
-            {/* ── Travel: Departure Route ────────────────────────────── */}
+            {/* ── Travel: Return Route ────────────────────────────── */}
             {isTravel && (
                 <Animated.View entering={FadeInDown.delay(450)} style={styles.field}>
                     <View style={styles.labelRow}>
                         <ThemedText style={styles.label}>
-                            DEPARTURE ROUTE{' '}
+                            RETURN ROUTE{' '}
                             {form.type?.toLowerCase() === 'bus'
                                 ? <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
                                 : <ThemedText style={{ color: '#94A3B8' }}>(OPTIONAL)</ThemedText>
