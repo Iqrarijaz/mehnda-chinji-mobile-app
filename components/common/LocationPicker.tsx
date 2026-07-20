@@ -11,10 +11,9 @@ import {
     KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing, cancelAnimation } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import MapLibreGL, { MapView, Camera } from '@maplibre/maplibre-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -26,6 +25,7 @@ import {
     PlaceResult,
 } from '@/utils/locationService';
 import { SubmitButton } from './SubmitButton';
+import { LocationLoadingModal } from './LocationLoadingModal';
 
 // MapLibre is fully free and needs no API key/token; pass null to satisfy the
 // Mapbox-compatible API surface.
@@ -59,70 +59,6 @@ interface LocationPickerProps {
     delay?: number;
     variant?: 'default' | 'icon' | 'button';
 }
-
-const LOADING_TIPS = [
-    'Getting your location…',
-    'Hold tight, almost there',
-    'Pinpointing your exact spot',
-    'Fetching a strong GPS signal',
-    'Almost done, hang on',
-];
-
-const TRACK_WIDTH = 240;
-const SEGMENT_WIDTH = 96;
-
-/**
- * Full-map overlay shown while the device location is being fetched. Rotates
- * reassuring tips and animates an indeterminate tri-color (primary → secondary
- * → lime) progress bar so the user stays on the screen.
- */
-function LocationLoadingOverlay({ colors }: { colors: any }) {
-    const [tipIndex, setTipIndex] = useState(0);
-    const progress = useSharedValue(0);
-
-    useEffect(() => {
-        progress.value = withRepeat(
-            withTiming(1, { duration: 1300, easing: Easing.inOut(Easing.ease) }),
-            -1,
-            false,
-        );
-        const id = setInterval(() => {
-            setTipIndex((i) => (i + 1) % LOADING_TIPS.length);
-        }, 1600);
-        return () => {
-            cancelAnimation(progress);
-            clearInterval(id);
-        };
-    }, []);
-
-    const segmentStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: progress.value * (TRACK_WIDTH + SEGMENT_WIDTH) - SEGMENT_WIDTH }],
-    }));
-
-    return (
-        <View style={styles.loadingOverlay}>
-            <View style={[styles.loadingCard, { backgroundColor: colors.background }]}>
-                <View style={[styles.loadingTrack, { backgroundColor: 'rgba(128,128,128,0.18)' }]}>
-                    <Animated.View style={[styles.loadingSegmentWrap, segmentStyle]}>
-                        <LinearGradient
-                            colors={[colors.primary, colors.secondary, colors.lime]}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                            style={styles.loadingSegment}
-                        />
-                    </Animated.View>
-                </View>
-                <ThemedText style={[styles.loadingTip, { color: colors.text }]}>
-                    {LOADING_TIPS[tipIndex]}
-                </ThemedText>
-                <ThemedText style={[styles.loadingSub, { color: colors.icon }]}>
-                    Please stay on this screen
-                </ThemedText>
-            </View>
-        </View>
-    );
-}
-
 
 export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0, variant = 'default' }: LocationPickerProps) {
     const { theme, isDark } = useTheme();
@@ -352,10 +288,6 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
                             />
                         </View>
 
-                        {locating && (
-                            <LocationLoadingOverlay colors={colors} />
-                        )}
-
                         {/* Floating Search overlay */}
                         <View style={[styles.floatingSearchContainer, { top: Math.max(insets.top, 20) + 60 }]}>
                             <View style={[styles.searchBoxFS, { backgroundColor: colors.background, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 }]}>
@@ -406,6 +338,9 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
                     </View>
                 </View>
             </Modal>
+
+            {/* Premium location-fetch loading modal (presents over the map) */}
+            <LocationLoadingModal visible={locating} />
         </AnimatedView>
     );
 }
@@ -500,48 +435,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 5,
-    },
-    loadingOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.35)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 30,
-    },
-    loadingCard: {
-        width: 280,
-        paddingVertical: 22,
-        paddingHorizontal: 20,
-        borderRadius: 16,
-        alignItems: 'center',
-        gap: 12,
-        shadowColor: '#000',
-        shadowOpacity: 0.15,
-        shadowRadius: 10,
-        elevation: 6,
-    },
-    loadingTrack: {
-        width: TRACK_WIDTH,
-        height: 6,
-        borderRadius: 3,
-        overflow: 'hidden',
-    },
-    loadingSegmentWrap: {
-        width: SEGMENT_WIDTH,
-        height: 6,
-    },
-    loadingSegment: {
-        flex: 1,
-        height: 6,
-        borderRadius: 3,
-    },
-    loadingTip: {
-        fontSize: 14,
-        fontWeight: '700',
-        textAlign: 'center',
-    },
-    loadingSub: {
-        fontSize: 12,
-        textAlign: 'center',
     },
 });
