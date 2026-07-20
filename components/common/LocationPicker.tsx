@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import MapView, { Marker, UrlTile } from 'react-native-maps';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -35,15 +36,11 @@ interface LocationPickerProps {
     value: LocationValue | null;
     onChange: (value: LocationValue | null) => void;
     delay?: number;
+    variant?: 'default' | 'icon' | 'button';
 }
 
-/**
- * Reusable location picker shared across Business, Essential and Marketplace
- * create/edit forms. Lets the user search an address (OpenStreetMap / Nominatim),
- * pick a result, or capture their current GPS location. All coordinates are
- * optional — the field can be cleared at any time.
- */
-export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0 }: LocationPickerProps) {
+
+export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0, variant = 'default' }: LocationPickerProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -53,6 +50,19 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0 
     const [searching, setSearching] = useState(false);
     const [locating, setLocating] = useState(false);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const mapRef = useRef<MapView>(null);
+    const [selectedCoord, setSelectedCoord] = useState<{ latitude: number; longitude: number } | null>(
+        value ? { latitude: value.latitude, longitude: value.longitude } : null
+    );
+
+    useEffect(() => {
+        if (value) {
+            setSelectedCoord({ latitude: value.latitude, longitude: value.longitude });
+        } else {
+            setSelectedCoord(null);
+        }
+    }, [value]);
 
     const AnimatedView = delay > 0 ? Animated.View : View;
     const animatedProps = delay > 0 ? { entering: FadeInDown.delay(delay) } : {};
@@ -80,32 +90,50 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0 
     }, [query]);
 
     const selectPlace = (place: PlaceResult) => {
-        onChange({
+        setSelectedCoord({ latitude: place.latitude, longitude: place.longitude });
+        mapRef.current?.animateToRegion({
             latitude: place.latitude,
             longitude: place.longitude,
-            address: place.displayName,
-        });
-        closeModal();
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+        }, 500);
+        setResults([]);
+        setQuery(place.displayName);
     };
 
     const useCurrentLocation = async () => {
         setLocating(true);
         try {
             const coords = await getCurrentCoords({ requestPermission: true });
-            if (!coords) {
-                setLocating(false);
-                return;
-            }
-            const address = await reverseGeocode(coords.latitude, coords.longitude);
-            onChange({
+            if (!coords) return;
+            
+            setSelectedCoord({ latitude: coords.latitude, longitude: coords.longitude });
+            mapRef.current?.animateToRegion({
                 latitude: coords.latitude,
                 longitude: coords.longitude,
-                address: address || 'Current location',
-            });
-            closeModal();
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+            }, 500);
+            setResults([]);
         } finally {
             setLocating(false);
         }
+    };
+
+    const handleConfirm = async () => {
+        if (!selectedCoord) {
+            closeModal();
+            return;
+        }
+        setLocating(true);
+        const address = await reverseGeocode(selectedCoord.latitude, selectedCoord.longitude);
+        onChange({
+            latitude: selectedCoord.latitude,
+            longitude: selectedCoord.longitude,
+            address: address || 'Selected location',
+        });
+        setLocating(false);
+        closeModal();
     };
 
     const clearLocation = () => {
@@ -127,106 +155,146 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0 
             : '';
 
     return (
-        <AnimatedView {...animatedProps} style={styles.field}>
-            <View style={styles.labelRow}>
-                <ThemedText style={[styles.label, { color: colors.text }]}>
-                    {label} <ThemedText style={{ color: colors.icon, fontWeight: '400' }}>(Optional)</ThemedText>
-                </ThemedText>
-                {value ? (
-                    <TouchableOpacity onPress={() => onChange(null)} hitSlop={8}>
-                        <ThemedText style={{ color: '#EF4444', fontSize: 12, fontWeight: '700' }}>Remove</ThemedText>
-                    </TouchableOpacity>
-                ) : null}
-            </View>
-
-            <TouchableOpacity
-                style={[styles.trigger, { backgroundColor: inputBg, height: Platform.OS === 'android' ? 48 : 52 }]}
-                onPress={() => setModalVisible(true)}
-                activeOpacity={0.7}
-            >
-                <Ionicons
-                    name={value ? 'location' : 'location-outline'}
-                    size={18}
-                    color={value ? colors.primary : colors.icon}
-                    style={{ marginRight: 10 }}
-                />
-                <ThemedText
-                    style={[styles.triggerText, { color: value ? colors.text : colors.icon }]}
-                    numberOfLines={1}
-                >
-                    {value ? displayLabel : 'Search or use current location'}
-                </ThemedText>
-                <Ionicons name="chevron-forward" size={16} color={colors.icon} />
-            </TouchableOpacity>
-
-            <Modal visible={modalVisible} animationType="slide" transparent onRequestClose={closeModal}>
-                <View style={styles.modalOverlay}>
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                        style={[styles.modalCard, { backgroundColor: colors.background }]}
-                    >
-                        <View style={styles.modalHeader}>
-                            <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Location</ThemedText>
-                            <TouchableOpacity onPress={closeModal} hitSlop={8}>
-                                <Ionicons name="close" size={24} color={colors.text} />
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={[styles.searchBox, { backgroundColor: inputBg }]}>
-                            <Ionicons name="search" size={18} color={colors.icon} style={{ marginRight: 8 }} />
-                            <TextInput
-                                style={[styles.searchInput, { color: colors.text }]}
-                                placeholder="Search an address or place"
-                                placeholderTextColor={colors.icon}
-                                value={query}
-                                onChangeText={setQuery}
-                                autoFocus
-                                returnKeyType="search"
-                            />
-                            {searching ? <ActivityIndicator size="small" color={colors.primary} /> : null}
-                        </View>
-
-                        <SubmitButton
-                            title="Use Current Location"
-                            icon="navigate"
-                            isLoading={locating}
-                            onPress={useCurrentLocation}
-                            style={{ alignSelf: 'center', marginBottom: 16 }}
-                        />
-
-                        <FlatList
-                            data={results}
-                            keyExtractor={(item, index) => `${item.latitude}-${item.longitude}-${index}`}
-                            keyboardShouldPersistTaps="handled"
-                            style={styles.resultsList}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    style={[styles.resultRow, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }]}
-                                    onPress={() => selectPlace(item)}
-                                    activeOpacity={0.7}
-                                >
-                                    <Ionicons name="location-outline" size={18} color={colors.icon} style={{ marginRight: 10, marginTop: 2 }} />
-                                    <ThemedText style={[styles.resultText, { color: colors.text }]} numberOfLines={2}>
-                                        {item.displayName}
-                                    </ThemedText>
-                                </TouchableOpacity>
-                            )}
-                            ListEmptyComponent={
-                                query.trim().length >= 3 && !searching ? (
-                                    <ThemedText style={[styles.emptyText, { color: colors.icon }]}>
-                                        No places found. Try a different search.
-                                    </ThemedText>
-                                ) : null
-                            }
-                        />
-
+        <AnimatedView {...animatedProps} style={variant === 'default' ? styles.field : undefined}>
+            {variant === 'default' ? (
+                <>
+                    <View style={styles.labelRow}>
+                        <ThemedText style={[styles.label, { color: colors.text }]}>
+                            {label} <ThemedText style={{ color: colors.icon, fontWeight: '400' }}>(Optional)</ThemedText>
+                        </ThemedText>
                         {value ? (
-                            <TouchableOpacity style={styles.clearBtn} onPress={clearLocation} activeOpacity={0.7}>
-                                <Ionicons name="trash-outline" size={16} color="#EF4444" />
-                                <ThemedText style={styles.clearText}>Remove saved location</ThemedText>
+                            <TouchableOpacity onPress={() => onChange(null)} hitSlop={8}>
+                                <ThemedText style={{ color: '#EF4444', fontSize: 12, fontWeight: '700' }}>Remove</ThemedText>
                             </TouchableOpacity>
                         ) : null}
-                    </KeyboardAvoidingView>
+                    </View>
+
+                    <TouchableOpacity
+                        style={[styles.trigger, { backgroundColor: inputBg, minHeight: 80, paddingVertical: 12, alignItems: 'flex-start' }]}
+                        onPress={() => setModalVisible(true)}
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons
+                            name={value ? 'location' : 'location-outline'}
+                            size={18}
+                            color={value ? colors.primary : colors.icon}
+                            style={{ marginRight: 10, marginTop: 2 }}
+                        />
+                        <ThemedText
+                            style={[styles.triggerText, { color: value ? colors.text : colors.icon, marginTop: 1 }]}
+                        >
+                            {value ? displayLabel : 'Search or use current location'}
+                        </ThemedText>
+                        <Ionicons name="chevron-forward" size={16} color={colors.icon} style={{ marginTop: 2 }} />
+                    </TouchableOpacity>
+                </>
+            ) : variant === 'button' ? (
+                <TouchableOpacity
+                    onPress={() => setModalVisible(true)}
+                    style={{ backgroundColor: colors.lime, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }}
+                >
+                    <Ionicons name="location" size={12} color="#FFF" style={{ marginRight: 4 }} />
+                    <ThemedText style={{ color: '#FFF', fontSize: 10, fontWeight: '600' }}>{label === 'LOCATION' ? 'Current Location' : label}</ThemedText>
+                </TouchableOpacity>
+            ) : (
+                <TouchableOpacity onPress={() => setModalVisible(true)} hitSlop={8}>
+                    <Ionicons name="location" size={20} color={colors.lime} />
+                </TouchableOpacity>
+            )}
+
+            <Modal visible={modalVisible} animationType="slide" transparent={false} onRequestClose={closeModal}>
+                <View style={[styles.modalOverlayFS, { backgroundColor: colors.background }]}>
+                    {/* Header */}
+                    <View style={[styles.modalHeaderFS, { backgroundColor: colors.background }]}>
+                        <TouchableOpacity onPress={closeModal} hitSlop={8} style={{ padding: 4 }}>
+                            <Ionicons name="arrow-back" size={24} color={colors.text} />
+                        </TouchableOpacity>
+                        <ThemedText style={[styles.modalTitle, { color: colors.text, flex: 1, marginLeft: 16 }]}>Select Location</ThemedText>
+                        <SubmitButton
+                            title="Done"
+                            onPress={handleConfirm}
+                            disabled={!selectedCoord}
+                            isLoading={locating}
+                            style={{ height: 36, minWidth: 80, paddingHorizontal: 16 }}
+                        />
+                    </View>
+
+                    <View style={{ flex: 1, position: 'relative' }}>
+                        <MapView
+                            ref={mapRef}
+                            style={{ flex: 1 }}
+                            mapType={Platform.OS === 'android' ? 'none' : 'standard'}
+                            initialRegion={{
+                                latitude: value?.latitude || 30.3753,
+                                longitude: value?.longitude || 69.3451,
+                                latitudeDelta: value ? 0.01 : 10,
+                                longitudeDelta: value ? 0.01 : 10,
+                            }}
+                            onPress={(e) => {
+                                setResults([]);
+                                setSelectedCoord(e.nativeEvent.coordinate);
+                            }}
+                        >
+                            {Platform.OS === 'android' && (
+                                <UrlTile
+                                    urlTemplate="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    maximumZ={19}
+                                    flipY={false}
+                                />
+                            )}
+                            {selectedCoord && (
+                                <Marker coordinate={selectedCoord} />
+                            )}
+                        </MapView>
+
+                        {/* Floating Search overlay */}
+                        <View style={styles.floatingSearchContainer}>
+                            <View style={[styles.searchBoxFS, { backgroundColor: inputBg, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 }]}>
+                                <Ionicons name="search" size={18} color={colors.icon} style={{ marginRight: 8 }} />
+                                <TextInput
+                                    style={[styles.searchInput, { color: colors.text }]}
+                                    placeholder="Search an address or place"
+                                    placeholderTextColor={colors.icon}
+                                    value={query}
+                                    onChangeText={setQuery}
+                                    returnKeyType="search"
+                                />
+                                {searching ? <ActivityIndicator size="small" color={colors.primary} /> : null}
+                            </View>
+
+                            {results.length > 0 && (
+                                <FlatList
+                                    data={results}
+                                    keyExtractor={(item, index) => `${item.latitude}-${item.longitude}-${index}`}
+                                    keyboardShouldPersistTaps="handled"
+                                    style={[styles.resultsListFS, { backgroundColor: colors.background, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 }]}
+                                    renderItem={({ item }) => (
+                                        <TouchableOpacity
+                                            style={[styles.resultRow, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }]}
+                                            onPress={() => selectPlace(item)}
+                                            activeOpacity={0.7}
+                                        >
+                                            <Ionicons name="location-outline" size={18} color={colors.icon} style={{ marginRight: 10, marginTop: 2 }} />
+                                            <ThemedText style={[styles.resultText, { color: colors.text }]} numberOfLines={2}>
+                                                {item.displayName}
+                                            </ThemedText>
+                                        </TouchableOpacity>
+                                    )}
+                                />
+                            )}
+                        </View>
+
+                        {/* Floating Current Location Button */}
+                        <TouchableOpacity
+                            style={styles.floatingCurrentLocBtn}
+                            onPress={useCurrentLocation}
+                            activeOpacity={0.8}
+                        >
+                            <View style={{ backgroundColor: colors.lime, padding: 12, borderRadius: 30, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 5, elevation: 5 }}>
+                                <Ionicons name="navigate" size={24} color="#FFF" />
+                            </View>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </Modal>
         </AnimatedView>
@@ -259,36 +327,44 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         marginRight: 8,
     },
-    modalOverlay: {
+    modalOverlayFS: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'flex-end',
     },
-    modalCard: {
-        maxHeight: '85%',
-        minHeight: '55%',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        padding: 16,
-        paddingBottom: Platform.OS === 'ios' ? 32 : 16,
-    },
-    modalHeader: {
+    modalHeaderFS: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 14,
+        paddingHorizontal: 16,
+        paddingTop: Platform.OS === 'ios' ? 50 : 20,
+        paddingBottom: 12,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: 'rgba(0,0,0,0.1)',
+        zIndex: 10,
     },
-    modalTitle: { fontSize: 17, fontWeight: '700' },
-    searchBox: {
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    floatingSearchContainer: {
+        position: 'absolute',
+        top: 16,
+        left: 16,
+        right: 16,
+        zIndex: 20,
+    },
+    searchBoxFS: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 12,
         paddingHorizontal: 14,
         height: 50,
-        marginBottom: 12,
     },
     searchInput: { flex: 1, fontSize: 14 },
-    resultsList: { flex: 1 },
+    resultsListFS: {
+        marginTop: 8,
+        borderRadius: 12,
+        maxHeight: 250,
+        paddingHorizontal: 14,
+    },
     resultRow: {
         flexDirection: 'row',
         alignItems: 'flex-start',
@@ -296,13 +372,10 @@ const styles = StyleSheet.create({
         borderBottomWidth: StyleSheet.hairlineWidth,
     },
     resultText: { flex: 1, fontSize: 13, lineHeight: 18 },
-    emptyText: { textAlign: 'center', marginTop: 24, fontSize: 13 },
-    clearBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-        paddingVertical: 12,
+    floatingCurrentLocBtn: {
+        position: 'absolute',
+        bottom: 30,
+        right: 20,
+        zIndex: 10,
     },
-    clearText: { color: '#EF4444', fontSize: 13, fontWeight: '600' },
 });

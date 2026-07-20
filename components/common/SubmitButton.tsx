@@ -12,6 +12,8 @@ interface SubmitButtonProps extends TouchableOpacityProps {
     icon?: keyof typeof Ionicons.glyphMap;
 }
 
+import { ActivityIndicator } from 'react-native';
+
 export function SubmitButton({ title, isLoading, disabled, style, icon, ...rest }: SubmitButtonProps) {
     const isDisabled = disabled || isLoading;
     const { theme } = useTheme();
@@ -25,6 +27,9 @@ export function SubmitButton({ title, isLoading, disabled, style, icon, ...rest 
             {...rest}
         >
             <View style={styles.buttonContent}>
+                {isLoading && (
+                    <ActivityIndicator size="small" color="#FFFFFF" style={{ marginRight: 8 }} />
+                )}
                 {icon && !isLoading && (
                     <Ionicons name={icon} size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
                 )}

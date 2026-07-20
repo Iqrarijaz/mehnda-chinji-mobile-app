@@ -1,10 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import React, { useState, useMemo } from 'react';
 import { Platform, StyleSheet, TextInput, TouchableOpacity, View, ActivityIndicator, ScrollView } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-
 import { TimePicker } from '@/components/common/TimePicker';
 import { EssentialsTypePills } from '@/components/common/EssentialsTypePills';
 import { SubmitButton } from '@/components/common/SubmitButton';
@@ -13,7 +11,6 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useEssentialsAPI } from '@/hooks/useEssentialsAPI';
-import { LinearGradient } from 'expo-linear-gradient';
 import { LocationPicker, LocationValue } from '@/components/common/LocationPicker';
 import { resolveLocationForSubmit } from '@/utils/locationService';
 
@@ -56,7 +53,6 @@ const EssentialSubmitForm = React.memo(({
     const [form, setForm] = useState({
         name: editData?.name || '',
         address: editData?.address || '',
-        googleAddress: editData?.googleAddress || '',
         timing: editData?.timing || '',
         type: editData?.type || '',
         tags: editData?.tags || [] as { eng: string; ur: string }[],
@@ -95,7 +91,7 @@ const EssentialSubmitForm = React.memo(({
     const [location, setLocation] = useState<LocationValue | null>(() => {
         const coords = editData?.location?.coordinates;
         if (Array.isArray(coords) && coords.length === 2 && !(coords[0] === 0 && coords[1] === 0)) {
-            return { latitude: coords[1], longitude: coords[0] };
+            return { latitude: coords[1], longitude: coords[0], address: editData?.address || '' };
         }
         return null;
     });
@@ -189,7 +185,6 @@ const EssentialSubmitForm = React.memo(({
         const isMainChanged =
             form.name.trim() !== (editData.name || '').trim() ||
             form.address.trim() !== (editData.address || '').trim() ||
-            form.googleAddress.trim() !== (editData.googleAddress || '').trim() ||
             form.timing.trim() !== (editData.timing || '').trim() ||
             form.type !== (editData.type || '') ||
             JSON.stringify(form.tags) !== JSON.stringify(editData.tags || []) ||
@@ -392,53 +387,43 @@ const EssentialSubmitForm = React.memo(({
             {!isTravel && (
                 <Animated.View entering={FadeInDown.delay(250)} style={styles.field}>
                     <View style={styles.labelRow}>
-                        <ThemedText style={styles.label}>ADDRESS <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                            <ThemedText style={styles.label}>ADDRESS <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                            <LocationPicker
+                                label='Open Map'
+                                value={location}
+                                variant="button"
+                                onChange={(loc) => {
+                                    setLocation(loc);
+                                    if (loc?.address) {
+                                        handleChange('address', loc.address);
+                                    }
+                                }}
+                            />
+                        </View>
                         <ThemedText style={[styles.charCount, form.address.length >= 150 && { color: '#EF4444' }]}>
                             {form.address.length}/150
                         </ThemedText>
                     </View>
                     <View style={[styles.inputBox, {
                         backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                        height: Platform.OS === 'android' ? 48 : 52,
+                        minHeight: 80,
+                        alignItems: 'flex-start',
+                        paddingVertical: 12,
                     }]}>
-                        <Ionicons name="map-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                         <TextInput
-                            style={[styles.inputText, { color: colors.text }]}
+                            style={[styles.inputText, { color: colors.text, textAlignVertical: 'top', minHeight: 60 }]}
                             placeholder="Enter address"
                             placeholderTextColor={colors.icon}
                             value={form.address}
                             onChangeText={(text) => { handleChange('address', text); setErrors(prev => ({ ...prev, address: '' })); }}
                             maxLength={150}
+                            multiline
                         />
                     </View>
                     {errors['address'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors['address']}</ThemedText>}
                 </Animated.View>
             )}
-
-            {!isTravel && (
-                <Animated.View entering={FadeInDown.delay(300)} style={styles.field}>
-                    <View style={styles.labelRow}>
-                        <ThemedText style={styles.label}>GOOGLE ADDRESS <ThemedText style={[styles.label, { color: colors.icon, fontWeight: '400' }]}>(Optional)</ThemedText></ThemedText>
-                    </View>
-                    <View style={[styles.inputBox, {
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                        height: Platform.OS === 'android' ? 48 : 52,
-                    }]}>
-                        <Ionicons name="navigate-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
-                        <TextInput
-                            style={[styles.inputText, { color: colors.text }]}
-                            placeholder="Enter Google Maps link or address"
-                            placeholderTextColor={colors.icon}
-                            value={form.googleAddress}
-                            onChangeText={(text) => handleChange('googleAddress', text)}
-                        />
-                    </View>
-                </Animated.View>
-            )}
-
-            <Animated.View entering={FadeInDown.delay(340)} style={styles.field}>
-                <LocationPicker value={location} onChange={setLocation} />
-            </Animated.View>
 
             <Animated.View entering={FadeInDown.delay(350)} style={styles.field}>
                 <View style={styles.labelRow}>
@@ -503,7 +488,13 @@ const EssentialSubmitForm = React.memo(({
             {isTravel && (
                 <Animated.View entering={FadeInDown.delay(400)} style={[styles.field, { marginBottom: 20 }]}>
                     <View style={styles.labelRow}>
-                        <ThemedText style={styles.label}>ROUTE / SCHEDULE <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
+                        <ThemedText style={styles.label}>
+                            ROUTE / SCHEDULE{' '}
+                            {form.type?.toLowerCase() === 'bus'
+                                ? <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
+                                : <ThemedText style={{ color: '#94A3B8' }}>(OPTIONAL)</ThemedText>
+                            }
+                        </ThemedText>
                         {form.route.length < 10 && (
                             <TouchableOpacity onPress={addRoute}>
                                 <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add Stop</ThemedText>
@@ -685,82 +676,6 @@ const EssentialSubmitForm = React.memo(({
             {isTravel && (
                 <Animated.View entering={FadeInDown.delay(450)} style={styles.field}>
                     <View style={styles.labelRow}>
-                        <ThemedText style={styles.label}>
-                            RETURN ROUTE{' '}
-                            {form.type?.toLowerCase() === 'bus'
-                                ? <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
-                                : <ThemedText style={{ color: '#94A3B8' }}>(OPTIONAL)</ThemedText>
-                            }
-                        </ThemedText>
-                        {form.route.length < 10 && (
-                            <TouchableOpacity onPress={() => {
-                                if (form.route.length < 10) {
-                                    setForm(prev => ({ ...prev, route: [...prev.route, { city: '', time: '' }] }));
-                                    setErrors(prev => ({ ...prev, route: '' }));
-                                }
-                            }}>
-                                <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add Stop</ThemedText>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                    {errors['route'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginBottom: 8 }}>{errors['route']}</ThemedText>}
-
-                    {form.route.map((r: any, index: number) => (
-                        <View key={index} style={{ marginBottom: 10 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                <View style={[styles.inputBox, { flex: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
-                                    <Ionicons name="location-outline" size={16} color={colors.icon} style={{ marginRight: 8 }} />
-                                    <TextInput
-                                        style={[styles.inputText, { color: colors.text }]}
-                                        placeholder={index === 0 ? 'From' : index === form.route.length - 1 ? 'To' : `Stop ${index + 1}`}
-                                        placeholderTextColor={colors.icon}
-                                        value={r.city}
-                                        onChangeText={(val) => {
-                                            const newRoute = [...form.route];
-                                            newRoute[index] = { ...newRoute[index], city: val };
-                                            setForm(prev => ({ ...prev, route: newRoute }));
-                                        }}
-                                    />
-                                </View>
-                                <TouchableOpacity
-                                    onPress={() => setRoutePickerIndex(index)}
-                                    style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}
-                                >
-                                    <Ionicons name="time-outline" size={16} color={colors.icon} style={{ marginRight: 6 }} />
-                                    <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 13, fontWeight: '600' }}>
-                                        {r.time || 'Time'}
-                                    </ThemedText>
-                                </TouchableOpacity>
-
-                                {index > 0 && (
-                                    <TouchableOpacity onPress={() => {
-                                        const newRoute = form.route.filter((_: any, i: number) => i !== index);
-                                        setForm(prev => ({ ...prev, route: newRoute }));
-                                    }} style={{ padding: 4 }}>
-                                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        </View>
-                    ))}
-
-                    <TimePicker
-                        visible={routePickerIndex !== null}
-                        onClose={() => setRoutePickerIndex(null)}
-                        onSelect={(val) => {
-                            if (routePickerIndex !== null) {
-                                const newRoute = [...form.route];
-                                newRoute[routePickerIndex] = { ...newRoute[routePickerIndex], time: val };
-                                setForm(prev => ({ ...prev, route: newRoute }));
-                            }
-                            setRoutePickerIndex(null);
-                        }}
-                        title="Departure Time"
-                        currentValue={routePickerIndex !== null ? form.route[routePickerIndex]?.time : ''}
-                    />
-
-                    {/* Return Route Section */}
-                    <View style={[styles.labelRow, { marginTop: 16 }]}>
                         <ThemedText style={styles.label}>
                             RETURN ROUTE{' '}
                             {form.type?.toLowerCase() === 'bus'
