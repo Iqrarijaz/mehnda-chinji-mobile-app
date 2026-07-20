@@ -34,6 +34,8 @@ import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ThankYouModal } from '@/components/common/ThankYou';
+import { LocationPicker, LocationValue } from '@/components/common/LocationPicker';
+import { resolveLocationForSubmit } from '@/utils/locationService';
 import { marketplaceListingSchema } from '@/utils/validation';
 
 interface CreateMarketplaceListingProps {
@@ -108,6 +110,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     const [isPickerVisible, setIsPickerVisible] = useState(false);
     const [isUploadingImages, setIsUploadingImages] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [location, setLocation] = useState<LocationValue | null>(null);
 
     // Pre-fill form when editing
     useEffect(() => {
@@ -131,6 +134,12 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 model: listingToEdit.metadata?.model || '',
                 year: listingToEdit.metadata?.year ? String(listingToEdit.metadata.year) : ''
             });
+            const coords = listingToEdit.location?.coordinates;
+            if (Array.isArray(coords) && coords.length === 2 && !(coords[0] === 0 && coords[1] === 0)) {
+                setLocation({ latitude: coords[1], longitude: coords[0] });
+            } else {
+                setLocation(null);
+            }
         } else if (visible) {
             // Reset for new listing
             setFormData({
@@ -150,6 +159,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 model: '',
                 year: ''
             });
+            setLocation(null);
         }
     }, [visible, listingToEdit, user]);
 
@@ -300,6 +310,14 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
             payload.listingId = listingToEdit._id;
         }
 
+        // Attach coordinates: manual selection, else silent current-location
+        // capture (only if permission already granted). Absent → saved without.
+        const coords = await resolveLocationForSubmit(location);
+        if (coords) {
+            payload.latitude = coords.latitude;
+            payload.longitude = coords.longitude;
+        }
+
         if (categoryEn.toLowerCase() === 'vehicles') {
             const metadataObj: Record<string, any> = {};
             if (model.trim()) metadataObj.model = model;
@@ -424,6 +442,11 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             value={formData.village}
                             onPress={() => setVillagePickerVisible(true)}
                         />
+                    </Animated.View>
+
+                    {/* Location Picker (optional) */}
+                    <Animated.View entering={FadeInDown.delay(270)} style={styles.inputField}>
+                        <LocationPicker value={location} onChange={setLocation} />
                     </Animated.View>
 
                     {/* Phone Number */}
