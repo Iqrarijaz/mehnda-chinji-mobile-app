@@ -6,6 +6,12 @@ module.exports = ({ config }) => {
             "expo-secure-store",
             "@react-native-firebase/app",
             [
+                "expo-location",
+                {
+                    "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to send accurate local weather notifications for your area."
+                }
+            ],
+            [
                 "expo-splash-screen",
                 {
                     "backgroundColor": "#E6F4FE",

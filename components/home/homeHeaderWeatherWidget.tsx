@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { useWeatherCity } from '@/context/WeatherContext';
 import { useWeather } from '@/hooks/useWeather';
+import { useWeatherLocation } from '@/hooks/useWeatherLocation';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -16,9 +16,13 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    // 🌐 Shared city from WeatherContext
-    const { selectedCity } = useWeatherCity();
-    const { weather, isWeatherLoading } = useWeather(selectedCity);
+    // 📍 Prefer the user's current location (when permission is granted),
+    // otherwise fall back to their profile city.
+    const { coords, fallbackCity } = useWeatherLocation();
+    const { weather, isWeatherLoading } = useWeather(
+        fallbackCity,
+        coords ? { lat: coords.latitude, lon: coords.longitude } : null,
+    );
 
     const getIconName = (icon: string, isNight: boolean) => {
         if (icon.startsWith('01')) return isNight ? 'moon' : 'sunny';
@@ -47,7 +51,7 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
     const condition = weather?.weather?.[0]?.main ?? 'Loading...';
     const feelsLike = weather ? Math.round(weather.main.feels_like) : '--';
     const humidity = weather?.main?.humidity ?? '--';
-    const location = weather?.name ? `${weather.name}, PK` : selectedCity;
+    const location = weather?.name ? `${weather.name}, PK` : fallbackCity;
 
     // Format sunrise/sunset
     const formatTime = (timestamp?: number) => {
