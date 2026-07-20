@@ -35,9 +35,20 @@ export const useAppUpdate = () => {
 
         if (now - lastCheck > ONE_DAY_MS) {
           const info = await fetchAppVersionInfo();
-          const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '1.2.5';
+
+          // Fallback to EXPO_PUBLIC_APP_VERSION, then 1.2.5
+          let currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.4';
+          try {
+            const packageJson = require('../../package.json');
+            if (packageJson && packageJson.version) {
+              currentVersion = packageJson.version;
+            }
+          } catch (e) {
+            // Ignore if package.json cannot be required
+          }
+
           const { isMandatory, isOptional } = checkUpdateStatus(currentVersion, info.latestVersion, info.minRequiredVersion);
-          
+
           if (isMandatory || isOptional) {
             setUpdateInfo({
               visible: true,
@@ -59,7 +70,7 @@ export const useAppUpdate = () => {
       const updateTimer = setTimeout(() => {
         checkUpdate();
       }, 10000); // 10 seconds delay after interactions
-      
+
       // We can't clear the timeout inside InteractionManager easily if it unmounts immediately,
       // but typically AppInitializer doesn't unmount unless the app closes.
     });
