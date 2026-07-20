@@ -1,26 +1,11 @@
 module.exports = ({ config }) => {
-    // react-native-maps uses the Google Maps SDK as the map engine on Android
-    // (even when we render free OpenStreetMap tiles via UrlTile). Supply the key
-    // through an env var so the secret is never committed; without it the map
-    // renders blank on Android. iOS uses Apple Maps and needs no key.
-    const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || "";
-
     return {
         ...config,
-        android: {
-            ...config.android,
-            config: {
-                ...(config.android?.config || {}),
-                googleMaps: {
-                    ...(config.android?.config?.googleMaps || {}),
-                    apiKey: googleMapsApiKey,
-                },
-            },
-        },
         plugins: [
             "expo-router",
             "expo-secure-store",
             "@react-native-firebase/app",
+            "@maplibre/maplibre-react-native",
             [
                 "expo-location",
                 {
