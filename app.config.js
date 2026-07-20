@@ -5,6 +5,7 @@ module.exports = ({ config }) => {
             "expo-router",
             "expo-secure-store",
             "@react-native-firebase/app",
+            "@maplibre/maplibre-react-native",
             [
                 "expo-location",
                 {

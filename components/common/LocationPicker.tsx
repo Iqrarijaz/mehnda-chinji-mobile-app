@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import MapView, { Marker, UrlTile } from 'react-native-maps';
+import MapLibreGL, { MapView, Camera, MarkerView } from '@maplibre/maplibre-react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -24,6 +24,25 @@ import {
     PlaceResult,
 } from '@/utils/locationService';
 import { SubmitButton } from './SubmitButton';
+
+// MapLibre is fully free and needs no API key/token; pass null to satisfy the
+// Mapbox-compatible API surface.
+MapLibreGL?.setAccessToken?.(null);
+
+// Free OpenStreetMap raster tiles — no API key, no Google dependency.
+const OSM_STYLE = {
+    version: 8,
+    sources: {
+        osm: {
+            type: 'raster',
+            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+            tileSize: 256,
+            maxzoom: 19,
+            attribution: '© OpenStreetMap contributors',
+        },
+    },
+    layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
+};
 
 export interface LocationValue {
     latitude: number;
@@ -51,7 +70,7 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
     const [locating, setLocating] = useState(false);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const mapRef = useRef<MapView>(null);
+    const cameraRef = useRef<Camera>(null);
     const [selectedCoord, setSelectedCoord] = useState<{ latitude: number; longitude: number } | null>(
         value ? { latitude: value.latitude, longitude: value.longitude } : null
     );
@@ -89,14 +108,25 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
         };
     }, [query]);
 
+    const moveCamera = (latitude: number, longitude: number, zoomLevel = 14) => {
+        cameraRef.current?.setCamera({
+            centerCoordinate: [longitude, latitude], // MapLibre uses [lng, lat]
+            zoomLevel,
+            animationDuration: 600,
+        });
+    };
+
+    const handleMapPress = (feature: any) => {
+        const coords = feature?.geometry?.coordinates;
+        if (Array.isArray(coords) && coords.length === 2) {
+            setResults([]);
+            setSelectedCoord({ latitude: coords[1], longitude: coords[0] });
+        }
+    };
+
     const selectPlace = (place: PlaceResult) => {
         setSelectedCoord({ latitude: place.latitude, longitude: place.longitude });
-        mapRef.current?.animateToRegion({
-            latitude: place.latitude,
-            longitude: place.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-        }, 500);
+        moveCamera(place.latitude, place.longitude, 14);
         setResults([]);
         setQuery(place.displayName);
     };
@@ -106,14 +136,9 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
         try {
             const coords = await getCurrentCoords({ requestPermission: true });
             if (!coords) return;
-            
+
             setSelectedCoord({ latitude: coords.latitude, longitude: coords.longitude });
-            mapRef.current?.animateToRegion({
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-            }, 500);
+            moveCamera(coords.latitude, coords.longitude, 15);
             setResults([]);
         } finally {
             setLocating(false);
@@ -202,7 +227,7 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
                 </TouchableOpacity>
             )}
 
-            <Modal visible={modalVisible} animationType="slide" transparent={false} onRequestClose={closeModal}>
+            <Modal visible={modalVisible} animationType="slide" transparent={true} onRequestClose={closeModal}>
                 <View style={[styles.modalOverlayFS, { backgroundColor: colors.background }]}>
                     {/* Header */}
                     <View style={[styles.modalHeaderFS, { backgroundColor: colors.background }]}>
@@ -221,29 +246,28 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
 
                     <View style={{ flex: 1, position: 'relative' }}>
                         <MapView
-                            ref={mapRef}
                             style={{ flex: 1 }}
-                            mapType={Platform.OS === 'android' ? 'none' : 'standard'}
-                            initialRegion={{
-                                latitude: value?.latitude || 30.3753,
-                                longitude: value?.longitude || 69.3451,
-                                latitudeDelta: value ? 0.01 : 10,
-                                longitudeDelta: value ? 0.01 : 10,
-                            }}
-                            onPress={(e) => {
-                                setResults([]);
-                                setSelectedCoord(e.nativeEvent.coordinate);
-                            }}
+                            mapStyle={JSON.stringify(OSM_STYLE)}
+                            logoEnabled={false}
+                            attributionEnabled={true}
+                            onPress={handleMapPress}
                         >
-                            {Platform.OS === 'android' && (
-                                <UrlTile
-                                    urlTemplate="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    maximumZ={19}
-                                    flipY={false}
-                                />
-                            )}
+                            <Camera
+                                ref={cameraRef}
+                                defaultSettings={{
+                                    centerCoordinate: value
+                                        ? [value.longitude, value.latitude]
+                                        : [69.3451, 30.3753], // Pakistan
+                                    zoomLevel: value ? 13 : 4,
+                                }}
+                            />
                             {selectedCoord && (
-                                <Marker coordinate={selectedCoord} />
+                                <MarkerView
+                                    coordinate={[selectedCoord.longitude, selectedCoord.latitude]}
+                                    anchor={{ x: 0.5, y: 1 }}
+                                >
+                                    <Ionicons name="location" size={40} color={colors.primary} />
+                                </MarkerView>
                             )}
                         </MapView>
 
@@ -329,6 +353,11 @@ const styles = StyleSheet.create({
     },
     modalOverlayFS: {
         flex: 1,
+        width: '100%',
+        height: '100%',
+        borderRadius: 24,
+        overflow: 'hidden',
+        padding: 0,
     },
     modalHeaderFS: {
         flexDirection: 'row',
