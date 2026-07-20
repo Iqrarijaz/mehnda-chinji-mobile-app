@@ -278,7 +278,7 @@ export default function MarketplaceDetailsScreen() {
                                         style={[styles.infoCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.background }]}
                                     >
                                         <View style={[styles.infoIconTile, { backgroundColor: `${colors.secondary}16` }]}>
-                                            <Ionicons name={row.icon} size={16} color={colors.secondary} />
+                                            <Ionicons name={row.icon} size={13} color={colors.secondary} />
                                         </View>
                                         <View style={{ flex: 1 }}>
                                             <ThemedText style={[styles.infoLabel, { color: colors.textSecondary }]}>{row.label}</ThemedText>
@@ -493,14 +493,14 @@ const styles = StyleSheet.create({
         width: (width - 32 - 10) / 2,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
-        padding: 12,
-        borderRadius: 16,
+        gap: 8,
+        padding: 8,
+        borderRadius: 14,
     },
     infoIconTile: {
-        width: 34,
-        height: 34,
-        borderRadius: 11,
+        width: 26,
+        height: 26,
+        borderRadius: 9,
         justifyContent: 'center',
         alignItems: 'center',
     },

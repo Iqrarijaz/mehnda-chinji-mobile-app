@@ -12,6 +12,7 @@ import {
 import Toast from 'react-native-toast-message';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import * as yup from 'yup';
 
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -33,6 +34,7 @@ import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ThankYouModal } from '@/components/common/ThankYou';
+import { marketplaceListingSchema } from '@/utils/validation';
 
 interface CreateMarketplaceListingProps {
     visible?: boolean;
@@ -105,6 +107,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
 
     const [isPickerVisible, setIsPickerVisible] = useState(false);
     const [isUploadingImages, setIsUploadingImages] = useState(false);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     // Pre-fill form when editing
     useEffect(() => {
@@ -200,6 +203,9 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                     }
                 }
                 updateForm('images', [...formData.images, ...uploadedUrls]);
+                if (uploadedUrls.length > 0) {
+                    setErrors(prev => ({ ...prev, images: '' }));
+                }
             } catch (error) {
                 console.error("Image upload failed:", error);
                 Toast.show({ type: 'error', text1: 'Upload failed', text2: 'Failed to upload images. Please try again.' });
@@ -248,6 +254,23 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     const handleSubmit = async () => {
         const { title, price, city, village, categoryEn, typeEn, description, images, negotiable, showPhoneNumber, categoryUr, typeUr, model, year, phone } = formData;
         const sellerPhone = phone || user?.user?.phone || '';
+
+        // Image validation (yup) — shown inline below the images picker.
+        try {
+            await marketplaceListingSchema.validate({ images }, { abortEarly: false });
+            setErrors({});
+        } catch (err: any) {
+            if (err instanceof yup.ValidationError) {
+                const newErrors: { [key: string]: string } = {};
+                err.inner.forEach((validationError) => {
+                    if (validationError.path) {
+                        newErrors[validationError.path] = validationError.message;
+                    }
+                });
+                setErrors(newErrors);
+                return;
+            }
+        }
 
         if (!title.trim() || !price.trim() || !city.trim() || !village.trim() || !categoryEn || !typeEn || !description.trim() || !sellerPhone.trim()) {
             Toast.show({ type: 'error', text1: 'Validation Error', text2: 'Please fill all required fields.' });
@@ -492,7 +515,9 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
 
                     {/* Pick Images */}
                     <Animated.View entering={FadeInDown.delay(550)} style={styles.inputField}>
-                        <ThemedText style={[styles.label, { color: colors.text }]}>Images (Max 5)</ThemedText>
+                        <ThemedText style={[styles.label, { color: colors.text }]}>
+                            Images (Max 5) <ThemedText style={styles.required}>*</ThemedText>
+                        </ThemedText>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll} contentContainerStyle={{ paddingTop: 10, paddingRight: 10, paddingBottom: 10 }}>
                             {formData.images.map((imgUrl, idx) => (
                                 <View key={imgUrl} style={styles.imageThumbnailContainer}>
@@ -509,6 +534,9 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                                 </TouchableOpacity>
                             )}
                         </ScrollView>
+                        {errors.images ? (
+                            <ThemedText style={styles.errorText}>{errors.images}</ThemedText>
+                        ) : null}
                     </Animated.View>
 
                     {/* Footer Buttons inline */}
@@ -652,6 +680,13 @@ const styles = StyleSheet.create({
     },
     required: {
         color: '#EF4444',
+    },
+    errorText: {
+        color: '#EF4444',
+        fontSize: 12,
+        fontWeight: '500',
+        marginTop: 4,
+        marginLeft: 2,
     },
     row: {
         flexDirection: 'row',

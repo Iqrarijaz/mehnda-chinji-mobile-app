@@ -31,7 +31,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BannerAd from '@/ads/components/BannerAd';
 import InterstitialService from '@/ads/interstitial.service';
 import { capitalizeString } from '@/utils/string';
-import { ContactSection } from '@/components/essentials/shared/ContactSection';
+import { toWhatsAppNumber } from '@/utils/phone';
 import { LocationSection } from '@/components/essentials/shared/LocationSection';
 import { TagChips } from '@/components/essentials/shared/TagChips';
 import { SectionHeading } from '@/components/essentials/shared/SectionHeading';
@@ -80,6 +80,15 @@ const BusinessDetailScreen = () => {
         }
     }, [business?.phone]);
 
+    const handleWhatsApp = useCallback(() => {
+        const wa = toWhatsAppNumber(business?.phone);
+        if (wa) {
+            Linking.openURL(`https://wa.me/${wa}`);
+        } else {
+            Alert.alert('WhatsApp Unavailable', 'This number is not available on WhatsApp.');
+        }
+    }, [business?.phone]);
+
     // The logo tile gently floats, matching the essentials hero language.
     const bob = useSharedValue(0);
     useEffect(() => {
@@ -105,10 +114,14 @@ const BusinessDetailScreen = () => {
 
     const businessImage = (business.images && business.images.length > 0 ? business.images[0] : null) || business.logo || null;
 
-    const contacts = [
-        business.phone ? { name: 'Business Phone', number: business.phone } : null,
-        business.phone2 ? { name: 'Secondary Contact', number: business.phone2 } : null,
-    ].filter(Boolean) as { name: string; number: string }[];
+    const waNumber = toWhatsAppNumber(business.phone);
+
+    // Capitalized area for the location card (address is already capitalized above).
+    const businessForLocation = {
+        ...business,
+        village: capitalizeString(business.village || ''),
+        city: capitalizeString(business.city || ''),
+    };
 
     return (
         <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
@@ -195,20 +208,36 @@ const BusinessDetailScreen = () => {
                 {/* Detail Card Container */}
                 <View style={[styles.detailsCard, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF', flex: 1 }]}>
 
-                    {/* Primary action */}
+                    {/* Primary actions — Call + WhatsApp */}
                     <Animated.View entering={FadeInDown.duration(400)} style={styles.actionRow}>
                         {business.phone ? (
-                            <PressableScale
-                                onPress={handleCall}
-                                intensity={0.04}
-                                containerStyle={{ flex: 1 }}
-                                style={[styles.callButton, { backgroundColor: colors.primary }]}
-                            >
-                                <View style={[styles.callIcon, { backgroundColor: colors.lime }]}>
-                                    <Ionicons name="call" size={15} color="#FFFFFF" />
-                                </View>
-                                <ThemedText style={styles.callButtonText}>Call Business</ThemedText>
-                            </PressableScale>
+                            <>
+                                <PressableScale
+                                    onPress={handleCall}
+                                    intensity={0.04}
+                                    containerStyle={{ flex: 1 }}
+                                    style={[styles.callButton, { backgroundColor: colors.primary }]}
+                                >
+                                    <View style={[styles.callIcon, { backgroundColor: colors.lime }]}>
+                                        <Ionicons name="call" size={15} color="#FFFFFF" />
+                                    </View>
+                                    <ThemedText style={styles.callButtonText}>Call</ThemedText>
+                                </PressableScale>
+
+                                {waNumber ? (
+                                    <PressableScale
+                                        onPress={handleWhatsApp}
+                                        intensity={0.04}
+                                        containerStyle={{ flex: 1 }}
+                                        style={[styles.callButton, { backgroundColor: colors.lime }]}
+                                    >
+                                        <View style={[styles.callIcon, { backgroundColor: 'rgba(255,255,255,0.28)' }]}>
+                                            <Ionicons name="logo-whatsapp" size={16} color="#FFFFFF" />
+                                        </View>
+                                        <ThemedText style={styles.callButtonText}>WhatsApp</ThemedText>
+                                    </PressableScale>
+                                ) : null}
+                            </>
                         ) : (
                             <View style={[styles.callButton, { flex: 1, backgroundColor: `${colors.primary}10`, opacity: 0.6 }]}>
                                 <Ionicons name="call-outline" size={16} color={colors.primary} />
@@ -235,12 +264,9 @@ const BusinessDetailScreen = () => {
                             </View>
                         )}
 
-                        {/* Contacts (shared component, same tel: behavior) */}
-                        <ContactSection contacts={contacts} />
-
                         {/* Location + business hours (shared component) */}
                         <LocationSection
-                            place={business}
+                            place={businessForLocation}
                             address={address}
                             timingLabel="Business Hours"
                         />
@@ -372,6 +398,7 @@ const styles = StyleSheet.create({
     },
     actionRow: {
         flexDirection: 'row',
+        gap: 10,
         marginBottom: 12,
     },
     callButton: {

@@ -201,6 +201,11 @@ const PlaceSubmissionScreen = () => {
 
     const handleThankYouClose = () => {
         setShowThankYou(false);
+        if (user?.user?.role !== 'APP_ADMIN') {
+            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                InterstitialService.getInstance().show(true);
+            });
+        }
         if (category) {
             router.replace({ pathname: '/listing/[category]', params: { category, tab: 'requests' } });
         } else {

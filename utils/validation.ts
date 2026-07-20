@@ -68,6 +68,13 @@ export const getPasswordStrength = (password: string): number => {
     return 4;
 };
 
+export const marketplaceListingSchema = yup.object().shape({
+    images: yup.array()
+        .of(yup.string())
+        .min(1, 'Please add at least one image of your item.')
+        .required('Please add at least one image of your item.'),
+});
+
 export const businessSchema = yup.object().shape({
     name: yup.string()
         .matches(/^[a-zA-Z\s]+$/, 'Name must contain only alphabets')
