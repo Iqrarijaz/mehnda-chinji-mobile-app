@@ -8,6 +8,7 @@ import {
     Switch,
     Image,
     KeyboardAvoidingView,
+    TextInput,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
@@ -25,8 +26,7 @@ import { useAuth } from '@/context/AuthContext';
 import { createMarketplaceListing, updateMarketplaceListing, MARKETPLACE_QUERY_KEYS } from '@/apis/marketplace';
 import { uploadPublicImage, deletePublicImage } from '@/apis/public';
 import { getAuthenticatedConfiguration, CONFIG_QUERY_KEYS } from '@/apis/configuration';
-import citiesDataFallback from '@/data/cities.json';
-import villagesDataFallback from '@/data/villages.json';
+
 import { MarketplaceCategoryPicker } from './MarketplaceCategoryPicker';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
@@ -56,23 +56,6 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     const { user } = useAuth();
     const queryClient = useQueryClient();
 
-    const { data: citiesConfigData } = useQuery({
-        queryKey: CONFIG_QUERY_KEYS.cities,
-        queryFn: () => getAuthenticatedConfiguration('CITIES'),
-        staleTime: 1000 * 60 * 60 * 24, // 24 hours
-    });
-
-    const { data: villagesConfigData } = useQuery({
-        queryKey: CONFIG_QUERY_KEYS.villages,
-        queryFn: () => getAuthenticatedConfiguration('VILLAGES'),
-        staleTime: 1000 * 60 * 60 * 24, // 24 hours
-    });
-
-    const citiesData: string[] = citiesConfigData?.data?.data || citiesDataFallback;
-    const villagesData: string[] = villagesConfigData?.data?.data || villagesDataFallback;
-
-    const [cityPickerVisible, setCityPickerVisible] = useState(false);
-    const [villagePickerVisible, setVillagePickerVisible] = useState(false);
     const [showThankYou, setShowThankYou] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -83,6 +66,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
         typeEn: '',
         typeUr: '',
         negotiable: false,
+        address: '',
         city: '',
         village: '',
         showPhoneNumber: true,
@@ -103,8 +87,9 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     const handleYearChange = React.useCallback((val: string) => updateForm('year', val), [updateForm]);
     const handleDescriptionChange = React.useCallback((val: string) => updateForm('description', val), [updateForm]);
     const handleNegotiableToggle = React.useCallback((val: boolean) => updateForm('negotiable', val), [updateForm]);
-    const handleCitySelect = React.useCallback((city: string) => updateForm('city', city), [updateForm]);
-    const handleVillageSelect = React.useCallback((village: string) => updateForm('village', village), [updateForm]);
+    const handleAddressChange = React.useCallback((val: string) => updateForm('address', val), [updateForm]);
+    const handleCityChange = React.useCallback((val: string) => updateForm('city', val.replace(/\b\w/g, l => l.toUpperCase())), [updateForm]);
+    const handleVillageChange = React.useCallback((val: string) => updateForm('village', val.replace(/\b\w/g, l => l.toUpperCase())), [updateForm]);
     const handlePhoneChange = React.useCallback((val: string) => updateForm('phone', val.replace(/[^0-9]/g, '')), [updateForm]);
 
     const [isPickerVisible, setIsPickerVisible] = useState(false);
@@ -123,8 +108,9 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 typeEn: listingToEdit.type?.en || '',
                 typeUr: listingToEdit.type?.ur || '',
                 negotiable: !!listingToEdit.negotiable,
-                city: listingToEdit.city || '',
-                village: listingToEdit.village || '',
+                address: listingToEdit.place || listingToEdit.address || '',
+                city: listingToEdit.city || user?.user?.city || '',
+                village: listingToEdit.village || user?.user?.village || '',
                 showPhoneNumber: listingToEdit.showPhoneNumber !== false,
                 phone: listingToEdit.sellerPhone || user?.user?.phone || '',
                 description: listingToEdit.description || '',
@@ -150,8 +136,9 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 typeEn: '',
                 typeUr: '',
                 negotiable: false,
-                city: '',
-                village: '',
+                address: '',
+                city: user?.user?.city || '',
+                village: user?.user?.village || '',
                 showPhoneNumber: true,
                 phone: user?.user?.phone || '',
                 description: '',
@@ -262,7 +249,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     });
 
     const handleSubmit = async () => {
-        const { title, price, city, village, categoryEn, typeEn, description, images, negotiable, showPhoneNumber, categoryUr, typeUr, model, year, phone } = formData;
+        const { title, price, address, city, village, categoryEn, typeEn, description, images, negotiable, showPhoneNumber, categoryUr, typeUr, model, year, phone } = formData;
         const sellerPhone = phone || user?.user?.phone || '';
 
         // Image validation (yup) — shown inline below the images picker.
@@ -282,7 +269,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
             }
         }
 
-        if (!title.trim() || !price.trim() || !city.trim() || !village.trim() || !categoryEn || !typeEn || !description.trim() || !sellerPhone.trim()) {
+        if (!title.trim() || !price.trim() || !city.trim() || !village.trim() || !address.trim() || !categoryEn || !typeEn || !description.trim() || !sellerPhone.trim()) {
             Toast.show({ type: 'error', text1: 'Validation Error', text2: 'Please fill all required fields.' });
             return;
         }
@@ -298,6 +285,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
             price: Number(price),
             city,
             village,
+            place: address,
             sellerPhone,
             negotiable,
             showPhoneNumber,
@@ -409,10 +397,9 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                         showCharCount
                     />
 
-                    {/* Price & Place */}
-                    <Animated.View entering={FadeInDown.delay(250)} style={styles.row}>
+                    {/* Price */}
+                    <Animated.View entering={FadeInDown.delay(250)} style={styles.inputField}>
                         <FormInput
-                            containerStyle={{ flex: 1 }}
                             label="PRICE (RS.)"
                             required
                             icon="cash-outline"
@@ -422,31 +409,86 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             onChangeText={handlePriceChange}
                             maxLength={8}
                         />
-                        <ModalPickerTrigger
-                            containerStyle={{ flex: 1, marginLeft: 12 }}
+                    </Animated.View>
+
+
+                    {/* Address Map Picker */}
+                    <Animated.View entering={FadeInDown.delay(260)} style={styles.inputField}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                <ThemedText style={[styles.label, { color: colors.text }]}>ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
+                                <LocationPicker
+                                    label='Open Map'
+                                    value={location}
+                                    variant="button"
+                                    onChange={(loc) => {
+                                        setLocation(loc);
+                                        if (loc?.address) {
+                                            handleAddressChange(loc.address);
+                                            setErrors(prev => ({ ...prev, address: '' }));
+                                        }
+                                    }}
+                                />
+                            </View>
+                            <ThemedText style={[{ fontSize: 10, fontWeight: '700', color: colors.icon }, formData.address.length >= 150 && { color: '#EF4444' }]}>
+                                {formData.address.length}/150
+                            </ThemedText>
+                        </View>
+                        <View style={[{
+                            backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
+                            borderRadius: 12,
+                            paddingHorizontal: 14,
+                            minHeight: 80,
+                            alignItems: 'flex-start',
+                            paddingVertical: 12,
+                            borderColor: errors.address ? '#EF4444' : 'transparent',
+                            borderWidth: errors.address ? 1 : 0,
+                            marginTop: 6,
+                        }]}>
+                            <TextInput
+                                style={[styles.textInput, { color: colors.text, textAlignVertical: 'top', minHeight: 60, fontSize: 14 }]}
+                                placeholder="Shop #, Street, Area"
+                                placeholderTextColor={colors.icon}
+                                value={formData.address}
+                                onChangeText={(text) => {
+                                    handleAddressChange(text);
+                                    setErrors(prev => ({ ...prev, address: '' }));
+                                }}
+                                maxLength={150}
+                                multiline
+                            />
+                        </View>
+                        {errors.address ? (
+                            <ThemedText style={{ color: '#EF4444', fontSize: 11, marginLeft: 4, marginTop: 2 }}>
+                                {errors.address}
+                            </ThemedText>
+                        ) : null}
+                    </Animated.View>
+
+                    {/* City & Village */}
+                    <Animated.View entering={FadeInDown.delay(265)} style={styles.row}>
+                        <FormInput
+                            containerStyle={{ flex: 1 }}
                             label="CITY"
                             required
                             icon="business-outline"
-                            placeholder="Select City"
+                            placeholder="e.g. Talagang"
                             value={formData.city}
-                            onPress={() => setCityPickerVisible(true)}
+                            onChangeText={handleCityChange}
+                            maxLength={30}
+                            autoCapitalize="words"
                         />
-                    </Animated.View>
-
-                    <Animated.View entering={FadeInDown.delay(260)} style={styles.inputField}>
-                        <ModalPickerTrigger
+                        <FormInput
+                            containerStyle={{ flex: 1, marginLeft: 12 }}
                             label="VILLAGE"
                             required
                             icon="home-outline"
-                            placeholder="Select Village"
+                            placeholder="e.g. Chinji"
                             value={formData.village}
-                            onPress={() => setVillagePickerVisible(true)}
+                            onChangeText={handleVillageChange}
+                            maxLength={30}
+                            autoCapitalize="words"
                         />
-                    </Animated.View>
-
-                    {/* Location Picker (optional) */}
-                    <Animated.View entering={FadeInDown.delay(270)} style={styles.inputField}>
-                        <LocationPicker value={location} onChange={setLocation} />
                     </Animated.View>
 
                     {/* Phone Number */}
@@ -593,25 +635,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 onSelect={(selection) => handleCategorySelect(selection.category, selection.type)}
             />
 
-            <SearchableDropdown
-                visible={cityPickerVisible}
-                onClose={() => setCityPickerVisible(false)}
-                onSelect={handleCitySelect}
-                currentValue={formData.city}
-                options={citiesData}
-                title="Select City"
-                placeholder="Search city..."
-            />
 
-            <SearchableDropdown
-                visible={villagePickerVisible}
-                onClose={() => setVillagePickerVisible(false)}
-                onSelect={handleVillageSelect}
-                currentValue={formData.village}
-                options={villagesData}
-                title="Select Village"
-                placeholder="Search village/town..."
-            />
 
             <LoaderOverlay visible={mutation.isPending || isUploadingImages} />
         </KeyboardAvoidingView>
@@ -623,6 +647,11 @@ CreateMarketplaceListing.displayName = 'CreateMarketplaceListing';
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    textInput: {
+        width: '100%',
+        padding: 0,
+        margin: 0,
     },
     // ── Hero Header ──────────────────────────────────────────────────────
     header: {

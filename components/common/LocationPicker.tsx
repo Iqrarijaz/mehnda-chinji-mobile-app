@@ -69,7 +69,7 @@ interface LocationPickerProps {
     variant?: 'default' | 'icon' | 'button';
 }
 
-export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0, variant = 'default' }: LocationPickerProps) {
+export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0, variant = 'default' }: LocationPickerProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
@@ -363,7 +363,16 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
             <LocationLoadingModal visible={locating} />
         </AnimatedView>
     );
-}
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.value?.latitude === nextProps.value?.latitude &&
+        prevProps.value?.longitude === nextProps.value?.longitude &&
+        prevProps.value?.address === nextProps.value?.address &&
+        prevProps.delay === nextProps.delay &&
+        prevProps.variant === nextProps.variant &&
+        prevProps.label === nextProps.label
+    );
+});
 
 const styles = StyleSheet.create({
     field: { gap: 6 },

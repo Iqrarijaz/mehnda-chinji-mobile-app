@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 14,
+        borderRadius: 12,
         paddingHorizontal: 14,
     },
     inputText: {

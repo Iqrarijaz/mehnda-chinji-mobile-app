@@ -10,12 +10,21 @@ import { ThemedView } from '@/components/ThemedView';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PasswordModal } from '@/components/setting/PasswordModal';
+import messaging from '@react-native-firebase/messaging';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isSearchActive, setIsSearchActive] = React.useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    // Subscribe to marketplace reminders so already registered users receive them
+    messaging()
+      .subscribeToTopic('marketplace_reminder')
+      .then(() => console.log('Subscribed to marketplace_reminder from Home'))
+      .catch(err => console.log('Failed to subscribe to topic', err));
+  }, []);
 
   return (
     <ThemedView style={styles.container}>

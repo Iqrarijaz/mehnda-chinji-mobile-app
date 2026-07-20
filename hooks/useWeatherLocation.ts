@@ -13,6 +13,8 @@ interface WeatherLocation {
     fallbackCity: string;
 }
 
+let globalCachedCoords: Coordinates | null = null;
+
 /**
  * Resolves the location the home weather widget should display:
  *   - current GPS location when location permission is already granted, else
@@ -26,7 +28,7 @@ interface WeatherLocation {
 export function useWeatherLocation(): WeatherLocation {
     const { user } = useAuth();
     const { selectedCity } = useWeatherCity();
-    const [coords, setCoords] = useState<Coordinates | null>(null);
+    const [coords, setCoords] = useState<Coordinates | null>(globalCachedCoords);
 
     const profileCity = user?.user?.city
         ? `${capitalizeString(user.user.city)}, PK`
@@ -35,7 +37,10 @@ export function useWeatherLocation(): WeatherLocation {
     const resolveCoords = useCallback(async () => {
         const current = await getCurrentCoords({ requestPermission: false });
         setCoords((prev) => {
-            if (!current) return prev === null ? prev : null;
+            if (!current) {
+                globalCachedCoords = prev === null ? prev : null;
+                return globalCachedCoords;
+            }
             // Round to ~100m so GPS jitter doesn't churn state / re-render.
             const next = {
                 latitude: Number(current.latitude.toFixed(3)),
@@ -44,6 +49,7 @@ export function useWeatherLocation(): WeatherLocation {
             if (prev && prev.latitude === next.latitude && prev.longitude === next.longitude) {
                 return prev;
             }
+            globalCachedCoords = next;
             return next;
         });
     }, []);
