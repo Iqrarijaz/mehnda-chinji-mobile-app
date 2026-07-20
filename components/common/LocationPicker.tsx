@@ -202,7 +202,7 @@ export function LocationPicker({ label = 'LOCATION', value, onChange, delay = 0,
                 </TouchableOpacity>
             )}
 
-            <Modal visible={modalVisible} animationType="slide" transparent={false} onRequestClose={closeModal}>
+            <Modal visible={modalVisible} animationType="slide" transparent={true} onRequestClose={closeModal}>
                 <View style={[styles.modalOverlayFS, { backgroundColor: colors.background }]}>
                     {/* Header */}
                     <View style={[styles.modalHeaderFS, { backgroundColor: colors.background }]}>
@@ -329,6 +329,11 @@ const styles = StyleSheet.create({
     },
     modalOverlayFS: {
         flex: 1,
+        width: '100%',
+        height: '100%',
+        borderRadius: 24,
+        overflow: 'hidden',
+        padding: 0,
     },
     modalHeaderFS: {
         flexDirection: 'row',
