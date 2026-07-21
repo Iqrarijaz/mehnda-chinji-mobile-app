@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useWeatherCity } from '@/context/WeatherContext';
 import { getCurrentCoords, Coordinates } from '@/utils/locationService';
 import { capitalizeString } from '@/utils/string';
+import { useSavedCities } from '@/hooks/useSavedCities';
 
 interface WeatherLocation {
     /** Current-location coordinates when permission is granted, else null. */
@@ -28,6 +29,7 @@ let globalCachedCoords: Coordinates | null = null;
 export function useWeatherLocation(): WeatherLocation {
     const { user } = useAuth();
     const { selectedCity } = useWeatherCity();
+    const { defaultCity } = useSavedCities();
     const [coords, setCoords] = useState<Coordinates | null>(globalCachedCoords);
 
     const profileCity = user?.user?.city
@@ -64,5 +66,11 @@ export function useWeatherLocation(): WeatherLocation {
         }, [resolveCoords]),
     );
 
-    return { coords, fallbackCity: profileCity };
+    // Current GPS wins. If it's unavailable, fall back to the user's Default
+    // saved City (by its coordinates, for accuracy), then the profile city.
+    const effectiveCoords: Coordinates | null =
+        coords ?? (defaultCity ? { latitude: defaultCity.latitude, longitude: defaultCity.longitude } : null);
+    const fallbackCity = coords ? profileCity : (defaultCity?.name || profileCity);
+
+    return { coords: effectiveCoords, fallbackCity };
 }

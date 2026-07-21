@@ -1,7 +1,40 @@
 import axios from 'axios';
+import apiClient from '../client';
 
 const WEATHER_API_KEY = '5a7027b89c8e1abc39b876ee950ade1b';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
+
+// ── Saved cities (synced with the backend) ──────────────────────────────────
+
+export interface SavedCity {
+    name: string;
+    latitude: number;
+    longitude: number;
+    isDefault?: boolean;
+}
+
+export const getSavedCities = async (): Promise<{ success: boolean; data: SavedCity[] }> => {
+    const res: any = await apiClient.get('/api/user/v1/weather/saved-cities');
+    return res;
+};
+
+export const saveSavedCities = async (cities: SavedCity[]): Promise<{ success: boolean; data: SavedCity[] }> => {
+    const res: any = await apiClient.put('/api/user/v1/weather/saved-cities', { cities });
+    return res;
+};
+
+// ── Air quality (free OpenWeather Air Pollution API) ────────────────────────
+
+export const getAirQuality = async (lat: number, lon: number) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/air_pollution`, {
+            params: { lat, lon, appid: WEATHER_API_KEY },
+        });
+        return response.data?.list?.[0] ?? null; // { main: { aqi }, components: {...} }
+    } catch {
+        return null;
+    }
+};
 
 export interface WeatherResponse {
     coord: { lon: number; lat: number };
