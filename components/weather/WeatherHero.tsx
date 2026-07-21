@@ -5,6 +5,7 @@ import { ThemedText } from '../ThemedText';
 import { getIconName } from './weatherUtils';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 
 interface WeatherHeroProps {
     weather: any;
@@ -14,9 +15,10 @@ interface WeatherHeroProps {
 const WeatherHero = React.memo(({ weather, isLoading }: WeatherHeroProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
+
     if (isLoading && !weather) {
         return (
-            <View style={styles.loadingContainer}>
+            <View style={[styles.loadingContainer, { backgroundColor: colors.primary }]}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
             </View>
         );
@@ -25,11 +27,11 @@ const WeatherHero = React.memo(({ weather, isLoading }: WeatherHeroProps) => {
     if (!weather) return null;
 
     return (
-        <View style={styles.heroCard}>
+        <View style={[styles.heroCard, { backgroundColor: colors.primary }]}>
             {/* Top row: City Name & Date */}
             <View style={styles.locationContainer}>
                 <View style={styles.locationRow}>
-                    <Ionicons name="location" size={16} color="rgba(255,255,255,0.9)" />
+                    <Ionicons name="location" size={16} color={colors.lime} />
                     <ThemedText style={styles.city}>{weather.name}</ThemedText>
                 </View>
                 <ThemedText style={styles.date}>
@@ -53,7 +55,7 @@ const WeatherHero = React.memo(({ weather, isLoading }: WeatherHeroProps) => {
             </View>
 
             {/* Bottom Row: Meta Info Pills (Feels Like, High/Low) */}
-            <View style={styles.metaRow}>
+            <View style={[styles.metaRow, { backgroundColor: 'rgba(0,0,0,0.18)' }]}>
                 <View style={styles.metaItem}>
                     <Ionicons name="thermometer-outline" size={13} color="rgba(255,255,255,0.7)" />
                     <ThemedText style={styles.metaText}>Feels {Math.round(weather.main.feels_like)}°</ThemedText>
@@ -77,100 +79,75 @@ export default WeatherHero;
 
 const styles = StyleSheet.create({
     heroCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.12)',
-        borderRadius: 16,
-        borderColor: 'rgba(255, 255, 255, 0.15)',
-        padding: 16,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-    },
+        borderRadius: Layout.borderRadius,
+        padding: 20,
+        marginBottom: 16 },
     loadingContainer: {
-        height: 150,
+        height: 160,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.12)',
-        borderRadius: 16,
-        marginBottom: 16,
-    },
+        borderRadius: Layout.borderRadius,
+        marginBottom: 16 },
     locationContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
         paddingBottom: 10,
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     locationRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-    },
+        gap: 4 },
     city: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
-    },
+        color: '#FFFFFF' },
     date: {
         fontSize: 12,
         color: 'rgba(255, 255, 255, 0.7)',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     mainRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 12,
-        paddingHorizontal: 4,
-    },
+        paddingHorizontal: 4 },
     tempColumn: {
-        flexDirection: 'column',
-    },
+        flexDirection: 'column' },
     temp: {
         fontSize: Platform.OS === 'android' ? 52 : 56,
         fontWeight: '900',
         color: '#FFFFFF',
         lineHeight: Platform.OS === 'android' ? 56 : 60,
-        letterSpacing: -1,
-    },
+        letterSpacing: -1 },
     condition: {
         fontSize: 15,
         color: 'rgba(255, 255, 255, 0.85)',
         fontWeight: '600',
         textTransform: 'capitalize',
-        marginTop: 2,
-    },
+        marginTop: 2 },
     staticIcon: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+
+
+
+
     },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-        borderRadius: 12,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingVertical: 10,
+        paddingHorizontal: 14 },
     metaItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-    },
+        gap: 4 },
     metaText: {
         color: 'rgba(255, 255, 255, 0.9)',
         fontSize: 12,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     metaDivider: {
         width: 1,
         height: 12,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    },
-});
+        backgroundColor: 'rgba(255, 255, 255, 0.2)' } });

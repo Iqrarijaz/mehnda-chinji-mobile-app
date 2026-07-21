@@ -4,6 +4,7 @@ import LottieView from 'lottie-react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 
 const { width } = Dimensions.get('window');
 
@@ -26,20 +27,17 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
     const translateY = scrollX.interpolate({
         inputRange: [(index - 1) * width, index * width, (index + 1) * width],
         outputRange: [50, 0, -50],
-        extrapolate: 'clamp',
-    });
+        extrapolate: 'clamp' });
 
     const opacity = scrollX.interpolate({
         inputRange: [(index - 0.6) * width, index * width, (index + 0.6) * width],
         outputRange: [0, 1, 0],
-        extrapolate: 'clamp',
-    });
+        extrapolate: 'clamp' });
 
     const scale = scrollX.interpolate({
         inputRange: [(index - 1) * width, index * width, (index + 1) * width],
         outputRange: [0.85, 1, 0.85],
-        extrapolate: 'clamp',
-    });
+        extrapolate: 'clamp' });
 
     return (
         <View style={styles.container}>
@@ -61,8 +59,7 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
                     {
                         opacity,
                         transform: [{ translateY }],
-                        backgroundColor: colors.card,
-                    }
+                        backgroundColor: colors.card }
                 ]}
             >
                 <ThemedText
@@ -94,43 +91,35 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 28,
-    },
+        paddingHorizontal: 28 },
     animationContainer: {
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     lottie: {
         width: width * 0.76,
-        height: width * 0.76,
-    },
+        height: width * 0.76 },
     cardContainer: {
         width: '100%',
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         paddingVertical: 20,
         paddingHorizontal: 18,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     title: {
         fontSize: 20,
         lineHeight: 34,
         fontWeight: '800',
         paddingTop: 4,
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     divider: {
         width: 32,
         height: 2,
-        borderRadius: 1,
-        marginVertical: 12,
-    },
+        borderRadius: Layout.borderRadius,
+        marginVertical: 12 },
     description: {
         fontSize: 12,
         textAlign: 'center',
         lineHeight: 18,
         fontWeight: '600',
-        paddingHorizontal: 8,
-    },
-});
+        paddingHorizontal: 8 } });

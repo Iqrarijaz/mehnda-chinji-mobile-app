@@ -82,13 +82,9 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
                     <View style={styles.header}>
                         <View style={[
                             styles.iconWrapper,
-                            { backgroundColor: config.bg, borderColor: config.color + '10'}
+                            { backgroundColor: config.bg }
                         ]}>
-                            <Ionicons
-                                name={config.icon}
-                                size={36}
-                                color={config.color}
-                            />
+                            <Ionicons name={config.icon} size={22} color={config.color} />
                         </View>
                         <ThemedText style={[styles.title, { color: config.color }]}>{title}</ThemedText>
                     </View>
@@ -132,77 +128,56 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
-    },
+        padding: 24 },
     modalContent: {
         width: '100%',
         borderRadius: Layout.borderRadius,
         padding: 24,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-    },
+        alignItems: 'center' },
     header: {
         alignItems: 'center',
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     iconWrapper: {
         width: 72,
         height: 72,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     title: {
         fontSize: 18,
         fontWeight: '700',
         textAlign: 'center',
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     message: {
         fontSize: 13,
         color: '#64748B',
         textAlign: 'center',
         lineHeight: 20,
         marginBottom: 24,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     footer: {
         flexDirection: 'row',
         gap: 12,
-        marginTop: 8,
-    },
+        marginTop: 8 },
     cancelBtn: {
         flex: 1,
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 20,
-        backgroundColor: '#F8FAFC',
-        borderColor: '#E2E8F0',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: '#F8FAFC' },
     cancelText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#64748B',
-    },
+        color: '#64748B' },
     confirmBtnWrapper: {
         flex: 1,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-    },
+        alignItems: 'center' },
     confirmBtnText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#FFFFFF',
-    },
-});
+        color: '#FFFFFF' } });

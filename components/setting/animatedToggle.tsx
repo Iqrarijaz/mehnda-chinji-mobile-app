@@ -4,8 +4,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withSpring,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 
 const TOGGLE_WIDTH = 52;
 const TOGGLE_HEIGHT = 30;
@@ -21,8 +20,7 @@ interface AnimatedToggleProps {
 export const AnimatedToggle: React.FC<AnimatedToggleProps> = ({
     value,
     onValueChange,
-    primaryColor = '#006666',
-}) => {
+    primaryColor = '#006666' }) => {
     const offset = useSharedValue(value ? THUMB_TRAVEL : 0);
     const bgProgress = useSharedValue(value ? 1 : 0);
 
@@ -32,12 +30,10 @@ export const AnimatedToggle: React.FC<AnimatedToggleProps> = ({
     }, [value]);
 
     const trackStyle = useAnimatedStyle(() => ({
-        backgroundColor: bgProgress.value > 0.5 ? primaryColor : '#D1D5DB',
-    }));
+        backgroundColor: bgProgress.value > 0.5 ? primaryColor : '#D1D5DB' }));
 
     const thumbStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: offset.value }],
-    }));
+        transform: [{ translateX: offset.value }] }));
 
     return (
         <TouchableOpacity activeOpacity={0.8} onPress={() => onValueChange(!value)}>
@@ -54,12 +50,9 @@ const styles = StyleSheet.create({
         height: TOGGLE_HEIGHT,
         borderRadius: TOGGLE_HEIGHT / 2,
         justifyContent: 'center',
-        paddingHorizontal: 3,
-    },
+        paddingHorizontal: 3 },
     toggleThumb: {
         width: THUMB_SIZE,
         height: THUMB_SIZE,
         borderRadius: THUMB_SIZE / 2,
-        backgroundColor: '#FFFFFF',
-    },
-});
+        backgroundColor: '#FFFFFF' } });

@@ -7,11 +7,11 @@ import Animated, {
     withDelay,
     withRepeat,
     withSequence,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
 function Dot({ delay, color }: { delay: number; color: string }) {
     const progress = useSharedValue(0);
@@ -34,8 +34,7 @@ function Dot({ delay, color }: { delay: number; color: string }) {
 
     const style = useAnimatedStyle(() => ({
         opacity: 0.35 + progress.value * 0.65,
-        transform: [{ translateY: -progress.value * 5 }],
-    }));
+        transform: [{ translateY: -progress.value * 5 }] }));
 
     return <Animated.View style={[styles.dot, { backgroundColor: color }, style]} />;
 }
@@ -62,11 +61,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 7,
-    },
+        gap: 7 },
     dot: {
         width: 8,
         height: 8,
-        borderRadius: 4,
-    },
-});
+        borderRadius: Layout.borderRadius } });

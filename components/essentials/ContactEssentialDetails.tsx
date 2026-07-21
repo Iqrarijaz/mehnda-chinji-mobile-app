@@ -6,6 +6,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { capitalizeString } from '@/utils/string';
+import { Layout } from '@/constants/layout';
 
 interface Contact {
     name?: string;
@@ -28,8 +29,7 @@ export const ContactEssentialDetails = React.memo(({ contacts, primaryColor }: C
             Toast.show({
                 type: 'error',
                 text1: 'No Phone',
-                text2: 'Phone number not available.',
-            });
+                text2: 'Phone number not available.' });
         }
     };
 
@@ -39,7 +39,7 @@ export const ContactEssentialDetails = React.memo(({ contacts, primaryColor }: C
                 Contact Details
             </ThemedText>
             {contacts.map((contact, idx) => (
-                <View key={idx} style={[styles.contactItem, { borderBottomColor: colors.border, borderBottomWidth: idx === contacts.length - 1 ? 0 : StyleSheet.hairlineWidth }]}>
+                <View key={idx} style={styles.contactItem}>
                     <View style={styles.contactInfo}>
                         {contact.name ? (
                             <ThemedText style={[styles.contactName, { color: colors.text }]}>{capitalizeString(contact.name)}</ThemedText>
@@ -63,37 +63,30 @@ ContactEssentialDetails.displayName = 'ContactEssentialDetails';
 
 const styles = StyleSheet.create({
     detailSection: {
-        gap: 6,
-    },
+        gap: 6 },
     sectionHeading: {
         fontSize: 10,
         fontWeight: '800',
         textTransform: 'uppercase',
-        letterSpacing: 0.8,
-    },
+        letterSpacing: 0.8 },
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 4,
-    },
+        paddingVertical: 4 },
     contactInfo: {
-        flex: 1,
-    },
+        flex: 1 },
     contactName: {
         fontSize: 14,
         fontWeight: '700',
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     contactNumber: {
         // Font size and weight depend on whether name is present, handled inline
     },
     callBtn: {
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         alignItems: 'center',
         justifyContent: 'center',
-        marginLeft: 12,
-    },
-});
+        marginLeft: 12 } });

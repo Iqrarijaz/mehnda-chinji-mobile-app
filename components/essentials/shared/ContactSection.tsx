@@ -11,6 +11,7 @@ import { capitalizeString } from '@/utils/string';
 import { toWhatsAppNumber } from '@/utils/phone';
 import { PressableScale } from './PressableScale';
 import { SectionHeading } from './SectionHeading';
+import { Layout } from '@/constants/layout';
 
 export interface ContactItem {
     name?: string;
@@ -64,8 +65,7 @@ const ContactCard = React.memo(({
     index,
     size,
     iconTint,
-    onContactAction,
-}: {
+    onContactAction }: {
     contact: ContactItem;
     index: number;
     size: 'regular' | 'large';
@@ -85,8 +85,7 @@ const ContactCard = React.memo(({
             Toast.show({
                 type: 'error',
                 text1: 'No Phone',
-                text2: 'Phone number not available.',
-            });
+                text2: 'Phone number not available.' });
         }
     };
 
@@ -98,8 +97,7 @@ const ContactCard = React.memo(({
             Toast.show({
                 type: 'error',
                 text1: 'WhatsApp unavailable',
-                text2: 'Could not open WhatsApp for this number.',
-            });
+                text2: 'Could not open WhatsApp for this number.' });
         });
     };
 
@@ -193,8 +191,7 @@ export const ContactSection = React.memo(({
     hint,
     size = 'regular',
     iconTint = 'primary',
-    onContactAction,
-}: ContactSectionProps) => {
+    onContactAction }: ContactSectionProps) => {
     if (!contacts || contacts.length === 0) return null;
 
     return (
@@ -220,74 +217,59 @@ ContactSection.displayName = 'ContactSection';
 
 const styles = StyleSheet.create({
     section: {
-        gap: 8,
-    },
+        gap: 8 },
     list: {
-        gap: 8,
-    },
+        gap: 8 },
     card: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
-        borderRadius: 16,
-        gap: 12,
-    },
+        borderRadius: Layout.borderRadius,
+        gap: 12 },
     cardLarge: {
         padding: 12,
-        borderRadius: 18,
-        minHeight: 64,
-    },
+        borderRadius: Layout.borderRadius,
+        minHeight: 64 },
     iconTile: {
         width: 40,
         height: 40,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     iconTileLarge: {
         width: 44,
         height: 44,
-        borderRadius: 15,
-    },
+        borderRadius: Layout.borderRadius },
     info: {
-        flex: 1,
-    },
+        flex: 1 },
     label: {
         fontSize: 10.5,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.4,
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     number: {
         fontSize: 14.5,
         fontWeight: '700',
-        letterSpacing: 0.3,
-    },
+        letterSpacing: 0.3 },
     numberLarge: {
         fontSize: 16,
         fontWeight: '800',
-        letterSpacing: 0.4,
-    },
+        letterSpacing: 0.4 },
     description: {
         fontSize: 11,
-        marginTop: 1,
-    },
+        marginTop: 1 },
     actions: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     actionBtn: {
         width: 38,
         height: 38,
-        borderRadius: 19,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     actionBtnLarge: {
         width: 42,
         height: 42,
-        borderRadius: 21,
-    },
-});
+        borderRadius: Layout.borderRadius } });

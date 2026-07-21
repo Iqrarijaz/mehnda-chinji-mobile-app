@@ -1,8 +1,7 @@
 import React, { useMemo, useRef, useEffect, useCallback } from 'react';
 import {
     StyleSheet, View, ScrollView,
-    Dimensions, Animated, TouchableOpacity, Alert, Platform,
-} from 'react-native';
+    Dimensions, Animated, TouchableOpacity, Alert, Platform } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
@@ -32,8 +31,7 @@ const PALETTE = {
         textSecondary: Colors.light.textSecondary,
         divider: Colors.light.border,
         headerOverlay: 'rgba(4,60,35,0.55)',
-        headerOverlayBottom: 'rgba(3,30,18,0.85)',
-    },
+        headerOverlayBottom: 'rgba(3,30,18,0.85)' },
     dark: {
         primary: Colors.dark.primary,
         primaryLight: 'rgba(0,102,102,0.15)',
@@ -46,9 +44,7 @@ const PALETTE = {
         textSecondary: Colors.dark.textSecondary,
         divider: Colors.dark.border,
         headerOverlay: 'rgba(1,1,1,0.55)',
-        headerOverlayBottom: 'rgba(1,1,1,0.92)',
-    },
-};
+        headerOverlayBottom: 'rgba(1,1,1,0.92)' } };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const { width } = Dimensions.get('window');
@@ -178,5 +174,4 @@ export default function PrayerTimesScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    body: { paddingHorizontal: 16, paddingBottom: 40 },
-});
+    body: { paddingHorizontal: 16, paddingBottom: 40 } });

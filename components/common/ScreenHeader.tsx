@@ -11,8 +11,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
-    ViewStyle,
-} from 'react-native';
+    ViewStyle } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import Animated, {
     Easing,
@@ -20,8 +19,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withRepeat,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Avatar from '../ui/avatar';
 import { NotificationIcon } from '../common/NotificationIcon';
@@ -67,99 +65,11 @@ export interface ScreenHeaderProps {
 const DECOR_ICON: Record<ScreenHeaderDecor, keyof typeof Ionicons.glyphMap> = {
     community: 'people',
     business: 'storefront',
-    marketplace: 'pricetag',
-};
+    marketplace: 'pricetag' };
 
 // ─── Decor layer ──────────────────────────────────────────────────────────────
 
-const DecorLayer = React.memo(function DecorLayer({ decor, lime, secondary }: { decor: ScreenHeaderDecor; lime: string; secondary: string }) {
-    // The whole layer drifts very slowly sideways — subtle background motion.
-    const drift = useSharedValue(0);
-    useEffect(() => {
-        drift.value = withRepeat(
-            withTiming(1, { duration: 6000, easing: Easing.inOut(Easing.sin) }),
-            -1,
-            true
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    const driftStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: -3 + drift.value * 6 }],
-    }));
 
-    return (
-        <Animated.View style={[StyleSheet.absoluteFill, driftStyle]} pointerEvents="none">
-            <Svg style={StyleSheet.absoluteFill} viewBox="0 0 375 190" preserveAspectRatio="xMinYMin slice">
-                <Circle cx={360} cy={5} r={80} fill="rgba(255,255,255,0.05)" />
-                <Circle cx={15} cy={185} r={60} fill="rgba(255,255,255,0.04)" />
-
-                {decor === 'community' && (
-                    <>
-                        {/* connected homes and a location pin */}
-                        <Path
-                            d="M30 96 l12 -10 l12 10 v16 h-24 z M78 100 l10 -8 l10 8 v12 h-20 z"
-                            fill="none"
-                            stroke="rgba(255,255,255,0.09)"
-                            strokeWidth={2}
-                            strokeLinejoin="round"
-                        />
-                        <Path
-                            d="M60 130 C 120 100, 220 150, 330 90"
-                            stroke="rgba(255,255,255,0.08)"
-                            strokeWidth={2}
-                            strokeDasharray="4 8"
-                            strokeLinecap="round"
-                            fill="none"
-                        />
-                        <Path
-                            d="M318 66 c0 -8 6 -14 13 -14 c7 0 13 6 13 14 c0 9 -13 22 -13 22 c0 0 -13 -13 -13 -22 z"
-                            fill="none"
-                            stroke="rgba(255,255,255,0.09)"
-                            strokeWidth={2}
-                        />
-                    </>
-                )}
-
-                {decor === 'business' && (
-                    <>
-                        {/* shop awning + window + growth line */}
-                        <Path
-                            d="M28 76 L88 76 L83 91 L73 91 L68 76 L58 76 L53 91 L43 91 L38 76 L28 76 Z"
-                            fill="rgba(255,255,255,0.07)"
-                        />
-                        <Rect x={36} y={91} width={44} height={28} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1.5} />
-                        <Path
-                            d="M255 125 Q285 90 315 100 T380 60"
-                            stroke="rgba(255,255,255,0.08)"
-                            strokeWidth={2}
-                            fill="none"
-                        />
-                    </>
-                )}
-
-                {decor === 'marketplace' && (
-                    <>
-                        {/* shopping bag + product box + price tag */}
-                        <Path
-                            d="M34 84 h34 l4 38 h-42 z"
-                            fill="none"
-                            stroke="rgba(255,255,255,0.08)"
-                            strokeWidth={2}
-                            strokeLinejoin="round"
-                        />
-                        <Path d="M42 84 c0 -10 18 -10 18 0" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={2} />
-                        <Rect x={302} y={94} width={32} height={26} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={2} rx={3} />
-                        <Path d="M302 104 h32 M318 94 v10" stroke="rgba(255,255,255,0.08)" strokeWidth={2} />
-                        <Path d="M256 42 l20 0 l9 9 l-20 20 l-20 -20 z" fill="rgba(255,255,255,0.06)" transform="rotate(18 265 56)" />
-                    </>
-                )}
-
-                <Circle cx={150} cy={40} r={3} fill={lime} opacity={0.5} />
-                <Circle cx={245} cy={120} r={2.5} fill={secondary} opacity={0.5} />
-            </Svg>
-        </Animated.View>
-    );
-});
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -173,8 +83,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
     backIcon = 'arrow-back',
     hideAccountActions = false,
     decor,
-    hero,
-}: ScreenHeaderProps) {
+    hero }: ScreenHeaderProps) {
     const { theme } = useTheme();
     const { user } = useAuth();
     const colors = Colors[theme];
@@ -200,11 +109,9 @@ export const ScreenHeader = React.memo(function ScreenHeader({
 
     const haloStyle = useAnimatedStyle(() => ({
         opacity: 0.15 + pulse.value * 0.12,
-        transform: [{ scale: 1.05 + pulse.value * 0.08 }],
-    }));
+        transform: [{ scale: 1.05 + pulse.value * 0.08 }] }));
     const tileStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 + pulse.value * 0.03 }],
-    }));
+        transform: [{ scale: 1 + pulse.value * 0.03 }] }));
 
     const heroIcon = hero?.icon || (decor ? DECOR_ICON[decor] : 'apps');
 
@@ -214,12 +121,11 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                 styles.container,
                 {
                     backgroundColor: colors.primary,
-                    paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20),
-                },
+                    paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) },
                 containerStyle,
             ]}
         >
-            {decor && <DecorLayer decor={decor} lime={colors.lime} secondary={colors.secondary} />}
+
 
             {/* ── Icon row ────────────────────────────────────────────────── */}
             <View style={styles.row}>
@@ -256,25 +162,16 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                         <>
                             <NotificationIcon
                                 containerStyle={{ marginRight: 12 }}
-                                badgeStyle={{ borderColor: colors.primary }}
                             />
-
-                            <TouchableOpacity
-                                onPress={() => router.push('/profile')}
-                                style={styles.avatarBtn}
-                            >
-                                <Avatar
-                                    uri={user?.user?.profileImage}
-                                    name={user?.user?.name}
-                                    size={34}
-                                />
+                            <TouchableOpacity onPress={() => router.push('/profile')} style={styles.avatarBtn}>
+                                <Avatar size={38} uri={user?.user?.profile_image_url || user?.user?.avatar} name={user?.user?.first_name || user?.user?.name || ''} />
                             </TouchableOpacity>
                         </>
                     )}
                 </View>
             </View>
 
-            {/* ── Per-screen content (search, toggles, etc.) ────────────── */}
+            {/* ── Content (search bars, toggles, etc.) ────────────── */}
             {children}
 
             {/* ── Optional hero band ──────────────────────────────────────── */}
@@ -297,14 +194,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                     {hero.subtitle ? (
                         <ThemedText style={styles.heroSubtitle}>{hero.subtitle}</ThemedText>
                     ) : null}
-                    <Svg width="100%" height={12} viewBox="0 0 375 12" preserveAspectRatio="none" style={styles.heroWave}>
-                        <Path
-                            d="M0 6 Q94 0 187 6 Q281 12 375 6"
-                            stroke="rgba(255,255,255,0.12)"
-                            strokeWidth={1.5}
-                            fill="none"
-                        />
-                    </Svg>
+
                 </Animated.View>
             )}
         </View>
@@ -319,8 +209,7 @@ export const HeaderIconBtn = React.memo(function HeaderIconBtn({
     onPress,
     style,
     size = 20,
-    badge,
-}: {
+    badge }: {
     name: keyof typeof Ionicons.glyphMap;
     onPress: () => void;
     style?: ViewStyle;
@@ -346,100 +235,82 @@ const styles = StyleSheet.create({
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
         paddingBottom: Platform.OS === 'android' ? 8 : 16,
         zIndex: 10,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: Platform.OS === 'android' ? 18 : 20,
-    },
+        marginBottom: Platform.OS === 'android' ? 18 : 20 },
     leftSide: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     rightSide: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     iconBtn: {
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     avatarBtn: {
         width: 38,
         height: 38,
-        borderRadius: 19,
-        borderColor: 'rgba(255,255,255,0.5)',
-        // borderWidth: 2,
+        borderRadius: Layout.borderRadius,
+        //
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     // Hero band
     heroBand: {
         alignItems: 'center',
         paddingTop: 10,
-        paddingHorizontal: 8,
-    },
+        paddingHorizontal: 8 },
     heroIconWrap: {
         width: 52,
         height: 52,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     heroHalo: {
         position: 'absolute',
         width: 44,
         height: 44,
-        borderRadius: 14,
-        backgroundColor: 'rgba(255,255,255,0.4)',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: 'rgba(255,255,255,0.4)' },
     heroTile: {
         width: 40,
         height: 40,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     heroTitleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     heroTitle: {
         fontSize: 18,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     heroCountPill: {
         paddingHorizontal: 9,
         paddingVertical: 3,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     heroCountText: {
         fontSize: 10,
         fontWeight: '800',
         color: '#1E293B',
         letterSpacing: 0.4,
-        textTransform: 'uppercase',
-    },
+        textTransform: 'uppercase' },
     heroSubtitle: {
         fontSize: 12,
         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
         marginTop: 6,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
     heroWave: {
-        marginTop: 10,
-    },
-});
+        marginTop: 10 } });

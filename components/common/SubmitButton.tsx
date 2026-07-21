@@ -13,6 +13,7 @@ interface SubmitButtonProps extends TouchableOpacityProps {
 }
 
 import { ActivityIndicator } from 'react-native';
+import { Layout } from '@/constants/layout';
 
 export function SubmitButton({ title, isLoading, disabled, style, icon, ...rest }: SubmitButtonProps) {
     const isDisabled = disabled || isLoading;
@@ -44,22 +45,18 @@ export function SubmitButton({ title, isLoading, disabled, style, icon, ...rest 
 const styles = StyleSheet.create({
     updateButton: {
         height: 46,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'flex-start',
-        paddingHorizontal: 24,
-    },
+        paddingHorizontal: 24 },
     buttonContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 8,
-    },
+        paddingHorizontal: 8 },
     updateButtonText: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

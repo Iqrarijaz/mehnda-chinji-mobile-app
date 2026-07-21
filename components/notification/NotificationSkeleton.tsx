@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Layout } from '@/constants/layout';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withRepeat,
     withSequence,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 
 const SkimBox = React.memo(({ w, h, radius = 8 }: { w: number | string; h: number; radius?: number }) => {
     const opacity = useSharedValue(0.35);
@@ -53,13 +53,9 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         backgroundColor: '#FFFFFF',
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         padding: 16,
-        marginBottom: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
+        marginBottom: 10
     },
-    lines: { flex: 1, marginLeft: 14 },
+    lines: { flex: 1, marginLeft: 14 }
 });

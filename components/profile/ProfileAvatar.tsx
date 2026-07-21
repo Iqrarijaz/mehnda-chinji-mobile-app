@@ -3,6 +3,7 @@ import { View, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-nat
 import { Ionicons } from '@expo/vector-icons';
 import Avatar from '@/components/ui/avatar';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { Layout } from '@/constants/layout';
 
 interface ProfileAvatarProps {
     uri?: string | null;
@@ -62,18 +63,14 @@ const styles = StyleSheet.create({
     avatarContainer: {
         alignItems: 'center',
         marginTop: 4,
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     imageWrapper: {
         position: 'relative',
         padding: 3,
-        borderRadius: 45,
-        backgroundColor: 'rgba(255,255,255,0.3)',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: 'rgba(255,255,255,0.3)' },
     avatar: {
-        borderRadius: 40,
-        borderColor: '#FFFFFF',
-    },
+        borderRadius: Layout.borderRadius },
     cameraIcon: {
         position: 'absolute',
         bottom: -2,
@@ -81,11 +78,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#0D9488',
         width: 28,
         height: 28,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: '#FFFFFF',
-    },
+        alignItems: 'center' },
     deleteIcon: {
         position: 'absolute',
         bottom: -2,
@@ -93,17 +88,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#EF4444',
         width: 28,
         height: 28,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: '#FFFFFF',
-    },
+        alignItems: 'center' },
     loaderOverlay: {
         width: 80,
         height: 80,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0,0,0,0.3)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
-});
+        alignItems: 'center' } });

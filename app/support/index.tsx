@@ -151,7 +151,7 @@ export default function SupportScreen() {
                 <View style={styles.actionsGrid}>
                     <Animated.View entering={FadeInDown.delay(200).duration(500)} style={styles.actionItem}>
                         <TouchableOpacity
-                            style={styles.actionCard}
+                            style={[styles.actionCard, { backgroundColor: colors.card }]}
                             onPress={() => router.push('/support/create-ticket')}
                         >
                             <View style={[styles.actionIcon, { backgroundColor: `${colors.primary}15` }]}>
@@ -163,7 +163,7 @@ export default function SupportScreen() {
 
                     <Animated.View entering={FadeInDown.delay(300).duration(500)} style={styles.actionItem}>
                         <TouchableOpacity
-                            style={styles.actionCard}
+                            style={[styles.actionCard, { backgroundColor: colors.card }]}
                             onPress={() => router.push('/support/tickets')}
                         >
                             <View style={[styles.actionIcon, { backgroundColor: `${colors.primary}10` }]}>
@@ -215,93 +215,72 @@ export default function SupportScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     headerWrap: {
         paddingBottom: 24,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        zIndex: 2,
-    },
+        zIndex: 2 },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     backBtn: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitleWrap: {
         flex: 1,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         fontSize: 20,
         fontWeight: '800',
-        color: '#FFFFFF',
-    },
+        color: '#FFFFFF' },
     historyBtn: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerSubtitleWrap: {
         alignItems: 'center',
-        marginTop: 10,
-    },
+        marginTop: 10 },
     headerSubtitle: {
         fontSize: 14,
         color: 'rgba(255,255,255,0.85)',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     scrollView: {
         flex: 1,
         marginTop: -30,
-        zIndex: 0,
-    },
+        zIndex: 0 },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingTop: 46,
-    },
+        paddingTop: 46 },
     actionsGrid: {
         flexDirection: 'row',
         gap: 16,
-        marginBottom: 24,
-    },
+        marginBottom: 24 },
     actionItem: {
-        flex: 1,
-    },
+        flex: 1 },
     actionCard: {
-        backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
         padding: 16,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-    },
+        alignItems: 'center' },
     actionIcon: {
         width: 56,
         height: 56,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 10,
-    },
+        marginBottom: 10 },
     actionText: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#1E293B',
-    },
+        color: '#1E293B' },
     sectionTitle: {
         fontSize: 14,
         fontWeight: '700',
@@ -309,14 +288,11 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 16,
-        marginLeft: 4,
-    },
+        marginLeft: 4 },
     footerNote: {
         fontSize: 12,
         color: '#94A3B8',
         textAlign: 'center',
         marginTop: 24,
         lineHeight: 18,
-        paddingHorizontal: 20,
-    },
-});
+        paddingHorizontal: 20 } });

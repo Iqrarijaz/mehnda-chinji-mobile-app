@@ -15,8 +15,7 @@ import {
     ScrollView,
     StyleSheet,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -54,8 +53,7 @@ const PlaceSubmissionScreen = () => {
     const { data: essentialsConfig } = useQuery({
         queryKey: ['configuration', 'ESSENTIALS_ICONS'],
         queryFn: () => getAuthenticatedConfiguration('ESSENTIALS_ICONS'),
-        staleTime: 0,
-    });
+        staleTime: 0 });
 
     const getConfigArray = (resp: any) => {
         let val = resp?.data?.data || resp?.data?.value || resp?.data || resp;
@@ -119,8 +117,7 @@ const PlaceSubmissionScreen = () => {
                 Toast.show({
                     type: 'error',
                     text1: 'Permission Denied',
-                    text2: 'Camera roll permissions are required to upload photos.',
-                });
+                    text2: 'Camera roll permissions are required to upload photos.' });
                 return;
             }
         }
@@ -129,8 +126,7 @@ const PlaceSubmissionScreen = () => {
             mediaTypes: ['images'],
             allowsEditing: true,
             aspect: [16, 9],
-            quality: 0.8,
-        });
+            quality: 0.8 });
 
         if (!result.canceled) {
             const asset = result.assets[0];
@@ -172,8 +168,7 @@ const PlaceSubmissionScreen = () => {
             Toast.show({
                 type: 'error',
                 text1: 'Upload Failed',
-                text2: 'Could not upload image. Please try again.',
-            });
+                text2: 'Could not upload image. Please try again.' });
         } finally {
             setIsUploading(false);
         }
@@ -194,8 +189,7 @@ const PlaceSubmissionScreen = () => {
         timing: editData?.timing || '',
         images: selectedImage ? [selectedImage] : [],
         village: '',
-        city: '',
-    };
+        city: '' };
     const heroPlaceName = isEditing ? (editData?.name || 'Edit Submission') : `Add ${category ? category.charAt(0).toUpperCase() + category.slice(1) : 'Place'}`;
     const noop = () => { };
 
@@ -310,7 +304,7 @@ const PlaceSubmissionScreen = () => {
                     <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.heroContent}>
                         <View style={styles.heroIconWrap}>
                             {selectedImage ? (
-                                <Image source={{ uri: selectedImage }} style={{ width: 32, height: 32, borderRadius: 10 }} contentFit="cover" />
+                                <Image source={{ uri: selectedImage }} style={{ width: 32, height: 32, borderRadius: Layout.borderRadius }} contentFit="cover" />
                             ) : (
                                 <Ionicons name="location" size={24} color="#0D9488" />
                             )}
@@ -338,58 +332,35 @@ const PlaceSubmissionScreen = () => {
                         keyboardShouldPersistTaps="handled"
                     >
                         {!isEmergency && !isNoPhotoCategory && (
-                            <View style={styles.imageSection}>
-                                {selectedImage ? (
-                                    <View style={styles.imageHeaderWrapper}>
-                                        <Image
-                                            source={{ uri: selectedImage }}
-                                            style={styles.imageHeader}
-                                            contentFit="cover"
-                                            onLoadStart={() => setIsImageLoading(true)}
-                                            onLoadEnd={() => setIsImageLoading(false)}
-                                            onError={() => setIsImageLoading(false)}
-                                        />
-                                        <TouchableOpacity
-                                            style={styles.changeImageBtn}
-                                            onPress={pickImage}
-                                            disabled={isUploading}
-                                        >
-                                            <LinearGradient
-                                                colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.3)']}
-                                                style={styles.changeImageGradient}
-                                            >
-                                                <Ionicons name="camera" size={20} color="#FFF" />
-                                                <ThemedText style={styles.changeImageText}>
-                                                    {isUploading ? 'Uploading...' : 'Change Photo'}
-                                                </ThemedText>
-                                            </LinearGradient>
-                                        </TouchableOpacity>
-                                    </View>
-                                ) : (
-                                    <TouchableOpacity
-                                        style={[styles.imagePlaceholder, { borderColor: colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC' }]}
-                                        onPress={pickImage}
+                            <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 24, gap: 6 }}>
+                                <ThemedText style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, marginLeft: 2, color: colors.text }}>PLACE IMAGE</ThemedText>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                                    <TouchableOpacity 
+                                        style={{ width: 80, height: 80, borderRadius: Layout.borderRadius, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }} 
+                                        onPress={pickImage} 
                                         disabled={isUploading}
                                     >
-                                        <View style={[styles.imageIconCircle, { backgroundColor: colors.primary + '15' }]}>
-                                            <Ionicons name="image" size={32} color={colors.primary} />
-                                        </View>
-                                        <ThemedText style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>
-                                            {isUploading ? 'Uploading...' : 'Add Photo'}
-                                        </ThemedText>
-                                    </TouchableOpacity>
-                                )}
-                                {(isUploading || isImageLoading) && (
-                                    <View style={styles.uploadOverlay}>
-                                        <ActivityIndicator size="large" color={colors.primary} />
-                                        {isUploading && (
-                                            <ThemedText style={{ color: '#FFF', fontSize: 12, fontWeight: '700', marginTop: 8 }}>
-                                                UPLOADING...
-                                            </ThemedText>
+                                        {(isUploading || isImageLoading) ? (
+                                            <ActivityIndicator color={colors.primary} />
+                                        ) : selectedImage ? (
+                                            <Image 
+                                                source={{ uri: selectedImage }} 
+                                                style={{ width: '100%', height: '100%' }}
+                                                contentFit="cover"
+                                                onLoadStart={() => setIsImageLoading(true)}
+                                                onLoadEnd={() => setIsImageLoading(false)}
+                                                onError={() => setIsImageLoading(false)} 
+                                            />
+                                        ) : (
+                                            <Ionicons name="camera-outline" size={30} color={colors.icon} />
                                         )}
+                                    </TouchableOpacity>
+                                    <View style={{ flex: 1 }}>
+                                        <ThemedText style={{ color: colors.textSecondary, fontSize: 13 }}>Add a photo of this place (Optional).</ThemedText>
+                                        <ThemedText style={{ color: colors.textSecondary, fontSize: 11, marginTop: 4 }}>If no image is provided, category icon will be used.</ThemedText>
                                     </View>
-                                )}
-                            </View>
+                                </View>
+                            </Animated.View>
                         )}
                         <EssentialSubmitForm
                             category={category || 'general'}
@@ -414,137 +385,108 @@ export default PlaceSubmissionScreen;
 
 const styles = StyleSheet.create({
     mainContainer: {
-        flex: 1,
-    },
+        flex: 1 },
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     content: {
-        flex: 1,
-    },
+        flex: 1 },
 
     headerWrap: {
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        paddingBottom: 16,
-    },
+        paddingBottom: 16 },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingBottom: 4,
-    },
+        paddingBottom: 4 },
     backBtn: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     heroContent: {
         alignItems: 'center',
         paddingHorizontal: 24,
-        marginTop: 4,
-    },
+        marginTop: 4 },
     heroIconWrap: {
         width: 48,
         height: 48,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-        elevation: 8,
-    },
+        marginBottom: 12 },
     heroTitle: {
         fontSize: 20,
         fontWeight: '800',
         color: '#FFFFFF',
         marginBottom: 4,
         textAlign: 'center',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     heroSubtitle: {
         fontSize: 13,
         color: 'rgba(255,255,255,0.85)',
         textAlign: 'center',
         lineHeight: 18,
         fontWeight: '500',
-        maxWidth: '90%',
-    },
+        maxWidth: '90%' },
 
     scroll: {
-        flex: 1,
-    },
+        flex: 1 },
     scrollContent: {
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
 
     imageSection: {
-        marginBottom: 24,
-    },
+        marginBottom: 24 },
     imageHeaderWrapper: {
         width: '100%',
         height: 180,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        backgroundColor: '#F1F5F9',
-    },
+        backgroundColor: '#F1F5F9' },
     imageHeader: {
         width: '100%',
-        height: '100%',
-    },
+        height: '100%' },
     changeImageBtn: {
         position: 'absolute',
         bottom: 0,
         left: 0,
-        right: 0,
-    },
+        right: 0 },
     changeImageGradient: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 12,
-        gap: 8,
-    },
+        gap: 8 },
     changeImageText: {
         color: '#FFFFFF',
         fontSize: 13,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     imagePlaceholder: {
         width: '100%',
         height: 160,
-        borderRadius: 16,
-        borderWidth: 2,
+        borderRadius: Layout.borderRadius,
         borderStyle: 'dashed',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 12,
-    },
+        gap: 12 },
     imageIconCircle: {
         width: 64,
         height: 64,
-        borderRadius: 32,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     imagePlaceholderText: {
         fontSize: 14,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     uploadOverlay: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(0,0,0,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 16,
-        zIndex: 10,
-    },
-});
+        borderRadius: Layout.borderRadius,
+        zIndex: 10 } });

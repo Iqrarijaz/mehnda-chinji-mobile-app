@@ -10,14 +10,14 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withRepeat,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
+import { Layout } from '@/constants/layout';
 
 interface BankHeroHeaderProps {
     place: any;
@@ -41,8 +41,7 @@ export const BankHeroHeader = React.memo(function BankHeroHeader({
     onBack,
     onReport,
     onEdit,
-    primaryColor,
-}: BankHeroHeaderProps) {
+    primaryColor }: BankHeroHeaderProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
@@ -66,12 +65,10 @@ export const BankHeroHeader = React.memo(function BankHeroHeader({
 
     const shimmerStyle = useAnimatedStyle(() => ({
         opacity: 0.18 + shimmer.value * 0.14,
-        transform: [{ scale: 1.06 + shimmer.value * 0.1 }],
-    }));
+        transform: [{ scale: 1.06 + shimmer.value * 0.1 }] }));
 
     const tileStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 + shimmer.value * 0.022 }],
-    }));
+        transform: [{ scale: 1 + shimmer.value * 0.022 }] }));
 
     const BG = primaryColor || '#1a2d4a'; // deep navy
 
@@ -176,112 +173,97 @@ const styles = StyleSheet.create({
         paddingBottom: 12,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     navRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingBottom: 4,
-    },
+        paddingBottom: 4 },
     navActions: { flexDirection: 'row', gap: 8 },
     navButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0,0,0,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     identityRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 20,
         marginTop: 10,
-        gap: 14,
-    },
+        gap: 14 },
     identityText: { flex: 1 },
     chipRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
         marginBottom: 8,
-        flexWrap: 'wrap',
-    },
+        flexWrap: 'wrap' },
     typeChip: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     typeChipText: {
         fontSize: 10,
         fontWeight: '800',
         color: '#1E293B',
         textTransform: 'uppercase',
-        letterSpacing: 0.6,
-    },
+        letterSpacing: 0.6 },
     timingChip: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
         paddingHorizontal: 9,
         paddingVertical: 4,
-        borderRadius: 999,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.14)',
-        flexShrink: 1,
-    },
-    timingDot: { width: 6, height: 6, borderRadius: 3 },
+        flexShrink: 1 },
+    timingDot: { width: 6, height: 6, borderRadius: Layout.borderRadius },
     timingText: {
         fontSize: 10,
         fontWeight: '700',
         color: '#FFFFFF',
         letterSpacing: 0.4,
         textTransform: 'uppercase',
-        flexShrink: 1,
-    },
+        flexShrink: 1 },
     title: {
         fontSize: 21,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
-        lineHeight: 26,
-    },
+        lineHeight: 26 },
     subtitleRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
-        marginTop: 5,
-    },
+        marginTop: 5 },
     subtitle: {
         fontSize: 12.5,
         color: 'rgba(255,255,255,0.78)',
         fontWeight: '600',
-        flexShrink: 1,
-    },
+        flexShrink: 1 },
     tileWrap: { width: 58, height: 58, justifyContent: 'center', alignItems: 'center' },
     halo: {
         position: 'absolute',
         width: 58,
         height: 58,
-        borderRadius: 29,
-        backgroundColor: 'rgba(255,255,255,0.25)',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: 'rgba(255,255,255,0.25)' },
     serviceTile: {
         width: 58,
         height: 58,
-        borderRadius: 29,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.14)',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     serviceImage: { width: '100%', height: '100%' },
-    accentLine: { marginTop: 12, paddingHorizontal: 20 },
-});
+    accentLine: { marginTop: 12, paddingHorizontal: 20 } });
 
 const BankBackgroundDecor = React.memo(({ limeColor }: { limeColor: string }) => (
     <Svg

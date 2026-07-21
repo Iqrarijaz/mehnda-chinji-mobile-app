@@ -5,9 +5,10 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     StyleSheet,
-    Platform,
-    Image
+    Platform
 } from 'react-native';
+import { Image } from 'expo-image';
+import { SubmitButton } from '@/components/common/SubmitButton';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Device from 'expo-device';
@@ -45,8 +46,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
         ageVerified: false,
         termsAccepted: false,
         guidelinesAccepted: false,
-        googleLoading: false,
-    });
+        googleLoading: false });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -115,8 +115,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
             Toast.show({
                 type: 'error',
                 text1: 'Validation Error',
-                text2: 'Please fix the errors in the form',
-            });
+                text2: 'Please fix the errors in the form' });
             return;
         }
 
@@ -143,8 +142,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
             Toast.show({
                 type: 'success',
                 text1: 'Success!',
-                text2: 'Account created successfully',
-            });
+                text2: 'Account created successfully' });
 
             analyticsService.trackEvent(AnalyticsEvents.SIGN_UP, { method: 'email' });
 
@@ -153,8 +151,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
             Toast.show({
                 type: 'error',
                 text1: 'Registration Failed',
-                text2: error?.response?.data?.message || error?.message || 'Something went wrong',
-            });
+                text2: error?.response?.data?.message || error?.message || 'Something went wrong' });
         } finally {
             setFormData(prev => ({ ...prev, loading: false }));
         }
@@ -164,8 +161,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
         setFormData(prev => ({ ...prev, googleLoading: true }));
         try {
             GoogleSignin.configure({
-                webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || '672311293362-dfgu9rtfc0ucfb1j3nmnu4snv2ss4b8r.apps.googleusercontent.com',
-            });
+                webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || '672311293362-dfgu9rtfc0ucfb1j3nmnu4snv2ss4b8r.apps.googleusercontent.com' });
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
 
@@ -180,16 +176,14 @@ export const RegisterForm = React.memo(function RegisterForm() {
             const response = await googleLoginApi({
                 idToken,
                 deviceName,
-                platform,
-            });
+                platform });
 
             await login(response);
             analyticsService.trackEvent(AnalyticsEvents.SIGN_UP, { method: 'google' });
             Toast.show({
                 type: 'success',
                 text1: 'Welcome!',
-                text2: 'Registered with Google',
-            });
+                text2: 'Registered with Google' });
         } catch (error: any) {
             const message =
                 error?.response?.data?.message ||
@@ -198,8 +192,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
             Toast.show({
                 type: 'error',
                 text1: 'Registration Failed',
-                text2: message,
-            });
+                text2: message });
         } finally {
             setFormData(prev => ({ ...prev, googleLoading: false }));
         }
@@ -237,10 +230,8 @@ export const RegisterForm = React.memo(function RegisterForm() {
                             if (errors.fullName) validateField('fullName', fullName);
                         }}
                         onBlur={() => handleBlur('fullName')}
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
+                        inputBoxStyle={{ borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC' }}
                         rightAccessory={renderValidationIcon('fullName')}
                     />
                     {touched.fullName && errors.fullName ? <ThemedText style={styles.errorText}>{errors.fullName}</ThemedText> : null}
@@ -261,10 +252,8 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         onBlur={() => handleBlur('email')}
                         keyboardType="email-address"
                         autoCapitalize="none"
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
+                        inputBoxStyle={{ borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC' }}
                         rightAccessory={
                             checkingAccount.email ? (
                                 <ActivityIndicator size="small" color="#006666" style={{ marginLeft: 8 }} />
@@ -290,10 +279,8 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         onBlur={() => handleBlur('phone')}
                         keyboardType="phone-pad"
                         maxLength={11}
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
+                        inputBoxStyle={{ borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC' }}
                         rightAccessory={
                             checkingAccount.phone ? (
                                 <ActivityIndicator size="small" color="#006666" style={{ marginLeft: 8 }} />
@@ -321,10 +308,8 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         onBlur={() => handleBlur('password')}
                         secureTextEntry={!formData.showPassword}
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
+                        inputBoxStyle={{ borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC' }}
                         rightAccessory={
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 {renderValidationIcon('password')}
@@ -359,10 +344,8 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         onBlur={() => handleBlur('confirmPassword')}
                         secureTextEntry={!formData.showConfirmPassword}
-                        inputBoxStyle={{
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                        }}
+                        inputBoxStyle={{ borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC' }}
                         rightAccessory={
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 {renderValidationIcon('confirmPassword')}
@@ -391,8 +374,8 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, formData.ageVerified && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
-                            {formData.ageVerified && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+                        <View style={[styles.checkbox, { borderWidth: 1, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.ageVerified && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                            {formData.ageVerified && <Ionicons name="checkmark" size={14} color="#FFF" />}
                         </View>
                     </TouchableOpacity>
                     <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
@@ -410,29 +393,27 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, formData.termsAccepted && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
-                            {formData.termsAccepted && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+                        <View style={[styles.checkbox, { borderWidth: 1, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.termsAccepted && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                            {formData.termsAccepted && <Ionicons name="checkmark" size={14} color="#FFF" />}
                         </View>
                     </TouchableOpacity>
-                    <View style={{ flex: 1 }}>
-                        <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
-                            I agree to the {' '}
-                            <ThemedText
-                                style={{ color: colors.primary, fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
-                                onPress={() => {
-                                    router.push('/terms' as any);
-                                }}
-                            >Terms & Conditions</ThemedText>
-                            {' '} and {' '}
-                            <ThemedText
-                                style={{ color: colors.primary, fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
-                                onPress={() => {
-                                    router.push('/privacy' as any);
-                                }}
-                            >Privacy Policy</ThemedText>
-                            <ThemedText style={styles.required}> *</ThemedText>
-                        </ThemedText>
-                    </View>
+                    <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
+                        I agree to the {' '}
+                        <ThemedText
+                            style={{ color: colors.primary, fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
+                            onPress={() => {
+                                router.push('/terms' as any);
+                            }}
+                        >Terms & Conditions</ThemedText>
+                        {' '} and {' '}
+                        <ThemedText
+                            style={{ color: colors.primary, fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
+                            onPress={() => {
+                                router.push('/privacy' as any);
+                            }}
+                        >Privacy Policy</ThemedText>
+                        <ThemedText style={styles.required}> *</ThemedText>
+                    </ThemedText>
                 </View>
 
                 {errors.termsAccepted && <ThemedText style={[styles.errorText, { marginTop: -12, marginBottom: 16 }]}>{errors.termsAccepted}</ThemedText>}
@@ -446,54 +427,45 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, formData.guidelinesAccepted && { backgroundColor: '#006666', borderColor: '#006666' }]}>
-                            {formData.guidelinesAccepted && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+                        <View style={[styles.checkbox, { borderWidth: 1, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.guidelinesAccepted && { backgroundColor: '#006666', borderColor: '#006666' }]}>
+                            {formData.guidelinesAccepted && <Ionicons name="checkmark" size={14} color="#FFF" />}
                         </View>
                     </TouchableOpacity>
-                    <View style={{ flex: 1 }}>
-                        <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
-                            I agree to follow the {' '}
-                            <ThemedText
-                                style={{ color: '#006666', fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
-                                onPress={() => {
-                                    router.push('/communityGuidelines' as any);
-                                }}
-                            >Community Guidelines</ThemedText>
-                            <ThemedText style={styles.required}> *</ThemedText>
-                        </ThemedText>
-                    </View>
+                    <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
+                        I agree to follow the {' '}
+                        <ThemedText
+                            style={{ color: '#006666', fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
+                            onPress={() => {
+                                router.push('/communityGuidelines' as any);
+                            }}
+                        >Community Guidelines</ThemedText>
+                        <ThemedText style={styles.required}> *</ThemedText>
+                    </ThemedText>
                 </View>
 
                 {errors.guidelinesAccepted && <ThemedText style={[styles.errorText, { marginTop: -12, marginBottom: 16 }]}>{errors.guidelinesAccepted}</ThemedText>}
 
                 {/* Register Button */}
-                <TouchableOpacity
-                    style={[
-                        styles.registerButton,
-                        { backgroundColor: isFormValid() ? '#006666' : '#94A3B8' }
-                    ]}
+                <SubmitButton
+                    title="Sign Up"
                     onPress={handleRegister}
-                    disabled={formData.loading || !isFormValid()}
-                >
-                    {formData.loading ? (
-                        <ActivityIndicator color="#FFFFFF" />
-                    ) : (
-                        <ThemedText style={styles.registerButtonText}>Sign Up</ThemedText>
-                    )}
-                </TouchableOpacity>
+                    isLoading={formData.loading}
+                    disabled={!isFormValid()}
+                    style={{ marginTop: 8, alignSelf: 'center', width: '100%', backgroundColor: isFormValid() ? colors.primary : '#94A3B8' }}
+                />
 
                 {/* Google Login Button */}
                 <TouchableOpacity
                     style={[
                         styles.registerButton,
-                        { backgroundColor: '#F5F5F5', shadowColor: 'rgba(0,0,0,0.1)', marginTop: 8, marginBottom: 8 }
+                        { backgroundColor: colors.cardBg, marginTop: 8, marginBottom: 8 }
                     ]}
                     onPress={handleGoogleLogin}
                     disabled={formData.googleLoading}
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
-                        <ThemedText style={[styles.registerButtonText, { color: '#000000' }]}>Sign up with Google</ThemedText>
+                        <ThemedText style={[styles.registerButtonText, { color: colors.text }]}>Sign up with Google</ThemedText>
                     </View>
                 </TouchableOpacity>
 
@@ -517,70 +489,54 @@ const styles = StyleSheet.create({
     formContainer: {
         paddingHorizontal: 20,
         paddingTop: 32,
-        paddingBottom: 40,
-    },
+        paddingBottom: 40 },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-    },
+        padding: 16 },
     inputField: {
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     errorText: {
         color: '#EF4444',
         fontSize: 12,
         marginTop: 6,
         marginLeft: 4,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     strengthContainer: {
         marginTop: 8,
-        paddingHorizontal: 2,
-    },
+        paddingHorizontal: 2 },
     strengthBarContainer: {
         flexDirection: 'row',
         height: 4,
         gap: 4,
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     strengthBar: {
         flex: 1,
         height: '100%',
-        borderRadius: 2,
-        backgroundColor: '#E2E8F0',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: '#E2E8F0' },
     strengthText: {
         fontSize: 11,
         fontWeight: '600',
-        textAlign: 'right',
-    },
+        textAlign: 'right' },
     label: {
         fontSize: 11,
         fontWeight: '700',
         color: '#475569',
         letterSpacing: 0.5,
         marginBottom: 8,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     required: {
-        color: '#EF4444',
-    },
+        color: '#EF4444' },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         height: 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14,
-    },
+        paddingHorizontal: 14 },
     input: {
         flex: 1,
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     registerButton: {
         height: 52,
         borderRadius: Layout.borderRadius,
@@ -588,50 +544,36 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 8,
         marginBottom: 20,
-        overflow: 'hidden',
-        shadowColor: '#006666',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-    },
+        overflow: 'hidden' },
     registerButtonText: {
         color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     footer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 8,
-    },
+        marginTop: 8 },
     footerText: {
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     footerLink: {
         fontSize: 12,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     checkboxContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 16,
-        paddingHorizontal: 4,
-    },
+        paddingHorizontal: 4 },
     checkbox: {
         width: 22,
         height: 22,
-        borderRadius: 6,
-        borderColor: '#E2E8F0',
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 10,
-    },
+        marginRight: 10 },
     checkboxText: {
         fontSize: 12,
         flex: 1,
-        lineHeight: 18,
-    },
-});
+        lineHeight: 18 } });

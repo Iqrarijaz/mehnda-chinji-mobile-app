@@ -63,7 +63,7 @@ const WeatherDetails = React.memo(({ visibilityKm, uv, aqi, updatedLabel }: Weat
     const aq = aqiInfo(aqi, colors.lime, colors.secondary);
 
     return (
-        <View style={[styles.card, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
+        <View style={[styles.card, { backgroundColor: colors.cardBg }]}>
             <ThemedText style={[styles.title, { color: colors.text }]}>Details</ThemedText>
             <View style={styles.grid}>
                 <Tile
@@ -90,9 +90,7 @@ export default WeatherDetails;
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.borderRadius, padding: 18, marginBottom: 14,
-        shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12,
-    },
+        borderRadius: Layout.borderRadius, padding: 20, marginBottom: 14 },
     title: { fontSize: 14, fontWeight: '700', letterSpacing: 0.3, marginBottom: 14 },
     grid: { flexDirection: 'row', flexWrap: 'wrap' },
     tile: {
@@ -101,14 +99,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 10,
         marginBottom: 14,
-        paddingRight: 8,
-    },
+        paddingRight: 8 },
     iconWrap: {
-        width: 38, height: 38, borderRadius: 12,
-        justifyContent: 'center', alignItems: 'center',
-    },
+        width: 42, height: 42, borderRadius: Layout.borderRadius,
+        justifyContent: 'center', alignItems: 'center' },
     label: { fontSize: 11, fontWeight: '600' },
     valueRow: { flexDirection: 'row', alignItems: 'baseline', gap: 3, marginTop: 1 },
     value: { fontSize: 15, fontWeight: '800' },
-    sub: { fontSize: 11, fontWeight: '700' },
-});
+    sub: { fontSize: 11, fontWeight: '700' } });

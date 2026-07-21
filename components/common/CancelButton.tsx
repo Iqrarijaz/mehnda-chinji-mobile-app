@@ -5,6 +5,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 
 import { Ionicons } from '@expo/vector-icons';
+import { Layout } from '@/constants/layout';
 
 interface CancelButtonProps extends TouchableOpacityProps {
     title?: string;
@@ -17,7 +18,7 @@ export function CancelButton({ title = 'Cancel', disabled, style, icon, ...rest 
 
     return (
         <TouchableOpacity
-            style={[styles.cancelButton, { borderColor: colors.border }, disabled && { opacity: 0.6 }, style]}
+            style={[styles.cancelButton, disabled && { opacity: 0.6 }, style]}
             disabled={disabled}
             activeOpacity={0.7}
             {...rest}
@@ -37,23 +38,18 @@ export function CancelButton({ title = 'Cancel', disabled, style, icon, ...rest 
 const styles = StyleSheet.create({
     cancelButton: {
         height: 46,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'flex-start',
         paddingHorizontal: 24,
-        borderWidth: 1,
-        backgroundColor: 'transparent',
-    },
+        backgroundColor: 'transparent' },
     buttonContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 8,
-    },
+        paddingHorizontal: 8 },
     cancelButtonText: {
         fontSize: 14,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

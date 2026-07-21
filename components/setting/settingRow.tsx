@@ -8,8 +8,7 @@ import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
-} from 'react-native-reanimated';
+    withSpring } from 'react-native-reanimated';
 import { AnimatedToggle } from './AnimatedToggle';
 
 
@@ -44,16 +43,14 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
     toggleValue = false,
     onToggleChange,
     primaryColor,
-    isLast = false,
-}) => {
+    isLast = false }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const textColor = color || colors.text;
     const scale = useSharedValue(1);
 
     const animatedContainer = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-    }));
+        transform: [{ scale: scale.value }] }));
 
     const handlePressIn = () => {
         scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
@@ -67,7 +64,7 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
         <AnimatedTouchable
             style={[
                 styles.settingRow,
-                !isLast && [styles.settingRowBorder, { borderBottomColor: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' }],
+                !isLast && styles.settingRowBorder,
                 animatedContainer,
             ]}
             activeOpacity={1}
@@ -103,36 +100,27 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: Platform.OS === 'android' ? 10 : 13,
         paddingHorizontal: 14,
-        borderRadius: Layout.borderRadius,
-    },
+        borderRadius: Layout.borderRadius },
     settingRowBorder: {
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        marginHorizontal: 4,
-    },
+        marginHorizontal: 4 },
     settingRowLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-        flex: 1,
-    },
+        flex: 1 },
     settingIconWrap: {
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 14,
-    },
+        marginRight: 14 },
     settingTextWrap: {
-        flex: 1,
-    },
+        flex: 1 },
     settingLabel: {
         fontSize: 15,
         fontWeight: '600',
-        letterSpacing: -0.1,
-    },
+        letterSpacing: -0.1 },
     settingSubtitle: {
         fontSize: 12,
         fontWeight: '400',
-        marginTop: 1,
-    },
-});
+        marginTop: 1 } });

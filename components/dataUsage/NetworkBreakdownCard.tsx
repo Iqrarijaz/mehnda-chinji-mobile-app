@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { SlideInLeft, useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
 import { formatBytes } from '@/utils/dataUsageUtils';
+import { Layout } from '@/constants/layout';
 
 interface NetworkRowProps {
     icon: string;
@@ -17,8 +18,7 @@ const NetworkRow = ({ icon, label, bytes, totalBytes, delay }: NetworkRowProps) 
     const percentage = totalBytes > 0 ? (bytes / totalBytes) : 0;
 
     const barStyle = useAnimatedStyle(() => ({
-        width: withSpring(`${percentage * 100}%`, { damping: 20 }),
-    }));
+        width: withSpring(`${percentage * 100}%`, { damping: 20 }) }));
 
     return (
         <Animated.View entering={SlideInLeft.delay(delay).duration(450)} style={styles.row}>
@@ -69,8 +69,7 @@ export const NetworkBreakdownCard = React.memo(({ wifi, mobile, total }: { wifi:
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     sectionTitle: {
         fontSize: 11,
         fontWeight: '800',
@@ -78,64 +77,48 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 8,
-        marginLeft: 4,
-    },
+        marginLeft: 4 },
     card: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 22,
-        padding: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-    },
+        borderRadius: Layout.borderRadius,
+        padding: 12 },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 8,
-        gap: 16,
-    },
+        gap: 16 },
     iconBox: {
         width: 42,
         height: 42,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#F8FAFC',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     content: {
         flex: 1,
-        gap: 8,
-    },
+        gap: 8 },
     rowTop: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     rowLabel: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#1E293B',
-    },
+        color: '#1E293B' },
     rowValue: {
         fontSize: 11,
         fontWeight: '800',
-        color: '#0F172A',
-    },
+        color: '#0F172A' },
     track: {
         height: 6,
         backgroundColor: '#F1F5F9',
-        borderRadius: 3,
-        overflow: 'hidden',
-    },
+        borderRadius: Layout.borderRadius,
+        overflow: 'hidden' },
     bar: {
         height: '100%',
         backgroundColor: '#009688',
-        borderRadius: 3,
-    },
+        borderRadius: Layout.borderRadius },
     divider: {
         height: 1,
         backgroundColor: '#F1F5F9',
-        marginHorizontal: 4,
-    },
-});
+        marginHorizontal: 4 } });

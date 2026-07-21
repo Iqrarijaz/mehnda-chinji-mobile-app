@@ -23,6 +23,7 @@ import { loginSchema } from '@/utils/validation';
 import { clientStorage } from '@/utils/storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { SubmitButton } from '@/components/common/SubmitButton';
 import { FormInput } from '@/components/common/FormInput';
 
 // Removed global configuration
@@ -42,7 +43,7 @@ export const LoginForm = React.memo(function LoginForm() {
         rememberMe: true,
         showPassword: false,
         loading: false,
-        googleLoading: false,
+        googleLoading: false
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -76,7 +77,7 @@ export const LoginForm = React.memo(function LoginForm() {
             Toast.show({
                 type: 'error',
                 text1: 'Storage Error',
-                text2: 'Failed to load saved credentials',
+                text2: 'Failed to load saved credentials'
             });
         }
     };
@@ -102,7 +103,7 @@ export const LoginForm = React.memo(function LoginForm() {
         try {
             await loginSchema.validate({
                 email: formData.email,
-                password: formData.password,
+                password: formData.password
             }, { abortEarly: false });
             performLogin(formData.email, formData.password);
         } catch (error: any) {
@@ -133,7 +134,7 @@ export const LoginForm = React.memo(function LoginForm() {
                 deviceName,
                 platform,
                 latitude: 0,
-                longitude: 0,
+                longitude: 0
             });
 
             // Save or clear credentials for Remember Me
@@ -150,7 +151,7 @@ export const LoginForm = React.memo(function LoginForm() {
             Toast.show({
                 type: 'success',
                 text1: 'Welcome Back!',
-                text2: 'Logged in successfully',
+                text2: 'Logged in successfully'
             });
         } catch (error: any) {
             const message =
@@ -160,7 +161,7 @@ export const LoginForm = React.memo(function LoginForm() {
             Toast.show({
                 type: 'error',
                 text1: 'Login Failed',
-                text2: message,
+                text2: message
             });
         } finally {
             setFormData(prev => ({ ...prev, loading: false }));
@@ -171,7 +172,7 @@ export const LoginForm = React.memo(function LoginForm() {
         setFormData(prev => ({ ...prev, googleLoading: true }));
         try {
             GoogleSignin.configure({
-                webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || '672311293362-dfgu9rtfc0ucfb1j3nmnu4snv2ss4b8r.apps.googleusercontent.com',
+                webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || '672311293362-dfgu9rtfc0ucfb1j3nmnu4snv2ss4b8r.apps.googleusercontent.com'
             });
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
@@ -187,7 +188,7 @@ export const LoginForm = React.memo(function LoginForm() {
             const response = await googleLoginApi({
                 idToken,
                 deviceName,
-                platform,
+                platform
             });
 
             await login(response);
@@ -195,7 +196,7 @@ export const LoginForm = React.memo(function LoginForm() {
             Toast.show({
                 type: 'success',
                 text1: 'Welcome!',
-                text2: 'Logged in with Google',
+                text2: 'Logged in with Google'
             });
         } catch (error: any) {
             const message =
@@ -205,7 +206,7 @@ export const LoginForm = React.memo(function LoginForm() {
             Toast.show({
                 type: 'error',
                 text1: 'Login Failed',
-                text2: message,
+                text2: message
             });
         } finally {
             setFormData(prev => ({ ...prev, googleLoading: false }));
@@ -234,8 +235,8 @@ export const LoginForm = React.memo(function LoginForm() {
                         autoCapitalize="none"
                         editable={!formData.loading}
                         inputBoxStyle={{
-                            borderColor: errors.email && touched.email ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC'
                         }}
                         rightAccessory={
                             touched.email && !errors.email && formData.email.length > 0 ? (
@@ -264,8 +265,8 @@ export const LoginForm = React.memo(function LoginForm() {
                         secureTextEntry={!formData.showPassword}
                         editable={!formData.loading}
                         inputBoxStyle={{
-                            borderColor: errors.password && touched.password ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC'
                         }}
                         rightAccessory={
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -312,23 +313,22 @@ export const LoginForm = React.memo(function LoginForm() {
                 </View>
 
                 {/* Login Button */}
-                <TouchableOpacity
-                    style={[styles.loginButton, { backgroundColor: colors.primary, shadowColor: colors.primary }]}
+                <SubmitButton
+                    title="Log In"
                     onPress={handleLogin}
-                    disabled={formData.loading}
-                >
-                    <ThemedText style={styles.loginButtonText}>Log In</ThemedText>
-                </TouchableOpacity>
+                    isLoading={formData.loading}
+                    style={{ marginTop: 8, marginBottom: 10, alignSelf: 'center', width: '100%' }}
+                />
 
                 {/* Google Login Button */}
                 <TouchableOpacity
-                    style={[styles.loginButton, { backgroundColor: '#F5F5F5', shadowColor: 'rgba(0,0,0,0.1)' }]}
+                    style={[styles.loginButton, { backgroundColor: colors.cardBg }]}
                     onPress={handleGoogleLogin}
                     disabled={formData.googleLoading}
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
-                        <ThemedText style={[styles.loginButtonText, { color: '#000000' }]}>Sign in with Google</ThemedText>
+                        <ThemedText style={[styles.loginButtonText, { color: colors.text }]}>Sign in with Google</ThemedText>
                     </View>
                 </TouchableOpacity>
 
@@ -353,25 +353,21 @@ const styles = StyleSheet.create({
     formContainer: {
         paddingHorizontal: 18,
         paddingTop: 30,
-        paddingBottom: 40,
+        paddingBottom: 40
     },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
+        padding: 16
     },
     inputField: {
-        marginBottom: 20,
+        marginBottom: 20
     },
     errorText: {
         color: '#EF4444',
         fontSize: 12,
         marginTop: 6,
         marginLeft: 4,
-        fontWeight: '500',
+        fontWeight: '500'
     },
     label: {
         fontSize: 11,
@@ -379,41 +375,41 @@ const styles = StyleSheet.create({
         color: '#475569',
         letterSpacing: 0.5,
         marginBottom: 6,
-        marginLeft: 0,
+        marginLeft: 0
     },
     required: {
-        color: '#EF4444',
+        color: '#EF4444'
     },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         height: 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
+        paddingHorizontal: 12
     },
     input: {
         flex: 1,
         fontSize: 12,
-        fontWeight: '500',
+        fontWeight: '500'
     },
     optionsRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 22,
+        marginBottom: 22
     },
     rememberMe: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 6
     },
     optionText: {
         fontSize: 12,
-        fontWeight: '500',
+        fontWeight: '500'
     },
     forgotText: {
         fontSize: 12,
-        fontWeight: '600',
+        fontWeight: '600'
     },
     loginButton: {
         height: 52,
@@ -421,29 +417,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 18,
-        overflow: 'hidden',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
+        overflow: 'hidden'
     },
     loginButtonText: {
         color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
-        letterSpacing: 0.5,
+        letterSpacing: 0.5
     },
     footer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 6,
+        marginTop: 6
     },
     footerText: {
         fontSize: 12,
-        fontWeight: '500',
+        fontWeight: '500'
     },
     footerLink: {
         fontSize: 12,
-        fontWeight: '700',
-    },
+        fontWeight: '700'
+    }
 });

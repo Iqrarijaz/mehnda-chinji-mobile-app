@@ -10,8 +10,7 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -68,8 +67,7 @@ const TopperForm = () => {
         passingYear: '',
         totalMarks: '',
         obtainedMarks: '',
-        image: '',
-    });
+        image: '' });
 
     const [isUploading, setIsUploading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -84,8 +82,7 @@ const TopperForm = () => {
                 passingYear: editData.passingYear || '',
                 totalMarks: editData.totalMarks?.toString() || '',
                 obtainedMarks: editData.obtainedMarks?.toString() || '',
-                image: editData.image || '',
-            });
+                image: editData.image || '' });
             setSelectedImage(editData.image || null);
         }
     }, [editDataParam]);
@@ -105,8 +102,7 @@ const TopperForm = () => {
             mediaTypes: 'images',
             allowsEditing: true,
             aspect: [1, 1],
-            quality: 0.8,
-        });
+            quality: 0.8 });
 
         if (!result.canceled) {
             const uri = result.assets[0].uri;
@@ -163,8 +159,7 @@ const TopperForm = () => {
         mutation.mutate({
             ...form,
             totalMarks: Number(form.totalMarks),
-            obtainedMarks: Number(form.obtainedMarks),
-        });
+            obtainedMarks: Number(form.obtainedMarks) });
     };
 
     return (
@@ -231,7 +226,7 @@ const TopperForm = () => {
                                     FULL NAME <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                 <Ionicons name="person-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -250,7 +245,7 @@ const TopperForm = () => {
                                     FATHER'S NAME <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                 <Ionicons name="people-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -270,7 +265,7 @@ const TopperForm = () => {
                                 </ThemedText>
                             </View>
                             <TouchableOpacity
-                                style={[styles.dropdownTrigger, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
+                                style={[styles.dropdownTrigger, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}
                                 onPress={() => setShowClassPicker(true)}
                             >
                                 <View style={styles.triggerContent}>
@@ -298,7 +293,7 @@ const TopperForm = () => {
                                     PASSING YEAR <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                 <Ionicons name="calendar-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -319,7 +314,7 @@ const TopperForm = () => {
                                 </ThemedText>
                             </View>
                             <View style={{ flexDirection: 'row', gap: 12 }}>
-                                <View style={[styles.inputBox, { flex: 1, backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                <View style={[styles.inputBox, { flex: 1, backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="star-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -330,7 +325,7 @@ const TopperForm = () => {
                                         placeholderTextColor={colors.icon}
                                     />
                                 </View>
-                                <View style={[styles.inputBox, { flex: 1, backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                <View style={[styles.inputBox, { flex: 1, backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <TextInput
                                         style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={form.totalMarks}
@@ -349,8 +344,7 @@ const TopperForm = () => {
             {/* Sticky Footer Button */}
             <View style={[styles.footer, {
                 backgroundColor: isDark ? colors.card : 'rgba(245, 246, 250, 0.95)',
-                borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                borderTopWidth: 1,
+                borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', borderTopWidth: 1,
                 paddingBottom: Math.max(insets.bottom, 20)
             }]}>
                 <TouchableOpacity
@@ -381,53 +375,44 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 260 : 280,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
-    },
+        paddingHorizontal: 16 },
     backButton: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         fontSize: 18,
         fontWeight: '700',
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     welcomeText: {
         fontSize: 18,
         fontWeight: '800',
         marginTop: 6,
         marginBottom: 6,
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     subtitleText: {
         fontSize: 12,
         marginTop: 2,
         textAlign: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     avatarContainer: {
         alignItems: 'center',
-        marginTop: 15,
-    },
+        marginTop: 15 },
     imageCircle: {
         width: 90,
         height: 90,
-        borderRadius: 45,
-        borderColor: '#FFF',
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     fullImage: { width: '100%', height: '100%' },
     loaderOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
     deleteAvatarBtn: {
@@ -435,87 +420,68 @@ const styles = StyleSheet.create({
         top: -2,
         right: -2,
         backgroundColor: 'rgba(255,255,255,0.9)',
-        borderRadius: 12,
-    },
+        borderRadius: Layout.borderRadius },
     cameraBadge: {
         position: 'absolute',
         bottom: 0,
         right: 0,
         width: 24,
         height: 24,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: '#FFF',
-    },
+        alignItems: 'center' },
     content: { paddingBottom: 140 },
     formSection: {
         paddingHorizontal: 20,
         marginTop: 20,
-        gap: 16,
-    },
+        gap: 16 },
     inputField: { gap: 6 },
     labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingRight: 4,
-    },
+        paddingRight: 4 },
     label: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     required: { color: '#EF4444' },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14,
-    },
+        paddingHorizontal: 14 },
     textInput: { flex: 1, fontWeight: '500' },
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14,
-    },
+        paddingHorizontal: 14 },
     triggerContent: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     triggerText: {
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     footer: {
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
         paddingHorizontal: 20,
-        paddingTop: Platform.OS === 'android' ? 10 : 12,
-    },
+        paddingTop: Platform.OS === 'android' ? 10 : 12 },
     updateButton: {
         height: Platform.OS === 'android' ? 48 : 52,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-        shadowColor: '#0D9488',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-    },
+        overflow: 'hidden' },
     buttonContent: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     updateButtonText: {
         fontSize: Platform.OS === 'android' ? 14 : 15,
         fontWeight: '700',
-        color: '#FFFFFF',
-    },
-});
+        color: '#FFFFFF' } });

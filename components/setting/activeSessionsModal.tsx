@@ -6,8 +6,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withSpring,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 import React, { useCallback, useEffect } from 'react';
 import {
     ActivityIndicator,
@@ -15,8 +14,7 @@ import {
     ScrollView,
     StyleSheet,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { getActiveSessions, revokeSession } from '@/apis/profile';
@@ -128,8 +126,8 @@ const SkeletonCard = React.memo(({ delay }: { delay: number }) => {
         <Animated.View entering={SlideInLeft.delay(delay).duration(300)} style={[styles.card, { backgroundColor: colors.background, opacity: 0.5 }]}>
             <View style={[styles.iconCircle, { backgroundColor: skeletonBg }]} />
             <View style={styles.info}>
-                <View style={{ width: '60%', height: 13, borderRadius: 6, backgroundColor: skeletonBg, marginBottom: 8 }} />
-                <View style={{ width: '40%', height: 11, borderRadius: 5, backgroundColor: subBg }} />
+                <View style={{ width: '60%', height: 13, borderRadius: Layout.borderRadius, backgroundColor: skeletonBg, marginBottom: 8 }} />
+                <View style={{ width: '40%', height: 11, borderRadius: Layout.borderRadius, backgroundColor: subBg }} />
             </View>
         </Animated.View>
     );
@@ -153,8 +151,7 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
             if (response.success) return response.data;
             throw new Error(response.message || 'Failed to load sessions');
         },
-        enabled: visible,
-    });
+        enabled: visible });
 
     const sessions: any[] = sessionsData ?? [];
 
@@ -170,8 +167,7 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
         },
         onError: (error: any) => {
             Toast.show({ type: 'error', text1: 'Error', text2: error.message || 'Failed to revoke session' });
-        },
-    });
+        } });
 
     return (
         <PremiumModal visible={visible} onClose={onClose} type="centered">
@@ -230,19 +226,16 @@ const styles = StyleSheet.create({
     header: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     title: {
         fontSize: 14,
         fontWeight: '800',
         textAlign: 'center',
-        marginBottom: 3,
-    },
+        marginBottom: 3 },
     subtitle: {
         fontSize: 11,
         fontWeight: '500',
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
 
     // Session card
     list: { maxHeight: '55%' },
@@ -252,8 +245,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
         padding: 10,
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     cardCurrent: {
         backgroundColor: 'rgba(0,102,102,0.08)', // Using alpha for consistent branding
     },
@@ -264,42 +256,35 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,102,102,0.08)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12,
-    },
+        marginRight: 12 },
     iconCircleCurrent: {
-        backgroundColor: 'rgba(0,102,102,0.12)',
-    },
+        backgroundColor: 'rgba(0,102,102,0.12)' },
     info: { flex: 1 },
     nameRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
         marginBottom: 2,
-        flexWrap: 'wrap',
-    },
+        flexWrap: 'wrap' },
     deviceName: {
         fontSize: 12,
         fontWeight: '700',
-        flexShrink: 1,
-    },
+        flexShrink: 1 },
     badge: {
         backgroundColor: 'rgba(0,102,102,0.14)',
         paddingHorizontal: 8,
         paddingVertical: 2,
-        borderRadius: Layout.borderRadius,
-    },
+        borderRadius: Layout.borderRadius },
     badgeText: {
         fontSize: 10,
         fontWeight: '700',
         color: '#006666',
         textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     meta: {
         fontSize: 11,
         color: '#94A3B8',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     revokeBtn: {
         width: 30,
         height: 30,
@@ -307,36 +292,29 @@ const styles = StyleSheet.create({
         backgroundColor: '#FEF2F2',
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 10,
-    },
+        marginLeft: 10 },
 
     // Empty
     empty: {
         alignItems: 'center',
         paddingVertical: 40,
-        gap: 12,
-    },
+        gap: 12 },
     emptyText: {
         fontSize: 11,
         color: '#94A3B8',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 16,
-    },
+        marginTop: 16 },
     modalButton: {
         width: 120,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

@@ -9,6 +9,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
+import { Layout } from '@/constants/layout';
 
 interface OfflineIndicatorProps {
     visible: boolean;
@@ -24,16 +25,14 @@ const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({ visible }) => {
         if (visible) {
             translateY.value = withSpring(insets.top > 0 ? insets.top + 10 : 20, {
                 damping: 15,
-                stiffness: 120,
-            });
+                stiffness: 120 });
         } else {
             translateY.value = withTiming(-100, { duration: 300 });
         }
     }, [visible, insets.top]);
 
     const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: translateY.value }],
-    }));
+        transform: [{ translateY: translateY.value }] }));
 
     if (!visible && translateY.value === -100) return null;
 
@@ -54,33 +53,24 @@ const styles = StyleSheet.create({
         left: 20,
         right: 20,
         zIndex: 9999,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     content: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: OFFLINE_COLOR,
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 25,
+        borderRadius: Layout.borderRadius,
         gap: 10,
         ...Platform.select({
-            ios: {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.2,
-                shadowRadius: 8,
+            ios: {
             },
             android: {
 
-            },
-        }),
-    },
+            } }) },
     text: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });
 
 export default React.memo(OfflineIndicator);

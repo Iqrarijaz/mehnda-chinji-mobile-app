@@ -65,7 +65,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                 onRequestClose={() => setIsModalVisible(false)}
             >
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalCard, { backgroundColor: colors.card }]}>
+                    <View style={[styles.modalCard, { backgroundColor: colors.cardBg }]}>
                         <View style={styles.modalHeader}>
                             <ThemedText style={[styles.modalTitle, { color: colors.text }]}>More Categories</ThemedText>
                         </View>
@@ -106,72 +106,55 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 14,
-        paddingBottom: 8,
-    },
+        paddingBottom: 8 },
     sectionTitle: {
         fontSize: 17,
         fontWeight: '700',
         marginLeft: 6,
         marginTop: 10,
         marginBottom: 14,
-        opacity: 0.85,
-    },
+        opacity: 0.85 },
     grid: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-    },
+        flexWrap: 'wrap' },
     gridItem: {
-        width: '33.33%',
-    },
+        width: '33.33%' },
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     modalCard: {
         width: '90%',
         height: '60%',
         borderRadius: Layout.borderRadius,
         padding: 20,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-    },
+        overflow: 'hidden' },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 16,
-        paddingHorizontal: 6,
-    },
+        paddingHorizontal: 6 },
     modalTitle: {
         fontSize: 18,
         fontWeight: '800',
-        letterSpacing: -0.5,
-    },
+        letterSpacing: -0.5 },
     modalGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        paddingBottom: 8,
-    },
+        paddingBottom: 8 },
     footerContainer: {
         marginTop: 16,
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     closePill: {
         width: 90,
         height: 34,
-        borderRadius: 17,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     closePillText: {
         color: '#FFFFFF',
         fontSize: 13,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

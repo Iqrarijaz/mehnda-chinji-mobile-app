@@ -31,8 +31,7 @@ export const LoaderOverlay: React.FC<LoaderOverlayProps> = ({ visible, text }) =
                     colorFilters={[
                         {
                             keypath: '**',
-                            color: colors.primary,
-                        }
+                            color: colors.primary }
                     ]}
                 />
             </View>
@@ -46,10 +45,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 9999,
-    },
+        zIndex: 9999 },
     lottie: {
         width: 150,
-        height: 150,
-    }
+        height: 150 }
 });

@@ -128,8 +128,7 @@ export default function QuranListScreen() {
 
     const { data: response, isLoading, isError, refetch, isRefetching } = useQuery({
         queryKey: ['quran-surahs'],
-        queryFn: listSurahs,
-    });
+        queryFn: listSurahs });
 
     const surahs = response?.data || [];
 
@@ -194,7 +193,7 @@ export default function QuranListScreen() {
 
             <View style={styles.headerAddon}>
                 {/* Search Bar */}
-                <View style={[styles.searchBarContainer, { backgroundColor: colors.card }]}>
+                <View style={[styles.searchBarContainer, { backgroundColor: colors.cardBg }]}>
                     <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
                     <TextInput
                         placeholder="Search Surah by name..."
@@ -334,8 +333,7 @@ const styles = StyleSheet.create({
     backgroundImage: { flex: 1 },
     headerAddon: {
         paddingHorizontal: 20,
-        paddingBottom: 0,
-    },
+        paddingBottom: 0 },
     searchBarContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -343,17 +341,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         height: 42,
         marginTop: 16,
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     searchIcon: { marginRight: 8 },
     searchInput: { flex: 1, fontSize: 14, paddingVertical: 8 },
     // Segmented Control
     segmentedContainer: {
         flexDirection: 'row',
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         padding: 4,
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     segmentedTab: {
         flex: 1,
         flexDirection: 'row',
@@ -361,45 +357,38 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 6,
         paddingVertical: 10,
-        borderRadius: 10,
-    },
+        borderRadius: Layout.borderRadius },
     activeDot: {
         width: 5,
         height: 5,
-        borderRadius: 2.5,
-    },
+        borderRadius: Layout.borderRadius },
     segmentedTabText: {
         fontSize: 13,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     favBadge: {
         marginLeft: 5,
         minWidth: 18,
         height: 18,
-        borderRadius: 9,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 4,
-    },
+        paddingHorizontal: 4 },
     favBadgeText: {
         fontSize: 10,
         fontWeight: 'bold',
         color: '#fff',
         lineHeight: 18,
         textAlignVertical: 'center',
-        includeFontPadding: false,
-    },
+        includeFontPadding: false },
     // List
     listContent: {
         paddingHorizontal: 20,
-        paddingVertical: 16,
-    },
+        paddingVertical: 16 },
     // States
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     loadingText: { marginTop: 12, fontSize: 14 },
     errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
     errorText: { marginTop: 12, fontSize: 15, textAlign: 'center' },
-    retryButton: { marginTop: 16, paddingVertical: 10, paddingHorizontal: 24, borderRadius: 20 },
+    retryButton: { marginTop: 16, paddingVertical: 10, paddingHorizontal: 24, borderRadius: Layout.borderRadius },
     emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
-    emptyText: { marginTop: 12, fontSize: 14, textAlign: 'center', lineHeight: 22 },
-});
+    emptyText: { marginTop: 12, fontSize: 14, textAlign: 'center', lineHeight: 22 } });

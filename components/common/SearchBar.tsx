@@ -6,13 +6,11 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-    ViewStyle,
-} from 'react-native';
+    ViewStyle } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
-} from 'react-native-reanimated';
+    withSpring } from 'react-native-reanimated';
 
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -46,8 +44,7 @@ export function SearchBar({
     returnKeyType = 'search',
     rightAction,
     style,
-    inputRef,
-}: SearchBarProps) {
+    inputRef }: SearchBarProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -57,8 +54,7 @@ export function SearchBar({
     const focus = useSharedValue(0);
 
     const focusStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 + focus.value * 0.015 }],
-    }));
+        transform: [{ scale: 1 + focus.value * 0.015 }] }));
 
     const handleFocus = () => {
         setFocused(true);
@@ -124,19 +120,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 42,
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        borderRadius: Layout.borderRadius,
-    },
+        borderRadius: Layout.borderRadius },
     icon: {
-        marginRight: 10,
-    },
+        marginRight: 10 },
     input: {
         flex: 1,
         fontSize: Platform.OS === 'android' ? 13 : 15,
         padding: 0,
-        height: '100%',
-    },
+        height: '100%' },
     rightAction: {
         marginLeft: 10,
-        justifyContent: 'center',
-    },
-});
+        justifyContent: 'center' } });

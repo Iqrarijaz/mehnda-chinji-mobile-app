@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Switch } from 'react-native';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
+import { Layout } from '@/constants/layout';
 
 interface ToggleRowProps {
     label: string;
@@ -74,8 +75,7 @@ export const DataControlToggles = ({
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     sectionTitle: {
         fontSize: 11,
         fontWeight: '800',
@@ -83,41 +83,29 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 8,
-        marginLeft: 4,
-    },
+        marginLeft: 4 },
     card: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 22,
-        padding: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-    },
+        borderRadius: Layout.borderRadius,
+        padding: 12 },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 8,
-        gap: 16,
-    },
+        gap: 16 },
     textContainer: {
         flex: 1,
-        gap: 2,
-    },
+        gap: 2 },
     label: {
         fontSize: 13,
         fontWeight: '700',
-        color: '#1E293B',
-    },
+        color: '#1E293B' },
     description: {
         fontSize: 11,
         color: '#64748B',
         fontWeight: '500',
-        lineHeight: 16,
-    },
+        lineHeight: 16 },
     divider: {
         height: 1,
         backgroundColor: '#F1F5F9',
-        marginHorizontal: 4,
-    },
-});
+        marginHorizontal: 4 } });

@@ -20,8 +20,7 @@ interface Props {
 
 const FilterChip = React.memo(({ label, value, isActive, onPress }: { label: string; value: string; isActive: boolean; onPress: () => void }) => {
     const animStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: withSpring(isActive ? 1.04 : 1, { damping: 14 }) }],
-    }));
+        transform: [{ scale: withSpring(isActive ? 1.04 : 1, { damping: 14 }) }] }));
     return (
         <Animated.View style={animStyle}>
             <TouchableOpacity
@@ -65,13 +64,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: Platform.OS === 'android' ? 5 : 6,
         borderRadius: Layout.borderRadius,
-        backgroundColor: '#FFFFFF',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-    },
+        backgroundColor: '#FFFFFF' },
     chipActive: { backgroundColor: PRIMARY },
     label: { fontSize: 11, fontWeight: '600', color: '#64748B' },
-    labelActive: { color: '#FFFFFF', fontWeight: '700' },
-});
+    labelActive: { color: '#FFFFFF', fontWeight: '700' } });

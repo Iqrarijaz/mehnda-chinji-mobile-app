@@ -5,8 +5,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
-    ActivityIndicator,
-} from 'react-native';
+    ActivityIndicator } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 
 import { Colors } from '@/constants/colors';
@@ -47,6 +46,7 @@ interface SectionData {
 export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentCategory, currentType }: MarketplaceCategoryPickerProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
+    const lightColors = Colors.light;
 
     const { data: configData, isLoading } = useQuery({
         queryKey: CONFIG_QUERY_KEYS.marketplaceCategories,
@@ -92,7 +92,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <ThemedText style={[
                             styles.itemTextEng,
-                            { color: colors.text, marginLeft: 12 },
+                            { color: lightColors.text, marginLeft: 12 },
                             isSelected && { color: colors.primary, fontWeight: '700' }
                         ]}>
                             {item.name.en}
@@ -100,7 +100,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                     </View>
                     <ThemedText style={[
                         styles.itemTextUr,
-                        { color: colors.icon },
+                        { color: lightColors.icon },
                         isSelected && { color: colors.primary, fontWeight: '700' }
                     ]}>
                         {item.name.ur}
@@ -114,7 +114,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
     const renderSectionHeader = useCallback(({ section }: { section: SectionData }) => {
         return (
             <TouchableOpacity
-                style={[styles.sectionHeader, { backgroundColor: colors.card, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
+                style={[styles.sectionHeader, { backgroundColor: '#F8FAFC', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
                 onPress={() => {
                     onSelect({
                         category: { en: section.title.title.en, ur: section.title.title.ur },
@@ -123,7 +123,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                     onClose();
                 }}
             >
-                <ThemedText style={[styles.sectionHeaderTextEng, { color: colors.textSecondary }]}>
+                <ThemedText style={[styles.sectionHeaderTextEng, { color: lightColors.textSecondary }]}>
                     {section.title.title.en}
                 </ThemedText>
             </TouchableOpacity>
@@ -138,9 +138,9 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
             onRequestClose={onClose}
         >
             <View style={styles.modalOverlay}>
-                <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                <View style={[styles.modalContent, { backgroundColor: '#FFFFFF', borderRadius: Layout.modalBorderRadius }]}>
                     <View style={styles.modalHeader}>
-                        <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Category</ThemedText>
+                        <ThemedText style={[styles.modalTitle, { color: lightColors.text }]}>Select Category</ThemedText>
                         {(currentCategory || currentType) && (
                             <TouchableOpacity
                                 onPress={() => {
@@ -168,7 +168,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                             style={{ flex: 1 }}
                             ListEmptyComponent={() => (
                                 <View style={{ padding: 20, alignItems: 'center' }}>
-                                    <ThemedText style={{ color: colors.icon }}>No categories found.</ThemedText>
+                                    <ThemedText style={{ color: lightColors.icon }}>No categories found.</ThemedText>
                                 </View>
                             )}
                         />
@@ -194,78 +194,59 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
-    },
+        padding: 20 },
     modalContent: {
         width: '90%',
         height: '60%',
         borderRadius: Layout.borderRadius,
         padding: 20,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-    },
+        overflow: 'hidden' },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     modalTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
-    },
+        fontWeight: 'bold' },
     listContent: {
-        paddingBottom: 20,
-    },
+        paddingBottom: 20 },
     sectionHeader: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        marginTop: 8,
-    },
+        marginTop: 8 },
     sectionHeaderTextEng: {
         fontSize: 14,
         fontWeight: 'bold',
-        textTransform: 'uppercase',
-    },
+        textTransform: 'uppercase' },
     item: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingVertical: 12,
         paddingHorizontal: 12,
-        borderRadius: 8,
-        marginBottom: 4,
-    },
+        borderRadius: Layout.borderRadius,
+        marginBottom: 4 },
     labelContainer: {
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingRight: 16,
-    },
+        paddingRight: 16 },
     itemTextEng: {
         fontSize: 15,
-        fontFamily: 'Inter-Medium',
-    },
+        fontFamily: 'Inter-Medium' },
     itemTextUr: {
         fontSize: 15,
-        fontFamily: 'Jameel-Noori-Nastaleeq',
-    },
+        fontFamily: 'Jameel-Noori-Nastaleeq' },
     footerContainer: {
         marginTop: 16,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     closePill: {
         paddingHorizontal: 16,
         paddingVertical: 6,
-        borderRadius: 16,
-    },
+        borderRadius: Layout.borderRadius },
     closePillText: {
         color: '#FFFFFF',
         fontSize: 12,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

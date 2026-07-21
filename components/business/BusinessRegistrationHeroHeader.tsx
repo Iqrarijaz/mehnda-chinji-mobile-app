@@ -13,8 +13,7 @@ interface BusinessRegistrationHeroHeaderProps {
  */
 function BusinessRegistrationHeroHeaderComponent({
     isEditing,
-    onBack,
-}: BusinessRegistrationHeroHeaderProps) {
+    onBack }: BusinessRegistrationHeroHeaderProps) {
     return (
         <ScreenHeader
             showMenuIcon={false}
@@ -23,8 +22,7 @@ function BusinessRegistrationHeroHeaderComponent({
             decor="business"
             hero={{
                 title: isEditing ? 'Update Your Listing' : 'Grow Your Business',
-                subtitle: 'Fill in the details below to list your business in the community directory',
-            }}
+                subtitle: 'Fill in the details below to list your business in the community directory' }}
         />
     );
 }

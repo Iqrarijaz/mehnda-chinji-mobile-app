@@ -13,29 +13,24 @@ const termsData = [
     {
         id: '1',
         title: 'Acceptance of Terms',
-        content: 'By accessing or using the Rehbar app, you agree to these Terms. If you do not agree with any part of these terms, you may not use our services. These terms form a legally binding agreement between you and Rehbar.',
-    },
+        content: 'By accessing or using the Rehbar app, you agree to these Terms. If you do not agree with any part of these terms, you may not use our services. These terms form a legally binding agreement between you and Rehbar.' },
     {
         id: '2',
         title: 'User Accounts and Responsibilities',
-        content: '• Account Registration: To use certain features of the app (such as registering a business, creating a marketplace listing, or submitting places), you must create an account. You agree to provide accurate, current, and complete information during registration.\n• Account Security: You are responsible for safeguarding your login credentials. You must notify us immediately of any unauthorized use of your account.',
-    },
+        content: '• Account Registration: To use certain features of the app (such as registering a business, creating a marketplace listing, or submitting places), you must create an account. You agree to provide accurate, current, and complete information during registration.\n• Account Security: You are responsible for safeguarding your login credentials. You must notify us immediately of any unauthorized use of your account.' },
     {
         id: '3',
         title: 'App Features and User Submissions',
-        content: 'Users are permitted to submit information regarding businesses, schools, mosques, hospitals, and other community categories to be added to the app directory. All user submissions are subject to review and approval by Rehbar Administrators.',
-    },
+        content: 'Users are permitted to submit information regarding businesses, schools, mosques, hospitals, and other community categories to be added to the app directory. All user submissions are subject to review and approval by Rehbar Administrators.' },
 
     {
         id: '4',
         title: 'Marketplace Policy',
-        content: '• Role of Rehbar: The Rehbar Marketplace is strictly a communication platform to connect buyers and sellers. Rehbar does not facilitate payments, guarantee item quality, or mediate disputes.\n• No Liability: Rehbar and its developers assume zero liability for any financial loss, fraud, or disputes arising from transactions coordinated through this app.',
-    },
+        content: '• Role of Rehbar: The Rehbar Marketplace is strictly a communication platform to connect buyers and sellers. Rehbar does not facilitate payments, guarantee item quality, or mediate disputes.\n• No Liability: Rehbar and its developers assume zero liability for any financial loss, fraud, or disputes arising from transactions coordinated through this app.' },
     {
         id: '5',
         title: 'Prohibited Conduct',
-        content: 'When submitting businesses, places, or creating a marketplace listing, you agree NOT to:\n• Provide false, misleading, or fraudulent information.\n• Submit content that is illegal, offensive, harassing, or discriminatory.\n• Attempt to manipulate, spam, or overload the application\'s forms.',
-    },
+        content: 'When submitting businesses, places, or creating a marketplace listing, you agree NOT to:\n• Provide false, misleading, or fraudulent information.\n• Submit content that is illegal, offensive, harassing, or discriminatory.\n• Attempt to manipulate, spam, or overload the application\'s forms.' },
 ];
 
 const AccordionItem = ({ item, index }: { item: any, index: number }) => {
@@ -65,10 +60,9 @@ const AccordionItem = ({ item, index }: { item: any, index: number }) => {
     const colors = Colors[theme];
 
     return (
-        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.accordionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <TouchableOpacity onPress={toggleAccordion} style={styles.accordionHeader} activeOpacity={0.7}>
+        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.accordionContainer, { backgroundColor: colors.card }]}>
+            <TouchableOpacity style={styles.accordionHeader} onPress={toggleAccordion} activeOpacity={0.7}>
                 <View style={styles.accordionTitleWrap}>
-                    <View style={[styles.bulletPoint, { backgroundColor: colors.border }]} />
                     <ThemedText style={[styles.accordionTitle, { color: colors.textSecondary }, expanded && { color: colors.text, fontWeight: '700' }]}>{item.title}</ThemedText>
                 </View>
                 <Animated.View style={iconAnimatedStyle}>
@@ -179,45 +173,37 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: Layout.borderRadius,
         borderBottomRightRadius: Layout.borderRadius,
         overflow: 'hidden',
-        zIndex: 2,
-    },
+        zIndex: 2 },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     backBtn: {
         width: 42,
         height: 42,
-        borderRadius: 21,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitleWrap: {
         flex: 1,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
-    },
+        color: '#FFFFFF' },
     headerSubtitleWrap: {
         alignItems: 'center',
-        marginTop: 12,
-    },
+        marginTop: 12 },
     headerSubtitle: {
         fontSize: 11,
         color: '#FFFFFF',
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     headerDate: {
         fontSize: 10,
         color: 'rgba(255,255,255,0.7)',
         marginTop: 4,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     infoBtn: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -239,132 +225,98 @@ const styles = StyleSheet.create({
     scrollView: {
         flex: 1,
         marginTop: -20,
-        zIndex: 0,
-    },
+        zIndex: 0 },
     scrollContent: {
         paddingHorizontal: 16,
-        paddingTop: 40,
-    },
+        paddingTop: 40 },
 
     // Card Content
     card: {
         borderRadius: Layout.borderRadius,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.04,
-        shadowRadius: 16,
-    },
+        padding: 16 },
     cardHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     cardHeaderText: {
         fontSize: 14,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     welcomeText: {
         fontSize: 12,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
     divider: {
         height: 1,
-        marginVertical: 20,
-    },
+        marginVertical: 20 },
 
     // Accordion
     accordionContainer: {
         marginBottom: 16,
         borderRadius: Layout.borderRadius,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     accordionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 16,
-    },
+        padding: 16 },
     accordionTitleWrap: {
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
-        paddingRight: 12,
-    },
+        paddingRight: 12 },
     bulletPoint: {
         width: 6,
         height: 6,
-        borderRadius: 3,
-        marginRight: 10,
-    },
+        borderRadius: Layout.borderRadius,
+        marginRight: 10 },
     accordionTitle: {
         fontSize: 12,
         fontWeight: '600',
-        flex: 1,
-    },
+        flex: 1 },
     accordionTitleActive: {
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     accordionContentWrap: {
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     accordionContentInner: {
         paddingHorizontal: 16,
-        paddingBottom: 16,
-    },
+        paddingBottom: 16 },
     bodyText: {
         fontSize: 11,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
 
     // Sticky Footer
     stickyFooter: {
         position: 'absolute',
         bottom: 0,
         left: 0,
-        right: 0,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 12,
+        right: 0,
         paddingHorizontal: 20,
         paddingTop: 16,
         borderTopLeftRadius: Layout.borderRadius,
-        borderTopRightRadius: Layout.borderRadius,
-    },
+        borderTopRightRadius: Layout.borderRadius },
     checkboxRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     checkbox: {
         width: 24,
         height: 24,
-        borderRadius: 6,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12,
-    },
+        marginRight: 12 },
     checkboxText: {
         fontSize: 11,
         fontWeight: '500',
-        flex: 1,
-    },
+        flex: 1 },
     acceptButton: {
         height: 52,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-    },
+        alignItems: 'center' },
     acceptButtonText: {
         fontSize: 12,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
 
     // Modal
     modalOverlay: {
@@ -372,44 +324,37 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(15,23,42,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
-    },
+        padding: 24 },
     modalContent: {
         borderRadius: Layout.borderRadius,
         padding: 24,
         width: '100%',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     modalIconWrap: {
         width: 64,
         height: 64,
-        borderRadius: 32,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     modalTitle: {
         fontSize: 16,
         fontWeight: '700',
         marginBottom: 12,
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     modalBody: {
         fontSize: 11,
         lineHeight: 18,
         textAlign: 'center',
-        marginBottom: 24,
-    },
+        marginBottom: 24 },
     modalBtn: {
         width: '100%',
         height: 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     modalBtnText: {
         color: '#FFFFFF',
         fontSize: 12,
-        fontWeight: '700',
-    }
+        fontWeight: '700' }
 });

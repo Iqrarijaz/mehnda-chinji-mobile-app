@@ -28,12 +28,7 @@ const styles = StyleSheet.create({
     sectionCard: {
         borderRadius: Layout.borderRadius,
         padding: Platform.OS === 'android' ? 0 : 4,
-        marginBottom: Platform.OS === 'android' ? 12 : 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-    },
+        marginBottom: Platform.OS === 'android' ? 12 : 16 },
     sectionTitle: {
         fontSize: 13,
         fontWeight: '700',
@@ -41,6 +36,4 @@ const styles = StyleSheet.create({
         letterSpacing: 0.8,
         marginLeft: Platform.OS === 'android' ? 12 : 16,
         marginTop: Platform.OS === 'android' ? 10 : 14,
-        marginBottom: 6,
-    },
-});
+        marginBottom: 6 } });

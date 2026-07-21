@@ -54,8 +54,7 @@ export default function FeedbackScreen() {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: error?.message || 'Failed to submit feedback. Please try again.',
-            });
+                text2: error?.message || 'Failed to submit feedback. Please try again.' });
         }
     });
 
@@ -91,7 +90,7 @@ export default function FeedbackScreen() {
         const isReviewed = item.status === 'REVIEWED';
 
         return (
-            <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={[styles.card, { backgroundColor: colors.cardBg }]}>
                 <View style={styles.cardHeader}>
                     <View style={styles.typeBadge}>
                         <ThemedText style={styles.typeText}>{item.type}</ThemedText>
@@ -139,8 +138,8 @@ export default function FeedbackScreen() {
             <Stack.Screen options={{ headerShown: false }} />
 
             {/* Header */}
-            <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-                <TouchableOpacity onPress={handleGoBack} style={[styles.iconBtn, { backgroundColor: colors.card }]}>
+            <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.background }]}>
+                <TouchableOpacity onPress={handleGoBack} style={styles.iconBtn}>
                     <Ionicons name="arrow-back" size={20} color={colors.text} />
                 </TouchableOpacity>
                 <View style={{ flex: 1, marginLeft: 12 }}>
@@ -149,9 +148,9 @@ export default function FeedbackScreen() {
             </View>
 
             {/* Tab Selector */}
-            <View style={[styles.tabContainer, { borderBottomColor: colors.border }]}>
+            <View style={styles.tabContainer}>
                 <TouchableOpacity
-                    style={[styles.tabItem, activeTab === 'submit' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }]}
+                    style={[styles.tabItem, activeTab === 'submit' && { borderBottomWidth: 2, borderBottomColor: colors.primary }]}
                     onPress={() => setActiveTab('submit')}
                 >
                     <ThemedText style={[styles.tabText, activeTab === 'submit' ? { color: colors.primary, fontWeight: '700' } : { color: colors.textSecondary }]}>
@@ -159,7 +158,7 @@ export default function FeedbackScreen() {
                     </ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.tabItem, activeTab === 'history' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }]}
+                    style={[styles.tabItem, activeTab === 'history' && { borderBottomWidth: 2, borderBottomColor: colors.primary }]}
                     onPress={() => setActiveTab('history')}
                 >
                     <ThemedText style={[styles.tabText, activeTab === 'history' ? { color: colors.primary, fontWeight: '700' } : { color: colors.textSecondary }]}>
@@ -186,9 +185,8 @@ export default function FeedbackScreen() {
                                     onPress={() => setFeedbackType(type)}
                                     style={[
                                         styles.typeButton,
-                                        { backgroundColor: isActive ? colors.primary : colors.card, borderColor: isActive ? colors.primary : colors.border }
-                                    ]}
-                                >
+                                        { backgroundColor: isActive ? colors.primary : colors.card }
+                                    ]}>
                                     <ThemedText style={[styles.typeButtonText, { color: isActive ? '#fff' : colors.text }]}>
                                         {label}
                                     </ThemedText>
@@ -202,15 +200,13 @@ export default function FeedbackScreen() {
                         style={[
                             styles.textInput,
                             {
-                                backgroundColor: colors.card,
+                                backgroundColor: colors.cardBg,
                                 color: colors.text,
-                                borderColor: colors.border
                             }
                         ]}
-                        placeholder="Tell us what you think..."
-                        placeholderTextColor={colors.textSecondary}
                         multiline
-                        numberOfLines={6}
+                        placeholder="Tell us what's on your mind..."
+                        placeholderTextColor={colors.textSecondary}
                         value={message}
                         onChangeText={setMessage}
                         textAlignVertical="top"
@@ -281,102 +277,83 @@ export default function FeedbackScreen() {
 
 const styles = StyleSheet.create({
     root: {
-        flex: 1,
-    },
+        flex: 1 },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 20,
-        paddingBottom: 14,
-    },
+        paddingBottom: 14 },
     iconBtn: {
         width: 38,
         height: 38,
-        borderRadius: 19,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     screenTitle: { fontSize: 20, fontWeight: '700' },
     tabContainer: {
-        flexDirection: 'row',
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
+        flexDirection: 'row' },
     tabItem: {
         flex: 1,
         alignItems: 'center',
-        paddingVertical: 14,
-    },
+        paddingVertical: 14 },
     tabText: {
         fontSize: 14,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     scroll: {
         paddingHorizontal: 20,
-        paddingTop: 24,
-    },
+        paddingTop: 24 },
     sectionLabel: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 1,
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     typeContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 10,
-    },
+        gap: 10 },
     typeButton: {
         paddingVertical: 10,
         paddingHorizontal: 16,
-        borderRadius: 20,
-    },
+        borderRadius: Layout.borderRadius },
     typeButtonText: {
         fontSize: 13,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     textInput: {
         borderRadius: Layout.borderRadius,
         padding: 16,
         height: 150,
         fontSize: 15,
-        marginBottom: 24,
-    },
+        marginBottom: 24 },
     submitButton: {
         height: 52,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     submitButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     center: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
     },
     listContent: {
-        padding: 16,
-    },
+        padding: 16 },
     card: {
         padding: 16,
-        borderRadius: 12,
-        marginBottom: 12,
-    },
+        borderRadius: Layout.borderRadius,
+        marginBottom: 12 },
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     typeBadge: {
         backgroundColor: '#E2E8F0',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 4,
-    },
+        borderRadius: Layout.borderRadius },
     typeText: {
         fontSize: 10,
         fontWeight: '700',
@@ -386,8 +363,7 @@ const styles = StyleSheet.create({
     statusBadge: {
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 12,
-    },
+        borderRadius: Layout.borderRadius },
     statusText: {
         fontSize: 10,
         fontWeight: '700',
@@ -402,11 +378,9 @@ const styles = StyleSheet.create({
     cardFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     dateText: {
-        fontSize: 12,
-    },
+        fontSize: 12 },
     sourceText: {
         fontSize: 11,
         textTransform: 'capitalize'
@@ -416,27 +390,22 @@ const styles = StyleSheet.create({
         marginTop: 60,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 24,
-    },
+        paddingHorizontal: 24 },
     emptyTitle: {
         fontSize: 18,
         fontWeight: '700',
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     emptyText: {
         fontSize: 14,
         textAlign: 'center',
         marginBottom: 24,
-        lineHeight: 20,
-    },
+        lineHeight: 20 },
     btn: {
         paddingHorizontal: 24,
         paddingVertical: 12,
-        borderRadius: 8,
-    },
+        borderRadius: Layout.borderRadius },
     btnText: {
         color: '#fff',
         fontWeight: '600',
-        fontSize: 15,
-    }
+        fontSize: 15 }
 });

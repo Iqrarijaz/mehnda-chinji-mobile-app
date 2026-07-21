@@ -4,10 +4,10 @@ import {
     Animated,
     StyleSheet,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import { BaseToastProps } from 'react-native-toast-message';
 import { ThemedText } from './ThemedText';
+import { Layout } from '@/constants/layout';
 
 /* ------------------ Animated BG Blob ------------------ */
 const FloatingBlob = ({ color }: { color: string }) => {
@@ -19,13 +19,11 @@ const FloatingBlob = ({ color }: { color: string }) => {
                 Animated.timing(translateX, {
                     toValue: 20,
                     duration: 4000,
-                    useNativeDriver: true,
-                }),
+                    useNativeDriver: true }),
                 Animated.timing(translateX, {
                     toValue: 0,
                     duration: 4000,
-                    useNativeDriver: true,
-                }),
+                    useNativeDriver: true }),
             ])
         ).start();
     }, []);
@@ -36,8 +34,7 @@ const FloatingBlob = ({ color }: { color: string }) => {
                 styles.blob,
                 {
                     backgroundColor: color,
-                    transform: [{ translateX }],
-                },
+                    transform: [{ translateX }] },
             ]}
         />
     );
@@ -48,8 +45,7 @@ const ToastLayout = ({
     text1,
     text2,
     hide,
-    type,
-}: BaseToastProps & { hide: () => void; type: 'success' | 'error' }) => {
+    type }: BaseToastProps & { hide: () => void; type: 'success' | 'error' }) => {
     const isSuccess = type === 'success';
 
     return (
@@ -94,74 +90,59 @@ export const ToastConfig = {
     ),
     error: (props: BaseToastProps & { hide: () => void }) => (
         <ToastLayout {...props} type="error" />
-    ),
-};
+    ) };
 
 /* ------------------ Styles ------------------ */
 const styles = StyleSheet.create({
     toast: {
         width: '92%',
         minHeight: 60,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         paddingVertical: 10,
         paddingHorizontal: 16,
         flexDirection: 'row',
         alignItems: 'center',
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
+        overflow: 'hidden',
         marginTop: 12,
-        zIndex: 99999,
-    },
+        zIndex: 99999 },
 
     successBg: {
-        backgroundColor: '#CFFAE3',
-    },
+        backgroundColor: '#CFFAE3' },
     errorBg: {
-        backgroundColor: '#FAD1D1',
-    },
+        backgroundColor: '#FAD1D1' },
 
     blob: {
         position: 'absolute',
         left: -20,
         width: 80,
         height: 80,
-        borderRadius: 40,
-    },
+        borderRadius: Layout.borderRadius },
 
     iconWrapper: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
-        zIndex: 2,
-    },
+        zIndex: 2 },
 
     textContainer: {
         flex: 1,
-        zIndex: 2,
-    },
+        zIndex: 2 },
 
     title: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#0F172A',
-    },
+        color: '#0F172A' },
 
     subtitle: {
         fontSize: 12,
         color: '#334155',
         marginTop: 2,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
 
     closeBtn: {
         padding: 6,
-        zIndex: 2,
-    },
-});
+        zIndex: 2 } });

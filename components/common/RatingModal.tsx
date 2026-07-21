@@ -4,8 +4,7 @@ import {
     StyleSheet,
     Modal,
     TouchableOpacity,
-    Platform,
-} from 'react-native';
+    Platform } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { ThemedText } from '../ThemedText';
 import { Colors } from '@/constants/colors';
@@ -89,78 +88,60 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
-    },
+        padding: 24 },
     modalContent: {
         width: '100%',
         borderRadius: Layout.borderRadius,
         padding: 24,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
+        alignItems: 'center',
         ...Platform.select({
             android: {
 
-            },
-        }),
-    },
+            } }) },
     lottieContainer: {
         width: 220,
         height: 180,
         marginBottom: 16,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     lottie: {
         width: '100%',
-        height: '100%',
-    },
+        height: '100%' },
     textContainer: {
         marginBottom: 24,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     title: {
         fontSize: 22,
         fontWeight: '900',
         marginBottom: 12,
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     description: {
         fontSize: 15,
         lineHeight: 22,
         textAlign: 'center',
-        opacity: 0.7,
-    },
+        opacity: 0.7 },
     buttonContainer: {
         width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 8,
-        marginTop: 8,
-    },
+        marginTop: 8 },
     modalButton: {
         width: 100,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
         fontSize: 13,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     laterButton: {
         paddingVertical: 8,
         paddingHorizontal: 12,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     laterButtonText: {
         fontSize: 14,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

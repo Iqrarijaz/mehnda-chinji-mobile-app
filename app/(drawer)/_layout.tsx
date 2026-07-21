@@ -19,16 +19,14 @@ export default function DrawerLayout() {
                     headerShown: false,
                     swipeEnabled: isAuthenticated,
                     drawerType: 'front',
-                    drawerStyle: { backgroundColor: theme === 'dark' ? Colors[theme].card : Colors[theme].background },
-                }}
+                    drawerStyle: { backgroundColor: theme === 'dark' ? Colors[theme].card : Colors[theme].background } }}
             >
                 <Drawer.Screen
                     name="(tabs)"
                     options={{
                         drawerLabel: 'Main App',
                         title: 'Main App',
-                        drawerItemStyle: isAuthenticated ? {} : { display: 'none' },
-                    }}
+                        drawerItemStyle: isAuthenticated ? {} : { display: 'none' } }}
                 />
             </Drawer>
         </View>

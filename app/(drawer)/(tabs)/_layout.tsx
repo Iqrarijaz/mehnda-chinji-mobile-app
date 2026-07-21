@@ -82,8 +82,7 @@ export default function TabLayout() {
           freezeOnBlur: true,
           headerShown: true,
           headerStyle: {
-            backgroundColor: Colors[theme].background,
-          },
+            backgroundColor: Colors[theme].background },
           headerTintColor: Colors[theme].text,
           headerLeft: () => (
             <TouchableOpacity
@@ -100,8 +99,7 @@ export default function TabLayout() {
             >
               <Ionicons name="menu" size={28} color={Colors[theme].text} />
             </TouchableOpacity>
-          ),
-        }}>
+          ) }}>
         <Tabs.Screen
           name="index"
           options={{
@@ -110,8 +108,7 @@ export default function TabLayout() {
             tabBarLabel: 'Home',
             tabBarIcon: ({ focused, color, size }) => (
               <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
-            ),
-          }}
+            ) }}
         />
 
         <Tabs.Screen
@@ -123,8 +120,7 @@ export default function TabLayout() {
             tabBarIcon: ({ focused, color, size }: { focused: boolean; color: string; size: number }) => (
               <Ionicons name={focused ? 'briefcase' : 'briefcase-outline'} size={size} color={color} />
             ),
-            unmountOnBlur: true,
-          } as any}
+            unmountOnBlur: true } as any}
         />
 
         <Tabs.Screen
@@ -136,8 +132,7 @@ export default function TabLayout() {
             tabBarIcon: ({ focused, color, size }: { focused: boolean; color: string; size: number }) => (
               <Ionicons name={focused ? 'cart' : 'cart-outline'} size={size} color={color} />
             ),
-            unmountOnBlur: true,
-          } as any}
+            unmountOnBlur: true } as any}
         />
       </Tabs>
 

@@ -14,7 +14,6 @@ export const HomeHeader = React.memo(({ setIsSearchActive }: HomeHeaderProps) =>
     return (
         <View style={styles.headerWrapper}>
             <ScreenHeader
-                decor="community"
                 rightActions={
                     <HeaderIconBtn
                         name="search-outline"
@@ -30,6 +29,4 @@ export const HomeHeader = React.memo(({ setIsSearchActive }: HomeHeaderProps) =>
 
 const styles = StyleSheet.create({
     headerWrapper: {
-        zIndex: 10,
-    },
-});
+        zIndex: 10 } });

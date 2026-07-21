@@ -9,8 +9,7 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -166,7 +165,8 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                                     <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
                                     <View style={[styles.inputBox, {
                                         backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                        borderColor: errors.email && touched.email ? '#EF4444' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0')
+                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                                        borderWidth: 1
                                     }]}>
                                         <Ionicons name="mail-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
                                         <TextInput
@@ -268,152 +268,115 @@ export default ForgotPasswordScreen;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     headerSection: {
         paddingBottom: 38,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     headerContent: {
         paddingHorizontal: 22,
-        paddingTop: 38,
-    },
+        paddingTop: 38 },
     headerTitle: {
         fontSize: 28, // Reduced from 32
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
-        marginBottom: 6,
-    },
+        marginBottom: 6 },
     headerSubtitle: {
         fontSize: 15,
         color: 'rgba(255, 255, 255, 0.9)',
-        lineHeight: 22,
-    },
+        lineHeight: 22 },
     formContainer: {
         flex: 1,
         paddingHorizontal: 18,
         paddingTop: 30,
-        paddingBottom: 38,
-    },
+        paddingBottom: 38 },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-    },
+        padding: 16 },
     inputField: {
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     errorText: {
         color: '#EF4444',
         fontSize: 12,
         marginTop: 6,
         marginLeft: 4,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     label: {
         fontSize: 11,
         fontWeight: '700',
         color: '#475569',
         letterSpacing: 0.5,
         marginBottom: 6,
-        marginLeft: 0,
-    },
+        marginLeft: 0 },
     required: {
-        color: '#EF4444',
-    },
+        color: '#EF4444' },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         height: 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
-    },
+        paddingHorizontal: 12 },
     input: {
         flex: 1,
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     submitButton: {
         height: 52,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 18,
-        overflow: 'hidden',
-        shadowColor: '#006666',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-    },
+        overflow: 'hidden' },
     submitButtonText: {
         color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     footer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 6,
-    },
+        marginTop: 6 },
     footerText: {
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     footerLink: {
         fontSize: 12,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     // Stage 2 Profile Styles
     profileContainer: {
         alignItems: 'center',
-        paddingVertical: 5,
-    },
+        paddingVertical: 5 },
     profileInfo: {
         alignItems: 'center',
-        marginBottom: 15,
-    },
+        marginBottom: 15 },
     profileAvatar: {
         width: 80,
         height: 80,
-        borderRadius: 40,
-        marginBottom: 10,
-        borderColor: '#00666620',
-    },
+        borderRadius: Layout.borderRadius,
+        marginBottom: 10 },
     profileAvatarPlaceholder: {
         width: 80,
         height: 80,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 10,
-    },
+        marginBottom: 10 },
     profileName: {
         fontSize: 18,
         fontWeight: '800',
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     profileEmail: {
         fontSize: 14,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     notMeButton: {
         marginTop: 10,
-        padding: 5,
-    },
+        padding: 5 },
     notMeText: {
         fontSize: 14,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     submitButtonHorizontal: {
         paddingHorizontal: 30,
-        alignSelf: 'center',
-    },
-});
+        alignSelf: 'center' } });

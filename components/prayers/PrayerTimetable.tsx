@@ -107,8 +107,7 @@ export const PrayerTimetable = ({
     selectedCity,
     pulseAnim,
     C,
-    isDark,
-}: PrayerTimetableProps) => {
+    isDark }: PrayerTimetableProps) => {
     return (
         <>
             {/* Section Header */}
@@ -155,10 +154,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 4,
-        paddingHorizontal: 2,
-    },
+        paddingHorizontal: 2 },
     sectionTitle: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.6 },
-    sectionPill: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 12 },
+    sectionPill: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: Layout.borderRadius },
     sectionPillText: { fontSize: 9, fontWeight: '700' },
 
     gridContainer: {
@@ -175,32 +173,25 @@ const styles = StyleSheet.create({
         padding: 6,
         borderRadius: Layout.borderRadius,
         minHeight: 65,
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     miniHeader: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
-        height: 12,
-    },
+        height: 12 },
     miniBody: {
         alignItems: 'center',
-        paddingBottom: 2,
-    },
+        paddingBottom: 2 },
     nameContainer: {
         width: '100%',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     prayerArabic: {
         fontFamily: 'NotoNastaliqUrdu-Regular',
         fontSize: 12,
         padding: 2, // 2px padding around name as requested
         fontWeight: '700',
         lineHeight: 22, // Balanced for Hadith card aesthetic in micro tile
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     adhanText: {
         fontSize: 12,
         fontWeight: '800',
-        lineHeight: 20,
-    },
-});
+        lineHeight: 20 } });

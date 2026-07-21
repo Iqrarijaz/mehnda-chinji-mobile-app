@@ -12,6 +12,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
 import { useRouter } from 'expo-router';
+import { Layout } from '@/constants/layout';
 
 interface BusinessCardProps {
     business: any;
@@ -112,78 +113,64 @@ export default BusinessCard;
 
 const styles = StyleSheet.create({
     card: {
-        marginBottom: 10,
-    },
+        marginBottom: 10 },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
-        gap: 10,
-    },
+        gap: 10 },
     tile: {
         width: TILE_SIZE,
         height: TILE_SIZE,
-        borderRadius: 14,
-    },
+        borderRadius: Layout.borderRadius },
     tilePlaceholder: {
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     tileHalo: {
         position: 'absolute',
         width: TILE_SIZE * 0.82,
         height: TILE_SIZE * 0.82,
-        borderRadius: TILE_SIZE * 0.41,
-    },
+        borderRadius: TILE_SIZE * 0.41 },
     initialCircle: {
         width: 44,
         height: 44,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     initialText: {
         fontSize: 18,
-        fontWeight: '800',
-    },
+        fontWeight: '800' },
     info: {
         flex: 1,
         gap: 2,
-        paddingTop: 10,
-    },
+        paddingTop: 10 },
     typeBadge: {
         position: 'absolute',
         top: 0,
         right: 0,
         maxWidth: '60%',
         paddingHorizontal: 10,
-        borderTopRightRadius: 12,
-        borderBottomLeftRadius: 12,
-    },
+        borderTopRightRadius: 28,
+        borderBottomLeftRadius: 28 },
     typeBadgeText: {
         fontSize: 9,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
-        color: '#FFFFFF',
-    },
+        color: '#FFFFFF' },
     name: {
         fontSize: 14.5,
         fontWeight: '800',
         letterSpacing: 0.1,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 2,
-        paddingRight: 8,
-    },
+        paddingRight: 8 },
     metaText: {
         fontSize: 11.5,
         fontWeight: '500',
         flexShrink: 1,
-        lineHeight: 15,
-    },
-});
+        lineHeight: 15 } });

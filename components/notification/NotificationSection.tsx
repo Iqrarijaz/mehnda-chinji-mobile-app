@@ -40,6 +40,4 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
         marginBottom: 10,
         marginTop: 6,
-        paddingHorizontal: 4,
-    },
-});
+        paddingHorizontal: 4 } });

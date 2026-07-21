@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { ThemedText } from '@/components/ThemedText';
+import { Layout } from '@/constants/layout';
 
 interface ShareAyahCardProps {
     arabic: string;
@@ -26,8 +27,7 @@ export function ShareAyahCard({
     surahEnglishName,
     verseNumber,
     primary,
-    lime,
-}: ShareAyahCardProps) {
+    lime }: ShareAyahCardProps) {
     return (
         <LinearGradient
             colors={[primary, '#0b3b3b']}
@@ -61,28 +61,24 @@ const styles = StyleSheet.create({
         width: 360,
         paddingHorizontal: 26,
         paddingVertical: 30,
-        borderRadius: 24,
-    },
+        borderRadius: Layout.borderRadius },
     topBar: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
         paddingVertical: 10,
-        marginBottom: 24,
-    },
+        marginBottom: 24 },
     surah: {
         color: '#FFFFFF',
         fontSize: 20,
         fontWeight: '700',
-        writingDirection: 'rtl',
-    },
+        writingDirection: 'rtl' },
     versePill: {
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     verseText: { color: '#0b3b3b', fontSize: 11, fontWeight: '800' },
     arabic: {
         color: '#FFFFFF',
@@ -90,22 +86,18 @@ const styles = StyleSheet.create({
         lineHeight: 58,
         textAlign: 'center',
         writingDirection: 'rtl',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     translation: {
         color: 'rgba(255,255,255,0.85)',
         fontSize: 15,
         lineHeight: 24,
         textAlign: 'center',
-        marginTop: 20,
-    },
+        marginTop: 20 },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
-        marginTop: 28,
-    },
-    dot: { width: 6, height: 6, borderRadius: 3 },
-    brand: { color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: '700', letterSpacing: 0.4 },
-});
+        marginTop: 28 },
+    dot: { width: 6, height: 6, borderRadius: Layout.borderRadius },
+    brand: { color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: '700', letterSpacing: 0.4 } });

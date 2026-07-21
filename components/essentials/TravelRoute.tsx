@@ -5,14 +5,14 @@ import Animated, {
     FadeInDown,
     useAnimatedStyle,
     useSharedValue,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { FlowingLine } from './travel/FlowingLine';
 import { SectionHeading } from './shared/SectionHeading';
+import { Layout } from '@/constants/layout';
 
 interface TravelRouteProps {
     route: any[];
@@ -57,8 +57,7 @@ function RouteStopComponent({
     stop,
     index,
     isFirst,
-    isLast,
-}: {
+    isLast }: {
     stop: any;
     index: number;
     isFirst: boolean;
@@ -69,8 +68,7 @@ function RouteStopComponent({
     const pressed = useSharedValue(0);
 
     const pressStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 - pressed.value * 0.02 }],
-    }));
+        transform: [{ scale: 1 - pressed.value * 0.02 }] }));
 
     const kind = isFirst ? 'origin' : isLast ? 'destination' : 'stop';
 
@@ -178,80 +176,64 @@ TravelRoute.displayName = 'TravelRoute';
 
 const styles = StyleSheet.create({
     section: {
-        gap: 10,
-    },
+        gap: 10 },
     timeline: {
-        marginTop: 2,
-    },
+        marginTop: 2 },
     stopRow: {
         flexDirection: 'row',
-        gap: 12,
-    },
+        gap: 12 },
     timelineColumn: {
         width: 28,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     terminalNode: {
         width: 28,
         height: 28,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     stopNodeOuter: {
         width: 20,
         height: 20,
-        borderRadius: 10,
+        borderRadius: Layout.borderRadius,
         marginVertical: 4,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     stopNodeInner: {
         width: 8,
         height: 8,
-        borderRadius: 4,
-    },
+        borderRadius: Layout.borderRadius },
     connector: {
         flex: 1,
-        marginVertical: 3,
-    },
+        marginVertical: 3 },
     stopCardWrap: {
         flex: 1,
-        paddingBottom: 12,
-    },
+        paddingBottom: 12 },
     stopCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
         paddingVertical: 9,
-        gap: 10,
-    },
+        gap: 10 },
     stopInfo: {
-        flex: 1,
-    },
+        flex: 1 },
     stopKind: {
         fontSize: 9,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.6,
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     stopCity: {
         fontSize: 13.5,
         fontWeight: '700',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     timeBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
         paddingHorizontal: 9,
         paddingVertical: 5,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     timeText: {
         fontSize: 11.5,
-        fontWeight: '700',
-    },
-});
+        fontWeight: '700' } });

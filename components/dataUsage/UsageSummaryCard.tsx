@@ -9,6 +9,7 @@ import Animated, {
 import Svg, { Circle } from 'react-native-svg';
 import { ThemedText } from '../ThemedText';
 import { splitBytes } from '@/utils/dataUsageUtils';
+import { Layout } from '@/constants/layout';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const RADIUS = 70;
@@ -30,8 +31,7 @@ export const UsageSummaryCard = React.memo(({ totalBytes, resetDate }: UsageSumm
     }, [totalBytes]);
 
     const animatedProps = useAnimatedProps(() => ({
-        strokeDashoffset: CIRCUMFERENCE * (1 - progress.value),
-    }));
+        strokeDashoffset: CIRCUMFERENCE * (1 - progress.value) }));
 
     const dateStr = new Date(resetDate).toLocaleDateString('en-US', {
         month: 'short',
@@ -87,54 +87,41 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#FFFFFF',
         marginHorizontal: 20,
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 16,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.06,
-        shadowRadius: 12,
-        marginBottom: 12,
-    },
+        gap: 16,
+        marginBottom: 12 },
     chartContainer: {
         width: 100,
         height: 100,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     svg: {
         position: 'absolute',
         transform: [{ scale: 0.65 }]
     },
     centerText: {
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     value: {
         fontSize: 16,
         fontWeight: '900',
-        color: '#0F172A',
-    },
+        color: '#0F172A' },
     unit: {
         fontSize: 10,
         fontWeight: '700',
         color: '#64748B',
-        textTransform: 'uppercase',
-    },
+        textTransform: 'uppercase' },
     infoContainer: {
         flex: 1,
-        gap: 4,
-    },
+        gap: 4 },
     label: {
         fontSize: 13,
         fontWeight: '800',
-        color: '#0F172A',
-    },
+        color: '#0F172A' },
     dateLabel: {
         fontSize: 11,
         color: '#94A3B8',
-        fontWeight: '500',
-    },
-});
+        fontWeight: '500' } });

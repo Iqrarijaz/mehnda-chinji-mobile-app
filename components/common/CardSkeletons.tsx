@@ -3,6 +3,7 @@ import { View, StyleSheet, Dimensions } from 'react-native';
 import Skeleton from './Skeleton';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 
 const { width } = Dimensions.get('window');
 
@@ -37,7 +38,7 @@ export const DonorCardSkeleton = () => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     return (
-        <View style={[styles.donorCard, { backgroundColor: colors.card, borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+        <View style={[styles.donorCard, { backgroundColor: colors.card }]}>
             <View style={styles.row}>
                 <Skeleton width={30} height={30} borderRadius={15} style={{ marginRight: 10 }} />
                 <View style={styles.content}>
@@ -82,48 +83,33 @@ export const RequestCardSkeleton = () => {
 
 const styles = StyleSheet.create({
     businessCard: {
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         padding: 14,
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
 
     donorCard: {
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
         paddingVertical: 12,
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     row: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     content: {
         flex: 1,
-        marginLeft: 12,
-    },
+        marginLeft: 12 },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     contentContainer: {
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingTop: 8,
-        borderTopWidth: StyleSheet.hairlineWidth,
-    },
+        paddingTop: 8 },
     requestCard: {
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         padding: 12,
         marginBottom: 16,
-        marginHorizontal: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-
-    },
-});
+        marginHorizontal: 16 } });

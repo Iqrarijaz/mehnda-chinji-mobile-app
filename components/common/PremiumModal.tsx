@@ -5,8 +5,7 @@ import Animated, {
     FadeInUp,
     useAnimatedProps,
     useSharedValue,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -41,8 +40,7 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
     type = 'centered',
     sheetStyle,
     overlayStyle,
-    closable = true,
-}) => {
+    closable = true }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const blurIntensity = useSharedValue(0);
@@ -56,8 +54,7 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
     }, [visible]);
 
     const animatedProps = useAnimatedProps(() => ({
-        intensity: blurIntensity.value,
-    } as any));
+        intensity: blurIntensity.value } as any));
 
     return (
         <Modal
@@ -119,41 +116,31 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         justifyContent: 'flex-end',
         alignItems: 'center',
-        paddingBottom: isAndroid ? 20 : 30,
-    },
+        paddingBottom: isAndroid ? 20 : 30 },
     overlayCentered: {
         justifyContent: 'center',
         alignItems: 'center',
-        paddingBottom: 0,
-    },
+        paddingBottom: 0 },
     overlayFullscreen: {
         justifyContent: 'center',
         alignItems: 'stretch',
-        paddingBottom: 0,
-    },
+        paddingBottom: 0 },
     sheet: {
         width: '95%',
         borderRadius: Layout.borderRadius,
         paddingTop: 12,
         paddingHorizontal: 20,
-        paddingBottom: isAndroid ? 24 : 36,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -10 },
-        shadowOpacity: 0.15,
-        shadowRadius: 24,
-    },
+        paddingBottom: isAndroid ? 24 : 36 },
     sheetCentered: {
         maxWidth: 500,
         paddingTop: 14,
         paddingBottom: 14,
-        maxHeight: '85%',
-    },
+        maxHeight: '85%' },
     sheetFullscreen: {
         width: '100%',
         flex: 1,
-        borderRadius: 0,
+        borderRadius: Layout.borderRadius,
         paddingTop: 0,
         paddingHorizontal: 0,
-        paddingBottom: 0,
-    }
+        paddingBottom: 0 }
 });

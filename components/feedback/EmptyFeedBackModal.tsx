@@ -61,46 +61,34 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
-    },
+        padding: 24 },
     modalContent: {
         width: '100%',
         borderRadius: Layout.borderRadius,
         padding: 24,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-
-    },
+        alignItems: 'center' },
     imageContainer: {
         width: 220,
         height: 180,
         marginBottom: 16,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     image: {
         width: '100%',
-        height: '100%',
-    },
+        height: '100%' },
     modalSubtitle: {
         fontSize: 13,
         textAlign: 'center',
         marginBottom: 24,
-        lineHeight: 20,
-    },
+        lineHeight: 20 },
     modalButton: {
         width: 120,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '600',
-    }
+        fontWeight: '600' }
 });

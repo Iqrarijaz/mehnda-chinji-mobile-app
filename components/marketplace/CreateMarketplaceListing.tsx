@@ -8,8 +8,7 @@ import {
     Switch,
     Image,
     KeyboardAvoidingView,
-    TextInput,
-} from 'react-native';
+    TextInput } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
@@ -37,6 +36,7 @@ import { ThankYouModal } from '@/components/common/ThankYou';
 import { LocationPicker, LocationValue } from '@/components/common/LocationPicker';
 import { resolveLocationForSubmit } from '@/utils/locationService';
 import { marketplaceListingSchema } from '@/utils/validation';
+import { Layout } from '@/constants/layout';
 
 interface CreateMarketplaceListingProps {
     visible?: boolean;
@@ -49,8 +49,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     visible = true,
     onClose,
     onSuccess,
-    listingToEdit,
-}) => {
+    listingToEdit }) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const { user } = useAuth();
@@ -333,7 +332,6 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
     const handleThankYouClose = () => {
         setShowThankYou(false);
         onSuccess();
-        onClose();
         if (user?.user?.role !== 'APP_ADMIN') {
             import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
                 InterstitialService.getInstance().show(true);
@@ -369,8 +367,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                     title: listingToEdit ? 'Update Your Listing' : 'Sell An Item',
                     subtitle: listingToEdit
                         ? 'Update your item details'
-                        : 'List your item in the marketplace and reach local buyers',
-                }}
+                        : 'List your item in the marketplace and reach local buyers' }}
             />
 
             {/* ── Form ────────────────────────────────────────────────── */}
@@ -436,15 +433,12 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                         </View>
                         <View style={[{
                             backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                            borderRadius: 12,
+                            borderRadius: Layout.borderRadius,
                             paddingHorizontal: 14,
                             minHeight: 80,
                             alignItems: 'flex-start',
                             paddingVertical: 12,
-                            borderColor: errors.address ? '#EF4444' : 'transparent',
-                            borderWidth: errors.address ? 1 : 0,
-                            marginTop: 6,
-                        }]}>
+                            marginTop: 6 }]}>
                             <TextInput
                                 style={[styles.textInput, { color: colors.text, textAlignVertical: 'top', minHeight: 60, fontSize: 14 }]}
                                 placeholder="Shop #, Street, Area"
@@ -526,7 +520,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
 
                     {/* Vehicle details section (Shown conditionally) */}
                     {isVehicle && (
-                        <Animated.View entering={FadeInDown.delay(350)} style={[styles.vehicleSection, { borderColor: colors.border }]}>
+                        <Animated.View entering={FadeInDown.delay(350)} style={styles.vehicleSection}>
                             <ThemedText style={[styles.sectionTitle, { color: colors.primary }]}>Vehicle Specifications</ThemedText>
                             <View style={styles.row}>
                                 <FormInput
@@ -550,7 +544,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
 
                     {/* Switches */}
                     <Animated.View entering={FadeInDown.delay(450)} style={styles.switchGroup}>
-                        <View style={[styles.switchRow, { borderBottomColor: colors.border }]}>
+                        <View style={styles.switchRow}>
                             <View style={styles.switchLabelContainer}>
                                 <ThemedText style={[styles.switchLabel, { color: colors.text }]}>Negotiable Price</ThemedText>
                                 <ThemedText style={[styles.switchSub, { color: colors.textSecondary }]}>Allow buyers to negotiate prices</ThemedText>
@@ -558,7 +552,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             <Switch value={formData.negotiable} onValueChange={handleNegotiableToggle} trackColor={{ true: colors.primary }} />
                         </View>
 
-                        {/* <View style={[styles.switchRow, { borderBottomColor: colors.border }]}>
+                        {/* <View style={styles.switchRow}>
                             <View style={styles.switchLabelContainer}>
                                 <ThemedText style={[styles.switchLabel, { color: colors.text }]}>Show Contact Publicly</ThemedText>
                                 <ThemedText style={[styles.switchSub, { color: colors.textSecondary }]}>Let buyers see your number to call</ThemedText>
@@ -593,7 +587,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                                 </View>
                             ))}
                             {formData.images.length < 5 && (
-                                <TouchableOpacity style={[styles.addImagesBtn, { borderColor: colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' }]} onPress={pickImages} disabled={isUploadingImages}>
+                                <TouchableOpacity style={[styles.addImagesBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' }]} onPress={pickImages} disabled={isUploadingImages}>
                                     <Ionicons name="camera-outline" size={28} color={colors.primary} />
                                     <ThemedText style={[styles.addImagesText, { color: colors.primary }]}>{isUploadingImages ? 'Uploading...' : 'Add Photo'}</ThemedText>
                                 </TouchableOpacity>
@@ -619,7 +613,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             title={listingToEdit ? 'Update' : 'Post Now'}
                             onPress={handleSubmit}
                             isLoading={mutation.isPending || isUploadingImages}
-                            style={{ width: 160, height: 40, borderRadius: 20 }}
+                            style={{ width: 160, height: 40, borderRadius: Layout.borderRadius }}
                         />
                     </Animated.View>
 
@@ -646,194 +640,157 @@ CreateMarketplaceListing.displayName = 'CreateMarketplaceListing';
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     textInput: {
         width: '100%',
         padding: 0,
-        margin: 0,
-    },
+        margin: 0 },
     // ── Hero Header ──────────────────────────────────────────────────────
     header: {
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
         overflow: 'hidden',
-        paddingBottom: 24,
-    },
+        paddingBottom: 24 },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingBottom: 4,
-    },
+        paddingBottom: 4 },
     backButton: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerNavTitle: {
         fontSize: 17,
         fontWeight: '700',
         color: '#FFFFFF',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     heroContent: {
         alignItems: 'center',
         paddingHorizontal: 24,
-        marginTop: 16,
-    },
+        marginTop: 16 },
     heroIconWrap: {
         width: 64,
         height: 64,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.95)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     heroTitle: {
         fontSize: 20,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     heroSubtitle: {
         fontSize: 12,
         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
         marginTop: 6,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
 
     // ── Form ─────────────────────────────────────────────────────────────
     scrollContainer: {
-        flex: 1,
-    },
+        flex: 1 },
     scrollContent: {
-        paddingBottom: 40,
-    },
+        paddingBottom: 40 },
     formSection: {
         paddingHorizontal: 20,
         marginTop: 24,
-        gap: 16,
-    },
+        gap: 16 },
     inputField: {
-        gap: 6,
-    },
+        gap: 6 },
     label: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     required: {
-        color: '#EF4444',
-    },
+        color: '#EF4444' },
     errorText: {
         color: '#EF4444',
         fontSize: 12,
         fontWeight: '500',
         marginTop: 4,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     row: {
-        flexDirection: 'row',
-    },
+        flexDirection: 'row' },
 
     // ── Inputs (flat, borderless) ─────────────────────────────────────────
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
-        height: 48,
-    },
+        height: 48 },
     triggerContent: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     triggerText: {
         flex: 1,
         fontWeight: '500',
-        fontSize: 13,
-    },
+        fontSize: 13 },
 
     // ── Switches ─────────────────────────────────────────────────────────
     switchGroup: {
-        gap: 8,
-    },
+        gap: 8 },
     switchRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-    },
+        paddingVertical: 12 },
     switchLabelContainer: {
-        flex: 1,
-    },
+        flex: 1 },
     switchLabel: {
         fontSize: 14,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     switchSub: {
         fontSize: 11,
-        marginTop: 2,
-    },
+        marginTop: 2 },
 
     // ── Images ───────────────────────────────────────────────────────────
     imagesScroll: {
         flexDirection: 'row',
-        marginTop: 4,
-    },
+        marginTop: 4 },
     imageThumbnailContainer: {
         position: 'relative',
-        marginRight: 10,
-    },
+        marginRight: 10 },
     imageThumbnail: {
         width: 90,
         height: 90,
-        borderRadius: 12,
-    },
+        borderRadius: Layout.borderRadius },
     removeImageBtn: {
         position: 'absolute',
         top: -8,
         right: -8,
         backgroundColor: '#fff',
-        borderRadius: 15,
-        zIndex: 10,
-    },
+        borderRadius: Layout.borderRadius,
+        zIndex: 10 },
     addImagesBtn: {
         width: 90,
         height: 90,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     addImagesText: {
         fontSize: 9,
         fontWeight: '700',
-        marginTop: 4,
-    },
+        marginTop: 4 },
 
     // ── Vehicle Section ──────────────────────────────────────────────────
     vehicleSection: {
-        borderRadius: 12,
-        padding: 12,
-        borderStyle: 'dashed',
-        borderWidth: 1,
-    },
+        borderRadius: Layout.borderRadius,
+        padding: 12 },
     sectionTitle: {
         fontSize: 13,
         fontWeight: '700',
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
 
     // ── Buttons row ──────────────────────────────────────────────────────
     buttonsRow: {
@@ -841,17 +798,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 12,
-        marginTop: 20,
-    },
+        marginTop: 20 },
     cancelButton: {
         width: 120,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     cancelText: {
         fontSize: 14,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

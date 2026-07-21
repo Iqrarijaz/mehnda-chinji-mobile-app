@@ -9,6 +9,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { QuranHeader } from '@/components/quran/QuranHeader';
 import { getBookmarks, removeBookmark, type Bookmark } from '@/utils/quranPrefs';
+import { Layout } from '@/constants/layout';
 
 export default function BookmarksScreen() {
     const router = useRouter();
@@ -60,13 +61,10 @@ export default function BookmarksScreen() {
                     {bookmarks.map((b) => (
                         <TouchableOpacity
                             key={`${b.surah}:${b.ayahIndex}`}
-                            style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-                            activeOpacity={0.7}
-                            onPress={() => openAyah(b)}
-                        >
-                            <View style={styles.cardHeader}>
-                                <View style={[styles.badge, { backgroundColor: `${colors.primary}14` }]}>
-                                    <ThemedText style={[styles.badgeText, { color: colors.primary }]}>
+                            style={[styles.card, { backgroundColor: colors.cardBg }]}>
+                                <View style={styles.cardHeader}>
+                                    <View style={[styles.badge, { backgroundColor: `${colors.primary}14` }]}>
+                                        <ThemedText style={[styles.badgeText, { color: colors.primary }]}>
                                         {b.surahEnglishName} : {b.ayahNumberInSurah}
                                     </ThemedText>
                                 </View>
@@ -90,37 +88,30 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     list: { paddingHorizontal: 16, paddingTop: 14 },
     card: {
-        borderRadius: 16,
-        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: Layout.borderRadius,
         padding: 14,
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     cardHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 10,
-    },
+        marginBottom: 10 },
     badge: {
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     badgeText: { fontSize: 11, fontWeight: '800' },
     arabic: {
         fontSize: 22,
         lineHeight: 42,
         textAlign: 'right',
         writingDirection: 'rtl',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     empty: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 40,
-        gap: 10,
-    },
+        gap: 10 },
     emptyTitle: { fontSize: 17, fontWeight: '800', marginTop: 6 },
-    emptyText: { fontSize: 13, textAlign: 'center', lineHeight: 20 },
-});
+    emptyText: { fontSize: 13, textAlign: 'center', lineHeight: 20 } });

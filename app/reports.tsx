@@ -159,7 +159,7 @@ export default function ReportsScreen() {
                         }
 
                         return (
-                            <Animated.View key={report._id} entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.reportCard, { backgroundColor: colors.card, shadowColor: theme === 'dark' ? '#000' : '#000' }]}>
+                            <Animated.View key={report._id} entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.reportCard, { backgroundColor: colors.card }]}>
                                 <View style={styles.cardHeader}>
                                     <View style={[styles.targetBadge, { backgroundColor: colors.primary + '15' }]}>
                                         <ThemedText style={[styles.targetText, { color: colors.primary }]}>
@@ -181,7 +181,7 @@ export default function ReportsScreen() {
                                     </ThemedText>
                                 )}
 
-                                <View style={[styles.cardFooter, { borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                                <View style={[styles.cardFooter, { borderTopWidth: 1, borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
                                     <ThemedText style={[styles.dateText, { color: colors.icon }]}>
                                         {dayjs(report.createdAt).format('MMM DD, YYYY • hh:mm A')}
                                     </ThemedText>
@@ -212,26 +212,21 @@ export default function ReportsScreen() {
 
                         <ThemedText style={[styles.inputLabel, { color: colors.textSecondary }]}>Reason</ThemedText>
                         <TextInput
-                            style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
+                            style={[styles.input, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text }]}
                             value={editReason}
                             onChangeText={setEditReason}
-                            placeholder="Enter reason"
-                            placeholderTextColor={colors.icon}
                         />
 
                         <ThemedText style={[styles.inputLabel, { color: colors.textSecondary }]}>Additional Details</ThemedText>
                         <TextInput
-                            style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text, borderColor: colors.border }]}
+                            style={[styles.input, styles.textArea, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : '#F1F5F9', color: colors.text }]}
                             value={editDescription}
                             onChangeText={setEditDescription}
-                            placeholder="Enter description"
-                            placeholderTextColor={colors.icon}
                             multiline
-                            numberOfLines={4}
                             textAlignVertical="top"
                         />
 
-                        <TouchableOpacity
+                        <TouchableOpacity 
                             style={[styles.saveBtn, { backgroundColor: colors.primary }]}
                             onPress={handleSaveEdit}
                             disabled={updateMutation.isPending}
@@ -255,21 +250,18 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
-        zIndex: 2,
-    },
+        zIndex: 2 },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     backBtn: {
         width: 42,
         height: 42,
-        borderRadius: 21,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitleWrap: { flex: 1, alignItems: 'center' },
     headerTitle: {
         fontSize: 20,
@@ -287,53 +279,43 @@ const styles = StyleSheet.create({
     reportCard: {
         borderRadius: Layout.borderRadius,
         padding: 16,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-    },
+        marginBottom: 16 },
     cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
     targetBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: Layout.borderRadius },
     targetText: { fontSize: 12, fontWeight: '700' },
     statusBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 4, borderRadius: Layout.borderRadius },
-    statusDot: { width: 6, height: 6, borderRadius: 3, marginRight: 6 },
+    statusDot: { width: 6, height: 6, borderRadius: Layout.borderRadius, marginRight: 6 },
     statusText: { fontSize: 11, fontWeight: '700' },
     reasonText: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
     descriptionText: { fontSize: 14, lineHeight: 20, marginBottom: 12 },
-    cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, paddingTop: 12 },
+    cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12 },
     dateText: { fontSize: 12 },
     moreBtn: {
         padding: 4,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     menuPopover: {
         width: 160,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 6,
-        paddingVertical: 6,
-    },
+        paddingVertical: 6 },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 8,
         paddingHorizontal: 8,
-        borderRadius: 8,
-        gap: 10,
-    },
+        borderRadius: Layout.borderRadius,
+        gap: 10 },
     menuIconBox: {
         width: 28,
         height: 28,
-        borderRadius: 8,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     menuItemText: {
         fontSize: 14,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 },
     modalContent: { borderRadius: Layout.borderRadius, padding: 24 },
     modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },

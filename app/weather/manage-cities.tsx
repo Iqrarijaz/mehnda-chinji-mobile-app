@@ -11,6 +11,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useSavedCities } from '@/hooks/useSavedCities';
 import { searchPlaces, PlaceResult } from '@/utils/locationService';
+import { Layout } from '@/constants/layout';
 
 const MAX_CITIES = 10;
 
@@ -65,12 +66,9 @@ export default function ManageCitiesScreen() {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            {/* Gradient header */}
-            <LinearGradient
-                colors={[colors.primary, colors.secondary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[styles.header, { paddingTop: insets.top + 14 }]}
+            {/* Header */}
+            <View
+                style={[styles.header, { paddingTop: insets.top + 14, backgroundColor: colors.primary }]}
             >
                 <View style={styles.headerRow}>
                     <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} hitSlop={8}>
@@ -82,7 +80,7 @@ export default function ManageCitiesScreen() {
                     </View>
                     {isSaving ? <ActivityIndicator size="small" color="#FFFFFF" /> : null}
                 </View>
-            </LinearGradient>
+            </View>
 
             <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                 {/* Search / add */}
@@ -111,11 +109,8 @@ export default function ManageCitiesScreen() {
                         {results.map((r, i) => (
                             <TouchableOpacity
                                 key={`${r.latitude}-${r.longitude}-${i}`}
-                                style={[styles.resultRow, { borderBottomColor: colors.border }]}
-                                onPress={() => onAdd(r)}
-                                activeOpacity={0.7}
+                                style={[styles.resultRow, { borderBottomWidth: 1, borderBottomColor: colors.border }]}
                             >
-                                <Ionicons name="add-circle" size={20} color={colors.lime} style={{ marginRight: 10 }} />
                                 <ThemedText style={[styles.resultText, { color: colors.text }]} numberOfLines={2}>
                                     {r.displayName}
                                 </ThemedText>
@@ -139,16 +134,8 @@ export default function ManageCitiesScreen() {
                         <Animated.View
                             key={`${c.latitude}-${c.longitude}`}
                             entering={FadeInDown.delay(i * 40)}
-                            style={[styles.cityRow, { backgroundColor: colors.card, borderColor: colors.border }]}
+                            style={[styles.cityRow, { backgroundColor: colors.card }]}
                         >
-                            <TouchableOpacity onPress={() => setDefaultCity(i)} hitSlop={8} style={{ marginRight: 10 }}>
-                                <Ionicons
-                                    name={c.isDefault ? 'star' : 'star-outline'}
-                                    size={20}
-                                    color={c.isDefault ? colors.secondary : colors.icon}
-                                />
-                            </TouchableOpacity>
-
                             <View style={{ flex: 1 }}>
                                 <ThemedText style={[styles.cityName, { color: colors.text }]} numberOfLines={1}>{c.name}</ThemedText>
                                 {c.isDefault ? (
@@ -182,44 +169,36 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 16,
         paddingBottom: 18,
-        borderBottomLeftRadius: 24,
-        borderBottomRightRadius: 24,
-    },
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28 },
     headerRow: { flexDirection: 'row', alignItems: 'center' },
     iconBtn: {
-        width: 38, height: 38, borderRadius: 19,
+        width: 38, height: 38, borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
-        justifyContent: 'center', alignItems: 'center',
-    },
+        justifyContent: 'center', alignItems: 'center' },
     title: { fontSize: 18, fontWeight: '800', color: '#FFFFFF' },
     subtitle: { fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.85)', marginTop: 2 },
     body: { paddingHorizontal: 16, paddingTop: 16 },
     searchBox: {
         flexDirection: 'row', alignItems: 'center',
-        borderRadius: 14, paddingHorizontal: 14, height: 50,
-    },
+        borderRadius: Layout.borderRadius, paddingHorizontal: 14, height: 50 },
     searchInput: { flex: 1, fontSize: 14 },
     resultRow: {
         flexDirection: 'row', alignItems: 'center',
-        paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth,
-    },
+        paddingVertical: 12 },
     resultText: { flex: 1, fontSize: 13, lineHeight: 18 },
     limitNote: {
         flexDirection: 'row', alignItems: 'center', gap: 8,
-        borderRadius: 12, padding: 12,
-    },
+        borderRadius: Layout.borderRadius, padding: 12 },
     limitText: { flex: 1, fontSize: 12, lineHeight: 17 },
     sectionLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6, marginTop: 22, marginBottom: 10 },
     cityRow: {
         flexDirection: 'row', alignItems: 'center',
-        borderRadius: 14, borderWidth: StyleSheet.hairlineWidth,
-        paddingVertical: 12, paddingHorizontal: 14, marginBottom: 10,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingVertical: 12, paddingHorizontal: 14, marginBottom: 10 },
     cityName: { fontSize: 15, fontWeight: '700' },
     defaultTag: { fontSize: 11, fontWeight: '700', marginTop: 1 },
     reorderBtn: {
-        width: 30, height: 30, alignItems: 'center', justifyContent: 'center',
-    },
+        width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
     empty: { alignItems: 'center', paddingVertical: 30, gap: 10 },
-    emptyText: { fontSize: 13, textAlign: 'center', paddingHorizontal: 30, lineHeight: 20 },
-});
+    emptyText: { fontSize: 13, textAlign: 'center', paddingHorizontal: 30, lineHeight: 20 } });

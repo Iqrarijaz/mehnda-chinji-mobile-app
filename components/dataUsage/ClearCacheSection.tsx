@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-nat
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
+import { Layout } from '@/constants/layout';
 
 export const ClearCacheSection = ({ onClear }: { onClear: () => Promise<void> }) => {
     const [clearing, setClearing] = useState(false);
@@ -46,55 +47,44 @@ export const ClearCacheSection = ({ onClear }: { onClear: () => Promise<void> })
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     card: {
         backgroundColor: '#FFF1F2',
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         padding: 12,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 16,
-        borderColor: '#FFE4E6',
-    },
+        gap: 16 },
     iconBox: {
         width: 48,
         height: 48,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FFE4E6',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     content: {
         flex: 1,
-        gap: 2,
-    },
+        gap: 2 },
     label: {
         fontSize: 13,
         fontWeight: '800',
-        color: '#9F1239',
-    },
+        color: '#9F1239' },
     description: {
         fontSize: 11,
         color: '#E11D48',
         fontWeight: '500',
-        opacity: 0.8,
-    },
+        opacity: 0.8 },
     button: {
         backgroundColor: '#EF4444',
         paddingHorizontal: 14,
         paddingVertical: 10,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        minWidth: 90,
-    },
+        minWidth: 90 },
     buttonLoading: {
-        opacity: 0.8,
-    },
+        opacity: 0.8 },
     buttonText: {
         color: '#FFFFFF',
         fontSize: 11,
-        fontWeight: '800',
-    },
-});
+        fontWeight: '800' } });

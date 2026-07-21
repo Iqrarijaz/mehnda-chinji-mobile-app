@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { ThemedText } from '@/components/ThemedText';
+import { Layout } from '@/constants/layout';
 
 interface NotificationToggleRowProps {
     label: string;
@@ -25,16 +26,14 @@ const NotificationToggleRow: React.FC<NotificationToggleRowProps> = React.memo((
     value,
     onValueChange,
     index,
-    isLast = false,
-}) => {
+    isLast = false }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
     return (
         <Animated.View
             entering={FadeInRight.delay(index * 100).duration(400)}
-            style={[styles.container, { borderBottomColor: colors.border }, isLast && { borderBottomWidth: 0 }]}
-        >
+            style={styles.container}>
             <View style={[styles.iconContainer, { backgroundColor: `${color}18` }]}>
                 <Ionicons name={icon} size={22} color={color} />
             </View>
@@ -59,30 +58,23 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 14,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
+        paddingVertical: 14 },
     iconContainer: {
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 14,
-    },
+        marginRight: 14 },
     content: {
         flex: 1,
-        marginRight: 10,
-    },
+        marginRight: 10 },
     label: {
         fontSize: 13,
         fontWeight: '600',
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     descriptionText: {
         fontSize: 11,
-        lineHeight: 16,
-    },
-});
+        lineHeight: 16 } });
 
 export default NotificationToggleRow;

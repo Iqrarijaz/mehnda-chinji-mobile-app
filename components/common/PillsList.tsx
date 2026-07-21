@@ -5,6 +5,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 
 export interface PillItem {
     id: string;
@@ -24,8 +25,7 @@ export const PillsList = React.memo(function PillsList({
     selectedId,
     onSelect,
     activeColor,
-    containerStyle,
-}: PillsListProps) {
+    containerStyle }: PillsListProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -48,7 +48,7 @@ export const PillsList = React.memo(function PillsList({
                             containerStyle={styles.tabWrap}
                             style={[
                                 styles.tab,
-                                { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' },
+                                { backgroundColor: colors.cardBg },
                                 isActive && { backgroundColor: resolvedActiveColor },
                             ]}
                         >
@@ -71,34 +71,26 @@ export const PillsList = React.memo(function PillsList({
 
 const styles = StyleSheet.create({
     tabsContainer: {
-        paddingVertical: 12,
-    },
+        paddingVertical: 12 },
     tabsList: {
-        paddingHorizontal: 12,
-    },
+        paddingHorizontal: 12 },
     tabWrap: {
-        marginRight: 8,
-    },
+        marginRight: 8 },
     tab: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
         paddingHorizontal: 18,
         paddingVertical: 7,
-        borderRadius: 999,
-        justifyContent: 'center',
-    },
+        borderRadius: Layout.borderRadius,
+        justifyContent: 'center' },
     activeDot: {
         width: 5,
         height: 5,
-        borderRadius: 2.5,
-    },
+        borderRadius: Layout.borderRadius },
     tabText: {
         fontSize: 12,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     tabTextActive: {
         fontWeight: '800',
-        letterSpacing: 0.2,
-    },
-});
+        letterSpacing: 0.2 } });

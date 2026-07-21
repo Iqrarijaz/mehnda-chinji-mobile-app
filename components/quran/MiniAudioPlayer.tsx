@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { memo, useRef } from 'react';
 import { ActivityIndicator, GestureResponderEvent, LayoutChangeEvent, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { Layout } from '@/constants/layout';
 
 interface MiniAudioPlayerProps {
     surah: SurahListItem;
@@ -40,8 +41,7 @@ export const MiniAudioPlayer = memo(({
     onPrev,
     onSeek,
     onClose,
-    bottomInset,
-}: MiniAudioPlayerProps) => {
+    bottomInset }: MiniAudioPlayerProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const trackWidth = useRef(0);
@@ -117,68 +117,55 @@ const styles = StyleSheet.create({
     container: {
         paddingTop: 10,
         paddingHorizontal: 14,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-    },
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28 },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
-    },
+        gap: 10 },
     playBtn: {
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     info: {
-        flex: 1,
-    },
+        flex: 1 },
     title: {
         fontSize: 14,
         fontWeight: '800',
         color: '#FFFFFF',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     counter: {
         fontSize: 11,
         fontWeight: '700',
-        marginTop: 1,
-    },
+        marginTop: 1 },
     stepBtn: {
         width: 30,
         height: 30,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     closeBtn: {
         width: 30,
         height: 30,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     track: {
         height: 20,
         justifyContent: 'center',
-        marginTop: 6,
-    },
+        marginTop: 6 },
     trackBg: {
         height: 4,
-        borderRadius: 2,
-        backgroundColor: 'rgba(255,255,255,0.22)',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: 'rgba(255,255,255,0.22)' },
     trackFill: {
         position: 'absolute',
         left: 0,
         height: 4,
-        borderRadius: 2,
-    },
+        borderRadius: Layout.borderRadius },
     thumb: {
         position: 'absolute',
         width: 12,
         height: 12,
-        borderRadius: 6,
-        marginLeft: -6,
-    },
-});
+        borderRadius: Layout.borderRadius,
+        marginLeft: -6 } });

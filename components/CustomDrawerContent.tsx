@@ -1,16 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import {
     DrawerContentComponentProps,
-    DrawerContentScrollView,
-} from '@react-navigation/drawer';
+    DrawerContentScrollView } from '@react-navigation/drawer';
 import { useRouter } from 'expo-router';
 import React, { memo, useCallback } from 'react';
 import {
     Platform,
     StyleSheet,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import Animated, { FadeIn, FadeInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -22,6 +20,7 @@ import Avatar from '@/components/ui/avatar';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
 interface MenuItem {
     label: string;
@@ -63,8 +62,7 @@ const DrawerRow = memo(function DrawerRow({
     isDisabled,
     delay,
     colors,
-    onPress,
-}: DrawerRowProps) {
+    onPress }: DrawerRowProps) {
     return (
         <Animated.View entering={FadeInLeft.delay(delay).duration(300)}>
             <PressableScale
@@ -87,8 +85,7 @@ const DrawerRow = memo(function DrawerRow({
                         {
                             backgroundColor: isFocused
                                 ? colors.primary
-                                : `${colors.primary}0D`,
-                        },
+                                : `${colors.primary}0D` },
                     ]}
                 >
                     <Ionicons
@@ -177,8 +174,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                     styles.header,
                     {
                         backgroundColor: colors.primary,
-                        paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20),
-                    },
+                        paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) },
                 ]}
             >
                 {/* Removed community decor */}
@@ -204,13 +200,12 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                             name={user?.user?.name}
                             size={54}
                         />
-                        <View style={[styles.onlineBadge, { backgroundColor: colors.lime, borderColor: colors.primary }]} />
+                        <View style={[styles.onlineBadge, { backgroundColor: colors.lime }]} />
                     </View>
-
                     <View style={styles.identityText}>
-                        <ThemedText style={styles.greeting}>{getGreeting()}</ThemedText>
+                        <ThemedText style={styles.greeting}>{getGreeting()},</ThemedText>
                         <ThemedText style={styles.headerName} numberOfLines={1}>{userName}</ThemedText>
-                        {user?.user?.isPremium ? (
+                        {user?.user?.premium ? (
                             <View style={[styles.premiumBadge, { backgroundColor: colors.lime }]}>
                                 <Ionicons name="star" size={10} color="#1E293B" style={{ marginRight: 3 }} />
                                 <ThemedText style={styles.premiumText}>PREMIUM</ThemedText>
@@ -285,169 +280,140 @@ export default memo(CustomDrawerContentComponent);
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     // Header
     header: {
         paddingHorizontal: 20,
         paddingBottom: 20,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     headerTop: {
         width: '100%',
         alignItems: 'flex-end',
         height: 32,
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     closeBtn: {
         width: 32,
         height: 32,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     identityRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 14,
-        marginTop: 8,
-    },
+        marginTop: 8 },
     avatarWrap: {
-        position: 'relative',
-    },
+        position: 'relative' },
     onlineBadge: {
         position: 'absolute',
         bottom: 0,
         right: 0,
         width: 14,
         height: 14,
-        borderRadius: 7,
-        borderWidth: 2,
-    },
+        borderRadius: Layout.borderRadius },
     identityText: {
-        flex: 1,
-    },
+        flex: 1 },
     greeting: {
         fontSize: 11,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.8)',
-        letterSpacing: 0.3,
-    },
+        letterSpacing: 0.3 },
     headerName: {
         fontSize: 18,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
-        marginTop: 2,
-    },
+        marginTop: 2 },
     headerEmail: {
         fontSize: 11.5,
         fontWeight: '500',
         color: 'rgba(255,255,255,0.75)',
-        marginTop: 3,
-    },
+        marginTop: 3 },
     premiumBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'flex-start',
         paddingHorizontal: 8,
         paddingVertical: 3,
-        borderRadius: 999,
-        marginTop: 6,
-    },
+        borderRadius: Layout.borderRadius,
+        marginTop: 6 },
     premiumText: {
         fontSize: 9,
         fontWeight: '800',
         letterSpacing: 0.5,
-        color: '#1E293B',
-    },
+        color: '#1E293B' },
     // Scroll
     scrollContent: {
         paddingTop: 12,
-        paddingHorizontal: 14,
-    },
+        paddingHorizontal: 14 },
     // Section
     section: {
-        marginBottom: 14,
-    },
+        marginBottom: 14 },
     sectionLabelRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
         marginLeft: 6,
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     sectionDot: {
         width: 5,
         height: 5,
-        borderRadius: 2.5,
-    },
+        borderRadius: Layout.borderRadius },
     sectionLabel: {
         fontSize: 10,
         fontWeight: '800',
         textTransform: 'uppercase',
-        letterSpacing: 1.2,
-    },
+        letterSpacing: 1.2 },
     // Menu Items
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 8,
         paddingHorizontal: 10,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         marginBottom: 4,
-        gap: 12,
-    },
+        gap: 12 },
     activeBar: {
         position: 'absolute',
         left: 0,
         top: 14,
         bottom: 14,
         width: 3,
-        borderRadius: 2,
-    },
+        borderRadius: Layout.borderRadius },
     iconTile: {
         width: 38,
         height: 38,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     menuLabel: {
         flex: 1,
         fontSize: 14,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     // Footer
     footer: {
         paddingHorizontal: 16,
         paddingTop: 12,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     logoutBtnWrap: {
         width: '100%',
-        marginBottom: 10,
-    },
+        marginBottom: 10 },
     logoutBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 13,
         paddingHorizontal: 24,
-        borderRadius: 18,
-        width: '100%',
-    },
+        borderRadius: Layout.borderRadius,
+        width: '100%' },
     logoutText: {
         fontSize: 14,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     versionText: {
         fontSize: 10,
         fontWeight: '500',
         textAlign: 'center',
-        opacity: 0.7,
-    },
-});
+        opacity: 0.7 } });

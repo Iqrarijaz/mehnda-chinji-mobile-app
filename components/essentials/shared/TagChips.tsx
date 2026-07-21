@@ -7,6 +7,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
 import { SectionHeading } from './SectionHeading';
+import { Layout } from '@/constants/layout';
 
 interface TagChipsProps {
     tags: any[];
@@ -37,8 +38,7 @@ export const TagChips = React.memo(({
     tags,
     title = 'Tags',
     accentDots = false,
-    highlightAvailability = false,
-}: TagChipsProps) => {
+    highlightAvailability = false }: TagChipsProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -70,8 +70,7 @@ export const TagChips = React.memo(({
                                 {
                                     backgroundColor: highlight
                                         ? `${colors.lime}1E`
-                                        : `${colors.primary}10`,
-                                },
+                                        : `${colors.primary}10` },
                             ]}
                         >
                             {showDot && (
@@ -92,29 +91,23 @@ TagChips.displayName = 'TagChips';
 
 const styles = StyleSheet.create({
     section: {
-        gap: 8,
-    },
+        gap: 8 },
     chipWrap: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 8,
-    },
+        gap: 8 },
     chip: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     chipDot: {
         width: 5,
         height: 5,
-        borderRadius: 2.5,
-    },
+        borderRadius: Layout.borderRadius },
     chipText: {
         fontSize: 11.5,
         fontWeight: '600',
-        letterSpacing: 0.2,
-    },
-});
+        letterSpacing: 0.2 } });

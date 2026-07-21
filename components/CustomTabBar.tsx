@@ -10,8 +10,7 @@ import {
     Text,
     Pressable,
     View,
-    useWindowDimensions,
-} from 'react-native';
+    useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
     useSharedValue,
@@ -21,8 +20,7 @@ import Animated, {
     interpolate,
     Extrapolate,
     ReduceMotion,
-    useAnimatedKeyboard,
-} from 'react-native-reanimated';
+    useAnimatedKeyboard } from 'react-native-reanimated';
 
 const isAndroid = Platform.OS === 'android';
 const BAR_HEIGHT = isAndroid ? 56 : 60;
@@ -110,8 +108,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
         return {
             visibleRoutes: routes,
             tabWidth: tWidth,
-            FULL_WIDTH: fWidth,
-        };
+            FULL_WIDTH: fWidth };
     }, [state.routes, descriptors, windowWidth]);
 
     // ─── Shared Values (UI Thread Animations) ─────────────────────────────────
@@ -126,8 +123,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
         );
         if (activeIndex !== -1 && tabWidth > 0) {
             indicatorX.value = withTiming(activeIndex * tabWidth, {
-                duration: 250,
-            });
+                duration: 250 });
         }
     }, [state.index, tabWidth, visibleRoutes]);
 
@@ -153,14 +149,12 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                 [0, BAR_HEIGHT + insets.bottom + 30],
                 [1, 0],
                 Extrapolate.CLAMP
-            ),
-        };
+            ) };
     });
 
     const animatedIndicatorStyle = useAnimatedStyle(() => {
         return {
-            transform: [{ translateX: indicatorX.value }],
-        };
+            transform: [{ translateX: indicatorX.value }] };
     });
 
     // ─── Stable Press Handlers to Maintain Memoization ────────────────────────
@@ -168,8 +162,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
         const event = navigation.emit({
             type: 'tabPress',
             target: routeKey,
-            canPreventDefault: true,
-        });
+            canPreventDefault: true });
         if (!isFocused && !event.defaultPrevented) {
             navigation.navigate(routeName, params);
         }
@@ -186,8 +179,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
         const event = navigation.emit({
             type: 'tabPress',
             target: homeRoute.key,
-            canPreventDefault: true,
-        });
+            canPreventDefault: true });
         if (!event.defaultPrevented) {
             navigation.navigate(homeRoute.name, homeRoute.params);
         }
@@ -209,8 +201,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                     {
                         backgroundColor: colors.primary,
                         width: FULL_WIDTH,
-                        borderRadius: isAndroid ? 29 : 30,
-                    },
+                        borderRadius: isAndroid ? 29 : 30 },
                     animatedContainerStyle,
                 ]}
                 pointerEvents="auto"
@@ -222,8 +213,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                             styles.indicator,
                             {
                                 width: tabWidth,
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            },
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)' },
                             animatedIndicatorStyle,
                         ]}
                     />
@@ -267,23 +257,18 @@ const styles = StyleSheet.create({
         height: BAR_HEIGHT,
         alignItems: 'center',
         justifyContent: 'space-between',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     indicator: {
         position: 'absolute',
         top: 0,
         left: 0,
         height: '100%',
-        borderRadius: isAndroid ? 29 : 30,
-    },
+        borderRadius: isAndroid ? 29 : 30 },
     tabItem: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         height: '100%',
-        width: '100%',
-    },
+        width: '100%' },
     label: {
-        fontSize: 10,
-    },
-});
+        fontSize: 10 } });

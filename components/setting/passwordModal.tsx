@@ -6,8 +6,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withSpring,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
@@ -16,8 +15,7 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { PremiumModal } from '../common/PremiumModal';
@@ -89,8 +87,7 @@ const StrengthBar = React.memo(({ password }: { password: string }) => {
     barWidth.value = withTiming(level, { duration: 400 });
     const barStyle = useAnimatedStyle(() => ({
         width: `${barWidth.value * 100}%`,
-        backgroundColor: color,
-    }));
+        backgroundColor: color }));
 
     if (!password) return null;
     return (
@@ -224,7 +221,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
                         />
                     </View>
 
-                    <TouchableOpacity onPress={resetAndClose} style={[styles.cancelBtn, { borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }]} activeOpacity={0.7}>
+                    <TouchableOpacity onPress={resetAndClose} style={styles.cancelBtn} activeOpacity={0.7}>
                         <ThemedText style={styles.cancelText}>Cancel</ThemedText>
                     </TouchableOpacity>
                 </View>
@@ -240,25 +237,21 @@ const styles = StyleSheet.create({
     header: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     title: {
         fontSize: 14,
         fontWeight: '800',
         textAlign: 'center',
-        marginBottom: 3,
-    },
+        marginBottom: 3 },
     subtitle: {
         fontSize: 11,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     closeBtn: {
         width: 30,
         height: 30,
-        borderRadius: 15,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
 
     // Input
     fieldWrap: { marginBottom: 10 },
@@ -268,26 +261,18 @@ const styles = StyleSheet.create({
         color: '#94A3B8',
         letterSpacing: 0.8,
         marginBottom: 4,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     inputRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
-        borderColor: '#E2E8F0', // Overridden in wrapStyle
+        borderRadius: Layout.borderRadius, // Overridden in wrapStyle
         paddingHorizontal: 14,
-        height: Platform.OS === 'android' ? 42 : 48,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.03,
-        shadowRadius: 6,
-    },
+        height: Platform.OS === 'android' ? 42 : 48 },
     inputIcon: { marginRight: 10 },
     input: {
         flex: 1,
         fontSize: 11,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     eyeBtn: { padding: 4 },
 
     // Strength bar
@@ -297,24 +282,20 @@ const styles = StyleSheet.create({
         gap: 10,
         marginTop: -6,
         marginBottom: 14,
-        marginHorizontal: 2,
-    },
+        marginHorizontal: 2 },
     strengthTrack: {
         flex: 1,
         height: 4,
-        borderRadius: 2,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#E2E8F0',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     strengthFill: {
         height: '100%',
-        borderRadius: 2,
-    },
+        borderRadius: Layout.borderRadius },
     strengthLabel: {
         fontSize: 11,
         fontWeight: '700',
-        width: 42,
-    },
+        width: 42 },
 
     // Mismatch
     mismatch: {
@@ -323,36 +304,30 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginTop: -8,
         marginBottom: 10,
-        marginLeft: 4,
-    },
+        marginLeft: 4 },
 
     // Buttons
     actions: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 12 },
     primaryBtn: {
         backgroundColor: '#006666',
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     primaryBtnDisabled: { opacity: 0.45 },
     primaryBtnText: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     cancelBtn: {
         flex: 1,
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 20,
-        backgroundColor: 'transparent',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: 'transparent' },
     cancelText: {
         fontSize: 14,
         color: '#94A3B8',
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

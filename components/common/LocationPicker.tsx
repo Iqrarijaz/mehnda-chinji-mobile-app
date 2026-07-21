@@ -8,8 +8,7 @@ import {
     ActivityIndicator,
     StyleSheet,
     Platform,
-    KeyboardAvoidingView,
-} from 'react-native';
+    KeyboardAvoidingView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import MapLibreGL, { MapView, Camera, Logger } from '@maplibre/maplibre-react-native';
@@ -22,10 +21,10 @@ import {
     searchPlaces,
     reverseGeocode,
     getCurrentCoords,
-    PlaceResult,
-} from '@/utils/locationService';
+    PlaceResult } from '@/utils/locationService';
 import { SubmitButton } from './SubmitButton';
 import { LocationLoadingModal } from './LocationLoadingModal';
+import { Layout } from '@/constants/layout';
 
 // MapLibre is fully free and needs no API key/token; pass null to satisfy the
 // Mapbox-compatible API surface.
@@ -45,11 +44,8 @@ const OSM_STYLE = {
             tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
             tileSize: 256,
             maxzoom: 19,
-            attribution: '© OpenStreetMap contributors',
-        },
-    },
-    layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
-};
+            attribution: '© OpenStreetMap contributors' } },
+    layers: [{ id: 'osm', type: 'raster', source: 'osm' }] };
 
 // Stable stringified style — passing a fresh string each render makes MapView
 // reload the style, which resets the camera and cancels tile requests.
@@ -82,7 +78,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const skipSearchRef = useRef(false);
 
-    const cameraRef = useRef<Camera>(null);
+    const cameraRef = useRef<React.ElementRef<typeof Camera>>(null);
     const [selectedCoord, setSelectedCoord] = useState<{ latitude: number; longitude: number } | null>(
         value ? { latitude: value.latitude, longitude: value.longitude } : null
     );
@@ -130,8 +126,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
         cameraRef.current?.setCamera({
             centerCoordinate: [longitude, latitude], // MapLibre uses [lng, lat]
             ...(zoomLevel != null ? { zoomLevel } : {}), // omit to preserve current zoom
-            animationDuration: 600,
-        });
+            animationDuration: 600 });
     };
 
     // Tapping the map recenters the camera there; the fixed center pin (and
@@ -186,8 +181,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
         onChange({
             latitude: selectedCoord.latitude,
             longitude: selectedCoord.longitude,
-            address: address || 'Selected location',
-        });
+            address: address || 'Selected location' });
         setLocating(false);
         closeModal();
     };
@@ -211,7 +205,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
             : '';
 
     return (
-        <AnimatedView {...animatedProps} style={variant === 'default' ? styles.field : undefined}>
+        <Animated.View {...animatedProps} style={variant === 'default' ? styles.field : undefined}>
             {variant === 'default' ? (
                 <>
                     <View style={styles.labelRow}>
@@ -247,7 +241,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
             ) : variant === 'button' ? (
                 <TouchableOpacity
                     onPress={() => setModalVisible(true)}
-                    style={{ backgroundColor: colors.lime, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }}
+                    style={{ backgroundColor: colors.lime, paddingHorizontal: 10, paddingVertical: 4, borderRadius: Layout.borderRadius, flexDirection: 'row', alignItems: 'center' }}
                 >
                     <Ionicons name="location" size={12} color="#FFF" style={{ marginRight: 4 }} />
                     <ThemedText style={{ color: '#FFF', fontSize: 10, fontWeight: '600' }}>{label === 'LOCATION' ? 'Current Location' : label}</ThemedText>
@@ -262,7 +256,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                 <View style={[styles.modalOverlayFS, { backgroundColor: colors.background }]}>
                     {/* Header */}
                     <View style={[styles.modalHeaderFS, { backgroundColor: 'transparent', paddingTop: Math.max(insets.top, 20) }]}>
-                        <TouchableOpacity onPress={closeModal} hitSlop={8} style={{ padding: 8, backgroundColor: '#FFF', borderRadius: 24, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 }}>
+                        <TouchableOpacity onPress={closeModal} hitSlop={8} style={{ padding: 8, backgroundColor: '#FFF', borderRadius: Layout.borderRadius }}>
                             <Ionicons name="arrow-back" size={24} color="#000" />
                         </TouchableOpacity>
                         <SubmitButton
@@ -292,8 +286,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                                     centerCoordinate: value
                                         ? [value.longitude, value.latitude]
                                         : [69.3451, 30.3753], // Pakistan
-                                    zoomLevel: value ? 13 : 4,
-                                }}
+                                    zoomLevel: value ? 13 : 4 }}
                             />
                         </MapView>
 
@@ -310,7 +303,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
 
                         {/* Floating Search overlay */}
                         <View style={[styles.floatingSearchContainer, { top: Math.max(insets.top, 20) + 60 }]}>
-                            <View style={[styles.searchBoxFS, { backgroundColor: colors.background, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 }]}>
+                            <View style={[styles.searchBoxFS, { backgroundColor: colors.background }]}>
                                 <Ionicons name="search" size={18} color={colors.icon} style={{ marginRight: 8 }} />
                                 <TextInput
                                     style={[styles.searchInput, { color: colors.text }]}
@@ -328,10 +321,10 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                                     data={results}
                                     keyExtractor={(item, index) => `${item.latitude}-${item.longitude}-${index}`}
                                     keyboardShouldPersistTaps="handled"
-                                    style={[styles.resultsListFS, { backgroundColor: colors.background, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 }]}
+                                    style={[styles.resultsListFS, { backgroundColor: colors.background }]}
                                     renderItem={({ item }) => (
                                         <TouchableOpacity
-                                            style={[styles.resultRow, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }]}
+                                            style={[styles.resultRow, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', borderBottomWidth: 1 }]}
                                             onPress={() => selectPlace(item)}
                                             activeOpacity={0.7}
                                         >
@@ -351,7 +344,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                             onPress={useCurrentLocation}
                             activeOpacity={0.8}
                         >
-                            <View style={{ backgroundColor: colors.lime, padding: 12, borderRadius: 30, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 5, elevation: 5 }}>
+                            <View style={{ backgroundColor: colors.lime, padding: 12, borderRadius: Layout.borderRadius }}>
                                 <Ionicons name="navigate" size={24} color="#FFF" />
                             </View>
                         </TouchableOpacity>
@@ -361,7 +354,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
 
             {/* Premium location-fetch loading modal (presents over the map) */}
             <LocationLoadingModal visible={locating} />
-        </AnimatedView>
+        </Animated.View>
     );
 }, (prevProps, nextProps) => {
     return (
@@ -380,34 +373,29 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingRight: 4,
-    },
+        paddingRight: 4 },
     label: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     trigger: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 12,
-        paddingHorizontal: 14,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 14 },
     triggerText: {
         flex: 1,
         fontSize: 14,
         fontWeight: '500',
-        marginRight: 8,
-    },
+        marginRight: 8 },
     modalOverlayFS: {
         flex: 1,
         width: '100%',
         height: '100%',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        padding: 0,
-    },
+        padding: 0 },
     modalHeaderFS: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -419,50 +407,40 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         left: 0,
-        right: 0,
-    },
+        right: 0 },
     modalTitle: {
         fontSize: 18,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     floatingSearchContainer: {
         position: 'absolute',
         top: 70,
         left: 16,
         right: 16,
-        zIndex: 20,
-    },
+        zIndex: 20 },
     searchBoxFS: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
-        height: 50,
-    },
+        height: 50 },
     searchInput: { flex: 1, fontSize: 14 },
     resultsListFS: {
         marginTop: 8,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         maxHeight: 250,
-        paddingHorizontal: 14,
-    },
+        paddingHorizontal: 14 },
     resultRow: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        paddingVertical: 12,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
+        paddingVertical: 12 },
     resultText: { flex: 1, fontSize: 13, lineHeight: 18 },
     floatingCurrentLocBtn: {
         position: 'absolute',
         bottom: 30,
         right: 20,
-        zIndex: 10,
-    },
+        zIndex: 10 },
     centerPinWrap: {
         ...StyleSheet.absoluteFillObject,
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 5,
-    },
-});
+        zIndex: 5 } });

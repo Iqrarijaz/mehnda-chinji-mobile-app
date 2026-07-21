@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Layout } from '@/constants/layout';
 
 interface ModalPickerTriggerProps {
     label: string;
@@ -25,8 +26,7 @@ export function ModalPickerTrigger({
     placeholder,
     onPress,
     delay = 0,
-    containerStyle,
-}: ModalPickerTriggerProps) {
+    containerStyle }: ModalPickerTriggerProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -78,38 +78,30 @@ export function ModalPickerTrigger({
 
 const styles = StyleSheet.create({
     inputField: {
-        gap: 6,
-    },
+        gap: 6 },
     labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingRight: 4,
-    },
+        paddingRight: 4 },
     label: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     required: {
-        color: '#EF4444',
-    },
+        color: '#EF4444' },
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: 12,
-        paddingHorizontal: 14,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 14 },
     triggerContent: {
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
-        marginRight: 10,
-    },
+        marginRight: 10 },
     triggerText: {
         fontWeight: '500',
-        flex: 1,
-    },
-});
+        flex: 1 } });

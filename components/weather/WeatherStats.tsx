@@ -31,7 +31,7 @@ const WeatherStats = React.memo(({ weather, forecast }: WeatherStatsProps) => {
     if (!weather) return null;
     const rainPct = forecast ? `${Math.round((forecast.list[0]?.pop || 0) * 100)}%` : '—';
     return (
-        <View style={[styles.card, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
+        <View style={[styles.card, { backgroundColor: colors.cardBg }]}>
             <View style={styles.grid}>
                 <StatItem icon="water" label="Humidity" value={`${weather.main.humidity}%`} accent={colors.primary} />
                 <StatItem icon="send" label="Wind" value={`${Math.round(weather.wind.speed)} m/s`} accent={colors.lime} />
@@ -46,15 +46,11 @@ export default WeatherStats;
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.borderRadius, padding: 18, marginBottom: 14,
-        shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12,
-    },
+        borderRadius: Layout.borderRadius, padding: 20, marginBottom: 14 },
     grid: { flexDirection: 'row', justifyContent: 'space-between' },
     statItem: { flex: 1, alignItems: 'center', gap: 4 },
     iconWrap: {
-        width: 40, height: 40, borderRadius: Layout.borderRadius,
-        justifyContent: 'center', alignItems: 'center', marginBottom: 4,
-    },
+        width: 44, height: 44, borderRadius: Layout.borderRadius,
+        justifyContent: 'center', alignItems: 'center', marginBottom: 4 },
     value: { fontSize: 15, fontWeight: '800' },
-    label: { fontSize: 11, fontWeight: '600' },
-});
+    label: { fontSize: 11, fontWeight: '600' } });

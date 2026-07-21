@@ -8,6 +8,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { PressableScale } from './PressableScale';
 import { SectionHeading } from './SectionHeading';
+import { Layout } from '@/constants/layout';
 
 interface LocationSectionProps {
     place: any;
@@ -33,8 +34,7 @@ export const LocationSection = React.memo(({
     hasDirections = false,
     title = 'Location & Directions',
     timingLabel = 'Working Hours',
-    distance,
-}: LocationSectionProps) => {
+    distance }: LocationSectionProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -48,7 +48,7 @@ export const LocationSection = React.memo(({
                 entering={FadeInDown.delay(80).duration(400)}
                 style={[
                     styles.card,
-                    { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.background },
+                    { backgroundColor: colors.cardBg },
                 ]}
             >
                 <View style={styles.infoRow}>
@@ -104,56 +104,45 @@ LocationSection.displayName = 'LocationSection';
 
 const styles = StyleSheet.create({
     section: {
-        gap: 8,
-    },
+        gap: 8 },
     card: {
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         padding: 10,
-        gap: 10,
-    },
+        gap: 10 },
     infoRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
-    },
+        gap: 12 },
     iconTile: {
         width: 40,
         height: 40,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     info: {
-        flex: 1,
-    },
+        flex: 1 },
     label: {
         fontSize: 10,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.4,
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     value: {
         fontSize: 13.5,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     sub: {
         fontSize: 11.5,
-        marginTop: 1,
-    },
+        marginTop: 1 },
     directionsBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
         height: 40,
-        borderRadius: 20,
-        marginTop: 4,
-    },
+        borderRadius: Layout.borderRadius,
+        marginTop: 4 },
     directionsText: {
         color: '#FFFFFF',
         fontSize: 13.5,
         fontWeight: '800',
-        letterSpacing: 0.3,
-    },
-});
+        letterSpacing: 0.3 } });

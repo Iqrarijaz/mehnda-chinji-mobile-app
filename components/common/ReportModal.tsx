@@ -195,6 +195,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                                         styles.reasonCard,
                                         {
                                             borderColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'),
+                                            borderWidth: 1,
                                             backgroundColor: isSelected ? `${colors.primary}10` : (isDark ? 'rgba(255,255,255,0.03)' : '#FFFFFF')
                                         }
                                     ]}
@@ -225,7 +226,8 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                                 {
                                     color: colors.text,
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
-                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'
+                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
+                                    borderWidth: 1
                                 }
                             ]}
                             placeholder="Please provide any extra context..."
@@ -247,8 +249,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                         style={[
                             styles.submitButton,
                             {
-                                backgroundColor: colors.primary,
-                                shadowOpacity: selectedReason ? 0.3 : 0.05,
+                                backgroundColor: colors.primary,
                                 marginTop: 10,
                                 marginBottom: 30,
                                 opacity: isSubmitting ? 0.6 : 1
@@ -275,106 +276,80 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingBottom: 16,
-        paddingTop: 8,
-    },
+        paddingTop: 8 },
     headerLeft: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerIcon: {
-        marginRight: 12,
-    },
+        marginRight: 12 },
     title: {
         fontSize: 20,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     subtitle: {
         fontSize: 13,
         opacity: 0.7,
-        marginTop: 2,
-    },
+        marginTop: 2 },
     closeButton: {
-        padding: 4,
-    },
+        padding: 4 },
     divider: {
         height: 1,
-        width: '100%',
-    },
+        width: '100%' },
     scrollContent: {
         padding: 20,
-        paddingBottom: isAndroid ? 110 : 70,
-    },
+        paddingBottom: isAndroid ? 110 : 70 },
     sectionTitle: {
         fontSize: 14,
         fontWeight: '600',
         marginBottom: 12,
-        opacity: 0.8,
-    },
+        opacity: 0.8 },
     reasonsContainer: {
         gap: 10,
-        marginBottom: 24,
-    },
+        marginBottom: 24 },
     reasonCard: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
-        borderRadius: Layout.borderRadius,
-    },
+        borderRadius: Layout.borderRadius },
     reasonText: {
-        fontSize: 15,
-    },
+        fontSize: 15 },
     detailsContainer: {
         marginTop: 12,
-        marginBottom: 32,
-    },
+        marginBottom: 32 },
     detailsHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     charCount: {
         fontSize: 12,
-        opacity: 0.6,
-    },
+        opacity: 0.6 },
     input: {
         height: 120,
         borderRadius: Layout.borderRadius,
         padding: 16,
-        fontSize: 15,
-    },
+        fontSize: 15 },
     anonymousText: {
         fontSize: 13,
         textAlign: 'center',
         opacity: 0.6,
         marginTop: 10,
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     footer: {
         paddingHorizontal: 20,
-        paddingTop: 8,
-    },
+        paddingTop: 8 },
     submitButton: {
         height: 46,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-    },
+        alignItems: 'center' },
     submitButtonText: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '700',
-    },
-});
+        fontWeight: '700' } });

@@ -10,8 +10,7 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -52,8 +51,7 @@ const EventForm = () => {
         date: '',
         type: 'OTHER',
         images: [] as string[],
-        externalLink: '',
-    });
+        externalLink: '' });
 
     const [isUploading, setIsUploading] = useState(false);
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -67,8 +65,7 @@ const EventForm = () => {
                 date: editData.date || '',
                 type: editData.type || 'OTHER',
                 images: editData.images || [],
-                externalLink: editData.externalLink || '',
-            });
+                externalLink: editData.externalLink || '' });
             setSelectedImages(editData.images || []);
         }
     }, [editDataParam]);
@@ -90,8 +87,7 @@ const EventForm = () => {
             mediaTypes: 'images',
             allowsEditing: true,
             aspect: [16, 9],
-            quality: 0.8,
-        });
+            quality: 0.8 });
 
         if (!result.canceled) {
             const uri = result.assets[0].uri;
@@ -183,7 +179,7 @@ const EventForm = () => {
                                     EVENT TITLE <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                 <Ionicons name="document-text-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -203,7 +199,7 @@ const EventForm = () => {
                                 </ThemedText>
                             </View>
                             <TouchableOpacity
-                                style={[styles.dropdownTrigger, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}
+                                style={[styles.dropdownTrigger, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}
                                 onPress={() => setShowTypePicker(true)}
                             >
                                 <View style={styles.triggerContent}>
@@ -231,7 +227,7 @@ const EventForm = () => {
                                     DATE / TIME <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                 <Ionicons name="calendar-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -250,7 +246,7 @@ const EventForm = () => {
                                     EXTERNAL LINK
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
                                 <Ionicons name="link-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -270,7 +266,7 @@ const EventForm = () => {
                                     DESCRIPTION <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, borderColor: colors.border, height: 100, alignItems: 'flex-start', paddingTop: 12 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: 100, alignItems: 'flex-start', paddingTop: 12 }]}>
                                 <Ionicons name="information-circle-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14, height: '100%', textAlignVertical: 'top' }]}
@@ -302,7 +298,7 @@ const EventForm = () => {
                                 ))}
                                 {selectedImages.length < 5 && (
                                     <TouchableOpacity
-                                        style={[styles.addImgBtn, { borderColor: colors.border, backgroundColor: colors.card }]}
+                                        style={[styles.addImgBtn, { backgroundColor: colors.card }]}
                                         onPress={pickImage}
                                         disabled={isUploading}
                                     >
@@ -326,8 +322,7 @@ const EventForm = () => {
             {/* Sticky Footer Button */}
             <View style={[styles.footer, {
                 backgroundColor: isDark ? colors.card : 'rgba(245, 246, 250, 0.95)',
-                borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                borderTopWidth: 1,
+                borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', borderTopWidth: 1,
                 paddingBottom: Math.max(insets.bottom, 20)
             }]}>
                 <TouchableOpacity
@@ -358,95 +353,80 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 100 : 110,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
-    },
+        paddingHorizontal: 16 },
     backButton: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         fontSize: 18,
         fontWeight: '700',
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     headerContentWrapper: {
         alignItems: 'center',
-        marginTop: 20,
-    },
+        marginTop: 20 },
     welcomeText: {
         fontSize: 18,
         fontWeight: '800',
         marginBottom: 6,
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     subtitleText: {
         fontSize: 12,
         textAlign: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     content: { paddingBottom: 140 },
     formSection: {
         paddingHorizontal: 20,
         marginTop: 20,
-        gap: 16,
-    },
+        gap: 16 },
     inputField: { gap: 6 },
     labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingRight: 4,
-    },
+        paddingRight: 4 },
     label: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     required: { color: '#EF4444' },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14,
-    },
+        paddingHorizontal: 14 },
     textInput: { flex: 1, fontWeight: '500' },
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14,
-    },
+        paddingHorizontal: 14 },
     triggerContent: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     triggerText: {
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     imageList: { flexDirection: 'row', marginTop: 4 },
     imageWrapper: { width: 90, height: 90, borderRadius: Layout.borderRadius, overflow: 'hidden', marginRight: 12 },
     eventImage: { width: '100%', height: '100%' },
-    deleteImgBtn: { position: 'absolute', top: 4, right: 4, backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 12 },
+    deleteImgBtn: { position: 'absolute', top: 4, right: 4, backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: Layout.borderRadius },
     addImgBtn: {
         width: 90,
         height: 90,
         borderRadius: Layout.borderRadius,
         borderStyle: 'dashed',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     addImgText: { fontSize: 11, fontWeight: '600', marginTop: 4 },
     footer: {
         position: 'absolute',
@@ -454,27 +434,18 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         paddingHorizontal: 20,
-        paddingTop: Platform.OS === 'android' ? 10 : 12,
-    },
+        paddingTop: Platform.OS === 'android' ? 10 : 12 },
     updateButton: {
         height: Platform.OS === 'android' ? 48 : 52,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-        shadowColor: '#0D9488',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-    },
+        overflow: 'hidden' },
     buttonContent: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     updateButtonText: {
         fontSize: Platform.OS === 'android' ? 14 : 15,
         fontWeight: '700',
-        color: '#FFFFFF',
-    },
-});
+        color: '#FFFFFF' } });

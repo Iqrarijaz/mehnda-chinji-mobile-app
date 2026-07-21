@@ -53,28 +53,22 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     headerSection: {
         paddingBottom: 40,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     headerContent: {
         paddingHorizontal: 24,
-        paddingTop: 40,
-    },
+        paddingTop: 40 },
     headerTitle: {
         fontSize: 28,
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     headerSubtitle: {
         fontSize: 15,
         color: 'rgba(255, 255, 255, 0.9)',
-        lineHeight: 22,
-    },
-});
+        lineHeight: 22 } });

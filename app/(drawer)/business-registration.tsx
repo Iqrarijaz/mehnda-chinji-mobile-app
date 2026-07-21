@@ -71,8 +71,7 @@ const BusinessRegistrationScreen = () => {
         address: '',
         category: null as any,
         tags: [] as { eng: string; ur: string }[],
-        timing: '',
-    });
+        timing: '' });
 
     const [professionModalVisible, setProfessionModalVisible] = useState(false);
     const [showThankYou, setShowThankYou] = useState(false);
@@ -139,8 +138,7 @@ const BusinessRegistrationScreen = () => {
                     icon: editData.logo || (editData.images && editData.images.length > 0 ? editData.images[0] : undefined)
                 } as any,
                 tags: editData.tags || [],
-                timing: editData.timing || '',
-            });
+                timing: editData.timing || '' });
             const coords = editData.location?.coordinates;
             if (Array.isArray(coords) && coords.length === 2 && !(coords[0] === 0 && coords[1] === 0)) {
                 setLocation({ latitude: coords[1], longitude: coords[0] });
@@ -162,8 +160,7 @@ const BusinessRegistrationScreen = () => {
                 address: user?.user?.address || user?.user?.village || '',
                 category: null,
                 tags: [],
-                timing: '',
-            });
+                timing: '' });
             setLocation(null);
             setSelectedImage(null);
             setUploadedImage(null);
@@ -182,8 +179,7 @@ const BusinessRegistrationScreen = () => {
             mediaTypes: ['images'],
             allowsEditing: true,
             aspect: [16, 9],
-            quality: 0.8,
-        });
+            quality: 0.8 });
         if (!result.canceled) {
             const asset = result.assets[0];
             let finalUri = asset.uri;
@@ -244,8 +240,7 @@ const BusinessRegistrationScreen = () => {
                 logo: uploadedImage || category.icon || null,
                 images: uploadedImage ? [uploadedImage] : (category.icon ? [category.icon] : []),
                 tags: form.tags.map((t: any) => ({ eng: t.eng, ur: t.ur })),
-                timing: `${openTime} - ${closeTime}`,
-            };
+                timing: `${openTime} - ${closeTime}` };
 
             // Attach coordinates: manual selection, else silent current-location
             // capture (only if permission already granted). Absent → saved without.
@@ -389,20 +384,11 @@ const BusinessRegistrationScreen = () => {
                             <TouchableOpacity
                                 style={[styles.dropdownTrigger, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                    height: Platform.OS === 'android' ? 48 : 52,
-                                    borderColor: errors.category ? '#EF4444' : 'transparent',
-                                    borderWidth: errors.category ? 1 : 0,
+                                    height: Platform.OS === 'android' ? 48 : 52
                                 }]}
                                 onPress={() => setProfessionModalVisible(true)}
-                                activeOpacity={0.7}
                             >
                                 <View style={styles.triggerContent}>
-                                    <Ionicons
-                                        name="apps-outline"
-                                        size={18}
-                                        color={form.category ? colors.primary : colors.icon}
-                                        style={{ marginRight: 10 }}
-                                    />
                                     <ThemedText style={[
                                         styles.triggerText,
                                         { color: form.category ? colors.text : colors.icon, fontSize: 14 }
@@ -447,10 +433,8 @@ const BusinessRegistrationScreen = () => {
                                 backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
                                 minHeight: 80,
                                 alignItems: 'flex-start',
-                                paddingVertical: 12,
-                                borderColor: errors.address ? '#EF4444' : 'transparent',
-                                borderWidth: errors.address ? 1 : 0,
-                            }]}>
+                                paddingVertical: 12 }]}
+                            >
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, textAlignVertical: 'top', minHeight: 60, fontSize: 14 }]}
                                     placeholder="Shop #, Street, Area"
@@ -499,8 +483,7 @@ const BusinessRegistrationScreen = () => {
                                     <TouchableOpacity
                                         style={[styles.dropdownTrigger, {
                                             backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                            height: Platform.OS === 'android' ? 48 : 52,
-                                        }]}
+                                            height: Platform.OS === 'android' ? 48 : 52 }]}
                                         onPress={() => setOpenTimePickerVisible(true)}
                                         activeOpacity={0.7}
                                     >
@@ -519,8 +502,7 @@ const BusinessRegistrationScreen = () => {
                                     <TouchableOpacity
                                         style={[styles.dropdownTrigger, {
                                             backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                            height: Platform.OS === 'android' ? 48 : 52,
-                                        }]}
+                                            height: Platform.OS === 'android' ? 48 : 52 }]}
                                         onPress={() => setCloseTimePickerVisible(true)}
                                         activeOpacity={0.7}
                                     >
@@ -551,8 +533,7 @@ const BusinessRegistrationScreen = () => {
                                                     {
                                                         backgroundColor: isSelected
                                                             ? `${colors.primary}1E`
-                                                            : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.035)'),
-                                                    }
+                                                            : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.035)') }
                                                 ]}
                                                 onPress={() => {
                                                     if (isSelected) {
@@ -635,147 +616,123 @@ export default BusinessRegistrationScreen;
 
 const styles = StyleSheet.create({
     mainContainer: {
-        flex: 1,
-    },
+        flex: 1 },
 
     // ── Hero Header ──────────────────────────────────────────────────────
     header: {
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        paddingBottom: 24,
-    },
+        paddingBottom: 24 },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingBottom: 4,
-    },
+        paddingBottom: 4 },
     backButton: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerNavTitle: {
         fontSize: 17,
         fontWeight: '700',
         color: '#FFFFFF',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     heroContent: {
         alignItems: 'center',
         paddingHorizontal: 24,
-        marginTop: 16,
-    },
+        marginTop: 16 },
     heroIconWrap: {
         width: 64,
         height: 64,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.95)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     heroTitle: {
         fontSize: 20,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     heroSubtitle: {
         fontSize: 12,
         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
         marginTop: 6,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
 
     // ── Form ─────────────────────────────────────────────────────────────
     scrollContent: {
-        paddingBottom: 40,
-    },
+        paddingBottom: 40 },
     formSection: {
         paddingHorizontal: 20,
         marginTop: 24,
-        gap: 16,
-    },
+        gap: 16 },
     inputField: {
-        gap: 6,
-    },
+        gap: 6 },
     label: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     required: {
-        color: '#EF4444',
-    },
+        color: '#EF4444' },
     subLabel: {
         fontSize: 9,
         fontWeight: '700',
         letterSpacing: 0.6,
         marginBottom: 4,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
 
     // ── Inputs (flat, borderless — mirrors profile.tsx) ──────────────────
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 12,
-        paddingHorizontal: 14,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 14 },
     textInput: {
         flex: 1,
         fontWeight: '500',
-        paddingVertical: 0,
-    },
+        paddingVertical: 0 },
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: 12,
-        paddingHorizontal: 14,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 14 },
     triggerContent: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     triggerText: {
         flex: 1,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
 
     // ── Tags ─────────────────────────────────────────────────────────────
     tagsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 8,
-        marginTop: 4,
-    },
+        marginTop: 4 },
     tagChip: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     tagChipText: {
         fontSize: 11.5,
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     tagChipDot: {
         width: 5,
         height: 5,
-        borderRadius: 2.5,
-    },
+        borderRadius: Layout.borderRadius },
 
     // ── Buttons row ──────────────────────────────────────────────────────
     buttonsRow: {
@@ -783,29 +740,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 12,
-        marginTop: 20,
-    },
+        marginTop: 20 },
     cancelButton: {
         width: 120,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     cancelText: {
         fontSize: 14,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     submitButton: {
         width: 160,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     submitText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#FFFFFF',
-    },
-});
+        color: '#FFFFFF' } });

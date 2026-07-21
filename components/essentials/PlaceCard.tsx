@@ -13,6 +13,7 @@ import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
+import { Layout } from '@/constants/layout';
 
 interface Contact {
     name: string;
@@ -65,8 +66,7 @@ const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardPro
     const { data: essentialsConfig } = useQuery({
         queryKey: ['configuration', 'ESSENTIALS_ICONS'],
         queryFn: () => getAuthenticatedConfiguration('ESSENTIALS_ICONS'),
-        staleTime: 1000 * 60 * 60 * 24,
-    });
+        staleTime: 1000 * 60 * 60 * 24 });
 
     const configData = useMemo(() => {
         let val = essentialsConfig?.data?.data || essentialsConfig?.data?.value || essentialsConfig?.data || essentialsConfig;
@@ -181,87 +181,72 @@ export default PlaceCard;
 const styles = StyleSheet.create({
     card: {
         marginBottom: 10,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
-        gap: 10,
-    },
+        gap: 10 },
     tile: {
         width: TILE_SIZE,
         height: TILE_SIZE,
-        borderRadius: 14,
-    },
+        borderRadius: Layout.borderRadius },
     tilePlaceholder: {
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     tileHalo: {
         position: 'absolute',
         width: TILE_SIZE * 0.82,
         height: TILE_SIZE * 0.82,
-        borderRadius: TILE_SIZE * 0.41,
-    },
+        borderRadius: TILE_SIZE * 0.41 },
     tileIconCircle: {
         width: 44,
         height: 44,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     info: {
         flex: 1,
-        gap: 4,
-    },
+        gap: 4 },
     typeChip: {
         alignSelf: 'flex-start',
         paddingHorizontal: 8,
         paddingVertical: 2.5,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     typeChipText: {
         fontSize: 9,
         fontWeight: '800',
         textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     typeBadge: {
         position: 'absolute',
         top: 0,
         right: 0,
         paddingHorizontal: 10,
-        borderRadius: 999,
-        borderTopRightRadius: 12,
-        borderBottomLeftRadius: 12,
-        borderTopLeftRadius: 0,
-        borderBottomRightRadius: 12,
-    },
+        borderRadius: Layout.borderRadius,
+        borderTopRightRadius: 28,
+        borderBottomLeftRadius: 28,
+        borderTopLeftRadius: 28,
+        borderBottomRightRadius: 28 },
     typeBadgeText: {
         fontSize: 9,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
-        color: '#FFFFFF',
-    },
+        color: '#FFFFFF' },
     name: {
         fontSize: 14.5,
         fontWeight: '800',
         letterSpacing: 0.1,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
-        paddingRight: 8,
-    },
+        paddingRight: 8 },
     metaText: {
         fontSize: 11.5,
         fontWeight: '500',
         flexShrink: 1,
-        lineHeight: 15,
-    },
-});
+        lineHeight: 15 } });

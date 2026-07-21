@@ -5,8 +5,7 @@ import {
     RefreshControl,
     StyleSheet,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FlashList } from '@shopify/flash-list';
 import { useQueryClient } from '@tanstack/react-query';
@@ -21,8 +20,8 @@ import NotificationSkeleton from '@/components/notification/NotificationSkeleton
 import { handleNotificationNavigation } from '@/utils/notificationNavigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTooltipStore } from '@/store/tooltipStore';
-
-
+import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
 
 function getDayLabel(dateStr: string): string {
     const date = new Date(dateStr);
@@ -48,6 +47,8 @@ function groupByDay(items: any[]): { label: string; data: any[] }[] {
 // ── Screen ───────────────────────────────────────────────────────────────────
 
 export default function NotificationsScreen() {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { isAuthenticated } = useAuth();
@@ -163,7 +164,7 @@ export default function NotificationsScreen() {
     }, [handlePress, handleDelete, deletingId]);
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
             {/* Fixed Header */}
             <NotificationHeader
@@ -197,8 +198,7 @@ export default function NotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F5F6FA' },
+    container: { flex: 1 },
     list: { flexGrow: 1, paddingTop: 8 },
-    filtersWrap: { backgroundColor: '#F5F6FA', paddingBottom: 4 },
-    sectionWrap: { paddingHorizontal: 16, marginTop: 12 },
-});
+    filtersWrap: { paddingBottom: 4 },
+    sectionWrap: { paddingHorizontal: 16, marginTop: 12 } });

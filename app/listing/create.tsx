@@ -28,11 +28,13 @@ export default function CreateListingScreen() {
             <Stack.Screen options={{ headerShown: false }} />
             <View style={{ flex: 1 }}>
                 <CreateMarketplaceListing
-                    onClose={() => router.back()}
+                    onClose={() => {
+                        if (router.canGoBack()) router.back();
+                        else router.replace('/(drawer)/(tabs)' as any);
+                    }}
                     onSuccess={() => {
-                        // The component triggers a toast and invalidates query,
-                        // so we just go back.
-                        router.back();
+                        if (router.canGoBack()) router.back();
+                        else router.replace('/(drawer)/(tabs)' as any);
                     }}
                     listingToEdit={listingToEdit}
                 />
@@ -43,6 +45,5 @@ export default function CreateListingScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    }
+        flex: 1 }
 });

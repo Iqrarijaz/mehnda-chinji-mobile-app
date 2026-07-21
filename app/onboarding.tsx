@@ -4,8 +4,7 @@ import {
     Animated,
     Dimensions,
     View,
-    FlatList,
-} from 'react-native';
+    FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { OnboardingSlide } from '@/components/onboarding/OnboardingSlide';
@@ -23,20 +22,17 @@ const SLIDES = [
         id: '1',
         title: 'ہر رابطہ، ایک جگہ',
         description: 'Find and connect with local services, contacts, and community resources instantly.',
-        animation: require('../public/json/onboarding1.json'),
-    },
+        animation: require('../public/json/onboarding1.json') },
     {
         id: '2',
         title: 'آسانی سے خریدیں اور بیچیں',
         description: 'Discover, buy, and sell item and vehicles directly within your community marketplace.',
-        animation: require('../public/json/onboarding2.json'),
-    },
+        animation: require('../public/json/onboarding2.json') },
     {
         id: '3',
         title: 'اپنا کاروبار بڑھائیں، ہمارے ساتھ',
         description: 'Register and promote your local business directly within the community directory.',
-        animation: require('../public/json/onboarding3.json'),
-    },
+        animation: require('../public/json/onboarding3.json') },
 ];
 
 export default function OnboardingScreen() {
@@ -117,8 +113,7 @@ export default function OnboardingScreen() {
                         bounces={false}
                         keyExtractor={(item: any) => item.id}
                         onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
-                            useNativeDriver: false,
-                        })}
+                            useNativeDriver: false })}
                         scrollEventThrottle={16}
                         onViewableItemsChanged={viewableItemsChanged}
                         viewabilityConfig={viewConfig}
@@ -140,14 +135,10 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     safeArea: {
         flex: 1,
-        justifyContent: 'space-between',
-    },
+        justifyContent: 'space-between' },
     content: {
         flex: 1,
-        justifyContent: 'center',
-    },
-});
+        justifyContent: 'center' } });

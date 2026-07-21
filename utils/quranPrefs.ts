@@ -1,14 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
- * Persistent Quran preferences & state (reading position, font size, bookmarks,
- * tajweed toggle), backed by AsyncStorage. All helpers are best-effort and never
+ * Persistent Quran preferences & state (reading position, font size, bookmarks),
+ * backed by AsyncStorage. All helpers are best-effort and never
  * throw — a storage failure simply falls back to defaults.
  */
 
 const KEY_LAST_POS = (surah: number) => `quran:lastPos:${surah}`;
 const KEY_FONT_SIZE = 'quran:fontSize';
-const KEY_TAJWEED = 'quran:tajweed';
 const KEY_BOOKMARKS = 'quran:bookmarks';
 
 // ── Font size ────────────────────────────────────────────────────────────────
@@ -29,22 +28,6 @@ export const getFontSize = async (): Promise<number> => {
 export const setFontSize = async (size: number): Promise<void> => {
     try {
         await AsyncStorage.setItem(KEY_FONT_SIZE, String(Math.round(size)));
-    } catch { }
-};
-
-// ── Tajweed toggle ───────────────────────────────────────────────────────────
-
-export const getTajweedEnabled = async (): Promise<boolean> => {
-    try {
-        return (await AsyncStorage.getItem(KEY_TAJWEED)) === '1';
-    } catch {
-        return false;
-    }
-};
-
-export const setTajweedEnabled = async (enabled: boolean): Promise<void> => {
-    try {
-        await AsyncStorage.setItem(KEY_TAJWEED, enabled ? '1' : '0');
     } catch { }
 };
 

@@ -33,6 +33,7 @@ import {
 import * as Location from 'expo-location';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Layout } from '@/constants/layout';
 
 const CategoryListingScreen = React.memo(() => {
     const { category, tab } = useLocalSearchParams<{ category: string; tab?: string }>();
@@ -142,16 +143,14 @@ const CategoryListingScreen = React.memo(() => {
     const {
         infiniteQuery,
         myRequestsQuery,
-        deleteMutation,
-    } = useEssentialsAPI({
+        deleteMutation } = useEssentialsAPI({
         category,
         search: debouncedSearch,
         type: selectedType,
         activeTab,
         lat: isNearbyEnabled && userLocation ? userLocation.lat : undefined,
         lng: isNearbyEnabled && userLocation ? userLocation.lng : undefined,
-        onDeleteSuccess: () => setDeleteTarget(null),
-    });
+        onDeleteSuccess: () => setDeleteTarget(null) });
 
     const {
         data: infiniteData,
@@ -461,128 +460,103 @@ export default CategoryListingScreen;
 CategoryListingScreen.displayName = 'CategoryListingScreen';
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
 
     content: {
-        flex: 1,
-    },
+        flex: 1 },
     loaderContainer: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     listContent: {
         padding: 16,
-        paddingBottom: 40,
-    },
+        paddingBottom: 40 },
     footerLoader: {
         paddingVertical: 30,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     endOfListContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 40,
         paddingHorizontal: 16,
-        gap: 15,
-    },
+        gap: 15 },
     endOfListLine: {
         height: 1,
         flex: 1,
-        opacity: 0.3,
-    },
+        opacity: 0.3 },
     endOfListDot: {
         width: 5,
         height: 5,
-        borderRadius: 2.5,
-    },
+        borderRadius: Layout.borderRadius },
     endOfListText: {
         fontSize: 13,
         fontWeight: '600',
         opacity: 0.6,
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     typesContainer: {
         paddingVertical: 12,
         paddingHorizontal: 4,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.05)',
-    },
+        backgroundColor: 'rgba(0,0,0,0.05)' },
     typesScrollContent: {
         paddingHorizontal: 12,
-        gap: 10,
-    },
+        gap: 10 },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 12,
-        paddingBottom: 4,
-    },
+        paddingBottom: 4 },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     resultCountRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
         paddingHorizontal: 20,
-        paddingBottom: 6,
-    },
+        paddingBottom: 6 },
     resultCountDot: {
         width: 5,
         height: 5,
-        borderRadius: 2.5,
-    },
+        borderRadius: Layout.borderRadius },
     resultCountText: {
         fontSize: 10.5,
         fontWeight: '800',
         textTransform: 'uppercase',
-        letterSpacing: 0.6,
-    },
+        letterSpacing: 0.6 },
     filterButton: {
         width: 42,
         height: 42,
-        borderRadius: 21,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     header: {
-        borderBottomLeftRadius: 24,
-        borderBottomRightRadius: 24,
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
         paddingHorizontal: 16,
         paddingBottom: 14,
-        zIndex: 10,
-    },
+        zIndex: 10 },
     headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     headerTitleWrap: {
         flex: 1,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         fontSize: 17,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.3,
-        textTransform: 'capitalize',
-    },
+        textTransform: 'capitalize' },
     headerRight: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     headerIconBtn: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
-});
+        alignItems: 'center' } });

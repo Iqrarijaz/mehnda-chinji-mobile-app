@@ -26,8 +26,7 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
     const scale = useSharedValue(1);
 
     const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-    }));
+        transform: [{ scale: scale.value }] }));
 
     const handlePress = () => {
         scale.value = withSpring(0.97, {}, () => {
@@ -83,45 +82,33 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
 
 const styles = StyleSheet.create({
     touchable: {
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     card: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 12,
-    },
+        padding: 16 },
     iconContainer: {
         width: 52,
         height: 52,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 16,
-    },
+        marginRight: 16 },
     content: {
-        flex: 1,
-    },
+        flex: 1 },
     title: {
         fontSize: 16,
         fontWeight: '700',
         color: '#1E293B',
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     subtitle: {
         fontSize: 12,
         color: '#64748B',
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     value: {
         fontSize: 14,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });
 
 export default SupportContactCard;

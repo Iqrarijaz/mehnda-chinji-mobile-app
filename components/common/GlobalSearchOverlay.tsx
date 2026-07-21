@@ -138,7 +138,7 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
         }
 
         return (
-            <View style={[styles.resultItem, { borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
+            <View style={[styles.resultItem, { borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', borderBottomWidth: 1 }]}>
                 <View style={[styles.iconBox, { backgroundColor: `${color}15` }]}>
                     <Ionicons name={icon} size={18} color={color} />
                 </View>
@@ -229,37 +229,30 @@ const styles = StyleSheet.create({
     overlay: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'transparent',
-        zIndex: 1000,
-    },
+        zIndex: 1000 },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
         paddingVertical: 12,
-        gap: 12,
-    },
+        gap: 12 },
     searchBar: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         height: 48,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16,
-        borderColor: 'rgba(0,0,0,0.05)',
-    },
+        paddingHorizontal: 16 },
     input: {
         flex: 1,
         marginLeft: 10,
         fontSize: Platform.OS === 'android' ? 13 : 15,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     cancelButton: {
-        paddingHorizontal: 4,
-    },
+        paddingHorizontal: 4 },
     listContent: {
         paddingHorizontal: 16,
-        paddingBottom: 40,
-    },
+        paddingBottom: 40 },
     sectionTitle: {
         fontSize: 12,
         fontWeight: 'bold',
@@ -267,41 +260,32 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 10,
         textTransform: 'uppercase',
-        letterSpacing: 1.2,
-    },
+        letterSpacing: 1.2 },
     resultItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 14,
-        borderBottomWidth: 1,
-    },
+        paddingVertical: 14 },
     iconBox: {
         width: 40,
         height: 40,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 14,
-    },
+        marginRight: 14 },
     textContainer: {
-        flex: 1,
-    },
+        flex: 1 },
     resultLabel: {
         fontSize: 16,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     resultSubtitle: {
         fontSize: 12,
         opacity: 0.5,
-        marginTop: 2,
-    },
+        marginTop: 2 },
     emptyState: {
         alignItems: 'center',
         marginTop: 60,
-        gap: 12,
-    },
+        gap: 12 },
     emptyText: {
         fontSize: 14,
-        opacity: 0.5,
-    }
+        opacity: 0.5 }
 });

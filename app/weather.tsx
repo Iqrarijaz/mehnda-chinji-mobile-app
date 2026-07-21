@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import {
@@ -10,23 +9,22 @@ import {
     ScrollView,
     StyleSheet,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import cities from '../data/cities.json';
+
 
 import BannerAd from '@/ads/components/BannerAd';
 import NativeAd from '@/ads/components/NativeAd';
 import WeatherDaily from '@/components/weather/WeatherDaily';
 import WeatherHero from '@/components/weather/WeatherHero';
 import WeatherHourly from '@/components/weather/WeatherHourly';
-import WeatherSearchBar from '@/components/weather/WeatherSearchBar';
+
 import { WeatherCitySwitcher } from '@/components/weather/WeatherCitySwitcher';
 import WeatherStats from '@/components/weather/WeatherStats';
 import WeatherSunrise from '@/components/weather/WeatherSunrise';
 import WeatherDetails from '@/components/weather/WeatherDetails';
-import { getWeatherGradient } from '@/utils/weatherTheme';
 
 import { useQuery } from '@tanstack/react-query';
 import { Colors } from '@/constants/colors';
@@ -35,6 +33,7 @@ import { useWeatherLocation } from '@/hooks/useWeatherLocation';
 import { useWeather } from '@/hooks/useWeather';
 import { useSavedCities } from '@/hooks/useSavedCities';
 import { SavedCity, getAirQuality, getUVIndex } from '@/apis/weather';
+import { Layout } from '@/constants/layout';
 
 function relativeWeatherTime(unixSec: number): string {
     const diffMin = Math.max(0, Math.round((Date.now() - unixSec * 1000) / 60000));
@@ -66,11 +65,7 @@ export default function WeatherScreen() {
 
     const activeCityKey = !selected
         ? null
-        : (selected.lat != null ? `${selected.lat.toFixed(3)},${(selected.lon as number).toFixed(3)}` : '__search__');
-
-    const [searchInput, setSearchInput] = useState('');
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [filteredCities, setFilteredCities] = useState<string[]>([]);
+        : (selected.lat != null ? `${selected.lat.toFixed(3)},${(selected.lon as number).toFixed(3)}` : null);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const { weather, forecast, isLoading, refetch } = useWeather(effectiveCity, effectiveCoords);
@@ -80,13 +75,13 @@ export default function WeatherScreen() {
         queryKey: ['airQuality', effectiveCoords?.lat, effectiveCoords?.lon],
         queryFn: () => getAirQuality(effectiveCoords!.lat, effectiveCoords!.lon),
         enabled: !!effectiveCoords,
-        staleTime: 1000 * 60 * 30,
+        staleTime: 1000 * 60 * 30
     });
     const uvQuery = useQuery({
         queryKey: ['uvIndex', effectiveCoords?.lat, effectiveCoords?.lon],
         queryFn: () => getUVIndex(effectiveCoords!.lat, effectiveCoords!.lon),
         enabled: !!effectiveCoords,
-        staleTime: 1000 * 60 * 30,
+        staleTime: 1000 * 60 * 30
     });
 
     const aqi = (airQuery.data as any)?.main?.aqi ?? null;
@@ -98,55 +93,12 @@ export default function WeatherScreen() {
     // Search
     // ─────────────────────────────────────────────────────────────
 
-    const handleSubmit = useCallback(() => {
-        if (!searchInput.trim()) return;
-
-        setSelected({ name: searchInput.trim() });
-        setSearchInput('');
-        setShowDropdown(false);
-    }, [searchInput]);
-
-    const handleSelectCity = useCallback(
-        (selectedCity: string) => {
-            setSelected({ name: `${selectedCity}, PK` });
-            setSearchInput('');
-            setShowDropdown(false);
-        },
-        []
-    );
-
-    // Saved-city switcher handlers.
     const selectCurrent = useCallback(() => setSelected(null), []);
     const selectSavedCity = useCallback(
         (c: SavedCity) => setSelected({ name: c.name, lat: c.latitude, lon: c.longitude }),
         [],
     );
     const openManageCities = useCallback(() => router.push('/weather/manage-cities' as any), [router]);
-
-    const handleChangeText = useCallback((text: string) => {
-        setSearchInput(text);
-
-        if (!text.trim()) {
-            setShowDropdown(false);
-            return;
-        }
-
-        const filtered = (cities as string[])
-            .filter(city =>
-                city.toLowerCase().includes(text.toLowerCase())
-            )
-            .slice(0, 8);
-
-        setFilteredCities(filtered);
-        setShowDropdown(filtered.length > 0);
-    }, []);
-
-    const handleClear = useCallback(() => {
-        setSearchInput('');
-        setShowDropdown(false);
-        // Clearing the search returns to the current-location default.
-        setSelected(null);
-    }, []);
 
     // ─────────────────────────────────────────────────────────────
     // Refresh
@@ -178,7 +130,7 @@ export default function WeatherScreen() {
             return {
                 time: `${hour}${ampm}`,
                 icon: item.weather[0].icon,
-                temp: Math.round(item.main.temp),
+                temp: Math.round(item.main.temp)
             };
         });
     }, [forecast]);
@@ -227,14 +179,14 @@ export default function WeatherScreen() {
                     day: new Date(
                         representative.dt * 1000
                     ).toLocaleDateString('en-US', {
-                        weekday: 'short',
+                        weekday: 'short'
                     }),
 
                     date: new Date(
                         representative.dt * 1000
                     ).toLocaleDateString('en-US', {
                         month: 'short',
-                        day: 'numeric',
+                        day: 'numeric'
                     }),
 
                     icon: representative.weather[0].icon,
@@ -242,7 +194,7 @@ export default function WeatherScreen() {
                     low: Math.min(...temps),
                     pop: Math.round(
                         (representative.pop || 0) * 100
-                    ),
+                    )
                 };
             });
     }, [forecast]);
@@ -257,7 +209,7 @@ export default function WeatherScreen() {
             {
                 hour: '2-digit',
                 minute: '2-digit',
-                hour12: true,
+                hour12: true
             }
         )
         : '--';
@@ -268,7 +220,7 @@ export default function WeatherScreen() {
             {
                 hour: '2-digit',
                 minute: '2-digit',
-                hour12: true,
+                hour12: true
             }
         )
         : '--';
@@ -282,17 +234,6 @@ export default function WeatherScreen() {
         >
             <Stack.Screen options={{ headerShown: false }} />
 
-            <LinearGradient
-                colors={
-                    theme === 'dark'
-                        ? [colors.background, colors.background]
-                        : getWeatherGradient(weather?.weather?.[0]?.icon, { primary: colors.primary, secondary: colors.secondary, lime: colors.lime })
-                }
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-            />
-
             <KeyboardAvoidingView
                 style={styles.flex}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -302,7 +243,7 @@ export default function WeatherScreen() {
                         styles.scrollContent,
                         {
                             paddingTop: insets.top + 16,
-                            paddingBottom: insets.bottom + 40,
+                            paddingBottom: insets.bottom + 40
                         },
                     ]}
                     keyboardShouldPersistTaps="handled"
@@ -311,7 +252,7 @@ export default function WeatherScreen() {
                         <RefreshControl
                             refreshing={isRefreshing}
                             onRefresh={handleRefresh}
-                            tintColor="#FFFFFF"
+                            tintColor={colors.primary}
                         />
                     }
                 >
@@ -319,7 +260,7 @@ export default function WeatherScreen() {
                     <View style={styles.topNav}>
                         <TouchableOpacity
                             activeOpacity={0.8}
-                            style={styles.backBtn}
+                            style={[styles.backBtn, { backgroundColor: `${colors.primary}14` }]}
                             onPress={() =>
                                 router.canGoBack()
                                     ? router.back()
@@ -329,21 +270,9 @@ export default function WeatherScreen() {
                             <Ionicons
                                 name="arrow-back"
                                 size={22}
-                                color="#FFFFFF"
+                                color={colors.primary}
                             />
                         </TouchableOpacity>
-
-                        <View style={styles.searchWrapper}>
-                            <WeatherSearchBar
-                                searchInput={searchInput}
-                                filteredCities={filteredCities}
-                                showDropdown={showDropdown}
-                                onChangeText={handleChangeText}
-                                onSubmit={handleSubmit}
-                                onClear={handleClear}
-                                onSelectCity={handleSelectCity}
-                            />
-                        </View>
                     </View>
 
                     {/* Saved-city switcher */}
@@ -377,7 +306,9 @@ export default function WeatherScreen() {
                         />
                     ) : null}
 
-                    <NativeAd placement="weather" />
+                    <View style={{ backgroundColor: colors.cardBg, padding: 8, borderRadius: Layout.borderRadius, marginBottom: 16 }}>
+                        <NativeAd placement="weather" />
+                    </View>
 
                     {/* Hourly */}
                     <WeatherHourly data={hourlyData} />
@@ -395,7 +326,7 @@ export default function WeatherScreen() {
 
                 </ScrollView>
 
-                <View style={styles.bannerContainer}>
+                <View style={[styles.bannerContainer, { paddingBottom: insets.bottom }]}>
                     <BannerAd placement="weather" />
                 </View>
             </KeyboardAvoidingView>
@@ -405,16 +336,16 @@ export default function WeatherScreen() {
 
 const styles = StyleSheet.create({
     flex: {
-        flex: 1,
+        flex: 1
     },
 
     container: {
-        flex: 1,
+        flex: 1
     },
 
     scrollContent: {
         paddingHorizontal: 20,
-        flexGrow: 1,
+        flexGrow: 1
     },
 
     topNav: {
@@ -423,27 +354,19 @@ const styles = StyleSheet.create({
         gap: 12,
         marginBottom: 24,
         zIndex: 9999,
-        overflow: 'visible',
+        overflow: 'visible'
     },
 
     backBtn: {
-        width: 42,
-        height: 42,
-        borderRadius: 22,
+        width: 46,
+        height: 46,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.18)',
-    },
-
-    searchWrapper: {
-        flex: 1,
-        zIndex: 9999,
-        overflow: 'visible',
+        alignItems: 'center'
     },
 
     bannerContainer: {
         justifyContent: 'center',
-        // minHeight: 60,
-        marginBottom: 26,
-    },
+        marginBottom: 8
+    }
 });

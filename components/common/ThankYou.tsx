@@ -76,41 +76,35 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
-    },
+        padding: 24 },
     modalContent: {
         width: '100%',
         borderRadius: Layout.borderRadius,
         padding: 24,
         alignItems: 'center',
-        // shadowColor: '#000',
-        // shadowOffset: { width: 0, height: 10 },
-        // shadowOpacity: 0.1,
-        // shadowRadius: 20,
+        // 
+        // 
+        // 
+        // 
     },
     lottieContainer: {
         marginBottom: 16,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     lottie: {
         width: '100%',
-        height: '100%',
-    },
+        height: '100%' },
     textContainer: {
         marginBottom: 24,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     modalButton: {
         width: 120,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '600',
-    }
+        fontWeight: '600' }
 });

@@ -20,7 +20,7 @@ export const MarketplaceDetailsSkeleton = React.memo(() => {
             {/* Image hero */}
             <Skeleton width={width} height={300} borderRadius={0} />
 
-            <View style={[styles.card, { backgroundColor: colors.card }]}>
+            <View style={[styles.card, { backgroundColor: colors.cardBg }]}>
                 {/* Title + price */}
                 <Skeleton width="70%" height={22} borderRadius={6} />
                 <Skeleton width="40%" height={26} borderRadius={8} style={{ marginTop: 10 }} />
@@ -57,25 +57,20 @@ MarketplaceDetailsSkeleton.displayName = 'MarketplaceDetailsSkeleton';
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     card: {
         flex: 1,
         marginTop: -20,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
         paddingHorizontal: 16,
-        paddingTop: 20,
-    },
+        paddingTop: 20 },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 12,
-        marginTop: 20,
-    },
+        marginTop: 20 },
     rowScroll: {
         flexDirection: 'row',
         gap: 12,
-        marginTop: 12,
-    },
-});
+        marginTop: 12 } });

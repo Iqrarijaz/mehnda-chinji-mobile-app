@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Layout } from '@/constants/layout';
 
 export interface FormInputProps extends TextInputProps {
     label?: string;
@@ -60,32 +61,30 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                     )}
                 </View>
             )}
-            <View 
+            <View
                 style={[
-                    styles.inputBox, 
-                    { 
+                    styles.inputBox,
+                    {
                         backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                        minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52),
-                        borderColor: error ? '#EF4444' : 'transparent',
-                        borderWidth: error ? 1 : 0,
+                        minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52)
                     },
                     multiline && { alignItems: 'flex-start', paddingVertical: 12 },
                     inputBoxStyle
                 ]}
             >
                 {icon && (
-                    <Ionicons 
-                        name={icon} 
-                        size={18} 
-                        color={colors.icon} 
-                        style={[{ marginRight: 10 }, multiline && { marginTop: 2 }]} 
+                    <Ionicons
+                        name={icon}
+                        size={18}
+                        color={colors.icon}
+                        style={[{ marginRight: 10 }, multiline && { marginTop: 2 }]}
                     />
                 )}
                 <TextInput
                     ref={ref}
                     placeholderTextColor={colors.icon}
                     style={[
-                        styles.textInput, 
+                        styles.textInput,
                         { color: colors.text },
                         multiline && { minHeight: 80 }
                     ]}
@@ -107,45 +106,45 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
 
 const styles = StyleSheet.create({
     inputField: {
-        gap: 6,
+        gap: 6
     },
     labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingRight: 4,
+        paddingRight: 4
     },
     label: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2,
-        textTransform: 'uppercase',
+        textTransform: 'uppercase'
     },
     required: {
-        color: '#EF4444',
+        color: '#EF4444'
     },
     charCount: {
         fontSize: 10,
-        fontWeight: '600',
+        fontWeight: '600'
     },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 12,
-        paddingHorizontal: 14,
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 14
     },
     textInput: {
         flex: 1,
         fontWeight: '500',
         fontSize: 14,
         padding: 0,
-        margin: 0,
+        margin: 0
     },
     errorText: {
         color: '#EF4444',
         fontSize: 11,
         marginLeft: 4,
-        marginTop: 2,
-    },
+        marginTop: 2
+    }
 });

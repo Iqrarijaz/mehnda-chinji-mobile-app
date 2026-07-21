@@ -10,8 +10,7 @@ import {
     TouchableOpacity,
     View,
     Dimensions,
-    Platform,
-} from 'react-native';
+    Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BannerAd from '@/ads/components/BannerAd';
@@ -28,6 +27,7 @@ import { CleanConfirmationModal } from '@/components/common/CleanConfirmationMod
 import Toast from 'react-native-toast-message';
 import { Alert } from 'react-native';
 import { useMutation } from '@tanstack/react-query';
+import { Layout } from '@/constants/layout';
 
 const ACADEMIC_CLASSES = [
     { label: 'Playgroup / Nursery', value: 'playgroup_nursery' },
@@ -124,7 +124,7 @@ const ManageEssentialDashboard = () => {
     );
 
     const renderTopperItem = (topper: any) => (
-        <View key={topper._id} style={[styles.itemCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#FFF', borderColor: colors.border }]}>
+        <View key={topper._id} style={[styles.itemCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#FFF' }]}>
             <View style={styles.itemMain}>
                 <View style={styles.itemImageContainer}>
                     {topper.image ? (
@@ -168,7 +168,7 @@ const ManageEssentialDashboard = () => {
     );
 
     const renderEventItem = (event: any) => (
-        <View key={event._id} style={[styles.itemCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#FFF', borderColor: colors.border }]}>
+        <View key={event._id} style={[styles.itemCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#FFF' }]}>
             <View style={styles.itemMain}>
                 <View style={styles.itemInfo}>
                     <View style={styles.eventBadgeRow}>
@@ -311,251 +311,195 @@ export default ManageEssentialDashboard;
 
 const styles = StyleSheet.create({
     mainContainer: {
-        flex: 1,
-    },
+        flex: 1 },
     header: {
         paddingHorizontal: 20,
         paddingBottom: 25,
-        borderBottomLeftRadius: 30,
-        borderBottomRightRadius: 30,
-    },
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28 },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     backBtn: {
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitleContainer: {
         flex: 1,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         color: '#FFF',
         fontSize: 18,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     headerSubtitle: {
         color: 'rgba(255,255,255,0.8)',
         fontSize: 12,
         fontWeight: '600',
-        letterSpacing: 1,
-    },
+        letterSpacing: 1 },
     statusCard: {
         backgroundColor: 'rgba(255,255,255,0.15)',
-        borderRadius: 15,
-        padding: 15,
-    },
+        borderRadius: Layout.borderRadius,
+        padding: 15 },
     statusRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 5,
-    },
+        marginBottom: 5 },
     statusIndicator: {
         width: 8,
         height: 8,
-        borderRadius: 4,
-        marginRight: 8,
-    },
+        borderRadius: Layout.borderRadius,
+        marginRight: 8 },
     statusLabel: {
         color: '#FFF',
         fontSize: 12,
         fontWeight: '800',
-        letterSpacing: 1,
-    },
+        letterSpacing: 1 },
     statusDescription: {
         color: 'rgba(255,255,255,0.9)',
         fontSize: 13,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
     tabContainer: {
         flexDirection: 'row',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 4,
         height: 42,
         marginHorizontal: 20,
         marginTop: 15,
-        marginBottom: 5,
-    },
+        marginBottom: 5 },
     tab: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         gap: 8,
-        height: '100%',
-    },
+        height: '100%' },
     tabText: {
-        fontSize: 14,
-    },
+        fontSize: 14 },
     content: {
-        flex: 1,
-    },
+        flex: 1 },
     list: {
-        gap: 15,
-    },
+        gap: 15 },
     itemCard: {
         padding: 12,
-        borderRadius: 15,
-    },
+        borderRadius: Layout.borderRadius },
     itemMain: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     itemImageContainer: {
         width: 50,
         height: 50,
-        borderRadius: 25,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        marginRight: 12,
-    },
+        marginRight: 12 },
     itemImage: {
         width: '100%',
-        height: '100%',
-    },
+        height: '100%' },
     itemImagePlaceholder: {
         width: '100%',
         height: '100%',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     itemInfo: {
-        flex: 1,
-    },
+        flex: 1 },
     itemName: {
         fontSize: 16,
         fontWeight: '700',
-        textTransform: 'capitalize',
-    },
+        textTransform: 'capitalize' },
     itemSubtitle: {
         fontSize: 13,
         opacity: 0.7,
-        marginTop: 2,
-    },
+        marginTop: 2 },
     schoolRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        marginTop: 4,
-    },
+        marginTop: 4 },
     schoolText: {
         fontSize: 12,
         textTransform: 'capitalize',
-        flex: 1,
-    },
+        flex: 1 },
     moreBtn: {
-        padding: 8,
-    },
+        padding: 8 },
     menuContainer: {
         width: 160,
-        borderRadius: 12,
-        padding: 6,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-    },
+        borderRadius: Layout.borderRadius,
+        padding: 6 },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
         paddingVertical: 10,
         paddingHorizontal: 12,
-        borderRadius: 8,
-    },
+        borderRadius: Layout.borderRadius },
     menuItemText: {
         fontSize: 14,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     eventBadgeRow: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 4,
-        gap: 8,
-    },
+        gap: 8 },
     typeBadge: {
         paddingHorizontal: 8,
         paddingVertical: 2,
-        borderRadius: 6,
-    },
+        borderRadius: Layout.borderRadius },
     typeBadgeText: {
         fontSize: 10,
-        fontWeight: '800',
-    },
+        fontWeight: '800' },
     eventDate: {
         fontSize: 11,
         opacity: 0.5,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     emptyState: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 60,
-    },
+        paddingVertical: 60 },
     emptyIconCircle: {
         width: 100,
         height: 100,
-        borderRadius: 50,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     emptyTitle: {
         fontSize: 20,
         fontWeight: '700',
-        marginBottom: 10,
-    },
+        marginBottom: 10 },
     emptySubtitle: {
         fontSize: 14,
         textAlign: 'center',
         opacity: 0.6,
         paddingHorizontal: 40,
         marginBottom: 30,
-        lineHeight: 20,
-    },
+        lineHeight: 20 },
     addBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 25,
         paddingVertical: 12,
-        borderRadius: 25,
-        gap: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-    },
+        borderRadius: Layout.borderRadius,
+        gap: 8 },
     addBtnText: {
         color: '#FFF',
         fontSize: 16,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     floatingAdd: {
         position: 'absolute',
         right: 20,
         width: 60,
         height: 60,
-        borderRadius: 30,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-    },
+        alignItems: 'center' },
     bannerContainer: {
         width: '100%',
         alignItems: 'center',
-        justifyContent: 'center',
-    }
+        justifyContent: 'center' }
 });

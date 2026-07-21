@@ -9,8 +9,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
-    Platform,
-} from 'react-native';
+    Platform } from 'react-native';
 import { Image } from 'expo-image';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import Animated, {
@@ -20,8 +19,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withRepeat,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -36,6 +34,7 @@ import { LocationSection } from '@/components/essentials/shared/LocationSection'
 import { TagChips } from '@/components/essentials/shared/TagChips';
 import { SectionHeading } from '@/components/essentials/shared/SectionHeading';
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
+import { Layout } from '@/constants/layout';
 
 
 const BusinessDetailScreen = () => {
@@ -100,8 +99,7 @@ const BusinessDetailScreen = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const bobStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: -3 + bob.value * 6 }],
-    }));
+        transform: [{ translateY: -3 + bob.value * 6 }] }));
 
     if (!business) {
         return (
@@ -142,15 +140,13 @@ const BusinessDetailScreen = () => {
         if (hasValidCoordinates) {
             const url = Platform.select({
                 ios: `maps:0,0?q=${lat},${lng}(${business.name})`,
-                android: `geo:0,0?q=${lat},${lng}(${business.name})`,
-            });
+                android: `geo:0,0?q=${lat},${lng}(${business.name})` });
             if (url) Linking.openURL(url);
         } else {
             const query = encodeURIComponent(business.address || business.name);
             const url = Platform.select({
                 ios: `maps:0,0?q=${query}`,
-                android: `geo:0,0?q=${query}`,
-            });
+                android: `geo:0,0?q=${query}` });
             if (url) Linking.openURL(url);
         }
     }, [hasValidCoordinates, lat, lng, business?.address, business?.name, business?.googleAddress]);
@@ -159,8 +155,7 @@ const BusinessDetailScreen = () => {
     const businessForLocation = {
         ...business,
         village: capitalizeString(business.village || ''),
-        city: capitalizeString(business.city || ''),
-    };
+        city: capitalizeString(business.city || '') };
 
     return (
         <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
@@ -335,146 +330,120 @@ export default BusinessDetailScreen;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     loaderContainer: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     heroHeader: {
         width: '100%',
         paddingBottom: 20,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     heroHeaderTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingBottom: 4,
-    },
+        paddingBottom: 4 },
     heroBackButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0,0,0,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     identityRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 20,
         marginTop: 8,
-        gap: 14,
-    },
+        gap: 14 },
     identityText: {
-        flex: 1,
-    },
+        flex: 1 },
     chipRow: {
         flexDirection: 'row',
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     typeChip: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 999,
-        maxWidth: '100%',
-    },
+        borderRadius: Layout.borderRadius,
+        maxWidth: '100%' },
     typeChipText: {
         fontSize: 10,
         fontWeight: '800',
         color: '#1E293B',
         textTransform: 'uppercase',
         letterSpacing: 0.6,
-        flexShrink: 1,
-    },
+        flexShrink: 1 },
     heroTitle: {
         fontSize: 21,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
-        lineHeight: 26,
-    },
+        lineHeight: 26 },
     subtitleRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
-        marginTop: 5,
-    },
+        marginTop: 5 },
     heroSubtitle: {
         fontSize: 12.5,
         color: 'rgba(255,255,255,0.85)',
         fontWeight: '600',
-        flexShrink: 1,
-    },
+        flexShrink: 1 },
     logoTile: {
         width: 58,
         height: 58,
-        borderRadius: 29,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.16)',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     logoImage: {
         width: '100%',
-        height: '100%',
-    },
+        height: '100%' },
     scrollView: {
-        flex: 1,
-    },
+        flex: 1 },
     detailsCard: {
         paddingHorizontal: 16,
         paddingTop: 12,
-        flex: 1,
-    },
+        flex: 1 },
     actionRow: {
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 12,
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     callButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
         height: 42,
-        borderRadius: 21,
-        paddingHorizontal: 24,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 24 },
     callIcon: {
         width: 24,
         height: 24,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     callButtonText: {
         color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '700',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     detailAdWrapper: {
         marginBottom: 10,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     sectionsContainer: {
-        gap: 16,
-    },
+        gap: 16 },
     detailSection: {
-        gap: 8,
-    },
+        gap: 8 },
     descriptionText: {
         fontSize: 12.5,
-        lineHeight: 19,
-    },
-});
+        lineHeight: 19 } });

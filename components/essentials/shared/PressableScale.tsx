@@ -3,8 +3,7 @@ import { Pressable, StyleProp, ViewStyle } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 
 interface PressableScaleProps {
     onPress?: () => void;
@@ -28,13 +27,11 @@ function PressableScaleComponent({
     intensity = 0.03,
     containerStyle,
     style,
-    children,
-}: PressableScaleProps) {
+    children }: PressableScaleProps) {
     const pressed = useSharedValue(0);
 
     const animStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 - pressed.value * intensity }],
-    }));
+        transform: [{ scale: 1 - pressed.value * intensity }] }));
 
     return (
         <Animated.View style={[containerStyle, animStyle]}>

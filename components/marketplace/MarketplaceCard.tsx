@@ -13,6 +13,7 @@ import Toast from 'react-native-toast-message';
 import { ActionMenu, ActionMenuItem } from '../common/ActionMenu';
 import { ThemedText } from '../ThemedText';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
+import { Layout } from '@/constants/layout';
 
 interface MarketplaceCardProps {
     item: any;
@@ -159,7 +160,7 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
             <PressableScale
                 intensity={0.025}
                 containerStyle={{ flex: 1 }}
-                style={[styles.container, { backgroundColor: colors.card }]}
+                style={[styles.container, { backgroundColor: colors.cardBg }]}
                 onPress={handlePress}
             >
 
@@ -249,30 +250,25 @@ MarketplaceCard.displayName = 'MarketplaceCard';
 
 const styles = StyleSheet.create({
     container: {
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         marginBottom: 14,
         overflow: 'hidden',
-        flex: 1,
-    },
+        flex: 1 },
     header: {
         position: 'absolute',
         top: 8,
         right: 8,
-        zIndex: 10,
-    },
+        zIndex: 10 },
     dateText: {
-        fontSize: 10,
-    },
+        fontSize: 10 },
 
     imageContainer: {
         height: 130,
         width: '100%',
-        position: 'relative',
-    },
+        position: 'relative' },
     image: {
         height: '100%',
-        width: '100%',
-    },
+        width: '100%' },
     imageBadge: {
         position: 'absolute',
         bottom: 8,
@@ -280,162 +276,137 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.55)',
         paddingHorizontal: 8,
         paddingVertical: 3,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     imageBadgeText: {
         color: '#fff',
         fontSize: 11,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     statusTab: {
         position: 'absolute',
         top: 8,
         left: 8,
         paddingHorizontal: 8,
         paddingVertical: 3,
-        borderRadius: 999,
-        zIndex: 5,
-    },
+        borderRadius: Layout.borderRadius,
+        zIndex: 5 },
     statusTabText: {
         color: '#fff',
         fontSize: 10,
         fontWeight: '700',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     imagePlaceholder: {
         height: 130,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     imagePlaceholderText: {
         fontSize: 12,
-        marginTop: 8,
-    },
+        marginTop: 8 },
     detailsContainer: {
         paddingHorizontal: 10,
         paddingTop: 6,
-        paddingBottom: 8,
-    },
+        paddingBottom: 8 },
     contentBlock: {
         marginTop: 0,
-        marginBottom: 0,
-    },
+        marginBottom: 0 },
     categoryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     categoryBadge: {
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 4,
-    },
+        borderRadius: Layout.borderRadius },
     categoryText: {
         fontSize: 10,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     statusBadge: {
         paddingHorizontal: 8,
         paddingVertical: 2,
-        borderRadius: 4,
-    },
+        borderRadius: Layout.borderRadius },
     statusText: {
         fontSize: 10,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     priceRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 1,
-    },
+        marginBottom: 1 },
     priceText: {
         fontSize: 13.5,
         fontWeight: '800',
         letterSpacing: 0.15,
-        flexShrink: 1,
-    },
+        flexShrink: 1 },
     negotiableBadge: {
         paddingHorizontal: 6,
         paddingVertical: 2,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     negotiableText: {
         fontSize: 8.5,
         fontWeight: '800',
-        letterSpacing: 0.4,
-    },
+        letterSpacing: 0.4 },
     title: {
         fontSize: 12.5,
         fontWeight: '700',
         marginTop: 0,
-        lineHeight: 14,
-    },
+        lineHeight: 14 },
     description: {
         fontSize: 12,
         marginTop: 4,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
     locationRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 0,
-    },
+        marginTop: 0 },
     locationContent: {
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
-        paddingRight: 8,
-    },
+        paddingRight: 8 },
     locationText: {
         color: '#9CA3AF',
         fontSize: 10.5,
-        marginLeft: 4,
-    },
+        marginLeft: 4 },
     metadataContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         padding: 8,
-        borderRadius: 6,
+        borderRadius: Layout.borderRadius,
         marginTop: 10,
-        gap: 6,
-    },
+        gap: 6 },
     metadataTag: {
         flexDirection: 'row',
         backgroundColor: 'rgba(0,0,0,0.03)',
         paddingHorizontal: 6,
         paddingVertical: 2,
-        borderRadius: 4,
-        alignItems: 'center',
-    },
+        borderRadius: Layout.borderRadius,
+        alignItems: 'center' },
     metaTagKey: {
         fontSize: 9,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     metaTagVal: {
         fontSize: 10,
         fontWeight: '600',
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     actionRow: {
         flexDirection: 'row',
         marginTop: 12,
-        gap: 8,
-    },
+        gap: 8 },
     actionButton: {
         flex: 1,
         height: 38,
-        borderRadius: 8,
+        borderRadius: Layout.borderRadius,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 4,
-    },
+        gap: 4 },
     chatButton: {
     },
     callButton: {},
     actionButtonText: {
         fontSize: 12,
-        fontWeight: '700',
-    },
-});
+        fontWeight: '600' },
+    actionsWrapper: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        zIndex: 10 } });

@@ -18,6 +18,7 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Modal, TouchableOpacity } from 'react-native';
 
+
 export default function LoginScreen() {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
@@ -94,81 +95,64 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     headerSection: {
         paddingBottom: 38,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     headerContent: {
         paddingHorizontal: 22,
-        paddingTop: 38,
-    },
+        paddingTop: 38 },
     headerTitle: {
         fontSize: 28,
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     headerSubtitle: {
         fontSize: 15,
         color: 'rgba(255, 255, 255, 0.9)',
-        lineHeight: 22,
-    },
+        lineHeight: 22 },
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
-    },
+        padding: 24 },
     modalContent: {
         width: '100%',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 24,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-    },
+        alignItems: 'center' },
     modalIconBox: {
         width: 80,
         height: 80,
-        borderRadius: 40,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0, 102, 102, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     modalTitle: {
         fontSize: 18,
         fontWeight: '700',
         color: '#0F172A',
         marginBottom: 12,
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     modalSubtitle: {
         fontSize: 15,
         color: '#64748B',
         lineHeight: 22,
         textAlign: 'center',
-        marginBottom: 24,
-    },
+        marginBottom: 24 },
     modalButton: {
         backgroundColor: '#006666',
         width: '100%',
         height: 52,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: '700',
-    },
-});
+        fontWeight: '700' } });

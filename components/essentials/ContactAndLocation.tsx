@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
 interface ContactAndLocationProps {
     place: any;
@@ -55,44 +56,35 @@ ContactAndLocation.displayName = 'ContactAndLocation';
 
 const styles = StyleSheet.create({
     detailSection: {
-        gap: 6,
-    },
+        gap: 6 },
     sectionHeading: {
         fontSize: 10,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.8,
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     infoListItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 4,
-        gap: 12,
-    },
+        gap: 12 },
     infoListIcon: {
         width: 26,
         height: 26,
-        borderRadius: 13,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     infoListContent: {
-        flex: 1,
-    },
+        flex: 1 },
     infoListLabel: {
         fontSize: 9,
         fontWeight: '600',
         textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     infoListVal: {
         fontSize: 12,
         fontWeight: '500',
-        marginTop: -2,
-    },
+        marginTop: -2 },
     infoListSub: {
         fontSize: 11,
-        marginTop: 1,
-    },
-});
+        marginTop: 1 } });

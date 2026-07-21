@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Layout } from '@/constants/layout';
 
 interface EmptyListingStateProps {
     activeTab: 'all' | 'requests';
@@ -63,59 +64,49 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         paddingTop: 64,
-        paddingHorizontal: 32,
-    },
+        paddingHorizontal: 32 },
     illustration: {
         width: 140,
         height: 140,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     ringOuter: {
         position: 'absolute',
         width: 140,
         height: 140,
-        borderRadius: 70,
-    },
+        borderRadius: Layout.borderRadius },
     ringInner: {
         position: 'absolute',
         width: 100,
         height: 100,
-        borderRadius: 50,
-    },
+        borderRadius: Layout.borderRadius },
     iconCircle: {
         width: 64,
         height: 64,
-        borderRadius: 32,
+        borderRadius: Layout.borderRadius,
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     accentDot: {
         position: 'absolute',
         width: 8,
         height: 8,
-        borderRadius: 4,
-    },
+        borderRadius: Layout.borderRadius },
     accentDotA: {
         top: 24,
-        right: 26,
-    },
+        right: 26 },
     accentDotB: {
         bottom: 30,
-        left: 22,
-    },
+        left: 22 },
     title: {
         fontSize: 17,
         fontWeight: '800',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     subtitle: {
         marginTop: 6,
         fontSize: 13,
         lineHeight: 19,
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     addButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -123,12 +114,9 @@ const styles = StyleSheet.create({
         marginTop: 20,
         paddingHorizontal: 20,
         height: 44,
-        borderRadius: 22,
-    },
+        borderRadius: Layout.borderRadius },
     addButtonText: {
         color: '#FFFFFF',
         fontSize: 13.5,
         fontWeight: '800',
-        letterSpacing: 0.3,
-    },
-});
+        letterSpacing: 0.3 } });

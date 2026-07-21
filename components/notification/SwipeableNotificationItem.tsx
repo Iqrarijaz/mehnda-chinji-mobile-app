@@ -6,9 +6,9 @@ import Animated, {
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 import NotificationItem from './NotificationItem';
+import { Layout } from '@/constants/layout';
 
 const DELETE_THRESHOLD = -80;
 const MAX_SWIPE = -90;
@@ -27,8 +27,7 @@ const SwipeableNotificationItem = React.memo(({
     onPress,
     onDelete,
     isDeleting = false,
-    delay = 0,
-}: Props) => {
+    delay = 0 }: Props) => {
     const translateX = useSharedValue(0);
 
     const handleDelete = useCallback(() => {
@@ -53,12 +52,10 @@ const SwipeableNotificationItem = React.memo(({
         });
 
     const cardStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: translateX.value }],
-    }));
+        transform: [{ translateX: translateX.value }] }));
 
     const deleteRevealStyle = useAnimatedStyle(() => ({
-        opacity: translateX.value < -10 ? 1 : 0,
-    }));
+        opacity: translateX.value < -10 ? 1 : 0 }));
 
     return (
         <View style={styles.wrapper}>
@@ -95,8 +92,7 @@ export default SwipeableNotificationItem;
 
 const styles = StyleSheet.create({
     wrapper: {
-        position: 'relative',
-    },
+        position: 'relative' },
     deleteBg: {
         position: 'absolute',
         right: 0,
@@ -104,21 +100,16 @@ const styles = StyleSheet.create({
         bottom: 8,
         width: MAX_SWIPE * -1,
         backgroundColor: DELETE_RED,
-        borderRadius: 18,
-        overflow: 'hidden',
-    },
+        borderRadius: Layout.borderRadius,
+        overflow: 'hidden' },
     deleteTouchable: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     deleteAction: {
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     loadingOverlay: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(255,255,255,0.35)',
-        borderRadius: 18,
-    },
-});
+        borderRadius: Layout.borderRadius } });

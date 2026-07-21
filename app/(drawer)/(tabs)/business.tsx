@@ -285,43 +285,37 @@ export default function BusinessScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F8FAFC',
-    },
+        backgroundColor: '#F8FAFC' },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 4,
-        paddingBottom: 8,
-    },
+        paddingBottom: 8 },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     listingIconButton: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     filterButton: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        position: 'relative',
-    },
+        position: 'relative' },
     filterBadge: {
         position: 'absolute',
         top: -2,
         right: -2,
         backgroundColor: '#EF4444',
-        borderRadius: 9,
+        borderRadius: Layout.borderRadius,
         width: 18,
         height: 18,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: '#FFFFFF',
     },
     filterBadgeText: {
         color: '#FFFFFF',
@@ -329,59 +323,46 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         lineHeight: 12,
-        includeFontPadding: false,
-    },
+        includeFontPadding: false },
     categoryScroller: {
         paddingHorizontal: 16,
-        gap: 8,
-    },
+        gap: 8 },
     categoryChip: {
         paddingHorizontal: 12,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        borderColor: 'rgba(255,255,255,0.3)',
-    },
+        backgroundColor: 'rgba(255,255,255,0.2)' },
     categoryChipActive: {
         backgroundColor: '#FFFFFF',
-        borderColor: '#FFFFFF',
     },
     categoryChipText: {
         color: '#FFFFFF',
         fontSize: 13,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     categoryChipTextActive: {
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     content: {
-        flex: 1,
-    },
+        flex: 1 },
     listContent: {
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
         paddingTop: Platform.OS === 'android' ? 18 : 20,
-        paddingBottom: 100,
-    },
+        paddingBottom: 100 },
     loaderContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 40,
-    },
+        paddingTop: 40 },
     emptyContainer: {
         alignItems: 'center',
-        marginTop: Platform.OS === 'android' ? 58 : 60,
-    },
+        marginTop: Platform.OS === 'android' ? 58 : 60 },
     emptyText: {
         marginTop: Platform.OS === 'android' ? 14 : 16,
         color: '#64748B',
         fontSize: Platform.OS === 'android' ? 16 : 18,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     emptySubText: {
         marginTop: Platform.OS === 'android' ? 4 : 6,
         color: '#94A3B8',
-        fontSize: Platform.OS === 'android' ? 12 : 14,
-    }
+        fontSize: Platform.OS === 'android' ? 12 : 14 }
 });
 

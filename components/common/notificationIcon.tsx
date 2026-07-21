@@ -48,7 +48,7 @@ export function NotificationIcon({
         >
             <Ionicons name="notifications-outline" size={size} color={iconColor} />
             {unreadCount > 0 && (
-                <View style={[styles.badge, { borderColor: colors.primary }, badgeStyle]}>
+                <View style={[styles.badge, badgeStyle]}>
                     <ThemedText style={styles.badgeText}>
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </ThemedText>
@@ -65,25 +65,22 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     badge: {
         position: 'absolute',
         top: -4,
         right: -4,
         backgroundColor: '#ef4444',
-        borderRadius: 10,
+        borderRadius: Layout.borderRadius,
         minWidth: 18,
         height: 18,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 4,
-    },
+        paddingHorizontal: 4 },
     badgeText: {
         color: '#FFFFFF',
         fontSize: 10,
         fontWeight: 'bold',
         textAlign: 'center',
-        lineHeight: 14,
-    }
+        lineHeight: 14 }
 });

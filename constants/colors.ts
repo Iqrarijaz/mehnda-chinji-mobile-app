@@ -5,7 +5,7 @@ export const Colors = {
     light: {
         text: '#222831',
         lime: '#7BC043',
-        background: '#F5F6FA',
+        background: '#FFFFFF',
         tint: tintColorLight,
         icon: '#475569',
         tabIconDefault: '#475569',
@@ -14,6 +14,7 @@ export const Colors = {
         secondary: '#FF9B51',
         white: '#FFFFFF',
         card: '#FFFFFF', // Light mode card
+        cardBg: 'rgba(0,0,0,0.035)', // Translucent card background
         border: '#D6DEE3', // Light mode border
         textSecondary: '#64748B',
     },
@@ -29,6 +30,7 @@ export const Colors = {
         secondary: '#FF9B51',
         white: '#FFFFFF',
         card: '#1F2121',
+        cardBg: 'rgba(255,255,255,0.06)', // Translucent card background
         border: '#1E293B',
         textSecondary: '#94A3B8',
     },

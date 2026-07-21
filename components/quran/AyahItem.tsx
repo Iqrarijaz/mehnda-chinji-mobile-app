@@ -1,10 +1,10 @@
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { tokenizeTajweed } from '@/utils/tajweed';
 import { Ionicons } from '@expo/vector-icons';
 import { memo, useMemo } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Layout } from '@/constants/layout';
 
 interface AyahItemProps {
     index: number;
@@ -18,7 +18,6 @@ interface AyahItemProps {
     borderColor?: string;
     cardColor: string;
     fontSize: number;
-    tajweedEnabled: boolean;
     isBookmarked: boolean;
     onLongPress: (index: number) => void;
 }
@@ -33,20 +32,13 @@ export const AyahItem = memo(({
     primaryColor,
     textSecondaryColor,
     fontSize,
-    tajweedEnabled,
     isBookmarked,
-    onLongPress,
-}: AyahItemProps) => {
+    onLongPress }: AyahItemProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
     const spacedText = useMemo(() => arabicText.replace(/\s+/g, '   '), [arabicText]);
     const baseColor = isPlaying ? primaryColor : colors.text;
-
-    const segments = useMemo(
-        () => (tajweedEnabled ? tokenizeTajweed(spacedText, baseColor) : null),
-        [tajweedEnabled, spacedText, baseColor],
-    );
 
     const arabicStyle = [
         styles.arabicText,
@@ -90,17 +82,7 @@ export const AyahItem = memo(({
 
             {/* Text content */}
             <View style={styles.textContent}>
-                {tajweedEnabled && segments ? (
-                    <ThemedText style={arabicStyle}>
-                        {segments.map((s, i) => (
-                            <ThemedText key={i} style={s.color ? { color: s.color } : undefined}>
-                                {s.text}
-                            </ThemedText>
-                        ))}
-                    </ThemedText>
-                ) : (
-                    <ThemedText style={arabicStyle}>{spacedText}</ThemedText>
-                )}
+                <ThemedText style={arabicStyle}>{spacedText}</ThemedText>
 
                 {showTranslation && englishText ? (
                     <ThemedText style={[styles.translationText, { color: textSecondaryColor }]}>
@@ -120,51 +102,42 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         paddingVertical: 14,
         paddingHorizontal: 12,
-        borderRadius: 16,
-        marginBottom: 6,
-    },
+        borderRadius: Layout.borderRadius,
+        marginBottom: 6 },
     playingAccent: {
         position: 'absolute',
         left: 0,
         top: 16,
         bottom: 16,
         width: 3,
-        borderRadius: 2,
-    },
+        borderRadius: Layout.borderRadius },
     leftControls: {
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
         width: 30,
-        paddingTop: 6,
-    },
+        paddingTop: 6 },
     badge: {
         width: 28,
         height: 28,
-        borderRadius: 14,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     badgeText: {
         fontSize: 11,
-        fontWeight: '800',
-    },
+        fontWeight: '800' },
     textContent: {
         flex: 1,
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     arabicText: {
         paddingVertical: 4,
         textAlign: 'right',
         writingDirection: 'rtl',
         fontWeight: '400',
-        width: '100%',
-    },
+        width: '100%' },
     translationText: {
         fontSize: 13,
         lineHeight: 20,
         textAlign: 'left',
         marginTop: 8,
-        width: '100%',
-    },
-});
+        width: '100%' } });

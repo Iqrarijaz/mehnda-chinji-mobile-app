@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
+import { Layout } from '@/constants/layout';
 
 interface DataUsageHeaderProps {
     onReset: () => void;
@@ -37,47 +38,38 @@ const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
         paddingTop: 10,
-        paddingBottom: 12,
-    },
+        paddingBottom: 12 },
     topRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 12,
-    },
+        marginBottom: 12 },
     backBtn: {
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#F1F5F9',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     resetBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#E6F4F2',
         paddingHorizontal: 12,
         paddingVertical: 8,
-        borderRadius: 12,
-        gap: 6,
-    },
+        borderRadius: Layout.borderRadius,
+        gap: 6 },
     resetText: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#009688',
-    },
+        color: '#009688' },
     titleContainer: {
-        gap: 4,
-    },
+        gap: 4 },
     title: {
         fontSize: 20,
         fontWeight: '800',
-        color: '#0F172A',
-    },
+        color: '#0F172A' },
     subtitle: {
         fontSize: 11,
         color: '#64748B',
-        fontWeight: '500',
-    },
-});
+        fontWeight: '500' } });

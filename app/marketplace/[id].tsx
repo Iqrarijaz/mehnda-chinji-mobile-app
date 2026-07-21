@@ -25,6 +25,7 @@ import { useMarketplaceAPI } from '@/hooks/useMarketplaceAPI';
 import { useMarketplaceStore } from '@/store/marketplaceStore';
 import { capitalizeString } from '@/utils/string';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Layout } from '@/constants/layout';
 
 const { width } = Dimensions.get('window');
 
@@ -47,8 +48,7 @@ export default function MarketplaceDetailsScreen() {
         detailsQuery,
         markSoldMutation,
         deleteMutation,
-        toggleStatusMutation,
-    } = useMarketplaceAPI({ id: id as string });
+        toggleStatusMutation } = useMarketplaceAPI({ id: id as string });
 
     const { data: response, isLoading, isError } = detailsQuery;
 
@@ -82,8 +82,7 @@ export default function MarketplaceDetailsScreen() {
     const handleEdit = () => {
         router.push({
             pathname: '/listing/create',
-            params: { listing: JSON.stringify(item) },
-        });
+            params: { listing: JSON.stringify(item) } });
     };
 
     const ownerActions = [
@@ -275,7 +274,7 @@ export default function MarketplaceDetailsScreen() {
                                 {infoRows.map((row) => (
                                     <View
                                         key={row.label}
-                                        style={[styles.infoCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.background }]}
+                                        style={[styles.infoCard, { backgroundColor: colors.cardBg }]}
                                     >
                                         <View style={[styles.infoIconTile, { backgroundColor: `${colors.secondary}16` }]}>
                                             <Ionicons name={row.icon} size={13} color={colors.secondary} />
@@ -345,7 +344,7 @@ export default function MarketplaceDetailsScreen() {
                                                     if (!simOwner) trackEntityInquiry(sim._id, 'Marketplace').catch(() => { });
                                                     router.push(`/marketplace/${sim._id}` as any);
                                                 }}
-                                                style={[styles.simCard, { backgroundColor: colors.card }]}
+                                                style={[styles.simCard, { backgroundColor: colors.cardBg }]}
                                             >
                                                 <Image
                                                     source={{ uri: sim.images?.[0] || sim.image || 'https://via.placeholder.com/150' }}
@@ -414,24 +413,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingBottom: 12,
-    },
+        paddingBottom: 12 },
     backButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     headerTitle: {
         fontSize: 17,
         fontWeight: '800',
         flex: 1,
         textAlign: 'center',
         color: '#fff',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     headerAction: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
     content: { flex: 1 },
     imageContainer: { position: 'relative' },
@@ -443,42 +439,38 @@ const styles = StyleSheet.create({
         left: 12,
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     statusTabText: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
     dotsRow: {
         position: 'absolute',
         bottom: 32,
         alignSelf: 'center',
         flexDirection: 'row',
-        gap: 5,
-    },
-    dot: { width: 6, height: 6, borderRadius: 3 },
+        gap: 5 },
+    dot: { width: 6, height: 6, borderRadius: Layout.borderRadius },
     expandBtn: {
         position: 'absolute',
         bottom: 28,
         right: 14,
         width: 30,
         height: 30,
-        borderRadius: 15,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0,0,0,0.4)',
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     noImage: { height: 300, alignItems: 'center', justifyContent: 'center' },
     detailsCard: {
         flex: 1,
         marginTop: -20,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
         paddingHorizontal: 16,
-        paddingTop: 20,
-    },
+        paddingTop: 20 },
     titleWrapper: { marginBottom: 16 },
     title: { fontSize: 20, fontWeight: '800', textTransform: 'capitalize', letterSpacing: 0.2, lineHeight: 26 },
     priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
     price: { fontSize: 22, fontWeight: '800', letterSpacing: 0.3 },
-    negChip: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999 },
+    negChip: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: Layout.borderRadius },
     negText: { fontSize: 10, fontWeight: '800', letterSpacing: 0.4 },
     detailAdWrapper: { marginBottom: 16, alignItems: 'center' },
     sectionsContainer: { gap: 20 },
@@ -487,38 +479,33 @@ const styles = StyleSheet.create({
     infoGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 10,
-    },
+        gap: 10 },
     infoCard: {
         width: (width - 32 - 10) / 2,
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
         padding: 8,
-        borderRadius: 14,
-    },
+        borderRadius: Layout.borderRadius },
     infoIconTile: {
         width: 26,
         height: 26,
-        borderRadius: 9,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     infoLabel: {
         fontSize: 9.5,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.4,
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     infoValue: { fontSize: 13, fontWeight: '700', textTransform: 'capitalize' },
-    viewerAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#eee' },
+    viewerAvatar: { width: 44, height: 44, borderRadius: Layout.borderRadius, backgroundColor: '#eee' },
     chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-    metaChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
+    metaChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: Layout.borderRadius },
     metaChipText: { fontSize: 11.5, fontWeight: '700' },
-    simCard: { width: 150, borderRadius: 16, overflow: 'hidden' },
+    simCard: { width: 150, borderRadius: Layout.borderRadius, overflow: 'hidden' },
     simImage: { width: 150, height: 110, backgroundColor: '#eee' },
     simInfo: { padding: 10, gap: 3 },
     simTitle: { fontSize: 13, fontWeight: '700', textTransform: 'capitalize' },
-    simPrice: { fontSize: 13.5, fontWeight: '800' },
-});
+    simPrice: { fontSize: 13.5, fontWeight: '800' } });

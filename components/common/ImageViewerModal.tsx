@@ -74,8 +74,7 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
                                 getItemLayout={(_, index) => ({
                                     length: Dimensions.get('window').width,
                                     offset: Dimensions.get('window').width * index,
-                                    index,
-                                })}
+                                    index })}
                                 renderItem={({ item }) => (
                                     <View style={styles.listImageWrapper}>
                                         <Image
@@ -111,56 +110,47 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.95)',
-    },
+        backgroundColor: 'rgba(0, 0, 0, 0.95)' },
     content: {
-        flex: 1,
-    },
+        flex: 1 },
     closeButton: {
         position: 'absolute',
         right: 20,
         zIndex: 10,
         padding: 8,
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        borderRadius: 25,
+        borderRadius: Layout.borderRadius,
         width: 42,
         height: 42,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     imageContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
-    },
+        padding: 20 },
     listImageWrapper: {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     image: {
         width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height,
-    },
+        height: Dimensions.get('window').height },
     placeholderAvatar: {
     },
     pagination: {
         position: 'absolute',
         left: 0,
         right: 0,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     paginationBadge: {
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: Layout.borderRadius,
-    },
+        borderRadius: Layout.borderRadius },
     paginationText: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '600',
-    }
+        fontWeight: '600' }
 });

@@ -5,8 +5,7 @@ import {
     Platform,
     StyleSheet,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 
 import { Colors } from '@/constants/colors';
@@ -79,8 +78,7 @@ export function TimePicker({
                                 styles.optionItem,
                                 isSelected && {
                                     backgroundColor: '#0D9488' + '18',
-                                    borderRadius: 12,
-                                }
+                                    borderRadius: Layout.borderRadius }
                             ]}
                         >
                             <ThemedText style={[
@@ -166,11 +164,9 @@ const styles = StyleSheet.create({
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.55)',
-        justifyContent: 'flex-end',
-    },
+        justifyContent: 'flex-end' },
     backdropTap: {
-        flex: 1,
-    },
+        flex: 1 },
 
     // ── Bottom Sheet ──────────────────────────────────────────────────────
     sheet: {
@@ -178,108 +174,90 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 28,
         paddingHorizontal: 24,
         paddingBottom: Platform.OS === 'android' ? 28 : 40,
-        paddingTop: 12,
-    },
+        paddingTop: 12 },
     handle: {
         width: 40,
         height: 4,
-        borderRadius: 2,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(148,163,184,0.4)',
         alignSelf: 'center',
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
 
     // ── Header ────────────────────────────────────────────────────────────
     headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     sheetTitle: {
         fontSize: 18,
         fontWeight: '800',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     sheetSubtitle: {
         fontSize: 11,
         marginTop: 2,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     closeBtn: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     accentRule: {
         height: 2,
-        borderRadius: 1,
+        borderRadius: Layout.borderRadius,
         backgroundColor: '#0D9488',
         width: 36,
-        marginBottom: 14,
-    },
+        marginBottom: 14 },
 
     // ── Preview badge (standalone, above scroll) ─────────────────────────
     previewRow: {
         alignItems: 'center',
-        marginVertical: 10,
-    },
+        marginVertical: 10 },
     previewBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
         paddingHorizontal: 20,
         paddingVertical: 8,
-        borderRadius: 14,
-    },
+        borderRadius: Layout.borderRadius },
     previewText: {
         fontSize: 20,
         fontWeight: '800',
         color: '#0D9488',
-        letterSpacing: 1,
-    },
+        letterSpacing: 1 },
 
     // ── Scroll columns ────────────────────────────────────────────────────
     pickerContainer: {
         height: 300,
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     optionItem: {
         height: 48,
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: 2,
-    },
+        marginVertical: 2 },
     optionText: {
         fontSize: 18,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     separatorWrap: {
         height: 48,
         justifyContent: 'center',
-        paddingBottom: 2,
-    },
+        paddingBottom: 2 },
     separator: {
         fontSize: 26,
         fontWeight: '800',
-        marginHorizontal: 4,
-    },
+        marginHorizontal: 4 },
 
     // ── Confirm button (ThankYou modal style) ────────────────────────────
     confirmBtn: {
         width: 120,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     confirmText: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

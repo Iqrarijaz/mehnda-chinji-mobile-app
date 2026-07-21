@@ -10,15 +10,13 @@ import {
     View,
     Platform,
     Dimensions,
-    ScrollView,
-} from 'react-native';
+    ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
     FadeInDown,
     FadeInUp,
-    FadeIn,
-} from 'react-native-reanimated';
+    FadeIn } from 'react-native-reanimated';
 
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -42,6 +40,7 @@ import { LocationSection } from '@/components/essentials/shared/LocationSection'
 import { TagChips } from '@/components/essentials/shared/TagChips';
 import { QuickActionsBar } from '@/components/essentials/shared/QuickActionsBar';
 import { capitalizeString } from '@/utils/string';
+import { Layout } from '@/constants/layout';
 
 const PlaceDetailScreen = () => {
     const { id, placeData, color, category: categoryParam } = useLocalSearchParams<{
@@ -123,15 +122,13 @@ const PlaceDetailScreen = () => {
         if (hasValidCoordinates) {
             const url = Platform.select({
                 ios: `maps:0,0?q=${lat},${lng}(${place.name})`,
-                android: `geo:0,0?q=${lat},${lng}(${place.name})`,
-            });
+                android: `geo:0,0?q=${lat},${lng}(${place.name})` });
             if (url) Linking.openURL(url);
         } else {
             const query = encodeURIComponent(place.address || place.name);
             const url = Platform.select({
                 ios: `maps:0,0?q=${query}`,
-                android: `geo:0,0?q=${query}`,
-            });
+                android: `geo:0,0?q=${query}` });
             if (url) Linking.openURL(url);
         }
     }, [hasValidCoordinates, lat, lng, place.address, place.name, place?.googleAddress]);
@@ -312,28 +309,22 @@ const PlaceDetailScreen = () => {
                             hasDirections={!!hasDirections}
                         />
                     ) : (
-                        <View style={[styles.actionRow, { borderBottomColor: isDark ? '#334155' : '#f1f5f9' }]}>
-
-
-                            {category.toLowerCase() !== 'travel' && (
-                                hasDirections ? (
-                                    <TouchableOpacity
-                                        style={[styles.actionBtnPrimary, { backgroundColor: primaryColor }]}
-                                        onPress={handleNavigate}
-                                        activeOpacity={0.8}
-                                    >
-                                        <Ionicons name="navigate" size={16} color="#FFFFFF" />
-                                        <ThemedText style={styles.actionBtnTextPrimary}>Directions</ThemedText>
-                                    </TouchableOpacity>
-                                ) : (
-                                    <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
-                                        <Ionicons name="navigate-outline" size={16} color={colors.textSecondary} />
-                                        <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Directions</ThemedText>
-                                    </View>
-                                )
+                        <View style={styles.actionRow}>
+                            {hasDirections ? (
+                                <TouchableOpacity
+                                    style={[styles.actionBtnPrimary, { backgroundColor: primaryColor }]}
+                                    onPress={handleNavigate}
+                                    activeOpacity={0.8}
+                                >
+                                    <Ionicons name="navigate" size={16} color="#FFFFFF" />
+                                    <ThemedText style={styles.actionBtnTextPrimary}>Directions</ThemedText>
+                                </TouchableOpacity>
+                            ) : (
+                                <View style={[styles.actionBtnPrimary, { backgroundColor: colors.border, opacity: 0.6 }]}>
+                                    <Ionicons name="navigate-outline" size={16} color={colors.textSecondary} />
+                                    <ThemedText style={[styles.actionBtnTextPrimary, { color: colors.textSecondary }]}>No Directions</ThemedText>
+                                </View>
                             )}
-
-
                         </View>
                     )}
 
@@ -452,82 +443,69 @@ export default PlaceDetailScreen;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     loaderContainer: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     heroHeader: {
         width: '100%',
         paddingBottom: 24,
-        borderBottomLeftRadius: 24,
-        borderBottomRightRadius: 24,
-        overflow: 'hidden',
-    },
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
+        overflow: 'hidden' },
     heroHeaderTop: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingBottom: 8,
-    },
+        paddingBottom: 8 },
     scrollView: {
-        flex: 1,
-    },
+        flex: 1 },
     detailsCard: {
         paddingHorizontal: 16,
         paddingTop: 12,
-        flex: 1,
-    },
+        flex: 1 },
     heroBackButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0,0,0,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
 
     heroHeaderNavTitle: {
         fontSize: 17,
         fontWeight: '700',
         color: '#FFFFFF',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     heroContent: {
         alignItems: 'center',
         paddingHorizontal: 24,
-        marginTop: 16,
-    },
+        marginTop: 16 },
     heroIconWrap: {
         width: 72,
         height: 72,
-        borderRadius: 36,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.95)',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     heroBusinessLogo: {
         width: '100%',
-        height: '100%',
-    },
+        height: '100%' },
     heroTitle: {
         fontSize: 22,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     heroSubtitle: {
         fontSize: 13,
         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
         marginTop: 6,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
     actionRow: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -535,155 +513,123 @@ const styles = StyleSheet.create({
         gap: 12,
         paddingBottom: 12,
         paddingTop: 0,
-        borderBottomWidth: 1,
-        marginBottom: 10,
-    },
+        marginBottom: 10 },
     actionBtnPrimary: {
         height: 42,
-        borderRadius: 21,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 24,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
-    },
+        gap: 6 },
     actionBtnTextPrimary: {
         color: '#FFFFFF',
         fontSize: 14,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     actionBtnIconOnly: {
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     detailAdWrapper: {
         marginBottom: 10,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     sectionsContainer: {
-        gap: 16,
-    },
+        gap: 16 },
     detailSection: {
-        gap: 6,
-    },
+        gap: 6 },
     sectionHeading: {
         fontSize: 10,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.8,
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     descriptionText: {
         fontSize: 12,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
     infoListItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 8,
-        gap: 12,
-    },
+        gap: 12 },
     infoListIcon: {
         width: 26,
         height: 26,
-        borderRadius: 13,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     infoListContent: {
-        flex: 1,
-    },
+        flex: 1 },
     infoListLabel: {
         fontSize: 9,
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
-        marginBottom: 1,
-    },
+        marginBottom: 1 },
     infoListVal: {
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     infoListSub: {
         fontSize: 11,
-        marginTop: 1,
-    },
+        marginTop: 1 },
     routeContainer: {
         marginTop: 4,
-        marginLeft: 4,
-    },
+        marginLeft: 4 },
     routeItem: {
         flexDirection: 'row',
-        gap: 16,
-    },
+        gap: 16 },
     routeDotContainer: {
         alignItems: 'center',
-        width: 12,
-    },
+        width: 12 },
     routeDot: {
         width: 10,
         height: 10,
-        borderRadius: 5,
-        marginTop: 6,
-    },
+        borderRadius: Layout.borderRadius,
+        marginTop: 6 },
     routeLine: {
         width: 2,
         flex: 1,
-        marginVertical: 2,
-    },
+        marginVertical: 2 },
     routeInfo: {
         flex: 1,
-        paddingBottom: 12,
-    },
+        paddingBottom: 12 },
     routeCity: {
         fontSize: 11,
         fontWeight: '700',
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     routeTime: {
         fontSize: 11,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     // ── Education Tabs ──
     eduTabContainer: {
         flexDirection: 'row',
-        borderRadius: 24,
+        borderRadius: Layout.borderRadius,
         padding: 4,
         marginBottom: 16,
-        borderWidth: 0,
-        height: 42,
-    },
+        height: 42 },
     eduTab: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         gap: 6,
-        height: '100%',
-    },
+        height: '100%' },
     eduTabText: {
-        fontSize: 12,
-    },
+        fontSize: 12 },
     eduContentWrap: {
     },
     itemDivider: {
         height: 1,
         width: '100%',
-        opacity: 0.4,
-    },
+        opacity: 0.4 },
     eduEmptyState: {
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 30,
-        gap: 8,
-    },
+        gap: 8 },
     eduEmptyText: {
         fontSize: 11,
-        fontWeight: '500',
-    },
-});
+        fontWeight: '500' } });
 

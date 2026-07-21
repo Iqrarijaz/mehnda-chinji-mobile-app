@@ -26,8 +26,7 @@ const NotificationHeader = React.memo(({
     unreadCount,
     isPending,
     showTooltip = false,
-    onCloseTooltip = () => { },
-}: Props) => {
+    onCloseTooltip = () => { } }: Props) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -87,72 +86,54 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        zIndex: 2,
-    },
+        zIndex: 2 },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     backBtn: {
         width: 32,
         height: 32,
-        borderRadius: 16,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitleWrap: {
         flex: 1,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         fontSize: 20,
         fontWeight: '800',
-        color: 'rgba(255,255,255,1)',
-    },
+        color: 'rgba(255,255,255,1)' },
     markBtn: {
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerSubtitleWrap: {
         alignItems: 'center',
         marginTop: -8,
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     headerSubtitle: {
         fontSize: 11,
         color: 'rgba(255,255,255,0.75)',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     // Tooltip styles — identical to categoryListingHeader
     tooltipContent: {
         padding: 0,
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'transparent',
-    },
+        backgroundColor: 'transparent' },
     tooltipPill: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
         paddingVertical: 12,
         borderRadius: Layout.borderRadius,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-        borderColor: 'rgba(0,0,0,0.05)',
-        gap: 12,
-    },
+        gap: 12 },
     tooltipText: {
         fontSize: 13,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     tooltipClose: {
-        padding: 4,
-    },
-});
+        padding: 4 } });

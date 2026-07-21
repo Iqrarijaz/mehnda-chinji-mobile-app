@@ -190,7 +190,7 @@ export default function CreateTicketScreen() {
                                     transition={200}
                                 />
                                 <TouchableOpacity
-                                    style={styles.removeIcon}
+                                    style={[styles.removeIcon, { backgroundColor: colors.card }]}
                                     onPress={() => removeImage(index)}
                                 >
                                     <Ionicons name="close-circle" size={24} color="#FF5252" />
@@ -199,7 +199,7 @@ export default function CreateTicketScreen() {
                         ))}
                         {images.length < 5 && (
                             <TouchableOpacity
-                                style={[styles.uploadButton, { borderColor: colors.border, backgroundColor: colors.card }]}
+                                style={[styles.uploadButton, { backgroundColor: colors.card }]}
                                 onPress={pickImage}
                             >
                                 <Ionicons name="camera-outline" size={32} color={colors.primary} />
@@ -223,99 +223,74 @@ export default function CreateTicketScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: '#ccc',
-    },
+        paddingVertical: 12 },
     backButton: {
         padding: 4,
-        marginRight: 12,
-    },
+        marginRight: 12 },
     headerTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
-    },
+        fontWeight: 'bold' },
     content: {
         paddingHorizontal: 20,
-        paddingBottom: 32,
-    },
+        paddingBottom: 32 },
     labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'baseline',
         marginTop: 16,
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     label: {
         fontSize: 16,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     charCount: {
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     input: {
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
         paddingVertical: 12,
-        fontSize: 15,
-    },
+        fontSize: 15 },
     textArea: {
         height: 150,
-        textAlignVertical: 'top',
-    },
+        textAlignVertical: 'top' },
     imageSection: {
         marginTop: 8,
-        flexDirection: 'row',
-    },
+        flexDirection: 'row' },
     imageWrapper: {
         marginRight: 12,
-        position: 'relative',
-    },
+        position: 'relative' },
     previewImage: {
         width: 100,
         height: 100,
-        borderRadius: Layout.borderRadius,
-    },
+        borderRadius: Layout.borderRadius },
     removeIcon: {
         position: 'absolute',
         top: -10,
         right: -10,
-        backgroundColor: '#FFFFFF',
-        borderRadius: Layout.borderRadius,
-    },
+        borderRadius: Layout.borderRadius },
     uploadButton: {
         width: 100,
         height: 100,
         borderRadius: Layout.borderRadius,
         borderStyle: 'dashed',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     uploadText: {
         fontSize: 12,
         marginTop: 4,
-        opacity: 0.7,
-    },
+        opacity: 0.7 },
     submitButton: {
         marginTop: 32,
         paddingVertical: 16,
         borderRadius: Layout.borderRadius,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-    },
+        alignItems: 'center' },
     submitButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
-    }
+        fontWeight: 'bold' }
 });

@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
+import { Layout } from '@/constants/layout';
 
 const PRIMARY = '#006666';
 
@@ -23,12 +24,10 @@ const styles = StyleSheet.create({
     iconWrap: {
         width: 64,
         height: 64,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: `${PRIMARY}10`,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 14,
-    },
+        marginBottom: 14 },
     title: { fontSize: 14, fontWeight: '800', color: '#0F172A', marginBottom: 8, textAlign: 'center' },
-    subtitle: { fontSize: 11, color: '#94A3B8', fontWeight: '500', textAlign: 'center', lineHeight: 18 },
-});
+    subtitle: { fontSize: 11, color: '#94A3B8', fontWeight: '500', textAlign: 'center', lineHeight: 18 } });

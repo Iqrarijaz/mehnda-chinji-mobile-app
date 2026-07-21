@@ -139,7 +139,8 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
                             <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>NEW PASSWORD</ThemedText>
                             <View style={[styles.inputBox, {
                                 backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                                borderWidth: 1
                             }]}>
                                 <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
                                 <TextInput
@@ -170,7 +171,8 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
                             <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>CONFIRM PASSWORD</ThemedText>
                             <View style={[styles.inputBox, {
                                 backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                                borderWidth: 1
                             }]}>
                                 <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
                                 <TextInput
@@ -205,14 +207,12 @@ export default ResetPasswordScreen;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     headerSection: {
         paddingBottom: 38,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     backButton: {
         position: 'absolute',
         top: 50,
@@ -220,64 +220,50 @@ const styles = StyleSheet.create({
         zIndex: 10,
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerContent: {
         paddingHorizontal: 22,
-        paddingTop: 38,
-    },
+        paddingTop: 38 },
     headerTitle: {
         fontSize: 32,
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
-        marginBottom: 6,
-    },
+        marginBottom: 6 },
     headerSubtitle: {
         fontSize: 15,
         color: 'rgba(255, 255, 255, 0.9)',
-        lineHeight: 22,
-    },
+        lineHeight: 22 },
     formContainer: {
         flex: 1,
         paddingHorizontal: 18,
         paddingTop: 30,
-        paddingBottom: 38,
-    },
+        paddingBottom: 38 },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-    },
+        padding: 16 },
     inputField: {
-        marginBottom: 18,
-    },
+        marginBottom: 18 },
     label: {
         fontSize: 11,
         fontWeight: '700',
         color: '#475569',
         letterSpacing: 0.5,
         marginBottom: 6,
-        marginLeft: 0,
-    },
+        marginLeft: 0 },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         height: 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
-    },
+        paddingHorizontal: 12 },
     input: {
         flex: 1,
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     submitButton: {
         height: 52,
         borderRadius: Layout.borderRadius,
@@ -285,51 +271,37 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 6,
         marginBottom: 18,
-        overflow: 'hidden',
-        shadowColor: '#006666',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-    },
+        overflow: 'hidden' },
     submitButtonText: {
         color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     strengthContainer: {
         marginTop: 8,
-        paddingHorizontal: 2,
-    },
+        paddingHorizontal: 2 },
     strengthBarContainer: {
         flexDirection: 'row',
         height: 4,
         gap: 4,
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     strengthBar: {
         flex: 1,
         height: '100%',
-        borderRadius: 2,
-        backgroundColor: '#E2E8F0',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: '#E2E8F0' },
     strengthText: {
         fontSize: 11,
         fontWeight: '600',
-        textAlign: 'right',
-    },
+        textAlign: 'right' },
     footer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 6,
-    },
+        marginTop: 6 },
     footerText: {
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     footerLink: {
         fontSize: 12,
-        fontWeight: '700',
-    },
-});
+        fontWeight: '700' } });

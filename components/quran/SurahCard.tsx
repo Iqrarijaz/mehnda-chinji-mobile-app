@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { memo } from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Layout } from '@/constants/layout';
 
 interface SurahCardProps {
     item: SurahListItem;
@@ -37,8 +38,7 @@ export const SurahCard = memo(({
     onPress,
     onFavToggle,
     onPlay,
-    onDownload,
-}: SurahCardProps) => {
+    onDownload }: SurahCardProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -47,7 +47,7 @@ export const SurahCard = memo(({
             <PressableScale
                 intensity={0.02}
                 onPress={onPress}
-                style={[styles.card, { backgroundColor: colors.card }]}
+                style={[styles.card, { backgroundColor: colors.cardBg }]}
             >
                 {/* Top row: number, names, arabic */}
                 <View style={styles.topRow}>
@@ -96,8 +96,7 @@ export const SurahCard = memo(({
                         style={[
                             styles.downloadBtn,
                             {
-                                backgroundColor: isDownloaded ? `${colors.lime}1E` : `${colors.primary}0D`,
-                            },
+                                backgroundColor: isDownloaded ? `${colors.lime}1E` : `${colors.primary}0D` },
                         ]}
                         hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                     >
@@ -148,82 +147,68 @@ SurahCard.displayName = 'SurahCard';
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         padding: 14,
         marginBottom: 12,
-        gap: 12,
-    },
+        gap: 12 },
     topRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
-    },
+        gap: 12 },
     numberTile: {
         width: 40,
         height: 40,
-        borderRadius: 13,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     numberText: { fontSize: 13, fontWeight: '800' },
     info: { flex: 1 },
     englishName: {
         fontSize: 15,
         fontWeight: '800',
-        letterSpacing: 0.1,
-    },
+        letterSpacing: 0.1 },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 3,
-    },
+        marginTop: 3 },
     metaText: { fontSize: 11, fontWeight: '500' },
     dot: {
         width: 3,
         height: 3,
-        borderRadius: 1.5,
+        borderRadius: Layout.borderRadius,
         marginHorizontal: 6,
-        opacity: 0.5,
-    },
+        opacity: 0.5 },
     arabicName: {
         fontSize: 18,
         fontFamily: 'NotoNastaliqUrdu-Regular',
         fontWeight: 'bold',
         textAlign: 'right',
-        maxWidth: 120,
-    },
+        maxWidth: 120 },
     actionRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     playBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
         paddingHorizontal: 14,
         height: 32,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     playBtnText: {
         color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '800',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     downloadBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
         paddingHorizontal: 12,
         height: 32,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     downloadText: {
         fontSize: 12,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     favButton: {
-        padding: 4,
-    },
-});
+        padding: 4 } });

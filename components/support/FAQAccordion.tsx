@@ -42,8 +42,7 @@ const FAQAccordion: React.FC<FAQAccordionProps> = ({ data }) => {
 const styles = StyleSheet.create({
     container: {
         marginTop: 24,
-        marginBottom: 32,
-    },
+        marginBottom: 32 },
     title: {
         fontSize: 14,
         fontWeight: '700',
@@ -51,8 +50,6 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 16,
-        marginLeft: 4,
-    },
-});
+        marginLeft: 4 } });
 
 export default FAQAccordion;

@@ -8,11 +8,11 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  withSequence,
-} from 'react-native-reanimated';
+  withSequence } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 
 interface OnboardingNavigationProps {
   step: number; // 1-based step: 1, 2, 3
@@ -29,8 +29,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
   totalSteps,
   onBack,
   onNext,
-  isLoading = false,
-}: OnboardingNavigationProps) {
+  isLoading = false }: OnboardingNavigationProps) {
   const { theme } = useTheme();
   const colors = Colors[theme];
   const insets = useSafeAreaInsets();
@@ -44,8 +43,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
 
   const animatedNavStyle = useAnimatedStyle(() => {
     return {
-      opacity: navOpacity.value,
-    };
+      opacity: navOpacity.value };
   });
 
 
@@ -74,8 +72,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
 
   const animatedArrowStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: arrowTranslateX.value }],
-    };
+      transform: [{ translateX: arrowTranslateX.value }] };
   });
 
   const backScale = useSharedValue(1);
@@ -83,14 +80,12 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
 
   const animatedBackBtnStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ scale: backScale.value }],
-    };
+      transform: [{ scale: backScale.value }] };
   });
 
   const animatedNextBtnStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ scale: nextScale.value }],
-    };
+      transform: [{ scale: nextScale.value }] };
   });
 
   const progressDots = useMemo(() => {
@@ -116,9 +111,8 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
       style={[
         styles.container,
         {
-          backgroundColor: colors.card,
-          paddingBottom: Math.max(insets.bottom, 16),
-        },
+          backgroundColor: colors.cardBg,
+          paddingBottom: Math.max(insets.bottom, 16) },
         animatedNavStyle,
       ]}
     >
@@ -155,9 +149,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
             styles.backBtn,
             {
               opacity: step === 1 ? 0 : 1,
-              borderColor: colors.border,
-              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-            },
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)' },
             animatedBackBtnStyle,
           ]}
         >
@@ -213,8 +205,7 @@ function Dot({ isActive, theme, colors }: { isActive: boolean; theme: any; color
   const animatedStyle = useAnimatedStyle(() => {
     return {
       width: dotWidth.value,
-      opacity: dotOpacity.value,
-    };
+      opacity: dotOpacity.value };
   });
 
   return (
@@ -222,8 +213,7 @@ function Dot({ isActive, theme, colors }: { isActive: boolean; theme: any; color
       style={[
         styles.progressDot,
         {
-          backgroundColor: isActive ? colors.secondary : colors.icon,
-        },
+          backgroundColor: isActive ? colors.secondary : colors.icon },
         animatedStyle,
       ]}
     />
@@ -234,58 +224,48 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 24,
     paddingTop: 14,
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
+    borderTopRightRadius: 28,
+    borderTopLeftRadius: 28,
     alignItems: 'center',
-    width: '100%',
-  },
+    width: '100%' },
 
   dotsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    height: 10,
-  },
+    height: 10 },
   progressDot: {
     height: 5,
-    borderRadius: 2.5,
-    marginHorizontal: 3,
-  },
+    borderRadius: Layout.borderRadius,
+    marginHorizontal: 3 },
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    gap: 12,
-  },
+    gap: 12 },
   backBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     height: 40,
     paddingHorizontal: 16,
-    borderRadius: 20,
-  },
+    borderRadius: Layout.borderRadius },
   backBtnText: {
     fontSize: 13,
-    fontWeight: '600',
-  },
+    fontWeight: '600' },
   nextBtn: {
     height: 40,
-    borderRadius: 20,
+    borderRadius: Layout.borderRadius,
     paddingHorizontal: 24,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   ctaContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-  },
+    justifyContent: 'center' },
   nextBtnText: {
     color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: '600',
-  },
-});
+    fontWeight: '600' } });

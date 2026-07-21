@@ -12,6 +12,5 @@ export async function setupAdhanChannel() {
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         enableVibrate: true,
-        sound: 'azaan',
-    });
+        sound: 'azaan' });
 }

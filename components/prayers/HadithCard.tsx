@@ -51,7 +51,7 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
         <View style={styles.outerContainer}>
             <LinearGradient
                 colors={cardBg as any}
-                style={[styles.hadithCard, { borderColor: isDark ? 'rgba(255,255,255,0.06)' : C.cardBorder }]}
+                style={styles.hadithCard}
             >
                 {/* Decorative Motif */}
                 <Ionicons
@@ -107,7 +107,7 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
                                 </ThemedText>
                             </View>
 
-                            <View style={[styles.footer, { borderTopColor: C.divider }]}>
+                            <View style={styles.footer}>
                                 <ThemedText style={[styles.sourceText, { color: C.textSecondary }]}>
                                     {hadith.book?.bookName} • HADITH {hadith.hadithNumber}
                                 </ThemedText>
@@ -133,77 +133,60 @@ const styles = StyleSheet.create({
         paddingVertical: 24,
         paddingHorizontal: 20,
         minHeight: 220,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     motifIcon: {
         position: 'absolute',
         top: -10,
         right: -10,
-        transform: [{ rotate: '-15deg' }],
-    },
+        transform: [{ rotate: '-15deg' }] },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 20,
-        zIndex: 2,
-    },
+        zIndex: 2 },
     headerLeft: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     titleBadge: {
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: Layout.borderRadius,
-    },
+        borderRadius: Layout.borderRadius },
     titleLabel: {
         fontSize: 10,
         fontWeight: '900',
-        letterSpacing: 1.2,
-    },
+        letterSpacing: 1.2 },
     iconButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     contentContainer: {
         flex: 1,
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     centerWrap: {
         paddingVertical: 40,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     hadithContent: {
-        flex: 1,
-    },
+        flex: 1 },
     textContainer: {
-        paddingVertical: 4,
-    },
+        paddingVertical: 4 },
     urduText: {
         textAlign: 'center',
         lineHeight: 28,
-        paddingHorizontal: 4,
-    },
+        paddingHorizontal: 4 },
     footer: {
         marginTop: 20,
         paddingTop: 16,
-        borderTopWidth: 1,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     sourceText: {
         fontSize: 11,
         fontWeight: '800',
         letterSpacing: 0.8,
         textTransform: 'uppercase',
-        opacity: 0.8,
-    },
+        opacity: 0.8 },
     errorText: {
         textAlign: 'center',
         fontSize: 14,
-        fontWeight: '500',
-    },
-});
+        fontWeight: '500' } });

@@ -13,12 +13,12 @@ import Animated, {
     FadeIn,
     ZoomIn,
     FadeInDown,
-    FadeOutUp,
-} from 'react-native-reanimated';
+    FadeOutUp } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
 const DEFAULT_MESSAGES = [
     '📍 Getting your location...',
@@ -82,16 +82,13 @@ export function LocationLoadingModal({ visible, messages = DEFAULT_MESSAGES, tit
 
     const glowStyle = useAnimatedStyle(() => ({
         transform: [{ scale: interpolate(glow.value, [0, 1], [0.8, 1.8]) }],
-        opacity: interpolate(glow.value, [0, 1], [0.45, 0]),
-    }));
+        opacity: interpolate(glow.value, [0, 1], [0.45, 0]) }));
 
     const iconStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: interpolate(breathe.value, [0, 1], [1, 1.06]) }],
-    }));
+        transform: [{ scale: interpolate(breathe.value, [0, 1], [1, 1.06]) }] }));
 
     const shimmerStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: interpolate(shimmer.value, [0, 1], [-SHIMMER_WIDTH, BAR_WIDTH]) }],
-    }));
+        transform: [{ translateX: interpolate(shimmer.value, [0, 1], [-SHIMMER_WIDTH, BAR_WIDTH]) }] }));
 
     return (
         <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={() => { }}>
@@ -106,7 +103,7 @@ export function LocationLoadingModal({ visible, messages = DEFAULT_MESSAGES, tit
                         <Animated.View
                             style={[
                                 styles.iconCircle,
-                                { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#FFFFFF', borderColor: colors.primary },
+                                { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#FFFFFF' },
                                 iconStyle,
                             ]}
                         >
@@ -172,93 +169,68 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 24,
-    },
+        padding: 24 },
     card: {
         width: '100%',
         maxWidth: 340,
-        borderRadius: 28,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 24,
         paddingTop: 32,
         paddingBottom: 26,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.22,
-        shadowRadius: 24,
-        elevation: 12,
-    },
+        alignItems: 'center' },
     iconWrap: {
         width: ICON_SIZE + 40,
         height: ICON_SIZE + 40,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     glow: {
         position: 'absolute',
         width: ICON_SIZE,
         height: ICON_SIZE,
-        borderRadius: ICON_SIZE / 2,
-    },
+        borderRadius: ICON_SIZE / 2 },
     iconCircle: {
         width: ICON_SIZE,
         height: ICON_SIZE,
         borderRadius: ICON_SIZE / 2,
         alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1.5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.12,
-        shadowRadius: 8,
-        elevation: 4,
-    },
+        justifyContent: 'center' },
     icon: {
         width: ICON_SIZE * 0.62,
-        height: ICON_SIZE * 0.62,
-    },
+        height: ICON_SIZE * 0.62 },
     title: {
         fontSize: 18,
         fontWeight: '800',
         letterSpacing: 0.2,
         marginBottom: 18,
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     track: {
         width: BAR_WIDTH,
         height: 8,
-        borderRadius: 4,
-        overflow: 'hidden',
-    },
+        borderRadius: Layout.borderRadius,
+        overflow: 'hidden' },
     shimmerWrap: {
         position: 'absolute',
         top: 0,
         bottom: 0,
-        width: SHIMMER_WIDTH,
-    },
+        width: SHIMMER_WIDTH },
     msgWrap: {
         height: 30,
         marginTop: 22,
         alignItems: 'center',
         justifyContent: 'center',
-        alignSelf: 'stretch',
-    },
+        alignSelf: 'stretch' },
     msgInner: {
         position: 'absolute',
         left: 0,
         right: 0,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     message: {
         fontSize: 15,
         fontWeight: '700',
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     reassure: {
         fontSize: 12,
         textAlign: 'center',
         lineHeight: 17,
-        marginTop: 10,
-    },
-});
+        marginTop: 10 } });

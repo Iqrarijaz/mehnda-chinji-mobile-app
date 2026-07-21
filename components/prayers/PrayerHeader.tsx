@@ -73,8 +73,7 @@ export const PrayerHeader = React.memo(({
     readableHijri,
     insets,
     C,
-    isDark,
-}: PrayerHeaderProps) => {
+    isDark }: PrayerHeaderProps) => {
     const router = useRouter();
 
     return (
@@ -139,33 +138,26 @@ const styles = StyleSheet.create({
     headerContainer: { width: '100%', position: 'relative' },
     headerImage: { width: '100%' },
     gradTop: {
-        position: 'absolute', top: 0, left: 0, right: 0, height: '55%',
-    },
+        position: 'absolute', top: 0, left: 0, right: 0, height: '55%' },
     gradBottom: {
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
-    },
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%' },
     backButton: {
         position: 'absolute', left: 16,
-        width: 36, height: 36, borderRadius: 18,
+        width: 36, height: 36, borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0,0,0,0.35)',
-        justifyContent: 'center', alignItems: 'center', zIndex: 10,
-    },
+        justifyContent: 'center', alignItems: 'center', zIndex: 10 },
     headerTextWrap: { position: 'absolute', left: 16, right: 16, alignItems: 'flex-start' },
     pill: {
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 20,
-        alignSelf: 'flex-start',
-        borderColor: 'rgba(255,255,255,0.2)',
-    },
+        borderRadius: Layout.borderRadius,
+        alignSelf: 'flex-start' },
     gregorianDate: {
         fontSize: 13,
-        fontWeight: '800',
-    },
+        fontWeight: '800' },
     hijriText: {
         fontSize: 12,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
 
     // Next Prayer card
     nextPrayerCard: {
@@ -173,8 +165,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         paddingVertical: 12, paddingHorizontal: 16,
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     nextPrayerLeft: { flex: 1 },
     nextPrayerLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 1.2, marginBottom: 2 },
     nextPrayerArabic: { fontSize: 13, fontWeight: '700', marginTop: 1, textAlign: 'left' },
@@ -182,7 +173,5 @@ const styles = StyleSheet.create({
     nextPrayerTime: { fontSize: 20, fontWeight: '900', paddingVertical: 2, letterSpacing: -0.5, fontVariant: ['tabular-nums'] },
     countdownWrap: {
         flexDirection: 'row', alignItems: 'center',
-        paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, marginTop: 6,
-    },
-    countdownText: { fontSize: 13, fontWeight: '800', letterSpacing: 1, fontVariant: ['tabular-nums'] },
-});
+        paddingHorizontal: 10, paddingVertical: 5, borderRadius: Layout.borderRadius, marginTop: 6 },
+    countdownText: { fontSize: 13, fontWeight: '800', letterSpacing: 1, fontVariant: ['tabular-nums'] } });

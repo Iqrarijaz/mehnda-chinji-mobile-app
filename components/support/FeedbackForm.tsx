@@ -68,8 +68,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) =
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 8,
-    },
+        marginTop: 8 },
     title: {
         fontSize: 14,
         fontWeight: '700',
@@ -77,51 +76,33 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 16,
-        marginLeft: 4,
-    },
+        marginLeft: 4 },
     card: {
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 15,
-    },
+        padding: 20 },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#F8FAFC',
         borderRadius: Layout.borderRadius,
-        borderColor: '#F1F5F9',
         marginBottom: 16,
-        paddingHorizontal: 14,
-    },
+        paddingHorizontal: 14 },
     inputFocused: {
-        borderColor: '#009688',
-        backgroundColor: '#FFFFFF',
-        shadowColor: '#009688',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
+        backgroundColor: '#FFFFFF' },
     inputIcon: {
-        marginRight: 10,
-    },
+        marginRight: 10 },
     input: {
         flex: 1,
         height: 52,
         fontSize: 15,
-        color: '#1E293B',
-    },
+        color: '#1E293B' },
     textAreaContainer: {
         alignItems: 'flex-start',
-        height: 120,
-    },
+        height: 120 },
     textArea: {
         height: 110,
-        paddingTop: 14,
-    },
+        paddingTop: 14 },
     submitButton: {
         flexDirection: 'row',
         backgroundColor: '#009688',
@@ -129,21 +110,12 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 8,
-        shadowColor: '#009688',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-    },
+        marginTop: 8 },
     submitButtonDisabled: {
-        backgroundColor: '#CBD5E1',
-        shadowOpacity: 0,
-    },
+        backgroundColor: '#CBD5E1' },
     submitText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: '700',
-    },
-});
+        fontWeight: '700' } });
 
 export default FeedbackForm;

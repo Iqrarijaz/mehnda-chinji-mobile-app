@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
 interface SectionHeadingProps {
     icon: keyof typeof Ionicons.glyphMap;
@@ -44,24 +45,19 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 5,
-    },
+        gap: 5 },
     label: {
         fontSize: 10,
         fontWeight: '800',
         textTransform: 'uppercase',
-        letterSpacing: 0.8,
-    },
+        letterSpacing: 0.8 },
     pill: {
         marginLeft: 'auto',
         paddingHorizontal: 9,
         paddingVertical: 3,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     pillText: {
         fontSize: 9.5,
         fontWeight: '800',
         letterSpacing: 0.3,
-        textTransform: 'uppercase',
-    },
-});
+        textTransform: 'uppercase' } });

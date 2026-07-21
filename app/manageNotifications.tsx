@@ -5,8 +5,7 @@ import {
     ScrollView,
     TouchableOpacity,
     ActivityIndicator,
-    RefreshControl,
-} from 'react-native';
+    RefreshControl } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
@@ -184,60 +183,48 @@ export default function ManageNotificationsScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     headerWrap: {
         paddingBottom: 24,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        zIndex: 2,
-    },
+        zIndex: 2 },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     backBtn: {
         width: 42,
         height: 42,
-        borderRadius: 21,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitleWrap: {
         flex: 1,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         fontSize: 20,
         fontWeight: '800',
-        color: '#FFFFFF',
-    },
+        color: '#FFFFFF' },
     headerSubtitleWrap: {
         alignItems: 'center',
-        marginTop: 8,
-    },
+        marginTop: 8 },
     headerSubtitle: {
         fontSize: 11,
         color: 'rgba(255,255,255,0.75)',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     scrollView: {
         flex: 1,
         marginTop: -30,
-        zIndex: 0,
-    },
+        zIndex: 0 },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingTop: 46,
-    },
+        paddingTop: 46 },
     footerNote: {
         fontSize: 11,
         textAlign: 'center',
         marginTop: 8,
         lineHeight: 18,
-        paddingHorizontal: 20,
-    },
-});
+        paddingHorizontal: 20 } });

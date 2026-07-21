@@ -30,16 +30,13 @@ const CATEGORIES: UtilCategory[] = [
                 id: 'quran',
                 label: 'Quran',
                 image: require('@/assets/icons/quran_icon.webp'),
-                route: '/quran',
-            },
+                route: '/quran' },
             {
                 id: 'prayers',
                 label: 'Prayers',
                 image: require('@/assets/icons/prayer_icon.webp'),
-                route: '/prayerTimes',
-            },
-        ],
-    },
+                route: '/prayerTimes' },
+        ] },
 ];
 
 export function UtilsGrid() {
@@ -65,7 +62,7 @@ export function UtilsGrid() {
                                     activeOpacity={0.7}
                                     style={styles.touchable}
                                 >
-                                    <View style={[styles.card, { backgroundColor: colors.card }]}>
+                                    <View style={[styles.card, { backgroundColor: colors.cardBg }]}>
                                         {util.image ? (
                                             <Image
                                                 source={util.image}
@@ -104,53 +101,42 @@ const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 14,
         paddingTop: 8,
-        paddingBottom: 8,
-    },
+        paddingBottom: 8 },
     categoryContainer: {
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     sectionTitle: {
         fontSize: 16,
         fontWeight: '700',
         marginLeft: 6,
         marginBottom: 12,
-        opacity: 0.85,
-    },
+        opacity: 0.85 },
     grid: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-    },
+        flexWrap: 'wrap' },
     gridItem: {
-        width: '25%',
-    },
+        width: '25%' },
     touchable: {
         flex: 1,
-        margin: 6,
-    },
+        margin: 6 },
     card: {
         borderRadius: Layout.borderRadius,
         padding: 8,
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: 90,
-    },
+        minHeight: 90 },
     icon: {
         width: 50,
         height: 50,
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     iconContainer: {
         width: 50,
         height: 50,
-        borderRadius: 25,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     label: {
         fontSize: 11,
         fontWeight: '600',
         textAlign: 'center',
-        lineHeight: 14,
-    },
-});
+        lineHeight: 14 } });

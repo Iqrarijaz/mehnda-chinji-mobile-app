@@ -5,8 +5,7 @@ import Animated, {
     SlideInLeft,
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
-} from 'react-native-reanimated';
+    withSpring } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 
@@ -45,8 +44,7 @@ const NotificationItem = React.memo(({ item, onPress, delay = 0 }: Props) => {
     const scale = useSharedValue(1);
 
     const animStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-    }));
+        transform: [{ scale: scale.value }] }));
 
     const handlePressIn = useCallback(() => {
         scale.value = withSpring(0.97, { damping: 15 });
@@ -107,38 +105,28 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
         padding: 6,
-        marginBottom: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.06,
-        shadowRadius: 10,
-    },
+        marginBottom: 8 },
     cardUnread: {
-        backgroundColor: `${PRIMARY}08`,
-    },
+        backgroundColor: `${PRIMARY}08` },
     iconWrap: { position: 'relative', marginRight: 10 },
     iconCircle: {
         width: 34,
         height: 34,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     badge: {
         position: 'absolute',
         top: -3,
         right: -3,
         width: 11,
         height: 11,
-        borderRadius: 6,
-        backgroundColor: PRIMARY,
-        borderColor: '#FFFFFF',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: PRIMARY },
     content: { flex: 1 },
     titleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
     title: { fontSize: 12, fontWeight: '600', color: '#0F172A', flex: 1 },
     titleUnread: { fontWeight: '800' },
-    dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: PRIMARY, marginLeft: 6 },
+    dot: { width: 7, height: 7, borderRadius: Layout.borderRadius, backgroundColor: PRIMARY, marginLeft: 6 },
     body: { fontSize: 11, color: '#64748B', lineHeight: 16, marginBottom: 4 },
-    time: { fontSize: 11, color: '#94A3B8', fontWeight: '500' },
-});
+    time: { fontSize: 11, color: '#94A3B8', fontWeight: '500' } });

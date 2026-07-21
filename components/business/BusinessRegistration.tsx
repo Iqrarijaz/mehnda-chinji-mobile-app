@@ -7,8 +7,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
-    RefreshControl,
-} from 'react-native';
+    RefreshControl } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { useBusinessAPI } from '@/hooks/useBusinessAPI';
@@ -191,68 +190,50 @@ export { BusinessRegistration };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     scrollContent: {
         padding: 20,
-        paddingBottom: 100,
-    },
+        paddingBottom: 100 },
     headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     headerBox: {
-        flex: 1,
-    },
+        flex: 1 },
     headerTitle: {
         fontSize: 18,
         fontWeight: '800',
         paddingBottom: 2,
-        letterSpacing: -0.3,
-    },
+        letterSpacing: -0.3 },
     headerSubtitle: {
         fontSize: 12,
         fontWeight: '500',
-        marginTop: 2,
-    },
+        marginTop: 2 },
     addButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
+        alignItems: 'center' },
     disabledButton: {
-        opacity: 0.7,
-    },
+        opacity: 0.7 },
     emptyState: {
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 60,
-        gap: 12,
-    },
+        gap: 12 },
     emptyStateText: {
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     emptyStateBtn: {
         paddingHorizontal: 20,
         paddingVertical: 10,
         borderRadius: Layout.borderRadius,
-        marginTop: 10,
-    },
+        marginTop: 10 },
     listContainer: {
-        marginTop: 10,
-    },
+        marginTop: 10 },
     centerContent: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
-});
+        alignItems: 'center' } });

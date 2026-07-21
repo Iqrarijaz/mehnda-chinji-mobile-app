@@ -6,8 +6,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-    ActivityIndicator,
-} from 'react-native';
+    ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
@@ -72,11 +71,11 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                         {item.icon ? (
                             <Image
                                 source={{ uri: item.icon }}
-                                style={{ width: 28, height: 28, marginRight: 12, borderRadius: 4 }}
+                                style={{ width: 28, height: 28, marginRight: 12, borderRadius: Layout.borderRadius }}
                                 contentFit="contain"
                             />
                         ) : (
-                            <View style={{ width: 28, height: 28, marginRight: 12, borderRadius: 4, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', justifyContent: 'center', alignItems: 'center' }}>
+                            <View style={{ width: 28, height: 28, marginRight: 12, borderRadius: Layout.borderRadius, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', justifyContent: 'center', alignItems: 'center' }}>
                                 <Ionicons name="briefcase-outline" size={16} color={colors.icon} />
                             </View>
                         )}
@@ -183,48 +182,37 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
-    },
+        padding: 20 },
     modalContent: {
         width: '90%',
         height: '60%',
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
         padding: 20,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-    },
+        overflow: 'hidden' },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     modalTitle: {
         fontSize: 18,
         fontWeight: '800',
-        letterSpacing: -0.5,
-    },
+        letterSpacing: -0.5 },
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
         height: 42,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     searchInput: {
         flex: 1,
         marginLeft: 8,
         fontSize: 14,
-        paddingVertical: 8,
-    },
+        paddingVertical: 8 },
     listContent: {
-        paddingBottom: 8,
-    },
+        paddingBottom: 8 },
     item: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -232,39 +220,31 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 12,
         marginVertical: 4,
-        borderRadius: 12,
-    },
+        borderRadius: Layout.borderRadius },
     labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         flex: 1,
-        marginRight: 15,
-    },
+        marginRight: 15 },
     itemTextEng: {
         fontSize: 13,
         fontWeight: '600',
-        textTransform: 'capitalize',
-    },
+        textTransform: 'capitalize' },
     itemTextUr: {
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     footerContainer: {
         marginTop: 16,
         alignItems: 'center',
-        justifyContent: 'center',
-    },
+        justifyContent: 'center' },
     closePill: {
         width: 90,
         height: 34,
-        borderRadius: 17,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     closePillText: {
         color: '#FFFFFF',
         fontSize: 13,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

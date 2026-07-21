@@ -10,8 +10,7 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -201,8 +200,7 @@ export default function VerifyOtpScreen() {
                                         styles.otpInput,
                                         {
                                             color: colors.text,
-                                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F5F9',
-                                        }
+                                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F5F9' }
                                     ]}
                                     value={digit}
                                     onChangeText={(value) => handleOtpChange(value, index)}
@@ -254,59 +252,46 @@ export default function VerifyOtpScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     headerSection: {
         paddingBottom: 10,
         borderBottomLeftRadius: Layout.headerBorderRadius,
-        borderBottomRightRadius: Layout.headerBorderRadius,
-    },
+        borderBottomRightRadius: Layout.headerBorderRadius },
     backButton: {
         marginLeft: 22,
         marginTop: 18,
         marginBottom: 8,
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerContent: {
         paddingHorizontal: 22,
-        paddingBottom: 18,
-    },
+        paddingBottom: 18 },
     headerTitle: {
         fontSize: 32,
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
-        marginBottom: 6,
-    },
+        marginBottom: 6 },
     headerSubtitle: {
         fontSize: 15,
         color: 'rgba(255, 255, 255, 0.9)',
-        lineHeight: 22,
-    },
+        lineHeight: 22 },
     formContainer: {
         flex: 1,
         paddingHorizontal: 18,
-        paddingTop: 30,
-    },
+        paddingTop: 30 },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-    },
+        padding: 16 },
     otpContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 10,
-        marginBottom: 30,
-    },
+        marginBottom: 30 },
     otpInput: {
         width: 40,
         height: 40,
@@ -314,70 +299,53 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 24,
         fontWeight: '800',
-        padding: 5,
-    },
+        padding: 5 },
     profilePreview: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 20,
         padding: 12,
-        borderRadius: 16,
-        backgroundColor: 'rgba(0, 64, 48, 0.05)',
-    },
+        borderRadius: Layout.borderRadius,
+        backgroundColor: 'rgba(0, 64, 48, 0.05)' },
     profileAvatar: {
         width: 50,
         height: 50,
-        borderRadius: 25,
-        marginRight: 15,
-    },
+        borderRadius: Layout.borderRadius,
+        marginRight: 15 },
     profileDetails: {
-        flex: 1,
-    },
+        flex: 1 },
     profileName: {
         fontSize: 14,
         fontWeight: '800',
         color: '#006666',
-        marginBottom: 2,
-    },
+        marginBottom: 2 },
     profileEmail: {
         fontSize: 11,
-        opacity: 0.6,
-    },
+        opacity: 0.6 },
     instructionText: {
         fontSize: 12,
         lineHeight: 18,
         textAlign: 'center',
         marginBottom: 25,
         paddingHorizontal: 10,
-        opacity: 0.8,
-    },
+        opacity: 0.8 },
     submitButton: {
         height: 52,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#006666',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-    },
+        alignItems: 'center' },
     submitButtonText: {
         color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     footer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: 25,
-    },
+        marginTop: 25 },
     footerText: {
         fontSize: 12,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     footerLink: {
         fontSize: 12,
-        fontWeight: '700',
-    },
-});
+        fontWeight: '700' } });

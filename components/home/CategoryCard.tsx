@@ -29,7 +29,7 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
         >
             <View style={[
                 styles.card,
-                { backgroundColor: colors.card, borderColor: isSelected ? accentColor : 'transparent'},
+                { backgroundColor: colors.cardBg },
                 compact && styles.cardCompact
             ]}>
                 <View style={[styles.iconContainer, compact && styles.iconContainerCompact, { backgroundColor: isImageAsset ? 'transparent' : accentColor + '12' }]}>
@@ -59,44 +59,35 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
 const styles = StyleSheet.create({
     touchable: {
         flex: 1,
-        margin: 6,
-    },
+        margin: 6 },
     card: {
         borderRadius: Layout.borderRadius,
         padding: 12,
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: 80,
-    },
+        minHeight: 80 },
     cardCompact: {
         padding: 8,
-        minHeight: 60,
-    },
+        minHeight: 60 },
     iconContainer: {
         width: 42,
         height: 42,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     iconContainerCompact: {
         width: 36,
         height: 36,
-        marginBottom: 4,
-    },
+        marginBottom: 4 },
     imageIcon: {
         width: 42,
-        height: 42,
-    },
+        height: 42 },
     imageIconCompact: {
         width: 36,
-        height: 36,
-    },
+        height: 36 },
     label: {
         fontSize: 11,
         fontWeight: '600',
         textAlign: 'center',
-        lineHeight: 14,
-    },
-});
+        lineHeight: 14 } });

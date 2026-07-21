@@ -10,8 +10,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withRepeat,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -19,6 +18,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
 import { FlowingLine } from './FlowingLine';
+import { Layout } from '@/constants/layout';
 
 interface TravelHeroHeaderProps {
     place: any;
@@ -41,8 +41,7 @@ export const TravelHeroHeader = React.memo(function TravelHeroHeader({
     onBack,
     onReport,
     onEdit,
-    primaryColor,
-}: TravelHeroHeaderProps) {
+    primaryColor }: TravelHeroHeaderProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
@@ -65,8 +64,7 @@ export const TravelHeroHeader = React.memo(function TravelHeroHeader({
     }, []);
 
     const bobStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: -3 + bob.value * 6 }],
-    }));
+        transform: [{ translateY: -3 + bob.value * 6 }] }));
 
     const BG = primaryColor || '#0f172a';
 
@@ -167,112 +165,93 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     navRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingBottom: 4,
-    },
+        paddingBottom: 4 },
     navActions: {
         flexDirection: 'row',
-        gap: 8,
-    },
+        gap: 8 },
     navButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0,0,0,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     identityRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 20,
         marginTop: 8,
-        gap: 14,
-    },
+        gap: 14 },
     identityText: {
-        flex: 1,
-    },
+        flex: 1 },
     chipRow: {
         flexDirection: 'row',
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     typeChip: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     typeChipText: {
         fontSize: 10,
         fontWeight: '800',
         color: '#1E293B',
         textTransform: 'uppercase',
-        letterSpacing: 0.6,
-    },
+        letterSpacing: 0.6 },
     title: {
         fontSize: 21,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
-        lineHeight: 26,
-    },
+        lineHeight: 26 },
     subtitleRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
-        marginTop: 5,
-    },
+        marginTop: 5 },
     subtitle: {
         fontSize: 12.5,
         color: 'rgba(255,255,255,0.85)',
         fontWeight: '600',
-        flexShrink: 1,
-    },
+        flexShrink: 1 },
     vehicleTile: {
         width: 58,
         height: 58,
-        borderRadius: 29,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.16)',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     vehicleImage: {
         width: '100%',
-        height: '100%',
-    },
+        height: '100%' },
     ribbon: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 24,
         marginTop: 16,
-        gap: 8,
-    },
+        gap: 8 },
     ribbonDot: {
         width: 8,
         height: 8,
-        borderRadius: 4,
-    },
+        borderRadius: Layout.borderRadius },
     ribbonLine: {
-        flex: 1,
-    },
+        flex: 1 },
     ribbonBus: {
         width: 26,
         height: 26,
-        borderRadius: 13,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
-});
+        alignItems: 'center' } });
 
 const TravelBackgroundDecor = React.memo(({ limeColor, secondaryColor }: { limeColor: string; secondaryColor: string }) => (
     <Svg

@@ -1,15 +1,14 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { useWeather } from '@/hooks/useWeather';
 import { useWeatherLocation } from '@/hooks/useWeatherLocation';
 import { useNextPrayer } from '@/hooks/useNextPrayer';
-import { getWeatherGradient, getWeatherIconName, getWeatherAccent } from '@/utils/weatherTheme';
+import { getWeatherIconName, getWeatherAccent } from '@/utils/weatherTheme';
 import { ThemedText } from '../ThemedText';
 
 interface HomeHeaderWeatherWidgetProps {
@@ -38,30 +37,30 @@ const PrayerBlock = React.memo(({ city, accent }: { city: string; accent: string
 PrayerBlock.displayName = 'PrayerBlock';
 
 // ── Loading skeleton (shimmering blocks) ──
-const Skeleton = ({ gradient }: { gradient: [string, string, ...string[]] }) => {
+const Skeleton = ({ backgroundColor }: { backgroundColor: string }) => {
     const shimmer = useSharedValue(0.4);
     React.useEffect(() => {
         shimmer.value = withRepeat(withTiming(0.9, { duration: 850, easing: Easing.inOut(Easing.ease) }), -1, true);
     }, []);
     const style = useAnimatedStyle(() => ({ opacity: shimmer.value }));
     const Block = ({ w, h, mt = 0 }: { w: number | string; h: number; mt?: number }) => (
-        <Animated.View style={[{ width: w as any, height: h, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.25)', marginTop: mt }, style]} />
+        <Animated.View style={[{ width: w as any, height: h, borderRadius: Layout.borderRadius, backgroundColor: 'rgba(255,255,255,0.25)', marginTop: mt }, style]} />
     );
     return (
-        <LinearGradient colors={gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.card}>
+        <View style={[styles.card, { backgroundColor }]}>
             <View style={styles.row}>
                 <View style={{ flex: 1.3 }}>
-                    <Block w={90} h={34} />
-                    <Block w={70} h={12} mt={10} />
-                    <Block w={110} h={12} mt={8} />
+                    <Block w={90} h={28} />
+                    <Block w={70} h={10} mt={6} />
+                    <Block w={110} h={10} mt={6} />
                 </View>
                 <View style={[styles.glassPanel, { justifyContent: 'center' }]}>
                     <Block w={'70%'} h={10} />
-                    <Block w={'55%'} h={16} mt={8} />
-                    <Block w={'45%'} h={10} mt={8} />
+                    <Block w={'55%'} h={16} mt={6} />
+                    <Block w={'45%'} h={10} mt={6} />
                 </View>
             </View>
-        </LinearGradient>
+        </View>
     );
 };
 
@@ -78,7 +77,6 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
     );
 
     const icon = weather?.weather?.[0]?.icon;
-    const gradient = useMemo(() => getWeatherGradient(icon, palette), [icon, palette.primary]);
     const accent = getWeatherAccent(icon, palette);
 
     // Today's high / low from the 3-hourly forecast (falls back to current).
@@ -94,14 +92,14 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
         }
         return {
             high: weather ? Math.round(weather.main.temp_max) : null,
-            low: weather ? Math.round(weather.main.temp_min) : null,
+            low: weather ? Math.round(weather.main.temp_min) : null
         };
     }, [forecast, weather]);
 
     if (isWeatherLoading && !weather) {
         return (
             <Pressable onPress={onPress}>
-                <Skeleton gradient={gradient} />
+                <Skeleton backgroundColor={colors.primary} />
             </Pressable>
         );
     }
@@ -115,7 +113,7 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
     return (
         <Animated.View entering={FadeInDown.duration(450)}>
             <Pressable onPress={onPress} style={({ pressed }) => pressed && { opacity: 0.92 }}>
-                <LinearGradient colors={gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.card}>
+                <View style={[styles.card, { backgroundColor: colors.primary }]}>
                     <View style={styles.row}>
                         {/* Weather column */}
                         <View style={styles.weatherCol}>
@@ -148,7 +146,7 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                             <ThemedText style={styles.updated}>Updated {updatedLabel}</ThemedText>
                         </View>
                     ) : null}
-                </LinearGradient>
+                </View>
             </Pressable>
         </Animated.View>
     );
@@ -168,101 +166,98 @@ function relativeTime(unixSec?: number): string {
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 22,
-        padding: 16,
-        marginBottom: 8,
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        marginBottom: 8
     },
     row: {
         flexDirection: 'row',
-        alignItems: 'stretch',
+        alignItems: 'stretch'
     },
     weatherCol: {
         flex: 1.3,
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
     tempRow: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     temp: {
-        fontSize: 34,
+        fontSize: 30,
         fontWeight: '800',
         color: '#FFFFFF',
-        lineHeight: 38,
+        lineHeight: 34
     },
     condition: {
         fontSize: 13,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.9)',
-        marginTop: 2,
+        color: 'rgba(255,255,255,0.9)'
     },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        marginTop: 6,
+        marginTop: 2
     },
     city: {
         fontSize: 13,
         fontWeight: '700',
         color: '#FFFFFF',
-        flexShrink: 1,
+        flexShrink: 1
     },
     highLow: {
         fontSize: 12,
         fontWeight: '700',
         color: '#FFFFFF',
-        marginLeft: 2,
+        marginLeft: 2
     },
     // Glassmorphism panel
     glassPanel: {
         flex: 1,
         backgroundColor: 'rgba(255,255,255,0.14)',
-        borderRadius: 16,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: 'rgba(255,255,255,0.25)',
-        paddingVertical: 10,
+        borderRadius: Layout.borderRadius,
+        paddingVertical: 6,
         paddingHorizontal: 12,
         marginLeft: 12,
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
     glassLabel: {
         fontSize: 9,
         fontWeight: '800',
         letterSpacing: 0.6,
-        color: 'rgba(255,255,255,0.75)',
+        color: 'rgba(255,255,255,0.75)'
     },
     prayerNameRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 5,
+        marginTop: 2
     },
     prayerName: {
         fontSize: 16,
         fontWeight: '800',
         color: '#FFFFFF',
-        flexShrink: 1,
+        flexShrink: 1
     },
     prayerCountdown: {
         fontSize: 13,
         fontWeight: '800',
-        marginTop: 3,
+        marginTop: 1
     },
     prayerTime: {
         fontSize: 11,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.75)',
-        marginTop: 2,
+        color: 'rgba(255,255,255,0.75)'
     },
     updatedRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        marginTop: 12,
+        marginTop: 6
     },
     updated: {
         fontSize: 10,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.7)',
-    },
+        color: 'rgba(255,255,255,0.7)'
+    }
 });

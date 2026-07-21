@@ -6,8 +6,7 @@ import Animated, {
     useAnimatedProps,
     useSharedValue,
     withRepeat,
-    withTiming,
-} from 'react-native-reanimated';
+    withTiming } from 'react-native-reanimated';
 
 const AnimatedLine = Animated.createAnimatedComponent(Line);
 
@@ -34,8 +33,7 @@ export function FlowingLine({
     color,
     thickness = 2,
     animated = true,
-    style,
-}: FlowingLineProps) {
+    style }: FlowingLineProps) {
     const [length, setLength] = useState(0);
     const offset = useSharedValue(0);
 
@@ -50,8 +48,7 @@ export function FlowingLine({
     }, [animated]);
 
     const animatedProps = useAnimatedProps(() => ({
-        strokeDashoffset: offset.value,
-    }));
+        strokeDashoffset: offset.value }));
 
     const half = thickness / 2;
 

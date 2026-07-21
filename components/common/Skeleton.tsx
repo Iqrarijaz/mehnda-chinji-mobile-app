@@ -76,8 +76,6 @@ const Skeleton: React.FC<SkeletonProps> = ({
 const styles = StyleSheet.create({
     container: {
         overflow: 'hidden',
-        position: 'relative',
-    },
-});
+        position: 'relative' } });
 
 export default React.memo(Skeleton);

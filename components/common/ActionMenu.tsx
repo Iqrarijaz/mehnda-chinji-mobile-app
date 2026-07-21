@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 
 export interface ActionMenuItem {
     label: string;
@@ -38,12 +39,10 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
             <MenuOptions customStyles={{
                 optionsContainer: {
                     backgroundColor: colors.card,
-                    borderRadius: 18,
+                    borderRadius: Layout.borderRadius,
                     padding: 6,
                     width: 190,
-                    marginTop: 34,
-                },
-            }}>
+                    marginTop: 34 } }}>
                 {actions.map((action, index) => {
                     const isDestructive = action.destructive;
                     const accent = isDestructive ? '#EF4444' : (action.color || colors.primary);
@@ -68,25 +67,20 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
 
 const styles = StyleSheet.create({
     trigger: {
-        paddingHorizontal: 2,
-    },
+        paddingHorizontal: 2 },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
         paddingVertical: 8,
         paddingHorizontal: 8,
-        borderRadius: 12,
-    },
+        borderRadius: Layout.borderRadius },
     menuIconTile: {
         width: 30,
         height: 30,
-        borderRadius: 10,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     menuText: {
         fontSize: 13.5,
-        fontWeight: '700',
-    },
-});
+        fontWeight: '700' } });

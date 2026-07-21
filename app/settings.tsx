@@ -22,8 +22,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-    Linking,
-} from 'react-native';
+    Linking } from 'react-native';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -89,8 +88,7 @@ export default function SettingsScreen() {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: error.response?.data?.message || 'Failed to update email',
-            });
+                text2: error.response?.data?.message || 'Failed to update email' });
         } finally {
             setIsUpdatingEmail(false);
         }
@@ -312,35 +310,29 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: Layout.borderRadius,
         borderBottomRightRadius: Layout.borderRadius,
         overflow: 'hidden',
-        zIndex: 2,
-    },
+        zIndex: 2 },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     backBtn: {
         width: 42,
         height: 42,
-        borderRadius: 21,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitleWrap: {
         flex: 1,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         fontSize: 20,
         fontWeight: '800',
-        color: '#FFFFFF',
-    },
+        color: '#FFFFFF' },
     tabContainer: {
         flexDirection: 'row',
         marginBottom: 8,
-        gap: 8,
-    },
+        gap: 8 },
     tabButton: {
         flex: 1,
         flexDirection: 'row',
@@ -349,29 +341,23 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.1)',
-        gap: 6,
-    },
+        gap: 6 },
     activeTabButton: {
-        backgroundColor: 'rgba(255,255,255,0.25)',
-    },
+        backgroundColor: 'rgba(255,255,255,0.25)' },
     tabLabel: {
         fontSize: 13,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.6)',
-    },
+        color: 'rgba(255,255,255,0.6)' },
     activeTabLabel: {
-        color: '#FFFFFF',
-    },
+        color: '#FFFFFF' },
 
     // Scroll
     scrollView: {
         flex: 1,
-        zIndex: 0,
-    },
+        zIndex: 0 },
     scrollContent: {
         paddingHorizontal: 16,
-        paddingTop: 16,
-    },
+        paddingTop: 16 },
 
     // Version
     versionWrap: { alignItems: 'center', paddingVertical: 20 },
@@ -383,8 +369,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
-    },
+        padding: 20 },
     modalContent: { width: '100%', borderRadius: Layout.borderRadius, padding: 24, alignItems: 'center' },
     modalTitle: { fontSize: 20, fontWeight: '700', marginBottom: 20 },
     inputContainer: {
@@ -393,12 +378,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 15,
-        marginBottom: 24,
-    },
+        marginBottom: 24 },
     input: { flex: 1, height: 50, fontSize: 15 },
     modalButtons: { flexDirection: 'row', width: '100%', gap: 12 },
     modalButton: { flex: 1, height: 50, borderRadius: Layout.borderRadius, justifyContent: 'center', alignItems: 'center' },
     cancelButton: {},
     cancelButtonText: { fontWeight: '600' },
-    confirmButtonText: { color: '#FFFFFF', fontWeight: '700' },
-});
+    confirmButtonText: { color: '#FFFFFF', fontWeight: '700' } });

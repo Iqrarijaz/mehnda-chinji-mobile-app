@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { Layout } from '@/constants/layout';
 
 interface AyahActionsModalProps {
     visible: boolean;
@@ -25,8 +26,7 @@ export function AyahActionsModal({
     isBookmarked,
     onToggleBookmark,
     onShareText,
-    onShareImage,
-}: AyahActionsModalProps) {
+    onShareImage }: AyahActionsModalProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -70,37 +70,31 @@ const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.45)',
-        justifyContent: 'flex-end',
-    },
+        justifyContent: 'flex-end' },
     sheet: {
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
         paddingHorizontal: 20,
         paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-        paddingTop: 10,
-    },
+        paddingTop: 10 },
     handle: {
         alignSelf: 'center',
         width: 40,
         height: 4,
-        borderRadius: 2,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(128,128,128,0.4)',
-        marginBottom: 14,
-    },
+        marginBottom: 14 },
     label: { fontSize: 12, fontWeight: '700', marginBottom: 6 },
     arabic: {
         fontSize: 20,
         lineHeight: 38,
         textAlign: 'right',
         writingDirection: 'rtl',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 14,
         paddingHorizontal: 16,
-        borderRadius: 14,
-    },
-    rowText: { fontSize: 15, fontWeight: '600' },
-});
+        borderRadius: Layout.borderRadius },
+    rowText: { fontSize: 15, fontWeight: '600' } });

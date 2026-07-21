@@ -28,8 +28,7 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
     const chevronStyle = useAnimatedStyle(() => {
         const rotate = interpolate(animation.value, [0, 1], [0, 180]);
         return {
-            transform: [{ rotate: `${rotate}deg` }],
-        };
+            transform: [{ rotate: `${rotate}deg` }] };
     });
 
     const bodyStyle = useAnimatedStyle(() => {
@@ -76,18 +75,13 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         marginBottom: 12,
         overflow: 'hidden',
-        // Shadow for premium feel
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.04,
-        shadowRadius: 8,
+        // Shadow for premium feel
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 16,
-    },
+        padding: 16 },
     headerOpen: {
         backgroundColor: '#f0fdfa', // Very light teal
     },
@@ -96,21 +90,16 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#1E293B',
         flex: 1,
-        marginRight: 12,
-    },
+        marginRight: 12 },
     activeText: {
-        color: '#009688',
-    },
+        color: '#009688' },
     answerContainer: {
         paddingHorizontal: 16,
         paddingBottom: 16,
-        paddingTop: 4,
-    },
+        paddingTop: 4 },
     answer: {
         fontSize: 14,
         lineHeight: 22,
-        color: '#64748B',
-    },
-});
+        color: '#64748B' } });
 
 export default FAQItem;

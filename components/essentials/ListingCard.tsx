@@ -13,8 +13,7 @@ export const ListingCard = ({ children, style, ...rest }: ViewProps) => {
             style={[
                 styles.card,
                 {
-                    backgroundColor: colors.card,
-                    borderColor: colors.border
+                    backgroundColor: colors.cardBg
                 },
                 style
             ]}
@@ -29,6 +28,5 @@ const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.cardBorderRadius,
         marginBottom: 16,
-        overflow: 'hidden',
-    }
+        overflow: 'hidden' }
 });

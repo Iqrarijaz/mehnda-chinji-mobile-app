@@ -33,8 +33,7 @@ import {
 } from 'react-native';
 import Animated, {
     FadeInDown,
-    FadeInUp,
-} from 'react-native-reanimated';
+    FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import Toast from 'react-native-toast-message';
@@ -72,7 +71,7 @@ export default function ProfileScreen() {
 
     const sanitizeName = useCallback((value: string) => {
         const cleaned = value.replace(/[^A-Za-z\s]/g, '').slice(0, 30);
-        return cleaned.replace(/\s{2,}/g, ' ').trimStart();
+        return cleaned.replace(/\s{2 }/g, ' ').trimStart();
     }, []);
 
     const [formData, setFormData] = useState({
@@ -83,8 +82,7 @@ export default function ProfileScreen() {
         city: '',
         village: '',
         emailVerified: false,
-        otpVerified: false,
-    });
+        otpVerified: false });
 
     const [cityPickerVisible, setCityPickerVisible] = useState(false);
     const [villagePickerVisible, setVillagePickerVisible] = useState(false);
@@ -101,8 +99,7 @@ export default function ProfileScreen() {
             city: user?.user?.city || '',
             village: toTitleCase(user?.user?.village || ''),
             emailVerified: user?.user?.emailVerified || false,
-            otpVerified: user?.user?.otpVerified || false,
-        };
+            otpVerified: user?.user?.otpVerified || false };
     }, [user, toTitleCase]);
 
     // Initialize form only when currentData changes (e.g., initial load or backend refresh)
@@ -138,8 +135,7 @@ export default function ProfileScreen() {
             mediaTypes: 'images',
             allowsEditing: true,
             aspect: [1, 1],
-            quality: 0.7,
-        });
+            quality: 0.7 });
 
         if (!result.canceled && result.assets && result.assets.length > 0) {
             const asset = result.assets[0];
@@ -156,8 +152,7 @@ export default function ProfileScreen() {
             const file: any = {
                 uri: manipResult.uri,
                 name: `profile_${user?.user?._id || Date.now()}.jpg`,
-                type: `image/jpeg`,
-            };
+                type: `image/jpeg` };
 
             uploadFormData.append('image', file);
             uploadImageMutation.mutate(uploadFormData);
@@ -436,187 +431,149 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     header: {
         paddingBottom: 18,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     headerIdentity: {
         alignItems: 'center',
-        marginTop: 2,
-    },
+        marginTop: 2 },
     nameRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
         marginTop: 8,
-        paddingHorizontal: 24,
-    },
+        paddingHorizontal: 24 },
     userName: {
         fontSize: 18,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
-        flexShrink: 1,
-    },
+        flexShrink: 1 },
     verifiedChip: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 3,
         paddingHorizontal: 8,
         paddingVertical: 3,
-        borderRadius: 999,
-    },
+        borderRadius: Layout.borderRadius },
     verifiedText: {
         fontSize: 9.5,
         fontWeight: '800',
         color: '#1E293B',
         textTransform: 'uppercase',
-        letterSpacing: 0.4,
-    },
+        letterSpacing: 0.4 },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
-    },
+        paddingHorizontal: 16 },
     backButton: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     headerTitle: {
         fontSize: 20,
         fontWeight: '800',
         color: '#FFFFFF',
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     subtitleText: {
         fontSize: 11,
         color: 'rgba(255,255,255,0.8)',
         marginTop: 4,
         textAlign: 'center',
-        paddingHorizontal: 20,
-    },
+        paddingHorizontal: 20 },
     scrollContent: {
-        paddingBottom: 40,
-    },
+        paddingBottom: 40 },
     formSection: {
         paddingHorizontal: 20,
         marginTop: 20,
-        gap: 16,
-    },
+        gap: 16 },
     inputField: {
-        gap: 6,
-    },
+        gap: 6 },
     labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingRight: 4,
-    },
+        paddingRight: 4 },
     label: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
-        marginLeft: 2,
-    },
+        marginLeft: 2 },
     required: {
-        color: '#EF4444',
-    },
+        color: '#EF4444' },
     errorText: {
         color: '#EF4444',
         fontSize: 11,
         marginLeft: 4,
-        marginTop: 2,
-    },
+        marginTop: 2 },
     charCount: {
         fontSize: 10,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 12,
-        paddingHorizontal: 14,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 14 },
     textInput: {
         flex: 1,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: 12,
-        paddingHorizontal: 14,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 14 },
     triggerContent: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     triggerText: {
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     genderRow: {
         flexDirection: 'row',
         gap: 12,
-        marginTop: 4,
-    },
+        marginTop: 4 },
     genderPill: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: 12,
-        gap: 6,
-    },
+        borderRadius: Layout.borderRadius,
+        gap: 6 },
     genderText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#64748B',
-    },
+        color: '#64748B' },
     infoTip: {
         flexDirection: 'row',
         gap: 8,
         paddingHorizontal: 8,
         marginTop: 4,
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     infoText: {
         fontSize: 11,
         color: '#64748B',
         flex: 1,
-        lineHeight: 18,
-    },
+        lineHeight: 18 },
     updateButton: {
         height: Platform.OS === 'android' ? 48 : 52,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-        shadowColor: '#0D9488',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-    },
+        overflow: 'hidden' },
     buttonContent: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     updateButtonText: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#FFFFFF',
-    },
-
-});
+        color: '#FFFFFF' } });
 

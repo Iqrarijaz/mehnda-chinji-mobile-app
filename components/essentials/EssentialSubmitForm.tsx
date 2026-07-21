@@ -13,6 +13,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useEssentialsAPI } from '@/hooks/useEssentialsAPI';
 import { LocationPicker, LocationValue } from '@/components/common/LocationPicker';
 import { resolveLocationForSubmit } from '@/utils/locationService';
+import { Layout } from '@/constants/layout';
 
 interface EssentialSubmitFormProps {
     category: string;
@@ -62,8 +63,7 @@ const EssentialSubmitForm = React.memo(({
         metadata: {
             principalName: editData?.metadata?.principalName || '',
             totalStudents: editData?.metadata?.totalStudents?.toString() || '',
-            totalTeachers: editData?.metadata?.totalTeachers?.toString() || '',
-        }
+            totalTeachers: editData?.metadata?.totalTeachers?.toString() || '' }
     });
 
     const selectedTypeInfo = typesToRender.find((t: any) => t.key?.toLowerCase() === form.type?.toLowerCase());
@@ -222,8 +222,7 @@ const EssentialSubmitForm = React.memo(({
             Toast.show({
                 type: 'info',
                 text1: 'Upload in Progress',
-                text2: 'Please wait for the photo to finish uploading.',
-            });
+                text2: 'Please wait for the photo to finish uploading.' });
             return;
         }
 
@@ -291,8 +290,7 @@ const EssentialSubmitForm = React.memo(({
             tags: (form.tags || []).map((t: any) => ({ eng: t.eng, ur: t.ur })),
             route: form.route.filter((r: any) => r.city.trim() !== ''),
             returnRoute: isTravel ? form.returnRoute.filter((r: any) => r.city.trim() !== '') : [],
-            metadata: isEducation ? form.metadata : {},
-        };
+            metadata: isEducation ? form.metadata : {} };
 
         // Attach coordinates: manual selection, else silent current-location
         // capture (only if permission already granted). Absent → saved without.
@@ -321,8 +319,7 @@ const EssentialSubmitForm = React.memo(({
                 </View>
                 <View style={[styles.inputBox, {
                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                    height: Platform.OS === 'android' ? 48 : 52,
-                }]}>
+                    height: Platform.OS === 'android' ? 48 : 52 }]}>
                     <Ionicons name="storefront-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                     <TextInput
                         style={[styles.inputText, { color: colors.text }]}
@@ -410,8 +407,7 @@ const EssentialSubmitForm = React.memo(({
                         backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
                         minHeight: 80,
                         alignItems: 'flex-start',
-                        paddingVertical: 12,
-                    }]}>
+                        paddingVertical: 12 }]}>
                         <TextInput
                             style={[styles.inputText, { color: colors.text, textAlignVertical: 'top', minHeight: 60 }]}
                             placeholder="Enter address"
@@ -443,8 +439,7 @@ const EssentialSubmitForm = React.memo(({
                             <View style={{ flex: 1, gap: 8 }}>
                                 <View style={[styles.inputBox, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                    height: Platform.OS === 'android' ? 48 : 52,
-                                }]}>
+                                    height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="person-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         style={[styles.inputText, { color: colors.text }]}
@@ -456,10 +451,7 @@ const EssentialSubmitForm = React.memo(({
                                 </View>
                                 <View style={[styles.inputBox, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                    height: Platform.OS === 'android' ? 48 : 52,
-                                    borderColor: errors[`contact[${index}].number`] ? '#EF4444' : 'transparent',
-                                    borderWidth: errors[`contact[${index}].number`] ? 1 : 0
-                                }]}>
+                                    height: Platform.OS === 'android' ? 48 : 52 }]}>
                                     <Ionicons name="call-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         style={[styles.inputText, { color: colors.text }]}
@@ -604,8 +596,7 @@ const EssentialSubmitForm = React.memo(({
                                 style={[styles.inputBox, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
                                     height: Platform.OS === 'android' ? 48 : 52,
-                                    justifyContent: 'space-between',
-                                }]}
+                                    justifyContent: 'space-between' }]}
                                 activeOpacity={0.7}
                             >
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -624,8 +615,7 @@ const EssentialSubmitForm = React.memo(({
                                 style={[styles.inputBox, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
                                     height: Platform.OS === 'android' ? 48 : 52,
-                                    justifyContent: 'space-between',
-                                }]}
+                                    justifyContent: 'space-between' }]}
                                 activeOpacity={0.7}
                             >
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -762,77 +752,58 @@ export default EssentialSubmitForm;
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 16,
-    },
+        paddingTop: 16 },
     field: {
-        marginBottom: 20,
-    },
+        marginBottom: 20 },
     labelRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     label: {
         fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.5,
-        color: '#64748B',
-    },
+        color: '#64748B' },
     subLabel: {
         fontSize: 10,
         fontWeight: '700',
         marginBottom: 4,
-        marginLeft: 4,
-    },
+        marginLeft: 4 },
     charCount: {
         fontSize: 11,
         color: '#94A3B8',
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 12,
-        paddingHorizontal: 14,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 14 },
     inputText: {
         flex: 1,
         fontSize: 14,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     input: {
-        borderRadius: 12,
-        padding: 14,
-        borderWidth: 1,
-    },
+        borderRadius: Layout.borderRadius,
+        padding: 14 },
     textArea: {
         minHeight: 120,
-        textAlignVertical: 'top',
-    },
+        textAlignVertical: 'top' },
 
     formatToolbar: {
         flexDirection: 'row',
         gap: 8,
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     formatBtn: {
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 6,
-    },
+        borderRadius: Layout.borderRadius },
     formatBtnText: {
         fontSize: 11,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 12,
-        marginTop: 10,
-        paddingTop: 20,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(150,150,150,0.1)',
-    },
-});
+        paddingTop: 20 } });

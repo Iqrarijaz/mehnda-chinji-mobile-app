@@ -5,6 +5,7 @@ import { errorLogger } from '@/lib/errorLogger';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { ThemedText } from '@/components/ThemedText';
+import { Layout } from '@/constants/layout';
 
 interface Props {
   children: ReactNode;
@@ -54,8 +55,7 @@ const FallbackUI = React.memo(({ onRetry }: { onRetry: () => void }) => {
  */
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false,
-  };
+    hasError: false };
 
   public static getDerivedStateFromError(_: Error): State {
     return { hasError: true };
@@ -64,8 +64,7 @@ export class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     errorLogger.log(error, {
       type: 'COMPONENT_ERROR',
-      componentStack: errorInfo.componentStack,
-    });
+      componentStack: errorInfo.componentStack });
   }
 
   private handleRetry = () => {
@@ -88,43 +87,34 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
-  },
+    padding: 24 },
   lottieContainer: {
     width: 350,
     height: 350,
     marginBottom: 16,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   lottie: {
     width: '100%',
-    height: '100%',
-  },
+    height: '100%' },
   textContainer: {
     marginBottom: 24,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   title: {
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 8,
-    textAlign: 'center',
-  },
+    textAlign: 'center' },
   message: {
     fontSize: 14,
-    textAlign: 'center',
-  },
+    textAlign: 'center' },
   modalButton: {
     width: 120,
     height: 40,
-    borderRadius: 20,
+    borderRadius: Layout.borderRadius,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   modalButtonText: {
     color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: '600',
-  },
-});
+    fontWeight: '600' } });

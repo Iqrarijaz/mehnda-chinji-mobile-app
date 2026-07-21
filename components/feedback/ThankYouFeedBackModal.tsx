@@ -36,6 +36,5 @@ const styles = StyleSheet.create({
     modalSubtitle: {
         fontSize: 13,
         textAlign: 'center',
-        lineHeight: 20,
-    }
+        lineHeight: 20 }
 });

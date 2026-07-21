@@ -6,6 +6,7 @@ import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
+import { Layout } from '@/constants/layout';
 
 interface QuranHeaderProps {
     title: string;
@@ -34,8 +35,7 @@ export const QuranHeader = memo(({
     paddingTop,
     onBack,
     rightSlot,
-    arabicTitle,
-}: QuranHeaderProps) => {
+    arabicTitle }: QuranHeaderProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -84,53 +84,44 @@ const styles = StyleSheet.create({
         paddingBottom: 18,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     topRow: {
         minHeight: 40,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     navButton: {
         position: 'absolute',
         left: 0,
         width: 38,
         height: 38,
-        borderRadius: 19,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     titleWrap: {
         alignItems: 'center',
-        paddingHorizontal: 52,
-    },
+        paddingHorizontal: 52 },
     title: {
         fontSize: 18,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     titleArabic: {
         fontFamily: 'NotoNastaliqUrdu-Regular',
-        fontSize: 20,
-    },
+        fontSize: 20 },
     subtitle: {
         fontSize: 12,
         color: 'rgba(255,255,255,0.8)',
         fontWeight: '500',
         marginTop: 3,
-        textAlign: 'center',
-    },
+        textAlign: 'center' },
     controlsRow: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         flexWrap: 'wrap',
-        marginTop: 14,
-    },
-});
+        marginTop: 14 } });
 
 const QuranBackgroundDecor = memo(({ lime, secondary }: { lime: string; secondary: string }) => (
     <Svg style={StyleSheet.absoluteFill} viewBox="0 0 375 130" preserveAspectRatio="xMinYMin slice">

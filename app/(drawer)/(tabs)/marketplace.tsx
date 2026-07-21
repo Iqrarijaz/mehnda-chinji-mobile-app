@@ -102,11 +102,9 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
     const {
         categoriesConfigQuery,
         infiniteQuery,
-        myListQuery,
-    } = useMarketplaceAPI({
+        myListQuery } = useMarketplaceAPI({
         filters: marketplaceFilters,
-        isMineTab,
-    });
+        isMineTab });
 
     const { data: configData, refetch: refetchCategories } = categoriesConfigQuery;
 
@@ -341,9 +339,8 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                         Active Filters:
                     </ThemedText>
                     <TouchableOpacity
-                        style={[styles.clearFiltersBtn, { borderColor: colors.primary }]}
+                        style={[styles.clearFiltersBtn, { backgroundColor: colors.card }]}
                         onPress={() => {
-                            setSelectedCategories([]);
                             setSelectedItems([]);
                         }}
                     >
@@ -402,118 +399,97 @@ export default MarketplaceScreen;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
+        flex: 1 },
     headerContainer: {
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
-        paddingBottom: Platform.OS === 'android' ? 8 : 16,
-    },
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
+        paddingBottom: Platform.OS === 'android' ? 8 : 16 },
     headerContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-        marginBottom: Platform.OS === 'android' ? 18 : 20,
-    },
+        marginBottom: Platform.OS === 'android' ? 18 : 20 },
     headerTitle: {
         color: '#FFFFFF',
         fontSize: 18,
-        fontWeight: 'bold',
-    },
+        fontWeight: 'bold' },
     iconButton: {
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.2)',
-    },
+        backgroundColor: 'rgba(255,255,255,0.2)' },
     rightActions: {
         flexDirection: 'row',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     profileButton: {
         width: 38,
         height: 38,
-        borderRadius: 19,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-    },
+        overflow: 'hidden' },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 4,
-        paddingBottom: 8,
-    },
+        paddingBottom: 8 },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-    },
+        gap: 8 },
     searchInputContainer: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         height: 42,
-        borderRadius: 22,
-        paddingHorizontal: 16,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 16 },
     searchInput: {
         flex: 1,
         fontSize: 14,
-        paddingVertical: 8,
-    },
+        paddingVertical: 8 },
     filterButton: {
         width: 42,
         height: 42,
-        borderRadius: 22,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        position: 'relative',
-    },
+        position: 'relative' },
     filterBadge: {
         position: 'absolute',
         top: -2,
         right: -2,
         backgroundColor: '#EF4444',
-        borderRadius: 9,
+        borderRadius: Layout.borderRadius,
         width: 18,
         height: 18,
         justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: '#FFFFFF',
-    },
+        alignItems: 'center' },
     filterBadgeText: {
         color: '#FFFFFF',
         fontSize: 10,
         fontWeight: 'bold',
         textAlign: 'center',
         lineHeight: 12,
-        includeFontPadding: false,
-    },
+        includeFontPadding: false },
     activeFiltersRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        marginBottom: 8,
-    },
+        marginBottom: 8 },
     activeFiltersTitle: {
         fontSize: 12,
-        fontWeight: '700',
-    },
+        fontWeight: '700' },
     clearFiltersBtn: {
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         paddingHorizontal: 10,
-        paddingVertical: 3,
-    },
+        paddingVertical: 3 },
     listContent: {
-        paddingHorizontal: 16,
-    },
+        paddingHorizontal: 16 },
     centered: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
-    },
-});
+        padding: 20 } });

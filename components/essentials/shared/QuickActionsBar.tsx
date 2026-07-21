@@ -7,6 +7,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { PressableScale } from './PressableScale';
+import { Layout } from '@/constants/layout';
 
 interface QuickActionsBarProps {
     /** Existing call handler from the page; hidden when absent. */
@@ -27,8 +28,7 @@ export const QuickActionsBar = React.memo(({
     hasContact = false,
     callLabel = 'Call Now',
     onDirections,
-    hasDirections,
-}: QuickActionsBarProps) => {
+    hasDirections }: QuickActionsBarProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -75,41 +75,34 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 12,
-        marginBottom: 16,
-    },
+        marginBottom: 16 },
     primaryBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
         height: 42,
-        borderRadius: 21,
-        paddingHorizontal: 24,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 24 },
     primaryIcon: {
         width: 24,
         height: 24,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     primaryText: {
         color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '700',
-        letterSpacing: 0.2,
-    },
+        letterSpacing: 0.2 },
     secondaryBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
         height: 42,
-        borderRadius: 21,
-        paddingHorizontal: 24,
-    },
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 24 },
     secondaryText: {
         fontSize: 14,
-        fontWeight: '700',
-    },
-});
+        fontWeight: '700' } });

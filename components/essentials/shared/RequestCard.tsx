@@ -4,13 +4,13 @@ import {
     ActivityIndicator,
     Platform,
     StyleSheet,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { TintedCard } from '@/components/ui/tintedCard';
+import { Layout } from '@/constants/layout';
 
 interface RequestCardProps {
     item: any;
@@ -35,8 +35,7 @@ const RequestCard = React.memo(({
     categoryColor,
     isDeleting,
     onEdit,
-    onDelete,
-}: RequestCardProps) => {
+    onDelete }: RequestCardProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -51,15 +50,13 @@ const RequestCard = React.memo(({
         actions.push({
             label: 'Edit',
             icon: 'create',
-            onPress: () => onEdit(item),
-        });
+            onPress: () => onEdit(item) });
     }
     actions.push({
         label: 'Delete',
         icon: 'trash',
         destructive: true,
-        onPress: () => onDelete(item._id, item.name),
-    });
+        onPress: () => onDelete(item._id, item.name) });
 
     return (
         <TintedCard
@@ -153,105 +150,84 @@ const styles = StyleSheet.create({
     card: {
         paddingHorizontal: 12,
         paddingVertical: 10,
-        marginBottom: 10,
-    },
+        marginBottom: 10 },
     cardHeader: {
-        marginBottom: 6,
-    },
+        marginBottom: 6 },
     nameStatusRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     name: {
         fontSize: 14,
         fontWeight: '800',
         textTransform: 'capitalize',
         flex: 1,
-        marginRight: 8,
-    },
+        marginRight: 8 },
     statusBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 8,
-        gap: 5,
-    },
+        borderRadius: Layout.borderRadius,
+        gap: 5 },
     statusDot: {
         width: 6,
         height: 6,
-        borderRadius: 3,
-    },
+        borderRadius: Layout.borderRadius },
     statusText: {
         fontSize: 10,
         fontWeight: '900',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     cardBody: {
         gap: 6,
-        marginBottom: 10,
-    },
+        marginBottom: 10 },
     categoryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     catLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 5,
-    },
+        gap: 5 },
     metaText: {
         fontSize: 11,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     typePill: {
         paddingHorizontal: 8,
         paddingVertical: 3,
-        borderRadius: 6,
-    },
+        borderRadius: Layout.borderRadius },
     typeText: {
         fontSize: 10,
         fontWeight: '700',
-        letterSpacing: 0.5,
-    },
+        letterSpacing: 0.5 },
     infoRow: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        gap: 5,
-    },
+        gap: 5 },
     infoText: {
         fontSize: 11,
         fontWeight: '500',
         flex: 1,
-        textTransform: 'capitalize',
-    },
+        textTransform: 'capitalize' },
     divider: {
         height: 1,
         width: '100%',
         marginBottom: 8,
-        opacity: 0.5,
-    },
+        opacity: 0.5 },
     cardFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-    },
+        alignItems: 'center' },
     footerLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-    },
+        gap: 4 },
     dateText: {
         fontSize: 11,
-        fontWeight: '600',
-    },
+        fontWeight: '600' },
     moreBtn: {
         padding: 4,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'transparent',
-    },
-});
+        backgroundColor: 'transparent' } });

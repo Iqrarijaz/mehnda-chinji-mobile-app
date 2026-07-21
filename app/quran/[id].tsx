@@ -20,13 +20,12 @@ import { QuranSettingsModal } from '@/components/quran/QuranSettingsModal';
 import { AyahActionsModal } from '@/components/quran/AyahActionsModal';
 import { ShareAyahCard } from '@/components/quran/ShareAyahCard';
 import { startSurahDownload, getPlayableAyahUri, cleanupExpiredCache } from '@/utils/quranAudioCache';
+import { Layout } from '@/constants/layout';
 import {
     getFontSize, setFontSize as persistFontSize,
-    getTajweedEnabled, setTajweedEnabled as persistTajweed,
     getLastPosition, setLastPosition,
     getBookmarks, toggleBookmark as toggleBookmarkStore, isBookmarked as isBookmarkedIn,
-    FONT_SIZE_DEFAULT, type Bookmark,
-} from '@/utils/quranPrefs';
+    FONT_SIZE_DEFAULT, type Bookmark } from '@/utils/quranPrefs';
 
 export default function SurahDetailScreen() {
     const { id, autoplay, ayah: ayahParam } = useLocalSearchParams<{ id: string; autoplay?: string; ayah?: string }>();
@@ -53,7 +52,6 @@ export default function SurahDetailScreen() {
 
     // ── Reading preferences & features ──────────────────────────────────────
     const [fontSize, setFontSizeState] = useState<number>(FONT_SIZE_DEFAULT);
-    const [tajweedEnabled, setTajweedEnabledState] = useState<boolean>(false);
     const [settingsVisible, setSettingsVisible] = useState(false);
     const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
     const [actionIndex, setActionIndex] = useState<number | null>(null);
@@ -66,9 +64,8 @@ export default function SurahDetailScreen() {
     // Load persisted preferences + bookmarks once.
     useEffect(() => {
         (async () => {
-            const [fs, tj, bm] = await Promise.all([getFontSize(), getTajweedEnabled(), getBookmarks()]);
+            const [fs, bm] = await Promise.all([getFontSize(), getBookmarks()]);
             setFontSizeState(fs);
-            setTajweedEnabledState(tj);
             setBookmarks(bm);
         })();
     }, []);
@@ -78,10 +75,6 @@ export default function SurahDetailScreen() {
         persistFontSize(v);
     }, []);
 
-    const changeTajweed = useCallback((v: boolean) => {
-        setTajweedEnabledState(v);
-        persistTajweed(v);
-    }, []);
 
     const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
     const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
@@ -97,7 +90,7 @@ export default function SurahDetailScreen() {
     const { data: response, isLoading, isError, refetch } = useQuery({
         queryKey: ['quran-surah', surahNumber],
         queryFn: () => getSurah(surahNumber, { edition: 'quran-uthmani,en.asad,ar.alafasy' }),
-        enabled: !isNaN(surahNumber),
+        enabled: !isNaN(surahNumber)
     });
 
     const editionsData = response?.data as any;
@@ -226,7 +219,7 @@ export default function SurahDetailScreen() {
                 playsInSilentModeIOS: true,
                 shouldDuckAndroid: true,
                 playThroughEarpieceAndroid: false,
-                staysActiveInBackground: true,
+                staysActiveInBackground: true
             });
 
             // Local status update callback helper
@@ -329,7 +322,7 @@ export default function SurahDetailScreen() {
             ayahIndex: actionIndex,
             ayahNumberInSurah: ayah?.numberInSurah ?? actionIndex + 1,
             text: ayah?.text || '',
-            createdAt: Date.now(),
+            createdAt: Date.now()
         });
         setBookmarks(next);
     }, [actionIndex, surahInfo, ayahs, surahNumber]);
@@ -394,14 +387,13 @@ export default function SurahDetailScreen() {
                 primaryColor={colors.primary}
                 textSecondaryColor={colors.textSecondary}
                 borderColor={colors.border}
-                cardColor={colors.card}
+                cardColor={colors.cardBg}
                 fontSize={fontSize}
-                tajweedEnabled={tajweedEnabled}
                 isBookmarked={isBookmarkedIn(bookmarks, surahNumber, index)}
                 onLongPress={openAyahActions}
             />
         );
-    }, [englishEdition, surahNumber, playingIndex, bufferingIndex, colors, showTranslation, fontSize, tajweedEnabled, bookmarks, openAyahActions]);
+    }, [englishEdition, surahNumber, playingIndex, bufferingIndex, colors, showTranslation, fontSize, bookmarks, openAyahActions]);
 
     const renderHeader = useCallback(() => {
         if (surahNumber !== 1 && surahNumber !== 9 && ayahs[0]?.text) {
@@ -443,7 +435,7 @@ export default function SurahDetailScreen() {
                             <Ionicons name="bookmark-outline" size={16} color="#FFFFFF" />
                         </TouchableOpacity>
 
-                        {/* Reading settings (font size + tajweed) */}
+                        {/* Reading settings (font size) */}
                         <TouchableOpacity
                             onPress={() => setSettingsVisible(true)}
                             style={[styles.headerIconBtn, { marginRight: 8 }]}
@@ -550,14 +542,12 @@ export default function SurahDetailScreen() {
                 </View>
             )}
 
-            {/* Reading settings (font size + tajweed) */}
+            {/* Reading settings (font size) */}
             <QuranSettingsModal
                 visible={settingsVisible}
                 onClose={() => setSettingsVisible(false)}
                 fontSize={fontSize}
                 onFontSize={changeFontSize}
-                tajweedEnabled={tajweedEnabled}
-                onTajweed={changeTajweed}
             />
 
             {/* Long-press ayah actions */}
@@ -592,113 +582,107 @@ export default function SurahDetailScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
     },
     backgroundImage: {
-        flex: 1,
+        flex: 1
     },
     readingContainer: {
         flex: 1,
         paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 6,
+        paddingBottom: 6
     },
     listContent: {
-        paddingVertical: 8,
+        paddingVertical: 8
     },
     bismillahContainer: {
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 16,
-        marginBottom: 8,
+        marginBottom: 8
     },
     bismillahText: {
         fontSize: 22,
         lineHeight: 40,
         fontWeight: 'bold',
-        textAlign: 'center',
+        textAlign: 'center'
     },
     centerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
+        padding: 24
     },
     loadingText: {
         marginTop: 12,
-        fontSize: 14,
+        fontSize: 14
     },
     errorText: {
         marginTop: 12,
         fontSize: 15,
-        textAlign: 'center',
+        textAlign: 'center'
     },
     retryButton: {
         marginTop: 16,
         paddingVertical: 10,
         paddingHorizontal: 24,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius
     },
     headerControlsContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     headerToggle: {
         flexDirection: 'row',
         paddingHorizontal: 8,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         minWidth: 42,
-        height: 30,
+        height: 30
     },
     headerToggleText: {
         fontSize: 11,
         fontWeight: '700',
-        textAlign: 'center',
+        textAlign: 'center'
     },
     headerIconBtn: {
         width: 30,
         height: 30,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     offscreen: {
         position: 'absolute',
         left: -9999,
-        top: -9999,
+        top: -9999
     },
     paginationContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        borderTopWidth: StyleSheet.hairlineWidth,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 3,
+        justifyContent: 'space-between'
     },
     pageButton: {
         width: 38,
         height: 38,
-        borderRadius: 19,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: 'rgba(0,0,0,0.03)',
+        alignItems: 'center'
     },
     disabledPageButton: {
-        opacity: 0.4,
+        opacity: 0.4
     },
     pageIndicatorCapsule: {
         paddingHorizontal: 16,
         paddingVertical: 6,
-        borderRadius: 20,
+        borderRadius: Layout.borderRadius
     },
     pageIndicatorText: {
         fontSize: 13,
         fontWeight: '700',
-        textAlign: 'center',
-    },
+        textAlign: 'center'
+    }
 });

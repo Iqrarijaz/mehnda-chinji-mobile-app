@@ -1,12 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
 import React from 'react';
 import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -31,20 +29,23 @@ const WeatherSearchBar = React.memo(({
     onSubmit,
     onClear,
     onSelectCity,
-    onGPS,
-}: WeatherSearchBarProps) => {
+    onGPS }: WeatherSearchBarProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
     return (
         <View style={styles.wrapper}>
-            {/* Input pill */}
-            <BlurView intensity={40} tint="light" style={styles.inputBlur}>
-                <Ionicons name="search" size={16} color="rgba(255,255,255,0.7)" style={{ marginRight: 8 }} />
+            {/* Input pill — solid card background */}
+            <View style={[
+                styles.inputPill,
+                {
+                    backgroundColor: colors.cardBg },
+            ]}>
+                <Ionicons name="search" size={16} color={colors.primary} style={{ marginRight: 8 }} />
                 <TextInput
                     placeholder="Search city..."
-                    placeholderTextColor="rgba(255,255,255,0.6)"
-                    style={styles.input}
+                    placeholderTextColor={colors.textSecondary}
+                    style={[styles.input, { color: colors.text }]}
                     value={searchInput}
                     onChangeText={onChangeText}
                     onSubmitEditing={onSubmit}
@@ -52,31 +53,27 @@ const WeatherSearchBar = React.memo(({
                 />
                 {searchInput.length > 0 && (
                     <TouchableOpacity onPress={onClear}>
-                        <Ionicons name="close-circle" size={16} color="rgba(255,255,255,0.6)" />
+                        <Ionicons name="close-circle" size={16} color={colors.textSecondary} />
                     </TouchableOpacity>
                 )}
                 {onGPS && searchInput.length === 0 && (
                     <TouchableOpacity onPress={onGPS} style={{ marginLeft: 8 }}>
-                        <Ionicons name="location" size={18} color="rgba(255,255,255,0.8)" />
+                        <Ionicons name="location" size={18} color={colors.primary} />
                     </TouchableOpacity>
                 )}
-            </BlurView>
+            </View>
 
             {/* Dropdown */}
             {showDropdown && filteredCities.length > 0 && (
-                <View style={[styles.dropdown, { backgroundColor: colors.card, shadowColor: isDark ? 'transparent' : '#000' }]}>
+                <View style={[styles.dropdown, { backgroundColor: colors.cardBg }]}>
                     {filteredCities.map((item, i) => (
                         <TouchableOpacity
                             key={i}
                             style={[
                                 styles.dropItem,
-                                i < filteredCities.length - 1 && styles.dropItemBorder,
-                                i < filteredCities.length - 1 && { borderBottomColor: colors.border }
                             ]}
                             onPress={() => onSelectCity(item)}
-                            activeOpacity={0.7}
                         >
-                            <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
                             <ThemedText style={[styles.dropText, { color: colors.text }]}>{item}</ThemedText>
                         </TouchableOpacity>
                     ))}
@@ -90,17 +87,13 @@ export default WeatherSearchBar;
 
 const styles = StyleSheet.create({
     wrapper: { flex: 1, position: 'relative', zIndex: 100 },
-    inputBlur: {
+    inputPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 14,
-        height: 42,
-        borderRadius: Layout.borderRadius,
-        overflow: 'hidden',
-        borderColor: 'rgba(255,255,255,0.25)',
-        backgroundColor: 'rgba(255,255,255,0.1)',
-    },
-    input: { flex: 1, color: '#FFFFFF', fontSize: 14 },
+        paddingHorizontal: 16,
+        height: 46,
+        borderRadius: Layout.borderRadius },
+    input: { flex: 1, fontSize: 14 },
 
     // Dropdown
     dropdown: {
@@ -110,23 +103,17 @@ const styles = StyleSheet.create({
         right: 0,
         borderRadius: Layout.borderRadius,
         zIndex: 9999,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.12,
-        shadowRadius: 16,
-        overflow: 'hidden',
-    },
+
+
+
+        overflow: 'hidden' },
     dropItem: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
         paddingHorizontal: 16,
-        paddingVertical: 13,
-    },
-    dropItemBorder: {
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
+        paddingVertical: 13 },
+    dropItemBorder: {},
     dropText: {
         fontSize: 14,
-        fontWeight: '600',
-    },
-});
+        fontWeight: '600' } });

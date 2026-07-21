@@ -5,6 +5,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Image } from 'expo-image';
+import { Layout } from '@/constants/layout';
 
 export interface Tag {
     eng?: string;
@@ -27,8 +28,7 @@ export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = ({
     selectedTags,
     onToggleTag,
     isSingleSelect = false,
-    activeColor,
-}) => {
+    activeColor }) => {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const colors = Colors[theme];
@@ -54,8 +54,7 @@ export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = ({
                         style={[
                             styles.tagChip,
                             {
-                                backgroundColor: isSelected ? resolvedActiveColor : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)'),
-                            }
+                                backgroundColor: isSelected ? resolvedActiveColor : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)') }
                         ]}
                         onPress={() => onToggleTag(tag)}
                         activeOpacity={0.8}
@@ -92,21 +91,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 8,
-        marginTop: 6,
-    },
+        marginTop: 6 },
     tagChip: {
         paddingHorizontal: 16,
         paddingVertical: 10,
-        borderRadius: 20,
-    },
+        borderRadius: Layout.borderRadius },
     tagChipText: {
         fontSize: 13,
-        fontWeight: '500',
-    },
+        fontWeight: '500' },
     typeChipImageContainer: {
         width: 24,
         height: 20,
-        borderRadius: 9,
-        overflow: 'hidden',
-    },
-});
+        borderRadius: Layout.borderRadius,
+        overflow: 'hidden' } });

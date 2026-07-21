@@ -31,7 +31,7 @@ const NativeAd: React.FC<{ placement?: string }> = ({ placement = 'feed' }) => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.card }]}>
+    <View style={[styles.container]}>
       <View style={styles.adHeader}>
         <View style={[styles.adBadge, { backgroundColor: colors.primary }]}>
           <ThemedText style={styles.adBadgeText}>Ad</ThemedText>

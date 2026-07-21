@@ -84,8 +84,7 @@ function DrawerLayout() {
           screenOptions={{
             headerShown: false,
             animation: 'slide_from_right',
-            gestureEnabled: true,
-          }}
+            gestureEnabled: true }}
         >
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" />
@@ -172,9 +171,7 @@ function DeferredHooks() {
         shouldPlaySound: true,
         shouldSetBadge: false,
         shouldShowBanner: true,
-        shouldShowList: true,
-      }),
-    });
+        shouldShowList: true }) });
   }, []);
 
   const { isAuthenticated } = useAuth();
