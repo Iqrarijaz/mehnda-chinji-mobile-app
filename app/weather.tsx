@@ -22,14 +22,26 @@ import WeatherDaily from '@/components/weather/WeatherDaily';
 import WeatherHero from '@/components/weather/WeatherHero';
 import WeatherHourly from '@/components/weather/WeatherHourly';
 import WeatherSearchBar from '@/components/weather/WeatherSearchBar';
+import { WeatherCitySwitcher } from '@/components/weather/WeatherCitySwitcher';
 import WeatherStats from '@/components/weather/WeatherStats';
 import WeatherSunrise from '@/components/weather/WeatherSunrise';
-import { BG_GRADIENT } from '@/components/weather/weatherUtils';
+import WeatherDetails from '@/components/weather/WeatherDetails';
+import { getWeatherGradient } from '@/utils/weatherTheme';
 
+import { useQuery } from '@tanstack/react-query';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useWeatherLocation } from '@/hooks/useWeatherLocation';
 import { useWeather } from '@/hooks/useWeather';
+import { useSavedCities } from '@/hooks/useSavedCities';
+import { SavedCity, getAirQuality, getUVIndex } from '@/apis/weather';
+
+function relativeWeatherTime(unixSec: number): string {
+    const diffMin = Math.max(0, Math.round((Date.now() - unixSec * 1000) / 60000));
+    if (diffMin < 1) return 'Just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    return `${Math.floor(diffMin / 60)}h ago`;
+}
 
 export default function WeatherScreen() {
     const router = useRouter();
@@ -39,14 +51,22 @@ export default function WeatherScreen() {
     const colors = Colors[theme];
 
     // Same resolution as the home widget: current GPS location when permission
-    // is granted, otherwise the profile city. Keeps the two screens in sync.
+    // is granted, otherwise the profile/Default city. Keeps the screens in sync.
     const { coords, fallbackCity } = useWeatherLocation();
-    // A city the user explicitly searched/picked here overrides the location.
-    const [manualCity, setManualCity] = useState<string | null>(null);
+    const { cities: savedCities } = useSavedCities();
 
-    const useCoords = !!coords && !manualCity;
-    const effectiveCity = manualCity || fallbackCity;
-    const effectiveCoords = useCoords ? { lat: coords!.latitude, lon: coords!.longitude } : null;
+    // Explicit selection overrides the auto location: a saved city (with coords),
+    // or a free-text search (name only). null → auto (current / default).
+    const [selected, setSelected] = useState<{ name: string; lat?: number; lon?: number } | null>(null);
+
+    const effectiveCoords = selected
+        ? (selected.lat != null ? { lat: selected.lat, lon: selected.lon as number } : null)
+        : (coords ? { lat: coords.latitude, lon: coords.longitude } : null);
+    const effectiveCity = selected?.name || fallbackCity;
+
+    const activeCityKey = !selected
+        ? null
+        : (selected.lat != null ? `${selected.lat.toFixed(3)},${(selected.lon as number).toFixed(3)}` : '__search__');
 
     const [searchInput, setSearchInput] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
@@ -55,6 +75,25 @@ export default function WeatherScreen() {
 
     const { weather, forecast, isLoading, refetch } = useWeather(effectiveCity, effectiveCoords);
 
+    // Supplementary coord-based data: air quality (OpenWeather) + UV (Open-Meteo).
+    const airQuery = useQuery({
+        queryKey: ['airQuality', effectiveCoords?.lat, effectiveCoords?.lon],
+        queryFn: () => getAirQuality(effectiveCoords!.lat, effectiveCoords!.lon),
+        enabled: !!effectiveCoords,
+        staleTime: 1000 * 60 * 30,
+    });
+    const uvQuery = useQuery({
+        queryKey: ['uvIndex', effectiveCoords?.lat, effectiveCoords?.lon],
+        queryFn: () => getUVIndex(effectiveCoords!.lat, effectiveCoords!.lon),
+        enabled: !!effectiveCoords,
+        staleTime: 1000 * 60 * 30,
+    });
+
+    const aqi = (airQuery.data as any)?.main?.aqi ?? null;
+    const uv = uvQuery.data ?? null;
+    const visibilityKm = weather?.visibility != null ? Math.round(weather.visibility / 1000) : null;
+    const updatedLabel = weather?.dt ? relativeWeatherTime(weather.dt) : '';
+
     // ─────────────────────────────────────────────────────────────
     // Search
     // ─────────────────────────────────────────────────────────────
@@ -62,19 +101,27 @@ export default function WeatherScreen() {
     const handleSubmit = useCallback(() => {
         if (!searchInput.trim()) return;
 
-        setManualCity(searchInput.trim());
+        setSelected({ name: searchInput.trim() });
         setSearchInput('');
         setShowDropdown(false);
     }, [searchInput]);
 
     const handleSelectCity = useCallback(
         (selectedCity: string) => {
-            setManualCity(`${selectedCity}, PK`);
+            setSelected({ name: `${selectedCity}, PK` });
             setSearchInput('');
             setShowDropdown(false);
         },
         []
     );
+
+    // Saved-city switcher handlers.
+    const selectCurrent = useCallback(() => setSelected(null), []);
+    const selectSavedCity = useCallback(
+        (c: SavedCity) => setSelected({ name: c.name, lat: c.latitude, lon: c.longitude }),
+        [],
+    );
+    const openManageCities = useCallback(() => router.push('/weather/manage-cities' as any), [router]);
 
     const handleChangeText = useCallback((text: string) => {
         setSearchInput(text);
@@ -98,7 +145,7 @@ export default function WeatherScreen() {
         setSearchInput('');
         setShowDropdown(false);
         // Clearing the search returns to the current-location default.
-        setManualCity(null);
+        setSelected(null);
     }, []);
 
     // ─────────────────────────────────────────────────────────────
@@ -239,7 +286,7 @@ export default function WeatherScreen() {
                 colors={
                     theme === 'dark'
                         ? [colors.background, colors.background]
-                        : BG_GRADIENT
+                        : getWeatherGradient(weather?.weather?.[0]?.icon, { primary: colors.primary, secondary: colors.secondary, lime: colors.lime })
                 }
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
@@ -299,6 +346,15 @@ export default function WeatherScreen() {
                         </View>
                     </View>
 
+                    {/* Saved-city switcher */}
+                    <WeatherCitySwitcher
+                        cities={savedCities}
+                        activeKey={activeCityKey}
+                        onSelectCurrent={selectCurrent}
+                        onSelectCity={selectSavedCity}
+                        onManage={openManageCities}
+                    />
+
                     {/* Hero */}
                     <WeatherHero
                         weather={weather}
@@ -310,6 +366,16 @@ export default function WeatherScreen() {
                         weather={weather}
                         forecast={forecast}
                     />
+
+                    {/* Details: visibility, UV, air quality, last updated */}
+                    {weather ? (
+                        <WeatherDetails
+                            visibilityKm={visibilityKm}
+                            uv={uv}
+                            aqi={aqi}
+                            updatedLabel={updatedLabel}
+                        />
+                    ) : null}
 
                     <NativeAd placement="weather" />
 

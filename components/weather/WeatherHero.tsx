@@ -3,6 +3,8 @@ import React from 'react';
 import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { getIconName } from './weatherUtils';
+import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
 
 interface WeatherHeroProps {
     weather: any;
@@ -10,6 +12,8 @@ interface WeatherHeroProps {
 }
 
 const WeatherHero = React.memo(({ weather, isLoading }: WeatherHeroProps) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     if (isLoading && !weather) {
         return (
             <View style={styles.loadingContainer}>
@@ -56,12 +60,12 @@ const WeatherHero = React.memo(({ weather, isLoading }: WeatherHeroProps) => {
                 </View>
                 <View style={styles.metaDivider} />
                 <View style={styles.metaItem}>
-                    <Ionicons name="arrow-up" size={13} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="arrow-up" size={13} color={colors.secondary} />
                     <ThemedText style={styles.metaText}>H: {Math.round(weather.main.temp_max)}°</ThemedText>
                 </View>
                 <View style={styles.metaDivider} />
                 <View style={styles.metaItem}>
-                    <Ionicons name="arrow-down" size={13} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="arrow-down" size={13} color={colors.lime} />
                     <ThemedText style={styles.metaText}>L: {Math.round(weather.main.temp_min)}°</ThemedText>
                 </View>
             </View>
