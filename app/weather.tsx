@@ -24,7 +24,7 @@ import WeatherHourly from '@/components/weather/WeatherHourly';
 import WeatherSearchBar from '@/components/weather/WeatherSearchBar';
 import WeatherStats from '@/components/weather/WeatherStats';
 import WeatherSunrise from '@/components/weather/WeatherSunrise';
-import { BG_GRADIENT } from '@/components/weather/weatherUtils';
+import { getWeatherGradient } from '@/utils/weatherTheme';
 
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -239,7 +239,7 @@ export default function WeatherScreen() {
                 colors={
                     theme === 'dark'
                         ? [colors.background, colors.background]
-                        : BG_GRADIENT
+                        : getWeatherGradient(weather?.weather?.[0]?.icon, { primary: colors.primary, secondary: colors.secondary, lime: colors.lime })
                 }
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}

@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
-import { getIconName, PRIMARY } from './weatherUtils';
+import { getIconName } from './weatherUtils';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -12,17 +13,31 @@ const HourlyCard = React.memo(({ time, icon, temp, isNow }: HourlyCardProps) => 
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
-    return (
-        <View
-            style={[
-                styles.card,
-                { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : colors.background },
-                isNow && { backgroundColor: isDark ? colors.primary : PRIMARY }
-            ]}
-        >
+    const inner = (
+        <>
             <ThemedText style={[styles.time, { color: colors.textSecondary }, isNow && styles.timeActive]}>{time}</ThemedText>
             <Ionicons name={getIconName(icon) as any} size={22} color={isNow ? '#FFFFFF' : colors.textSecondary} />
             <ThemedText style={[styles.temp, { color: colors.text }, isNow && styles.tempActive]}>{temp}°</ThemedText>
+        </>
+    );
+
+    if (isNow) {
+        // "Now" gets a warm Primary → Secondary gradient to stand out.
+        return (
+            <LinearGradient
+                colors={[colors.primary, colors.secondary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.card}
+            >
+                {inner}
+            </LinearGradient>
+        );
+    }
+
+    return (
+        <View style={[styles.card, { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : colors.background }]}>
+            {inner}
         </View>
     );
 });

@@ -1,6 +1,6 @@
-// Shared constants and helpers for weather components
-export const PRIMARY = '#006666';
-export const BG_GRADIENT: readonly [string, string] = ['#006666', '#004d4d'];
+// Shared helpers for weather components.
+// (Condition gradients + accent colours now live in utils/weatherTheme.ts, which
+// draws from the Primary / Secondary / Lime brand palette.)
 
 export function getIconName(icon: string): string {
     if (icon.startsWith('01')) return icon.endsWith('n') ? 'moon' : 'sunny';
