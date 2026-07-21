@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     },
     info: {
         flex: 1,
-        gap: 1,
+        gap: 4,
     },
     typeChip: {
         alignSelf: 'flex-start',

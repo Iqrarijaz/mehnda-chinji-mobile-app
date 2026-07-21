@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     },
     info: {
         flex: 1,
-        gap: 1,
+        gap: 2,
         paddingTop: 10,
     },
     typeBadge: {
