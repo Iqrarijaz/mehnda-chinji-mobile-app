@@ -86,8 +86,9 @@ export const businessSchema = yup.object().shape({
         .max(50, 'Address must not exceed 50 characters')
         .required('Address is required'),
     phone: yup.string()
-        .length(11, 'Phone number must be exactly 11 digits')
-        .matches(/^03[0-9]{9}$/, 'Phone number must start with 03 and contain only digits')
+        .min(8, 'Phone number must be at least 8 digits')
+        .max(11, 'Phone number must not exceed 11 digits')
+        .matches(/^[0-9]+$/, 'Phone number must contain only digits')
         .required('Phone is required'),
     category: yup.object().nullable().required('Category is required'),
 });

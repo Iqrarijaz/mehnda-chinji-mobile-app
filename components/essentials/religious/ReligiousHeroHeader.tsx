@@ -34,7 +34,7 @@ interface ReligiousHeroHeaderProps {
  * faint geometric islamic-pattern decor, a gently glowing crescent tile,
  * and soft ambient arcs — all presentation-only, actions pass through.
  */
-export function ReligiousHeroHeader({
+export const ReligiousHeroHeader = React.memo(function ReligiousHeroHeader({
     place,
     placeName,
     isOwner,
@@ -82,44 +82,7 @@ export function ReligiousHeroHeader({
             style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Geometric islamic-inspired decor */}
-            <Svg
-                style={StyleSheet.absoluteFill}
-                viewBox="0 0 375 185"
-                preserveAspectRatio="xMinYMin slice"
-            >
-                {/* large faint circles */}
-                <Circle cx={360} cy={-10} r={100} fill="rgba(255,255,255,0.05)" />
-                <Circle cx={0} cy={185} r={80} fill="rgba(255,255,255,0.04)" />
-
-                {/* Arch / minaret silhouette (right side) */}
-                <Path
-                    d="M340 185 L340 90 Q340 55 360 55 Q380 55 380 90 L380 185"
-                    fill="rgba(255,255,255,0.06)"
-                />
-                <Path
-                    d="M350 90 Q360 72 370 90"
-                    fill="rgba(255,255,255,0.08)"
-                />
-
-                {/* Crescent shape top-left */}
-                <Path
-                    d="M52 30 a22 22 0 1 1 0 44 a14 14 0 1 0 0 -44"
-                    fill="rgba(255,255,255,0.09)"
-                />
-
-                {/* small star dots */}
-                <Circle cx={120} cy={52} r={3} fill="rgba(255,255,255,0.18)" />
-                <Circle cx={200} cy={28} r={2} fill="rgba(255,255,255,0.14)" />
-                <Circle cx={250} cy={70} r={2.5} fill={colors.lime} opacity={0.4} />
-
-                {/* Horizontal decorative line */}
-                <Path
-                    d="M0 175 Q187 165 375 175"
-                    stroke="rgba(255,255,255,0.08)"
-                    strokeWidth={1}
-                    fill="none"
-                />
-            </Svg>
+            <ReligiousBackgroundDecor limeColor={colors.lime} />
 
             {/* Nav row */}
             <View
@@ -210,7 +173,7 @@ export function ReligiousHeroHeader({
             </Animated.View>
         </Animated.View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -344,3 +307,39 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
 });
+
+const ReligiousBackgroundDecor = React.memo(({ limeColor }: { limeColor: string }) => (
+    <Svg
+        style={StyleSheet.absoluteFill}
+        viewBox="0 0 375 185"
+        preserveAspectRatio="xMinYMin slice"
+    >
+        <Circle cx={360} cy={-10} r={100} fill="rgba(255,255,255,0.05)" />
+        <Circle cx={0} cy={185} r={80} fill="rgba(255,255,255,0.04)" />
+
+        <Path
+            d="M340 185 L340 90 Q340 55 360 55 Q380 55 380 90 L380 185"
+            fill="rgba(255,255,255,0.06)"
+        />
+        <Path
+            d="M350 90 Q360 72 370 90"
+            fill="rgba(255,255,255,0.08)"
+        />
+
+        <Path
+            d="M52 30 a22 22 0 1 1 0 44 a14 14 0 1 0 0 -44"
+            fill="rgba(255,255,255,0.09)"
+        />
+
+        <Circle cx={120} cy={52} r={3} fill="rgba(255,255,255,0.18)" />
+        <Circle cx={200} cy={28} r={2} fill="rgba(255,255,255,0.14)" />
+        <Circle cx={250} cy={70} r={2.5} fill={limeColor} opacity={0.4} />
+
+        <Path
+            d="M0 175 Q187 165 375 175"
+            stroke="rgba(255,255,255,0.08)"
+            strokeWidth={1}
+            fill="none"
+        />
+    </Svg>
+));

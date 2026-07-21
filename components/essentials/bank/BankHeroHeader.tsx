@@ -34,7 +34,7 @@ interface BankHeroHeaderProps {
  * pattern decor (coin rings, bar chart lines, card outline), a slow-
  * shimmer icon tile — all presentation-only, actions pass through.
  */
-export function BankHeroHeader({
+export const BankHeroHeader = React.memo(function BankHeroHeader({
     place,
     placeName,
     isOwner,
@@ -81,32 +81,7 @@ export function BankHeroHeader({
             style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Financial decor */}
-            <Svg
-                style={StyleSheet.absoluteFill}
-                viewBox="0 0 375 185"
-                preserveAspectRatio="xMinYMin slice"
-            >
-                {/* Large coin rings */}
-                <Circle cx={355} cy={-15} r={90} fill="rgba(255,255,255,0.05)" />
-                <Circle cx={355} cy={-15} r={60} fill="rgba(255,255,255,0.04)" />
-                <Circle cx={10} cy={185} r={70} fill="rgba(255,255,255,0.04)" />
-
-                {/* Bar chart lines (right side) */}
-                <Rect x={290} y={110} width={8} height={55} rx={3} fill="rgba(255,255,255,0.07)" />
-                <Rect x={304} y={90} width={8} height={75} rx={3} fill="rgba(255,255,255,0.09)" />
-                <Rect x={318} y={105} width={8} height={60} rx={3} fill="rgba(255,255,255,0.06)" />
-                <Rect x={332} y={75} width={8} height={90} rx={3} fill="rgba(255,255,255,0.08)" />
-
-                {/* Credit card outline (left) */}
-                <Rect x={20} y={115} width={68} height={45} rx={6} stroke="rgba(255,255,255,0.09)" strokeWidth={1.5} fill="none" />
-                <Rect x={20} y={127} width={68} height={8} fill="rgba(255,255,255,0.06)" />
-                <Rect x={26} y={143} width={18} height={6} rx={2} fill="rgba(255,255,255,0.09)" />
-
-                {/* Accent dots */}
-                <Circle cx={155} cy={38} r={3} fill={colors.lime} opacity={0.5} />
-                <Circle cx={225} cy={60} r={2.5} fill="rgba(255,255,255,0.22)" />
-                <Circle cx={260} cy={28} r={2} fill="rgba(255,255,255,0.15)" />
-            </Svg>
+            <BankBackgroundDecor limeColor={colors.lime} />
 
             {/* Nav row */}
             <View
@@ -193,7 +168,7 @@ export function BankHeroHeader({
             </Animated.View>
         </Animated.View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -307,3 +282,28 @@ const styles = StyleSheet.create({
     serviceImage: { width: '100%', height: '100%' },
     accentLine: { marginTop: 12, paddingHorizontal: 20 },
 });
+
+const BankBackgroundDecor = React.memo(({ limeColor }: { limeColor: string }) => (
+    <Svg
+        style={StyleSheet.absoluteFill}
+        viewBox="0 0 375 185"
+        preserveAspectRatio="xMinYMin slice"
+    >
+        <Circle cx={355} cy={-15} r={90} fill="rgba(255,255,255,0.05)" />
+        <Circle cx={355} cy={-15} r={60} fill="rgba(255,255,255,0.04)" />
+        <Circle cx={10} cy={185} r={70} fill="rgba(255,255,255,0.04)" />
+
+        <Rect x={290} y={110} width={8} height={55} rx={3} fill="rgba(255,255,255,0.07)" />
+        <Rect x={304} y={90} width={8} height={75} rx={3} fill="rgba(255,255,255,0.09)" />
+        <Rect x={318} y={105} width={8} height={60} rx={3} fill="rgba(255,255,255,0.06)" />
+        <Rect x={332} y={75} width={8} height={90} rx={3} fill="rgba(255,255,255,0.08)" />
+
+        <Rect x={20} y={115} width={68} height={45} rx={6} stroke="rgba(255,255,255,0.09)" strokeWidth={1.5} fill="none" />
+        <Rect x={20} y={127} width={68} height={8} fill="rgba(255,255,255,0.06)" />
+        <Rect x={26} y={143} width={18} height={6} rx={2} fill="rgba(255,255,255,0.09)" />
+
+        <Circle cx={155} cy={38} r={3} fill={limeColor} opacity={0.5} />
+        <Circle cx={225} cy={60} r={2.5} fill="rgba(255,255,255,0.22)" />
+        <Circle cx={260} cy={28} r={2} fill="rgba(255,255,255,0.15)" />
+    </Svg>
+));

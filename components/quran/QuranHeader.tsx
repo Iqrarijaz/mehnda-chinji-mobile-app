@@ -45,20 +45,7 @@ export const QuranHeader = memo(({
             style={[styles.container, { backgroundColor: colors.primary, paddingTop }]}
         >
             {/* Faint crescent + star decor */}
-            <Svg style={StyleSheet.absoluteFill} viewBox="0 0 375 130" preserveAspectRatio="xMinYMin slice">
-                <Circle cx={352} cy={0} r={80} fill="rgba(255,255,255,0.05)" />
-                <Circle cx={8} cy={130} r={55} fill="rgba(255,255,255,0.04)" />
-                <Path
-                    d="M300 40 a18 18 0 1 0 13 31 a14 14 0 1 1 -13 -31 z"
-                    fill="rgba(255,255,255,0.07)"
-                />
-                <Path
-                    d="M58 44 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3 z"
-                    fill="rgba(255,255,255,0.09)"
-                />
-                <Circle cx={120} cy={34} r={3} fill={colors.lime} opacity={0.5} />
-                <Circle cx={250} cy={96} r={2.5} fill={colors.secondary} opacity={0.6} />
-            </Svg>
+            <QuranBackgroundDecor lime={colors.lime} secondary={colors.secondary} />
 
             {/* Title row: back left, title centered */}
             <View style={styles.topRow}>
@@ -144,3 +131,20 @@ const styles = StyleSheet.create({
         marginTop: 14,
     },
 });
+
+const QuranBackgroundDecor = memo(({ lime, secondary }: { lime: string; secondary: string }) => (
+    <Svg style={StyleSheet.absoluteFill} viewBox="0 0 375 130" preserveAspectRatio="xMinYMin slice">
+        <Circle cx={352} cy={0} r={80} fill="rgba(255,255,255,0.05)" />
+        <Circle cx={8} cy={130} r={55} fill="rgba(255,255,255,0.04)" />
+        <Path
+            d="M300 40 a18 18 0 1 0 13 31 a14 14 0 1 1 -13 -31 z"
+            fill="rgba(255,255,255,0.07)"
+        />
+        <Path
+            d="M58 44 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3 z"
+            fill="rgba(255,255,255,0.09)"
+        />
+        <Circle cx={120} cy={34} r={3} fill={lime} opacity={0.5} />
+        <Circle cx={250} cy={96} r={2.5} fill={secondary} opacity={0.6} />
+    </Svg>
+));

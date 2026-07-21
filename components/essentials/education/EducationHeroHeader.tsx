@@ -34,7 +34,7 @@ interface EducationHeroHeaderProps {
  * and open-book decor, and a gently floating institution tile.
  * Presentation only — nav actions pass straight through.
  */
-export function EducationHeroHeader({
+export const EducationHeroHeader = React.memo(function EducationHeroHeader({
     place,
     placeName,
     isOwner,
@@ -79,46 +79,7 @@ export function EducationHeroHeader({
             style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Education decor: faint circles, graduation cap, open book */}
-            <Svg
-                style={StyleSheet.absoluteFill}
-                viewBox="0 0 375 185"
-                preserveAspectRatio="xMinYMin slice"
-            >
-                <Circle cx={350} cy={0} r={95} fill="rgba(255,255,255,0.06)" />
-                <Circle cx={5} cy={185} r={70} fill="rgba(255,255,255,0.05)" />
-                {/* graduation cap: mortarboard, band, tassel */}
-                <Path
-                    d="M296 74 l34 -13 l34 13 l-34 13 z"
-                    stroke="rgba(255,255,255,0.11)"
-                    strokeWidth={2}
-                    strokeLinejoin="round"
-                    fill="none"
-                />
-                <Path
-                    d="M312 82 v14 c0 5 8 9 18 9 c10 0 18 -4 18 -9 v-14"
-                    stroke="rgba(255,255,255,0.11)"
-                    strokeWidth={2}
-                    fill="none"
-                />
-                <Path
-                    d="M364 74 v22"
-                    stroke="rgba(255,255,255,0.11)"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    fill="none"
-                />
-                <Circle cx={364} cy={99} r={2.5} fill="rgba(255,255,255,0.14)" />
-                {/* open book */}
-                <Path
-                    d="M40 118 c10 -7 22 -7 30 -2 c8 -5 20 -5 30 2 v26 c-10 -7 -22 -7 -30 -2 c-8 -5 -20 -5 -30 2 z M70 116 v26"
-                    stroke="rgba(255,255,255,0.10)"
-                    strokeWidth={2}
-                    strokeLinejoin="round"
-                    fill="none"
-                />
-                <Circle cx={140} cy={52} r={3.5} fill={colors.lime} opacity={0.55} />
-                <Circle cx={248} cy={110} r={3.5} fill={colors.secondary} opacity={0.6} />
-            </Svg>
+            <EducationBackgroundDecor limeColor={colors.lime} secondaryColor={colors.secondary} />
 
             {/* Nav row */}
             <View
@@ -188,7 +149,7 @@ export function EducationHeroHeader({
             </Animated.View>
         </Animated.View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -304,3 +265,44 @@ const styles = StyleSheet.create({
         height: '100%',
     },
 });
+
+const EducationBackgroundDecor = React.memo(({ limeColor, secondaryColor }: { limeColor: string; secondaryColor: string }) => (
+    <Svg
+        style={StyleSheet.absoluteFill}
+        viewBox="0 0 375 185"
+        preserveAspectRatio="xMinYMin slice"
+    >
+        <Circle cx={350} cy={0} r={95} fill="rgba(255,255,255,0.06)" />
+        <Circle cx={5} cy={185} r={70} fill="rgba(255,255,255,0.05)" />
+        <Path
+            d="M296 74 l34 -13 l34 13 l-34 13 z"
+            stroke="rgba(255,255,255,0.11)"
+            strokeWidth={2}
+            strokeLinejoin="round"
+            fill="none"
+        />
+        <Path
+            d="M312 82 v14 c0 5 8 9 18 9 c10 0 18 -4 18 -9 v-14"
+            stroke="rgba(255,255,255,0.11)"
+            strokeWidth={2}
+            fill="none"
+        />
+        <Path
+            d="M364 74 v22"
+            stroke="rgba(255,255,255,0.11)"
+            strokeWidth={2}
+            strokeLinecap="round"
+            fill="none"
+        />
+        <Circle cx={364} cy={99} r={2.5} fill="rgba(255,255,255,0.14)" />
+        <Path
+            d="M40 118 c10 -7 22 -7 30 -2 c8 -5 20 -5 30 2 v26 c-10 -7 -22 -7 -30 -2 c-8 -5 -20 -5 -30 2 z M70 116 v26"
+            stroke="rgba(255,255,255,0.10)"
+            strokeWidth={2}
+            strokeLinejoin="round"
+            fill="none"
+        />
+        <Circle cx={140} cy={52} r={3.5} fill={limeColor} opacity={0.55} />
+        <Circle cx={248} cy={110} r={3.5} fill={secondaryColor} opacity={0.6} />
+    </Svg>
+));

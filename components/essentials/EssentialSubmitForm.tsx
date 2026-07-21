@@ -268,10 +268,11 @@ const EssentialSubmitForm = React.memo(({
         }
 
         for (let i = 0; i < validContacts.length; i++) {
-            if (validContacts[i].number.trim().length !== 11) {
+            const num = validContacts[i].number.trim();
+            if (num.length < 8 || num.length > 11 || !/^[0-9]+$/.test(num)) {
                 const originalIndex = form.contact.findIndex((c: any) => c.number === validContacts[i].number);
                 if (originalIndex !== -1) {
-                    newErrors[`contact[${originalIndex}].number`] = 'Must be exactly 11 digits.';
+                    newErrors[`contact[${originalIndex}].number`] = 'Must be 8 to 11 digits and contain only numbers.';
                 }
             }
         }
@@ -286,7 +287,7 @@ const EssentialSubmitForm = React.memo(({
             ...form,
             contact: validContacts.map((c: any) => ({ name: c.name, number: c.number })),
             category: category,
-            images: uploadedImage ? [uploadedImage] : [],
+            images: uploadedImage ? [uploadedImage] : (selectedTypeInfo?.image ? [selectedTypeInfo.image] : (selectedTypeInfo?.icon ? [selectedTypeInfo.icon] : [])),
             tags: (form.tags || []).map((t: any) => ({ eng: t.eng, ur: t.ur })),
             route: form.route.filter((r: any) => r.city.trim() !== ''),
             returnRoute: isTravel ? form.returnRoute.filter((r: any) => r.city.trim() !== '') : [],

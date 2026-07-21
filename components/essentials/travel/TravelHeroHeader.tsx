@@ -34,7 +34,7 @@ interface TravelHeroHeaderProps {
  * Compact travel-specific hero. Route-themed decor and motion are pure
  * transform/opacity (plus one dash-offset), presentation only.
  */
-export function TravelHeroHeader({
+export const TravelHeroHeader = React.memo(function TravelHeroHeader({
     place,
     placeName,
     isOwner,
@@ -76,24 +76,7 @@ export function TravelHeroHeader({
             style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Route-inspired background decor */}
-            <Svg
-                style={StyleSheet.absoluteFill}
-                viewBox="0 0 375 190"
-                preserveAspectRatio="xMinYMin slice"
-            >
-                <Circle cx={345} cy={5} r={95} fill="rgba(255,255,255,0.06)" />
-                <Circle cx={10} cy={185} r={70} fill="rgba(255,255,255,0.05)" />
-                <Path
-                    d="M -20 140 C 70 60, 190 170, 400 55"
-                    stroke="rgba(255,255,255,0.12)"
-                    strokeWidth={2}
-                    strokeDasharray="5 9"
-                    strokeLinecap="round"
-                    fill="none"
-                />
-                <Circle cx={96} cy={97} r={3.5} fill={colors.lime} opacity={0.6} />
-                <Circle cx={252} cy={118} r={3.5} fill={colors.secondary} opacity={0.65} />
-            </Svg>
+            <TravelBackgroundDecor limeColor={colors.lime} secondaryColor={colors.secondary} />
 
             {/* Nav row */}
             <View
@@ -176,7 +159,7 @@ export function TravelHeroHeader({
             ) : null}
         </Animated.View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -290,3 +273,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 });
+
+const TravelBackgroundDecor = React.memo(({ limeColor, secondaryColor }: { limeColor: string; secondaryColor: string }) => (
+    <Svg
+        style={StyleSheet.absoluteFill}
+        viewBox="0 0 375 190"
+        preserveAspectRatio="xMinYMin slice"
+    >
+        <Circle cx={345} cy={5} r={95} fill="rgba(255,255,255,0.06)" />
+        <Circle cx={10} cy={185} r={70} fill="rgba(255,255,255,0.05)" />
+        <Path
+            d="M -20 140 C 70 60, 190 170, 400 55"
+            stroke="rgba(255,255,255,0.12)"
+            strokeWidth={2}
+            strokeDasharray="5 9"
+            strokeLinecap="round"
+            fill="none"
+        />
+        <Circle cx={96} cy={97} r={3.5} fill={limeColor} opacity={0.6} />
+        <Circle cx={252} cy={118} r={3.5} fill={secondaryColor} opacity={0.65} />
+    </Svg>
+));

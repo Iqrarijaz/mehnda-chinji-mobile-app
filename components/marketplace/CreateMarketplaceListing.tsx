@@ -274,8 +274,8 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
             return;
         }
 
-        if (!sellerPhone || sellerPhone.length !== 11 || !sellerPhone.startsWith('03')) {
-            Toast.show({ type: 'error', text1: 'Validation Error', text2: 'Valid phone number required.' });
+        if (!sellerPhone || sellerPhone.length < 8 || sellerPhone.length > 11 || !/^[0-9]+$/.test(sellerPhone)) {
+            Toast.show({ type: 'error', text1: 'Validation Error', text2: 'Valid phone number (8-11 digits) required.' });
             return;
         }
 

@@ -72,7 +72,7 @@ const DECOR_ICON: Record<ScreenHeaderDecor, keyof typeof Ionicons.glyphMap> = {
 
 // ─── Decor layer ──────────────────────────────────────────────────────────────
 
-function DecorLayer({ decor, lime, secondary }: { decor: ScreenHeaderDecor; lime: string; secondary: string }) {
+const DecorLayer = React.memo(function DecorLayer({ decor, lime, secondary }: { decor: ScreenHeaderDecor; lime: string; secondary: string }) {
     // The whole layer drifts very slowly sideways — subtle background motion.
     const drift = useSharedValue(0);
     useEffect(() => {
@@ -159,7 +159,7 @@ function DecorLayer({ decor, lime, secondary }: { decor: ScreenHeaderDecor; lime
             </Svg>
         </Animated.View>
     );
-}
+});
 
 // ─── Component ────────────────────────────────────────────────────────────────
 

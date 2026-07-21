@@ -11,6 +11,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    Image,
+    ActivityIndicator
 } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -36,6 +38,9 @@ import { useTheme } from '@/context/ThemeContext';
 
 import * as yup from 'yup';
 import { businessSchema } from '@/utils/validation';
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+import { uploadUserImage } from '@/apis/essentials';
 
 const BusinessRegistrationScreen = () => {
     const router = useRouter();
@@ -77,6 +82,10 @@ const BusinessRegistrationScreen = () => {
     const [closeTime, setCloseTime] = useState('09:00 PM');
     const [openTimePickerVisible, setOpenTimePickerVisible] = useState(false);
     const [closeTimePickerVisible, setCloseTimePickerVisible] = useState(false);
+
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
 
     const selectedProfessionInfo = professionsList.find(
         (p: any) => p && p.name_eng?.toLowerCase() === form.category?.name_eng?.toLowerCase()
@@ -138,6 +147,11 @@ const BusinessRegistrationScreen = () => {
             } else {
                 setLocation(null);
             }
+            if (editData.images && editData.images.length > 0) {
+                const img = editData.images[0];
+                setSelectedImage(img);
+                setUploadedImage(img);
+            }
         } else {
             setOpenTime('09:00 AM');
             setCloseTime('09:00 PM');
@@ -151,8 +165,67 @@ const BusinessRegistrationScreen = () => {
                 timing: '',
             });
             setLocation(null);
+            setSelectedImage(null);
+            setUploadedImage(null);
         }
     }, [editDataParam, user]);
+
+    const pickImage = async () => {
+        if (Platform.OS === 'ios') {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                Toast.show({ type: 'error', text1: 'Permission Denied', text2: 'Camera roll permissions are required.' });
+                return;
+            }
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: [16, 9],
+            quality: 0.8,
+        });
+        if (!result.canceled) {
+            const asset = result.assets[0];
+            let finalUri = asset.uri;
+            try {
+                const manipResult = await ImageManipulator.manipulateAsync(
+                    asset.uri,
+                    [{ resize: { width: 1080 } }],
+                    { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+                );
+                finalUri = manipResult.uri;
+            } catch (e) {
+                console.error('Image compression failed', e);
+            }
+            setSelectedImage(finalUri);
+            handleImageUpload(finalUri);
+        }
+    };
+
+    const handleImageUpload = async (uri: string) => {
+        setIsUploadingImage(true);
+        try {
+            const filename = uri.split('/').pop() || 'image.jpg';
+            const match = /\.(\w+)$/.exec(filename);
+            const type = match ? `image/${match[1]}` : `image`;
+            const formData = new FormData();
+            formData.append('image', { uri, name: filename, type } as any);
+            const res: any = await uploadUserImage(formData);
+            if (res.data?.success) {
+                setUploadedImage(res.data.imageUrl);
+            } else {
+                setSelectedImage(null);
+                setUploadedImage(null);
+                Toast.show({ type: 'error', text1: 'Upload Failed', text2: 'Could not upload image.' });
+            }
+        } catch (error) {
+            setSelectedImage(null);
+            setUploadedImage(null);
+            Toast.show({ type: 'error', text1: 'Upload Failed', text2: 'Something went wrong.' });
+        } finally {
+            setIsUploadingImage(false);
+        }
+    };
 
     const handleSubmit = async () => {
         try {
@@ -168,7 +241,8 @@ const BusinessRegistrationScreen = () => {
                 description: form.description,
                 phone,
                 address,
-                logo: category.icon || null,
+                logo: uploadedImage || category.icon || null,
+                images: uploadedImage ? [uploadedImage] : (category.icon ? [category.icon] : []),
                 tags: form.tags.map((t: any) => ({ eng: t.eng, ur: t.ur })),
                 timing: `${openTime} - ${closeTime}`,
             };
@@ -266,6 +340,30 @@ const BusinessRegistrationScreen = () => {
                     keyboardShouldPersistTaps="handled"
                 >
                     <View style={styles.formSection}>
+                        
+                        {/* Image Upload */}
+                        <Animated.View entering={FadeInDown.delay(150)} style={styles.inputField}>
+                            <ThemedText style={[styles.label, { color: colors.text }]}>BUSINESS IMAGE</ThemedText>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                                <TouchableOpacity 
+                                    style={[{ width: 80, height: 80, borderRadius: Layout.borderRadius, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }]} 
+                                    onPress={pickImage} 
+                                    disabled={isUploadingImage}
+                                >
+                                    {isUploadingImage ? (
+                                        <ActivityIndicator color={colors.primary} />
+                                    ) : uploadedImage ? (
+                                        <Image source={{ uri: uploadedImage }} style={{ width: '100%', height: '100%' }} />
+                                    ) : (
+                                        <Ionicons name="camera-outline" size={30} color={colors.icon} />
+                                    )}
+                                </TouchableOpacity>
+                                <View style={{ flex: 1 }}>
+                                    <ThemedText style={{ color: colors.textSecondary, fontSize: 13 }}>Add a photo of your business (Optional).</ThemedText>
+                                    <ThemedText style={{ color: colors.textSecondary, fontSize: 11, marginTop: 4 }}>If no image is provided, category icon will be used.</ThemedText>
+                                </View>
+                            </View>
+                        </Animated.View>
 
                         {/* Business Name */}
                         <FormInput
@@ -335,7 +433,7 @@ const BusinessRegistrationScreen = () => {
                                         onChange={(loc) => {
                                             setLocation(loc);
                                             if (loc?.address) {
-                                                setForm(prev => ({ ...prev, address: loc.address }));
+                                                setForm(prev => ({ ...prev, address: loc.address || '' }));
                                                 setErrors(prev => ({ ...prev, address: '' }));
                                             }
                                         }}

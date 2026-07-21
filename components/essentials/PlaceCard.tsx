@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     },
     info: {
         flex: 1,
-        gap: 4,
+        gap: 1,
     },
     typeChip: {
         alignSelf: 'flex-start',
@@ -250,6 +250,7 @@ const styles = StyleSheet.create({
         fontSize: 14.5,
         fontWeight: '800',
         letterSpacing: 0.1,
+        lineHeight: 18,
     },
     metaRow: {
         flexDirection: 'row',
@@ -261,5 +262,6 @@ const styles = StyleSheet.create({
         fontSize: 11.5,
         fontWeight: '500',
         flexShrink: 1,
+        lineHeight: 15,
     },
 });

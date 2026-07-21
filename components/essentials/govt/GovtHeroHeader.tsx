@@ -34,7 +34,7 @@ interface GovtHeroHeaderProps {
  * civic decor (pillars, shield, seal rings), a slow-pulse icon tile —
  * all presentation-only, actions pass through.
  */
-export function GovtHeroHeader({
+export const GovtHeroHeader = React.memo(function GovtHeroHeader({
     place,
     placeName,
     isOwner,
@@ -80,40 +80,7 @@ export function GovtHeroHeader({
             style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Civic / institutional decor */}
-            <Svg
-                style={StyleSheet.absoluteFill}
-                viewBox="0 0 375 185"
-                preserveAspectRatio="xMinYMin slice"
-            >
-                {/* Seal rings (top-right) */}
-                <Circle cx={360} cy={-5} r={95} fill="rgba(255,255,255,0.04)" />
-                <Circle cx={360} cy={-5} r={65} fill="rgba(255,255,255,0.04)" />
-                <Circle cx={360} cy={-5} r={38} fill="rgba(255,255,255,0.05)" />
-
-                {/* Pillar silhouettes (left) */}
-                <Rect x={22} y={85} width={9} height={90} rx={3} fill="rgba(255,255,255,0.07)" />
-                <Rect x={36} y={85} width={9} height={90} rx={3} fill="rgba(255,255,255,0.07)" />
-                <Rect x={50} y={85} width={9} height={90} rx={3} fill="rgba(255,255,255,0.07)" />
-                {/* Pillar cap */}
-                <Rect x={16} y={80} width={50} height={7} rx={2} fill="rgba(255,255,255,0.09)" />
-                {/* Pediment triangle */}
-                <Path d="M16 80 L41 55 L66 80 Z" fill="rgba(255,255,255,0.07)" />
-
-                {/* Shield outline (center-right) */}
-                <Path
-                    d="M230 50 L258 50 L258 78 Q244 92 230 78 Z"
-                    stroke="rgba(255,255,255,0.09)"
-                    strokeWidth={1.5}
-                    fill="rgba(255,255,255,0.04)"
-                />
-                {/* Horizontal rule inside shield */}
-                <Line x1={234} y1={64} x2={254} y2={64} stroke="rgba(255,255,255,0.09)" strokeWidth={1} />
-
-                {/* Accent dots */}
-                <Circle cx={160} cy={42} r={3} fill={colors.lime} opacity={0.45} />
-                <Circle cx={290} cy={130} r={2.5} fill="rgba(255,255,255,0.18)" />
-                <Circle cx={195} cy={22} r={2} fill="rgba(255,255,255,0.12)" />
-            </Svg>
+            <GovtBackgroundDecor limeColor={colors.lime} />
 
             {/* Nav row */}
             <View
@@ -200,7 +167,7 @@ export function GovtHeroHeader({
             </Animated.View>
         </Animated.View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -314,3 +281,33 @@ const styles = StyleSheet.create({
     serviceImage: { width: '100%', height: '100%' },
     accentLine: { marginTop: 12, paddingHorizontal: 20 },
 });
+
+const GovtBackgroundDecor = React.memo(({ limeColor }: { limeColor: string }) => (
+    <Svg
+        style={StyleSheet.absoluteFill}
+        viewBox="0 0 375 185"
+        preserveAspectRatio="xMinYMin slice"
+    >
+        <Circle cx={360} cy={-5} r={95} fill="rgba(255,255,255,0.04)" />
+        <Circle cx={360} cy={-5} r={65} fill="rgba(255,255,255,0.04)" />
+        <Circle cx={360} cy={-5} r={38} fill="rgba(255,255,255,0.05)" />
+
+        <Rect x={22} y={85} width={9} height={90} rx={3} fill="rgba(255,255,255,0.07)" />
+        <Rect x={36} y={85} width={9} height={90} rx={3} fill="rgba(255,255,255,0.07)" />
+        <Rect x={50} y={85} width={9} height={90} rx={3} fill="rgba(255,255,255,0.07)" />
+        <Rect x={16} y={80} width={50} height={7} rx={2} fill="rgba(255,255,255,0.09)" />
+        <Path d="M16 80 L41 55 L66 80 Z" fill="rgba(255,255,255,0.07)" />
+
+        <Path
+            d="M230 50 L258 50 L258 78 Q244 92 230 78 Z"
+            stroke="rgba(255,255,255,0.09)"
+            strokeWidth={1.5}
+            fill="rgba(255,255,255,0.04)"
+        />
+        <Line x1={234} y1={64} x2={254} y2={64} stroke="rgba(255,255,255,0.09)" strokeWidth={1} />
+
+        <Circle cx={160} cy={42} r={3} fill={limeColor} opacity={0.45} />
+        <Circle cx={290} cy={130} r={2.5} fill="rgba(255,255,255,0.18)" />
+        <Circle cx={195} cy={22} r={2} fill="rgba(255,255,255,0.12)" />
+    </Svg>
+));

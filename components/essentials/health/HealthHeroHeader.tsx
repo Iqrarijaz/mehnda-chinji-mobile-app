@@ -41,7 +41,7 @@ interface HealthHeroHeaderProps {
  * gently breathing service tile, and a slow single-heartbeat line.
  * Presentation only — nav actions pass straight through.
  */
-export function HealthHeroHeader({
+export const HealthHeroHeader = React.memo(function HealthHeroHeader({
     place,
     placeName,
     isOwner,
@@ -99,30 +99,7 @@ export function HealthHeroHeader({
             style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Healthcare decor: faint circles, cross, stethoscope curve */}
-            <Svg
-                style={StyleSheet.absoluteFill}
-                viewBox="0 0 375 185"
-                preserveAspectRatio="xMinYMin slice"
-            >
-                <Circle cx={350} cy={0} r={95} fill="rgba(255,255,255,0.06)" />
-                <Circle cx={5} cy={185} r={70} fill="rgba(255,255,255,0.05)" />
-                {/* stethoscope: tube curve ending in a chest piece */}
-                <Path
-                    d="M296 40 c0 26 -20 40 -20 62 c0 18 14 28 30 28 c16 0 30 -10 30 -28"
-                    stroke="rgba(255,255,255,0.10)"
-                    strokeWidth={2.5}
-                    strokeLinecap="round"
-                    fill="none"
-                />
-                <Circle cx={336} cy={96} r={7} stroke="rgba(255,255,255,0.10)" strokeWidth={2.5} fill="none" />
-                {/* small medical cross */}
-                <Path
-                    d="M48 96 h8 v-8 h8 v8 h8 v8 h-8 v8 h-8 v-8 h-8 z"
-                    fill="rgba(255,255,255,0.10)"
-                />
-                <Circle cx={128} cy={48} r={3.5} fill={colors.lime} opacity={0.55} />
-                <Circle cx={236} cy={64} r={3.5} fill={colors.secondary} opacity={0.6} />
-            </Svg>
+            <HealthBackgroundDecor limeColor={colors.lime} secondaryColor={colors.secondary} />
 
             {/* Nav row */}
             <View
@@ -219,7 +196,7 @@ export function HealthHeroHeader({
             </Animated.View>
         </Animated.View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -352,3 +329,28 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
 });
+
+const HealthBackgroundDecor = React.memo(({ limeColor, secondaryColor }: { limeColor: string; secondaryColor: string }) => (
+    <Svg
+        style={StyleSheet.absoluteFill}
+        viewBox="0 0 375 185"
+        preserveAspectRatio="xMinYMin slice"
+    >
+        <Circle cx={350} cy={0} r={95} fill="rgba(255,255,255,0.06)" />
+        <Circle cx={5} cy={185} r={70} fill="rgba(255,255,255,0.05)" />
+        <Path
+            d="M296 40 c0 26 -20 40 -20 62 c0 18 14 28 30 28 c16 0 30 -10 30 -28"
+            stroke="rgba(255,255,255,0.10)"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            fill="none"
+        />
+        <Circle cx={336} cy={96} r={7} stroke="rgba(255,255,255,0.10)" strokeWidth={2.5} fill="none" />
+        <Path
+            d="M48 96 h8 v-8 h8 v8 h8 v8 h-8 v8 h-8 v-8 h-8 z"
+            fill="rgba(255,255,255,0.10)"
+        />
+        <Circle cx={128} cy={48} r={3.5} fill={limeColor} opacity={0.55} />
+        <Circle cx={236} cy={64} r={3.5} fill={secondaryColor} opacity={0.6} />
+    </Svg>
+));

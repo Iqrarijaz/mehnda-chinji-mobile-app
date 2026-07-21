@@ -42,7 +42,7 @@ interface EmergencyHeroHeaderProps {
  * Compact emergency hero: calm brand palette, heartbeat sweep, and a softly
  * pulsing service tile. Presentation only — nav actions passed straight through.
  */
-export function EmergencyHeroHeader({
+export const EmergencyHeroHeader = React.memo(function EmergencyHeroHeader({
     place,
     placeName,
     isOwner,
@@ -103,28 +103,7 @@ export function EmergencyHeroHeader({
             style={[styles.container, { backgroundColor: BG }]}
         >
             {/* Emergency-themed decor: faint shield, cross, and circles */}
-            <Svg
-                style={StyleSheet.absoluteFill}
-                viewBox="0 0 375 190"
-                preserveAspectRatio="xMinYMin slice"
-            >
-                <Circle cx={350} cy={0} r={95} fill="rgba(255,255,255,0.06)" />
-                <Circle cx={5} cy={190} r={70} fill="rgba(255,255,255,0.05)" />
-                {/* shield outline */}
-                <Path
-                    d="M300 118 l26 -10 l26 10 v20 c0 16 -12 28 -26 34 c-14 -6 -26 -18 -26 -34 z"
-                    stroke="rgba(255,255,255,0.10)"
-                    strokeWidth={2}
-                    fill="none"
-                />
-                {/* small medical cross */}
-                <Path
-                    d="M52 84 h8 v-8 h8 v8 h8 v8 h-8 v8 h-8 v-8 h-8 z"
-                    fill="rgba(255,255,255,0.10)"
-                />
-                <Circle cx={120} cy={52} r={3.5} fill={colors.lime} opacity={0.55} />
-                <Circle cx={268} cy={70} r={3.5} fill={colors.secondary} opacity={0.6} />
-            </Svg>
+            <EmergencyBackgroundDecor limeColor={colors.lime} secondaryColor={colors.secondary} />
 
             {/* Nav row */}
             <View
@@ -222,7 +201,7 @@ export function EmergencyHeroHeader({
             </Animated.View>
         </Animated.View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -355,3 +334,26 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
 });
+
+const EmergencyBackgroundDecor = React.memo(({ limeColor, secondaryColor }: { limeColor: string; secondaryColor: string }) => (
+    <Svg
+        style={StyleSheet.absoluteFill}
+        viewBox="0 0 375 190"
+        preserveAspectRatio="xMinYMin slice"
+    >
+        <Circle cx={350} cy={0} r={95} fill="rgba(255,255,255,0.06)" />
+        <Circle cx={5} cy={190} r={70} fill="rgba(255,255,255,0.05)" />
+        <Path
+            d="M300 118 l26 -10 l26 10 v20 c0 16 -12 28 -26 34 c-14 -6 -26 -18 -26 -34 z"
+            stroke="rgba(255,255,255,0.10)"
+            strokeWidth={2}
+            fill="none"
+        />
+        <Path
+            d="M52 84 h8 v-8 h8 v8 h8 v8 h-8 v8 h-8 v-8 h-8 z"
+            fill="rgba(255,255,255,0.10)"
+        />
+        <Circle cx={120} cy={52} r={3.5} fill={limeColor} opacity={0.55} />
+        <Circle cx={268} cy={70} r={3.5} fill={secondaryColor} opacity={0.6} />
+    </Svg>
+));

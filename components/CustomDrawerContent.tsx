@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import Animated, { FadeIn, FadeInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Path } from 'react-native-svg';
 
 import { useRewardedAd } from '@/ads/hooks/useAds';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
@@ -182,28 +181,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                     },
                 ]}
             >
-                {/* Faint community decor */}
-                <Svg style={StyleSheet.absoluteFill} viewBox="0 0 300 200" preserveAspectRatio="xMinYMin slice">
-                    <Circle cx={290} cy={10} r={70} fill="rgba(255,255,255,0.05)" />
-                    <Circle cx={10} cy={190} r={55} fill="rgba(255,255,255,0.04)" />
-                    <Path
-                        d="M40 150 C 100 120, 180 175, 280 115"
-                        stroke="rgba(255,255,255,0.08)"
-                        strokeWidth={2}
-                        strokeDasharray="4 8"
-                        strokeLinecap="round"
-                        fill="none"
-                    />
-                    <Path
-                        d="M230 60 l10 -8 l10 8 v14 h-20 z"
-                        fill="none"
-                        stroke="rgba(255,255,255,0.09)"
-                        strokeWidth={2}
-                        strokeLinejoin="round"
-                    />
-                    <Circle cx={60} cy={70} r={3} fill={colors.lime} opacity={0.55} />
-                    <Circle cx={200} cy={150} r={2.5} fill={colors.secondary} opacity={0.6} />
-                </Svg>
+                {/* Removed community decor */}
 
                 <View style={styles.headerTop}>
                     <TouchableOpacity
