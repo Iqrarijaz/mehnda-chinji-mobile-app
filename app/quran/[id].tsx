@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Alert, Share } from 'react-native';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,10 +16,20 @@ import { analyticsService, AnalyticsEvents } from '@/analytics';
 // Import memoized components
 import { AyahItem } from '@/components/quran/AyahItem';
 import { QuranHeader } from '@/components/quran/QuranHeader';
+import { QuranSettingsModal } from '@/components/quran/QuranSettingsModal';
+import { AyahActionsModal } from '@/components/quran/AyahActionsModal';
+import { ShareAyahCard } from '@/components/quran/ShareAyahCard';
 import { startSurahDownload, getPlayableAyahUri, cleanupExpiredCache } from '@/utils/quranAudioCache';
+import {
+    getFontSize, setFontSize as persistFontSize,
+    getTajweedEnabled, setTajweedEnabled as persistTajweed,
+    getLastPosition, setLastPosition,
+    getBookmarks, toggleBookmark as toggleBookmarkStore, isBookmarked as isBookmarkedIn,
+    FONT_SIZE_DEFAULT, type Bookmark,
+} from '@/utils/quranPrefs';
 
 export default function SurahDetailScreen() {
-    const { id, autoplay } = useLocalSearchParams<{ id: string; autoplay?: string }>();
+    const { id, autoplay, ayah: ayahParam } = useLocalSearchParams<{ id: string; autoplay?: string; ayah?: string }>();
     const surahNumber = parseInt(Array.isArray(id) ? id[0] : id || '1', 10);
     const router = useRouter();
     const insets = useSafeAreaInsets();
@@ -41,6 +51,48 @@ export default function SurahDetailScreen() {
     const soundRef = useRef<Audio.Sound | null>(null);
     const flatListRef = useRef<FlashListRef<any>>(null);
 
+    // ── Reading preferences & features ──────────────────────────────────────
+    const [fontSize, setFontSizeState] = useState<number>(FONT_SIZE_DEFAULT);
+    const [tajweedEnabled, setTajweedEnabledState] = useState<boolean>(false);
+    const [settingsVisible, setSettingsVisible] = useState(false);
+    const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+    const [actionIndex, setActionIndex] = useState<number | null>(null);
+    const [actionsVisible, setActionsVisible] = useState(false);
+
+    const shareCardRef = useRef<View>(null);
+    const savedPosRef = useRef<number>(-1);
+    const restoredRef = useRef(false);
+
+    // Load persisted preferences + bookmarks once.
+    useEffect(() => {
+        (async () => {
+            const [fs, tj, bm] = await Promise.all([getFontSize(), getTajweedEnabled(), getBookmarks()]);
+            setFontSizeState(fs);
+            setTajweedEnabledState(tj);
+            setBookmarks(bm);
+        })();
+    }, []);
+
+    const changeFontSize = useCallback((v: number) => {
+        setFontSizeState(v);
+        persistFontSize(v);
+    }, []);
+
+    const changeTajweed = useCallback((v: boolean) => {
+        setTajweedEnabledState(v);
+        persistTajweed(v);
+    }, []);
+
+    const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
+    const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+        if (!viewableItems?.length) return;
+        const top = viewableItems[0]?.index;
+        if (typeof top === 'number' && top !== savedPosRef.current) {
+            savedPosRef.current = top;
+            setLastPosition(surahNumber, top);
+        }
+    }).current;
+
     // Fetch Surah details with 3 editions: Uthmani Arabic, English translation, and audio recitation
     const { data: response, isLoading, isError, refetch } = useQuery({
         queryKey: ['quran-surah', surahNumber],
@@ -61,6 +113,23 @@ export default function SurahDetailScreen() {
         ? `${surahInfo.englishName} · ${surahInfo.numberOfAyahs} verses`
         : 'Loading verses…';
     const ayahs = arabicEdition?.ayahs || [];
+
+    // Reading progress: restore the last-read ayah once the verses are loaded.
+    useEffect(() => {
+        if (restoredRef.current || !ayahs.length) return;
+        (async () => {
+            // A bookmark deep-link (?ayah=) wins over the saved reading position.
+            const deepLink = ayahParam ? parseInt(Array.isArray(ayahParam) ? ayahParam[0] : ayahParam, 10) : NaN;
+            const target = Number.isFinite(deepLink) ? deepLink : await getLastPosition(surahNumber);
+            savedPosRef.current = target;
+            if (target > 0 && target < ayahs.length) {
+                setTimeout(() => {
+                    flatListRef.current?.scrollToIndex({ index: target, animated: false, viewPosition: 0 });
+                }, 350);
+            }
+            restoredRef.current = true;
+        })();
+    }, [ayahs.length, surahNumber, ayahParam]);
 
     // Keep references updated for audio playback callback to avoid re-creating it
     const isAutoPlayRef = useRef(isAutoPlay);
@@ -237,6 +306,67 @@ export default function SurahDetailScreen() {
         }
     }, [autoplay, audioEdition, handlePlaySurah]);
 
+    // ── Long-press actions: bookmark + share ────────────────────────────────
+    const openAyahActions = useCallback((index: number) => {
+        setActionIndex(index);
+        setActionsVisible(true);
+    }, []);
+
+    const actionAyah = actionIndex != null ? ayahs[actionIndex] : null;
+    const actionEnglish = actionIndex != null ? (englishEdition?.ayahs?.[actionIndex]?.text || '') : '';
+    const actionVerseLabel = actionAyah && surahInfo
+        ? `${surahInfo.englishName} · Verse ${actionAyah.numberInSurah ?? (actionIndex as number) + 1}`
+        : '';
+    const actionBookmarked = actionIndex != null && isBookmarkedIn(bookmarks, surahNumber, actionIndex);
+
+    const handleToggleBookmark = useCallback(async () => {
+        if (actionIndex == null || !surahInfo) return;
+        const ayah = ayahs[actionIndex];
+        const next = await toggleBookmarkStore({
+            surah: surahNumber,
+            surahName: surahInfo.name,
+            surahEnglishName: surahInfo.englishName,
+            ayahIndex: actionIndex,
+            ayahNumberInSurah: ayah?.numberInSurah ?? actionIndex + 1,
+            text: ayah?.text || '',
+            createdAt: Date.now(),
+        });
+        setBookmarks(next);
+    }, [actionIndex, surahInfo, ayahs, surahNumber]);
+
+    const handleShareText = useCallback(async () => {
+        if (actionIndex == null || !surahInfo) return;
+        const ayah = ayahs[actionIndex];
+        const eng = englishEdition?.ayahs?.[actionIndex]?.text;
+        const message =
+            `${ayah?.text || ''}` +
+            (eng ? `\n\n${eng}` : '') +
+            `\n\n— ${surahInfo.englishName} (${surahInfo.name}) : ${ayah?.numberInSurah ?? actionIndex + 1}` +
+            `\nShared via Rehbar`;
+        try {
+            await Share.share({ message });
+        } catch { }
+    }, [actionIndex, surahInfo, ayahs, englishEdition]);
+
+    const handleShareImage = useCallback(async () => {
+        if (actionIndex == null) return;
+        try {
+            const ViewShot = require('react-native-view-shot');
+            const Sharing = require('expo-sharing');
+            // Let the off-screen card finish laying out before capturing.
+            await new Promise((r) => setTimeout(r, 80));
+            const uri = await ViewShot.captureRef(shareCardRef, { format: 'png', quality: 1, result: 'tmpfile' });
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: 'Share Ayah' });
+            } else {
+                handleShareText();
+            }
+        } catch {
+            // view-shot / expo-sharing unavailable (needs a native rebuild) → text.
+            handleShareText();
+        }
+    }, [actionIndex, handleShareText]);
+
     const renderAyahItem = useCallback(({ item, index }: { item: any; index: number }) => {
         const arabicText = item.text;
         const englishText = englishEdition?.ayahs?.[index]?.text || '';
@@ -265,9 +395,13 @@ export default function SurahDetailScreen() {
                 textSecondaryColor={colors.textSecondary}
                 borderColor={colors.border}
                 cardColor={colors.card}
+                fontSize={fontSize}
+                tajweedEnabled={tajweedEnabled}
+                isBookmarked={isBookmarkedIn(bookmarks, surahNumber, index)}
+                onLongPress={openAyahActions}
             />
         );
-    }, [englishEdition, surahNumber, playingIndex, bufferingIndex, colors, showTranslation]);
+    }, [englishEdition, surahNumber, playingIndex, bufferingIndex, colors, showTranslation, fontSize, tajweedEnabled, bookmarks, openAyahActions]);
 
     const renderHeader = useCallback(() => {
         if (surahNumber !== 1 && surahNumber !== 9 && ayahs[0]?.text) {
@@ -300,6 +434,24 @@ export default function SurahDetailScreen() {
                 onBack={handleBack}
                 rightSlot={
                     <View style={styles.headerControlsContainer}>
+                        {/* Bookmarks list */}
+                        <TouchableOpacity
+                            onPress={() => router.push('/quran/bookmarks')}
+                            style={[styles.headerIconBtn, { marginRight: 8 }]}
+                            activeOpacity={0.8}
+                        >
+                            <Ionicons name="bookmark-outline" size={16} color="#FFFFFF" />
+                        </TouchableOpacity>
+
+                        {/* Reading settings (font size + tajweed) */}
+                        <TouchableOpacity
+                            onPress={() => setSettingsVisible(true)}
+                            style={[styles.headerIconBtn, { marginRight: 8 }]}
+                            activeOpacity={0.8}
+                        >
+                            <Ionicons name="options-outline" size={16} color="#FFFFFF" />
+                        </TouchableOpacity>
+
                         {/* Play/Pause Surah Button */}
                         <TouchableOpacity
                             onPress={handlePlaySurah}
@@ -391,8 +543,47 @@ export default function SurahDetailScreen() {
                             ListHeaderComponent={renderHeader}
                             contentContainerStyle={styles.listContent}
                             showsVerticalScrollIndicator={false}
+                            onViewableItemsChanged={onViewableItemsChanged}
+                            viewabilityConfig={viewabilityConfig}
                         />
                     </View>
+                </View>
+            )}
+
+            {/* Reading settings (font size + tajweed) */}
+            <QuranSettingsModal
+                visible={settingsVisible}
+                onClose={() => setSettingsVisible(false)}
+                fontSize={fontSize}
+                onFontSize={changeFontSize}
+                tajweedEnabled={tajweedEnabled}
+                onTajweed={changeTajweed}
+            />
+
+            {/* Long-press ayah actions */}
+            <AyahActionsModal
+                visible={actionsVisible}
+                onClose={() => setActionsVisible(false)}
+                verseLabel={actionVerseLabel}
+                arabicPreview={actionAyah?.text || ''}
+                isBookmarked={actionBookmarked}
+                onToggleBookmark={handleToggleBookmark}
+                onShareText={handleShareText}
+                onShareImage={handleShareImage}
+            />
+
+            {/* Off-screen card captured for "Share as Image" */}
+            {actionAyah && surahInfo && (
+                <View ref={shareCardRef} collapsable={false} style={styles.offscreen}>
+                    <ShareAyahCard
+                        arabic={actionAyah.text || ''}
+                        translation={actionEnglish}
+                        surahName={surahInfo.name}
+                        surahEnglishName={surahInfo.englishName}
+                        verseNumber={actionAyah.numberInSurah ?? (actionIndex as number) + 1}
+                        primary={colors.primary}
+                        lime={colors.lime}
+                    />
                 </View>
             )}
         </View>
@@ -465,6 +656,19 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: '700',
         textAlign: 'center',
+    },
+    headerIconBtn: {
+        width: 30,
+        height: 30,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.18)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    offscreen: {
+        position: 'absolute',
+        left: -9999,
+        top: -9999,
     },
     paginationContainer: {
         flexDirection: 'row',
