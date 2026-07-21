@@ -36,6 +36,27 @@ export const getAirQuality = async (lat: number, lon: number) => {
     }
 };
 
+// ── UV Index (free Open-Meteo — OpenWeather's free tier omits UV) ────────────
+
+export const getUVIndex = async (lat: number, lon: number): Promise<number | null> => {
+    try {
+        const response = await axios.get('https://api.open-meteo.com/v1/forecast', {
+            params: {
+                latitude: lat,
+                longitude: lon,
+                current: 'uv_index',
+                daily: 'uv_index_max',
+                timezone: 'auto',
+                forecast_days: 1,
+            },
+        });
+        const uv = response.data?.current?.uv_index ?? response.data?.daily?.uv_index_max?.[0];
+        return typeof uv === 'number' ? uv : null;
+    } catch {
+        return null;
+    }
+};
+
 export interface WeatherResponse {
     coord: { lon: number; lat: number };
     weather: Array<{ id: number; main: string; description: string; icon: string }>;
@@ -48,6 +69,7 @@ export interface WeatherResponse {
         humidity: number;
     };
     wind: { speed: number; deg: number };
+    visibility?: number;
     name: string;
     dt: number;
     sys: { country: string; sunrise: number; sunset: number };

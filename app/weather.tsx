@@ -25,14 +25,23 @@ import WeatherSearchBar from '@/components/weather/WeatherSearchBar';
 import { WeatherCitySwitcher } from '@/components/weather/WeatherCitySwitcher';
 import WeatherStats from '@/components/weather/WeatherStats';
 import WeatherSunrise from '@/components/weather/WeatherSunrise';
+import WeatherDetails from '@/components/weather/WeatherDetails';
 import { getWeatherGradient } from '@/utils/weatherTheme';
 
+import { useQuery } from '@tanstack/react-query';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useWeatherLocation } from '@/hooks/useWeatherLocation';
 import { useWeather } from '@/hooks/useWeather';
 import { useSavedCities } from '@/hooks/useSavedCities';
-import { SavedCity } from '@/apis/weather';
+import { SavedCity, getAirQuality, getUVIndex } from '@/apis/weather';
+
+function relativeWeatherTime(unixSec: number): string {
+    const diffMin = Math.max(0, Math.round((Date.now() - unixSec * 1000) / 60000));
+    if (diffMin < 1) return 'Just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    return `${Math.floor(diffMin / 60)}h ago`;
+}
 
 export default function WeatherScreen() {
     const router = useRouter();
@@ -65,6 +74,25 @@ export default function WeatherScreen() {
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const { weather, forecast, isLoading, refetch } = useWeather(effectiveCity, effectiveCoords);
+
+    // Supplementary coord-based data: air quality (OpenWeather) + UV (Open-Meteo).
+    const airQuery = useQuery({
+        queryKey: ['airQuality', effectiveCoords?.lat, effectiveCoords?.lon],
+        queryFn: () => getAirQuality(effectiveCoords!.lat, effectiveCoords!.lon),
+        enabled: !!effectiveCoords,
+        staleTime: 1000 * 60 * 30,
+    });
+    const uvQuery = useQuery({
+        queryKey: ['uvIndex', effectiveCoords?.lat, effectiveCoords?.lon],
+        queryFn: () => getUVIndex(effectiveCoords!.lat, effectiveCoords!.lon),
+        enabled: !!effectiveCoords,
+        staleTime: 1000 * 60 * 30,
+    });
+
+    const aqi = (airQuery.data as any)?.main?.aqi ?? null;
+    const uv = uvQuery.data ?? null;
+    const visibilityKm = weather?.visibility != null ? Math.round(weather.visibility / 1000) : null;
+    const updatedLabel = weather?.dt ? relativeWeatherTime(weather.dt) : '';
 
     // ─────────────────────────────────────────────────────────────
     // Search
@@ -338,6 +366,16 @@ export default function WeatherScreen() {
                         weather={weather}
                         forecast={forecast}
                     />
+
+                    {/* Details: visibility, UV, air quality, last updated */}
+                    {weather ? (
+                        <WeatherDetails
+                            visibilityKm={visibilityKm}
+                            uv={uv}
+                            aqi={aqi}
+                            updatedLabel={updatedLabel}
+                        />
+                    ) : null}
 
                     <NativeAd placement="weather" />
 
