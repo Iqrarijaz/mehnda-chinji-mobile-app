@@ -1,8 +1,10 @@
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { memo } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { tokenizeTajweed } from '@/utils/tajweed';
+import { Ionicons } from '@expo/vector-icons';
+import { memo, useMemo } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 interface AyahItemProps {
     index: number;
@@ -15,6 +17,10 @@ interface AyahItemProps {
     textSecondaryColor: string;
     borderColor?: string;
     cardColor: string;
+    fontSize: number;
+    tajweedEnabled: boolean;
+    isBookmarked: boolean;
+    onLongPress: (index: number) => void;
 }
 
 export const AyahItem = memo(({
@@ -26,53 +32,83 @@ export const AyahItem = memo(({
     isBuffering,
     primaryColor,
     textSecondaryColor,
+    fontSize,
+    tajweedEnabled,
+    isBookmarked,
+    onLongPress,
 }: AyahItemProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    return (
-    <View style={[
-        styles.rowContainer,
-        isPlaying && { backgroundColor: `${primaryColor}0D` },
-    ]}>
-        {/* Lime accent bar while playing */}
-        {isPlaying && <View style={[styles.playingAccent, { backgroundColor: colors.lime }]} />}
+    const spacedText = useMemo(() => arabicText.replace(/\s+/g, '   '), [arabicText]);
+    const baseColor = isPlaying ? primaryColor : colors.text;
 
-        {/* Verse number badge */}
-        <View style={styles.leftControls}>
-            <View style={[
-                styles.badge,
-                { backgroundColor: isPlaying ? primaryColor : `${primaryColor}12` },
-            ]}>
-                {isBuffering ? (
-                    <ActivityIndicator size="small" color={isPlaying ? '#FFFFFF' : colors.secondary} />
-                ) : (
-                    <ThemedText style={[
-                        styles.badgeText,
-                        { color: isPlaying ? '#FFFFFF' : primaryColor },
-                    ]}>
-                        {index + 1}
-                    </ThemedText>
+    const segments = useMemo(
+        () => (tajweedEnabled ? tokenizeTajweed(spacedText, baseColor) : null),
+        [tajweedEnabled, spacedText, baseColor],
+    );
+
+    const arabicStyle = [
+        styles.arabicText,
+        { fontSize, lineHeight: fontSize * 1.9, color: baseColor },
+    ];
+
+    return (
+        <Pressable
+            onLongPress={() => onLongPress(index)}
+            delayLongPress={280}
+            style={({ pressed }) => [
+                styles.rowContainer,
+                isPlaying && { backgroundColor: `${primaryColor}0D` },
+                pressed && { backgroundColor: `${primaryColor}12` },
+            ]}
+        >
+            {/* Lime accent bar while playing */}
+            {isPlaying && <View style={[styles.playingAccent, { backgroundColor: colors.lime }]} />}
+
+            {/* Verse number badge + bookmark indicator */}
+            <View style={styles.leftControls}>
+                <View style={[
+                    styles.badge,
+                    { backgroundColor: isPlaying ? primaryColor : `${primaryColor}12` },
+                ]}>
+                    {isBuffering ? (
+                        <ActivityIndicator size="small" color={isPlaying ? '#FFFFFF' : colors.secondary} />
+                    ) : (
+                        <ThemedText style={[
+                            styles.badgeText,
+                            { color: isPlaying ? '#FFFFFF' : primaryColor },
+                        ]}>
+                            {index + 1}
+                        </ThemedText>
+                    )}
+                </View>
+                {isBookmarked && (
+                    <Ionicons name="bookmark" size={13} color={colors.secondary} style={{ marginTop: 6 }} />
                 )}
             </View>
-        </View>
 
-        {/* Text content */}
-        <View style={styles.textContent}>
-            <ThemedText style={[
-                styles.arabicText,
-                { color: isPlaying ? primaryColor : undefined },
-            ]}>
-                {arabicText.replace(/\s+/g, '   ')}
-            </ThemedText>
+            {/* Text content */}
+            <View style={styles.textContent}>
+                {tajweedEnabled && segments ? (
+                    <ThemedText style={arabicStyle}>
+                        {segments.map((s, i) => (
+                            <ThemedText key={i} style={s.color ? { color: s.color } : undefined}>
+                                {s.text}
+                            </ThemedText>
+                        ))}
+                    </ThemedText>
+                ) : (
+                    <ThemedText style={arabicStyle}>{spacedText}</ThemedText>
+                )}
 
-            {showTranslation && englishText ? (
-                <ThemedText style={[styles.translationText, { color: textSecondaryColor }]}>
-                    {englishText}
-                </ThemedText>
-            ) : null}
-        </View>
-    </View>
+                {showTranslation && englishText ? (
+                    <ThemedText style={[styles.translationText, { color: textSecondaryColor }]}>
+                        {englishText}
+                    </ThemedText>
+                ) : null}
+            </View>
+        </Pressable>
     );
 });
 
@@ -118,8 +154,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     arabicText: {
-        fontSize: 24,
-        lineHeight: 46,
         paddingVertical: 4,
         textAlign: 'right',
         writingDirection: 'rtl',
