@@ -80,8 +80,8 @@ QuranHeader.displayName = 'QuranHeader';
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 16,
-        paddingBottom: 18,
+        paddingHorizontal: 13,
+        paddingBottom: 15,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
         overflow: 'hidden' },
@@ -100,18 +100,18 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     titleWrap: {
         alignItems: 'center',
-        paddingHorizontal: 52 },
+        paddingHorizontal: 48 },
     title: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
         textAlign: 'center' },
     titleArabic: {
         fontFamily: 'NotoNastaliqUrdu-Regular',
-        fontSize: 20 },
+        fontSize: 16.5 },
     subtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: 'rgba(255,255,255,0.8)',
         fontWeight: '500',
         marginTop: 3,

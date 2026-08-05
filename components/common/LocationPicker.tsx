@@ -214,13 +214,13 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                         </ThemedText>
                         {value ? (
                             <TouchableOpacity onPress={() => onChange(null)} hitSlop={8}>
-                                <ThemedText style={{ color: '#EF4444', fontSize: 12, fontWeight: '700' }}>Remove</ThemedText>
+                                <ThemedText style={{ color: '#EF4444', fontSize: 10.5, fontWeight: '700' }}>Remove</ThemedText>
                             </TouchableOpacity>
                         ) : null}
                     </View>
 
                     <TouchableOpacity
-                        style={[styles.trigger, { backgroundColor: inputBg, minHeight: 80, paddingVertical: 12, alignItems: 'flex-start' }]}
+                        style={[styles.trigger, { backgroundColor: inputBg, minHeight: 80, paddingVertical: 10, alignItems: 'flex-start' }]}
                         onPress={() => setModalVisible(true)}
                         activeOpacity={0.7}
                     >
@@ -241,10 +241,10 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
             ) : variant === 'button' ? (
                 <TouchableOpacity
                     onPress={() => setModalVisible(true)}
-                    style={{ backgroundColor: colors.lime, paddingHorizontal: 10, paddingVertical: 4, borderRadius: Layout.borderRadius, flexDirection: 'row', alignItems: 'center' }}
+                    style={{ backgroundColor: colors.lime, paddingHorizontal: 8, paddingVertical: 4, borderRadius: Layout.borderRadius, flexDirection: 'row', alignItems: 'center' }}
                 >
                     <Ionicons name="location" size={12} color="#FFF" style={{ marginRight: 4 }} />
-                    <ThemedText style={{ color: '#FFF', fontSize: 10, fontWeight: '600' }}>{label === 'LOCATION' ? 'Current Location' : label}</ThemedText>
+                    <ThemedText style={{ color: '#FFF', fontSize: 9, fontWeight: '600' }}>{label === 'LOCATION' ? 'Current Location' : label}</ThemedText>
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity onPress={() => setModalVisible(true)} hitSlop={8}>
@@ -256,7 +256,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                 <View style={[styles.modalOverlayFS, { backgroundColor: colors.background }]}>
                     {/* Header */}
                     <View style={[styles.modalHeaderFS, { backgroundColor: 'transparent', paddingTop: Math.max(insets.top, 20) }]}>
-                        <TouchableOpacity onPress={closeModal} hitSlop={8} style={{ padding: 8, backgroundColor: '#FFF', borderRadius: Layout.borderRadius }}>
+                        <TouchableOpacity onPress={closeModal} hitSlop={8} style={{ padding: 7, backgroundColor: '#FFF', borderRadius: Layout.borderRadius }}>
                             <Ionicons name="arrow-back" size={24} color="#000" />
                         </TouchableOpacity>
                         <SubmitButton
@@ -264,7 +264,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                             onPress={handleConfirm}
                             disabled={!selectedCoord}
                             isLoading={locating}
-                            style={{ height: 36, minWidth: 80, paddingHorizontal: 16 }}
+                            style={{ height: 36, minWidth: 80, paddingHorizontal: 13 }}
                         />
                     </View>
 
@@ -344,7 +344,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                             onPress={useCurrentLocation}
                             activeOpacity={0.8}
                         >
-                            <View style={{ backgroundColor: colors.lime, padding: 12, borderRadius: Layout.borderRadius }}>
+                            <View style={{ backgroundColor: colors.lime, padding: 10, borderRadius: Layout.borderRadius }}>
                                 <Ionicons name="navigate" size={24} color="#FFF" />
                             </View>
                         </TouchableOpacity>
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingRight: 4 },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2 },
@@ -383,10 +383,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     triggerText: {
         flex: 1,
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '500',
         marginRight: 8 },
     modalOverlayFS: {
@@ -400,16 +400,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: 13,
         paddingTop: Platform.OS === 'ios' ? 16 : 16,
-        paddingBottom: 12,
+        paddingBottom: 10,
         zIndex: 30,
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0 },
     modalTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '600' },
     floatingSearchContainer: {
         position: 'absolute',
@@ -421,19 +421,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14,
+        paddingHorizontal: 11,
         height: 50 },
-    searchInput: { flex: 1, fontSize: 14 },
+    searchInput: { flex: 1, fontSize: 12.5 },
     resultsListFS: {
         marginTop: 8,
         borderRadius: Layout.borderRadius,
         maxHeight: 250,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     resultRow: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        paddingVertical: 12 },
-    resultText: { flex: 1, fontSize: 13, lineHeight: 18 },
+        paddingVertical: 10 },
+    resultText: { flex: 1, fontSize: 11.5, lineHeight: 18 },
     floatingCurrentLocBtn: {
         position: 'absolute',
         bottom: 30,

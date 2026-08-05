@@ -128,13 +128,13 @@ const styles = StyleSheet.create({
     sheet: {
         width: '95%',
         borderRadius: Layout.borderRadius,
-        paddingTop: 12,
-        paddingHorizontal: 20,
+        paddingTop: 10,
+        paddingHorizontal: 16,
         paddingBottom: isAndroid ? 24 : 36 },
     sheetCentered: {
         maxWidth: 500,
-        paddingTop: 14,
-        paddingBottom: 14,
+        paddingTop: 11,
+        paddingBottom: 11,
         maxHeight: '85%' },
     sheetFullscreen: {
         width: '100%',

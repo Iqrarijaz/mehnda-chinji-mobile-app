@@ -148,8 +148,8 @@ export default RequestCard;
 
 const styles = StyleSheet.create({
     card: {
-        paddingHorizontal: 12,
-        paddingVertical: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
         marginBottom: 10 },
     cardHeader: {
         marginBottom: 6 },
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center' },
     name: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '800',
         textTransform: 'capitalize',
         flex: 1,
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     statusBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius,
         gap: 5 },
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
         height: 6,
         borderRadius: Layout.borderRadius },
     statusText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '900',
         letterSpacing: 0.5 },
     cardBody: {
@@ -190,14 +190,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 5 },
     metaText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '600' },
     typePill: {
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 3,
         borderRadius: Layout.borderRadius },
     typeText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         letterSpacing: 0.5 },
     infoRow: {
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         gap: 5 },
     infoText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '500',
         flex: 1,
         textTransform: 'capitalize' },
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 4 },
     dateText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '600' },
     moreBtn: {
         padding: 4,

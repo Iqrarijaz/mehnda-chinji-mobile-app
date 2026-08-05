@@ -148,7 +148,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                                     onClose();
                                 }}
                             >
-                                <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Clear</ThemedText>
+                                <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 12.5 }}>Clear</ThemedText>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -167,7 +167,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                             stickySectionHeadersEnabled={false}
                             style={{ flex: 1 }}
                             ListEmptyComponent={() => (
-                                <View style={{ padding: 20, alignItems: 'center' }}>
+                                <View style={{ padding: 16, alignItems: 'center' }}>
                                     <ThemedText style={{ color: lightColors.icon }}>No categories found.</ThemedText>
                                 </View>
                             )}
@@ -194,12 +194,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20 },
+        padding: 16 },
     modalContent: {
         width: '90%',
         height: '60%',
         borderRadius: Layout.borderRadius,
-        padding: 20,
+        padding: 16,
         overflow: 'hidden' },
     modalHeader: {
         flexDirection: 'row',
@@ -207,24 +207,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16 },
     modalTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: 'bold' },
     listContent: {
-        paddingBottom: 20 },
+        paddingBottom: 16 },
     sectionHeader: {
-        paddingVertical: 8,
-        paddingHorizontal: 12,
+        paddingVertical: 7,
+        paddingHorizontal: 10,
         marginTop: 8 },
     sectionHeaderTextEng: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: 'bold',
         textTransform: 'uppercase' },
     item: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
         borderRadius: Layout.borderRadius,
         marginBottom: 4 },
     labelContainer: {
@@ -232,21 +232,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingRight: 16 },
+        paddingRight: 13 },
     itemTextEng: {
-        fontSize: 15,
+        fontSize: 12.5,
         fontFamily: 'Inter-Medium' },
     itemTextUr: {
-        fontSize: 15,
+        fontSize: 12.5,
         fontFamily: 'Jameel-Noori-Nastaleeq' },
     footerContainer: {
         marginTop: 16,
         alignItems: 'center' },
     closePill: {
-        paddingHorizontal: 16,
-        paddingVertical: 6,
+        paddingHorizontal: 13,
+        paddingVertical: 5,
         borderRadius: Layout.borderRadius },
     closePillText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '600' } });

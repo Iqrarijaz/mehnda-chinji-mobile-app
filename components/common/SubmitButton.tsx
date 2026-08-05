@@ -64,13 +64,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'flex-start',
-        paddingHorizontal: 24 },
+        paddingHorizontal: 20 },
     buttonContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 8 },
+        paddingHorizontal: 7 },
     updateButtonText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });

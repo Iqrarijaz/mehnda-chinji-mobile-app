@@ -184,7 +184,7 @@ export default function SettingsScreen() {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
 
             {/* ── Header ──────────────────────────────────────────── */}
-            <ScreenHeader showMenuIcon={false} containerStyle={{ paddingBottom: 8 }}>
+            <ScreenHeader showMenuIcon={false} containerStyle={{ paddingBottom: 7 }}>
                 {/* ── Tabs ── */}
                 <View style={styles.tabContainer}>
                     {tabs.map((tab) => {
@@ -286,11 +286,11 @@ export default function SettingsScreen() {
                 }}
                 buttonText={updateCheckState.isAvailable ? "Update Now" : "Done"}
             >
-                <View style={{ alignItems: 'center', paddingHorizontal: 10 }}>
-                    <ThemedText style={{ textAlign: 'center', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>
+                <View style={{ alignItems: 'center', paddingHorizontal: 8 }}>
+                    <ThemedText style={{ textAlign: 'center', fontSize: 15.5, fontWeight: '700', marginBottom: 8 }}>
                         {updateCheckState.isAvailable ? "Update Available!" : "Up to Date"}
                     </ThemedText>
-                    <ThemedText style={{ textAlign: 'center', fontSize: 14, color: colors.textSecondary }}>
+                    <ThemedText style={{ textAlign: 'center', fontSize: 12.5, color: colors.textSecondary }}>
                         {updateCheckState.isAvailable
                             ? "A new version of the app is available. Please update to enjoy the latest features and improvements."
                             : "You are already using the latest version of the app."}
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
 
     // Header
     headerWrap: {
-        paddingBottom: 16,
+        paddingBottom: 13,
         borderBottomLeftRadius: Layout.borderRadius,
         borderBottomRightRadius: Layout.borderRadius,
         overflow: 'hidden',
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
     backBtn: {
         width: 42,
         height: 42,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center' },
     headerTitle: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         color: '#FFFFFF' },
     tabContainer: {
@@ -338,14 +338,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 10,
+        paddingVertical: 8,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.1)',
         gap: 6 },
     activeTabButton: {
         backgroundColor: 'rgba(255,255,255,0.25)' },
     tabLabel: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.6)' },
     activeTabLabel: {
@@ -356,12 +356,12 @@ const styles = StyleSheet.create({
         flex: 1,
         zIndex: 0 },
     scrollContent: {
-        paddingHorizontal: 16,
-        paddingTop: 16 },
+        paddingHorizontal: 13,
+        paddingTop: 13 },
 
     // Version
-    versionWrap: { alignItems: 'center', paddingVertical: 20 },
-    versionText: { fontSize: 12, color: '#B0B8C9', fontWeight: '500' },
+    versionWrap: { alignItems: 'center', paddingVertical: 16 },
+    versionText: { fontSize: 10.5, color: '#B0B8C9', fontWeight: '500' },
 
     // Modal
     modalOverlay: {
@@ -369,17 +369,17 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20 },
-    modalContent: { width: '100%', borderRadius: Layout.borderRadius, padding: 24, alignItems: 'center' },
-    modalTitle: { fontSize: 20, fontWeight: '700', marginBottom: 20 },
+        padding: 16 },
+    modalContent: { width: '100%', borderRadius: Layout.borderRadius, padding: 20, alignItems: 'center' },
+    modalTitle: { fontSize: 16.5, fontWeight: '700', marginBottom: 20 },
     inputContainer: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 15,
+        paddingHorizontal: 12,
         marginBottom: 24 },
-    input: { flex: 1, height: 50, fontSize: 15 },
+    input: { flex: 1, height: 50, fontSize: 12.5 },
     modalButtons: { flexDirection: 'row', width: '100%', gap: 12 },
     modalButton: { flex: 1, height: 50, borderRadius: Layout.borderRadius, justifyContent: 'center', alignItems: 'center' },
     cancelButton: {},

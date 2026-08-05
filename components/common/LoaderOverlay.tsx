@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     text: {
         marginTop: 18,
         color: '#FFFFFF',
-        fontSize: 15,
+        fontSize: 12.5,
         fontWeight: '700',
         textAlign: 'center',
         letterSpacing: 0.2 } });

@@ -265,8 +265,8 @@ const styles = StyleSheet.create({
     // Hero band
     heroBand: {
         alignItems: 'center',
-        paddingTop: 10,
-        paddingHorizontal: 8 },
+        paddingTop: 8,
+        paddingHorizontal: 7 },
     heroIconWrap: {
         width: 52,
         height: 52,
@@ -291,23 +291,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 8 },
     heroTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
         letterSpacing: 0.2 },
     heroCountPill: {
-        paddingHorizontal: 9,
+        paddingHorizontal: 7,
         paddingVertical: 3,
         borderRadius: Layout.borderRadius },
     heroCountText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800',
         color: '#1E293B',
         letterSpacing: 0.4,
         textTransform: 'uppercase' },
     heroSubtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
         marginTop: 6,

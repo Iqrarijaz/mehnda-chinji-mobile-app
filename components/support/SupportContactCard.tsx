@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 16 },
+        padding: 13 },
     iconContainer: {
         width: 52,
         height: 52,
@@ -99,16 +99,16 @@ const styles = StyleSheet.create({
     content: {
         flex: 1 },
     title: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700',
         color: '#1E293B',
         marginBottom: 2 },
     subtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: '#64748B',
         marginBottom: 4 },
     value: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });
 
 export default SupportContactCard;

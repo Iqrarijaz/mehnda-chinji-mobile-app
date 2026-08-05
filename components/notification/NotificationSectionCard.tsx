@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     container: {
         marginBottom: 24 },
     title: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 1,
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
         marginLeft: 4 },
     card: {
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16,
+        paddingHorizontal: 13,
         paddingVertical: 4 } });
 
 export default NotificationSectionCard;

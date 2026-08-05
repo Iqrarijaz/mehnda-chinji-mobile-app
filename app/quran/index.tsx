@@ -332,18 +332,18 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     backgroundImage: { flex: 1 },
     headerAddon: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingBottom: 0 },
     searchBarContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         height: 42,
         marginTop: 16,
         marginBottom: 12 },
     searchIcon: { marginRight: 8 },
-    searchInput: { flex: 1, fontSize: 14, paddingVertical: 8 },
+    searchInput: { flex: 1, fontSize: 12.5, paddingVertical: 7 },
     // Segmented Control
     segmentedContainer: {
         flexDirection: 'row',
@@ -356,14 +356,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
-        paddingVertical: 10,
+        paddingVertical: 8,
         borderRadius: Layout.borderRadius },
     activeDot: {
         width: 5,
         height: 5,
         borderRadius: Layout.borderRadius },
     segmentedTabText: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '500' },
     favBadge: {
         marginLeft: 5,
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 4 },
     favBadgeText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 'bold',
         color: '#fff',
         lineHeight: 18,
@@ -382,13 +382,13 @@ const styles = StyleSheet.create({
         includeFontPadding: false },
     // List
     listContent: {
-        paddingHorizontal: 20,
-        paddingVertical: 16 },
+        paddingHorizontal: 16,
+        paddingVertical: 13 },
     // States
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    loadingText: { marginTop: 12, fontSize: 14 },
-    errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-    errorText: { marginTop: 12, fontSize: 15, textAlign: 'center' },
-    retryButton: { marginTop: 16, paddingVertical: 10, paddingHorizontal: 24, borderRadius: Layout.borderRadius },
-    emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
-    emptyText: { marginTop: 12, fontSize: 14, textAlign: 'center', lineHeight: 22 } });
+    loadingText: { marginTop: 12, fontSize: 12.5 },
+    errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+    errorText: { marginTop: 12, fontSize: 12.5, textAlign: 'center' },
+    retryButton: { marginTop: 16, paddingVertical: 8, paddingHorizontal: 20, borderRadius: Layout.borderRadius },
+    emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingTop: 56 },
+    emptyText: { marginTop: 12, fontSize: 12.5, textAlign: 'center', lineHeight: 22 } });

@@ -33,7 +33,7 @@ export default NotificationSection;
 const styles = StyleSheet.create({
     section: { marginBottom: 8 },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         color: '#94A3B8',
         textTransform: 'uppercase',

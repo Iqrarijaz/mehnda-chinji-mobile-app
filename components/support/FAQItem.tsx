@@ -75,18 +75,20 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         marginBottom: 12,
         overflow: 'hidden',
-        // Shadow for premium feel
+        // Shadow for premium feel
+
+
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 16 },
+        padding: 13 },
     headerOpen: {
         backgroundColor: '#f0fdfa', // Very light teal
     },
     question: {
-        fontSize: 15,
+        fontSize: 12.5,
         fontWeight: '600',
         color: '#1E293B',
         flex: 1,
@@ -94,11 +96,11 @@ const styles = StyleSheet.create({
     activeText: {
         color: '#009688' },
     answerContainer: {
-        paddingHorizontal: 16,
-        paddingBottom: 16,
+        paddingHorizontal: 13,
+        paddingBottom: 13,
         paddingTop: 4 },
     answer: {
-        fontSize: 14,
+        fontSize: 12.5,
         lineHeight: 22,
         color: '#64748B' } });
 

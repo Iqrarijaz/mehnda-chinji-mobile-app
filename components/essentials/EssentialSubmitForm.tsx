@@ -331,14 +331,14 @@ const EssentialSubmitForm = React.memo(({
                         maxLength={100}
                     />
                 </View>
-                {errors['name'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors['name']}</ThemedText>}
+                {errors['name'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginTop: 4 }}>{errors['name']}</ThemedText>}
             </Animated.View>
 
             <View style={styles.field}>
                 <View style={styles.labelRow}>
                     <ThemedText style={styles.label}>Select Type <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                 </View>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 8 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 7 }}>
                     <EssentialsTypePills
                         availableTags={typesToRender.map((t: any) => ({ id: t.key, label: t.label, icon: t.icon }))}
                         selectedTags={form.type ? [{ id: form.type }] : []}
@@ -353,7 +353,7 @@ const EssentialSubmitForm = React.memo(({
                         activeColor={activeColor}
                     />
                 </ScrollView>
-                {errors['type'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors['type']}</ThemedText>}
+                {errors['type'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginTop: 4 }}>{errors['type']}</ThemedText>}
             </View>
 
             {availableTags && availableTags.length > 0 && (
@@ -379,7 +379,7 @@ const EssentialSubmitForm = React.memo(({
                         }}
                         activeColor={activeColor}
                     />
-                    {errors['tags'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors['tags']}</ThemedText>}
+                    {errors['tags'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginTop: 4 }}>{errors['tags']}</ThemedText>}
                 </View>
             )}
 
@@ -408,7 +408,7 @@ const EssentialSubmitForm = React.memo(({
                         backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
                         minHeight: 80,
                         alignItems: 'flex-start',
-                        paddingVertical: 12 }]}>
+                        paddingVertical: 10 }]}>
                         <TextInput
                             style={[styles.inputText, { color: colors.text, textAlignVertical: 'top', minHeight: 60 }]}
                             placeholder="Enter address"
@@ -419,7 +419,7 @@ const EssentialSubmitForm = React.memo(({
                             multiline
                         />
                     </View>
-                    {errors['address'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors['address']}</ThemedText>}
+                    {errors['address'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginTop: 4 }}>{errors['address']}</ThemedText>}
                 </Animated.View>
             )}
 
@@ -428,11 +428,11 @@ const EssentialSubmitForm = React.memo(({
                     <ThemedText style={styles.label}>CONTACTS (MAX 3) <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                     {form.contact.length < 3 && (
                         <TouchableOpacity onPress={addContact}>
-                            <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add</ThemedText>
+                            <ThemedText style={{ color: colors.primary, fontSize: 11.5, fontWeight: '700' }}>+ Add</ThemedText>
                         </TouchableOpacity>
                     )}
                 </View>
-                {errors['contact_general'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginBottom: 8 }}>{errors['contact_general']}</ThemedText>}
+                {errors['contact_general'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginBottom: 8 }}>{errors['contact_general']}</ThemedText>}
 
                 {form.contact.map((contact: any, index: number) => (
                     <View key={index} style={{ marginBottom: 10 }}>
@@ -464,12 +464,12 @@ const EssentialSubmitForm = React.memo(({
                                         maxLength={11}
                                     />
                                 </View>
-                                {errors[`contact[${index}].number`] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors[`contact[${index}].number`]}</ThemedText>}
+                                {errors[`contact[${index}].number`] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginTop: 4 }}>{errors[`contact[${index}].number`]}</ThemedText>}
                             </View>
                             {index > 0 && (
                                 <TouchableOpacity
                                     onPress={() => removeContact(index)}
-                                    style={{ paddingTop: 16 }}
+                                    style={{ paddingTop: 13 }}
                                 >
                                     <Ionicons name="trash-outline" size={20} color="#EF4444" />
                                 </TouchableOpacity>
@@ -487,11 +487,11 @@ const EssentialSubmitForm = React.memo(({
                         </ThemedText>
                         {form.route.length < 10 && (
                             <TouchableOpacity onPress={addRoute}>
-                                <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add Stop</ThemedText>
+                                <ThemedText style={{ color: colors.primary, fontSize: 11.5, fontWeight: '700' }}>+ Add Stop</ThemedText>
                             </TouchableOpacity>
                         )}
                     </View>
-                    {errors['route'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginBottom: 8 }}>{errors['route']}</ThemedText>}
+                    {errors['route'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginBottom: 8 }}>{errors['route']}</ThemedText>}
 
                     {form.route.map((r: any, index: number) => (
                         <View key={index} style={{ marginBottom: 10 }}>
@@ -511,7 +511,7 @@ const EssentialSubmitForm = React.memo(({
                                     style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}
                                 >
                                     <Ionicons name="time-outline" size={16} color={colors.icon} style={{ marginRight: 6 }} />
-                                    <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 13, fontWeight: '600' }}>
+                                    <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 11.5, fontWeight: '600' }}>
                                         {r.time || 'Time'}
                                     </ThemedText>
                                 </TouchableOpacity>
@@ -598,7 +598,7 @@ const EssentialSubmitForm = React.memo(({
                             >
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                                     <Ionicons name="time-outline" size={18} color={colors.icon} />
-                                    <ThemedText style={{ color: fromTime ? colors.text : colors.icon, fontSize: 14, fontWeight: '500' }}>
+                                    <ThemedText style={{ color: fromTime ? colors.text : colors.icon, fontSize: 12.5, fontWeight: '500' }}>
                                         {fromTime || 'From'}
                                     </ThemedText>
                                 </View>
@@ -617,7 +617,7 @@ const EssentialSubmitForm = React.memo(({
                             >
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                                     <Ionicons name="time-outline" size={18} color={colors.icon} />
-                                    <ThemedText style={{ color: toTime ? colors.text : colors.icon, fontSize: 14, fontWeight: '500' }}>
+                                    <ThemedText style={{ color: toTime ? colors.text : colors.icon, fontSize: 12.5, fontWeight: '500' }}>
                                         {toTime || 'To'}
                                     </ThemedText>
                                 </View>
@@ -625,7 +625,7 @@ const EssentialSubmitForm = React.memo(({
                             </TouchableOpacity>
                         </View>
                     </View>
-                    {errors['timing'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors['timing']}</ThemedText>}
+                    {errors['timing'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginTop: 4 }}>{errors['timing']}</ThemedText>}
 
                     <TimePicker
                         visible={showFromPicker}
@@ -669,11 +669,11 @@ const EssentialSubmitForm = React.memo(({
                         </ThemedText>
                         {form.returnRoute.length < 10 && (
                             <TouchableOpacity onPress={addReturnRoute}>
-                                <ThemedText style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>+ Add Stop</ThemedText>
+                                <ThemedText style={{ color: colors.primary, fontSize: 11.5, fontWeight: '700' }}>+ Add Stop</ThemedText>
                             </TouchableOpacity>
                         )}
                     </View>
-                    {errors['returnRoute'] && <ThemedText style={{ color: '#EF4444', fontSize: 12, marginBottom: 8 }}>{errors['returnRoute']}</ThemedText>}
+                    {errors['returnRoute'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginBottom: 8 }}>{errors['returnRoute']}</ThemedText>}
 
                     {form.returnRoute.map((r: any, index: number) => (
                         <View key={index} style={{ marginBottom: 10 }}>
@@ -693,7 +693,7 @@ const EssentialSubmitForm = React.memo(({
                                     style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}
                                 >
                                     <Ionicons name="time-outline" size={16} color={colors.icon} style={{ marginRight: 6 }} />
-                                    <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 13, fontWeight: '600' }}>
+                                    <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 11.5, fontWeight: '600' }}>
                                         {r.time || 'Time'}
                                     </ThemedText>
                                 </TouchableOpacity>
@@ -749,7 +749,7 @@ export default EssentialSubmitForm;
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 16 },
+        paddingTop: 13 },
     field: {
         marginBottom: 20 },
     labelRow: {
@@ -758,31 +758,31 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 8 },
     label: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         letterSpacing: 0.5,
         color: '#64748B' },
     subLabel: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         marginBottom: 4,
         marginLeft: 4 },
     charCount: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#94A3B8',
         fontWeight: '500' },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     inputText: {
         flex: 1,
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '500' },
     input: {
         borderRadius: Layout.borderRadius,
-        padding: 14 },
+        padding: 11 },
     textArea: {
         minHeight: 120,
         textAlignVertical: 'top' },
@@ -792,15 +792,15 @@ const styles = StyleSheet.create({
         gap: 8,
         marginBottom: 8 },
     formatBtn: {
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius },
     formatBtnText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '600' },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 12,
-        paddingTop: 20 } });
+        paddingTop: 16 } });

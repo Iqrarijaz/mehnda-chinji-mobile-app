@@ -155,14 +155,14 @@ export default function BusinessScreen() {
     const renderFooter = useCallback(() => {
         if (isFetchingNextPage) {
             return (
-                <View style={{ paddingVertical: 24 }}>
+                <View style={{ paddingVertical: 20 }}>
                     <LoadingDots />
                 </View>
             );
         }
         if (!hasNextPage && businesses.length > 0) {
             return (
-                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: '600', letterSpacing: 0.4, paddingVertical: 20 }}>
+                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 10.5, fontWeight: '600', letterSpacing: 0.4, paddingVertical: 16 }}>
                     {"You're all caught up"}
                 </ThemedText>
             );
@@ -228,7 +228,7 @@ export default function BusinessScreen() {
                         </View>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
-                            <ThemedText style={{ color: '#FFFFFF', fontSize: 13, marginRight: 8 }}>Search Nearby (15km)</ThemedText>
+                            <ThemedText style={{ color: '#FFFFFF', fontSize: 11.5, marginRight: 8 }}>Search Nearby (15km)</ThemedText>
                             <Switch
                                 value={isNearbyEnabled}
                                 onValueChange={toggleNearby}
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8FAFC' },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 4,
-        paddingBottom: 8 },
+        paddingBottom: 7 },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -326,16 +326,16 @@ const styles = StyleSheet.create({
     },
     filterBadgeText: {
         color: '#FFFFFF',
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 'bold',
         textAlign: 'center',
         lineHeight: 12,
         includeFontPadding: false },
     categoryScroller: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 13,
         gap: 8 },
     categoryChip: {
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)' },
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     },
     categoryChipText: {
         color: '#FFFFFF',
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600' },
     categoryChipTextActive: {
         fontWeight: '700' },
@@ -353,12 +353,12 @@ const styles = StyleSheet.create({
     listContent: {
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
         paddingTop: Platform.OS === 'android' ? 18 : 20,
-        paddingBottom: 100 },
+        paddingBottom: 96 },
     loaderContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 40 },
+        paddingTop: 36 },
     emptyContainer: {
         alignItems: 'center',
         marginTop: Platform.OS === 'android' ? 58 : 60 },

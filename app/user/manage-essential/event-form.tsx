@@ -267,7 +267,7 @@ const EventForm = () => {
                                     DESCRIPTION <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: 100, alignItems: 'flex-start', paddingTop: 12 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: 100, alignItems: 'flex-start', paddingTop: 10 }]}>
                                 <Ionicons name="information-circle-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14, height: '100%', textAlignVertical: 'top' }]}
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16 },
+        paddingHorizontal: 13 },
     backButton: {
         width: 42,
         height: 42,
@@ -372,24 +372,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '700',
         textAlign: 'center' },
     headerContentWrapper: {
         alignItems: 'center',
         marginTop: 20 },
     welcomeText: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         marginBottom: 6,
         textAlign: 'center' },
     subtitleText: {
-        fontSize: 12,
+        fontSize: 10.5,
         textAlign: 'center',
-        paddingHorizontal: 20 },
-    content: { paddingBottom: 140 },
+        paddingHorizontal: 16 },
+    content: { paddingBottom: 136 },
     formSection: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginTop: 20,
         gap: 16 },
     inputField: { gap: 6 },
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingRight: 4 },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2 },
@@ -408,14 +408,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     textInput: { flex: 1, fontWeight: '500' },
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     triggerContent: {
         flexDirection: 'row',
         alignItems: 'center' },
@@ -432,13 +432,13 @@ const styles = StyleSheet.create({
         borderStyle: 'dashed',
         justifyContent: 'center',
         alignItems: 'center' },
-    addImgText: { fontSize: 11, fontWeight: '600', marginTop: 4 },
+    addImgText: { fontSize: 10, fontWeight: '600', marginTop: 4 },
     footer: {
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: Platform.OS === 'android' ? 10 : 12 },
     updateButton: {
         height: Platform.OS === 'android' ? 48 : 52,

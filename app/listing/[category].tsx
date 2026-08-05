@@ -352,7 +352,7 @@ const CategoryListingScreen = React.memo(() => {
                         </TouchableOpacity>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
-                        <ThemedText style={{ color: '#FFFFFF', fontSize: 13, marginRight: 8 }}>Search Nearby (15km)</ThemedText>
+                        <ThemedText style={{ color: '#FFFFFF', fontSize: 11.5, marginRight: 8 }}>Search Nearby (15km)</ThemedText>
                         <Switch
                             value={isNearbyEnabled}
                             onValueChange={toggleNearby}
@@ -476,17 +476,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     listContent: {
-        padding: 16,
-        paddingBottom: 40 },
+        padding: 13,
+        paddingBottom: 36 },
     footerLoader: {
-        paddingVertical: 30,
+        paddingVertical: 26,
         alignItems: 'center' },
     endOfListContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 40,
-        paddingHorizontal: 16,
+        paddingVertical: 36,
+        paddingHorizontal: 13,
         gap: 15 },
     endOfListLine: {
         height: 1,
@@ -497,16 +497,16 @@ const styles = StyleSheet.create({
         height: 5,
         borderRadius: Layout.borderRadius },
     endOfListText: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600',
         opacity: 0.6,
         letterSpacing: 0.5 },
     typesContainer: {
-        paddingVertical: 12,
+        paddingVertical: 10,
         paddingHorizontal: 4,
         backgroundColor: 'rgba(0,0,0,0.05)' },
     typesScrollContent: {
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         gap: 10 },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 12,
@@ -519,14 +519,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        paddingHorizontal: 20,
-        paddingBottom: 6 },
+        paddingHorizontal: 16,
+        paddingBottom: 5 },
     resultCountDot: {
         width: 5,
         height: 5,
         borderRadius: Layout.borderRadius },
     resultCountText: {
-        fontSize: 10.5,
+        fontSize: 9.5,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.6 },
@@ -539,8 +539,8 @@ const styles = StyleSheet.create({
     header: {
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
-        paddingHorizontal: 16,
-        paddingBottom: 14,
+        paddingHorizontal: 13,
+        paddingBottom: 11,
         zIndex: 10 },
     headerRow: {
         flexDirection: 'row',
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center' },
     headerTitle: {
-        fontSize: 17,
+        fontSize: 14.5,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.3,

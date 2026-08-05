@@ -269,41 +269,41 @@ const styles = StyleSheet.create({
     container: {
         flex: 1 },
     headerSection: {
-        paddingBottom: 38,
+        paddingBottom: 34,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden' },
     headerContent: {
-        paddingHorizontal: 22,
-        paddingTop: 38 },
+        paddingHorizontal: 18,
+        paddingTop: 34 },
     headerTitle: {
-        fontSize: 28, // Reduced from 32
+        fontSize: 24, // Reduced from 32
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
         marginBottom: 6 },
     headerSubtitle: {
-        fontSize: 15,
+        fontSize: 12.5,
         color: 'rgba(255, 255, 255, 0.9)',
         lineHeight: 22 },
     formContainer: {
         flex: 1,
-        paddingHorizontal: 18,
-        paddingTop: 30,
-        paddingBottom: 38 },
+        paddingHorizontal: 15,
+        paddingTop: 26,
+        paddingBottom: 34 },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16 },
+        padding: 13 },
     inputField: {
         marginBottom: 20 },
     errorText: {
         color: '#EF4444',
-        fontSize: 12,
+        fontSize: 10.5,
         marginTop: 6,
         marginLeft: 4,
         fontWeight: '500' },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         color: '#475569',
         letterSpacing: 0.5,
@@ -316,10 +316,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12 },
+        paddingHorizontal: 10 },
     input: {
         flex: 1,
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     submitButton: {
         height: 52,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden' },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         letterSpacing: 0.5 },
     footer: {
@@ -339,15 +339,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 6 },
     footerText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     footerLink: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700' },
     // Stage 2 Profile Styles
     profileContainer: {
         alignItems: 'center',
-        paddingVertical: 5 },
+        paddingVertical: 4 },
     profileInfo: {
         alignItems: 'center',
         marginBottom: 15 },
@@ -364,18 +364,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 10 },
     profileName: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         marginBottom: 2 },
     profileEmail: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '500' },
     notMeButton: {
         marginTop: 10,
-        padding: 5 },
+        padding: 4 },
     notMeText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700' },
     submitButtonHorizontal: {
-        paddingHorizontal: 30,
+        paddingHorizontal: 26,
         alignSelf: 'center' } });

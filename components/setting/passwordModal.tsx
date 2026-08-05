@@ -170,7 +170,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{ paddingBottom: 12 }}
+                contentContainerStyle={{ paddingBottom: 10 }}
             >
                 {/* Inputs */}
                 <InputField
@@ -243,12 +243,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 16 },
     title: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '800',
         textAlign: 'center',
         marginBottom: 3 },
     subtitle: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '500' },
     closeBtn: {
         width: 30,
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     // Input
     fieldWrap: { marginBottom: 10 },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         color: '#94A3B8',
         letterSpacing: 0.8,
@@ -270,12 +270,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius, // Overridden in wrapStyle
-        paddingHorizontal: 14,
+        paddingHorizontal: 11,
         height: Platform.OS === 'android' ? 42 : 48 },
     inputIcon: { marginRight: 10 },
     input: {
         flex: 1,
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '500' },
     eyeBtn: { padding: 4 },
 
@@ -297,13 +297,13 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: Layout.borderRadius },
     strengthLabel: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         width: 42 },
 
     // Mismatch
     mismatch: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#EF4444',
         fontWeight: '600',
         marginTop: -8,
@@ -318,11 +318,11 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
     primaryBtnDisabled: { opacity: 0.45 },
     primaryBtnText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     cancelBtn: {
         flex: 1,
@@ -332,6 +332,6 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         backgroundColor: 'transparent' },
     cancelText: {
-        fontSize: 14,
+        fontSize: 12.5,
         color: '#94A3B8',
         fontWeight: '600' } });

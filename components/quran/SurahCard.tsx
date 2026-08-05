@@ -148,7 +148,7 @@ SurahCard.displayName = 'SurahCard';
 const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius,
-        padding: 14,
+        padding: 11,
         marginBottom: 12,
         gap: 12 },
     topRow: {
@@ -161,17 +161,17 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },
-    numberText: { fontSize: 13, fontWeight: '800' },
+    numberText: { fontSize: 11.5, fontWeight: '800' },
     info: { flex: 1 },
     englishName: {
-        fontSize: 15,
+        fontSize: 12.5,
         fontWeight: '800',
         letterSpacing: 0.1 },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 3 },
-    metaText: { fontSize: 11, fontWeight: '500' },
+    metaText: { fontSize: 10, fontWeight: '500' },
     dot: {
         width: 3,
         height: 3,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 6,
         opacity: 0.5 },
     arabicName: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontFamily: 'NotoNastaliqUrdu-Regular',
         fontWeight: 'bold',
         textAlign: 'right',
@@ -192,23 +192,23 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
-        paddingHorizontal: 14,
+        paddingHorizontal: 11,
         height: 32,
         borderRadius: Layout.borderRadius },
     playBtnText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '800',
         letterSpacing: 0.2 },
     downloadBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         height: 32,
         borderRadius: Layout.borderRadius },
     downloadText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700' },
     favButton: {
         padding: 4 } });

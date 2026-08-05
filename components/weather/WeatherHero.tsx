@@ -80,7 +80,7 @@ export default WeatherHero;
 const styles = StyleSheet.create({
     heroCard: {
         borderRadius: Layout.borderRadius,
-        padding: 20,
+        padding: 16,
         marginBottom: 16 },
     loadingContainer: {
         height: 160,
@@ -92,18 +92,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingBottom: 10,
+        paddingBottom: 8,
         marginBottom: 12 },
     locationRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4 },
     city: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700',
         color: '#FFFFFF' },
     date: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: 'rgba(255, 255, 255, 0.7)',
         fontWeight: '500' },
     mainRow: {
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         lineHeight: Platform.OS === 'android' ? 56 : 60,
         letterSpacing: -1 },
     condition: {
-        fontSize: 15,
+        fontSize: 12.5,
         color: 'rgba(255, 255, 255, 0.85)',
         fontWeight: '600',
         textTransform: 'capitalize',
@@ -137,15 +137,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingVertical: 10,
-        paddingHorizontal: 14 },
+        paddingVertical: 8,
+        paddingHorizontal: 11 },
     metaItem: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4 },
     metaText: {
         color: 'rgba(255, 255, 255, 0.9)',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '600' },
     metaDivider: {
         width: 1,

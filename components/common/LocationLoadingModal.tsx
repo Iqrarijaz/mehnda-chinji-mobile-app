@@ -169,14 +169,14 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 24 },
+        padding: 20 },
     card: {
         width: '100%',
         maxWidth: 340,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 24,
-        paddingTop: 32,
-        paddingBottom: 26,
+        paddingHorizontal: 20,
+        paddingTop: 28,
+        paddingBottom: 22,
         alignItems: 'center' },
     iconWrap: {
         width: ICON_SIZE + 40,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
         width: ICON_SIZE * 0.62,
         height: ICON_SIZE * 0.62 },
     title: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         letterSpacing: 0.2,
         marginBottom: 18,
@@ -226,11 +226,11 @@ const styles = StyleSheet.create({
         right: 0,
         alignItems: 'center' },
     message: {
-        fontSize: 15,
+        fontSize: 12.5,
         fontWeight: '700',
         textAlign: 'center' },
     reassure: {
-        fontSize: 12,
+        fontSize: 10.5,
         textAlign: 'center',
         lineHeight: 17,
         marginTop: 10 } });

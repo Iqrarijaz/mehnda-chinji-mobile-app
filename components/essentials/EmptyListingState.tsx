@@ -63,8 +63,8 @@ export default EmptyListingState;
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
-        paddingTop: 64,
-        paddingHorizontal: 32 },
+        paddingTop: 60,
+        paddingHorizontal: 28 },
     illustration: {
         width: 140,
         height: 140,
@@ -99,12 +99,12 @@ const styles = StyleSheet.create({
         bottom: 30,
         left: 22 },
     title: {
-        fontSize: 17,
+        fontSize: 14.5,
         fontWeight: '800',
         letterSpacing: 0.2 },
     subtitle: {
         marginTop: 6,
-        fontSize: 13,
+        fontSize: 11.5,
         lineHeight: 19,
         textAlign: 'center' },
     addButton: {
@@ -112,11 +112,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 6,
         marginTop: 20,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         height: 44,
         borderRadius: Layout.borderRadius },
     addButtonText: {
         color: '#FFFFFF',
-        fontSize: 13.5,
+        fontSize: 12,
         fontWeight: '800',
         letterSpacing: 0.3 } });

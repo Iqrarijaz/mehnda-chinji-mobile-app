@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     detailSection: {
         gap: 6 },
     sectionHeading: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.8,
@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 0.5 },
     infoListVal: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500',
         marginTop: -2 },
     infoListSub: {
-        fontSize: 11,
+        fontSize: 10,
         marginTop: 1 } });

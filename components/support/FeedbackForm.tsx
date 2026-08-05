@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     container: {
         marginTop: 8 },
     title: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700',
         color: '#64748B',
         textTransform: 'uppercase',
@@ -80,14 +80,14 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 20 },
+        padding: 16 },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#F8FAFC',
         borderRadius: Layout.borderRadius,
         marginBottom: 16,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     inputFocused: {
         backgroundColor: '#FFFFFF' },
     inputIcon: {
@@ -95,14 +95,14 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         height: 52,
-        fontSize: 15,
+        fontSize: 12.5,
         color: '#1E293B' },
     textAreaContainer: {
         alignItems: 'flex-start',
         height: 120 },
     textArea: {
         height: 110,
-        paddingTop: 14 },
+        paddingTop: 11 },
     submitButton: {
         flexDirection: 'row',
         backgroundColor: '#009688',
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#CBD5E1' },
     submitText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700' } });
 
 export default FeedbackForm;

@@ -88,10 +88,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         marginHorizontal: 20,
         borderRadius: Layout.borderRadius,
-        padding: 16,
+        padding: 13,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 16,
+        gap: 16,
+
+
+
+
         marginBottom: 12 },
     chartContainer: {
         width: 100,
@@ -106,11 +110,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center' },
     value: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '900',
         color: '#0F172A' },
     unit: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         color: '#64748B',
         textTransform: 'uppercase' },
@@ -118,10 +122,10 @@ const styles = StyleSheet.create({
         flex: 1,
         gap: 4 },
     label: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '800',
         color: '#0F172A' },
     dateLabel: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#94A3B8',
         fontWeight: '500' } });

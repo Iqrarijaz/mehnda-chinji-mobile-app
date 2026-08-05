@@ -589,21 +589,21 @@ const styles = StyleSheet.create({
     },
     readingContainer: {
         flex: 1,
-        paddingHorizontal: 16,
-        paddingTop: 10,
-        paddingBottom: 6
+        paddingHorizontal: 13,
+        paddingTop: 8,
+        paddingBottom: 5
     },
     listContent: {
-        paddingVertical: 8
+        paddingVertical: 7
     },
     bismillahContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 16,
+        paddingVertical: 13,
         marginBottom: 8
     },
     bismillahText: {
-        fontSize: 22,
+        fontSize: 18.5,
         lineHeight: 40,
         fontWeight: 'bold',
         textAlign: 'center'
@@ -612,21 +612,21 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24
+        padding: 20
     },
     loadingText: {
         marginTop: 12,
-        fontSize: 14
+        fontSize: 12.5
     },
     errorText: {
         marginTop: 12,
-        fontSize: 15,
+        fontSize: 12.5,
         textAlign: 'center'
     },
     retryButton: {
         marginTop: 16,
-        paddingVertical: 10,
-        paddingHorizontal: 24,
+        paddingVertical: 8,
+        paddingHorizontal: 20,
         borderRadius: Layout.borderRadius
     },
     headerControlsContainer: {
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
     },
     headerToggle: {
         flexDirection: 'row',
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
         height: 30
     },
     headerToggleText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         textAlign: 'center'
     },
@@ -676,12 +676,12 @@ const styles = StyleSheet.create({
         opacity: 0.4
     },
     pageIndicatorCapsule: {
-        paddingHorizontal: 16,
-        paddingVertical: 6,
+        paddingHorizontal: 13,
+        paddingVertical: 5,
         borderRadius: Layout.borderRadius
     },
     pageIndicatorText: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '700',
         textAlign: 'center'
     }

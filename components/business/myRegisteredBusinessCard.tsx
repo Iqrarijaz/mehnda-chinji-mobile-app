@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center' },
     bizName: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '800',
         textTransform: 'capitalize',
         flex: 1,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     statusBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius,
         gap: 6 },
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
         height: 6,
         borderRadius: Layout.borderRadius },
     statusText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '900',
         letterSpacing: 0.5 },
     cardBody: {
@@ -218,16 +218,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 6 },
     bizCategory: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '600' },
     urduCat: {
-        fontSize: 11 },
+        fontSize: 10 },
     descriptionRow: {
         flexDirection: 'row',
         gap: 6,
         alignItems: 'flex-start' },
     descriptionText: {
-        fontSize: 11,
+        fontSize: 10,
         fontStyle: 'italic',
         flex: 1,
         lineHeight: 16 },
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         gap: 6 },
     bizInfoText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '500',
         flex: 1 },
     divider: {
@@ -258,14 +258,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 12 },
     dateText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '600' },
     searchToggleContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 2 },
     searchText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700' },
     moreBtn: {
         padding: 4,
@@ -282,8 +282,8 @@ const styles = StyleSheet.create({
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 6,
-        paddingHorizontal: 6,
+        paddingVertical: 5,
+        paddingHorizontal: 5,
         borderRadius: Layout.borderRadius - 4,
         gap: 8 },
     menuIconBox: {
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     menuItemText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '600' },
     menuSeparator: {
         height: 1,

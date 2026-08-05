@@ -283,29 +283,29 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingBottom: 14 },
+        paddingHorizontal: 16,
+        paddingBottom: 11 },
     iconBtn: {
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },
-    screenTitle: { fontSize: 20, fontWeight: '700' },
+    screenTitle: { fontSize: 16.5, fontWeight: '700' },
     tabContainer: {
         flexDirection: 'row' },
     tabItem: {
         flex: 1,
         alignItems: 'center',
-        paddingVertical: 14 },
+        paddingVertical: 11 },
     tabText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     scroll: {
-        paddingHorizontal: 20,
-        paddingTop: 24 },
+        paddingHorizontal: 16,
+        paddingTop: 20 },
     sectionLabel: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
         marginBottom: 12 },
@@ -314,17 +314,17 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         gap: 10 },
     typeButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 16,
+        paddingVertical: 8,
+        paddingHorizontal: 13,
         borderRadius: Layout.borderRadius },
     typeButtonText: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600' },
     textInput: {
         borderRadius: Layout.borderRadius,
-        padding: 16,
+        padding: 13,
         height: 150,
-        fontSize: 15,
+        fontSize: 12.5,
         marginBottom: 24 },
     submitButton: {
         height: 52,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700' },
     center: {
         flex: 1,
@@ -341,9 +341,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     listContent: {
-        padding: 16 },
+        padding: 13 },
     card: {
-        padding: 16,
+        padding: 13,
         borderRadius: Layout.borderRadius,
         marginBottom: 12 },
     cardHeader: {
@@ -353,26 +353,26 @@ const styles = StyleSheet.create({
         marginBottom: 12 },
     typeBadge: {
         backgroundColor: '#E2E8F0',
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius },
     typeText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         color: '#475569',
         textTransform: 'uppercase'
     },
     statusBadge: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius },
     statusText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         textTransform: 'uppercase'
     },
     feedbackText: {
-        fontSize: 15,
+        fontSize: 12.5,
         lineHeight: 22,
         marginBottom: 16,
         fontStyle: 'italic'
@@ -382,9 +382,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center' },
     dateText: {
-        fontSize: 12 },
+        fontSize: 10.5 },
     sourceText: {
-        fontSize: 11,
+        fontSize: 10,
         textTransform: 'capitalize'
     },
     emptyContainer: {
@@ -392,22 +392,22 @@ const styles = StyleSheet.create({
         marginTop: 60,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 24 },
+        paddingHorizontal: 20 },
     emptyTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '700',
         marginBottom: 8 },
     emptyText: {
-        fontSize: 14,
+        fontSize: 12.5,
         textAlign: 'center',
         marginBottom: 24,
         lineHeight: 20 },
     btn: {
-        paddingHorizontal: 24,
-        paddingVertical: 12,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
         borderRadius: Layout.borderRadius },
     btnText: {
         color: '#fff',
         fontWeight: '600',
-        fontSize: 15 }
+        fontSize: 12.5 }
 });

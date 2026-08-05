@@ -20,7 +20,7 @@ const NotificationEmptyState = React.memo(() => (
 export default NotificationEmptyState;
 
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 40, paddingHorizontal: 40 },
+    container: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 36, paddingHorizontal: 36 },
     iconWrap: {
         width: 64,
         height: 64,
@@ -29,5 +29,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 14 },
-    title: { fontSize: 14, fontWeight: '800', color: '#0F172A', marginBottom: 8, textAlign: 'center' },
-    subtitle: { fontSize: 11, color: '#94A3B8', fontWeight: '500', textAlign: 'center', lineHeight: 18 } });
+    title: { fontSize: 12.5, fontWeight: '800', color: '#0F172A', marginBottom: 8, textAlign: 'center' },
+    subtitle: { fontSize: 10, color: '#94A3B8', fontWeight: '500', textAlign: 'center', lineHeight: 18 } });

@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
     rowContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        paddingVertical: 14,
-        paddingHorizontal: 12,
+        paddingVertical: 11,
+        paddingHorizontal: 10,
         borderRadius: Layout.borderRadius,
         marginBottom: 6 },
     playingAccent: {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 12,
         width: 30,
-        paddingTop: 6 },
+        paddingTop: 5 },
     badge: {
         width: 28,
         height: 28,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     badgeText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '800' },
     textContent: {
         flex: 1,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         width: '100%' },
     translationText: {
-        fontSize: 13,
+        fontSize: 11.5,
         lineHeight: 20,
         textAlign: 'left',
         marginTop: 8,

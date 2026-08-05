@@ -74,9 +74,9 @@ const styles = StyleSheet.create({
     sheet: {
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-        paddingTop: 10 },
+        paddingTop: 8 },
     handle: {
         alignSelf: 'center',
         width: 40,
@@ -84,9 +84,9 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(128,128,128,0.4)',
         marginBottom: 14 },
-    label: { fontSize: 12, fontWeight: '700', marginBottom: 6 },
+    label: { fontSize: 10.5, fontWeight: '700', marginBottom: 6 },
     arabic: {
-        fontSize: 20,
+        fontSize: 16.5,
         lineHeight: 38,
         textAlign: 'right',
         writingDirection: 'rtl',
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 14,
-        paddingHorizontal: 16,
+        paddingVertical: 11,
+        paddingHorizontal: 13,
         borderRadius: Layout.borderRadius },
-    rowText: { fontSize: 15, fontWeight: '600' } });
+    rowText: { fontSize: 12.5, fontWeight: '600' } });

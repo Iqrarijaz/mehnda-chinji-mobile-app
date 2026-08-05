@@ -162,7 +162,7 @@ export const TravelHeroHeader = React.memo(function TravelHeroHeader({
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        paddingBottom: 20,
+        paddingBottom: 16,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
         overflow: 'hidden' },
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
+        paddingHorizontal: 13,
         paddingBottom: 4 },
     navActions: {
         flexDirection: 'row',
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     identityRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginTop: 8,
         gap: 14 },
     identityText: {
@@ -197,17 +197,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius },
     typeChipText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800',
         color: '#1E293B',
         textTransform: 'uppercase',
         letterSpacing: 0.6 },
     title: {
-        fontSize: 21,
+        fontSize: 17.5,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
         gap: 5,
         marginTop: 5 },
     subtitle: {
-        fontSize: 12.5,
+        fontSize: 11,
         color: 'rgba(255,255,255,0.85)',
         fontWeight: '600',
         flexShrink: 1 },
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     ribbon: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         marginTop: 16,
         gap: 8 },
     ribbonDot: {

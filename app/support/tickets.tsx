@@ -301,8 +301,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 12 },
+        paddingHorizontal: 16,
+        paddingVertical: 10 },
     backButton: {
         width: 40,
         height: 40,
@@ -310,27 +310,27 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     navTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '700' },
     headerContent: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginBottom: 16 },
     filterBar: {
         flexDirection: 'row',
-        paddingRight: 20,
+        paddingRight: 16,
         paddingVertical: 4 },
     filterChip: {
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius,
         marginRight: 8,
         backgroundColor: 'rgba(0,0,0,0.04)' },
     filterLabel: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600' },
     listContent: {
-        paddingHorizontal: 20,
-        paddingBottom: 40 },
+        paddingHorizontal: 16,
+        paddingBottom: 36 },
     cardContainer: {
         flexDirection: 'row',
         borderRadius: Layout.borderRadius,
@@ -340,21 +340,21 @@ const styles = StyleSheet.create({
         width: 6 },
     cardMain: {
         flex: 1,
-        padding: 16 },
+        padding: 13 },
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 10 },
     ticketId: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '600',
         opacity: 0.5,
         letterSpacing: 0.5 },
     statusBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius },
     statusDot: {
@@ -363,26 +363,26 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         marginRight: 6 },
     statusText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800' },
     subject: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700',
         marginBottom: 6 },
     desc: {
-        fontSize: 13,
+        fontSize: 11.5,
         lineHeight: 18,
         marginBottom: 16 },
     cardFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 12 },
+        paddingTop: 10 },
     footerItem: {
         flexDirection: 'row',
         alignItems: 'center' },
     footerText: {
-        fontSize: 12,
+        fontSize: 10.5,
         marginLeft: 6,
         fontWeight: '500' },
     deleteAction: {
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 80 },
+        paddingTop: 76 },
     emptyIconBg: {
         width: 140,
         height: 140,
@@ -405,31 +405,31 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24 },
     emptyTitle: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: 'bold',
         marginBottom: 8 },
     emptySubtitle: {
-        fontSize: 14,
+        fontSize: 12.5,
         textAlign: 'center',
-        paddingHorizontal: 40,
+        paddingHorizontal: 36,
         lineHeight: 20,
         marginBottom: 32 },
     createButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 24,
-        paddingVertical: 14,
+        paddingHorizontal: 20,
+        paddingVertical: 11,
         borderRadius: Layout.borderRadius },
     createButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700' },
     skeletonContainer: {
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
     skeletonCard: {
         height: 140,
         borderRadius: Layout.borderRadius,
-        padding: 16,
+        padding: 13,
         marginBottom: 16 },
     skeletonHeader: {
         height: 20,
@@ -444,11 +444,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 40 },
+        padding: 36 },
     errorText: {
-        fontSize: 16,
+        fontSize: 13.5,
         marginTop: 16,
         marginBottom: 20 },
     retryButton: {
-        padding: 10 }
+        padding: 8 }
 });

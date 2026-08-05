@@ -47,17 +47,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 5 },
     label: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.8 },
     pill: {
         marginLeft: 'auto',
-        paddingHorizontal: 9,
+        paddingHorizontal: 7,
         paddingVertical: 3,
         borderRadius: Layout.borderRadius },
     pillText: {
-        fontSize: 9.5,
+        fontSize: 8.5,
         fontWeight: '800',
         letterSpacing: 0.3,
         textTransform: 'uppercase' } });

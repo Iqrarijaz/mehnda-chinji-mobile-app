@@ -302,12 +302,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     wordmark: {
-        fontSize: 26,
+        fontSize: 22,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
     tagline: {
-        fontSize: 12,
+        fontSize: 10.5,
         marginTop: 6,
         fontWeight: '600',
         letterSpacing: 3,

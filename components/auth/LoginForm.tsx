@@ -351,26 +351,26 @@ export const LoginForm = React.memo(function LoginForm() {
 
 const styles = StyleSheet.create({
     formContainer: {
-        paddingHorizontal: 18,
-        paddingTop: 30,
-        paddingBottom: 40
+        paddingHorizontal: 15,
+        paddingTop: 26,
+        paddingBottom: 36
     },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16
+        padding: 13
     },
     inputField: {
         marginBottom: 20
     },
     errorText: {
         color: '#EF4444',
-        fontSize: 12,
+        fontSize: 10.5,
         marginTop: 6,
         marginLeft: 4,
         fontWeight: '500'
     },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         color: '#475569',
         letterSpacing: 0.5,
@@ -385,11 +385,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12
+        paddingHorizontal: 10
     },
     input: {
         flex: 1,
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500'
     },
     optionsRow: {
@@ -404,11 +404,11 @@ const styles = StyleSheet.create({
         gap: 6
     },
     optionText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500'
     },
     forgotText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '600'
     },
     loginButton: {
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     },
     loginButtonText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         letterSpacing: 0.5
     },
@@ -432,11 +432,11 @@ const styles = StyleSheet.create({
         marginTop: 6
     },
     footerText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500'
     },
     footerLink: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700'
     }
 });

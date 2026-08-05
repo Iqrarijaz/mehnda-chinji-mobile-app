@@ -230,17 +230,17 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12 },
+        paddingHorizontal: 13,
+        paddingVertical: 10 },
     backButton: {
         padding: 4,
         marginRight: 12 },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: 'bold' },
     content: {
-        paddingHorizontal: 20,
-        paddingBottom: 32 },
+        paddingHorizontal: 16,
+        paddingBottom: 28 },
     labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -248,16 +248,16 @@ const styles = StyleSheet.create({
         marginTop: 16,
         marginBottom: 8 },
     label: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '600' },
     charCount: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     input: {
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        fontSize: 15 },
+        paddingHorizontal: 13,
+        paddingVertical: 10,
+        fontSize: 12.5 },
     textArea: {
         height: 150,
         textAlignVertical: 'top' },
@@ -284,16 +284,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     uploadText: {
-        fontSize: 12,
+        fontSize: 10.5,
         marginTop: 4,
         opacity: 0.7 },
     submitButton: {
         marginTop: 32,
-        paddingVertical: 16,
+        paddingVertical: 13,
         borderRadius: Layout.borderRadius,
         alignItems: 'center' },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: 'bold' }
 });

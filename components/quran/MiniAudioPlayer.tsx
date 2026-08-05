@@ -115,8 +115,8 @@ MiniAudioPlayer.displayName = 'MiniAudioPlayer';
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 10,
-        paddingHorizontal: 14,
+        paddingTop: 8,
+        paddingHorizontal: 11,
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28 },
     row: {
@@ -132,12 +132,12 @@ const styles = StyleSheet.create({
     info: {
         flex: 1 },
     title: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2 },
     counter: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         marginTop: 1 },
     stepBtn: {

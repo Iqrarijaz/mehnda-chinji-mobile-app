@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
         gap: 8 },
     card: {
         borderRadius: Layout.borderRadius,
-        padding: 10,
+        padding: 8,
         gap: 10 },
     infoRow: {
         flexDirection: 'row',
@@ -122,16 +122,16 @@ const styles = StyleSheet.create({
     info: {
         flex: 1 },
     label: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.4,
         marginBottom: 2 },
     value: {
-        fontSize: 13.5,
+        fontSize: 12,
         fontWeight: '700' },
     sub: {
-        fontSize: 11.5,
+        fontSize: 10,
         marginTop: 1 },
     directionsBtn: {
         flexDirection: 'row',
@@ -143,6 +143,6 @@ const styles = StyleSheet.create({
         marginTop: 4 },
     directionsText: {
         color: '#FFFFFF',
-        fontSize: 13.5,
+        fontSize: 12,
         fontWeight: '800',
         letterSpacing: 0.3 } });

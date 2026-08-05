@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
 
     // Header 
     headerWrap: {
-        paddingBottom: 24,
+        paddingBottom: 20,
         borderBottomLeftRadius: Layout.borderRadius,
         borderBottomRightRadius: Layout.borderRadius,
         overflow: 'hidden',
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
     backBtn: {
         width: 42,
         height: 42,
@@ -194,18 +194,18 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center' },
     headerTitle: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700',
         color: '#FFFFFF' },
     headerSubtitleWrap: {
         alignItems: 'center',
         marginTop: 12 },
     headerSubtitle: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#FFFFFF',
         fontWeight: '600' },
     headerDate: {
-        fontSize: 10,
+        fontSize: 9,
         color: 'rgba(255,255,255,0.7)',
         marginTop: 4,
         fontWeight: '500' },
@@ -215,14 +215,14 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: 16,
         backgroundColor: 'rgba(255,255,255,0.15)',
-        paddingHorizontal: 14,
-        paddingVertical: 6,
+        paddingHorizontal: 11,
+        paddingVertical: 5,
         borderRadius: Layout.borderRadius,
         gap: 6
     },
     infoBtnText: {
         color: 'rgba(255,255,255,0.9)',
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '600'
     },
 
@@ -232,24 +232,24 @@ const styles = StyleSheet.create({
         marginTop: -20,
         zIndex: 0 },
     scrollContent: {
-        paddingHorizontal: 16,
-        paddingTop: 40 },
+        paddingHorizontal: 13,
+        paddingTop: 36 },
 
     // Card Content
     card: {
         borderRadius: Layout.borderRadius,
-        padding: 16 },
+        padding: 13 },
     cardHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
         marginBottom: 16 },
     cardHeaderText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700',
         color: '#0F172A' },
     welcomeText: {
-        fontSize: 12,
+        fontSize: 10.5,
         lineHeight: 18,
         color: '#64748B' },
     divider: {
@@ -268,12 +268,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 16 },
+        padding: 13 },
     accordionTitleWrap: {
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
-        paddingRight: 12 },
+        paddingRight: 10 },
     bulletPoint: {
         width: 6,
         height: 6,
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#CBD5E1',
         marginRight: 10 },
     accordionTitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '600',
         color: '#334155',
         flex: 1 },
@@ -291,10 +291,10 @@ const styles = StyleSheet.create({
     accordionContentWrap: {
         overflow: 'hidden' },
     accordionContentInner: {
-        paddingHorizontal: 16,
-        paddingBottom: 16 },
+        paddingHorizontal: 13,
+        paddingBottom: 13 },
     bodyText: {
-        fontSize: 11,
+        fontSize: 10,
         lineHeight: 18,
         color: '#475569' },
 
@@ -304,9 +304,13 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#FFFFFF',
-        paddingHorizontal: 20,
-        paddingTop: 16,
+        backgroundColor: '#FFFFFF',
+
+
+
+
+        paddingHorizontal: 16,
+        paddingTop: 13,
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28 },
     checkboxRow: {
@@ -321,7 +325,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 12 },
     checkboxText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '500',
         color: '#334155',
         flex: 1 },
@@ -331,7 +335,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     acceptButtonText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700' },
 
     // Modal
@@ -340,11 +344,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(15,23,42,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24 },
+        padding: 20 },
     modalContent: {
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 24,
+        padding: 20,
         width: '100%',
         alignItems: 'center' },
     modalIconWrap: {
@@ -356,13 +360,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16 },
     modalTitle: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700',
         color: '#0F172A',
         marginBottom: 12,
         textAlign: 'center' },
     modalBody: {
-        fontSize: 11,
+        fontSize: 10,
         lineHeight: 18,
         color: '#475569',
         textAlign: 'center',
@@ -375,6 +379,6 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     modalBtnText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700' }
 });

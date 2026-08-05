@@ -36,9 +36,9 @@ export const DataUsageHeader = ({ onReset, onBack }: DataUsageHeaderProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 12 },
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: 10 },
     topRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -55,21 +55,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#E6F4F2',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
+        paddingHorizontal: 10,
+        paddingVertical: 7,
         borderRadius: Layout.borderRadius,
         gap: 6 },
     resetText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         color: '#009688' },
     titleContainer: {
         gap: 4 },
     title: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         color: '#0F172A' },
     subtitle: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#64748B',
         fontWeight: '500' } });

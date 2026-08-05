@@ -63,8 +63,8 @@ const styles = StyleSheet.create({
         marginTop: -20,
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
-        paddingHorizontal: 16,
-        paddingTop: 20 },
+        paddingHorizontal: 13,
+        paddingTop: 16 },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',

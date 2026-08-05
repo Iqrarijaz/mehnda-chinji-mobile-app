@@ -93,11 +93,11 @@ const styles = StyleSheet.create({
         gap: 8,
         marginTop: 6 },
     tagChip: {
-        paddingHorizontal: 16,
-        paddingVertical: 10,
+        paddingHorizontal: 13,
+        paddingVertical: 8,
         borderRadius: Layout.borderRadius },
     tagChipText: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '500' },
     typeChipImageContainer: {
         width: 24,

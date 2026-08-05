@@ -228,23 +228,23 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 12 },
     title: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '800',
         textAlign: 'center',
         marginBottom: 3 },
     subtitle: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '500',
         textAlign: 'center' },
 
     // Session card
     list: { maxHeight: '55%' },
-    listContent: { paddingBottom: 8 },
+    listContent: { paddingBottom: 7 },
     card: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        padding: 10,
+        padding: 8,
         marginBottom: 8 },
     cardCurrent: {
         backgroundColor: 'rgba(0,102,102,0.08)', // Using alpha for consistent branding
@@ -267,22 +267,22 @@ const styles = StyleSheet.create({
         marginBottom: 2,
         flexWrap: 'wrap' },
     deviceName: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         flexShrink: 1 },
     badge: {
         backgroundColor: 'rgba(0,102,102,0.14)',
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 2,
         borderRadius: Layout.borderRadius },
     badgeText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         color: '#006666',
         textTransform: 'uppercase',
         letterSpacing: 0.5 },
     meta: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#94A3B8',
         fontWeight: '500' },
     revokeBtn: {
@@ -297,10 +297,10 @@ const styles = StyleSheet.create({
     // Empty
     empty: {
         alignItems: 'center',
-        paddingVertical: 40,
+        paddingVertical: 36,
         gap: 12 },
     emptyText: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#94A3B8',
         fontWeight: '500' },
     footer: {
@@ -316,5 +316,5 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });

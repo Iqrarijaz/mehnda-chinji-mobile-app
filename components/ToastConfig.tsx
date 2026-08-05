@@ -98,11 +98,15 @@ const styles = StyleSheet.create({
         width: '92%',
         minHeight: 60,
         borderRadius: Layout.borderRadius,
-        paddingVertical: 10,
-        paddingHorizontal: 16,
+        paddingVertical: 8,
+        paddingHorizontal: 13,
         flexDirection: 'row',
         alignItems: 'center',
-        overflow: 'hidden',
+        overflow: 'hidden',
+
+
+
+
         marginTop: 12,
         zIndex: 99999 },
 
@@ -133,16 +137,16 @@ const styles = StyleSheet.create({
         zIndex: 2 },
 
     title: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '800',
         color: '#0F172A' },
 
     subtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: '#334155',
         marginTop: 2,
         lineHeight: 18 },
 
     closeBtn: {
-        padding: 6,
+        padding: 5,
         zIndex: 2 } });

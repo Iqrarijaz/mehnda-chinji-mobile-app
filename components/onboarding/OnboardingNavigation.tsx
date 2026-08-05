@@ -222,8 +222,8 @@ function Dot({ isActive, theme, colors }: { isActive: boolean; theme: any; color
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 24,
-    paddingTop: 14,
+    paddingHorizontal: 20,
+    paddingTop: 11,
     borderTopRightRadius: 28,
     borderTopLeftRadius: 28,
     alignItems: 'center',
@@ -250,15 +250,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 40,
-    paddingHorizontal: 16,
+    paddingHorizontal: 13,
     borderRadius: Layout.borderRadius },
   backBtnText: {
-    fontSize: 13,
+    fontSize: 11.5,
     fontWeight: '600' },
   nextBtn: {
     height: 40,
     borderRadius: Layout.borderRadius,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center' },
   ctaContent: {
@@ -267,5 +267,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center' },
   nextBtnText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 12.5,
     fontWeight: '600' } });

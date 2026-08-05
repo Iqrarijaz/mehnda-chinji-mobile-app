@@ -103,7 +103,7 @@ export function QuranSettingsModal({
                                 onPress={() => onFontSize(clamp(fontSize - 2))}
                                 style={[styles.stepBtn, { backgroundColor: `${colors.primary}14` }]}
                             >
-                                <ThemedText style={[styles.stepText, { color: colors.primary, fontSize: 14 }]}>A</ThemedText>
+                                <ThemedText style={[styles.stepText, { color: colors.primary, fontSize: 12.5 }]}>A</ThemedText>
                             </TouchableOpacity>
 
                             <FontSlider
@@ -117,7 +117,7 @@ export function QuranSettingsModal({
                                 onPress={() => onFontSize(clamp(fontSize + 2))}
                                 style={[styles.stepBtn, { backgroundColor: `${colors.primary}14` }]}
                             >
-                                <ThemedText style={[styles.stepText, { color: colors.primary, fontSize: 22 }]}>A</ThemedText>
+                                <ThemedText style={[styles.stepText, { color: colors.primary, fontSize: 18.5 }]}>A</ThemedText>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -135,9 +135,9 @@ const styles = StyleSheet.create({
     sheet: {
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-        paddingTop: 10 },
+        paddingTop: 8 },
     handle: {
         alignSelf: 'center',
         width: 40,
@@ -150,19 +150,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 8 },
-    title: { fontSize: 17, fontWeight: '800' },
-    section: { paddingVertical: 14 },
+    title: { fontSize: 14.5, fontWeight: '800' },
+    section: { paddingVertical: 11 },
     sectionLabelRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 12 },
-    sectionLabel: { fontSize: 14, fontWeight: '700' },
-    hint: { fontSize: 12, marginTop: 3 },
+    sectionLabel: { fontSize: 12.5, fontWeight: '700' },
+    hint: { fontSize: 10.5, marginTop: 3 },
     valuePill: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '800',
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         paddingVertical: 3,
         borderRadius: Layout.borderRadius,
         overflow: 'hidden' },

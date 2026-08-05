@@ -260,7 +260,7 @@ const ManageEssentialDashboard = () => {
             <ScrollView
                 style={styles.content}
                 contentContainerStyle={{
-                    padding: 20,
+                    padding: 16,
                     paddingBottom: canShowBanner ? bottomInset + 150 : insets.bottom + 100
                 }}
                 refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
@@ -315,8 +315,8 @@ const styles = StyleSheet.create({
     mainContainer: {
         flex: 1 },
     header: {
-        paddingHorizontal: 20,
-        paddingBottom: 25,
+        paddingHorizontal: 16,
+        paddingBottom: 21,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28 },
     headerTop: {
@@ -336,17 +336,17 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     headerTitle: {
         color: '#FFF',
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '700' },
     headerSubtitle: {
         color: 'rgba(255,255,255,0.8)',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '600',
         letterSpacing: 1 },
     statusCard: {
         backgroundColor: 'rgba(255,255,255,0.15)',
         borderRadius: Layout.borderRadius,
-        padding: 15 },
+        padding: 12 },
     statusRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -358,12 +358,12 @@ const styles = StyleSheet.create({
         marginRight: 8 },
     statusLabel: {
         color: '#FFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '800',
         letterSpacing: 1 },
     statusDescription: {
         color: 'rgba(255,255,255,0.9)',
-        fontSize: 13,
+        fontSize: 11.5,
         lineHeight: 18 },
     tabContainer: {
         flexDirection: 'row',
@@ -382,13 +382,13 @@ const styles = StyleSheet.create({
         gap: 8,
         height: '100%' },
     tabText: {
-        fontSize: 14 },
+        fontSize: 12.5 },
     content: {
         flex: 1 },
     list: {
         gap: 15 },
     itemCard: {
-        padding: 12,
+        padding: 10,
         borderRadius: Layout.borderRadius },
     itemMain: {
         flexDirection: 'row',
@@ -410,11 +410,11 @@ const styles = StyleSheet.create({
     itemInfo: {
         flex: 1 },
     itemName: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700',
         textTransform: 'capitalize' },
     itemSubtitle: {
-        fontSize: 13,
+        fontSize: 11.5,
         opacity: 0.7,
         marginTop: 2 },
     schoolRow: {
@@ -423,24 +423,24 @@ const styles = StyleSheet.create({
         gap: 4,
         marginTop: 4 },
     schoolText: {
-        fontSize: 12,
+        fontSize: 10.5,
         textTransform: 'capitalize',
         flex: 1 },
     moreBtn: {
-        padding: 8 },
+        padding: 7 },
     menuContainer: {
         width: 160,
         borderRadius: Layout.borderRadius,
-        padding: 6 },
+        padding: 5 },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 12,
+        paddingVertical: 8,
+        paddingHorizontal: 10,
         borderRadius: Layout.borderRadius },
     menuItemText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     eventBadgeRow: {
         flexDirection: 'row',
@@ -448,21 +448,21 @@ const styles = StyleSheet.create({
         marginBottom: 4,
         gap: 8 },
     typeBadge: {
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 2,
         borderRadius: Layout.borderRadius },
     typeBadgeText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800' },
     eventDate: {
-        fontSize: 11,
+        fontSize: 10,
         opacity: 0.5,
         fontWeight: '600' },
     emptyState: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 60 },
+        paddingVertical: 56 },
     emptyIconCircle: {
         width: 100,
         height: 100,
@@ -471,26 +471,26 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20 },
     emptyTitle: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '700',
         marginBottom: 10 },
     emptySubtitle: {
-        fontSize: 14,
+        fontSize: 12.5,
         textAlign: 'center',
         opacity: 0.6,
-        paddingHorizontal: 40,
+        paddingHorizontal: 36,
         marginBottom: 30,
         lineHeight: 20 },
     addBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 25,
-        paddingVertical: 12,
+        paddingHorizontal: 21,
+        paddingVertical: 10,
         borderRadius: Layout.borderRadius,
         gap: 8 },
     addBtnText: {
         color: '#FFF',
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700' },
     floatingAdd: {
         position: 'absolute',

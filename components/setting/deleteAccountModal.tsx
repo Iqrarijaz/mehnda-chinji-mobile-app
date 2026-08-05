@@ -120,8 +120,8 @@ const styles = StyleSheet.create({
     modalContent: {
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
-        padding: 24,
-        paddingBottom: 40 },
+        padding: 20,
+        paddingBottom: 36 },
 
     modalHeader: {
         flexDirection: 'row',
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16 },
     modalTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '700',
         color: '#0F172A' },
     closeButton: {
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         marginBottom: 12 },
     inputLabel: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600',
         color: '#475569',
         letterSpacing: 0.5,
@@ -151,8 +151,8 @@ const styles = StyleSheet.create({
     input: {
         height: Platform.OS === 'android' ? 48 : 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 18,
-        fontSize: 15,
+        paddingHorizontal: 15,
+        fontSize: 12.5,
         fontWeight: '500',
         backgroundColor: 'transparent' },
     saveButton: {
@@ -163,11 +163,11 @@ const styles = StyleSheet.create({
         marginTop: 10 },
     saveButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700' },
     warningText: {
         color: '#ef4444',
-        fontSize: 14,
+        fontSize: 12.5,
         textAlign: 'center',
         marginBottom: 12,
         lineHeight: 20 },
@@ -183,6 +183,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: Layout.borderRadius },
     cancelText: {
-        fontSize: 14,
+        fontSize: 12.5,
         color: '#94A3B8',
         fontWeight: '600' } });

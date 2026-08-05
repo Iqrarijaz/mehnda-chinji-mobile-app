@@ -74,10 +74,10 @@ export const DataControlToggles = ({
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginBottom: 12 },
     sectionTitle: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '800',
         color: '#94A3B8',
         textTransform: 'uppercase',
@@ -87,21 +87,21 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 12 },
+        padding: 10 },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 8,
+        paddingVertical: 7,
         gap: 16 },
     textContainer: {
         flex: 1,
         gap: 2 },
     label: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '700',
         color: '#1E293B' },
     description: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#64748B',
         fontWeight: '500',
         lineHeight: 16 },

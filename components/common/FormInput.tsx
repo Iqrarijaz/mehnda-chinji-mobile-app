@@ -95,7 +95,7 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                         minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52),
                         borderWidth: 1.5
                     },
-                    multiline && { alignItems: 'flex-start', paddingVertical: 12 },
+                    multiline && { alignItems: 'flex-start', paddingVertical: 10 },
                     inputBoxStyle,
                     animatedBorderStyle
                 ]}
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
         paddingRight: 4
     },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2,
@@ -156,25 +156,25 @@ const styles = StyleSheet.create({
         color: '#EF4444'
     },
     charCount: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '600'
     },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14
+        paddingHorizontal: 11
     },
     textInput: {
         flex: 1,
         fontWeight: '500',
-        fontSize: 14,
+        fontSize: 12.5,
         padding: 0,
         margin: 0
     },
     errorText: {
         color: '#EF4444',
-        fontSize: 11,
+        fontSize: 10,
         marginLeft: 4,
         marginTop: 2
     }

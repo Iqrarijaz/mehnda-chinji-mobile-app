@@ -71,16 +71,16 @@ export default WeatherDaily;
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.borderRadius, padding: 20, marginBottom: 14 },
-    title: { fontSize: 14, fontWeight: '700', letterSpacing: 0.3, marginBottom: 6 },
+        borderRadius: Layout.borderRadius, padding: 16, marginBottom: 14 },
+    title: { fontSize: 12.5, fontWeight: '700', letterSpacing: 0.3, marginBottom: 6 },
     row: {
-        flexDirection: 'row', alignItems: 'center', paddingVertical: 10 },
+        flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
     dayContainer: { width: 70 },
-    day: { fontSize: 13, fontWeight: '700' },
-    date: { fontSize: 11, fontWeight: '600', opacity: 0.8 },
-    pop: { fontSize: 11, fontWeight: '700', width: 40, textAlign: 'right' },
+    day: { fontSize: 11.5, fontWeight: '700' },
+    date: { fontSize: 10, fontWeight: '600', opacity: 0.8 },
+    pop: { fontSize: 10, fontWeight: '700', width: 40, textAlign: 'right' },
     temps: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: 8 },
-    low: { fontSize: 13, fontWeight: '600', width: 28, textAlign: 'right' },
+    low: { fontSize: 11.5, fontWeight: '600', width: 28, textAlign: 'right' },
     bar: { flex: 1, height: 6, borderRadius: Layout.borderRadius, overflow: 'hidden', justifyContent: 'center' },
     barFill: { position: 'absolute', height: '100%', borderRadius: Layout.borderRadius },
-    high: { fontSize: 13, fontWeight: '700', width: 28 } });
+    high: { fontSize: 11.5, fontWeight: '700', width: 28 } });

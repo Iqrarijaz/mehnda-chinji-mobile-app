@@ -148,11 +148,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24 },
+        padding: 20 },
     modalContent: {
         width: '100%',
         borderRadius: Layout.borderRadius,
-        padding: 24,
+        padding: 20,
         alignItems: 'center' },
     header: {
         alignItems: 'center',
@@ -165,12 +165,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20 },
     title: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '700',
         textAlign: 'center',
         marginBottom: 8 },
     message: {
-        fontSize: 13,
+        fontSize: 11.5,
         color: '#64748B',
         textAlign: 'center',
         lineHeight: 20,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         backgroundColor: '#F8FAFC' },
     cancelText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600',
         color: '#64748B' },
     confirmBtnWrapper: {
@@ -198,6 +198,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     confirmBtnText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600',
         color: '#FFFFFF' } });

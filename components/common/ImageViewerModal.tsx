@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
         right: 20,
         zIndex: 10 },
     closeButtonSurface: {
-        padding: 8,
+        padding: 7,
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         borderRadius: Layout.borderRadius,
         width: 42,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20 },
+        padding: 16 },
     listImageWrapper: {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
@@ -166,11 +166,11 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     paginationBadge: {
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
         borderRadius: Layout.borderRadius },
     paginationText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' }
 });

@@ -233,8 +233,8 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: 13,
+        paddingVertical: 10,
         gap: 12 },
     searchBar: {
         flex: 1,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 48,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16 },
+        paddingHorizontal: 13 },
     input: {
         flex: 1,
         marginLeft: 10,
@@ -251,10 +251,10 @@ const styles = StyleSheet.create({
     cancelButton: {
         paddingHorizontal: 4 },
     listContent: {
-        paddingHorizontal: 16,
-        paddingBottom: 40 },
+        paddingHorizontal: 13,
+        paddingBottom: 36 },
     sectionTitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: 'bold',
         opacity: 0.5,
         marginTop: 20,
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     resultItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 14 },
+        paddingVertical: 11 },
     iconBox: {
         width: 40,
         height: 40,
@@ -275,10 +275,10 @@ const styles = StyleSheet.create({
     textContainer: {
         flex: 1 },
     resultLabel: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '600' },
     resultSubtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         opacity: 0.5,
         marginTop: 2 },
     emptyState: {
@@ -286,6 +286,6 @@ const styles = StyleSheet.create({
         marginTop: 60,
         gap: 12 },
     emptyText: {
-        fontSize: 14,
+        fontSize: 12.5,
         opacity: 0.5 }
 });

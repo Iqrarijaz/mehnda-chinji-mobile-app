@@ -63,7 +63,7 @@ export function ModalPickerTrigger({
                         style={[
                             styles.triggerText, 
                             !value ? { color: colors.icon } : { color: colors.text, textTransform: 'capitalize' }, 
-                            { fontSize: 14 }
+                            { fontSize: 12.5 }
                         ]}
                         numberOfLines={1}
                     >
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingRight: 4 },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2 },
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     triggerContent: {
         flexDirection: 'row',
         alignItems: 'center',

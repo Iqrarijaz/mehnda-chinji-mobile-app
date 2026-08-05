@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 6,
+        padding: 5,
         marginBottom: 8 },
     cardUnread: {
         backgroundColor: `${PRIMARY}08` },
@@ -125,8 +125,8 @@ const styles = StyleSheet.create({
         backgroundColor: PRIMARY },
     content: { flex: 1 },
     titleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-    title: { fontSize: 12, fontWeight: '600', color: '#0F172A', flex: 1 },
+    title: { fontSize: 10.5, fontWeight: '600', color: '#0F172A', flex: 1 },
     titleUnread: { fontWeight: '800' },
     dot: { width: 7, height: 7, borderRadius: Layout.borderRadius, backgroundColor: PRIMARY, marginLeft: 6 },
-    body: { fontSize: 11, color: '#64748B', lineHeight: 16, marginBottom: 4 },
-    time: { fontSize: 11, color: '#94A3B8', fontWeight: '500' } });
+    body: { fontSize: 10, color: '#64748B', lineHeight: 16, marginBottom: 4 },
+    time: { fontSize: 10, color: '#94A3B8', fontWeight: '500' } });
