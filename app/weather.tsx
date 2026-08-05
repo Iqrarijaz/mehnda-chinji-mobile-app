@@ -120,7 +120,9 @@ export default function WeatherScreen() {
     const hourlyData = useMemo(() => {
         if (!forecast) return [];
 
-        return forecast.list.slice(0, 8).map((item: any) => {
+        // 16 x 3-hour steps = 48h of forecast — enough that the hourly chart
+        // genuinely needs to scroll, matching the "slider" behaviour.
+        return forecast.list.slice(0, 16).map((item: any) => {
             const date = new Date(item.dt * 1000);
 
             const hours = date.getHours();
@@ -130,7 +132,8 @@ export default function WeatherScreen() {
             return {
                 time: `${hour}${ampm}`,
                 icon: item.weather[0].icon,
-                temp: Math.round(item.main.temp)
+                temp: Math.round(item.main.temp),
+                pop: Math.round((item.pop || 0) * 100)
             };
         });
     }, [forecast]);
