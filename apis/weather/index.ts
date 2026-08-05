@@ -57,14 +57,15 @@ export const getUVIndex = async (lat: number, lon: number): Promise<number | nul
     }
 };
 
-// ── Rain radar (free RainViewer public API — no key required) ───────────────
-// https://www.rainviewer.com/api.html — a global list of available radar
-// frame timestamps (recent past + short-term nowcast). Tile images for a
-// given frame are fetched on-demand by the map itself via getRadarTileUrl.
+// ── Rain radar (proxied + cached through our own backend, not RainViewer
+// directly — see GET /api/user/v1/weather/radar in the backend repo) ────────
+// Frames arrive with a ready-to-use tileUrlTemplate already built
+// server-side, so there's no client-side URL-building step anymore.
 
 export interface RadarFrame {
     time: number; // unix seconds
     path: string;
+    tileUrlTemplate: string;
 }
 
 export interface RadarFramesResponse {
@@ -75,27 +76,20 @@ export interface RadarFramesResponse {
 
 export const getRadarFrames = async (): Promise<RadarFramesResponse | null> => {
     try {
-        const response = await axios.get('https://api.rainviewer.com/public/weather-maps.json');
-        const data = response.data;
-        if (!data?.host || !data?.radar) return null;
+        const res: any = await apiClient.get('/api/user/v1/weather/radar', {
+            params: { size: 256, color: 4, smooth: 1, snow: 1 },
+        });
+        const data = res?.data;
+        if (!data?.host) return null;
         return {
             host: data.host,
-            past: data.radar.past || [],
-            nowcast: data.radar.nowcast || [],
+            past: data.past || [],
+            nowcast: data.nowcast || [],
         };
     } catch {
         return null;
     }
 };
-
-/**
- * Builds an XYZ tile URL template for a given radar frame.
- * size: 256 (matches the OSM base tiles); color: 4 = the classic
- * green→yellow→red "Original" RainViewer palette; "1_1" = smoothed +
- * snow-aware rendering.
- */
-export const getRadarTileUrl = (host: string, path: string): string =>
-    `${host}${path}/256/{z}/{x}/{y}/4/1_1.png`;
 
 export interface WeatherResponse {
     coord: { lon: number; lat: number };

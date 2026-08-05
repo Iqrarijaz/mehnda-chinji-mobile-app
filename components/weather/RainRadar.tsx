@@ -4,7 +4,7 @@ import MapLibreGL, { Camera, MapView, RasterLayer, RasterSource } from '@maplibr
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
-import { getRadarFrames, getRadarTileUrl, RadarFrame } from '@/apis/weather';
+import { getRadarFrames, RadarFrame } from '@/apis/weather';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -83,7 +83,7 @@ const RainRadar = React.memo(({ coords }: RainRadarProps) => {
 
     const activeFrame = frames[activeIndex];
     const isForecastFrame = !!data && activeIndex >= data.past.slice(-6).length;
-    const tileUrl = activeFrame && data ? getRadarTileUrl(data.host, activeFrame.path) : null;
+    const tileUrl = activeFrame?.tileUrlTemplate ?? null;
 
     return (
         <View style={[styles.wrapper, { backgroundColor: colors.cardBg }]}>
