@@ -50,29 +50,42 @@ export interface ForecastResponse {
     };
 }
 
-export const getWeather = async (city: string = 'talagang,pk') => {
+export interface WeatherCoords {
+    lat: number;
+    lon: number;
+}
+
+// Prefer precise coordinates (current location) when provided, else fall back
+// to a city name query.
+const buildLocationParams = (city: string, coords?: WeatherCoords | null) => {
+    if (coords && Number.isFinite(coords.lat) && Number.isFinite(coords.lon)) {
+        return { lat: coords.lat, lon: coords.lon };
+    }
+    return { q: city };
+};
+
+export const getWeather = async (city: string = 'talagang,pk', coords?: WeatherCoords | null) => {
     try {
         const response = await axios.get(`${BASE_URL}/weather`, {
             params: {
-                q: city,
+                ...buildLocationParams(city, coords),
                 APPID: WEATHER_API_KEY,
                 units: 'metric',
             },
         });
 
         const data = response.data as WeatherResponse;
-        console.log("API RESPONSE LOGS", data);
         return data;
     } catch (error: any) {
         throw error.response?.data || error.message;
     }
 };
 
-export const getForecast = async (city: string = 'talagang,pk') => {
+export const getForecast = async (city: string = 'talagang,pk', coords?: WeatherCoords | null) => {
     try {
         const response = await axios.get(`${BASE_URL}/forecast`, {
             params: {
-                q: city,
+                ...buildLocationParams(city, coords),
                 APPID: WEATHER_API_KEY,
                 units: 'metric',
             },
