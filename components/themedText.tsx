@@ -20,6 +20,7 @@ export function ThemedText({
 
   return (
     <Text
+      allowFontScaling={false}
       style={[
         { color },
         type === 'default' ? styles.default : undefined,

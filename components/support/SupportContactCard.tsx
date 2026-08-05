@@ -70,9 +70,9 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
                     <Ionicons name={icon} size={26} color={color} />
                 </View>
                 <View style={styles.content}>
-                    <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.subtitle}>{subtitle}</Text>
-                    {!hideValue && <Text style={[styles.value, { color }]}>{value}</Text>}
+                    <Text allowFontScaling={false} style={styles.title}>{title}</Text>
+                    <Text allowFontScaling={false} style={styles.subtitle}>{subtitle}</Text>
+                    {!hideValue && <Text allowFontScaling={false} style={[styles.value, { color }]}>{value}</Text>}
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
             </Animated.View>

@@ -177,7 +177,7 @@ export default function SupportScreen() {
 
                 {/* Contact Section */}
                 <Animated.View entering={FadeInDown.delay(400).duration(500)}>
-                    <Text style={styles.sectionTitle}>Contact Support</Text>
+                    <Text allowFontScaling={false} style={styles.sectionTitle}>Contact Support</Text>
                     <SupportContactCard
                         type="whatsapp"
                         title="WhatsApp Chat"
@@ -206,7 +206,7 @@ export default function SupportScreen() {
                     isSubmitting={createTicketMutation.isPending}
                 />
 
-                <Text style={styles.footerNote}>
+                <Text allowFontScaling={false} style={styles.footerNote}>
                     Our support team is available Monday to Friday, 9AM - 6PM. Responses may take up to 24 hours.
                 </Text>
             </ScrollView>

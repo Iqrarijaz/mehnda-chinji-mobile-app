@@ -110,6 +110,7 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                 )}
                 <TextInput
                     ref={ref}
+                    allowFontScaling={false}
                     placeholderTextColor={colors.icon}
                     style={[
                         styles.textInput,

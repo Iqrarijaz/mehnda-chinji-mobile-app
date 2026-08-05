@@ -46,7 +46,7 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
                 onPress={onToggle}
                 style={[styles.header, isOpen && styles.headerOpen]}
             >
-                <Text style={[styles.question, isOpen && styles.activeText]}>{question}</Text>
+                <Text allowFontScaling={false} style={[styles.question, isOpen && styles.activeText]}>{question}</Text>
                 <Animated.View style={chevronStyle}>
                     <Ionicons
                         name="chevron-down"
@@ -62,7 +62,7 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
                     exiting={FadeOut.duration(200)}
                     style={styles.answerContainer}
                 >
-                    <Text style={styles.answer}>{answer}</Text>
+                    <Text allowFontScaling={false} style={styles.answer}>{answer}</Text>
                 </Animated.View>
             )}
         </View>
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         marginBottom: 12,
         overflow: 'hidden',
-        // Shadow for premium feel
+        // Shadow for premium feel
     },
     header: {
         flexDirection: 'row',

@@ -196,6 +196,7 @@ export default function VerifyOtpScreen() {
                             {otp.map((digit, index) => (
                                 <TextInput
                                     key={index}
+                                    allowFontScaling={false}
                                     ref={(ref) => { inputRefs.current[index] = ref; }}
                                     style={[
                                         styles.otpInput,

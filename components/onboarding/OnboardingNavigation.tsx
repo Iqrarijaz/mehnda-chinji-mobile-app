@@ -154,7 +154,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
           ]}
         >
           <Ionicons name="arrow-back" size={14} color={colors.text} style={{ marginRight: 4 }} />
-          <Text style={[styles.backBtnText, { color: colors.text }]}>Back</Text>
+          <Text allowFontScaling={false} style={[styles.backBtnText, { color: colors.text }]}>Back</Text>
         </AnimatedPressable>
 
         {/* Continue CTA */}
@@ -177,7 +177,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
             <View style={styles.ctaContent}>
-              <Text style={styles.nextBtnText}>
+              <Text allowFontScaling={false} style={styles.nextBtnText}>
                 {ctaText}
               </Text>
               <Animated.View style={animatedArrowStyle}>

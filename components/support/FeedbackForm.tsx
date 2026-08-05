@@ -32,7 +32,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) =
             entering={SlideInLeft.delay(600).duration(450)}
             style={styles.container}
         >
-            <Text style={styles.title}>Send us Feedback</Text>
+            <Text allowFontScaling={false} style={styles.title}>Send us Feedback</Text>
             <View style={styles.card}>
                 <FormInput
                     label="SUBJECT"

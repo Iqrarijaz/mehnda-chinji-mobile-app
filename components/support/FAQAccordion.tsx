@@ -21,7 +21,7 @@ const FAQAccordion: React.FC<FAQAccordionProps> = ({ data }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Frequently Asked Questions</Text>
+            <Text allowFontScaling={false} style={styles.title}>Frequently Asked Questions</Text>
             {data.map((item, index) => (
                 <Animated.View
                     key={index}

@@ -45,7 +45,6 @@ import { useAppFonts } from '@/hooks/useFonts';
 import { initConfig } from '@/lib/remoteConfig';
 import { initializeDeviceInfo } from '@/lib/deviceInfo';
 import AdManager from '@/ads/adManager.service';
-import { Text, TextInput } from 'react-native';
 import { ToastConfig } from '@/components/ToastConfig';
 import CustomSplashScreen from '@/components/splashScreen';
 import { AppUpdateModal } from '@/components/common/AppUpdateModal';
@@ -58,18 +57,12 @@ SplashScreen.preventAutoHideAsync();
 // Android uses duration for its hide animation).
 SplashScreen.setOptions({ duration: 350, fade: true });
 
-// Disable global font scaling to prevent UI breakage on devices with large accessibility fonts
-
-
-if (!(Text as any).defaultProps) {
-  (Text as any).defaultProps = {};
-}
-(Text as any).defaultProps.allowFontScaling = false;
-
-if (!(TextInput as any).defaultProps) {
-  (TextInput as any).defaultProps = {};
-}
-(TextInput as any).defaultProps.allowFontScaling = false;
+// Font scaling is disabled per-component (ThemedText, FormInput, and every
+// other Text/TextInput usage explicitly sets allowFontScaling={false}) so
+// large system accessibility font settings can't break layouts. A global
+// `Text.defaultProps.allowFontScaling = false` hack used to live here, but
+// React 19 removed defaultProps support for function components entirely,
+// so it was silently a no-op — RN's Text/TextInput are function components.
 
 function DrawerLayout() {
   const { theme } = useTheme();
