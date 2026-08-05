@@ -478,15 +478,11 @@ const EssentialSubmitForm = React.memo(({
                 ))}
             </Animated.View>
 
-            {isTravel && (
+            {isTravel && form.type?.toLowerCase() === 'bus' && (
                 <Animated.View entering={FadeInDown.delay(400)} style={[styles.field, { marginBottom: 20 }]}>
                     <View style={styles.labelRow}>
                         <ThemedText style={styles.label}>
-                            ROUTE / SCHEDULE{' '}
-                            {form.type?.toLowerCase() === 'bus'
-                                ? <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
-                                : <ThemedText style={{ color: '#94A3B8' }}>(OPTIONAL)</ThemedText>
-                            }
+                            ROUTE / SCHEDULE <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
                         </ThemedText>
                         {form.route.length < 10 && (
                             <TouchableOpacity onPress={addRoute}>
@@ -663,16 +659,12 @@ const EssentialSubmitForm = React.memo(({
                 </Animated.View>
             )}
 
-            {/* ── Travel: Return Route ────────────────────────────── */}
-            {isTravel && (
+            {/* ── Travel: Return Route (bus only) ─────────────────── */}
+            {isTravel && form.type?.toLowerCase() === 'bus' && (
                 <Animated.View entering={FadeInDown.delay(450)} style={styles.field}>
                     <View style={styles.labelRow}>
                         <ThemedText style={styles.label}>
-                            RETURN ROUTE{' '}
-                            {form.type?.toLowerCase() === 'bus'
-                                ? <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
-                                : <ThemedText style={{ color: '#94A3B8' }}>(OPTIONAL)</ThemedText>
-                            }
+                            RETURN ROUTE <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
                         </ThemedText>
                         {form.returnRoute.length < 10 && (
                             <TouchableOpacity onPress={addReturnRoute}>
