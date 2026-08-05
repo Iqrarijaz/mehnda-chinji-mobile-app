@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
+        paddingHorizontal: 14,
         paddingBottom: 4 },
     heroBackButton: {
         width: 36,
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     identityRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 17,
         marginTop: 8,
         gap: 14 },
     identityText: {
@@ -369,30 +369,30 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        paddingHorizontal: 10,
-        paddingVertical: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
         borderRadius: Layout.borderRadius,
         maxWidth: '100%' },
     typeChipText: {
-        fontSize: 10,
+        fontSize: 9.5,
         fontWeight: '800',
         color: '#1E293B',
         textTransform: 'uppercase',
         letterSpacing: 0.6,
         flexShrink: 1 },
     heroTitle: {
-        fontSize: 21,
+        fontSize: 18,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
-        lineHeight: 26 },
+        lineHeight: 23 },
     subtitleRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
         marginTop: 5 },
     heroSubtitle: {
-        fontSize: 12.5,
+        fontSize: 11,
         color: 'rgba(255,255,255,0.85)',
         fontWeight: '600',
         flexShrink: 1 },
@@ -410,8 +410,8 @@ const styles = StyleSheet.create({
     scrollView: {
         flex: 1 },
     detailsCard: {
-        paddingHorizontal: 16,
-        paddingTop: 12,
+        paddingHorizontal: 14,
+        paddingTop: 10,
         flex: 1 },
     actionRow: {
         flexDirection: 'row',
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
         gap: 6,
         height: 42,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 24 },
+        paddingHorizontal: 20 },
     callIcon: {
         width: 24,
         height: 24,
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     callButtonText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700',
         letterSpacing: 0.2 },
     detailAdWrapper: {
@@ -445,5 +445,5 @@ const styles = StyleSheet.create({
     detailSection: {
         gap: 8 },
     descriptionText: {
-        fontSize: 12.5,
-        lineHeight: 19 } });
+        fontSize: 11,
+        lineHeight: 17 } });

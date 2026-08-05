@@ -113,12 +113,12 @@ export default BusinessCard;
 
 const styles = StyleSheet.create({
     card: {
-        marginBottom: 10 },
+        marginBottom: 8 },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 10,
-        gap: 10 },
+        padding: 8,
+        gap: 8 },
     tile: {
         width: TILE_SIZE,
         height: TILE_SIZE,
@@ -139,18 +139,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center' },
     initialText: {
-        fontSize: 18,
+        fontSize: 15,
         fontWeight: '800' },
     info: {
         flex: 1,
         gap: 2,
-        paddingTop: 10 },
+        paddingTop: 8 },
     typeBadge: {
         position: 'absolute',
         top: 0,
         right: 0,
         maxWidth: '60%',
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         borderTopRightRadius: 28,
         borderBottomLeftRadius: 28 },
     typeBadgeText: {
@@ -160,17 +160,17 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
         color: '#FFFFFF' },
     name: {
-        fontSize: 14.5,
+        fontSize: 12.5,
         fontWeight: '800',
         letterSpacing: 0.1,
-        lineHeight: 18 },
+        lineHeight: 16 },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 2,
         paddingRight: 8 },
     metaText: {
-        fontSize: 11.5,
+        fontSize: 10,
         fontWeight: '500',
         flexShrink: 1,
-        lineHeight: 15 } });
+        lineHeight: 13.5 } });
