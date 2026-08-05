@@ -92,11 +92,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     title: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '800',
         letterSpacing: -0.4 },
     description: {
-        fontSize: 13.5,
+        fontSize: 12,
         lineHeight: 19,
         marginBottom: 10,
         paddingLeft: 2 },
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     primaryBtnText: {
         color: '#FFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     cancelBtn: {
         flex: 1,
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: Layout.borderRadius },
     cancelText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     lottieContainer: {
         width: 150,

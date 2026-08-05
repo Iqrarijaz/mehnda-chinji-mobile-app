@@ -100,14 +100,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
         borderRadius: Layout.borderRadius },
     chipDot: {
         width: 5,
         height: 5,
         borderRadius: Layout.borderRadius },
     chipText: {
-        fontSize: 11.5,
+        fontSize: 10,
         fontWeight: '600',
         letterSpacing: 0.2 } });

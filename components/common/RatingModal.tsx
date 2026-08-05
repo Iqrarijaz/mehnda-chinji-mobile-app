@@ -88,12 +88,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24 },
+        padding: 20 },
     modalContent: {
         width: '100%',
         borderRadius: Layout.borderRadius,
-        padding: 24,
-        alignItems: 'center',
+        padding: 20,
+        alignItems: 'center',
+
+
+
+
         ...Platform.select({
             android: {
 
@@ -111,12 +115,12 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         alignItems: 'center' },
     title: {
-        fontSize: 22,
+        fontSize: 18.5,
         fontWeight: '900',
         marginBottom: 12,
         textAlign: 'center' },
     description: {
-        fontSize: 15,
+        fontSize: 12.5,
         lineHeight: 22,
         textAlign: 'center',
         opacity: 0.7 },
@@ -125,7 +129,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         marginTop: 8 },
     modalButton: {
         width: 100,
@@ -135,13 +139,13 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600' },
     laterButton: {
-        paddingVertical: 8,
-        paddingHorizontal: 12,
+        paddingVertical: 7,
+        paddingHorizontal: 10,
         justifyContent: 'center',
         alignItems: 'center' },
     laterButtonText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });

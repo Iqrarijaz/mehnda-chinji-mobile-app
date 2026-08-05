@@ -299,7 +299,8 @@ const BusinessRegistrationScreen = () => {
             <Stack.Screen options={{
                 headerShown: false,
                 gestureEnabled: true,
-                animation: 'slide_from_right'
+                presentation: 'modal',
+                animation: 'slide_from_bottom'
             }} />
 
             <ThankYouModal
@@ -309,7 +310,7 @@ const BusinessRegistrationScreen = () => {
                 animationWidth={260}
                 animationHeight={200}
             >
-                <ThemedText style={{ fontSize: 14, textAlign: 'center', lineHeight: 22, color: colors.textSecondary }}>
+                <ThemedText style={{ fontSize: 12.5, textAlign: 'center', lineHeight: 22, color: colors.textSecondary }}>
                     Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{user?.user?.name ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Entrepreneur'}</ThemedText>, {editData ? 'your business details have been updated successfully.' : 'thank you for registering! Our team will review and approve your business shortly.'}
                 </ThemedText>
             </ThankYouModal>
@@ -354,8 +355,8 @@ const BusinessRegistrationScreen = () => {
                                     )}
                                 </TouchableOpacity>
                                 <View style={{ flex: 1 }}>
-                                    <ThemedText style={{ color: colors.textSecondary, fontSize: 13 }}>Add a photo of your business (Optional).</ThemedText>
-                                    <ThemedText style={{ color: colors.textSecondary, fontSize: 11, marginTop: 4 }}>If no image is provided, category icon will be used.</ThemedText>
+                                    <ThemedText style={{ color: colors.textSecondary, fontSize: 11.5 }}>Add a photo of your business (Optional).</ThemedText>
+                                    <ThemedText style={{ color: colors.textSecondary, fontSize: 10, marginTop: 4 }}>If no image is provided, category icon will be used.</ThemedText>
                                 </View>
                             </View>
                         </Animated.View>
@@ -391,7 +392,7 @@ const BusinessRegistrationScreen = () => {
                                 <View style={styles.triggerContent}>
                                     <ThemedText style={[
                                         styles.triggerText,
-                                        { color: form.category ? colors.text : colors.icon, fontSize: 14 }
+                                        { color: form.category ? colors.text : colors.icon, fontSize: 12.5 }
                                     ]}>
                                         {form.category
                                             ? `${form.category.name_eng} - ${form.category.name_ur}`
@@ -401,7 +402,7 @@ const BusinessRegistrationScreen = () => {
                                 <Ionicons name="chevron-down" size={16} color={colors.icon} />
                             </TouchableOpacity>
                             {errors.category ? (
-                                <ThemedText style={{ color: '#EF4444', fontSize: 11, marginLeft: 4, marginTop: 2 }}>
+                                <ThemedText style={{ color: '#EF4444', fontSize: 10, marginLeft: 4, marginTop: 2 }}>
                                     {errors.category}
                                 </ThemedText>
                             ) : null}
@@ -425,7 +426,7 @@ const BusinessRegistrationScreen = () => {
                                         }}
                                     />
                                 </View>
-                                <ThemedText style={[{ fontSize: 10, fontWeight: '700', color: colors.icon }, form.address.length >= 150 && { color: '#EF4444' }]}>
+                                <ThemedText style={[{ fontSize: 9, fontWeight: '700', color: colors.icon }, form.address.length >= 150 && { color: '#EF4444' }]}>
                                     {form.address.length}/150
                                 </ThemedText>
                             </View>
@@ -433,10 +434,10 @@ const BusinessRegistrationScreen = () => {
                                 backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
                                 minHeight: 80,
                                 alignItems: 'flex-start',
-                                paddingVertical: 12 }]}
+                                paddingVertical: 10 }]}
                             >
                                 <TextInput
-                                    style={[styles.textInput, { color: colors.text, textAlignVertical: 'top', minHeight: 60, fontSize: 14 }]}
+                                    style={[styles.textInput, { color: colors.text, textAlignVertical: 'top', minHeight: 60, fontSize: 12.5 }]}
                                     placeholder="Shop #, Street, Area"
                                     placeholderTextColor={colors.icon}
                                     value={form.address}
@@ -449,7 +450,7 @@ const BusinessRegistrationScreen = () => {
                                 />
                             </View>
                             {errors.address ? (
-                                <ThemedText style={{ color: '#EF4444', fontSize: 11, marginLeft: 4, marginTop: 2 }}>
+                                <ThemedText style={{ color: '#EF4444', fontSize: 10, marginLeft: 4, marginTop: 2 }}>
                                     {errors.address}
                                 </ThemedText>
                             ) : null}
@@ -489,7 +490,7 @@ const BusinessRegistrationScreen = () => {
                                     >
                                         <View style={styles.triggerContent}>
                                             <Ionicons name="time-outline" size={18} color={colors.icon} style={{ marginRight: 8 }} />
-                                            <ThemedText style={[styles.triggerText, { color: colors.text, fontSize: 14 }]}>
+                                            <ThemedText style={[styles.triggerText, { color: colors.text, fontSize: 12.5 }]}>
                                                 {openTime}
                                             </ThemedText>
                                         </View>
@@ -508,7 +509,7 @@ const BusinessRegistrationScreen = () => {
                                     >
                                         <View style={styles.triggerContent}>
                                             <Ionicons name="time-outline" size={18} color={colors.icon} style={{ marginRight: 8 }} />
-                                            <ThemedText style={[styles.triggerText, { color: colors.text, fontSize: 14 }]}>
+                                            <ThemedText style={[styles.triggerText, { color: colors.text, fontSize: 12.5 }]}>
                                                 {closeTime}
                                             </ThemedText>
                                         </View>
@@ -623,11 +624,11 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        paddingBottom: 24 },
+        paddingBottom: 20 },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: 13,
         paddingBottom: 4 },
     backButton: {
         width: 42,
@@ -637,13 +638,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     headerNavTitle: {
-        fontSize: 17,
+        fontSize: 14.5,
         fontWeight: '700',
         color: '#FFFFFF',
         letterSpacing: 0.2 },
     heroContent: {
         alignItems: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         marginTop: 16 },
     heroIconWrap: {
         width: 64,
@@ -654,13 +655,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 12 },
     heroTitle: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
         letterSpacing: 0.2 },
     heroSubtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
         marginTop: 6,
@@ -668,15 +669,15 @@ const styles = StyleSheet.create({
 
     // ── Form ─────────────────────────────────────────────────────────────
     scrollContent: {
-        paddingBottom: 40 },
+        paddingBottom: 36 },
     formSection: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginTop: 24,
         gap: 16 },
     inputField: {
         gap: 6 },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2 },
@@ -694,7 +695,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     textInput: {
         flex: 1,
         fontWeight: '500',
@@ -704,7 +705,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     triggerContent: {
         flex: 1,
         flexDirection: 'row',
@@ -723,11 +724,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
         borderRadius: Layout.borderRadius },
     tagChipText: {
-        fontSize: 11.5,
+        fontSize: 10,
         letterSpacing: 0.2 },
     tagChipDot: {
         width: 5,
@@ -748,7 +749,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     cancelText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     submitButton: {
         width: 160,
@@ -757,6 +758,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     submitText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600',
         color: '#FFFFFF' } });

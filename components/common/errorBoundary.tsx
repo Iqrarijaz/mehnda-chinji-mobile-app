@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24 },
+    padding: 20 },
   lottieContainer: {
     width: 350,
     height: 350,
@@ -101,12 +101,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     alignItems: 'center' },
   title: {
-    fontSize: 18,
+    fontSize: 15.5,
     fontWeight: '700',
     marginBottom: 8,
     textAlign: 'center' },
   message: {
-    fontSize: 14,
+    fontSize: 12.5,
     textAlign: 'center' },
   modalButton: {
     width: 120,
@@ -116,5 +116,5 @@ const styles = StyleSheet.create({
     alignItems: 'center' },
   modalButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 12.5,
     fontWeight: '600' } });

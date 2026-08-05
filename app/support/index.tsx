@@ -30,6 +30,7 @@ import { createSupportTicket } from '@/apis/support';
 import FAQAccordion from '@/components/support/FAQAccordion';
 import SupportContactCard from '@/components/support/SupportContactCard';
 import FeedbackForm from '@/components/support/FeedbackForm';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
 const FAQ_DATA = [
     {
@@ -176,7 +177,7 @@ export default function SupportScreen() {
 
                 {/* Contact Section */}
                 <Animated.View entering={FadeInDown.delay(400).duration(500)}>
-                    <Text style={styles.sectionTitle}>Contact Support</Text>
+                    <Text allowFontScaling={false} style={styles.sectionTitle}>Contact Support</Text>
                     <SupportContactCard
                         type="whatsapp"
                         title="WhatsApp Chat"
@@ -205,10 +206,11 @@ export default function SupportScreen() {
                     isSubmitting={createTicketMutation.isPending}
                 />
 
-                <Text style={styles.footerNote}>
+                <Text allowFontScaling={false} style={styles.footerNote}>
                     Our support team is available Monday to Friday, 9AM - 6PM. Responses may take up to 24 hours.
                 </Text>
             </ScrollView>
+            <LoaderOverlay visible={createTicketMutation.isPending} text="Submitting feedback..." />
         </View>
     );
 }
@@ -217,7 +219,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1 },
     headerWrap: {
-        paddingBottom: 24,
+        paddingBottom: 20,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
@@ -225,7 +227,7 @@ const styles = StyleSheet.create({
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
     backBtn: {
         width: 42,
         height: 42,
@@ -237,7 +239,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center' },
     headerTitle: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         color: '#FFFFFF' },
     historyBtn: {
@@ -250,7 +252,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 10 },
     headerSubtitle: {
-        fontSize: 14,
+        fontSize: 12.5,
         color: 'rgba(255,255,255,0.85)',
         fontWeight: '500' },
     scrollView: {
@@ -258,8 +260,8 @@ const styles = StyleSheet.create({
         marginTop: -30,
         zIndex: 0 },
     scrollContent: {
-        paddingHorizontal: 20,
-        paddingTop: 46 },
+        paddingHorizontal: 16,
+        paddingTop: 42 },
     actionsGrid: {
         flexDirection: 'row',
         gap: 16,
@@ -268,7 +270,7 @@ const styles = StyleSheet.create({
         flex: 1 },
     actionCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16,
+        padding: 13,
         alignItems: 'center' },
     actionIcon: {
         width: 56,
@@ -278,11 +280,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 10 },
     actionText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700',
         color: '#1E293B' },
     sectionTitle: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700',
         color: '#64748B',
         textTransform: 'uppercase',
@@ -290,9 +292,9 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         marginLeft: 4 },
     footerNote: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: '#94A3B8',
         textAlign: 'center',
         marginTop: 24,
         lineHeight: 18,
-        paddingHorizontal: 20 } });
+        paddingHorizontal: 16 } });

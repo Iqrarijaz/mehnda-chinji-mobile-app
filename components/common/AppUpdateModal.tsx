@@ -110,11 +110,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24 },
+        padding: 20 },
     modalContent: {
         width: '100%',
         borderRadius: Layout.borderRadius,
-        padding: 24,
+        padding: 20,
         alignItems: 'center' },
     lottieContainer: {
         width: 180,
@@ -130,27 +130,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%' },
     title: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         marginBottom: 8,
         textAlign: 'center' },
     subtitle: {
-        fontSize: 14,
+        fontSize: 12.5,
         lineHeight: 20,
         textAlign: 'center' },
     notesContainer: {
         width: '100%',
-        padding: 12,
+        padding: 10,
         borderRadius: Layout.borderRadius,
         marginTop: 16 },
     notesTitle: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         marginBottom: 4,
         textTransform: 'uppercase',
         letterSpacing: 0.5 },
     notesText: {
-        fontSize: 11,
+        fontSize: 10,
         lineHeight: 16 },
     buttonContainer: {
         flexDirection: 'row',
@@ -163,6 +163,6 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' }
 });

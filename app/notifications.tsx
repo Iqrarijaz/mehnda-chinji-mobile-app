@@ -199,6 +199,6 @@ export default function NotificationsScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    list: { flexGrow: 1, paddingTop: 8 },
+    list: { flexGrow: 1, paddingTop: 7 },
     filtersWrap: { paddingBottom: 4 },
-    sectionWrap: { paddingHorizontal: 16, marginTop: 12 } });
+    sectionWrap: { paddingHorizontal: 13, marginTop: 12 } });

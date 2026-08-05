@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
         gap: 6,
         height: 42,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 24 },
+        paddingHorizontal: 20 },
     primaryIcon: {
         width: 24,
         height: 24,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     primaryText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700',
         letterSpacing: 0.2 },
     secondaryBtn: {
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         gap: 6,
         height: 42,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 24 },
+        paddingHorizontal: 20 },
     secondaryText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700' } });

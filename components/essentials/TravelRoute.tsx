@@ -207,13 +207,13 @@ const styles = StyleSheet.create({
         marginVertical: 3 },
     stopCardWrap: {
         flex: 1,
-        paddingBottom: 12 },
+        paddingBottom: 10 },
     stopCard: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
-        paddingVertical: 9,
+        paddingHorizontal: 10,
+        paddingVertical: 7,
         gap: 10 },
     stopInfo: {
         flex: 1 },
@@ -224,16 +224,16 @@ const styles = StyleSheet.create({
         letterSpacing: 0.6,
         marginBottom: 2 },
     stopCity: {
-        fontSize: 13.5,
+        fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.2 },
     timeBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        paddingHorizontal: 9,
-        paddingVertical: 5,
+        paddingHorizontal: 7,
+        paddingVertical: 4,
         borderRadius: Layout.borderRadius },
     timeText: {
-        fontSize: 11.5,
+        fontSize: 10,
         fontWeight: '700' } });

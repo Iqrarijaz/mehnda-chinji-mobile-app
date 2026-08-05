@@ -130,8 +130,8 @@ const styles = StyleSheet.create({
     },
     hadithCard: {
         borderRadius: Layout.borderRadius,
-        paddingVertical: 24,
-        paddingHorizontal: 20,
+        paddingVertical: 20,
+        paddingHorizontal: 16,
         minHeight: 220,
         overflow: 'hidden' },
     motifIcon: {
@@ -149,11 +149,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center' },
     titleBadge: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius },
     titleLabel: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '900',
         letterSpacing: 1.2 },
     iconButton: {
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center' },
     centerWrap: {
-        paddingVertical: 40,
+        paddingVertical: 36,
         alignItems: 'center' },
     hadithContent: {
         flex: 1 },
@@ -178,15 +178,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4 },
     footer: {
         marginTop: 20,
-        paddingTop: 16,
+        paddingTop: 13,
         alignItems: 'center' },
     sourceText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '800',
         letterSpacing: 0.8,
         textTransform: 'uppercase',
         opacity: 0.8 },
     errorText: {
         textAlign: 'center',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '500' } });

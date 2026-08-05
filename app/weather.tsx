@@ -306,7 +306,7 @@ export default function WeatherScreen() {
                         />
                     ) : null}
 
-                    <View style={{ backgroundColor: colors.cardBg, padding: 8, borderRadius: Layout.borderRadius, marginBottom: 16 }}>
+                    <View style={{ backgroundColor: colors.cardBg, padding: 7, borderRadius: Layout.borderRadius, marginBottom: 16 }}>
                         <NativeAd placement="weather" />
                     </View>
 
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     },
 
     scrollContent: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         flexGrow: 1
     },
 

@@ -46,11 +46,11 @@ export default WeatherStats;
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.borderRadius, padding: 20, marginBottom: 14 },
+        borderRadius: Layout.borderRadius, padding: 16, marginBottom: 14 },
     grid: { flexDirection: 'row', justifyContent: 'space-between' },
     statItem: { flex: 1, alignItems: 'center', gap: 4 },
     iconWrap: {
         width: 44, height: 44, borderRadius: Layout.borderRadius,
         justifyContent: 'center', alignItems: 'center', marginBottom: 4 },
-    value: { fontSize: 15, fontWeight: '800' },
-    label: { fontSize: 11, fontWeight: '600' } });
+    value: { fontSize: 12.5, fontWeight: '800' },
+    label: { fontSize: 10, fontWeight: '600' } });

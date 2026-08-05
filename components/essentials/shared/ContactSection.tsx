@@ -223,11 +223,11 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 10,
+        padding: 8,
         borderRadius: Layout.borderRadius,
         gap: 12 },
     cardLarge: {
-        padding: 12,
+        padding: 10,
         borderRadius: Layout.borderRadius,
         minHeight: 64 },
     iconTile: {
@@ -243,21 +243,21 @@ const styles = StyleSheet.create({
     info: {
         flex: 1 },
     label: {
-        fontSize: 10.5,
+        fontSize: 9.5,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.4,
         marginBottom: 2 },
     number: {
-        fontSize: 14.5,
+        fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.3 },
     numberLarge: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '800',
         letterSpacing: 0.4 },
     description: {
-        fontSize: 11,
+        fontSize: 10,
         marginTop: 1 },
     actions: {
         flexDirection: 'row',

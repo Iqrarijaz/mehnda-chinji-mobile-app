@@ -192,8 +192,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1 },
     scrollContent: {
-        padding: 20,
-        paddingBottom: 100 },
+        padding: 16,
+        paddingBottom: 96 },
     headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -202,12 +202,12 @@ const styles = StyleSheet.create({
     headerBox: {
         flex: 1 },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         paddingBottom: 2,
         letterSpacing: -0.3 },
     headerSubtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500',
         marginTop: 2 },
     addButton: {
@@ -224,11 +224,11 @@ const styles = StyleSheet.create({
         marginTop: 60,
         gap: 12 },
     emptyStateText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     emptyStateBtn: {
-        paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
         borderRadius: Layout.borderRadius,
         marginTop: 10 },
     listContainer: {

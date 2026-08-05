@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 40,
-        paddingTop: 80 },
+        paddingHorizontal: 36,
+        paddingTop: 76 },
     iconWrapper: {
         width: 120,
         height: 120,
@@ -35,13 +35,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24 },
     title: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '800',
         color: '#475569',
         textAlign: 'center',
         marginBottom: 8 },
     subtitle: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#94A3B8',
         textAlign: 'center',
         lineHeight: 22,

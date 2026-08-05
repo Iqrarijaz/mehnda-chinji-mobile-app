@@ -71,17 +71,17 @@ export const PillsList = React.memo(function PillsList({
 
 const styles = StyleSheet.create({
     tabsContainer: {
-        paddingVertical: 12 },
+        paddingVertical: 10 },
     tabsList: {
-        paddingHorizontal: 12 },
+        paddingHorizontal: 10 },
     tabWrap: {
         marginRight: 8 },
     tab: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        paddingHorizontal: 18,
-        paddingVertical: 7,
+        paddingHorizontal: 15,
+        paddingVertical: 6,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center' },
     activeDot: {
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         height: 5,
         borderRadius: Layout.borderRadius },
     tabText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700' },
     tabTextActive: {
         fontWeight: '800',

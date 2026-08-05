@@ -60,7 +60,7 @@ export const WeatherCitySwitcher = React.memo(({
         <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={[styles.row, { paddingBottom: 16 }]}
+            contentContainerStyle={[styles.row, { paddingBottom: 13 }]}
             keyboardShouldPersistTaps="handled"
         >
             <Chip active={activeKey === null} icon="navigate" label="Current" onPress={onSelectCurrent} accent={colors.lime} />
@@ -90,20 +90,20 @@ export const WeatherCitySwitcher = React.memo(({
 WeatherCitySwitcher.displayName = 'WeatherCitySwitcher';
 
 const styles = StyleSheet.create({
-    row: { gap: 8, paddingVertical: 4, paddingRight: 8 },
+    row: { gap: 8, paddingVertical: 4, paddingRight: 7 },
     chip: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         height: 34,
         maxWidth: 150 },
-    chipText: { fontSize: 13, fontWeight: '700', flexShrink: 1 },
+    chipText: { fontSize: 11.5, fontWeight: '700', flexShrink: 1 },
     manageChip: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 3,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         height: 34 },
-    manageText: { fontSize: 13, fontWeight: '800', color: '#FFFFFF' } });
+    manageText: { fontSize: 11.5, fontWeight: '800', color: '#FFFFFF' } });

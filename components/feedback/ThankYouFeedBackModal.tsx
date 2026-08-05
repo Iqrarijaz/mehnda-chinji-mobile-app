@@ -34,7 +34,7 @@ export const ThankYouFeedBackModal = memo(ThankYouFeedBackModalComponent);
 
 const styles = StyleSheet.create({
     modalSubtitle: {
-        fontSize: 13,
+        fontSize: 11.5,
         textAlign: 'center',
         lineHeight: 20 }
 });

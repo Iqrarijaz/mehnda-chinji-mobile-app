@@ -21,7 +21,7 @@ const FAQAccordion: React.FC<FAQAccordionProps> = ({ data }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Frequently Asked Questions</Text>
+            <Text allowFontScaling={false} style={styles.title}>Frequently Asked Questions</Text>
             {data.map((item, index) => (
                 <Animated.View
                     key={index}
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
         marginTop: 24,
         marginBottom: 32 },
     title: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700',
         color: '#64748B',
         textTransform: 'uppercase',

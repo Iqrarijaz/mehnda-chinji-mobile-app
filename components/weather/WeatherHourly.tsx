@@ -58,12 +58,12 @@ export default WeatherHourly;
 
 const styles = StyleSheet.create({
     wrapper: {
-        borderRadius: Layout.borderRadius, padding: 20, marginBottom: 14 },
-    title: { fontSize: 14, fontWeight: '700', letterSpacing: 0.3, marginBottom: 14 },
+        borderRadius: Layout.borderRadius, padding: 16, marginBottom: 14 },
+    title: { fontSize: 12.5, fontWeight: '700', letterSpacing: 0.3, marginBottom: 14 },
     scroll: { gap: 10, paddingBottom: 4 },
     card: {
-        borderRadius: Layout.borderRadius, paddingVertical: 14, paddingHorizontal: 16,
+        borderRadius: Layout.borderRadius, paddingVertical: 11, paddingHorizontal: 13,
         alignItems: 'center', gap: 6, minWidth: 66 },
-    time: { fontSize: 11, fontWeight: '600' },
+    time: { fontSize: 10, fontWeight: '600' },
     timeActive: { fontWeight: '700' },
-    temp: { fontSize: 14, fontWeight: '800' } });
+    temp: { fontSize: 12.5, fontWeight: '800' } });

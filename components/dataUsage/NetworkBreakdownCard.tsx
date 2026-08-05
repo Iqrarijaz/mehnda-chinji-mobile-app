@@ -68,10 +68,10 @@ export const NetworkBreakdownCard = React.memo(({ wifi, mobile, total }: { wifi:
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginBottom: 12 },
     sectionTitle: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '800',
         color: '#94A3B8',
         textTransform: 'uppercase',
@@ -81,11 +81,11 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 12 },
+        padding: 10 },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 8,
+        paddingVertical: 7,
         gap: 16 },
     iconBox: {
         width: 42,
@@ -102,11 +102,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center' },
     rowLabel: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         color: '#1E293B' },
     rowValue: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '800',
         color: '#0F172A' },
     track: {

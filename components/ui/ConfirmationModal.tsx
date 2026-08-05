@@ -81,13 +81,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20 },
+        padding: 16 },
     modalContent: {
         width: '85%',
         maxWidth: 320,
         alignSelf: 'center',
         borderRadius: Layout.borderRadius,
-        padding: 20,
+        padding: 16,
         overflow: 'hidden' },
     header: {
         alignItems: 'center',
@@ -100,15 +100,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 8 },
     title: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         textAlign: 'center' },
     message: {
-        fontSize: 14,
+        fontSize: 12.5,
         textAlign: 'center',
         lineHeight: 20,
         marginBottom: 20,
-        paddingHorizontal: 10 },
+        paddingHorizontal: 8 },
     footer: {
         flexDirection: 'row',
         gap: 12,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(128, 128, 128, 0.1)' },
     cancelText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     confirmBtnWrapper: {
         width: 120,
@@ -130,6 +130,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     confirmBtnText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600',
         color: '#FFFFFF' } });

@@ -84,14 +84,14 @@ export function TimePicker({
                             <ThemedText style={[
                                 styles.optionText,
                                 { color: colors.textSecondary },
-                                isSelected && { color: '#0D9488', fontWeight: '900', fontSize: 22 }
+                                isSelected && { color: '#0D9488', fontWeight: '900', fontSize: 18.5 }
                             ]}>
                                 {item}
                             </ThemedText>
                         </TouchableOpacity>
                     );
                 }}
-                contentContainerStyle={{ paddingVertical: 88 }}
+                contentContainerStyle={{ paddingVertical: 84 }}
             />
         </View>
     );
@@ -172,9 +172,9 @@ const styles = StyleSheet.create({
     sheet: {
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         paddingBottom: Platform.OS === 'android' ? 28 : 40,
-        paddingTop: 12 },
+        paddingTop: 10 },
     handle: {
         width: 40,
         height: 4,
@@ -190,11 +190,11 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         marginBottom: 4 },
     sheetTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         letterSpacing: 0.2 },
     sheetSubtitle: {
-        fontSize: 11,
+        fontSize: 10,
         marginTop: 2,
         fontWeight: '500' },
     closeBtn: {
@@ -218,11 +218,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        paddingHorizontal: 20,
-        paddingVertical: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 7,
         borderRadius: Layout.borderRadius },
     previewText: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         color: '#0D9488',
         letterSpacing: 1 },
@@ -239,14 +239,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginVertical: 2 },
     optionText: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '600' },
     separatorWrap: {
         height: 48,
         justifyContent: 'center',
         paddingBottom: 2 },
     separator: {
-        fontSize: 26,
+        fontSize: 22,
         fontWeight: '800',
         marginHorizontal: 4 },
 
@@ -259,5 +259,5 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     confirmText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });

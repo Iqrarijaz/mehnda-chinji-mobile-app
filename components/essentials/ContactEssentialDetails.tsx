@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     detailSection: {
         gap: 6 },
     sectionHeading: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 0.8 },
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     contactInfo: {
         flex: 1 },
     contactName: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700',
         marginBottom: 2 },
     contactNumber: {

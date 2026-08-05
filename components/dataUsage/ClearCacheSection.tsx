@@ -46,12 +46,12 @@ export const ClearCacheSection = ({ onClear }: { onClear: () => Promise<void> })
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginBottom: 16 },
     card: {
         backgroundColor: '#FFF1F2',
         borderRadius: Layout.borderRadius,
-        padding: 12,
+        padding: 10,
         flexDirection: 'row',
         alignItems: 'center',
         gap: 16 },
@@ -66,18 +66,18 @@ const styles = StyleSheet.create({
         flex: 1,
         gap: 2 },
     label: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '800',
         color: '#9F1239' },
     description: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#E11D48',
         fontWeight: '500',
         opacity: 0.8 },
     button: {
         backgroundColor: '#EF4444',
-        paddingHorizontal: 14,
-        paddingVertical: 10,
+        paddingHorizontal: 11,
+        paddingVertical: 8,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
@@ -86,5 +86,5 @@ const styles = StyleSheet.create({
         opacity: 0.8 },
     buttonText: {
         color: '#FFFFFF',
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '800' } });

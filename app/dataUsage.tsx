@@ -95,4 +95,4 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8FAFC',
         paddingTop: Platform.OS === 'android' ? 40 : 0 },
     scrollContent: {
-        paddingBottom: 40 } });
+        paddingBottom: 36 } });

@@ -352,7 +352,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 animationWidth={260}
                 animationHeight={200}
             >
-                <ThemedText style={{ fontSize: 14, textAlign: 'center', lineHeight: 22, color: colors.textSecondary }}>
+                <ThemedText style={{ fontSize: 12.5, textAlign: 'center', lineHeight: 22, color: colors.textSecondary }}>
                     Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{user?.user?.name ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Seller'}</ThemedText>, {listingToEdit ? 'your item details have been updated successfully.' : 'thank you for listing your item! Our team will review and approve it shortly.'}
                 </ThemedText>
             </ThankYouModal>
@@ -427,20 +427,20 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                                     }}
                                 />
                             </View>
-                            <ThemedText style={[{ fontSize: 10, fontWeight: '700', color: colors.icon }, formData.address.length >= 150 && { color: '#EF4444' }]}>
+                            <ThemedText style={[{ fontSize: 9, fontWeight: '700', color: colors.icon }, formData.address.length >= 150 && { color: '#EF4444' }]}>
                                 {formData.address.length}/150
                             </ThemedText>
                         </View>
                         <View style={[{
                             backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
                             borderRadius: Layout.borderRadius,
-                            paddingHorizontal: 14,
+                            paddingHorizontal: 11,
                             minHeight: 80,
                             alignItems: 'flex-start',
-                            paddingVertical: 12,
+                            paddingVertical: 10,
                             marginTop: 6 }]}>
                             <TextInput
-                                style={[styles.textInput, { color: colors.text, textAlignVertical: 'top', minHeight: 60, fontSize: 14 }]}
+                                style={[styles.textInput, { color: colors.text, textAlignVertical: 'top', minHeight: 60, fontSize: 12.5 }]}
                                 placeholder="Shop #, Street, Area"
                                 placeholderTextColor={colors.icon}
                                 value={formData.address}
@@ -453,7 +453,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             />
                         </View>
                         {errors.address ? (
-                            <ThemedText style={{ color: '#EF4444', fontSize: 11, marginLeft: 4, marginTop: 2 }}>
+                            <ThemedText style={{ color: '#EF4444', fontSize: 10, marginLeft: 4, marginTop: 2 }}>
                                 {errors.address}
                             </ThemedText>
                         ) : null}
@@ -577,7 +577,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                         <ThemedText style={[styles.label, { color: colors.text }]}>
                             Images (Max 5) <ThemedText style={styles.required}>*</ThemedText>
                         </ThemedText>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll} contentContainerStyle={{ paddingTop: 10, paddingRight: 10, paddingBottom: 10 }}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll} contentContainerStyle={{ paddingTop: 8, paddingRight: 8, paddingBottom: 8 }}>
                             {formData.images.map((imgUrl, idx) => (
                                 <View key={imgUrl} style={styles.imageThumbnailContainer}>
                                     <Image source={{ uri: imgUrl }} style={styles.imageThumbnail} />
@@ -650,11 +650,11 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
         overflow: 'hidden',
-        paddingBottom: 24 },
+        paddingBottom: 20 },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: 13,
         paddingBottom: 4 },
     backButton: {
         width: 42,
@@ -664,13 +664,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     headerNavTitle: {
-        fontSize: 17,
+        fontSize: 14.5,
         fontWeight: '700',
         color: '#FFFFFF',
         letterSpacing: 0.2 },
     heroContent: {
         alignItems: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         marginTop: 16 },
     heroIconWrap: {
         width: 64,
@@ -681,13 +681,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 12 },
     heroTitle: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
         letterSpacing: 0.2 },
     heroSubtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
         marginTop: 6,
@@ -697,15 +697,15 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flex: 1 },
     scrollContent: {
-        paddingBottom: 40 },
+        paddingBottom: 36 },
     formSection: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginTop: 24,
         gap: 16 },
     inputField: {
         gap: 6 },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2 },
@@ -713,7 +713,7 @@ const styles = StyleSheet.create({
         color: '#EF4444' },
     errorText: {
         color: '#EF4444',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500',
         marginTop: 4,
         marginLeft: 2 },
@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14,
+        paddingHorizontal: 11,
         height: 48 },
     triggerContent: {
         flex: 1,
@@ -735,7 +735,7 @@ const styles = StyleSheet.create({
     triggerText: {
         flex: 1,
         fontWeight: '500',
-        fontSize: 13 },
+        fontSize: 11.5 },
 
     // ── Switches ─────────────────────────────────────────────────────────
     switchGroup: {
@@ -744,14 +744,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 12 },
+        paddingVertical: 10 },
     switchLabelContainer: {
         flex: 1 },
     switchLabel: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     switchSub: {
-        fontSize: 11,
+        fontSize: 10,
         marginTop: 2 },
 
     // ── Images ───────────────────────────────────────────────────────────
@@ -786,9 +786,9 @@ const styles = StyleSheet.create({
     // ── Vehicle Section ──────────────────────────────────────────────────
     vehicleSection: {
         borderRadius: Layout.borderRadius,
-        padding: 12 },
+        padding: 10 },
     sectionTitle: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '700',
         marginBottom: 12 },
 
@@ -806,5 +806,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     cancelText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });

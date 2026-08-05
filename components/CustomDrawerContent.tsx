@@ -283,8 +283,8 @@ const styles = StyleSheet.create({
         flex: 1 },
     // Header
     header: {
-        paddingHorizontal: 20,
-        paddingBottom: 20,
+        paddingHorizontal: 16,
+        paddingBottom: 16,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
         overflow: 'hidden' },
@@ -317,18 +317,18 @@ const styles = StyleSheet.create({
     identityText: {
         flex: 1 },
     greeting: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.8)',
         letterSpacing: 0.3 },
     headerName: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
         marginTop: 2 },
     headerEmail: {
-        fontSize: 11.5,
+        fontSize: 10,
         fontWeight: '500',
         color: 'rgba(255,255,255,0.75)',
         marginTop: 3 },
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'flex-start',
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 3,
         borderRadius: Layout.borderRadius,
         marginTop: 6 },
@@ -347,8 +347,8 @@ const styles = StyleSheet.create({
         color: '#1E293B' },
     // Scroll
     scrollContent: {
-        paddingTop: 12,
-        paddingHorizontal: 14 },
+        paddingTop: 10,
+        paddingHorizontal: 11 },
     // Section
     section: {
         marginBottom: 14 },
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
         height: 5,
         borderRadius: Layout.borderRadius },
     sectionLabel: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800',
         textTransform: 'uppercase',
         letterSpacing: 1.2 },
@@ -371,8 +371,8 @@ const styles = StyleSheet.create({
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 8,
-        paddingHorizontal: 10,
+        paddingVertical: 7,
+        paddingHorizontal: 8,
         borderRadius: Layout.borderRadius,
         marginBottom: 4,
         gap: 12 },
@@ -391,12 +391,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center' },
     menuLabel: {
         flex: 1,
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     // Footer
     footer: {
-        paddingHorizontal: 16,
-        paddingTop: 12,
+        paddingHorizontal: 13,
+        paddingTop: 10,
         alignItems: 'center' },
     logoutBtnWrap: {
         width: '100%',
@@ -405,15 +405,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 13,
-        paddingHorizontal: 24,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
         borderRadius: Layout.borderRadius,
         width: '100%' },
     logoutText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700' },
     versionText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '500',
         textAlign: 'center',
         opacity: 0.7 } });

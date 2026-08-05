@@ -90,8 +90,8 @@ export default WeatherDetails;
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.borderRadius, padding: 20, marginBottom: 14 },
-    title: { fontSize: 14, fontWeight: '700', letterSpacing: 0.3, marginBottom: 14 },
+        borderRadius: Layout.borderRadius, padding: 16, marginBottom: 14 },
+    title: { fontSize: 12.5, fontWeight: '700', letterSpacing: 0.3, marginBottom: 14 },
     grid: { flexDirection: 'row', flexWrap: 'wrap' },
     tile: {
         width: '50%',
@@ -99,11 +99,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 10,
         marginBottom: 14,
-        paddingRight: 8 },
+        paddingRight: 7 },
     iconWrap: {
         width: 42, height: 42, borderRadius: Layout.borderRadius,
         justifyContent: 'center', alignItems: 'center' },
-    label: { fontSize: 11, fontWeight: '600' },
+    label: { fontSize: 10, fontWeight: '600' },
     valueRow: { flexDirection: 'row', alignItems: 'baseline', gap: 3, marginTop: 1 },
-    value: { fontSize: 15, fontWeight: '800' },
-    sub: { fontSize: 11, fontWeight: '700' } });
+    value: { fontSize: 12.5, fontWeight: '800' },
+    sub: { fontSize: 10, fontWeight: '700' } });

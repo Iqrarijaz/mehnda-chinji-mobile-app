@@ -11,6 +11,7 @@ import {
 import Toast from 'react-native-toast-message';
 
 import { deleteAccount } from '@/apis/profile';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { clientStorage } from '@/utils/storage';
 import { ThemedText } from '@/components/ThemedText';
 import { useAuth } from '@/context/AuthContext';
@@ -61,6 +62,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
     };
 
     return (
+        <>
         <PremiumModal visible={visible} onClose={resetAndClose} type="centered">
             <View style={styles.modalHeader}>
                 <ThemedText style={styles.modalTitle}>Delete Account</ThemedText>
@@ -105,6 +107,8 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
                 </TouchableOpacity>
             </View>
         </PremiumModal>
+        <LoaderOverlay visible={isDeleting} text="Deleting your account..." />
+        </>
     );
 };
 
@@ -116,8 +120,8 @@ const styles = StyleSheet.create({
     modalContent: {
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
-        padding: 24,
-        paddingBottom: 40 },
+        padding: 20,
+        paddingBottom: 36 },
 
     modalHeader: {
         flexDirection: 'row',
@@ -125,7 +129,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16 },
     modalTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '700',
         color: '#0F172A' },
     closeButton: {
@@ -138,7 +142,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         marginBottom: 12 },
     inputLabel: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600',
         color: '#475569',
         letterSpacing: 0.5,
@@ -147,8 +151,8 @@ const styles = StyleSheet.create({
     input: {
         height: Platform.OS === 'android' ? 48 : 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 18,
-        fontSize: 15,
+        paddingHorizontal: 15,
+        fontSize: 12.5,
         fontWeight: '500',
         backgroundColor: 'transparent' },
     saveButton: {
@@ -159,11 +163,11 @@ const styles = StyleSheet.create({
         marginTop: 10 },
     saveButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700' },
     warningText: {
         color: '#ef4444',
-        fontSize: 14,
+        fontSize: 12.5,
         textAlign: 'center',
         marginBottom: 12,
         lineHeight: 20 },
@@ -179,6 +183,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: Layout.borderRadius },
     cancelText: {
-        fontSize: 14,
+        fontSize: 12.5,
         color: '#94A3B8',
         fontWeight: '600' } });

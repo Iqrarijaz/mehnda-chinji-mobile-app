@@ -84,13 +84,13 @@ export const RequestCardSkeleton = () => {
 const styles = StyleSheet.create({
     businessCard: {
         borderRadius: Layout.borderRadius,
-        padding: 14,
+        padding: 11,
         marginBottom: 12 },
 
     donorCard: {
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: 13,
+        paddingVertical: 10,
         marginBottom: 16 },
     row: {
         flexDirection: 'row',
@@ -107,9 +107,9 @@ const styles = StyleSheet.create({
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingTop: 8 },
+        paddingTop: 7 },
     requestCard: {
         borderRadius: Layout.borderRadius,
-        padding: 12,
+        padding: 10,
         marginBottom: 16,
         marginHorizontal: 16 } });

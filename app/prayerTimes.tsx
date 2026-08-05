@@ -174,4 +174,4 @@ export default function PrayerTimesScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    body: { paddingHorizontal: 16, paddingBottom: 40 } });
+    body: { paddingHorizontal: 13, paddingBottom: 36 } });

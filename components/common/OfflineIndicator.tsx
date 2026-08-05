@@ -58,19 +58,23 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: OFFLINE_COLOR,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
         borderRadius: Layout.borderRadius,
         gap: 10,
         ...Platform.select({
-            ios: {
+            ios: {
+
+
+
+
             },
             android: {
 
             } }) },
     text: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });
 
 export default React.memo(OfflineIndicator);

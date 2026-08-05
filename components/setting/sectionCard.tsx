@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         padding: Platform.OS === 'android' ? 0 : 4,
         marginBottom: Platform.OS === 'android' ? 12 : 16 },
     sectionTitle: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.8,

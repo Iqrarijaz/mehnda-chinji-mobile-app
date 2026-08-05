@@ -3,6 +3,7 @@ import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { ThemedText } from '@/components/ThemedText';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -10,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -130,6 +131,7 @@ export default function CreateTicketScreen() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+            <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={handleBack} style={styles.backButton}>
@@ -217,6 +219,7 @@ export default function CreateTicketScreen() {
                     icon="paper-plane"
                 />
             </ScrollView>
+            <LoaderOverlay visible={createTicketMutation.isPending} text="Creating ticket..." />
         </View>
     );
 }
@@ -227,17 +230,17 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12 },
+        paddingHorizontal: 13,
+        paddingVertical: 10 },
     backButton: {
         padding: 4,
         marginRight: 12 },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: 'bold' },
     content: {
-        paddingHorizontal: 20,
-        paddingBottom: 32 },
+        paddingHorizontal: 16,
+        paddingBottom: 28 },
     labelContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -245,16 +248,16 @@ const styles = StyleSheet.create({
         marginTop: 16,
         marginBottom: 8 },
     label: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '600' },
     charCount: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     input: {
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        fontSize: 15 },
+        paddingHorizontal: 13,
+        paddingVertical: 10,
+        fontSize: 12.5 },
     textArea: {
         height: 150,
         textAlignVertical: 'top' },
@@ -281,16 +284,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     uploadText: {
-        fontSize: 12,
+        fontSize: 10.5,
         marginTop: 4,
         opacity: 0.7 },
     submitButton: {
         marginTop: 32,
-        paddingVertical: 16,
+        paddingVertical: 13,
         borderRadius: Layout.borderRadius,
         alignItems: 'center' },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: 'bold' }
 });

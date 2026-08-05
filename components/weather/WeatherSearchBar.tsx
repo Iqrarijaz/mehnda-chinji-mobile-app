@@ -90,10 +90,10 @@ const styles = StyleSheet.create({
     inputPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: 13,
         height: 46,
         borderRadius: Layout.borderRadius },
-    input: { flex: 1, fontSize: 14 },
+    input: { flex: 1, fontSize: 12.5 },
 
     // Dropdown
     dropdown: {
@@ -111,9 +111,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        paddingHorizontal: 16,
-        paddingVertical: 13 },
+        paddingHorizontal: 13,
+        paddingVertical: 10 },
     dropItemBorder: {},
     dropText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });

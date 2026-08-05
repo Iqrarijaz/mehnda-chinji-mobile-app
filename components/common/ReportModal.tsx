@@ -161,7 +161,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                     style={{ flex: 1 }}
                     contentContainerStyle={[
                         styles.scrollContent,
-                        isAndroid && { paddingBottom: 90 + keyboardHeight }
+                        isAndroid && { paddingBottom: 86 + keyboardHeight }
                     ]}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
@@ -249,7 +249,8 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                         style={[
                             styles.submitButton,
                             {
-                                backgroundColor: colors.primary,
+                                backgroundColor: colors.primary,
+
                                 marginTop: 10,
                                 marginBottom: 30,
                                 opacity: isSubmitting ? 0.6 : 1
@@ -281,19 +282,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingBottom: 16,
-        paddingTop: 8 },
+        paddingHorizontal: 16,
+        paddingBottom: 13,
+        paddingTop: 7 },
     headerLeft: {
         flexDirection: 'row',
         alignItems: 'center' },
     headerIcon: {
         marginRight: 12 },
     title: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '700' },
     subtitle: {
-        fontSize: 13,
+        fontSize: 11.5,
         opacity: 0.7,
         marginTop: 2 },
     closeButton: {
@@ -302,10 +303,10 @@ const styles = StyleSheet.create({
         height: 1,
         width: '100%' },
     scrollContent: {
-        padding: 20,
+        padding: 16,
         paddingBottom: isAndroid ? 110 : 70 },
     sectionTitle: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600',
         marginBottom: 12,
         opacity: 0.8 },
@@ -316,10 +317,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 16,
+        padding: 13,
         borderRadius: Layout.borderRadius },
     reasonText: {
-        fontSize: 15 },
+        fontSize: 12.5 },
     detailsContainer: {
         marginTop: 12,
         marginBottom: 32 },
@@ -328,22 +329,22 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center' },
     charCount: {
-        fontSize: 12,
+        fontSize: 10.5,
         opacity: 0.6 },
     input: {
         height: 120,
         borderRadius: Layout.borderRadius,
-        padding: 16,
-        fontSize: 15 },
+        padding: 13,
+        fontSize: 12.5 },
     anonymousText: {
-        fontSize: 13,
+        fontSize: 11.5,
         textAlign: 'center',
         opacity: 0.6,
         marginTop: 10,
         marginBottom: 20 },
     footer: {
-        paddingHorizontal: 20,
-        paddingTop: 8 },
+        paddingHorizontal: 16,
+        paddingTop: 7 },
     submitButton: {
         height: 46,
         borderRadius: Layout.borderRadius,
@@ -351,5 +352,5 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700' } });

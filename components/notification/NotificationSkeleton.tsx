@@ -49,12 +49,12 @@ const NotificationSkeleton = React.memo(() => (
 export default NotificationSkeleton;
 
 const styles = StyleSheet.create({
-    container: { paddingHorizontal: 20, paddingTop: 8 },
+    container: { paddingHorizontal: 16, paddingTop: 7 },
     card: {
         flexDirection: 'row',
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 16,
+        padding: 13,
         marginBottom: 10
     },
     lines: { flex: 1, marginLeft: 14 }

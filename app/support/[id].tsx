@@ -22,6 +22,7 @@ import {
     View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
 const { width } = Dimensions.get('window');
 
@@ -272,6 +273,7 @@ export default function TicketDetailScreen() {
                     </View>
                 )}
             </View>
+            <LoaderOverlay visible={replyMutation.isPending} text="Sending reply..." />
         </KeyboardAvoidingView>
     );
 }
@@ -283,13 +285,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 40
+        padding: 36
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 12 },
+        paddingHorizontal: 16,
+        paddingVertical: 10 },
     backButton: {
         width: 40,
         height: 40,
@@ -300,7 +302,7 @@ const styles = StyleSheet.create({
     headerTitleContainer: {
         flex: 1 },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: 'bold' },
     statusRow: {
         flexDirection: 'row',
@@ -312,21 +314,21 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         marginRight: 6 },
     statusText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         opacity: 0.6 },
     scrollContent: {
-        paddingBottom: 40 },
+        paddingBottom: 36 },
     metadataContainer: {
         margin: 20,
-        padding: 20,
+        padding: 16,
         borderRadius: Layout.borderRadius },
     subject: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         marginBottom: 10 },
     description: {
-        fontSize: 15,
+        fontSize: 12.5,
         lineHeight: 22,
         marginBottom: 15 },
     attachmentScroll: {
@@ -338,25 +340,25 @@ const styles = StyleSheet.create({
         marginRight: 12,
         backgroundColor: '#eee' },
     createdAt: {
-        fontSize: 12,
+        fontSize: 10.5,
         opacity: 0.7 },
     threadDivider: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginVertical: 10
     },
     dividerLine: {
         flex: 1,
         height: StyleSheet.hairlineWidth },
     dividerText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         marginHorizontal: 15,
         opacity: 0.5,
         textTransform: 'uppercase' },
     threadContainer: {
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
     messageWrapper: {
         flexDirection: 'row',
         marginBottom: 16,
@@ -367,21 +369,21 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start' },
     messageBubble: {
         maxWidth: '85%',
-        padding: 12,
+        padding: 10,
         borderRadius: Layout.borderRadius },
     userBubble: {
         borderBottomRightRadius: 28 },
     adminBubble: {
         borderBottomLeftRadius: 28 },
     senderLabel: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '800',
         marginBottom: 4,
         opacity: 0.5,
         textTransform: 'uppercase'
     },
     messageText: {
-        fontSize: 15,
+        fontSize: 12.5,
         lineHeight: 20 },
     messageAttachments: {
         marginTop: 8,
@@ -394,23 +396,23 @@ const styles = StyleSheet.create({
         marginRight: 8,
         marginBottom: 8 },
     messageTime: {
-        fontSize: 10,
+        fontSize: 9,
         marginTop: 4,
         alignSelf: 'flex-end' },
     replyContainer: {
         flexDirection: 'row',
         alignItems: 'flex-end',
-        paddingHorizontal: 16,
-        paddingTop: 12,
+        paddingHorizontal: 13,
+        paddingTop: 10,
         backgroundColor: 'transparent' },
     replyInput: {
         flex: 1,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        paddingTop: 10,
+        paddingHorizontal: 13,
+        paddingVertical: 8,
+        paddingTop: 8,
         maxHeight: 120,
-        fontSize: 15 },
+        fontSize: 12.5 },
     sendButton: {
         width: 42,
         height: 42,
@@ -419,13 +421,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginLeft: 8 },
     closedMessage: {
-        padding: 20,
+        padding: 16,
         alignItems: 'center',
         justifyContent: 'center' },
     closedText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600',
         opacity: 0.6 },
     retryButton: {
-        padding: 10 }
+        padding: 8 }
 });

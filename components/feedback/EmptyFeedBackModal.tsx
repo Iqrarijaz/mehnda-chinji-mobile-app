@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24 },
+        padding: 20 },
     modalContent: {
         width: '100%',
         borderRadius: Layout.borderRadius,
-        padding: 24,
+        padding: 20,
         alignItems: 'center' },
     imageContainer: {
         width: 220,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%' },
     modalSubtitle: {
-        fontSize: 13,
+        fontSize: 11.5,
         textAlign: 'center',
         marginBottom: 24,
         lineHeight: 20 },
@@ -89,6 +89,6 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' }
 });

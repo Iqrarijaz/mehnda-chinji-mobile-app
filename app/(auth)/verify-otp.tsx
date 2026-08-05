@@ -3,7 +3,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -17,9 +16,11 @@ import Toast from 'react-native-toast-message';
 import { sendOtp, verifyOtp } from '@/apis/login/forgot-password';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
+import { SubmitButton } from '@/components/common/SubmitButton';
 
 export default function VerifyOtpScreen() {
     const router = useRouter();
@@ -195,6 +196,7 @@ export default function VerifyOtpScreen() {
                             {otp.map((digit, index) => (
                                 <TextInput
                                     key={index}
+                                    allowFontScaling={false}
                                     ref={(ref) => { inputRefs.current[index] = ref; }}
                                     style={[
                                         styles.otpInput,
@@ -212,17 +214,12 @@ export default function VerifyOtpScreen() {
                             ))}
                         </View>
 
-                        <TouchableOpacity
-                            style={[styles.submitButton, { backgroundColor: '#006666' }]}
+                        <SubmitButton
+                            title="Verify OTP"
                             onPress={handleVerify}
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <ActivityIndicator color="#FFFFFF" />
-                            ) : (
-                                <ThemedText style={styles.submitButtonText}>Verify OTP</ThemedText>
-                            )}
-                        </TouchableOpacity>
+                            isLoading={loading}
+                            style={{ width: '100%' }}
+                        />
 
                         <View style={styles.footer}>
                             <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>
@@ -246,6 +243,7 @@ export default function VerifyOtpScreen() {
                     </View>
                 </View>
             </ScrollView>
+            <LoaderOverlay visible={loading} text="Please wait..." />
         </KeyboardAvoidingView>
     );
 }
@@ -254,7 +252,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1 },
     headerSection: {
-        paddingBottom: 10,
+        paddingBottom: 8,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius },
     backButton: {
@@ -268,25 +266,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     headerContent: {
-        paddingHorizontal: 22,
-        paddingBottom: 18 },
+        paddingHorizontal: 18,
+        paddingBottom: 15 },
     headerTitle: {
-        fontSize: 32,
+        fontSize: 28,
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
         marginBottom: 6 },
     headerSubtitle: {
-        fontSize: 15,
+        fontSize: 12.5,
         color: 'rgba(255, 255, 255, 0.9)',
         lineHeight: 22 },
     formContainer: {
         flex: 1,
-        paddingHorizontal: 18,
-        paddingTop: 30 },
+        paddingHorizontal: 15,
+        paddingTop: 26 },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16 },
+        padding: 13 },
     otpContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -297,14 +295,14 @@ const styles = StyleSheet.create({
         height: 40,
         borderRadius: Layout.borderRadius,
         textAlign: 'center',
-        fontSize: 24,
+        fontSize: 20.5,
         fontWeight: '800',
-        padding: 5 },
+        padding: 4 },
     profilePreview: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 20,
-        padding: 12,
+        padding: 10,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(0, 64, 48, 0.05)' },
     profileAvatar: {
@@ -315,19 +313,19 @@ const styles = StyleSheet.create({
     profileDetails: {
         flex: 1 },
     profileName: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '800',
         color: '#006666',
         marginBottom: 2 },
     profileEmail: {
-        fontSize: 11,
+        fontSize: 10,
         opacity: 0.6 },
     instructionText: {
-        fontSize: 12,
+        fontSize: 10.5,
         lineHeight: 18,
         textAlign: 'center',
         marginBottom: 25,
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         opacity: 0.8 },
     submitButton: {
         height: 52,
@@ -336,7 +334,7 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         letterSpacing: 0.5 },
     footer: {
@@ -344,8 +342,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 25 },
     footerText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     footerLink: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700' } });

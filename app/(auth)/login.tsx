@@ -97,21 +97,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1 },
     headerSection: {
-        paddingBottom: 38,
+        paddingBottom: 34,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden' },
     headerContent: {
-        paddingHorizontal: 22,
-        paddingTop: 38 },
+        paddingHorizontal: 18,
+        paddingTop: 34 },
     headerTitle: {
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
         marginBottom: 4 },
     headerSubtitle: {
-        fontSize: 15,
+        fontSize: 12.5,
         color: 'rgba(255, 255, 255, 0.9)',
         lineHeight: 22 },
     modalOverlay: {
@@ -119,11 +119,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24 },
+        padding: 20 },
     modalContent: {
         width: '100%',
         borderRadius: Layout.borderRadius,
-        padding: 24,
+        padding: 20,
         alignItems: 'center' },
     modalIconBox: {
         width: 80,
@@ -134,13 +134,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20 },
     modalTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '700',
         color: '#0F172A',
         marginBottom: 12,
         textAlign: 'center' },
     modalSubtitle: {
-        fontSize: 15,
+        fontSize: 12.5,
         color: '#64748B',
         lineHeight: 22,
         textAlign: 'center',
@@ -154,5 +154,5 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     modalButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700' } });

@@ -167,8 +167,8 @@ export default function ManageCitiesScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1 },
     header: {
-        paddingHorizontal: 16,
-        paddingBottom: 18,
+        paddingHorizontal: 13,
+        paddingBottom: 15,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28 },
     headerRow: { flexDirection: 'row', alignItems: 'center' },
@@ -176,29 +176,29 @@ const styles = StyleSheet.create({
         width: 38, height: 38, borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center', alignItems: 'center' },
-    title: { fontSize: 18, fontWeight: '800', color: '#FFFFFF' },
-    subtitle: { fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.85)', marginTop: 2 },
-    body: { paddingHorizontal: 16, paddingTop: 16 },
+    title: { fontSize: 15.5, fontWeight: '800', color: '#FFFFFF' },
+    subtitle: { fontSize: 10.5, fontWeight: '600', color: 'rgba(255,255,255,0.85)', marginTop: 2 },
+    body: { paddingHorizontal: 13, paddingTop: 13 },
     searchBox: {
         flexDirection: 'row', alignItems: 'center',
-        borderRadius: Layout.borderRadius, paddingHorizontal: 14, height: 50 },
-    searchInput: { flex: 1, fontSize: 14 },
+        borderRadius: Layout.borderRadius, paddingHorizontal: 11, height: 50 },
+    searchInput: { flex: 1, fontSize: 12.5 },
     resultRow: {
         flexDirection: 'row', alignItems: 'center',
-        paddingVertical: 12 },
-    resultText: { flex: 1, fontSize: 13, lineHeight: 18 },
+        paddingVertical: 10 },
+    resultText: { flex: 1, fontSize: 11.5, lineHeight: 18 },
     limitNote: {
         flexDirection: 'row', alignItems: 'center', gap: 8,
-        borderRadius: Layout.borderRadius, padding: 12 },
-    limitText: { flex: 1, fontSize: 12, lineHeight: 17 },
-    sectionLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6, marginTop: 22, marginBottom: 10 },
+        borderRadius: Layout.borderRadius, padding: 10 },
+    limitText: { flex: 1, fontSize: 10.5, lineHeight: 17 },
+    sectionLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 0.6, marginTop: 22, marginBottom: 10 },
     cityRow: {
         flexDirection: 'row', alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingVertical: 12, paddingHorizontal: 14, marginBottom: 10 },
-    cityName: { fontSize: 15, fontWeight: '700' },
-    defaultTag: { fontSize: 11, fontWeight: '700', marginTop: 1 },
+        paddingVertical: 10, paddingHorizontal: 11, marginBottom: 10 },
+    cityName: { fontSize: 12.5, fontWeight: '700' },
+    defaultTag: { fontSize: 10, fontWeight: '700', marginTop: 1 },
     reorderBtn: {
         width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
-    empty: { alignItems: 'center', paddingVertical: 30, gap: 10 },
-    emptyText: { fontSize: 13, textAlign: 'center', paddingHorizontal: 30, lineHeight: 20 } });
+    empty: { alignItems: 'center', paddingVertical: 26, gap: 10 },
+    emptyText: { fontSize: 11.5, textAlign: 'center', paddingHorizontal: 26, lineHeight: 20 } });

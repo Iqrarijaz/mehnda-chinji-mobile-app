@@ -212,7 +212,8 @@ const PlaceSubmissionScreen = () => {
             <Stack.Screen options={{
                 headerShown: false,
                 gestureEnabled: true,
-                animation: 'slide_from_right'
+                presentation: 'modal',
+                animation: 'slide_from_bottom'
             }} />
 
             <ThankYouModal
@@ -222,7 +223,7 @@ const PlaceSubmissionScreen = () => {
                 animationWidth={260}
                 animationHeight={200}
             >
-                <ThemedText style={{ fontSize: 14, textAlign: 'center', lineHeight: 22, color: colors.textSecondary }}>
+                <ThemedText style={{ fontSize: 12.5, textAlign: 'center', lineHeight: 22, color: colors.textSecondary }}>
                     Dear <ThemedText style={{ fontWeight: 'bold', color: colors.text }}>{user?.user?.name ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Hero'}</ThemedText>, thank you for your submission! Our team will review and approve this place shortly.
                 </ThemedText>
             </ThankYouModal>
@@ -327,13 +328,13 @@ const PlaceSubmissionScreen = () => {
                 <View style={styles.content}>
                     <ScrollView
                         style={styles.scroll}
-                        contentContainerStyle={[styles.scrollContent, { paddingTop: 16, paddingBottom: insets.bottom + 40 }]}
+                        contentContainerStyle={[styles.scrollContent, { paddingTop: 13, paddingBottom: insets.bottom + 40 }]}
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="handled"
                     >
                         {!isEmergency && !isNoPhotoCategory && (
                             <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 24, gap: 6 }}>
-                                <ThemedText style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, marginLeft: 2, color: colors.text }}>PLACE IMAGE</ThemedText>
+                                <ThemedText style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginLeft: 2, color: colors.text }}>PLACE IMAGE</ThemedText>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
                                     <TouchableOpacity 
                                         style={{ width: 80, height: 80, borderRadius: Layout.borderRadius, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }} 
@@ -356,8 +357,8 @@ const PlaceSubmissionScreen = () => {
                                         )}
                                     </TouchableOpacity>
                                     <View style={{ flex: 1 }}>
-                                        <ThemedText style={{ color: colors.textSecondary, fontSize: 13 }}>Add a photo of this place (Optional).</ThemedText>
-                                        <ThemedText style={{ color: colors.textSecondary, fontSize: 11, marginTop: 4 }}>If no image is provided, category icon will be used.</ThemedText>
+                                        <ThemedText style={{ color: colors.textSecondary, fontSize: 11.5 }}>Add a photo of this place (Optional).</ThemedText>
+                                        <ThemedText style={{ color: colors.textSecondary, fontSize: 10, marginTop: 4 }}>If no image is provided, category icon will be used.</ThemedText>
                                     </View>
                                 </View>
                             </Animated.View>
@@ -395,11 +396,11 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        paddingBottom: 16 },
+        paddingBottom: 13 },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: 13,
         paddingBottom: 4 },
     backBtn: {
         width: 42,
@@ -410,7 +411,7 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     heroContent: {
         alignItems: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         marginTop: 4 },
     heroIconWrap: {
         width: 48,
@@ -421,14 +422,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 12 },
     heroTitle: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         color: '#FFFFFF',
         marginBottom: 4,
         textAlign: 'center',
         letterSpacing: 0.5 },
     heroSubtitle: {
-        fontSize: 13,
+        fontSize: 11.5,
         color: 'rgba(255,255,255,0.85)',
         textAlign: 'center',
         lineHeight: 18,
@@ -438,7 +439,7 @@ const styles = StyleSheet.create({
     scroll: {
         flex: 1 },
     scrollContent: {
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
 
     imageSection: {
         marginBottom: 24 },
@@ -460,11 +461,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 12,
+        paddingVertical: 10,
         gap: 8 },
     changeImageText: {
         color: '#FFFFFF',
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600' },
     imagePlaceholder: {
         width: '100%',
@@ -481,7 +482,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     imagePlaceholderText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' },
     uploadOverlay: {
         ...StyleSheet.absoluteFillObject,

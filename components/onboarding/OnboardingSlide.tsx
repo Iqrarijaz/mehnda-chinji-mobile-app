@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 28 },
+        paddingHorizontal: 24 },
     animationContainer: {
         width: '100%',
         justifyContent: 'center',
@@ -103,11 +103,11 @@ const styles = StyleSheet.create({
     cardContainer: {
         width: '100%',
         borderRadius: Layout.borderRadius,
-        paddingVertical: 20,
-        paddingHorizontal: 18,
+        paddingVertical: 16,
+        paddingHorizontal: 15,
         alignItems: 'center' },
     title: {
-        fontSize: 20,
+        fontSize: 16.5,
         lineHeight: 34,
         fontWeight: '800',
         paddingTop: 4,
@@ -118,8 +118,8 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         marginVertical: 12 },
     description: {
-        fontSize: 12,
+        fontSize: 10.5,
         textAlign: 'center',
         lineHeight: 18,
         fontWeight: '600',
-        paddingHorizontal: 8 } });
+        paddingHorizontal: 7 } });

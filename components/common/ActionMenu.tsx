@@ -40,7 +40,7 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
                 optionsContainer: {
                     backgroundColor: colors.card,
                     borderRadius: Layout.borderRadius,
-                    padding: 6,
+                    padding: 5,
                     width: 190,
                     marginTop: 34 } }}>
                 {actions.map((action, index) => {
@@ -72,8 +72,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
-        paddingVertical: 8,
-        paddingHorizontal: 8,
+        paddingVertical: 7,
+        paddingHorizontal: 7,
         borderRadius: Layout.borderRadius },
     menuIconTile: {
         width: 30,
@@ -82,5 +82,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     menuText: {
-        fontSize: 13.5,
+        fontSize: 12,
         fontWeight: '700' } });

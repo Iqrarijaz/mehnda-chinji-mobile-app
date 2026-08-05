@@ -1,11 +1,17 @@
-import React from 'react';
-import { Modal, StyleSheet, TouchableOpacity, View, SafeAreaView, Platform, Dimensions, FlatList } from 'react-native';
+import React, { useEffect } from 'react';
+import { Modal, StyleSheet, View, SafeAreaView, Platform, Dimensions, FlatList } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, {
+    FadeIn,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming } from 'react-native-reanimated';
 import Avatar from '@/components/ui/avatar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 
 interface ImageViewerModalProps {
     visible: boolean;
@@ -44,21 +50,34 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
         itemVisiblePercentThreshold: 50
     }).current;
 
+    // Slight scale-up to accompany the content's fade-in, driven the same way
+    // PremiumModal drives its blur intensity, so it re-triggers on every open.
+    const contentScale = useSharedValue(0.96);
+    useEffect(() => {
+        contentScale.value = visible
+            ? withTiming(1, { duration: 260 })
+            : 0.96;
+    }, [visible]);
+    const contentAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: contentScale.value }]
+    }));
+
     return (
         <Modal
             visible={visible}
             transparent={true}
-            animationType="fade"
+            animationType="none"
             onRequestClose={onClose}
         >
-            <View style={styles.container}>
-                <View style={[styles.content, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-                    <TouchableOpacity
-                        style={[styles.closeButton, { top: insets.top + (Platform.OS === 'android' ? 20 : 10) }]}
+            <Animated.View entering={FadeIn.duration(220)} style={styles.container}>
+                <Animated.View style={[styles.content, { paddingTop: insets.top, paddingBottom: insets.bottom }, contentAnimatedStyle]}>
+                    <PressableScale
+                        containerStyle={[styles.closeButton, { top: insets.top + (Platform.OS === 'android' ? 20 : 10) }]}
+                        style={styles.closeButtonSurface}
                         onPress={onClose}
                     >
                         <Ionicons name="close" size={28} color="#FFFFFF" />
-                    </TouchableOpacity>
+                    </PressableScale>
 
                     {images.length > 0 ? (
                         <View style={{ flex: 1 }}>
@@ -101,8 +120,8 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
                             <Avatar uri={undefined} name={name} size={300} style={styles.placeholderAvatar} />
                         </View>
                     )}
-                </View>
-            </View>
+                </Animated.View>
+            </Animated.View>
         </Modal>
     );
 };
@@ -116,8 +135,9 @@ const styles = StyleSheet.create({
     closeButton: {
         position: 'absolute',
         right: 20,
-        zIndex: 10,
-        padding: 8,
+        zIndex: 10 },
+    closeButtonSurface: {
+        padding: 7,
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         borderRadius: Layout.borderRadius,
         width: 42,
@@ -128,7 +148,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20 },
+        padding: 16 },
     listImageWrapper: {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
@@ -146,11 +166,11 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     paginationBadge: {
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
         borderRadius: Layout.borderRadius },
     paginationText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' }
 });

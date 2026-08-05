@@ -59,37 +59,37 @@ export function ShareAyahCard({
 const styles = StyleSheet.create({
     card: {
         width: 360,
-        paddingHorizontal: 26,
-        paddingVertical: 30,
+        paddingHorizontal: 22,
+        paddingVertical: 26,
         borderRadius: Layout.borderRadius },
     topBar: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
+        paddingHorizontal: 11,
+        paddingVertical: 8,
         marginBottom: 24 },
     surah: {
         color: '#FFFFFF',
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '700',
         writingDirection: 'rtl' },
     versePill: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius },
-    verseText: { color: '#0b3b3b', fontSize: 11, fontWeight: '800' },
+    verseText: { color: '#0b3b3b', fontSize: 10, fontWeight: '800' },
     arabic: {
         color: '#FFFFFF',
-        fontSize: 30,
+        fontSize: 26,
         lineHeight: 58,
         textAlign: 'center',
         writingDirection: 'rtl',
         fontWeight: '500' },
     translation: {
         color: 'rgba(255,255,255,0.85)',
-        fontSize: 15,
+        fontSize: 12.5,
         lineHeight: 24,
         textAlign: 'center',
         marginTop: 20 },
@@ -100,4 +100,4 @@ const styles = StyleSheet.create({
         gap: 8,
         marginTop: 28 },
     dot: { width: 6, height: 6, borderRadius: Layout.borderRadius },
-    brand: { color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: '700', letterSpacing: 0.4 } });
+    brand: { color: 'rgba(255,255,255,0.9)', fontSize: 11.5, fontWeight: '700', letterSpacing: 0.4 } });

@@ -41,7 +41,7 @@ export default function RegisterScreen() {
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 style={{ flex: 1, backgroundColor: colors.background }}
-                contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.background, paddingBottom: 40 }}
+                contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.background, paddingBottom: 36 }}
                 bounces={false}
                 keyboardShouldPersistTaps="handled"
             >
@@ -55,20 +55,20 @@ const styles = StyleSheet.create({
     container: {
         flex: 1 },
     headerSection: {
-        paddingBottom: 40,
+        paddingBottom: 36,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden' },
     headerContent: {
-        paddingHorizontal: 24,
-        paddingTop: 40 },
+        paddingHorizontal: 20,
+        paddingTop: 36 },
     headerTitle: {
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
         marginBottom: 8 },
     headerSubtitle: {
-        fontSize: 15,
+        fontSize: 12.5,
         color: 'rgba(255, 255, 255, 0.9)',
         lineHeight: 22 } });

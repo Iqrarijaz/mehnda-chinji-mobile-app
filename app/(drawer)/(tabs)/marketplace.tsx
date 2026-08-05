@@ -1,5 +1,5 @@
 import React, { useState, useCallback, memo, useRef, useEffect, useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Platform, Switch } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Platform, Switch, RefreshControl } from 'react-native';
 import * as Location from 'expo-location';
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from 'expo-router';
@@ -22,7 +22,7 @@ import { useMarketplaceStore } from '@/store/marketplaceStore';
 const EmptyMarketplace = memo(({ colors }: { colors: any }) => (
     <View style={[styles.centered, { flex: 1, marginTop: 100 }]}>
         <Ionicons name="cart-outline" size={64} color="#CBD5E1" />
-        <ThemedText style={{ color: colors.textSecondary, marginTop: 12, fontSize: 16 }}>
+        <ThemedText style={{ color: colors.textSecondary, marginTop: 12, fontSize: 13.5 }}>
             No items found
         </ThemedText>
     </View>
@@ -204,14 +204,14 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
     const renderFooter = useCallback(() => {
         if (isFetchingNextPage) {
             return (
-                <View style={{ paddingVertical: 24 }}>
+                <View style={{ paddingVertical: 20 }}>
                     <LoadingDots />
                 </View>
             );
         }
         if (!hasNextPage && rawListings.length > 0) {
             return (
-                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: '600', letterSpacing: 0.4, paddingVertical: 20 }}>
+                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 10.5, fontWeight: '600', letterSpacing: 0.4, paddingVertical: 16 }}>
                     {"You're all caught up"}
                 </ThemedText>
             );
@@ -307,7 +307,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                         </TouchableOpacity>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
-                        <ThemedText style={{ color: '#FFFFFF', fontSize: 13, marginRight: 8 }}>Search Nearby (15km)</ThemedText>
+                        <ThemedText style={{ color: '#FFFFFF', fontSize: 11.5, marginRight: 8 }}>Search Nearby (15km)</ThemedText>
                         <Switch
                             value={isNearbyEnabled}
                             onValueChange={toggleNearby}
@@ -344,7 +344,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                             setSelectedItems([]);
                         }}
                     >
-                        <ThemedText style={{ color: colors.primary, fontSize: 11, fontWeight: '700' }}>
+                        <ThemedText style={{ color: colors.primary, fontSize: 10, fontWeight: '700' }}>
                             Clear All
                         </ThemedText>
                     </TouchableOpacity>
@@ -366,8 +366,14 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                         onEndReached={handleEndReached}
                         onEndReachedThreshold={0.5}
                         ListFooterComponent={renderFooter}
-                        refreshing={isRefetching}
-                        onRefresh={handleRefresh}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isRefetching}
+                                onRefresh={handleRefresh}
+                                tintColor={colors.primary}
+                                colors={[colors.primary]}
+                            />
+                        }
                         showsVerticalScrollIndicator={false}
                         ListEmptyComponent={<EmptyMarketplace colors={colors} />}
                     />
@@ -412,7 +418,7 @@ const styles = StyleSheet.create({
         marginBottom: Platform.OS === 'android' ? 18 : 20 },
     headerTitle: {
         color: '#FFFFFF',
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: 'bold' },
     iconButton: {
         width: 38,
@@ -433,7 +439,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden' },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 4,
-        paddingBottom: 8 },
+        paddingBottom: 7 },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -444,11 +450,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 42,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16 },
+        paddingHorizontal: 13 },
     searchInput: {
         flex: 1,
-        fontSize: 14,
-        paddingVertical: 8 },
+        fontSize: 12.5,
+        paddingVertical: 7 },
     filterButton: {
         width: 42,
         height: 42,
@@ -468,7 +474,7 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     filterBadgeText: {
         color: '#FFFFFF',
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 'bold',
         textAlign: 'center',
         lineHeight: 12,
@@ -477,19 +483,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
+        paddingHorizontal: 13,
         marginBottom: 8 },
     activeFiltersTitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700' },
     clearFiltersBtn: {
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         paddingVertical: 3 },
     listContent: {
-        paddingHorizontal: 16 },
+        paddingHorizontal: 13 },
     centered: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20 } });
+        padding: 16 } });

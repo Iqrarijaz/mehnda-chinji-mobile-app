@@ -155,8 +155,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: 4,
         paddingHorizontal: 2 },
-    sectionTitle: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.6 },
-    sectionPill: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: Layout.borderRadius },
+    sectionTitle: { fontSize: 10, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.6 },
+    sectionPill: { paddingHorizontal: 5, paddingVertical: 1, borderRadius: Layout.borderRadius },
     sectionPillText: { fontSize: 9, fontWeight: '700' },
 
     gridContainer: {
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
 
     gridCard: {
         width: '23.5%', // 4 columns per row
-        padding: 6,
+        padding: 5,
         borderRadius: Layout.borderRadius,
         minHeight: 65,
         justifyContent: 'center' },
@@ -186,12 +186,12 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     prayerArabic: {
         fontFamily: 'NotoNastaliqUrdu-Regular',
-        fontSize: 12,
+        fontSize: 10.5,
         padding: 2, // 2px padding around name as requested
         fontWeight: '700',
         lineHeight: 22, // Balanced for Hadith card aesthetic in micro tile
         textAlign: 'center' },
     adhanText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '800',
         lineHeight: 20 } });

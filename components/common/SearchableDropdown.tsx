@@ -70,7 +70,7 @@ export function SearchableDropdown({
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>{title}</ThemedText>
                         {currentValue ? (
                             <TouchableOpacity onPress={() => { onSelect(''); onClose(); }}>
-                                <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Clear</ThemedText>
+                                <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 12.5 }}>Clear</ThemedText>
                             </TouchableOpacity>
                         ) : null}
                     </View>
@@ -171,12 +171,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20 },
+        padding: 16 },
     modalContent: {
         width: '90%',
         height: '60%',
         borderRadius: Layout.borderRadius,
-        padding: 20,
+        padding: 16,
         overflow: 'hidden' },
     modalHeader: {
         flexDirection: 'row',
@@ -184,13 +184,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16 },
     modalTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: 'bold' },
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         marginBottom: 16 },
     searchInput: {
         flex: 1,
@@ -198,54 +198,54 @@ const styles = StyleSheet.create({
         marginLeft: 8,
         fontFamily: 'Inter-Regular' },
     listContent: {
-        paddingBottom: 20 },
+        paddingBottom: 16 },
     item: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
         borderRadius: Layout.borderRadius,
         marginBottom: 4 },
     labelContainer: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingRight: 16 },
+        paddingRight: 13 },
     itemText: {
-        fontSize: 15,
+        fontSize: 12.5,
         fontFamily: 'Inter-Medium' },
     emptyContainer: {
-        padding: 20,
+        padding: 16,
         alignItems: 'center' },
     emptyText: {
-        fontSize: 14,
+        fontSize: 12.5,
         textAlign: 'center' },
     addOptionContainer: {
         width: '100%',
         alignItems: 'center',
-        paddingVertical: 10 },
+        paddingVertical: 8 },
     addButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
         borderRadius: Layout.borderRadius,
         borderStyle: 'dashed',
         width: '100%',
         gap: 8 },
     addButtonText: {
-        fontSize: 15,
+        fontSize: 12.5,
         fontWeight: '700' },
     footerContainer: {
         marginTop: 16,
         alignItems: 'center' },
     closePill: {
-        paddingHorizontal: 16,
-        paddingVertical: 6,
+        paddingHorizontal: 13,
+        paddingVertical: 5,
         borderRadius: Layout.borderRadius },
     closePillText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '600' } });

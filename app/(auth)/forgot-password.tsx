@@ -7,7 +7,6 @@ import {
     Platform,
     ScrollView,
     StyleSheet,
-    TextInput,
     TouchableOpacity,
     View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,6 +20,8 @@ import { forgotPasswordSchema } from '@/utils/validation';
 import * as yup from 'yup';
 import { checkAccountDetails, sendOtp } from '@/apis/login/forgot-password';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { FormInput } from '@/components/common/FormInput';
+import { SubmitButton } from '@/components/common/SubmitButton';
 
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 
@@ -162,44 +163,42 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                             <>
                                 {/* Email/Phone Input */}
                                 <View style={styles.inputField}>
-                                    <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
-                                    <View style={[styles.inputBox, {
-                                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                                        borderWidth: 1
-                                    }]}>
-                                        <Ionicons name="mail-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                                        <TextInput
-                                            placeholder="example@gmail.com"
-                                            placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
-                                            value={email}
-                                            onChangeText={(text) => {
-                                                setEmail(text);
-                                                if (errors.email) validateField('email', text.trim());
-                                            }}
-                                            onBlur={() => handleBlur('email')}
-                                            style={[styles.input, { color: colors.text }]}
-                                            keyboardType="email-address"
-                                            autoCapitalize="none"
-                                            editable={!loading}
-                                        />
-                                        {touched.email && !errors.email && email.length > 0 && (
-                                            <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
-                                        )}
-                                    </View>
+                                    <FormInput
+                                        label="EMAIL ADDRESS"
+                                        required
+                                        icon="mail-outline"
+                                        placeholder="example@gmail.com"
+                                        value={email}
+                                        onChangeText={(text) => {
+                                            setEmail(text);
+                                            if (errors.email) validateField('email', text.trim());
+                                        }}
+                                        onBlur={() => handleBlur('email')}
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        editable={!loading}
+                                        inputBoxStyle={{
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC'
+                                        }}
+                                        rightAccessory={
+                                            touched.email && !errors.email && email.length > 0 ? (
+                                                <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
+                                            ) : undefined
+                                        }
+                                    />
                                     {touched.email && errors.email ? (
                                         <ThemedText style={styles.errorText}>{errors.email}</ThemedText>
                                     ) : null}
                                 </View>
 
                                 {/* Find Account Button */}
-                                <TouchableOpacity
-                                    style={[styles.submitButton, { backgroundColor: '#006666' }]}
+                                <SubmitButton
+                                    title="Find Account"
                                     onPress={handleSubmit}
-                                    disabled={loading}
-                                >
-                                    <ThemedText style={styles.submitButtonText}>Find Account</ThemedText>
-                                </TouchableOpacity>
+                                    isLoading={loading}
+                                    style={{ width: '100%' }}
+                                />
                             </>
                         ) : (
                             <View style={styles.profileContainer}>
@@ -270,41 +269,41 @@ const styles = StyleSheet.create({
     container: {
         flex: 1 },
     headerSection: {
-        paddingBottom: 38,
+        paddingBottom: 34,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden' },
     headerContent: {
-        paddingHorizontal: 22,
-        paddingTop: 38 },
+        paddingHorizontal: 18,
+        paddingTop: 34 },
     headerTitle: {
-        fontSize: 28, // Reduced from 32
+        fontSize: 24, // Reduced from 32
         fontWeight: '800',
         color: '#FFFFFF',
         lineHeight: 40,
         marginBottom: 6 },
     headerSubtitle: {
-        fontSize: 15,
+        fontSize: 12.5,
         color: 'rgba(255, 255, 255, 0.9)',
         lineHeight: 22 },
     formContainer: {
         flex: 1,
-        paddingHorizontal: 18,
-        paddingTop: 30,
-        paddingBottom: 38 },
+        paddingHorizontal: 15,
+        paddingTop: 26,
+        paddingBottom: 34 },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16 },
+        padding: 13 },
     inputField: {
         marginBottom: 20 },
     errorText: {
         color: '#EF4444',
-        fontSize: 12,
+        fontSize: 10.5,
         marginTop: 6,
         marginLeft: 4,
         fontWeight: '500' },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         color: '#475569',
         letterSpacing: 0.5,
@@ -317,10 +316,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12 },
+        paddingHorizontal: 10 },
     input: {
         flex: 1,
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     submitButton: {
         height: 52,
@@ -331,7 +330,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden' },
     submitButtonText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         letterSpacing: 0.5 },
     footer: {
@@ -340,15 +339,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 6 },
     footerText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     footerLink: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700' },
     // Stage 2 Profile Styles
     profileContainer: {
         alignItems: 'center',
-        paddingVertical: 5 },
+        paddingVertical: 4 },
     profileInfo: {
         alignItems: 'center',
         marginBottom: 15 },
@@ -365,18 +364,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 10 },
     profileName: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         marginBottom: 2 },
     profileEmail: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '500' },
     notMeButton: {
         marginTop: 10,
-        padding: 5 },
+        padding: 4 },
     notMeText: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700' },
     submitButtonHorizontal: {
-        paddingHorizontal: 30,
+        paddingHorizontal: 26,
         alignSelf: 'center' } });

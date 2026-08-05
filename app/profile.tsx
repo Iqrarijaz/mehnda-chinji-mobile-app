@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1 },
     header: {
-        paddingBottom: 18,
+        paddingBottom: 15,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden' },
@@ -445,9 +445,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 8,
         marginTop: 8,
-        paddingHorizontal: 24 },
+        paddingHorizontal: 20 },
     userName: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
@@ -456,11 +456,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 3,
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         paddingVertical: 3,
         borderRadius: Layout.borderRadius },
     verifiedText: {
-        fontSize: 9.5,
+        fontSize: 8.5,
         fontWeight: '800',
         color: '#1E293B',
         textTransform: 'uppercase',
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16 },
+        paddingHorizontal: 13 },
     backButton: {
         width: 42,
         height: 42,
@@ -478,20 +478,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     headerTitle: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center' },
     subtitleText: {
-        fontSize: 11,
+        fontSize: 10,
         color: 'rgba(255,255,255,0.8)',
         marginTop: 4,
         textAlign: 'center',
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
     scrollContent: {
-        paddingBottom: 40 },
+        paddingBottom: 36 },
     formSection: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginTop: 20,
         gap: 16 },
     inputField: {
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingRight: 4 },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2 },
@@ -510,17 +510,17 @@ const styles = StyleSheet.create({
         color: '#EF4444' },
     errorText: {
         color: '#EF4444',
-        fontSize: 11,
+        fontSize: 10,
         marginLeft: 4,
         marginTop: 2 },
     charCount: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '600' },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     textInput: {
         flex: 1,
         fontWeight: '500' },
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     triggerContent: {
         flexDirection: 'row',
         alignItems: 'center' },
@@ -548,17 +548,17 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         gap: 6 },
     genderText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '600',
         color: '#64748B' },
     infoTip: {
         flexDirection: 'row',
         gap: 8,
-        paddingHorizontal: 8,
+        paddingHorizontal: 7,
         marginTop: 4,
         alignItems: 'center' },
     infoText: {
-        fontSize: 11,
+        fontSize: 10,
         color: '#64748B',
         flex: 1,
         lineHeight: 18 },
@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 8 },
     updateButtonText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         color: '#FFFFFF' } });
 

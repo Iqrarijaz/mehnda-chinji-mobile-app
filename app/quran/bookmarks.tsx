@@ -86,10 +86,10 @@ export default function BookmarksScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    list: { paddingHorizontal: 16, paddingTop: 14 },
+    list: { paddingHorizontal: 13, paddingTop: 11 },
     card: {
         borderRadius: Layout.borderRadius,
-        padding: 14,
+        padding: 11,
         marginBottom: 12 },
     cardHeader: {
         flexDirection: 'row',
@@ -97,12 +97,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: 10 },
     badge: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: Layout.borderRadius },
-    badgeText: { fontSize: 11, fontWeight: '800' },
+    badgeText: { fontSize: 10, fontWeight: '800' },
     arabic: {
-        fontSize: 22,
+        fontSize: 18.5,
         lineHeight: 42,
         textAlign: 'right',
         writingDirection: 'rtl',
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 40,
+        paddingHorizontal: 36,
         gap: 10 },
-    emptyTitle: { fontSize: 17, fontWeight: '800', marginTop: 6 },
-    emptyText: { fontSize: 13, textAlign: 'center', lineHeight: 20 } });
+    emptyTitle: { fontSize: 14.5, fontWeight: '800', marginTop: 6 },
+    emptyText: { fontSize: 11.5, textAlign: 'center', lineHeight: 20 } });

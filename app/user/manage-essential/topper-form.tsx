@@ -18,6 +18,7 @@ import Toast from 'react-native-toast-message';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { addTopper, updateTopper, uploadUserImage } from '@/apis/essentials';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -164,7 +165,7 @@ const TopperForm = () => {
 
     return (
         <View style={[styles.mainContainer, { backgroundColor: colors.background }]}>
-            <Stack.Screen options={{ headerShown: false }} />
+            <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
 
             {/* Animated Header */}
             <Animated.View entering={FadeInUp.duration(600)} style={styles.header}>
@@ -363,6 +364,10 @@ const TopperForm = () => {
                     )}
                 </TouchableOpacity>
             </View>
+            <LoaderOverlay
+                visible={mutation.isPending || isUploading}
+                text={isUploading ? 'Uploading image...' : isEditing ? 'Saving changes...' : 'Adding topper...'}
+            />
         </View>
     );
 };
@@ -380,7 +385,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16 },
+        paddingHorizontal: 13 },
     backButton: {
         width: 42,
         height: 42,
@@ -389,20 +394,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center' },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '700',
         textAlign: 'center' },
     welcomeText: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         marginTop: 6,
         marginBottom: 6,
         textAlign: 'center' },
     subtitleText: {
-        fontSize: 12,
+        fontSize: 10.5,
         marginTop: 2,
         textAlign: 'center',
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
     avatarContainer: {
         alignItems: 'center',
         marginTop: 15 },
@@ -430,9 +435,9 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },
-    content: { paddingBottom: 140 },
+    content: { paddingBottom: 136 },
     formSection: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginTop: 20,
         gap: 16 },
     inputField: { gap: 6 },
@@ -442,7 +447,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingRight: 4 },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginLeft: 2 },
@@ -451,14 +456,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     textInput: { flex: 1, fontWeight: '500' },
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     triggerContent: {
         flexDirection: 'row',
         alignItems: 'center' },
@@ -469,7 +474,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: Platform.OS === 'android' ? 10 : 12 },
     updateButton: {
         height: Platform.OS === 'android' ? 48 : 52,

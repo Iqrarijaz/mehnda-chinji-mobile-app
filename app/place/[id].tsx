@@ -457,13 +457,13 @@ const styles = StyleSheet.create({
     heroHeaderTop: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: 14,
         paddingBottom: 8 },
     scrollView: {
         flex: 1 },
     detailsCard: {
-        paddingHorizontal: 16,
-        paddingTop: 12,
+        paddingHorizontal: 14,
+        paddingTop: 10,
         flex: 1 },
     heroBackButton: {
         width: 36,
@@ -474,13 +474,13 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
 
     heroHeaderNavTitle: {
-        fontSize: 17,
+        fontSize: 15,
         fontWeight: '700',
         color: '#FFFFFF',
         letterSpacing: 0.2 },
     heroContent: {
         alignItems: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         marginTop: 16 },
     heroIconWrap: {
         width: 72,
@@ -495,17 +495,17 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%' },
     heroTitle: {
-        fontSize: 22,
+        fontSize: 18,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
         letterSpacing: 0.2 },
     heroSubtitle: {
-        fontSize: 13,
+        fontSize: 11,
         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
-        marginTop: 6,
-        lineHeight: 18 },
+        marginTop: 5,
+        lineHeight: 16 },
     actionRow: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -517,14 +517,14 @@ const styles = StyleSheet.create({
     actionBtnPrimary: {
         height: 42,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6 },
     actionBtnTextPrimary: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '700' },
     actionBtnIconOnly: {
         width: 40,
@@ -546,8 +546,8 @@ const styles = StyleSheet.create({
         letterSpacing: 0.8,
         marginBottom: 4 },
     descriptionText: {
-        fontSize: 12,
-        lineHeight: 18 },
+        fontSize: 11,
+        lineHeight: 16 },
     infoListItem: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
         marginBottom: 1 },
     infoListVal: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '500' },
     infoListSub: {
         fontSize: 11,

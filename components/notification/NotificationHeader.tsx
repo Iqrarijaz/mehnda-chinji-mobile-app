@@ -82,7 +82,7 @@ export default NotificationHeader;
 
 const styles = StyleSheet.create({
     headerWrap: {
-        paddingBottom: 8,
+        paddingBottom: 7,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20 },
+        paddingHorizontal: 16 },
     backBtn: {
         width: 32,
         height: 32,
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center' },
     headerTitle: {
-        fontSize: 20,
+        fontSize: 16.5,
         fontWeight: '800',
         color: 'rgba(255,255,255,1)' },
     markBtn: {
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         marginTop: -8,
         marginBottom: 8 },
     headerSubtitle: {
-        fontSize: 11,
+        fontSize: 10,
         color: 'rgba(255,255,255,0.75)',
         fontWeight: '500' },
     // Tooltip styles — identical to categoryListingHeader
@@ -128,12 +128,12 @@ const styles = StyleSheet.create({
     tooltipPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: 13,
+        paddingVertical: 10,
         borderRadius: Layout.borderRadius,
         gap: 12 },
     tooltipText: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600' },
     tooltipClose: {
         padding: 4 } });

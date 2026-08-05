@@ -70,9 +70,9 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
                     <Ionicons name={icon} size={26} color={color} />
                 </View>
                 <View style={styles.content}>
-                    <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.subtitle}>{subtitle}</Text>
-                    {!hideValue && <Text style={[styles.value, { color }]}>{value}</Text>}
+                    <Text allowFontScaling={false} style={styles.title}>{title}</Text>
+                    <Text allowFontScaling={false} style={styles.subtitle}>{subtitle}</Text>
+                    {!hideValue && <Text allowFontScaling={false} style={[styles.value, { color }]}>{value}</Text>}
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
             </Animated.View>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 16 },
+        padding: 13 },
     iconContainer: {
         width: 52,
         height: 52,
@@ -99,16 +99,16 @@ const styles = StyleSheet.create({
     content: {
         flex: 1 },
     title: {
-        fontSize: 16,
+        fontSize: 13.5,
         fontWeight: '700',
         color: '#1E293B',
         marginBottom: 2 },
     subtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: '#64748B',
         marginBottom: 4 },
     value: {
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });
 
 export default SupportContactCard;

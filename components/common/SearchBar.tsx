@@ -84,6 +84,7 @@ export function SearchBar({
             />
             <TextInput
                 ref={inputRef}
+                allowFontScaling={false}
                 style={[styles.input, { color: colors.text }]}
                 placeholder={placeholder}
                 placeholderTextColor="#94A3B8"

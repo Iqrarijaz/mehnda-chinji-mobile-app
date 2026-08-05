@@ -14,6 +14,7 @@ import { ActionMenu, ActionMenuItem } from '../common/ActionMenu';
 import { ThemedText } from '../ThemedText';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
 import { Layout } from '@/constants/layout';
+import { LoaderOverlay } from '../common/LoaderOverlay';
 
 interface MarketplaceCardProps {
     item: any;
@@ -242,6 +243,16 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
                 confirmText="OK"
                 cancelText="Close"
             />
+            <LoaderOverlay
+                visible={markSoldMutation.isPending || deleteMutation.isPending || toggleStatusMutation.isPending}
+                text={
+                    deleteMutation.isPending
+                        ? 'Deleting listing...'
+                        : markSoldMutation.isPending
+                            ? 'Marking as sold...'
+                            : 'Updating listing...'
+                }
+            />
         </>
     );
 });
@@ -251,7 +262,7 @@ MarketplaceCard.displayName = 'MarketplaceCard';
 const styles = StyleSheet.create({
     container: {
         borderRadius: Layout.borderRadius,
-        marginBottom: 14,
+        marginBottom: 10,
         overflow: 'hidden',
         flex: 1 },
     header: {
@@ -279,7 +290,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius },
     imageBadgeText: {
         color: '#fff',
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '600' },
     statusTab: {
         position: 'absolute',
@@ -302,9 +313,9 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 8 },
     detailsContainer: {
-        paddingHorizontal: 10,
-        paddingTop: 6,
-        paddingBottom: 8 },
+        paddingHorizontal: 8,
+        paddingTop: 5,
+        paddingBottom: 6 },
     contentBlock: {
         marginTop: 0,
         marginBottom: 0 },
@@ -331,7 +342,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 1 },
     priceText: {
-        fontSize: 13.5,
+        fontSize: 12,
         fontWeight: '800',
         letterSpacing: 0.15,
         flexShrink: 1 },
@@ -344,14 +355,14 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 0.4 },
     title: {
-        fontSize: 12.5,
+        fontSize: 11.5,
         fontWeight: '700',
         marginTop: 0,
-        lineHeight: 14 },
+        lineHeight: 13.5 },
     description: {
-        fontSize: 12,
-        marginTop: 4,
-        lineHeight: 18 },
+        fontSize: 11,
+        marginTop: 3,
+        lineHeight: 16 },
     locationRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -364,14 +375,14 @@ const styles = StyleSheet.create({
         paddingRight: 8 },
     locationText: {
         color: '#9CA3AF',
-        fontSize: 10.5,
+        fontSize: 10,
         marginLeft: 4 },
     metadataContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        padding: 8,
+        padding: 6,
         borderRadius: Layout.borderRadius,
-        marginTop: 10,
+        marginTop: 8,
         gap: 6 },
     metadataTag: {
         flexDirection: 'row',
@@ -389,7 +400,7 @@ const styles = StyleSheet.create({
         marginLeft: 2 },
     actionRow: {
         flexDirection: 'row',
-        marginTop: 12,
+        marginTop: 10,
         gap: 8 },
     actionButton: {
         flex: 1,

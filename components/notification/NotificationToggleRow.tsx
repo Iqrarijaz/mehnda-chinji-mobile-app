@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 14 },
+        paddingVertical: 11 },
     iconContainer: {
         width: 40,
         height: 40,
@@ -70,11 +70,11 @@ const styles = StyleSheet.create({
         flex: 1,
         marginRight: 10 },
     label: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600',
         marginBottom: 2 },
     descriptionText: {
-        fontSize: 11,
+        fontSize: 10,
         lineHeight: 16 } });
 
 export default NotificationToggleRow;

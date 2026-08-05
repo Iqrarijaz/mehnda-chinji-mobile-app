@@ -180,13 +180,13 @@ export default PlaceCard;
 
 const styles = StyleSheet.create({
     card: {
-        marginBottom: 10,
+        marginBottom: 8,
         overflow: 'hidden' },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 10,
-        gap: 10 },
+        padding: 8,
+        gap: 8 },
     tile: {
         width: TILE_SIZE,
         height: TILE_SIZE,
@@ -208,11 +208,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center' },
     info: {
         flex: 1,
-        gap: 4 },
+        gap: 3 },
     typeChip: {
         alignSelf: 'flex-start',
-        paddingHorizontal: 8,
-        paddingVertical: 2.5,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
         borderRadius: Layout.borderRadius },
     typeChipText: {
         fontSize: 9,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         right: 0,
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         borderRadius: Layout.borderRadius,
         borderTopRightRadius: 28,
         borderBottomLeftRadius: 28,
@@ -236,17 +236,17 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
         color: '#FFFFFF' },
     name: {
-        fontSize: 14.5,
+        fontSize: 12.5,
         fontWeight: '800',
         letterSpacing: 0.1,
-        lineHeight: 18 },
+        lineHeight: 16 },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 5,
+        gap: 4,
         paddingRight: 8 },
     metaText: {
-        fontSize: 11.5,
+        fontSize: 10,
         fontWeight: '500',
         flexShrink: 1,
-        lineHeight: 15 } });
+        lineHeight: 13.5 } });

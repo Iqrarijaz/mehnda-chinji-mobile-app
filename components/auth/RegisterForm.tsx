@@ -400,14 +400,14 @@ export const RegisterForm = React.memo(function RegisterForm() {
                     <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
                         I agree to the {' '}
                         <ThemedText
-                            style={{ color: colors.primary, fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
+                            style={{ color: colors.primary, fontWeight: '700', fontSize: 11.5, textDecorationLine: 'underline' }}
                             onPress={() => {
                                 router.push('/terms' as any);
                             }}
                         >Terms & Conditions</ThemedText>
                         {' '} and {' '}
                         <ThemedText
-                            style={{ color: colors.primary, fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
+                            style={{ color: colors.primary, fontWeight: '700', fontSize: 11.5, textDecorationLine: 'underline' }}
                             onPress={() => {
                                 router.push('/privacy' as any);
                             }}
@@ -434,7 +434,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                     <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
                         I agree to follow the {' '}
                         <ThemedText
-                            style={{ color: '#006666', fontWeight: '700', fontSize: 13, textDecorationLine: 'underline' }}
+                            style={{ color: '#006666', fontWeight: '700', fontSize: 11.5, textDecorationLine: 'underline' }}
                             onPress={() => {
                                 router.push('/communityGuidelines' as any);
                             }}
@@ -487,17 +487,17 @@ export const RegisterForm = React.memo(function RegisterForm() {
 
 const styles = StyleSheet.create({
     formContainer: {
-        paddingHorizontal: 20,
-        paddingTop: 32,
-        paddingBottom: 40 },
+        paddingHorizontal: 16,
+        paddingTop: 28,
+        paddingBottom: 36 },
     formCard: {
         borderRadius: Layout.borderRadius,
-        padding: 16 },
+        padding: 13 },
     inputField: {
         marginBottom: 20 },
     errorText: {
         color: '#EF4444',
-        fontSize: 12,
+        fontSize: 10.5,
         marginTop: 6,
         marginLeft: 4,
         fontWeight: '500' },
@@ -515,11 +515,11 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         backgroundColor: '#E2E8F0' },
     strengthText: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '600',
         textAlign: 'right' },
     label: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         color: '#475569',
         letterSpacing: 0.5,
@@ -532,10 +532,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 52,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14 },
+        paddingHorizontal: 11 },
     input: {
         flex: 1,
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     registerButton: {
         height: 52,
@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden' },
     registerButtonText: {
         color: '#FFFFFF',
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         letterSpacing: 0.5 },
     footer: {
@@ -556,10 +556,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 8 },
     footerText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     footerLink: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700' },
     checkboxContainer: {
         flexDirection: 'row',
@@ -574,6 +574,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 10 },
     checkboxText: {
-        fontSize: 12,
+        fontSize: 10.5,
         flex: 1,
         lineHeight: 18 } });

@@ -120,7 +120,7 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                                     onClose();
                                 }}
                             >
-                                <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Clear</ThemedText>
+                                <ThemedText style={{ color: colors.primary, fontWeight: '700', fontSize: 12.5 }}>Clear</ThemedText>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -154,7 +154,7 @@ export function ProfessionPicker({ visible, onClose, onSelect, currentProfession
                                 renderItem={renderItem}
                                 contentContainerStyle={styles.listContent}
                                 ListEmptyComponent={() => (
-                                    <View style={{ padding: 20, alignItems: 'center' }}>
+                                    <View style={{ padding: 16, alignItems: 'center' }}>
                                         <ThemedText style={{ color: colors.icon }}>No professions found.</ThemedText>
                                     </View>
                                 )}
@@ -182,13 +182,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20 },
+        padding: 16 },
     modalContent: {
         width: '90%',
         height: '60%',
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 20,
+        padding: 16,
         overflow: 'hidden' },
     modalHeader: {
         flexDirection: 'row',
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16 },
     modalTitle: {
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: '800',
         letterSpacing: -0.5 },
     searchBar: {
@@ -204,21 +204,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 42,
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         marginBottom: 16 },
     searchInput: {
         flex: 1,
         marginLeft: 8,
-        fontSize: 14,
-        paddingVertical: 8 },
+        fontSize: 12.5,
+        paddingVertical: 7 },
     listContent: {
-        paddingBottom: 8 },
+        paddingBottom: 7 },
     item: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
         marginVertical: 4,
         borderRadius: Layout.borderRadius },
     labelContainer: {
@@ -228,11 +228,11 @@ const styles = StyleSheet.create({
         flex: 1,
         marginRight: 15 },
     itemTextEng: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600',
         textTransform: 'capitalize' },
     itemTextUr: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '500' },
     footerContainer: {
         marginTop: 16,
@@ -246,5 +246,5 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     closePillText: {
         color: '#FFFFFF',
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '600' } });

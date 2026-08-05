@@ -1,9 +1,14 @@
 import React from 'react';
-import { TouchableOpacity, TouchableOpacityProps, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, TouchableOpacityProps, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
-
+import { Layout } from '@/constants/layout';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming } from 'react-native-reanimated';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Ionicons } from '@expo/vector-icons';
 
 interface SubmitButtonProps extends TouchableOpacityProps {
@@ -12,22 +17,31 @@ interface SubmitButtonProps extends TouchableOpacityProps {
     icon?: keyof typeof Ionicons.glyphMap;
 }
 
-import { ActivityIndicator } from 'react-native';
-import { Layout } from '@/constants/layout';
-
-export function SubmitButton({ title, isLoading, disabled, style, icon, ...rest }: SubmitButtonProps) {
+export function SubmitButton({ title, isLoading, disabled, style, icon, onPress, ...rest }: SubmitButtonProps) {
     const isDisabled = disabled || isLoading;
     const { theme } = useTheme();
     const colors = Colors[theme];
 
+    // Gentle cross-fade whenever the label/spinner content swaps, instead of
+    // an instant cut, without changing the row's normal (non-absolute) layout flow.
+    const contentOpacity = useSharedValue(1);
+
+    React.useEffect(() => {
+        contentOpacity.value = 0.35;
+        contentOpacity.value = withTiming(1, { duration: 180 });
+    }, [isLoading]);
+
+    const contentStyle = useAnimatedStyle(() => ({ opacity: contentOpacity.value }));
+
     return (
-        <TouchableOpacity
-            style={[styles.updateButton, { backgroundColor: colors.lime }, isDisabled && { opacity: 0.6 }, style]}
+        <PressableScale
+            intensity={0.04}
             disabled={isDisabled}
-            activeOpacity={0.8}
-            {...rest}
+            onPress={onPress as (() => void) | undefined}
+            style={[styles.updateButton, { backgroundColor: colors.lime }, isDisabled && { opacity: 0.6 }, style]}
+            {...(rest as any)}
         >
-            <View style={styles.buttonContent}>
+            <Animated.View style={[styles.buttonContent, contentStyle]}>
                 {isLoading && (
                     <ActivityIndicator size="small" color="#FFFFFF" style={{ marginRight: 8 }} />
                 )}
@@ -37,8 +51,8 @@ export function SubmitButton({ title, isLoading, disabled, style, icon, ...rest 
                 <ThemedText style={styles.updateButtonText}>
                     {isLoading ? 'Processing...' : title}
                 </ThemedText>
-            </View>
-        </TouchableOpacity>
+            </Animated.View>
+        </PressableScale>
     );
 }
 
@@ -50,13 +64,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'flex-start',
-        paddingHorizontal: 24 },
+        paddingHorizontal: 20 },
     buttonContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 8 },
+        paddingHorizontal: 7 },
     updateButtonText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12.5,
         fontWeight: '600' } });

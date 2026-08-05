@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingVertical: Platform.OS === 'android' ? 10 : 13,
-        paddingHorizontal: 14,
+        paddingHorizontal: 11,
         borderRadius: Layout.borderRadius },
     settingRowBorder: {
         marginHorizontal: 4 },
@@ -117,10 +117,10 @@ const styles = StyleSheet.create({
     settingTextWrap: {
         flex: 1 },
     settingLabel: {
-        fontSize: 15,
+        fontSize: 12.5,
         fontWeight: '600',
         letterSpacing: -0.1 },
     settingSubtitle: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '400',
         marginTop: 1 } });

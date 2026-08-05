@@ -59,12 +59,12 @@ export default NotificationFilterTabs;
 
 const styles = StyleSheet.create({
     bar: { marginTop: 10 },
-    scroll: { paddingHorizontal: 16, gap: 10, paddingTop: 2, paddingBottom: 4 },
+    scroll: { paddingHorizontal: 13, gap: 10, paddingTop: 2, paddingBottom: 4 },
     chip: {
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         paddingVertical: Platform.OS === 'android' ? 5 : 6,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF' },
     chipActive: { backgroundColor: PRIMARY },
-    label: { fontSize: 11, fontWeight: '600', color: '#64748B' },
+    label: { fontSize: 10, fontWeight: '600', color: '#64748B' },
     labelActive: { color: '#FFFFFF', fontWeight: '700' } });
