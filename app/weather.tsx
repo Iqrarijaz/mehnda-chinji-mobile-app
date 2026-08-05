@@ -20,6 +20,7 @@ import NativeAd from '@/ads/components/NativeAd';
 import WeatherDaily from '@/components/weather/WeatherDaily';
 import WeatherHero from '@/components/weather/WeatherHero';
 import WeatherHourly from '@/components/weather/WeatherHourly';
+import RainRadar from '@/components/weather/RainRadar';
 
 import { WeatherCitySwitcher } from '@/components/weather/WeatherCitySwitcher';
 import WeatherStats from '@/components/weather/WeatherStats';
@@ -315,6 +316,9 @@ export default function WeatherScreen() {
 
                     {/* Hourly */}
                     <WeatherHourly data={hourlyData} />
+
+                    {/* Animated live rain radar */}
+                    <RainRadar coords={effectiveCoords} />
 
                     {/* Daily */}
                     <WeatherDaily data={dailyData} />
