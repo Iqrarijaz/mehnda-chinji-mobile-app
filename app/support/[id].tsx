@@ -22,6 +22,7 @@ import {
     View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
 const { width } = Dimensions.get('window');
 
@@ -272,6 +273,7 @@ export default function TicketDetailScreen() {
                     </View>
                 )}
             </View>
+            <LoaderOverlay visible={replyMutation.isPending} text="Sending reply..." />
         </KeyboardAvoidingView>
     );
 }

@@ -22,6 +22,7 @@ import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { FlashList } from '@shopify/flash-list';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
 const { width } = Dimensions.get('window');
 
@@ -288,6 +289,7 @@ export default function TicketListScreen() {
                     </View>
                 )}
             </View>
+            <LoaderOverlay visible={deleteMutation.isPending} text="Deleting ticket..." />
         </GestureHandlerRootView>
     );
 }

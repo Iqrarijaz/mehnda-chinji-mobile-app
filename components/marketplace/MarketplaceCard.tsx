@@ -14,6 +14,7 @@ import { ActionMenu, ActionMenuItem } from '../common/ActionMenu';
 import { ThemedText } from '../ThemedText';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
 import { Layout } from '@/constants/layout';
+import { LoaderOverlay } from '../common/LoaderOverlay';
 
 interface MarketplaceCardProps {
     item: any;
@@ -241,6 +242,16 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
                 type="danger"
                 confirmText="OK"
                 cancelText="Close"
+            />
+            <LoaderOverlay
+                visible={markSoldMutation.isPending || deleteMutation.isPending || toggleStatusMutation.isPending}
+                text={
+                    deleteMutation.isPending
+                        ? 'Deleting listing...'
+                        : markSoldMutation.isPending
+                            ? 'Marking as sold...'
+                            : 'Updating listing...'
+                }
             />
         </>
     );

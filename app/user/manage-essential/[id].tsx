@@ -21,6 +21,7 @@ import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 
 import { deleteTopper, deleteEvent, getMyRequests } from '@/apis/essentials';
 import { ThemedText } from '@/components/ThemedText';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
@@ -303,6 +304,7 @@ const ManageEssentialDashboard = () => {
                     <BannerAd placement="essential-details" />
                 </View>
             )}
+            <LoaderOverlay visible={deleteMutation.isPending} text="Deleting..." />
         </View>
     );
 };

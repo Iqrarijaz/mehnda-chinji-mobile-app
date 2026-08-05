@@ -22,6 +22,7 @@ import { PremiumModal } from '../common/PremiumModal';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { changePassword } from '@/apis/profile';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -159,6 +160,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
     const canSubmit = currentPassword.length > 0 && newPassword.length >= 6 && confirmPassword.length > 0;
 
     return (
+        <>
         <PremiumModal visible={visible} onClose={resetAndClose} type="centered">
 
             <Animated.View entering={SlideInLeft.delay(60).duration(350)} style={styles.header}>
@@ -227,6 +229,8 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
                 </View>
             </ScrollView>
         </PremiumModal>
+        <LoaderOverlay visible={isLoading} text="Updating password..." />
+        </>
     );
 });
 

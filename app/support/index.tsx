@@ -30,6 +30,7 @@ import { createSupportTicket } from '@/apis/support';
 import FAQAccordion from '@/components/support/FAQAccordion';
 import SupportContactCard from '@/components/support/SupportContactCard';
 import FeedbackForm from '@/components/support/FeedbackForm';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 
 const FAQ_DATA = [
     {
@@ -209,6 +210,7 @@ export default function SupportScreen() {
                     Our support team is available Monday to Friday, 9AM - 6PM. Responses may take up to 24 hours.
                 </Text>
             </ScrollView>
+            <LoaderOverlay visible={createTicketMutation.isPending} text="Submitting feedback..." />
         </View>
     );
 }

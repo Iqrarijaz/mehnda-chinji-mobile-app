@@ -11,6 +11,7 @@ import {
 import Toast from 'react-native-toast-message';
 
 import { deleteAccount } from '@/apis/profile';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { clientStorage } from '@/utils/storage';
 import { ThemedText } from '@/components/ThemedText';
 import { useAuth } from '@/context/AuthContext';
@@ -61,6 +62,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
     };
 
     return (
+        <>
         <PremiumModal visible={visible} onClose={resetAndClose} type="centered">
             <View style={styles.modalHeader}>
                 <ThemedText style={styles.modalTitle}>Delete Account</ThemedText>
@@ -105,6 +107,8 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
                 </TouchableOpacity>
             </View>
         </PremiumModal>
+        <LoaderOverlay visible={isDeleting} text="Deleting your account..." />
+        </>
     );
 };
 

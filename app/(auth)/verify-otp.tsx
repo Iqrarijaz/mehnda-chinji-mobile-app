@@ -16,6 +16,7 @@ import Toast from 'react-native-toast-message';
 import { sendOtp, verifyOtp } from '@/apis/login/forgot-password';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
@@ -241,6 +242,7 @@ export default function VerifyOtpScreen() {
                     </View>
                 </View>
             </ScrollView>
+            <LoaderOverlay visible={loading} text="Please wait..." />
         </KeyboardAvoidingView>
     );
 }

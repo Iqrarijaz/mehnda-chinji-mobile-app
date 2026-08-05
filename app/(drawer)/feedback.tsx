@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -271,6 +272,7 @@ export default function FeedbackScreen() {
                 onClose={() => { setShowSuccessModal(false); setActiveTab('history'); }}
             />
 
+            <LoaderOverlay visible={submitMutation.isPending} text="Submitting feedback..." />
         </KeyboardAvoidingView>
     );
 }

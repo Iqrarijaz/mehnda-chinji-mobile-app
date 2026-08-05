@@ -13,6 +13,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useEssentialsAPI } from '@/hooks/useEssentialsAPI';
 import { LocationPicker, LocationValue } from '@/components/common/LocationPicker';
 import { resolveLocationForSubmit } from '@/utils/locationService';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Layout } from '@/constants/layout';
 
 interface EssentialSubmitFormProps {
@@ -734,6 +735,10 @@ const EssentialSubmitForm = React.memo(({
                     disabled={isPending || isUploading || (isEditing && !hasChanges)}
                 />
             </Animated.View>
+            <LoaderOverlay
+                visible={isPending || isUploading}
+                text={isUploading ? 'Uploading image...' : isEditing ? 'Updating...' : 'Submitting...'}
+            />
         </View>
     );
 });

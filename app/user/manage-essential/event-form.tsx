@@ -18,6 +18,7 @@ import Toast from 'react-native-toast-message';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { addEvent, updateEvent, uploadUserImage } from '@/apis/essentials';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -341,6 +342,10 @@ const EventForm = () => {
                     )}
                 </TouchableOpacity>
             </View>
+            <LoaderOverlay
+                visible={mutation.isPending || isUploading}
+                text={isUploading ? 'Uploading image...' : isEditing ? 'Saving event...' : 'Posting event...'}
+            />
         </View>
     );
 };

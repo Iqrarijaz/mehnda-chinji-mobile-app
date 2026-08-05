@@ -12,6 +12,7 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { getUserReports, updateReport, deleteReport, ReportPayload } from '@/apis/report';
 import Toast from 'react-native-toast-message';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import dayjs from '@/utils/dayjs';
 
 export default function ReportsScreen() {
@@ -240,6 +241,10 @@ export default function ReportsScreen() {
                     </View>
                 </View>
             </Modal>
+            <LoaderOverlay
+                visible={deleteMutation.isPending || updateMutation.isPending}
+                text={deleteMutation.isPending ? 'Deleting report...' : 'Updating report...'}
+            />
         </View>
     );
 }

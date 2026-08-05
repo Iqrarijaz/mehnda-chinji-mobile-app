@@ -3,6 +3,7 @@ import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { ThemedText } from '@/components/ThemedText';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
+import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -218,6 +219,7 @@ export default function CreateTicketScreen() {
                     icon="paper-plane"
                 />
             </ScrollView>
+            <LoaderOverlay visible={createTicketMutation.isPending} text="Creating ticket..." />
         </View>
     );
 }
