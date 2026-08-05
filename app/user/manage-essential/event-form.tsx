@@ -152,7 +152,7 @@ const EventForm = () => {
 
     return (
         <View style={[styles.mainContainer, { backgroundColor: colors.background }]}>
-            <Stack.Screen options={{ headerShown: false }} />
+            <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
 
             {/* Animated Header */}
             <Animated.View entering={FadeInUp.duration(600)} style={styles.header}>

@@ -21,6 +21,7 @@ import * as Location from 'expo-location';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     Platform,
+    RefreshControl,
     StyleSheet,
     TextInput,
     TouchableOpacity,
@@ -261,8 +262,14 @@ export default function BusinessScreen() {
                             renderItem={renderItem}
                             keyExtractor={keyExtractor}
                             contentContainerStyle={styles.listContent}
-                            onRefresh={handleRefresh}
-                            refreshing={loading && !isFetchingNextPage}
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={loading && !isFetchingNextPage}
+                                    onRefresh={handleRefresh}
+                                    tintColor={colors.primary}
+                                    colors={[colors.primary]}
+                                />
+                            }
                             onEndReached={handleEndReached}
                             onEndReachedThreshold={0.5}
                             ListFooterComponent={renderFooter}

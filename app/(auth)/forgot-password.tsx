@@ -7,7 +7,6 @@ import {
     Platform,
     ScrollView,
     StyleSheet,
-    TextInput,
     TouchableOpacity,
     View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,6 +20,8 @@ import { forgotPasswordSchema } from '@/utils/validation';
 import * as yup from 'yup';
 import { checkAccountDetails, sendOtp } from '@/apis/login/forgot-password';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { FormInput } from '@/components/common/FormInput';
+import { SubmitButton } from '@/components/common/SubmitButton';
 
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 
@@ -162,44 +163,42 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                             <>
                                 {/* Email/Phone Input */}
                                 <View style={styles.inputField}>
-                                    <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>EMAIL ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
-                                    <View style={[styles.inputBox, {
-                                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                                        borderWidth: 1
-                                    }]}>
-                                        <Ionicons name="mail-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                                        <TextInput
-                                            placeholder="example@gmail.com"
-                                            placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
-                                            value={email}
-                                            onChangeText={(text) => {
-                                                setEmail(text);
-                                                if (errors.email) validateField('email', text.trim());
-                                            }}
-                                            onBlur={() => handleBlur('email')}
-                                            style={[styles.input, { color: colors.text }]}
-                                            keyboardType="email-address"
-                                            autoCapitalize="none"
-                                            editable={!loading}
-                                        />
-                                        {touched.email && !errors.email && email.length > 0 && (
-                                            <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
-                                        )}
-                                    </View>
+                                    <FormInput
+                                        label="EMAIL ADDRESS"
+                                        required
+                                        icon="mail-outline"
+                                        placeholder="example@gmail.com"
+                                        value={email}
+                                        onChangeText={(text) => {
+                                            setEmail(text);
+                                            if (errors.email) validateField('email', text.trim());
+                                        }}
+                                        onBlur={() => handleBlur('email')}
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        editable={!loading}
+                                        inputBoxStyle={{
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC'
+                                        }}
+                                        rightAccessory={
+                                            touched.email && !errors.email && email.length > 0 ? (
+                                                <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginLeft: 8 }} />
+                                            ) : undefined
+                                        }
+                                    />
                                     {touched.email && errors.email ? (
                                         <ThemedText style={styles.errorText}>{errors.email}</ThemedText>
                                     ) : null}
                                 </View>
 
                                 {/* Find Account Button */}
-                                <TouchableOpacity
-                                    style={[styles.submitButton, { backgroundColor: '#006666' }]}
+                                <SubmitButton
+                                    title="Find Account"
                                     onPress={handleSubmit}
-                                    disabled={loading}
-                                >
-                                    <ThemedText style={styles.submitButtonText}>Find Account</ThemedText>
-                                </TouchableOpacity>
+                                    isLoading={loading}
+                                    style={{ width: '100%' }}
+                                />
                             </>
                         ) : (
                             <View style={styles.profileContainer}>

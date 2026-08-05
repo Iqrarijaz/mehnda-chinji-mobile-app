@@ -25,7 +25,7 @@ export default function CreateListingScreen() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Stack.Screen options={{ headerShown: false }} />
+            <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
             <View style={{ flex: 1 }}>
                 <CreateMarketplaceListing
                     onClose={() => {

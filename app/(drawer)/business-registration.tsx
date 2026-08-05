@@ -299,7 +299,8 @@ const BusinessRegistrationScreen = () => {
             <Stack.Screen options={{
                 headerShown: false,
                 gestureEnabled: true,
-                animation: 'slide_from_right'
+                presentation: 'modal',
+                animation: 'slide_from_bottom'
             }} />
 
             <ThankYouModal

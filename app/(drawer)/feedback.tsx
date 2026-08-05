@@ -135,7 +135,7 @@ export default function FeedbackScreen() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={[styles.root, { backgroundColor: colors.background }]}
         >
-            <Stack.Screen options={{ headerShown: false }} />
+            <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
 
             {/* Header */}
             <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.background }]}>

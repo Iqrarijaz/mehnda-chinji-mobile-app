@@ -25,6 +25,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
     Platform,
+    RefreshControl,
     StyleSheet,
     TouchableOpacity,
     View,
@@ -399,8 +400,14 @@ const CategoryListingScreen = React.memo(() => {
                                 renderItem={activeTab === 'all' ? renderItem : renderRequestItem}
                                 keyExtractor={keyExtractor}
                                 contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 70 }]}
-                                onRefresh={handleRefresh}
-                                refreshing={loading && !isFetchingNextPage && !myRequestsFetchingNextPage}
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={loading && !isFetchingNextPage && !myRequestsFetchingNextPage}
+                                        onRefresh={handleRefresh}
+                                        tintColor={colors.primary}
+                                        colors={[colors.primary]}
+                                    />
+                                }
                                 onEndReached={handleLoadMore}
                                 onEndReachedThreshold={0.5}
                                 ListFooterComponent={

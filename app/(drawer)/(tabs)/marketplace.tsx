@@ -1,5 +1,5 @@
 import React, { useState, useCallback, memo, useRef, useEffect, useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Platform, Switch } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Platform, Switch, RefreshControl } from 'react-native';
 import * as Location from 'expo-location';
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from 'expo-router';
@@ -366,8 +366,14 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                         onEndReached={handleEndReached}
                         onEndReachedThreshold={0.5}
                         ListFooterComponent={renderFooter}
-                        refreshing={isRefetching}
-                        onRefresh={handleRefresh}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isRefetching}
+                                onRefresh={handleRefresh}
+                                tintColor={colors.primary}
+                                colors={[colors.primary]}
+                            />
+                        }
                         showsVerticalScrollIndicator={false}
                         ListEmptyComponent={<EmptyMarketplace colors={colors} />}
                     />

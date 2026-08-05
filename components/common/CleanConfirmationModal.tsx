@@ -1,10 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { ActivityIndicator, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
+import Animated, {
+    FadeIn,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 
 interface CleanConfirmationModalProps {
     visible: boolean;
@@ -69,15 +75,27 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
 
     const config = getStyles();
 
+    // Slight scale-up to accompany the sheet's fade-in, driven the same way
+    // PremiumModal drives its blur intensity, so it re-triggers on every open.
+    const sheetScale = useSharedValue(0.94);
+    useEffect(() => {
+        sheetScale.value = visible
+            ? withTiming(1, { duration: 240 })
+            : 0.94;
+    }, [visible]);
+    const sheetAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: sheetScale.value }]
+    }));
+
     return (
         <Modal
             visible={visible}
             transparent
-            animationType="fade"
+            animationType="none"
             onRequestClose={onClose}
         >
-            <View style={styles.modalOverlay}>
-                <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+            <Animated.View entering={FadeIn.duration(200)} style={styles.modalOverlay}>
+                <Animated.View style={[styles.modalContent, { backgroundColor: colors.card }, sheetAnimatedStyle]}>
                     {/* Header with Icon */}
                     <View style={styles.header}>
                         <View style={[
@@ -94,19 +112,19 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
 
                     {/* Footer Actions */}
                     <View style={styles.footer}>
-                        <TouchableOpacity
+                        <PressableScale
+                            containerStyle={styles.flexOne}
                             style={styles.cancelBtn}
                             onPress={onClose}
-                            activeOpacity={0.7}
                             disabled={isLoading}
                         >
                             <ThemedText style={styles.cancelText}>{cancelText}</ThemedText>
-                        </TouchableOpacity>
+                        </PressableScale>
 
-                        <TouchableOpacity
+                        <PressableScale
+                            containerStyle={styles.flexOne}
                             style={[styles.confirmBtnWrapper, { backgroundColor: config.btnBg }]}
                             onPress={onConfirm}
-                            activeOpacity={0.8}
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -114,15 +132,17 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
                             ) : (
                                 <ThemedText style={styles.confirmBtnText}>{confirmText}</ThemedText>
                             )}
-                        </TouchableOpacity>
+                        </PressableScale>
                     </View>
-                </View>
-            </View>
+                </Animated.View>
+            </Animated.View>
         </Modal>
     );
 };
 
 const styles = StyleSheet.create({
+    flexOne: {
+        flex: 1 },
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',

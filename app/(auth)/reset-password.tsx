@@ -7,7 +7,6 @@ import {
     Platform,
     ScrollView,
     StyleSheet,
-    TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
@@ -22,6 +21,8 @@ import { resetPasswordSchema } from '@/utils/validation';
 import { resetPassword } from '@/apis/login/forgot-password';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { FormInput } from '@/components/common/FormInput';
+import { SubmitButton } from '@/components/common/SubmitButton';
 
 const ResetPasswordScreen = memo(function ResetPasswordScreen() {
     const router = useRouter();
@@ -136,65 +137,57 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
 
                         {/* New Password Input */}
                         <View style={styles.inputField}>
-                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>NEW PASSWORD</ThemedText>
-                            <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                                borderWidth: 1
-                            }]}>
-                                <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                                <TextInput
-                                    placeholder="Enter new password"
-                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
-                                    value={formData.newPassword}
-                                    onChangeText={(newPassword) => setFormData(prev => ({ ...prev, newPassword }))}
-                                    style={[styles.input, { color: colors.text }]}
-                                    secureTextEntry={!formData.showPassword}
-                                    editable={!formData.loading}
-                                />
-                                <TouchableOpacity
-                                    onPress={() => setFormData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
-                                >
-                                    <Ionicons
-                                        name={formData.showPassword ? 'eye-outline' : 'eye-off-outline'}
-                                        size={20}
-                                        color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
-                                    />
-                                </TouchableOpacity>
-                            </View>
-
-
+                            <FormInput
+                                label="NEW PASSWORD"
+                                icon="lock-closed-outline"
+                                placeholder="Enter new password"
+                                value={formData.newPassword}
+                                onChangeText={(newPassword) => setFormData(prev => ({ ...prev, newPassword }))}
+                                secureTextEntry={!formData.showPassword}
+                                editable={!formData.loading}
+                                inputBoxStyle={{
+                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC'
+                                }}
+                                rightAccessory={
+                                    <TouchableOpacity
+                                        onPress={() => setFormData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
+                                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                    >
+                                        <Ionicons
+                                            name={formData.showPassword ? 'eye-outline' : 'eye-off-outline'}
+                                            size={20}
+                                            color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'}
+                                        />
+                                    </TouchableOpacity>
+                                }
+                            />
                         </View>
 
                         {/* Confirm Password Input */}
                         <View style={styles.inputField}>
-                            <ThemedText style={[styles.label, isDark && { color: '#E2E8F0' }]}>CONFIRM PASSWORD</ThemedText>
-                            <View style={[styles.inputBox, {
-                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                                borderWidth: 1
-                            }]}>
-                                <Ionicons name="lock-closed-outline" size={20} color={isDark ? 'rgba(255, 255, 255, 0.5)' : '#64748B'} style={{ marginRight: 12 }} />
-                                <TextInput
-                                    placeholder="Confirm new password"
-                                    placeholderTextColor={isDark ? 'rgba(255, 255, 255, 0.4)' : '#94A3B8'}
-                                    value={formData.confirmPassword}
-                                    onChangeText={(confirmPassword) => setFormData(prev => ({ ...prev, confirmPassword }))}
-                                    style={[styles.input, { color: colors.text }]}
-                                    secureTextEntry={!formData.showPassword}
-                                    editable={!formData.loading}
-                                />
-                            </View>
+                            <FormInput
+                                label="CONFIRM PASSWORD"
+                                icon="lock-closed-outline"
+                                placeholder="Confirm new password"
+                                value={formData.confirmPassword}
+                                onChangeText={(confirmPassword) => setFormData(prev => ({ ...prev, confirmPassword }))}
+                                secureTextEntry={!formData.showPassword}
+                                editable={!formData.loading}
+                                inputBoxStyle={{
+                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
+                                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC'
+                                }}
+                            />
                         </View>
 
                         {/* Submit Button */}
-                        <TouchableOpacity
-                            style={[styles.submitButton, { backgroundColor: '#006666' }]}
+                        <SubmitButton
+                            title="Set New Password"
                             onPress={handleSubmit}
-                            disabled={formData.loading}
-                        >
-                            <ThemedText style={styles.submitButtonText}>Set New Password</ThemedText>
-                        </TouchableOpacity>
+                            isLoading={formData.loading}
+                            style={{ width: '100%', marginTop: 6 }}
+                        />
                     </View>
                 </View>
             </ScrollView>

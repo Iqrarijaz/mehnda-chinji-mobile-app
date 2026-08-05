@@ -3,7 +3,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -20,6 +19,7 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
+import { SubmitButton } from '@/components/common/SubmitButton';
 
 export default function VerifyOtpScreen() {
     const router = useRouter();
@@ -212,17 +212,12 @@ export default function VerifyOtpScreen() {
                             ))}
                         </View>
 
-                        <TouchableOpacity
-                            style={[styles.submitButton, { backgroundColor: '#006666' }]}
+                        <SubmitButton
+                            title="Verify OTP"
                             onPress={handleVerify}
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <ActivityIndicator color="#FFFFFF" />
-                            ) : (
-                                <ThemedText style={styles.submitButtonText}>Verify OTP</ThemedText>
-                            )}
-                        </TouchableOpacity>
+                            isLoading={loading}
+                            style={{ width: '100%' }}
+                        />
 
                         <View style={styles.footer}>
                             <ThemedText style={[styles.footerText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748B' }]}>

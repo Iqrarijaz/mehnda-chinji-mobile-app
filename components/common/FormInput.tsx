@@ -4,7 +4,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, {
+    FadeInDown,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+    interpolateColor } from 'react-native-reanimated';
 import { Layout } from '@/constants/layout';
 
 export interface FormInputProps extends TextInputProps {
@@ -36,6 +41,8 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
     multiline,
     rightAccessory,
     error,
+    onFocus,
+    onBlur,
     ...rest
 }, ref) => {
     const { theme, isDark } = useTheme();
@@ -46,6 +53,25 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
 
     const valueLength = currentLength ?? (typeof rest.value === 'string' ? rest.value.length : 0);
     const isOverLimit = maxLength && valueLength > maxLength;
+
+    // Focus/blur border animation. Interpolates from whatever border color the
+    // box already has at rest (usually none) up to the brand primary color, so
+    // there's no visual change unless a field is actually focused.
+    const focusProgress = useSharedValue(0);
+    const restBorderColor = StyleSheet.flatten(inputBoxStyle)?.borderColor ?? 'transparent';
+
+    const handleFocus = (e: any) => {
+        focusProgress.value = withTiming(1, { duration: 180 });
+        onFocus?.(e);
+    };
+    const handleBlur = (e: any) => {
+        focusProgress.value = withTiming(0, { duration: 180 });
+        onBlur?.(e);
+    };
+
+    const animatedBorderStyle = useAnimatedStyle(() => ({
+        borderColor: interpolateColor(focusProgress.value, [0, 1], [restBorderColor, colors.primary])
+    }));
 
     return (
         <AnimatedView {...animatedProps} style={[styles.inputField, containerStyle]}>
@@ -61,15 +87,17 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                     )}
                 </View>
             )}
-            <View
+            <Animated.View
                 style={[
                     styles.inputBox,
                     {
                         backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                        minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52)
+                        minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52),
+                        borderWidth: 1.5
                     },
                     multiline && { alignItems: 'flex-start', paddingVertical: 12 },
-                    inputBoxStyle
+                    inputBoxStyle,
+                    animatedBorderStyle
                 ]}
             >
                 {icon && (
@@ -91,10 +119,12 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                     maxLength={maxLength}
                     multiline={multiline}
                     textAlignVertical={multiline ? 'top' : 'center'}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
                     {...rest}
                 />
                 {rightAccessory}
-            </View>
+            </Animated.View>
             {error ? (
                 <ThemedText style={styles.errorText}>
                     {error}
