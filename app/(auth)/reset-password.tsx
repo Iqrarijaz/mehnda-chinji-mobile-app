@@ -103,7 +103,7 @@ const ResetPasswordScreen = memo(function ResetPasswordScreen() {
         >
             {/* Header / Top Section */}
             <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: colors.primary, zIndex: 1 }]}>
                     <TouchableOpacity
                         style={styles.backButton}
                         onPress={() => router.back()}

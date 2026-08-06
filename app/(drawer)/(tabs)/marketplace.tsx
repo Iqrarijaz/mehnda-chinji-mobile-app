@@ -211,13 +211,13 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
         }
         if (!hasNextPage && rawListings.length > 0) {
             return (
-                <ThemedText style={{ textAlign: 'center', color: '#94a3b8', fontSize: 10.5, fontWeight: '600', letterSpacing: 0.4, paddingVertical: 16 }}>
+                <ThemedText style={{ textAlign: 'center', color: colors.placeholder, fontSize: 10.5, fontWeight: '600', letterSpacing: 0.4, paddingVertical: 16 }}>
                     {"You're all caught up"}
                 </ThemedText>
             );
         }
         return null;
-    }, [isFetchingNextPage, hasNextPage, rawListings.length]);
+    }, [isFetchingNextPage, hasNextPage, rawListings.length, colors.placeholder]);
 
 
     const renderItem = useCallback(({ item }: { item: any }) => {

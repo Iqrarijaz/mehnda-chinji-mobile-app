@@ -39,7 +39,7 @@ export default function LoginScreen() {
         >
             {/* Header / Top Section */}
             <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: colors.primary, zIndex: 1 }]}>
                     <View style={styles.headerContent}>
                         <Image
                             source={require('../../public/white_logo.svg')}
@@ -69,19 +69,19 @@ export default function LoginScreen() {
                 animationType="fade"
                 statusBarTranslucent
             >
-                <View style={styles.modalOverlay}>
-                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
-                        <View style={styles.modalIconBox}>
-                            <Ionicons name="time-outline" size={40} color="#006666" />
+                <View style={[styles.modalOverlay, { backgroundColor: colors.backdrop }]}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.modalBackground }]}>
+                        <View style={[styles.modalIconBox, { backgroundColor: `${colors.primary}18` }]}>
+                            <Ionicons name="time-outline" size={40} color={colors.primary} />
                         </View>
 
-                        <ThemedText style={styles.modalTitle}>Session Expired</ThemedText>
-                        <ThemedText style={styles.modalSubtitle}>
+                        <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Session Expired</ThemedText>
+                        <ThemedText style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
                             Your session has timed out or was ended. Please sign in again to continue.
                         </ThemedText>
 
                         <TouchableOpacity
-                            style={styles.modalButton}
+                            style={[styles.modalButton, { backgroundColor: colors.primary }]}
                             onPress={() => setShowExpiredModal(false)}
                         >
                             <ThemedText style={styles.modalButtonText}>Got it</ThemedText>
@@ -116,7 +116,6 @@ const styles = StyleSheet.create({
         lineHeight: 22 },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20 },
@@ -129,24 +128,20 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(0, 102, 102, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20 },
     modalTitle: {
         fontSize: 15.5,
         fontWeight: '700',
-        color: '#0F172A',
         marginBottom: 12,
         textAlign: 'center' },
     modalSubtitle: {
         fontSize: 12.5,
-        color: '#64748B',
         lineHeight: 22,
         textAlign: 'center',
         marginBottom: 24 },
     modalButton: {
-        backgroundColor: '#006666',
         width: '100%',
         height: 52,
         borderRadius: Layout.borderRadius,

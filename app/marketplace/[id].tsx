@@ -299,7 +299,7 @@ export default function MarketplaceDetailsScreen() {
                                         <View key={index} style={{ alignItems: 'center', width: 54 }}>
                                             <Image
                                                 source={{ uri: viewerLog.viewerId?.profileImage || 'https://via.placeholder.com/40' }}
-                                                style={styles.viewerAvatar}
+                                                style={[styles.viewerAvatar, { backgroundColor: colors.skeletonBase }]}
                                                 contentFit="cover"
                                             />
                                             <ThemedText style={{ fontSize: 9, color: colors.text, textAlign: 'center', marginTop: 4 }} numberOfLines={1}>
@@ -348,7 +348,7 @@ export default function MarketplaceDetailsScreen() {
                                             >
                                                 <Image
                                                     source={{ uri: sim.images?.[0] || sim.image || 'https://via.placeholder.com/150' }}
-                                                    style={styles.simImage}
+                                                    style={[styles.simImage, { backgroundColor: colors.skeletonBase }]}
                                                     contentFit="cover"
                                                     transition={200}
                                                 />
@@ -500,12 +500,12 @@ const styles = StyleSheet.create({
         letterSpacing: 0.4,
         marginBottom: 2 },
     infoValue: { fontSize: 11.5, fontWeight: '700', textTransform: 'capitalize' },
-    viewerAvatar: { width: 44, height: 44, borderRadius: Layout.borderRadius, backgroundColor: '#eee' },
+    viewerAvatar: { width: 44, height: 44, borderRadius: Layout.borderRadius },
     chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
     metaChip: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: Layout.borderRadius },
     metaChipText: { fontSize: 10, fontWeight: '700' },
     simCard: { width: 150, borderRadius: Layout.borderRadius, overflow: 'hidden' },
-    simImage: { width: 150, height: 110, backgroundColor: '#eee' },
+    simImage: { width: 150, height: 110 },
     simInfo: { padding: 8, gap: 3 },
     simTitle: { fontSize: 11.5, fontWeight: '700', textTransform: 'capitalize' },
     simPrice: { fontSize: 12, fontWeight: '800' } });
