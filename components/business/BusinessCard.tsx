@@ -40,6 +40,11 @@ const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => 
     }, [business?.categoryEn, business?.categoryUr]);
 
     const businessImage = business?.logo || business?.images?.[0];
+    // A business counts as "Verified" only when an admin actually reviewed
+    // and approved it by hand (approvedBy set) — not when it simply passed
+    // through the auto-approval timer untouched (status APPROVED but
+    // approvedBy null). Keeps the badge meaningful rather than universal.
+    const isVerified = !!business?.approvedBy;
 
     return (
         <Animated.View entering={FadeInDown.delay(Math.min(index, 6) * 55).duration(350)}>
@@ -79,9 +84,14 @@ const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => 
 
                         {/* Info */}
                         <View style={styles.info}>
-                            <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={2}>
-                                {businessName}
-                            </ThemedText>
+                            <View style={styles.nameRow}>
+                                <ThemedText style={[styles.name, { color: colors.text }]} numberOfLines={2}>
+                                    {businessName}
+                                </ThemedText>
+                                {isVerified ? (
+                                    <Ionicons name="checkmark-circle" size={14} color={colors.primary} style={styles.verifiedIcon} />
+                                ) : null}
+                            </View>
                             {address ? (
                                 <View style={styles.metaRow}>
                                     <Ionicons name="location" size={12} color={colors.secondary} />
@@ -145,6 +155,11 @@ const styles = StyleSheet.create({
         flex: 1,
         gap: 2,
         paddingTop: 8 },
+    nameRow: {
+        flexDirection: 'row',
+        alignItems: 'center' },
+    verifiedIcon: {
+        marginLeft: 4 },
     typeBadge: {
         position: 'absolute',
         top: 0,
@@ -160,6 +175,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
         color: '#FFFFFF' },
     name: {
+        flexShrink: 1,
         fontSize: 12.5,
         fontWeight: '800',
         letterSpacing: 0.1,
