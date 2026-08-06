@@ -10,6 +10,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
 interface FAQItemProps {
     question: string;
@@ -19,6 +21,8 @@ interface FAQItemProps {
 }
 
 const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, onToggle }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const animation = useSharedValue(0);
 
     React.useEffect(() => {
@@ -40,18 +44,18 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
     });
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.card }]}>
             <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={onToggle}
-                style={[styles.header, isOpen && styles.headerOpen]}
+                style={[styles.header, isOpen && { backgroundColor: `${colors.primary}14` }]}
             >
-                <Text allowFontScaling={false} style={[styles.question, isOpen && styles.activeText]}>{question}</Text>
+                <Text allowFontScaling={false} style={[styles.question, { color: isOpen ? colors.primary : colors.text }]}>{question}</Text>
                 <Animated.View style={chevronStyle}>
                     <Ionicons
                         name="chevron-down"
                         size={20}
-                        color={isOpen ? "#009688" : "#64748B"}
+                        color={isOpen ? colors.primary : colors.textSecondary}
                     />
                 </Animated.View>
             </TouchableOpacity>
@@ -62,7 +66,7 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
                     exiting={FadeOut.duration(200)}
                     style={styles.answerContainer}
                 >
-                    <Text allowFontScaling={false} style={styles.answer}>{answer}</Text>
+                    <Text allowFontScaling={false} style={[styles.answer, { color: colors.textSecondary }]}>{answer}</Text>
                 </Animated.View>
             )}
         </View>
@@ -71,37 +75,25 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
         marginBottom: 12,
-        overflow: 'hidden',
-        // Shadow for premium feel
-
-
-    },
+        overflow: 'hidden' },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: 13 },
-    headerOpen: {
-        backgroundColor: '#f0fdfa', // Very light teal
-    },
     question: {
         fontSize: 12.5,
         fontWeight: '600',
-        color: '#1E293B',
         flex: 1,
         marginRight: 12 },
-    activeText: {
-        color: '#009688' },
     answerContainer: {
         paddingHorizontal: 13,
         paddingBottom: 13,
         paddingTop: 4 },
     answer: {
         fontSize: 12.5,
-        lineHeight: 22,
-        color: '#64748B' } });
+        lineHeight: 22 } });
 
 export default FAQItem;

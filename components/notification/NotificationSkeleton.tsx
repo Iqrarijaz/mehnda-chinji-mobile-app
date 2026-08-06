@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -8,7 +10,7 @@ import Animated, {
     withSequence,
     withTiming } from 'react-native-reanimated';
 
-const SkimBox = React.memo(({ w, h, radius = 8 }: { w: number | string; h: number; radius?: number }) => {
+const SkimBox = React.memo(({ w, h, radius = 8, color }: { w: number | string; h: number; radius?: number; color: string }) => {
     const opacity = useSharedValue(0.35);
     useEffect(() => {
         opacity.value = withRepeat(
@@ -20,31 +22,35 @@ const SkimBox = React.memo(({ w, h, radius = 8 }: { w: number | string; h: numbe
     const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
     return (
         <Animated.View
-            style={[{ width: w as any, height: h, borderRadius: radius, backgroundColor: '#E2E8F0' }, style]}
+            style={[{ width: w as any, height: h, borderRadius: radius, backgroundColor: color }, style]}
         />
     );
 });
 
-const SkeletonCard = React.memo(() => (
-    <View style={styles.card}>
-        <SkimBox w={46} h={46} radius={14} />
+const SkeletonCard = React.memo(({ colors }: { colors: typeof Colors.light }) => (
+    <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <SkimBox w={46} h={46} radius={14} color={colors.skeletonBase} />
         <View style={styles.lines}>
-            <SkimBox w="70%" h={14} radius={6} />
+            <SkimBox w="70%" h={14} radius={6} color={colors.skeletonBase} />
             <View style={{ height: 6 }} />
-            <SkimBox w="90%" h={12} radius={5} />
+            <SkimBox w="90%" h={12} radius={5} color={colors.skeletonBase} />
             <View style={{ height: 4 }} />
-            <SkimBox w="40%" h={12} radius={5} />
+            <SkimBox w="40%" h={12} radius={5} color={colors.skeletonBase} />
             <View style={{ height: 6 }} />
-            <SkimBox w="25%" h={10} radius={4} />
+            <SkimBox w="25%" h={10} radius={4} color={colors.skeletonBase} />
         </View>
     </View>
 ));
 
-const NotificationSkeleton = React.memo(() => (
-    <View style={styles.container}>
-        {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
-    </View>
-));
+const NotificationSkeleton = React.memo(() => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+    return (
+        <View style={styles.container}>
+            {[...Array(6)].map((_, i) => <SkeletonCard key={i} colors={colors} />)}
+        </View>
+    );
+});
 
 export default NotificationSkeleton;
 
@@ -52,7 +58,6 @@ const styles = StyleSheet.create({
     container: { paddingHorizontal: 16, paddingTop: 7 },
     card: {
         flexDirection: 'row',
-        backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
         padding: 13,
         marginBottom: 10

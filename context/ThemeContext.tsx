@@ -10,7 +10,8 @@ interface ThemeContextType {
     themePreference: ThemePreference;
     setThemePreference: (pref: ThemePreference) => Promise<void>;
     isDark: boolean;
-    toggleTheme: () => void; // Keep for backward compatibility
+    /** Cycles light → dark → light. Kept for older call sites; prefer setThemePreference. */
+    toggleTheme: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
@@ -21,41 +22,56 @@ const ThemeContext = createContext<ThemeContextType>({
     toggleTheme: () => { },
 });
 
+const STORAGE_KEY = 'userTheme';
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const systemColorScheme = _useColorScheme() as ColorScheme;
+    // RN's useColorScheme reacts live to OS-level appearance changes (both
+    // Android and iOS), so 'system' preference stays in sync automatically —
+    // no manual Appearance listener needed.
+    const systemColorScheme = _useColorScheme();
     const [themePreference, setThemePreferenceState] = useState<ThemePreference>('system');
-    const [theme, setTheme] = useState<ColorScheme>('light');
+    const [hydrated, setHydrated] = useState(false);
 
     useEffect(() => {
         const loadTheme = async () => {
             try {
-                const storedTheme = await clientStorage.getItem('userTheme');
-                if (storedTheme) {
-                    setThemePreferenceState(storedTheme as ThemePreference);
+                const storedTheme = await clientStorage.getItem(STORAGE_KEY);
+                if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
+                    setThemePreferenceState(storedTheme);
                 }
             } catch (e) {
                 console.error('Failed to load theme preference', e);
+            } finally {
+                setHydrated(true);
             }
         };
         loadTheme();
     }, []);
 
-    useEffect(() => {
-        // Force light mode regardless of preference or system setting
-        setTheme('light');
-    }, [themePreference, systemColorScheme]);
-
     const setThemePreference = useCallback(async (pref: ThemePreference) => {
         setThemePreferenceState(pref);
-        await clientStorage.setItem('userTheme', pref);
+        try {
+            await clientStorage.setItem(STORAGE_KEY, pref);
+        } catch (e) {
+            console.error('Failed to persist theme preference', e);
+        }
     }, []);
 
     const toggleTheme = useCallback(() => {
-        const nextTheme = theme === 'light' ? 'dark' : 'light';
-        setThemePreference(nextTheme);
-    }, [theme, setThemePreference]);
+        const current = themePreference === 'system' ? (systemColorScheme ?? 'light') : themePreference;
+        setThemePreference(current === 'dark' ? 'light' : 'dark');
+    }, [themePreference, systemColorScheme, setThemePreference]);
 
-    const isDark = false; // Force false for light mode
+    // Priority: 1) explicit user choice, 2) system theme, 3) Light Mode default.
+    // Default to light until AsyncStorage has been read once, so we never
+    // flash dark before we know the user hasn't chosen it.
+    const theme: ColorScheme = useMemo(() => {
+        if (!hydrated) return 'light';
+        if (themePreference === 'light' || themePreference === 'dark') return themePreference;
+        return systemColorScheme === 'dark' ? 'dark' : 'light';
+    }, [hydrated, themePreference, systemColorScheme]);
+
+    const isDark = theme === 'dark';
 
     const themeValue = useMemo(() => ({
         theme,

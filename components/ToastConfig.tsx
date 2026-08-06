@@ -8,6 +8,8 @@ import {
 import { BaseToastProps } from 'react-native-toast-message';
 import { ThemedText } from './ThemedText';
 import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
 /* ------------------ Animated BG Blob ------------------ */
 const FloatingBlob = ({ color }: { color: string }) => {
@@ -47,37 +49,44 @@ const ToastLayout = ({
     hide,
     type }: BaseToastProps & { hide: () => void; type: 'success' | 'error' }) => {
     const isSuccess = type === 'success';
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+    // Dark mode: tinted-on-surface instead of pastel-on-white, so the toast
+    // reads as "success/error accent" rather than a bright light-mode chip
+    // dropped onto a dark screen.
+    const accent = isSuccess ? colors.success : colors.danger;
+    const bg = theme === 'dark'
+        ? (isSuccess ? 'rgba(74,222,128,0.14)' : 'rgba(248,113,113,0.14)')
+        : (isSuccess ? '#CFFAE3' : '#FAD1D1');
 
     return (
         <View
             style={[
                 styles.toast,
-                isSuccess ? styles.successBg : styles.errorBg,
+                { backgroundColor: bg, borderColor: `${accent}33`, borderWidth: theme === 'dark' ? 1 : 0 },
             ]}
         >
             {/* Animated background blobs */}
-            <FloatingBlob
-                color={isSuccess ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}
-            />
+            <FloatingBlob color={`${accent}26`} />
 
             {/* Icon */}
-            <View style={styles.iconWrapper}>
+            <View style={[styles.iconWrapper, { backgroundColor: colors.card }]}>
                 <Ionicons
                     name={isSuccess ? 'checkmark' : 'alert'}
                     size={18}
-                    color={isSuccess ? '#10B981' : '#EF4444'}
+                    color={accent}
                 />
             </View>
 
             {/* Content */}
             <View style={styles.textContainer}>
-                <ThemedText style={styles.title}>{text1}</ThemedText>
-                <ThemedText style={styles.subtitle}>{text2}</ThemedText>
+                <ThemedText style={[styles.title, { color: colors.text }]}>{text1}</ThemedText>
+                <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>{text2}</ThemedText>
             </View>
 
             {/* Close */}
             <TouchableOpacity onPress={hide} style={styles.closeBtn}>
-                <Ionicons name="close" size={18} color="#64748B" />
+                <Ionicons name="close" size={18} color={colors.textSecondary} />
             </TouchableOpacity>
         </View>
     );
@@ -103,17 +112,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         overflow: 'hidden',
-
-
-
-
         marginTop: 12,
         zIndex: 99999 },
-
-    successBg: {
-        backgroundColor: '#CFFAE3' },
-    errorBg: {
-        backgroundColor: '#FAD1D1' },
 
     blob: {
         position: 'absolute',
@@ -126,7 +126,6 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: Layout.borderRadius,
-        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
@@ -138,12 +137,10 @@ const styles = StyleSheet.create({
 
     title: {
         fontSize: 12.5,
-        fontWeight: '800',
-        color: '#0F172A' },
+        fontWeight: '800' },
 
     subtitle: {
         fontSize: 10.5,
-        color: '#334155',
         marginTop: 2,
         lineHeight: 18 },
 

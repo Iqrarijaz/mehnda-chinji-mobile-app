@@ -11,9 +11,13 @@ import { NetworkBreakdownCard } from '@/components/dataUsage/NetworkBreakdownCar
 import { DataControlToggles } from '@/components/dataUsage/DataControlToggles';
 import { ClearCacheSection } from '@/components/dataUsage/ClearCacheSection';
 import { DataUsageEmptyState } from '@/components/dataUsage/DataUsageEmptyState';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
 const DataUsageScreen = () => {
     const router = useRouter();
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const total = useDataUsageStore(state => state.total);
     const wifi = useDataUsageStore(state => state.wifi);
     const mobile = useDataUsageStore(state => state.mobile);
@@ -60,7 +64,7 @@ const DataUsageScreen = () => {
     }, [clearCache]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
             <DataUsageHeader onBack={handleBack} onReset={handleReset} />
 
             <ScrollView

@@ -33,9 +33,10 @@ import { SettingRowItem } from '@/components/setting/SettingRow';
 import { ScreenHeader } from '@/components/common/ScreenHeader';
 import { PasswordModal } from '@/components/setting/PasswordModal';
 import { DeleteAccountModal } from '@/components/setting/DeleteAccountModal';
+import { ThemeSelector } from '@/components/setting/ThemeSelector';
 
 export default function SettingsScreen() {
-    const { theme, toggleTheme, isDark } = useTheme();
+    const { theme } = useTheme();
     const { user, updateUser, logout } = useAuth();
     const router = useRouter();
     const colors = Colors[theme];
@@ -136,6 +137,10 @@ export default function SettingsScreen() {
             case 'app':
                 return (
                     <Animated.View key="app" entering={FadeIn.duration(400)}>
+                        <SectionCard title="Appearance" delay={50}>
+                            <ThemeSelector />
+                        </SectionCard>
+
                         <SectionCard title="Preferences" delay={100}>
                             <SettingRowItem
                                 icon="notifications-outline"
