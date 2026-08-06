@@ -57,6 +57,40 @@ export const getUVIndex = async (lat: number, lon: number): Promise<number | nul
     }
 };
 
+// ── Rain radar (proxied + cached through our own backend, not RainViewer
+// directly — see GET /api/user/v1/weather/radar in the backend repo) ────────
+// Frames arrive with a ready-to-use tileUrlTemplate already built
+// server-side, so there's no client-side URL-building step anymore.
+
+export interface RadarFrame {
+    time: number; // unix seconds
+    path: string;
+    tileUrlTemplate: string;
+}
+
+export interface RadarFramesResponse {
+    host: string;
+    past: RadarFrame[];
+    nowcast: RadarFrame[];
+}
+
+export const getRadarFrames = async (): Promise<RadarFramesResponse | null> => {
+    try {
+        const res: any = await apiClient.get('/api/user/v1/weather/radar', {
+            params: { size: 256, color: 4, smooth: 1, snow: 1 },
+        });
+        const data = res?.data;
+        if (!data?.host) return null;
+        return {
+            host: data.host,
+            past: data.past || [],
+            nowcast: data.nowcast || [],
+        };
+    } catch {
+        return null;
+    }
+};
+
 export interface WeatherResponse {
     coord: { lon: number; lat: number };
     weather: Array<{ id: number; main: string; description: string; icon: string }>;
