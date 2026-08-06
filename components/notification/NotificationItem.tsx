@@ -8,15 +8,15 @@ import Animated, {
     withSpring } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
-const PRIMARY = '#006666';
-
-function getTypeStyle(type: string): { icon: string; color: string } {
+function getTypeStyle(type: string, primary: string): { icon: string; color: string } {
     switch (type) {
-        case 'SYSTEM': return { icon: 'settings-outline', color: PRIMARY };
-        case 'COMMUNITY': return { icon: 'people-outline', color: PRIMARY };
-        case 'ACTIVITY': return { icon: 'flash-outline', color: PRIMARY };
-        default: return { icon: 'notifications-outline', color: PRIMARY };
+        case 'SYSTEM': return { icon: 'settings-outline', color: primary };
+        case 'COMMUNITY': return { icon: 'people-outline', color: primary };
+        case 'ACTIVITY': return { icon: 'flash-outline', color: primary };
+        default: return { icon: 'notifications-outline', color: primary };
     }
 }
 
@@ -41,6 +41,8 @@ interface Props {
 }
 
 const NotificationItem = React.memo(({ item, onPress, delay = 0 }: Props) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const scale = useSharedValue(1);
 
     const animStyle = useAnimatedStyle(() => ({
@@ -54,7 +56,7 @@ const NotificationItem = React.memo(({ item, onPress, delay = 0 }: Props) => {
         scale.value = withSpring(1, { damping: 12 });
     }, []);
 
-    const { icon, color } = getTypeStyle(item.type);
+    const { icon, color } = getTypeStyle(item.type, colors.primary);
 
     return (
         <Animated.View
@@ -66,29 +68,32 @@ const NotificationItem = React.memo(({ item, onPress, delay = 0 }: Props) => {
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
                 activeOpacity={1}
-                style={[styles.card, !item.isRead && styles.cardUnread]}
+                style={[
+                    styles.card,
+                    { backgroundColor: item.isRead ? colors.card : `${colors.primary}14` },
+                ]}
             >
                 {/* Left: Icon */}
                 <View style={styles.iconWrap}>
-                    <View style={[styles.iconCircle, { backgroundColor: `${PRIMARY}14` }]}>
+                    <View style={[styles.iconCircle, { backgroundColor: `${colors.primary}14` }]}>
                         <Ionicons name={icon as any} size={18} color={color} />
                     </View>
-                    {!item.isRead && <View style={styles.badge} />}
+                    {!item.isRead && <View style={[styles.badge, { backgroundColor: colors.primary }]} />}
                 </View>
 
                 {/* Middle: Content */}
                 <View style={styles.content}>
                     <View style={styles.titleRow}>
                         <ThemedText
-                            style={[styles.title, !item.isRead && styles.titleUnread]}
+                            style={[styles.title, { color: colors.text }, !item.isRead && styles.titleUnread]}
                             numberOfLines={1}
                         >
                             {item.title}
                         </ThemedText>
-                        {!item.isRead && <View style={styles.dot} />}
+                        {!item.isRead && <View style={[styles.dot, { backgroundColor: colors.primary }]} />}
                     </View>
-                    <ThemedText style={styles.body} numberOfLines={2}>{item.body}</ThemedText>
-                    <ThemedText style={styles.time}>{formatTime(item.createdAt)}</ThemedText>
+                    <ThemedText style={[styles.body, { color: colors.textSecondary }]} numberOfLines={2}>{item.body}</ThemedText>
+                    <ThemedText style={[styles.time, { color: colors.placeholder }]}>{formatTime(item.createdAt)}</ThemedText>
                 </View>
 
             </TouchableOpacity>
@@ -102,12 +107,9 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
         padding: 5,
         marginBottom: 8 },
-    cardUnread: {
-        backgroundColor: `${PRIMARY}08` },
     iconWrap: { position: 'relative', marginRight: 10 },
     iconCircle: {
         width: 34,
@@ -121,12 +123,11 @@ const styles = StyleSheet.create({
         right: -3,
         width: 11,
         height: 11,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: PRIMARY },
+        borderRadius: Layout.borderRadius },
     content: { flex: 1 },
     titleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-    title: { fontSize: 10.5, fontWeight: '600', color: '#0F172A', flex: 1 },
+    title: { fontSize: 10.5, fontWeight: '600', flex: 1 },
     titleUnread: { fontWeight: '800' },
-    dot: { width: 7, height: 7, borderRadius: Layout.borderRadius, backgroundColor: PRIMARY, marginLeft: 6 },
-    body: { fontSize: 10, color: '#64748B', lineHeight: 16, marginBottom: 4 },
-    time: { fontSize: 10, color: '#94A3B8', fontWeight: '500' } });
+    dot: { width: 7, height: 7, borderRadius: Layout.borderRadius, marginLeft: 6 },
+    body: { fontSize: 10, lineHeight: 16, marginBottom: 4 },
+    time: { fontSize: 10, fontWeight: '500' } });

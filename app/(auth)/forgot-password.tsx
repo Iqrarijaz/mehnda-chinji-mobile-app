@@ -132,7 +132,7 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
         >
             {/* Header / Top Section */}
             <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: colors.primary, zIndex: 1 }]}>
                     <View style={styles.headerContent}>
                         <Image
                             source={require('../../public/white_logo.svg')}
@@ -227,7 +227,7 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
 
                                 {/* Send OTP Button */}
                                 <TouchableOpacity
-                                    style={[styles.submitButton, styles.submitButtonHorizontal, { backgroundColor: '#006666', marginTop: 5 }]}
+                                    style={[styles.submitButton, styles.submitButtonHorizontal, { backgroundColor: colors.primary, marginTop: 5 }]}
                                     onPress={handleSendOtp}
                                     disabled={loading}
                                 >

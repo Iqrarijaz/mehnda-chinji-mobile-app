@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 interface SupportContactCardProps {
@@ -23,6 +25,8 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
     color,
     hideValue = false
 }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const scale = useSharedValue(1);
 
     const animatedStyle = useAnimatedStyle(() => ({
@@ -65,16 +69,16 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
             onPress={handlePress}
             style={styles.touchable}
         >
-            <Animated.View style={[styles.card, animatedStyle]}>
+            <Animated.View style={[styles.card, { backgroundColor: colors.card }, animatedStyle]}>
                 <View style={[styles.iconContainer, { backgroundColor: `${color}15` }]}>
                     <Ionicons name={icon} size={26} color={color} />
                 </View>
                 <View style={styles.content}>
-                    <Text allowFontScaling={false} style={styles.title}>{title}</Text>
-                    <Text allowFontScaling={false} style={styles.subtitle}>{subtitle}</Text>
+                    <Text allowFontScaling={false} style={[styles.title, { color: colors.text }]}>{title}</Text>
+                    <Text allowFontScaling={false} style={[styles.subtitle, { color: colors.textSecondary }]}>{subtitle}</Text>
                     {!hideValue && <Text allowFontScaling={false} style={[styles.value, { color }]}>{value}</Text>}
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
+                <Ionicons name="chevron-forward" size={20} color={colors.placeholder} />
             </Animated.View>
         </TouchableOpacity>
     );
@@ -86,7 +90,6 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
         padding: 13 },
     iconContainer: {
@@ -101,11 +104,9 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 13.5,
         fontWeight: '700',
-        color: '#1E293B',
         marginBottom: 2 },
     subtitle: {
         fontSize: 10.5,
-        color: '#64748B',
         marginBottom: 4 },
     value: {
         fontSize: 12.5,

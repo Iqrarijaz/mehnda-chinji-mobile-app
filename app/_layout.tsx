@@ -10,8 +10,14 @@ import { useAppOpenAd } from '@/ads/hooks/useAppOpenAd';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
 import { View, Platform, InteractionManager } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { MenuProvider } from 'react-native-popup-menu';
 import { useState, useEffect, useRef } from 'react';
@@ -65,13 +71,33 @@ SplashScreen.setOptions({ duration: 350, fade: true });
 // so it was silently a no-op — RN's Text/TextInput are function components.
 
 function DrawerLayout() {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const { loading } = useAuth();
 
+  // Root-level crossfade so switching themes never shows an instant/jarring
+  // cut or a flash of the wrong background behind screen transitions — every
+  // screen still swaps its own colors instantly, but the base layer they all
+  // sit on eases between light/dark.
+  const themeProgress = useSharedValue(isDark ? 1 : 0);
 
+  useEffect(() => {
+    themeProgress.value = withTiming(isDark ? 1 : 0, { duration: 280 });
+  }, [isDark, themeProgress]);
+
+  const animatedBg = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      themeProgress.value,
+      [0, 1],
+      [Colors.light.background, Colors.dark.background]
+    ),
+  }));
+
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(Colors[theme].background).catch(() => { });
+  }, [theme]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors[theme].background }}>
+    <Animated.View style={[{ flex: 1 }, animatedBg]}>
       {loading ? null : (
         <Stack
           screenOptions={{
@@ -98,8 +124,14 @@ function DrawerLayout() {
           <Stack.Screen name="communityGuidelines" />
         </Stack>
       )}
-    </View>
+    </Animated.View>
   );
+}
+function AppStatusBar() {
+  const { isDark } = useTheme();
+  // Light content (white icons) on dark backgrounds, dark content on light —
+  // matches Colors[theme].statusBarStyle.
+  return <StatusBar style={isDark ? 'light' : 'dark'} animated />;
 }
 function DeferredHooks() {
   usePushNotifications();
@@ -275,7 +307,7 @@ function RootLayout() {
                 <WeatherProvider>
                   <SocketProvider>
                     <MenuProvider>
-                      <StatusBar style="dark" />
+                      <AppStatusBar />
 
                       {isAppReady && (
                         <>

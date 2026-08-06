@@ -46,7 +46,6 @@ interface SectionData {
 export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentCategory, currentType }: MarketplaceCategoryPickerProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
-    const lightColors = Colors.light;
 
     const { data: configData, isLoading } = useQuery({
         queryKey: CONFIG_QUERY_KEYS.marketplaceCategories,
@@ -92,7 +91,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <ThemedText style={[
                             styles.itemTextEng,
-                            { color: lightColors.text, marginLeft: 12 },
+                            { color: colors.text, marginLeft: 12 },
                             isSelected && { color: colors.primary, fontWeight: '700' }
                         ]}>
                             {item.name.en}
@@ -100,7 +99,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                     </View>
                     <ThemedText style={[
                         styles.itemTextUr,
-                        { color: lightColors.icon },
+                        { color: colors.icon },
                         isSelected && { color: colors.primary, fontWeight: '700' }
                     ]}>
                         {item.name.ur}
@@ -114,7 +113,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
     const renderSectionHeader = useCallback(({ section }: { section: SectionData }) => {
         return (
             <TouchableOpacity
-                style={[styles.sectionHeader, { backgroundColor: '#F8FAFC', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
+                style={[styles.sectionHeader, { backgroundColor: colors.surface, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
                 onPress={() => {
                     onSelect({
                         category: { en: section.title.title.en, ur: section.title.title.ur },
@@ -123,7 +122,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                     onClose();
                 }}
             >
-                <ThemedText style={[styles.sectionHeaderTextEng, { color: lightColors.textSecondary }]}>
+                <ThemedText style={[styles.sectionHeaderTextEng, { color: colors.textSecondary }]}>
                     {section.title.title.en}
                 </ThemedText>
             </TouchableOpacity>
@@ -138,9 +137,9 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
             onRequestClose={onClose}
         >
             <View style={styles.modalOverlay}>
-                <View style={[styles.modalContent, { backgroundColor: '#FFFFFF', borderRadius: Layout.modalBorderRadius }]}>
+                <View style={[styles.modalContent, { backgroundColor: colors.modalBackground, borderRadius: Layout.modalBorderRadius }]}>
                     <View style={styles.modalHeader}>
-                        <ThemedText style={[styles.modalTitle, { color: lightColors.text }]}>Select Category</ThemedText>
+                        <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Select Category</ThemedText>
                         {(currentCategory || currentType) && (
                             <TouchableOpacity
                                 onPress={() => {
@@ -168,7 +167,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
                             style={{ flex: 1 }}
                             ListEmptyComponent={() => (
                                 <View style={{ padding: 16, alignItems: 'center' }}>
-                                    <ThemedText style={{ color: lightColors.icon }}>No categories found.</ThemedText>
+                                    <ThemedText style={{ color: colors.icon }}>No categories found.</ThemedText>
                                 </View>
                             )}
                         />

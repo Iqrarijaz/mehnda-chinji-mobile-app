@@ -5,6 +5,8 @@ import Animated, { SlideInLeft, useAnimatedStyle, withTiming, withSpring } from 
 import { ThemedText } from '../ThemedText';
 import { formatBytes } from '@/utils/dataUsageUtils';
 import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
 interface NetworkRowProps {
     icon: string;
@@ -12,9 +14,10 @@ interface NetworkRowProps {
     bytes: number;
     totalBytes: number;
     delay: number;
+    colors: typeof Colors.light;
 }
 
-const NetworkRow = ({ icon, label, bytes, totalBytes, delay }: NetworkRowProps) => {
+const NetworkRow = ({ icon, label, bytes, totalBytes, delay, colors }: NetworkRowProps) => {
     const percentage = totalBytes > 0 ? (bytes / totalBytes) : 0;
 
     const barStyle = useAnimatedStyle(() => ({
@@ -22,16 +25,16 @@ const NetworkRow = ({ icon, label, bytes, totalBytes, delay }: NetworkRowProps) 
 
     return (
         <Animated.View entering={SlideInLeft.delay(delay).duration(450)} style={styles.row}>
-            <View style={styles.iconBox}>
-                <Ionicons name={icon as any} size={20} color="#64748B" />
+            <View style={[styles.iconBox, { backgroundColor: colors.inputBackground }]}>
+                <Ionicons name={icon as any} size={20} color={colors.textSecondary} />
             </View>
             <View style={styles.content}>
                 <View style={styles.rowTop}>
-                    <ThemedText style={styles.rowLabel}>{label}</ThemedText>
-                    <ThemedText style={styles.rowValue}>{formatBytes(bytes)}</ThemedText>
+                    <ThemedText style={[styles.rowLabel, { color: colors.text }]}>{label}</ThemedText>
+                    <ThemedText style={[styles.rowValue, { color: colors.text }]}>{formatBytes(bytes)}</ThemedText>
                 </View>
-                <View style={styles.track}>
-                    <Animated.View style={[styles.bar, barStyle]} />
+                <View style={[styles.track, { backgroundColor: colors.inputBackground }]}>
+                    <Animated.View style={[styles.bar, { backgroundColor: colors.primary }, barStyle]} />
                 </View>
             </View>
         </Animated.View>
@@ -39,27 +42,31 @@ const NetworkRow = ({ icon, label, bytes, totalBytes, delay }: NetworkRowProps) 
 };
 
 export const NetworkBreakdownCard = React.memo(({ wifi, mobile, total }: { wifi: number, mobile: number, total: number }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     return (
         <Animated.View
             entering={SlideInLeft.delay(200).duration(500)}
             style={styles.container}
         >
-            <ThemedText style={styles.sectionTitle}>Network Breakdown</ThemedText>
-            <View style={styles.card}>
+            <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>Network Breakdown</ThemedText>
+            <View style={[styles.card, { backgroundColor: colors.card }]}>
                 <NetworkRow
                     icon="wifi"
                     label="Wi-Fi Usage"
                     bytes={wifi}
                     totalBytes={total}
                     delay={300}
+                    colors={colors}
                 />
-                <View style={styles.divider} />
+                <View style={[styles.divider, { backgroundColor: colors.divider }]} />
                 <NetworkRow
                     icon="cellular"
                     label="Mobile Data"
                     bytes={mobile}
                     totalBytes={total}
                     delay={400}
+                    colors={colors}
                 />
             </View>
         </Animated.View>
@@ -73,13 +80,11 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 10,
         fontWeight: '800',
-        color: '#94A3B8',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 8,
         marginLeft: 4 },
     card: {
-        backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
         padding: 10 },
     row: {
@@ -91,7 +96,6 @@ const styles = StyleSheet.create({
         width: 42,
         height: 42,
         borderRadius: Layout.borderRadius,
-        backgroundColor: '#F8FAFC',
         justifyContent: 'center',
         alignItems: 'center' },
     content: {
@@ -103,22 +107,17 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     rowLabel: {
         fontSize: 10.5,
-        fontWeight: '700',
-        color: '#1E293B' },
+        fontWeight: '700' },
     rowValue: {
         fontSize: 10,
-        fontWeight: '800',
-        color: '#0F172A' },
+        fontWeight: '800' },
     track: {
         height: 6,
-        backgroundColor: '#F1F5F9',
         borderRadius: Layout.borderRadius,
         overflow: 'hidden' },
     bar: {
         height: '100%',
-        backgroundColor: '#009688',
         borderRadius: Layout.borderRadius },
     divider: {
         height: 1,
-        backgroundColor: '#F1F5F9',
         marginHorizontal: 4 } });

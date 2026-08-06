@@ -427,14 +427,14 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, { borderWidth: 1, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.guidelinesAccepted && { backgroundColor: '#006666', borderColor: '#006666' }]}>
+                        <View style={[styles.checkbox, { borderWidth: 1, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.guidelinesAccepted && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                             {formData.guidelinesAccepted && <Ionicons name="checkmark" size={14} color="#FFF" />}
                         </View>
                     </TouchableOpacity>
                     <ThemedText style={[styles.checkboxText, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
                         I agree to follow the {' '}
                         <ThemedText
-                            style={{ color: '#006666', fontWeight: '700', fontSize: 11.5, textDecorationLine: 'underline' }}
+                            style={{ color: colors.primary, fontWeight: '700', fontSize: 11.5, textDecorationLine: 'underline' }}
                             onPress={() => {
                                 router.push('/communityGuidelines' as any);
                             }}

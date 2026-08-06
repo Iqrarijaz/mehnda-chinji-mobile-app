@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./public/icon.png",
     "scheme": "rehbarcommunityapp",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "backgroundColor": "#E6F4FE",
     "newArchEnabled": true,
     "ios": {

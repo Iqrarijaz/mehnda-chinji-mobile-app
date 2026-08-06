@@ -5,6 +5,8 @@ import {
     StyleSheet
 } from 'react-native';
 import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
@@ -15,6 +17,8 @@ interface FeedbackFormProps {
 }
 
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const [subject, setSubject] = useState('');
     const [description, setDescription] = useState('');
 
@@ -32,8 +36,8 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) =
             entering={SlideInLeft.delay(600).duration(450)}
             style={styles.container}
         >
-            <Text allowFontScaling={false} style={styles.title}>Send us Feedback</Text>
-            <View style={styles.card}>
+            <Text allowFontScaling={false} style={[styles.title, { color: colors.textSecondary }]}>Send us Feedback</Text>
+            <View style={[styles.card, { backgroundColor: colors.card }]}>
                 <FormInput
                     label="SUBJECT"
                     icon="bookmark-outline"

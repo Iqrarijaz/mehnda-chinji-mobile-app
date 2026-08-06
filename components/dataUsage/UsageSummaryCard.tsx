@@ -10,6 +10,8 @@ import Svg, { Circle } from 'react-native-svg';
 import { ThemedText } from '../ThemedText';
 import { splitBytes } from '@/utils/dataUsageUtils';
 import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const RADIUS = 70;
@@ -22,6 +24,8 @@ interface UsageSummaryCardProps {
 }
 
 export const UsageSummaryCard = React.memo(({ totalBytes, resetDate }: UsageSummaryCardProps) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const { value, unit } = splitBytes(totalBytes);
     const progress = useSharedValue(0);
 
@@ -42,7 +46,7 @@ export const UsageSummaryCard = React.memo(({ totalBytes, resetDate }: UsageSumm
     return (
         <Animated.View
             entering={SlideInLeft.delay(100).duration(500)}
-            style={styles.card}
+            style={[styles.card, { backgroundColor: colors.card }]}
         >
             <View style={styles.chartContainer}>
                 <Svg width={RADIUS * 2 + STROKE} height={RADIUS * 2 + STROKE} style={styles.svg}>
@@ -50,7 +54,7 @@ export const UsageSummaryCard = React.memo(({ totalBytes, resetDate }: UsageSumm
                         cx={RADIUS + STROKE / 2}
                         cy={RADIUS + STROKE / 2}
                         r={RADIUS}
-                        stroke="#F1F5F9"
+                        stroke={colors.inputBackground}
                         strokeWidth={STROKE}
                         fill="none"
                     />
@@ -58,7 +62,7 @@ export const UsageSummaryCard = React.memo(({ totalBytes, resetDate }: UsageSumm
                         cx={RADIUS + STROKE / 2}
                         cy={RADIUS + STROKE / 2}
                         r={RADIUS}
-                        stroke="#009688"
+                        stroke={colors.primary}
                         strokeWidth={STROKE}
                         strokeDasharray={CIRCUMFERENCE}
                         animatedProps={animatedProps}
@@ -70,14 +74,14 @@ export const UsageSummaryCard = React.memo(({ totalBytes, resetDate }: UsageSumm
                     />
                 </Svg>
                 <View style={styles.centerText}>
-                    <ThemedText style={styles.value}>{value}</ThemedText>
-                    <ThemedText style={styles.unit}>{unit}</ThemedText>
+                    <ThemedText style={[styles.value, { color: colors.text }]}>{value}</ThemedText>
+                    <ThemedText style={[styles.unit, { color: colors.textSecondary }]}>{unit}</ThemedText>
                 </View>
             </View>
 
             <View style={styles.infoContainer}>
-                <ThemedText style={styles.label}>Total App Usage</ThemedText>
-                <ThemedText style={styles.dateLabel}>Since {dateStr}</ThemedText>
+                <ThemedText style={[styles.label, { color: colors.text }]}>Total App Usage</ThemedText>
+                <ThemedText style={[styles.dateLabel, { color: colors.placeholder }]}>Since {dateStr}</ThemedText>
             </View>
         </Animated.View>
     );
@@ -85,7 +89,6 @@ export const UsageSummaryCard = React.memo(({ totalBytes, resetDate }: UsageSumm
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#FFFFFF',
         marginHorizontal: 20,
         borderRadius: Layout.borderRadius,
         padding: 13,

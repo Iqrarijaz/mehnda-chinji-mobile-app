@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import FAQItem from './FAQItem';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
 interface FAQ {
     question: string;
@@ -13,6 +15,8 @@ interface FAQAccordionProps {
 }
 
 const FAQAccordion: React.FC<FAQAccordionProps> = ({ data }) => {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const [openIndex, setOpenIndex] = useState<number | null>(null);
 
     const handleToggle = (index: number) => {
@@ -21,7 +25,7 @@ const FAQAccordion: React.FC<FAQAccordionProps> = ({ data }) => {
 
     return (
         <View style={styles.container}>
-            <Text allowFontScaling={false} style={styles.title}>Frequently Asked Questions</Text>
+            <Text allowFontScaling={false} style={[styles.title, { color: colors.textSecondary }]}>Frequently Asked Questions</Text>
             {data.map((item, index) => (
                 <Animated.View
                     key={index}
@@ -46,7 +50,6 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 12.5,
         fontWeight: '700',
-        color: '#64748B',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 16,

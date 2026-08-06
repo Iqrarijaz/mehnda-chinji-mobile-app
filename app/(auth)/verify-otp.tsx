@@ -134,7 +134,7 @@ export default function VerifyOtpScreen() {
         >
             {/* Header */}
             <View style={{ backgroundColor: colors.background, zIndex: 1 }}>
-                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: '#006666', zIndex: 1 }]}>
+                <View style={[styles.headerSection, { paddingTop: insets.top, backgroundColor: colors.primary, zIndex: 1 }]}>
                     <TouchableOpacity
                         style={styles.backButton}
                         onPress={() => router.back()}
@@ -167,7 +167,7 @@ export default function VerifyOtpScreen() {
                     <View style={[styles.formCard, { backgroundColor: colors.card }]}>
 
                         {/* Profile Preview */}
-                        <View style={styles.profilePreview}>
+                        <View style={[styles.profilePreview, { backgroundColor: `${colors.primary}0D` }]}>
                             {profileImage ? (
                                 <Image
                                     source={{ uri: profileImage }}
@@ -181,7 +181,7 @@ export default function VerifyOtpScreen() {
                                 </View>
                             )}
                             <View style={styles.profileDetails}>
-                                <ThemedText style={styles.profileName}>
+                                <ThemedText style={[styles.profileName, { color: colors.primary }]}>
                                     {name ? name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') : ''}
                                 </ThemedText>
                                 <ThemedText style={styles.profileEmail}>{email}</ThemedText>
@@ -303,8 +303,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20,
         padding: 10,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(0, 64, 48, 0.05)' },
+        borderRadius: Layout.borderRadius },
     profileAvatar: {
         width: 50,
         height: 50,
@@ -315,7 +314,6 @@ const styles = StyleSheet.create({
     profileName: {
         fontSize: 12.5,
         fontWeight: '800',
-        color: '#006666',
         marginBottom: 2 },
     profileEmail: {
         fontSize: 10,

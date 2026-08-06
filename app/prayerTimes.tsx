@@ -18,30 +18,26 @@ import { analyticsService, AnalyticsEvents } from '@/analytics';
 
 
 // ─── Theme palette ────────────────────────────────────────────────────────────
+// Built on top of the central Colors tokens (not a parallel definition) —
+// spreads the base theme in, then layers on the handful of extras this
+// screen needs (gold accents, header gradient overlays) that aren't
+// general-purpose enough to belong in constants/colors.ts.
 const PALETTE = {
     light: {
-        primary: Colors.light.primary,
+        ...Colors.light,
         primaryLight: '#D1FAE5',
         gold: '#D4AF37',
         goldLight: '#FEF9C3',
-        background: Colors.light.background,
-        card: Colors.light.card,
         cardBorder: Colors.light.border,
-        text: Colors.light.text,
-        textSecondary: Colors.light.textSecondary,
         divider: Colors.light.border,
         headerOverlay: 'rgba(4,60,35,0.55)',
         headerOverlayBottom: 'rgba(3,30,18,0.85)' },
     dark: {
-        primary: Colors.dark.primary,
+        ...Colors.dark,
         primaryLight: 'rgba(0,102,102,0.15)',
         gold: '#F0C040',
         goldLight: 'rgba(240,192,64,0.12)',
-        background: Colors.dark.background,
-        card: Colors.dark.card,
         cardBorder: Colors.dark.border,
-        text: Colors.dark.text,
-        textSecondary: Colors.dark.textSecondary,
         divider: Colors.dark.border,
         headerOverlay: 'rgba(1,1,1,0.55)',
         headerOverlayBottom: 'rgba(1,1,1,0.92)' } };

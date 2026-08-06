@@ -65,23 +65,23 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
         <>
         <PremiumModal visible={visible} onClose={resetAndClose} type="centered">
             <View style={styles.modalHeader}>
-                <ThemedText style={styles.modalTitle}>Delete Account</ThemedText>
-                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                    <Ionicons name="close" size={18} color="#64748B" />
+                <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Delete Account</ThemedText>
+                <TouchableOpacity onPress={onClose} style={[styles.closeButton, { backgroundColor: colors.inputBackground }]}>
+                    <Ionicons name="close" size={18} color={colors.textSecondary} />
                 </TouchableOpacity>
             </View>
 
             <View style={styles.inputContainer}>
-                <ThemedText style={styles.warningText}>
+                <ThemedText style={[styles.warningText, { color: colors.danger }]}>
                     This action is permanent and cannot be undone. All your data will be lost.
                 </ThemedText>
-                <ThemedText style={styles.inputLabel}>
-                    Type <ThemedText style={{ fontWeight: '800', color: '#ef4444' }}>DELETE MY ACCOUNT</ThemedText> to confirm.
+                <ThemedText style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                    Type <ThemedText style={{ fontWeight: '800', color: colors.danger }}>DELETE MY ACCOUNT</ThemedText> to confirm.
                 </ThemedText>
                 <TextInput
-                    style={[styles.input, { color: colors.text }]}
+                    style={[styles.input, { color: colors.text, backgroundColor: colors.inputBackground }]}
                     placeholder="DELETE MY ACCOUNT"
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor={colors.placeholder}
                     value={deleteConfirmation}
                     onChangeText={setDeleteConfirmation}
                 />
@@ -103,7 +103,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={onClose} style={styles.cancelBtn} activeOpacity={0.7}>
-                    <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+                    <ThemedText style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</ThemedText>
                 </TouchableOpacity>
             </View>
         </PremiumModal>
