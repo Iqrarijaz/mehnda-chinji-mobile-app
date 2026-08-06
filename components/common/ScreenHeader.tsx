@@ -11,18 +11,19 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
-    ViewStyle } from 'react-native';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
+    ViewStyle
+} from 'react-native';
 import Animated, {
     Easing,
     FadeInDown,
     useAnimatedStyle,
     useSharedValue,
     withRepeat,
-    withTiming } from 'react-native-reanimated';
+    withTiming
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Avatar from '../ui/avatar';
-import { NotificationIcon } from '../common/NotificationIcon';
+import { NotificationIcon } from './NotificationIcon';
 import { ThemedText } from '../ThemedText';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -65,7 +66,8 @@ export interface ScreenHeaderProps {
 const DECOR_ICON: Record<ScreenHeaderDecor, keyof typeof Ionicons.glyphMap> = {
     community: 'people',
     business: 'storefront',
-    marketplace: 'pricetag' };
+    marketplace: 'pricetag'
+};
 
 // ─── Decor layer ──────────────────────────────────────────────────────────────
 
@@ -109,9 +111,11 @@ export const ScreenHeader = React.memo(function ScreenHeader({
 
     const haloStyle = useAnimatedStyle(() => ({
         opacity: 0.15 + pulse.value * 0.12,
-        transform: [{ scale: 1.05 + pulse.value * 0.08 }] }));
+        transform: [{ scale: 1.05 + pulse.value * 0.08 }]
+    }));
     const tileStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 + pulse.value * 0.03 }] }));
+        transform: [{ scale: 1 + pulse.value * 0.03 }]
+    }));
 
     const heroIcon = hero?.icon || (decor ? DECOR_ICON[decor] : 'apps');
 
@@ -121,7 +125,8 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                 styles.container,
                 {
                     backgroundColor: colors.primary,
-                    paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) },
+                    paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20)
+                },
                 containerStyle,
             ]}
         >
@@ -210,12 +215,12 @@ export const HeaderIconBtn = React.memo(function HeaderIconBtn({
     style,
     size = 20,
     badge }: {
-    name: keyof typeof Ionicons.glyphMap;
-    onPress: () => void;
-    style?: ViewStyle;
-    size?: number;
-    badge?: React.ReactNode;
-}) {
+        name: keyof typeof Ionicons.glyphMap;
+        onPress: () => void;
+        style?: ViewStyle;
+        size?: number;
+        badge?: React.ReactNode;
+    }) {
     const { theme } = useTheme();
     const colors = Colors[theme];
     return (
@@ -235,25 +240,30 @@ const styles = StyleSheet.create({
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
         paddingBottom: Platform.OS === 'android' ? 8 : 16,
         zIndex: 10,
-        overflow: 'hidden' },
+        overflow: 'hidden'
+    },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: Platform.OS === 'android' ? 18 : 20 },
+        marginBottom: Platform.OS === 'android' ? 18 : 20
+    },
     leftSide: {
         flexDirection: 'row',
-        alignItems: 'center' },
+        alignItems: 'center'
+    },
     rightSide: {
         flexDirection: 'row',
-        alignItems: 'center' },
+        alignItems: 'center'
+    },
     iconBtn: {
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
-        alignItems: 'center' },
+        alignItems: 'center'
+    },
     avatarBtn: {
         width: 38,
         height: 38,
@@ -261,56 +271,68 @@ const styles = StyleSheet.create({
         //
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden' },
+        overflow: 'hidden'
+    },
     // Hero band
     heroBand: {
         alignItems: 'center',
         paddingTop: 8,
-        paddingHorizontal: 7 },
+        paddingHorizontal: 7
+    },
     heroIconWrap: {
         width: 52,
         height: 52,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8 },
+        marginBottom: 8
+    },
     heroHalo: {
         position: 'absolute',
         width: 44,
         height: 44,
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.4)' },
+        backgroundColor: 'rgba(255,255,255,0.4)'
+    },
     heroTile: {
         width: 40,
         height: 40,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
-        alignItems: 'center' },
+        alignItems: 'center'
+    },
     heroTitleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8 },
+        gap: 8
+    },
     heroTitle: {
         fontSize: 15.5,
         fontWeight: '800',
         color: '#FFFFFF',
         textAlign: 'center',
-        letterSpacing: 0.2 },
+        letterSpacing: 0.2
+    },
     heroCountPill: {
         paddingHorizontal: 7,
         paddingVertical: 3,
-        borderRadius: Layout.borderRadius },
+        borderRadius: Layout.borderRadius
+    },
     heroCountText: {
         fontSize: 9,
         fontWeight: '800',
         color: '#1E293B',
         letterSpacing: 0.4,
-        textTransform: 'uppercase' },
+        textTransform: 'uppercase'
+    },
     heroSubtitle: {
         fontSize: 10.5,
         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
         marginTop: 6,
-        lineHeight: 18 },
+        lineHeight: 18
+    },
     heroWave: {
-        marginTop: 10 } });
+        marginTop: 10
+    }
+});

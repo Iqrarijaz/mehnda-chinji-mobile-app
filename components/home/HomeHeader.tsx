@@ -29,4 +29,6 @@ export const HomeHeader = React.memo(({ setIsSearchActive }: HomeHeaderProps) =>
 
 const styles = StyleSheet.create({
     headerWrapper: {
-        zIndex: 10 } });
+        zIndex: 10
+    }
+});
