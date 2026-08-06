@@ -70,6 +70,8 @@ const BusinessDetailScreen = () => {
     const address = capitalizeString(business?.address || business?.village || 'N/A');
     const category = capitalizeString(business?.categoryEn || '');
     const urduCategory = business?.categoryUr;
+    // See BusinessCard.tsx for why this checks approvedBy rather than status.
+    const isVerified = !!business?.approvedBy;
 
     const handleCall = useCallback(() => {
         if (business?.phone) {
@@ -213,9 +215,20 @@ const BusinessDetailScreen = () => {
                                 </View>
                             </View>
                         ) : null}
-                        <ThemedText style={styles.heroTitle} numberOfLines={2}>
-                            {businessName}
-                        </ThemedText>
+                        <View style={styles.heroTitleRow}>
+                            <ThemedText style={styles.heroTitle} numberOfLines={2}>
+                                {businessName}
+                            </ThemedText>
+                            {isVerified ? (
+                                <Ionicons name="checkmark-circle" size={16} color={colors.lime} style={styles.verifiedIcon} />
+                            ) : null}
+                        </View>
+                        {isVerified ? (
+                            <View style={styles.verifiedRow}>
+                                <Ionicons name="shield-checkmark" size={11} color={colors.lime} />
+                                <ThemedText style={[styles.verifiedText, { color: colors.lime }]}>Verified by Rehbar</ThemedText>
+                            </View>
+                        ) : null}
                         <View style={styles.subtitleRow}>
                             <Ionicons name="person" size={12} color={colors.secondary} />
                             <ThemedText style={styles.heroSubtitle} numberOfLines={1}>
@@ -380,12 +393,26 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 0.6,
         flexShrink: 1 },
+    heroTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center' },
     heroTitle: {
+        flexShrink: 1,
         fontSize: 18,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
         lineHeight: 23 },
+    verifiedIcon: {
+        marginLeft: 5 },
+    verifiedRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        marginTop: 3 },
+    verifiedText: {
+        fontSize: 10,
+        fontWeight: '700' },
     subtitleRow: {
         flexDirection: 'row',
         alignItems: 'center',

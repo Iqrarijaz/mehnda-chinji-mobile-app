@@ -13,6 +13,7 @@ import { saveFcmToken } from '@/apis/profile';
 import { useAuth } from '@/context/AuthContext';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
+import { handleNotificationNavigation } from '@/utils/notificationNavigation';
 
 export const useFcmNotifications = () => {
     const [fcmToken, setFcmToken] = useState<string | null>(null);
@@ -124,20 +125,18 @@ export const useFcmNotifications = () => {
         // Handle background taps
         const unsubscribeOnNotificationOpenedApp = messagingInstance.onNotificationOpenedApp(remoteMessage => {
             if (__DEV__) console.log('👉 FCM Notification caused app to open from background:', remoteMessage);
-            if (remoteMessage.data?.route) {
-                router.push(remoteMessage.data.route as any);
+            if (remoteMessage.data) {
+                handleNotificationNavigation(remoteMessage.data as Record<string, any>, router);
             }
         });
 
         // Handle quit state taps
         messagingInstance.getInitialNotification().then(remoteMessage => {
-            if (remoteMessage) {
+            if (remoteMessage?.data) {
                 if (__DEV__) console.log('👉 FCM Notification caused app to open from quit state:', remoteMessage);
-                if (remoteMessage.data && remoteMessage.data.route) {
-                    setTimeout(() => {
-                        router.push(remoteMessage.data!.route as any);
-                    }, 1000);
-                }
+                setTimeout(() => {
+                    handleNotificationNavigation(remoteMessage.data as Record<string, any>, router);
+                }, 1000);
             }
         });
 

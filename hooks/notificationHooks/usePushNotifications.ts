@@ -7,6 +7,7 @@ import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { useRouter } from 'expo-router';
+import { handleNotificationNavigation } from '@/utils/notificationNavigation';
 
 
 export const usePushNotifications = () => {
@@ -122,10 +123,8 @@ export const usePushNotifications = () => {
                 const data = response.notification.request.content.data;
                 if (__DEV__) console.log('👉 Notification interaction:', response);
 
-                if (data?.route) {
-                    router.push(data.route as any);
-                } else if (data?.type === 'weather_rain') {
-                    router.push('/weather');
+                if (data) {
+                    handleNotificationNavigation(data as Record<string, any>, router);
                 }
             });
 
