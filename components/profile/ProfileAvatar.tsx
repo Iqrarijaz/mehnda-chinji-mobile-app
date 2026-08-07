@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { View, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Avatar from '@/components/ui/avatar';
+import Avatar from '@/components/ui/Avatar';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { Layout } from '@/constants/layout';
 

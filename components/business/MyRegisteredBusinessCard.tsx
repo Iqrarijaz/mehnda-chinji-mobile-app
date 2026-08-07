@@ -12,7 +12,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
-import { TintedCard } from '../ui/tintedCard';
+import { TintedCard } from '../ui/TintedCard';
 
 interface MyRegisteredBusinessCardProps {
     business: any;

@@ -7,7 +7,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withTiming } from 'react-native-reanimated';
-import Avatar from '@/components/ui/avatar';
+import Avatar from '@/components/ui/Avatar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
