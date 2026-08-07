@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import {
     View,
     TouchableOpacity,
@@ -24,18 +24,17 @@ import {
     PlaceResult } from '@/utils/locationService';
 import { SubmitButton } from './SubmitButton';
 import { LocationLoadingModal } from './LocationLoadingModal';
+import { BackButton } from './BackButton';
 import { Layout } from '@/constants/layout';
 
 // MapLibre is fully free and needs no API key/token; pass null to satisfy the
 // Mapbox-compatible API surface.
 MapLibreGL?.setAccessToken?.(null);
 
-// MapLibre logs a benign per-tile "Request failed … Canceled" warning whenever
-// the viewport changes before a tile finishes loading (normal while panning).
 // Raise the log level so these don't spam the console.
 Logger?.setLogLevel?.('error');
 
-// Free OpenStreetMap raster tiles — no API key, no Google dependency.
+// Free OpenStreetMap raster tiles
 const OSM_STYLE = {
     version: 8,
     sources: {
@@ -47,8 +46,6 @@ const OSM_STYLE = {
             attribution: '© OpenStreetMap contributors' } },
     layers: [{ id: 'osm', type: 'raster', source: 'osm' }] };
 
-// Stable stringified style — passing a fresh string each render makes MapView
-// reload the style, which resets the camera and cancels tile requests.
 const OSM_STYLE_JSON = JSON.stringify(OSM_STYLE);
 
 export interface LocationValue {
@@ -83,11 +80,25 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
         value ? { latitude: value.latitude, longitude: value.longitude } : null
     );
 
+    const initialCameraConfig = useMemo(() => ({
+        centerCoordinate: value
+            ? [value.longitude, value.latitude]
+            : [69.3451, 30.3753], // Pakistan
+        zoomLevel: value ? 13 : 4 
+    }), []);
+    
+    const [selectedAddress, setSelectedAddress] = useState<string | null>(value?.address ?? null);
+    const [resolvingAddress, setResolvingAddress] = useState(false);
+    const geoDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const geoSeqRef = useRef(0);
+
     useEffect(() => {
         if (value) {
             setSelectedCoord({ latitude: value.latitude, longitude: value.longitude });
+            setSelectedAddress(value.address ?? null);
         } else {
             setSelectedCoord(null);
+            setSelectedAddress(null);
         }
     }, [value]);
 
@@ -99,8 +110,6 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
     // Debounced Nominatim search.
     useEffect(() => {
         if (debounceRef.current) clearTimeout(debounceRef.current);
-        // Skip the search that a programmatic setQuery (e.g. picking a result)
-        // would otherwise trigger — it would re-open the dropdown over the map.
         if (skipSearchRef.current) {
             skipSearchRef.current = false;
             return;
@@ -124,13 +133,11 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
 
     const moveCamera = (latitude: number, longitude: number, zoomLevel?: number) => {
         cameraRef.current?.setCamera({
-            centerCoordinate: [longitude, latitude], // MapLibre uses [lng, lat]
-            ...(zoomLevel != null ? { zoomLevel } : {}), // omit to preserve current zoom
+            centerCoordinate: [longitude, latitude],
+            ...(zoomLevel != null ? { zoomLevel } : {}),
             animationDuration: 600 });
     };
 
-    // Tapping the map recenters the camera there; the fixed center pin (and
-    // selectedCoord, via onRegionDidChange) then reflects that exact point.
     const handleMapPress = (feature: any) => {
         const coords = feature?.geometry?.coordinates;
         if (Array.isArray(coords) && coords.length === 2) {
@@ -140,17 +147,34 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
         }
     };
 
-    // Keep the selection locked to whatever is under the center pin as the map
-    // moves (pan, fly-to, current location). Guarantees the marker is centered.
+    const resolveCenterAddress = (latitude: number, longitude: number) => {
+      if (geoDebounceRef.current) clearTimeout(geoDebounceRef.current);
+      setResolvingAddress(true);
+      const seq = ++geoSeqRef.current;
+      geoDebounceRef.current = setTimeout(async () => {
+        const address = await reverseGeocode(latitude, longitude);
+        if (seq !== geoSeqRef.current) return;
+        setSelectedAddress(address);
+        setResolvingAddress(false);
+      }, 500);
+    };
+
     const handleRegionChange = (feature: any) => {
         const coords = feature?.geometry?.coordinates;
         if (Array.isArray(coords) && coords.length === 2) {
             setSelectedCoord({ latitude: coords[1], longitude: coords[0] });
+            resolveCenterAddress(coords[1], coords[0]);
         }
     };
 
     const selectPlace = (place: PlaceResult) => {
         setSelectedCoord({ latitude: place.latitude, longitude: place.longitude });
+        setSelectedAddress(place.displayName);
+        onChange({
+            latitude: place.latitude,
+            longitude: place.longitude,
+            address: place.displayName,
+        });
         moveCamera(place.latitude, place.longitude, 14);
         setResults([]);
         skipSearchRef.current = true;
@@ -166,9 +190,37 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
             setSelectedCoord({ latitude: coords.latitude, longitude: coords.longitude });
             moveCamera(coords.latitude, coords.longitude, 15);
             setResults([]);
+
+            const address = await reverseGeocode(coords.latitude, coords.longitude);
+            const resolvedAddress = address || 'Current Location';
+            setSelectedAddress(resolvedAddress);
+            onChange({
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+                address: resolvedAddress,
+            });
         } finally {
             setLocating(false);
         }
+    };
+
+    const handleConfirmMarkerLocation = async () => {
+      setLocating(true);
+      try {
+        if (!selectedCoord) return;
+        const address = await reverseGeocode(selectedCoord.latitude, selectedCoord.longitude);
+        const resolvedAddress = address || selectedAddress || 'Selected store location';
+        setSelectedAddress(resolvedAddress);
+        onChange({
+          latitude: selectedCoord.latitude,
+          longitude: selectedCoord.longitude,
+          address: resolvedAddress,
+        });
+      } catch (err) {
+        console.warn('Location resolution error:', err);
+      } finally {
+        setLocating(false);
+      }
     };
 
     const handleConfirm = async () => {
@@ -176,13 +228,16 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
             closeModal();
             return;
         }
-        setLocating(true);
-        const address = await reverseGeocode(selectedCoord.latitude, selectedCoord.longitude);
+        let address = selectedAddress;
+        if (!address) {
+          setLocating(true);
+          address = await reverseGeocode(selectedCoord.latitude, selectedCoord.longitude);
+          setLocating(false);
+        }
         onChange({
             latitude: selectedCoord.latitude,
             longitude: selectedCoord.longitude,
             address: address || 'Selected location' });
-        setLocating(false);
         closeModal();
     };
 
@@ -192,6 +247,8 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
     };
 
     const closeModal = () => {
+        if (geoDebounceRef.current) clearTimeout(geoDebounceRef.current);
+        setResolvingAddress(false);
         setModalVisible(false);
         setQuery('');
         setResults([]);
@@ -256,9 +313,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                 <View style={[styles.modalOverlayFS, { backgroundColor: colors.background }]}>
                     {/* Header */}
                     <View style={[styles.modalHeaderFS, { backgroundColor: 'transparent', paddingTop: Math.max(insets.top, 20) }]}>
-                        <TouchableOpacity onPress={closeModal} hitSlop={8} style={{ padding: 7, backgroundColor: '#FFF', borderRadius: Layout.borderRadius }}>
-                            <Ionicons name="arrow-back" size={24} color="#000" />
-                        </TouchableOpacity>
+                        <BackButton onPress={closeModal} backgroundColor={isDark ? 'rgba(255,255,255,0.1)' : '#FFF'} />
                         <SubmitButton
                             title="Done"
                             onPress={handleConfirm}
@@ -276,22 +331,16 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                             attributionEnabled={true}
                             compassEnabled={true}
                             compassViewPosition={3} // 3 = bottom-right
-                            compassViewMargins={{ x: 24, y: Math.max(insets.bottom, 20) + 72 }}
+                            compassViewMargins={{ x: 24, y: Math.max(insets.bottom, 20) + 140 }}
                             onPress={handleMapPress}
                             onRegionDidChange={handleRegionChange}
                         >
                             <Camera
                                 ref={cameraRef}
-                                defaultSettings={{
-                                    centerCoordinate: value
-                                        ? [value.longitude, value.latitude]
-                                        : [69.3451, 30.3753], // Pakistan
-                                    zoomLevel: value ? 13 : 4 }}
+                                defaultSettings={initialCameraConfig}
                             />
                         </MapView>
 
-                        {/* Fixed center pin — the selection is always whatever the
-                            map is centered on, so the marker is guaranteed centered. */}
                         <View pointerEvents="none" style={styles.centerPinWrap}>
                             <Ionicons
                                 name="location"
@@ -337,22 +386,49 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                                 />
                             )}
                         </View>
-
-                        {/* Floating Current Location Button */}
+                        
+                        {/* Sticky Tick Confirmation Button directly above current location button */}
                         <TouchableOpacity
-                            style={[styles.floatingCurrentLocBtn, { bottom: Math.max(insets.bottom, 20) + 10 }]}
+                            style={[styles.floatingTickBtn, { bottom: Math.max(insets.bottom, 20) + 250 }]}
+                            onPress={handleConfirmMarkerLocation}
+                            activeOpacity={0.8}
+                            disabled={locating || resolvingAddress}>
+                            <View style={[styles.floatingIconBadge, { backgroundColor: colors.lime }]}>
+                                <Ionicons name="checkmark-sharp" size={26} color={colors.background} />
+                            </View>
+                        </TouchableOpacity>
+
+                        {/* Sticky Current Location Button */}
+                        <TouchableOpacity
+                            style={[styles.floatingCurrentLocBtn, { bottom: Math.max(insets.bottom, 20) + 185 }]}
                             onPress={useCurrentLocation}
                             activeOpacity={0.8}
                         >
-                            <View style={{ backgroundColor: colors.lime, padding: 10, borderRadius: Layout.borderRadius }}>
-                                <Ionicons name="navigate" size={24} color="#FFF" />
+                            <View style={[styles.floatingIconBadge, { backgroundColor: colors.lime }]}>
+                                <Ionicons name="navigate" size={24} color={colors.background} />
                             </View>
                         </TouchableOpacity>
+                        
+                        {/* Selected location confirmation card */}
+                        <View style={[styles.selectedCard, { backgroundColor: colors.background, paddingBottom: Math.max(insets.bottom, 20) }]}>
+                            <ThemedText style={styles.selectedHint}>
+                                Move the map so the pin sits exactly on your location — this helps others find you.
+                            </ThemedText>
+                            <View style={styles.selectedRow}>
+                                <Ionicons name="location" size={28} color={colors.primary} style={{ marginHorizontal: 4 }} />
+                                <View style={{ flex: 1 }}>
+                                    <ThemedText style={styles.selectedTitle}>Selected location</ThemedText>
+                                    <ThemedText style={[styles.selectedAddress, { color: colors.text }]} numberOfLines={2}>
+                                        {selectedAddress || 'Move the map to place the pin...'}
+                                    </ThemedText>
+                                </View>
+                            </View>
+                        </View>
                     </View>
                 </View>
             </Modal>
 
-            {/* Premium location-fetch loading modal (presents over the map) */}
+            {/* Premium location-fetch loading modal */}
             <LocationLoadingModal visible={locating} />
         </Animated.View>
     );
@@ -434,13 +510,62 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         paddingVertical: 10 },
     resultText: { flex: 1, fontSize: 11.5, lineHeight: 18 },
+    floatingTickBtn: {
+        position: 'absolute',
+        right: 20,
+        zIndex: 12,
+    },
     floatingCurrentLocBtn: {
         position: 'absolute',
-        bottom: 30,
         right: 20,
-        zIndex: 10 },
+        zIndex: 10,
+    },
+    floatingIconBadge: {
+        padding: 12,
+        borderRadius: 100,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
     centerPinWrap: {
         ...StyleSheet.absoluteFillObject,
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 5 } });
+        zIndex: 5 },
+    selectedCard: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 15,
+        borderTopLeftRadius: Layout.borderRadius * 2,
+        borderTopRightRadius: Layout.borderRadius * 2,
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        gap: 8,
+    },
+    selectedHint: {
+        fontSize: 12.5,
+        fontWeight: '600',
+        lineHeight: 18,
+    },
+    selectedRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    selectedTitle: {
+        fontSize: 12,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        letterSpacing: 0.4,
+    },
+    selectedAddress: {
+        fontSize: 15,
+        fontWeight: '800',
+        marginTop: 2,
+        lineHeight: 20,
+    },
+});

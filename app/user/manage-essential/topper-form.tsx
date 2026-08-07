@@ -20,6 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { addTopper, updateTopper, uploadUserImage } from '@/apis/essentials';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
@@ -171,9 +172,7 @@ const TopperForm = () => {
             <Animated.View entering={FadeInUp.duration(600)} style={styles.header}>
                 <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
                 <View style={[styles.headerTop, { paddingTop: insets.top + 10 }]}>
-                    <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color={isDark ? colors.text : '#FFFFFF'} />
-                    </TouchableOpacity>
+                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                     <ThemedText style={[styles.headerTitle, { color: isDark ? colors.text : '#FFFFFF' }]}>
                         {isEditing ? 'Edit Topper' : 'Add New Topper'}
                     </ThemedText>

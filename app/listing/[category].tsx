@@ -11,6 +11,7 @@ import { ListingCardSkeleton } from '@/components/essentials/ListingCardSkeleton
 import PlaceCard from '@/components/essentials/PlaceCard';
 import RequestCard from '@/components/essentials/shared/RequestCard';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 import { getCategoryTypes } from '@/constants/categoryTypes';
 import { Colors } from '@/constants/colors';
@@ -266,13 +267,7 @@ const CategoryListingScreen = React.memo(() => {
             <View style={[styles.header, { backgroundColor: headerBg, paddingTop: insets.top + (Platform.OS === 'android' ? 16 : 20) }]}>
                 {/* Nav row */}
                 <View style={styles.headerRow}>
-                    <TouchableOpacity
-                        style={styles.headerIconBtn}
-                        onPress={() => router.back()}
-                        activeOpacity={0.8}
-                    >
-                        <Ionicons name="arrow-back" size={20} color={headerBg} />
-                    </TouchableOpacity>
+                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
 
                     <Animated.View entering={FadeInDown.delay(80).duration(350)} style={styles.headerTitleWrap}>
                         <ThemedText style={styles.headerTitle} numberOfLines={1}>{categoryTitle}</ThemedText>

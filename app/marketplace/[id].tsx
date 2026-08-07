@@ -17,6 +17,7 @@ import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { SectionHeading } from '@/components/essentials/shared/SectionHeading';
 import { MarketplaceDetailsSkeleton } from '@/components/marketplace/MarketplaceDetailsSkeleton';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -101,9 +102,7 @@ export default function MarketplaceDetailsScreen() {
 
     const renderHeader = () => (
         <View style={[styles.header, { backgroundColor: colors.primary, paddingTop: insets.top + (Platform.OS === 'android' ? 12 : 8) }]}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <Ionicons name="arrow-back" size={20} color="#fff" />
-            </TouchableOpacity>
+            <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
             <ThemedText style={styles.headerTitle} numberOfLines={1}>Marketplace</ThemedText>
             <View style={styles.headerAction}>
                 {isOwner ? (

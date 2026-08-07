@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -111,12 +112,7 @@ export default function SupportScreen() {
                 style={[styles.headerWrap, { backgroundColor: colors.primary }]}
             >
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
-                    <TouchableOpacity
-                        onPress={handleBack}
-                        style={styles.backBtn}
-                    >
-                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                    </TouchableOpacity>
+                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                     <View style={styles.headerTitleWrap}>
                         <ThemedText style={styles.headerTitle}>Support & FAQ</ThemedText>
                     </View>

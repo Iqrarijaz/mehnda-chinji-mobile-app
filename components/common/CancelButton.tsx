@@ -38,7 +38,7 @@ export function CancelButton({ title = 'Cancel', disabled, style, icon, ...rest 
 const styles = StyleSheet.create({
     cancelButton: {
         height: 46,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 30,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',

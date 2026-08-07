@@ -1,6 +1,7 @@
 import { createSupportTicket } from '@/apis/support';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
@@ -134,9 +135,7 @@ export default function CreateTicketScreen() {
             <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color={colors.text} />
-                </TouchableOpacity>
+                <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                 <ThemedText style={styles.headerTitle}>Create New Ticket</ThemedText>
             </View>
 

@@ -60,7 +60,7 @@ export const WeatherCitySwitcher = React.memo(({
         <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={[styles.row, { paddingBottom: 13 }]}
+            contentContainerStyle={styles.row}
             keyboardShouldPersistTaps="handled"
         >
             <Chip active={activeKey === null} icon="navigate" label="Current" onPress={onSelectCurrent} accent={colors.lime} />

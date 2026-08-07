@@ -59,7 +59,7 @@ export function SubmitButton({ title, isLoading, disabled, style, icon, onPress,
 const styles = StyleSheet.create({
     updateButton: {
         height: 46,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 30,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',

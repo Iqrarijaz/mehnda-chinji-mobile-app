@@ -25,6 +25,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Avatar from '../ui/avatar';
 import { NotificationIcon } from './NotificationIcon';
 import { ThemedText } from '../ThemedText';
+import { BackButton } from './BackButton';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,7 +87,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
     hideAccountActions = false,
     decor,
     hero }: ScreenHeaderProps) {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const { user } = useAuth();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
@@ -137,11 +138,11 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                 {/* Left side: menu/back + optional extras */}
                 <View style={styles.leftSide}>
                     {showMenuIcon ? (
-                        <TouchableOpacity onPress={openDrawer} style={styles.iconBtn}>
-                            <Ionicons name="grid-outline" size={20} color={colors.primary} />
+                        <TouchableOpacity onPress={openDrawer} style={[styles.iconBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#FFFFFF' }]}>
+                            <Ionicons name="grid-outline" size={20} color={isDark ? '#FFFFFF' : colors.primary} />
                         </TouchableOpacity>
                     ) : (
-                        <TouchableOpacity
+                        <BackButton
                             onPress={() => {
                                 if (onBackPress) {
                                     onBackPress();
@@ -151,10 +152,11 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                                     router.replace('/(drawer)/(tabs)' as any);
                                 }
                             }}
-                            style={styles.iconBtn}
-                        >
-                            <Ionicons name={backIcon} size={20} color={colors.primary} />
-                        </TouchableOpacity>
+                            backgroundColor={isDark ? 'rgba(255,255,255,0.1)' : '#FFFFFF'}
+                            color={isDark ? '#FFFFFF' : colors.primary}
+                            size={20}
+                            style={{ marginRight: 0 }}
+                        />
                     )}
                     {leftActions}
                 </View>
@@ -221,11 +223,11 @@ export const HeaderIconBtn = React.memo(function HeaderIconBtn({
         size?: number;
         badge?: React.ReactNode;
     }) {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     return (
-        <TouchableOpacity onPress={onPress} style={[styles.iconBtn, { marginRight: 12 }, style]}>
-            <Ionicons name={name} size={size} color={colors.primary} />
+        <TouchableOpacity onPress={onPress} style={[styles.iconBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#FFFFFF', marginRight: 12 }, style]}>
+            <Ionicons name={name} size={size} color={isDark ? '#FFFFFF' : colors.primary} />
             {badge}
         </TouchableOpacity>
     );
@@ -237,8 +239,8 @@ const styles = StyleSheet.create({
     container: {
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
-        paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-        paddingBottom: Platform.OS === 'android' ? 8 : 16,
+        paddingHorizontal: 14,
+        paddingBottom: Platform.OS === 'android' ? 4 : 8,
         zIndex: 10,
         overflow: 'hidden'
     },
@@ -276,26 +278,27 @@ const styles = StyleSheet.create({
     // Hero band
     heroBand: {
         alignItems: 'center',
-        paddingTop: 8,
+        paddingTop: 0,
+        paddingBottom: 20,
         paddingHorizontal: 7
     },
     heroIconWrap: {
-        width: 52,
-        height: 52,
+        width: 44,
+        height: 44,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8
+        marginBottom: 6
     },
     heroHalo: {
         position: 'absolute',
-        width: 44,
-        height: 44,
+        width: 38,
+        height: 38,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.4)'
     },
     heroTile: {
-        width: 40,
-        height: 40,
+        width: 34,
+        height: 34,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',

@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { getTicketById, replyToSupportTicket } from '@/apis/support';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -140,9 +141,7 @@ export default function TicketDetailScreen() {
             <View style={[styles.container, { paddingTop: insets.top }]}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color={colors.text} />
-                    </TouchableOpacity>
+                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                     <View style={styles.headerTitleContainer}>
                         <ThemedText style={styles.headerTitle} numberOfLines={1}>{ticket.ticketId}</ThemedText>
                         <View style={styles.statusRow}>

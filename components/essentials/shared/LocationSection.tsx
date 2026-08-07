@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 6,
         height: 40,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 100,
         marginTop: 4 },
     directionsText: {
         color: '#FFFFFF',

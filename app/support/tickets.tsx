@@ -1,5 +1,6 @@
 import { deleteSupportTicket, getSupportTickets } from '@/apis/support';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -252,9 +253,7 @@ export default function TicketListScreen() {
             <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
                 {/* Custom Nav Bar */}
                 <View style={styles.navBar}>
-                    <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color={colors.text} />
-                    </TouchableOpacity>
+                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                     <ThemedText style={styles.navTitle}>My Support Tickets</ThemedText>
                     <View style={{ width: 40 }} />
                 </View>

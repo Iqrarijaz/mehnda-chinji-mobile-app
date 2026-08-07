@@ -21,13 +21,13 @@ export function NotificationIcon({
     badgeStyle,
     containerStyle
 }: NotificationIconProps) {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const { isAuthenticated } = useAuth();
     const colors = Colors[theme];
     const router = useRouter();
     const pathname = usePathname();
 
-    const iconColor = color || colors.primary;
+    const iconColor = color || (isDark ? '#FFFFFF' : colors.primary);
 
     const { badgeQuery } = useNotificationsAPI({
         enabled: isAuthenticated
@@ -44,7 +44,7 @@ export function NotificationIcon({
                     router.push('/notifications');
                 }
             }}
-            style={[styles.iconButton, containerStyle]}
+            style={[styles.iconButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#FFFFFF' }, containerStyle]}
         >
             <Ionicons name="notifications-outline" size={size} color={iconColor} />
             {unreadCount > 0 && (
@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
-        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center' },
     badge: {

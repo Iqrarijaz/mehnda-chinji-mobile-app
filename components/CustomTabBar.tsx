@@ -86,7 +86,7 @@ const TabItem = React.memo(({ route, isFocused, onPress, onLongPress, color, opt
 });
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const insets = useSafeAreaInsets();
     const colors = Colors[theme];
     const { width: windowWidth } = useWindowDimensions();
@@ -199,7 +199,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                 style={[
                     styles.container,
                     {
-                        backgroundColor: colors.primary,
+                        backgroundColor: isDark ? colors.card : colors.primary,
                         width: FULL_WIDTH,
                         borderRadius: isAndroid ? 29 : 30 },
                     animatedContainerStyle,

@@ -20,6 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { addEvent, updateEvent, uploadUserImage } from '@/apis/essentials';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
@@ -159,9 +160,7 @@ const EventForm = () => {
             <Animated.View entering={FadeInUp.duration(600)} style={styles.header}>
                 <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
                 <View style={[styles.headerTop, { paddingTop: insets.top + 10 }]}>
-                    <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color={isDark ? colors.text : '#FFFFFF'} />
-                    </TouchableOpacity>
+                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                     <ThemedText style={[styles.headerTitle, { color: isDark ? colors.text : '#FFFFFF' }]}>
                         {isEditing ? 'Edit Event' : 'Add New Event'}
                     </ThemedText>

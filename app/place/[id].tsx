@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
         marginBottom: 10 },
     actionBtnPrimary: {
         height: 42,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 100,
         paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
     actionBtnIconOnly: {
         width: 40,
         height: 40,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center' },
     detailAdWrapper: {

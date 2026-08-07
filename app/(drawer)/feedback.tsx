@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import moment from '@/utils/dayjs';
 
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
@@ -140,9 +141,7 @@ export default function FeedbackScreen() {
 
             {/* Header */}
             <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.background }]}>
-                <TouchableOpacity onPress={handleGoBack} style={styles.iconBtn}>
-                    <Ionicons name="arrow-back" size={20} color={colors.text} />
-                </TouchableOpacity>
+                <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                 <View style={{ flex: 1, marginLeft: 12 }}>
                     <ThemedText style={styles.screenTitle}>Feedback</ThemedText>
                 </View>

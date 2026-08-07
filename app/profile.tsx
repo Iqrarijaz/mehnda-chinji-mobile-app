@@ -6,6 +6,7 @@ import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -217,9 +218,7 @@ export default function ProfileScreen() {
                     </Svg>
 
                     <View style={[styles.headerTop, { paddingTop: insets.top + 10 }]}>
-                        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                        </TouchableOpacity>
+                        <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                         <ThemedText style={styles.headerTitle}>My Account</ThemedText>
                         <View style={{ width: 42 }} />
                     </View>

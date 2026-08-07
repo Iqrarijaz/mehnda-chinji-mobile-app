@@ -136,11 +136,10 @@ const PlaceCard = React.memo(({ data, category, color, index = 0 }: PlaceCardPro
                                 transition={300}
                             />
                         ) : (
-                            <View style={[styles.tile, styles.tilePlaceholder, { backgroundColor: `${primaryColor}0D` }]}>
-                                <View style={[styles.tileHalo, { backgroundColor: `${primaryColor}14` }]} />
-                                <View style={[styles.tileIconCircle, { backgroundColor: `${primaryColor}1F` }]}>
-                                    <Ionicons name={defaultIcon as any} size={24} color={primaryColor} />
-                                </View>
+                            <View style={[styles.tile, styles.tilePlaceholder, { backgroundColor: `${primaryColor}14` }]}>
+                                <ThemedText style={{ fontSize: 28, fontWeight: '800', color: primaryColor }}>
+                                    {placeName?.charAt(0)?.toUpperCase() || 'P'}
+                                </ThemedText>
                             </View>
                         )}
 
@@ -223,12 +222,11 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         right: 0,
+        maxWidth: '60%',
         paddingHorizontal: 8,
-        borderRadius: Layout.borderRadius,
         borderTopRightRadius: 28,
-        borderBottomLeftRadius: 28,
         borderTopLeftRadius: 28,
-        borderBottomRightRadius: 28 },
+        borderBottomLeftRadius: 28 },
     typeBadgeText: {
         fontSize: 9,
         fontWeight: '800',

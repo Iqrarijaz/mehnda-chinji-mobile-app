@@ -21,6 +21,7 @@ import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 
 import { deleteTopper, deleteEvent, getMyRequests } from '@/apis/essentials';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -224,9 +225,7 @@ const ManageEssentialDashboard = () => {
                 style={[styles.header, { paddingTop: insets.top + 10 }]}
             >
                 <View style={styles.headerTop}>
-                    <TouchableOpacity onPress={handleGoBack} style={styles.backBtn}>
-                        <Ionicons name="arrow-back" size={24} color="#FFF" />
-                    </TouchableOpacity>
+                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                     <View style={styles.headerTitleContainer}>
                         <ThemedText style={styles.headerTitle} numberOfLines={1}>{essential.category?.toUpperCase()}</ThemedText>
                         <ThemedText style={[styles.headerSubtitle, { textTransform: 'capitalize' }]}>{essential.name}</ThemedText>

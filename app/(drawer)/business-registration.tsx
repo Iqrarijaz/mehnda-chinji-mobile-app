@@ -565,15 +565,17 @@ const BusinessRegistrationScreen = () => {
                             </Animated.View>
                         )}
 
-                        <Animated.View entering={FadeInDown.delay(500)} style={styles.buttonsRow}>
+                        <Animated.View entering={FadeInUp.delay(500).springify()} style={styles.buttonsRow}>
                             <CancelButton
                                 onPress={handleGoBack}
+                                disabled={isPending || isUploadingImage}
+                                style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 40 }}
                             />
-
                             <SubmitButton
-                                title={editData ? 'Update' : 'Register'}
+                                title={editData ? 'Update' : 'Post Now'}
                                 onPress={handleSubmit}
-                                isLoading={isPending}
+                                isLoading={isPending || isUploadingImage}
+                                style={{ width: 160, height: 40, borderRadius: 30 }}
                             />
                         </Animated.View>
 

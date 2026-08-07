@@ -177,9 +177,9 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
                         )}
                     </View>
                 ) : (
-                    <View style={[styles.imagePlaceholder, { backgroundColor: colors.background }]}>
-                        <Ionicons name="images-outline" size={48} color={colors.textSecondary} />
-                        <ThemedText style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>No Images Available</ThemedText>
+                    <View style={[styles.imagePlaceholder, { backgroundColor: colors.lime }]}>
+                        <Ionicons name="images-outline" size={48} color="#FFFFFF" />
+                        <ThemedText style={[styles.imagePlaceholderText, { color: '#FFFFFF' }]}>No Images Available</ThemedText>
                         {(isOwner && showActions) && renderStatusBadge()}
                     </View>
                 )}
@@ -187,14 +187,14 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
                 {/* Content Details */}
                 <View style={styles.detailsContainer}>
                     <View style={styles.contentBlock}>
+                        <ThemedText style={[styles.priceText, { color: colors.lime }]} numberOfLines={1}>
+                            {capitalizedTitle}
+                        </ThemedText>
                         <View style={styles.priceRow}>
-                            <ThemedText style={[styles.priceText, { color: colors.lime }]} numberOfLines={1}>
+                            <ThemedText style={[styles.title, { color: colors.text }]} numberOfLines={1}>
                                 Rs. {typeof item.price === 'number' ? item.price.toLocaleString() : item.price || '—'}
                             </ThemedText>
                         </View>
-                        <ThemedText style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-                            {capitalizedTitle}
-                        </ThemedText>
                         {isOwner && showActions ? <View style={styles.actionsWrapper}><ActionMenu actions={actions} /></View> : null}
                     </View>
 

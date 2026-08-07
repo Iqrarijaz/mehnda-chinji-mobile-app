@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     track: {
         flexDirection: 'row',
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
+        borderWidth: 0,
         padding: 3,
         position: 'relative' },
     indicator: {

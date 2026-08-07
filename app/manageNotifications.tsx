@@ -17,6 +17,7 @@ import { useNotificationStore, NotificationPreferences } from '@/store/notificat
 import NotificationSectionCard from '@/components/notification/NotificationSectionCard';
 import NotificationToggleRow from '@/components/notification/NotificationToggleRow';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 
 export default function ManageNotificationsScreen() {
     const { theme } = useTheme();
@@ -51,12 +52,11 @@ export default function ManageNotificationsScreen() {
                 style={[styles.headerWrap, { backgroundColor: colors.primary }]}
             >
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
-                    <TouchableOpacity
-                        onPress={handleBack}
-                        style={styles.backBtn}
-                    >
-                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                    </TouchableOpacity>
+                    <BackButton
+                        backgroundColor="rgba(255,255,255,0.18)"
+                        color="#FFFFFF"
+                        size={22}
+                    />
                     <View style={styles.headerTitleWrap}>
                         <ThemedText style={styles.headerTitle}>Manage Notifications</ThemedText>
                     </View>

@@ -72,13 +72,10 @@ const BusinessCard = React.memo(({ business, index = 0 }: BusinessCardProps) => 
                                 transition={300}
                             />
                         ) : (
-                            <View style={[styles.tile, styles.tilePlaceholder, { backgroundColor: `${colors.primary}0D` }]}>
-                                <View style={[styles.tileHalo, { backgroundColor: `${colors.primary}14` }]} />
-                                <View style={[styles.initialCircle, { backgroundColor: `${colors.primary}1F` }]}>
-                                    <ThemedText style={[styles.initialText, { color: colors.primary }]}>
-                                        {businessName?.charAt(0)?.toUpperCase() || 'B'}
-                                    </ThemedText>
-                                </View>
+                            <View style={[styles.tile, styles.tilePlaceholder, { backgroundColor: `${colors.primary}14` }]}>
+                                <ThemedText style={{ fontSize: 28, fontWeight: '800', color: colors.primary }}>
+                                    {businessName?.charAt(0)?.toUpperCase() || 'B'}
+                                </ThemedText>
                             </View>
                         )}
 
@@ -167,6 +164,7 @@ const styles = StyleSheet.create({
         maxWidth: '60%',
         paddingHorizontal: 8,
         borderTopRightRadius: 28,
+        borderTopLeftRadius: 28,
         borderBottomLeftRadius: 28 },
     typeBadgeText: {
         fontSize: 9,

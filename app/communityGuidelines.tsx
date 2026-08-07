@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
@@ -91,15 +92,7 @@ export default function CommunityGuidelinesScreen() {
             {/* ── Header ──────────────────────────────────────── */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            if (router.canGoBack()) router.back();
-                            else router.replace('/settings');
-                        }}
-                        style={styles.backBtn}
-                    >
-                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                    </TouchableOpacity>
+                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                     <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.headerTitleWrap}>
                         <ThemedText style={styles.headerTitle}>Community Guidelines</ThemedText>
                     </Animated.View>

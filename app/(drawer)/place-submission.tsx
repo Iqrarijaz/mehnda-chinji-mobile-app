@@ -32,6 +32,7 @@ import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import { uploadUserImage } from '@/apis/essentials';
 import { ThankYouModal } from '@/components/common/ThankYou';
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { getCategoryTypes } from '@/constants/categoryTypes';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -296,9 +297,7 @@ const PlaceSubmissionScreen = () => {
                 <Animated.View entering={FadeInUp.duration(500)} style={styles.headerWrap}>
                     <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
                     <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
-                        <TouchableOpacity onPress={handleGoBack} style={styles.backBtn}>
-                            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                        </TouchableOpacity>
+                        <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                         <View style={{ width: 42 }} />
                     </View>
 
@@ -396,7 +395,7 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
-        paddingBottom: 13 },
+        paddingBottom: 20 },
     headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -412,15 +411,15 @@ const styles = StyleSheet.create({
     heroContent: {
         alignItems: 'center',
         paddingHorizontal: 20,
-        marginTop: 4 },
+        marginTop: 0 },
     heroIconWrap: {
-        width: 48,
-        height: 48,
+        width: 44,
+        height: 44,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 12 },
+        marginBottom: 6 },
     heroTitle: {
         fontSize: 16.5,
         fontWeight: '800',

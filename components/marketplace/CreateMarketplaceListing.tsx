@@ -29,6 +29,7 @@ import { getAuthenticatedConfiguration, CONFIG_QUERY_KEYS } from '@/apis/configu
 import { MarketplaceCategoryPicker } from './MarketplaceCategoryPicker';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
+import { CancelButton } from '@/components/common/CancelButton';
 import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
@@ -600,20 +601,16 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
 
                     {/* Footer Buttons inline */}
                     <Animated.View entering={FadeInUp.delay(600).springify()} style={styles.buttonsRow}>
-                        <TouchableOpacity
-                            style={[styles.cancelButton, { backgroundColor: isDark ? '#334155' : '#F1F5F9' }]}
+                        <CancelButton
                             onPress={onClose}
                             disabled={mutation.isPending || isUploadingImages}
-                        >
-                            <ThemedText style={[styles.cancelText, { color: colors.textSecondary }]}>
-                                Cancel
-                            </ThemedText>
-                        </TouchableOpacity>
+                            style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 40 }}
+                        />
                         <SubmitButton
                             title={listingToEdit ? 'Update' : 'Post Now'}
                             onPress={handleSubmit}
                             isLoading={mutation.isPending || isUploadingImages}
-                            style={{ width: 160, height: 40, borderRadius: Layout.borderRadius }}
+                            style={{ width: 160, height: 40, borderRadius: 30 }}
                         />
                     </Animated.View>
 
@@ -802,7 +799,7 @@ const styles = StyleSheet.create({
     cancelButton: {
         width: 120,
         height: 40,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center' },
     cancelText: {

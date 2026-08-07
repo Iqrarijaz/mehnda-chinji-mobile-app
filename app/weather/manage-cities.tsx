@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
+import { BackButton } from '@/components/common/BackButton';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useSavedCities } from '@/hooks/useSavedCities';
@@ -71,9 +72,7 @@ export default function ManageCitiesScreen() {
                 style={[styles.header, { paddingTop: insets.top + 14, backgroundColor: colors.primary }]}
             >
                 <View style={styles.headerRow}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} hitSlop={8}>
-                        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-                    </TouchableOpacity>
+                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
                     <View style={{ flex: 1, marginLeft: 12 }}>
                         <ThemedText style={styles.title}>Saved Cities</ThemedText>
                         <ThemedText style={styles.subtitle}>{cities.length}/{MAX_CITIES} · tap the star to set default</ThemedText>

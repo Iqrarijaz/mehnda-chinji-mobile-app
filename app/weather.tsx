@@ -21,6 +21,7 @@ import WeatherDaily from '@/components/weather/WeatherDaily';
 import WeatherHero from '@/components/weather/WeatherHero';
 import WeatherHourly from '@/components/weather/WeatherHourly';
 import RainRadar from '@/components/weather/RainRadar';
+import { BackButton } from '@/components/common/BackButton';
 
 import { WeatherCitySwitcher } from '@/components/weather/WeatherCitySwitcher';
 import WeatherStats from '@/components/weather/WeatherStats';
@@ -262,31 +263,22 @@ export default function WeatherScreen() {
                 >
                     {/* Header */}
                     <View style={styles.topNav}>
-                        <TouchableOpacity
-                            activeOpacity={0.8}
-                            style={[styles.backBtn, { backgroundColor: `${colors.primary}14` }]}
-                            onPress={() =>
-                                router.canGoBack()
-                                    ? router.back()
-                                    : router.replace('/(drawer)/(tabs)' as any)
-                            }
-                        >
-                            <Ionicons
-                                name="arrow-back"
-                                size={22}
-                                color={colors.primary}
-                            />
-                        </TouchableOpacity>
-                    </View>
+                        <BackButton
+                            backgroundColor={`${colors.primary}14`}
+                            style={{ width: 34, height: 34, borderRadius: 17 }}
+                        />
 
-                    {/* Saved-city switcher */}
-                    <WeatherCitySwitcher
-                        cities={savedCities}
-                        activeKey={activeCityKey}
-                        onSelectCurrent={selectCurrent}
-                        onSelectCity={selectSavedCity}
-                        onManage={openManageCities}
-                    />
+                        {/* Saved-city switcher */}
+                        <View style={{ flex: 1 }}>
+                            <WeatherCitySwitcher
+                                cities={savedCities}
+                                activeKey={activeCityKey}
+                                onSelectCurrent={selectCurrent}
+                                onSelectCity={selectSavedCity}
+                                onManage={openManageCities}
+                            />
+                        </View>
+                    </View>
 
                     {/* Hero */}
                     <WeatherHero
@@ -357,7 +349,7 @@ const styles = StyleSheet.create({
 
     topNav: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         gap: 12,
         marginBottom: 24,
         zIndex: 9999,

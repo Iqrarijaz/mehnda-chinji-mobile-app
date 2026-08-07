@@ -176,22 +176,25 @@ export default function NotificationsScreen() {
                 showTooltip={showSwipeTooltip}
                 onCloseTooltip={closeSwipeTooltip}
             />
-            {/* Fixed Filter Tabs */}
-            <View style={styles.filtersWrap}>
-                <NotificationFilterTabs active={activeFilter} onSelect={setActiveFilter} />
-            </View>
-            {/* Scrollable List */}
-            <View style={{ flex: 1 }}>
-                <FlashList
-                    data={listData}
-                    renderItem={renderItem as any}
-                    keyExtractor={(item: any, i: number) => `${item.type}-${i}`}
-                    contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 32 }]}
-                    showsVerticalScrollIndicator={false}
-                    refreshControl={
-                        <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor="#006666" />
-                    }
-                />
+            {/* Content Wrapper */}
+            <View style={{ flex: 1, backgroundColor: colors.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden' }}>
+                {/* Fixed Filter Tabs */}
+                <View style={styles.filtersWrap}>
+                    <NotificationFilterTabs active={activeFilter} onSelect={setActiveFilter} />
+                </View>
+                {/* Scrollable List */}
+                <View style={{ flex: 1 }}>
+                    <FlashList
+                        data={listData}
+                        renderItem={renderItem as any}
+                        keyExtractor={(item: any, i: number) => `${item.type}-${i}`}
+                        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 32 }]}
+                        showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor="#006666" />
+                        }
+                    />
+                </View>
             </View>
         </View>
     );

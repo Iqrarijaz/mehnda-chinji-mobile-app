@@ -451,12 +451,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 6,
         height: 42,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 100,
         paddingHorizontal: 20 },
     callIcon: {
         width: 24,
         height: 24,
-        borderRadius: Layout.borderRadius,
+        borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center' },
     callButtonText: {

@@ -176,6 +176,6 @@ const styles = StyleSheet.create({
     selectedSummary: { fontSize: 10, fontWeight: '600' },
     iconRow: { flexDirection: 'row', marginBottom: 2 },
     iconCell: { alignItems: 'center' },
-    rainHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4, marginBottom: 2 },
+    rainHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 18, marginBottom: 8 },
     rainLabel: { fontSize: 9.5, fontWeight: '600' },
-    chart: { marginVertical: 2 } });
+    chart: { marginVertical: 2, paddingBottom: 16 } });
