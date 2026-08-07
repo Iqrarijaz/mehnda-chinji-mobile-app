@@ -30,26 +30,7 @@ interface HomeHeaderWeatherWidgetProps {
 const WEATHER_FLEX = 65;
 const PRAYER_FLEX = 35;
 
-// ── Isolated prayer block (re-renders every second for the live countdown) ──
-const PrayerBlock = React.memo(({ city, accent }: { city: string; accent: string }) => {
-    const { nextPrayer } = useNextPrayer(city);
-    return (
-        <View style={styles.glassPanel}>
-            <ThemedText style={styles.glassLabel}>NEXT PRAYER</ThemedText>
-            <View style={styles.prayerNameRow}>
-                <Ionicons name="moon-outline" size={13} color={accent} style={{ marginRight: 5 }} />
-                <ThemedText style={styles.prayerName} numberOfLines={1}>
-                    {nextPrayer?.name ?? '—'}
-                </ThemedText>
-            </View>
-            <ThemedText style={[styles.prayerCountdown, { color: accent }]} numberOfLines={1}>
-                {nextPrayer ? `in ${nextPrayer.countdownLabel}` : '· · ·'}
-            </ThemedText>
-            <ThemedText style={styles.prayerTime}>{nextPrayer?.time ?? ''}</ThemedText>
-        </View>
-    );
-});
-PrayerBlock.displayName = 'PrayerBlock';
+
 
 // ── One horizontal weather row: icon+temp beside a 2-line info stack ──────
 // Shared shape for both the "today" and "tomorrow" pager pages, so the
@@ -59,22 +40,28 @@ interface WeatherRowProps {
     icon?: string;
     temp: number | string;
     conditionLine: string;
+    cityLabel: string;
     high: number | null;
     low: number | null;
     pop?: number;
     colors: typeof Colors.light;
     animateTemp?: boolean;
 }
-const WeatherRow = React.memo(({ width, icon, temp, conditionLine, high, low, pop, colors, animateTemp }: WeatherRowProps) => {
+const WeatherRow = React.memo(({ width, icon, temp, conditionLine, cityLabel, high, low, pop, colors, animateTemp }: WeatherRowProps) => {
     const TempWrap = animateTemp ? Animated.View : View;
     return (
         <View style={[styles.weatherCol, width ? { width } : null]}>
             <View style={styles.weatherRow}>
-                <View style={styles.iconTempBlock}>
-                    <Ionicons name={getWeatherIconName(icon)} size={32} color="#FFFFFF" />
-                    <TempWrap {...(animateTemp ? { key: String(temp), entering: FadeIn.duration(400) } : {})}>
-                        <ThemedText style={styles.temp}>{temp}°</ThemedText>
-                    </TempWrap>
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={styles.iconTempBlock}>
+                        <Ionicons name={getWeatherIconName(icon)} size={32} color="#FFFFFF" />
+                        <TempWrap {...(animateTemp ? { key: String(temp), entering: FadeIn.duration(400) } : {})}>
+                            <ThemedText style={styles.temp}>{temp}°</ThemedText>
+                        </TempWrap>
+                    </View>
+                    <ThemedText style={{ fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.85)', marginTop: 2, textAlign: 'center' }} numberOfLines={1}>
+                        {cityLabel}
+                    </ThemedText>
                 </View>
 
                 <View style={[styles.weatherDivider, { backgroundColor: `${colors.lime}55` }]} />
@@ -269,7 +256,8 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                                         width={pagerWidth}
                                         icon={icon}
                                         temp={temp}
-                                        conditionLine={`${condition} · ${city}`}
+                                        conditionLine={condition}
+                                        cityLabel={city}
                                         high={high}
                                         low={low}
                                         colors={colors}
@@ -280,6 +268,7 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                                         icon={tomorrow!.icon}
                                         temp={tomorrow!.high}
                                         conditionLine={`Tomorrow · ${tomorrow!.condition}`}
+                                        cityLabel={city}
                                         high={tomorrow!.high}
                                         low={tomorrow!.low}
                                         pop={tomorrow!.pop}
@@ -290,7 +279,8 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                                 <WeatherRow
                                     icon={icon}
                                     temp={temp}
-                                    conditionLine={`${condition} · ${city}`}
+                                    conditionLine={condition}
+                                    cityLabel={city}
                                     high={high}
                                     low={low}
                                     colors={colors}
@@ -313,9 +303,6 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                                 </View>
                             ) : null}
                         </View>
-
-                        {/* Prayer glass panel */}
-                        <PrayerBlock city={prayerCity} accent={accent} />
                     </View>
 
                     <View style={styles.updatedRow}>
@@ -352,7 +339,7 @@ function relativeTime(unixSec?: number): string {
 const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 16,
+        paddingHorizontal: 14,
         paddingVertical: 10,
         marginBottom: 8
     },
@@ -361,9 +348,9 @@ const styles = StyleSheet.create({
         alignItems: 'stretch'
     },
     weatherColWrap: {
-        flex: WEATHER_FLEX,
+        width: '100%',
         justifyContent: 'center',
-        paddingRight: 10
+        paddingRight: 0
     },
     weatherCol: {
         justifyContent: 'center'
@@ -449,42 +436,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         marginLeft: 2
     },
-    // Glassmorphism panel
-    glassPanel: {
-        flex: PRAYER_FLEX,
-        backgroundColor: 'rgba(255,255,255,0.14)',
-        borderRadius: Layout.borderRadius,
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        justifyContent: 'center'
-    },
-    glassLabel: {
-        fontSize: 9,
-        fontWeight: '800',
-        letterSpacing: 0.6,
-        color: 'rgba(255,255,255,0.75)'
-    },
-    prayerNameRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 2
-    },
-    prayerName: {
-        fontSize: 16,
-        fontWeight: '800',
-        color: '#FFFFFF',
-        flexShrink: 1
-    },
-    prayerCountdown: {
-        fontSize: 13,
-        fontWeight: '800',
-        marginTop: 1
-    },
-    prayerTime: {
-        fontSize: 11,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.75)'
-    },
+
     updatedRow: {
         flexDirection: 'row',
         alignItems: 'center',

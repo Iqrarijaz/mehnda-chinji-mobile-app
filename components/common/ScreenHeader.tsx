@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         paddingHorizontal: 14,
-        paddingBottom: Platform.OS === 'android' ? 4 : 8,
+        paddingBottom: 0,
         zIndex: 10,
         overflow: 'hidden'
     },
