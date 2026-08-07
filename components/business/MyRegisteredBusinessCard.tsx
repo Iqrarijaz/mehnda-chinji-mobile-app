@@ -70,8 +70,8 @@ const MyRegisteredBusinessCard = React.memo(({
 
     return (
         <TintedCard
-            tintColor={primaryColor}
-            bgColor={colors.card}
+            tintColor={colors.primary}
+            bgColor={colors.cardBg}
             style={styles.card}
         >
             <View style={styles.cardHeader}>

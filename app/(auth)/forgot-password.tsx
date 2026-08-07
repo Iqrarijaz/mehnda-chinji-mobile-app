@@ -252,7 +252,7 @@ const ForgotPasswordScreen = memo(function ForgotPasswordScreen() {
                                 Remember your password?{' '}
                             </ThemedText>
                             <TouchableOpacity onPress={() => router.back()}>
-                                <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#006666' }]}>Log In</ThemedText>
+                                <ThemedText style={[styles.footerLink, { color: isDark ? colors.text : colors.primary, fontWeight: 'bold' }]}>Log In</ThemedText>
                             </TouchableOpacity>
                         </View>
                     </View>

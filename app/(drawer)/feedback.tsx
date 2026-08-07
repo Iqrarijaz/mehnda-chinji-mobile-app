@@ -150,7 +150,7 @@ export default function FeedbackScreen() {
             {/* Tab Selector */}
             <View style={styles.tabContainer}>
                 <TouchableOpacity
-                    style={[styles.tabItem, activeTab === 'submit' && { borderBottomWidth: 2, borderBottomColor: colors.primary }]}
+                    style={[styles.tabItem, activeTab === 'submit' && { borderBottomWidth: 0, borderBottomColor: colors.primary }]}
                     onPress={() => setActiveTab('submit')}
                 >
                     <ThemedText style={[styles.tabText, activeTab === 'submit' ? { color: colors.primary, fontWeight: '700' } : { color: colors.textSecondary }]}>
@@ -158,7 +158,7 @@ export default function FeedbackScreen() {
                     </ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.tabItem, activeTab === 'history' && { borderBottomWidth: 2, borderBottomColor: colors.primary }]}
+                    style={[styles.tabItem, activeTab === 'history' && { borderBottomWidth: 0, borderBottomColor: colors.primary }]}
                     onPress={() => setActiveTab('history')}
                 >
                     <ThemedText style={[styles.tabText, activeTab === 'history' ? { color: colors.primary, fontWeight: '700' } : { color: colors.textSecondary }]}>

@@ -195,7 +195,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                                         styles.reasonCard,
                                         {
                                             borderColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'),
-                                            borderWidth: 1,
+                                            borderWidth: 0,
                                             backgroundColor: isSelected ? `${colors.primary}10` : (isDark ? 'rgba(255,255,255,0.03)' : '#FFFFFF')
                                         }
                                     ]}
@@ -227,7 +227,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
                                     color: colors.text,
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
                                     borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
-                                    borderWidth: 1
+                                    borderWidth: 0
                                 }
                             ]}
                             placeholder="Please provide any extra context..."

@@ -108,7 +108,7 @@ export default function ManageCitiesScreen() {
                         {results.map((r, i) => (
                             <TouchableOpacity
                                 key={`${r.latitude}-${r.longitude}-${i}`}
-                                style={[styles.resultRow, { borderBottomWidth: 1, borderBottomColor: colors.border }]}
+                                style={[styles.resultRow, { borderBottomWidth: 0, borderBottomColor: colors.border }]}
                             >
                                 <ThemedText style={[styles.resultText, { color: colors.text }]} numberOfLines={2}>
                                     {r.displayName}

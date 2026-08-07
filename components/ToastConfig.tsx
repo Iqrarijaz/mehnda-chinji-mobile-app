@@ -56,14 +56,14 @@ const ToastLayout = ({
     // dropped onto a dark screen.
     const accent = isSuccess ? colors.success : colors.danger;
     const bg = theme === 'dark'
-        ? (isSuccess ? 'rgba(74,222,128,0.14)' : 'rgba(248,113,113,0.14)')
+        ? colors.card // Opaque background for dark mode to fix transparency issue
         : (isSuccess ? '#CFFAE3' : '#FAD1D1');
 
     return (
         <View
             style={[
                 styles.toast,
-                { backgroundColor: bg, borderColor: `${accent}33`, borderWidth: theme === 'dark' ? 1 : 0 },
+                { backgroundColor: bg, borderColor: `${accent}33`, borderWidth: 0 },
             ]}
         >
             {/* Animated background blobs */}

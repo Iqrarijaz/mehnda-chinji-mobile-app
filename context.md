@@ -205,5 +205,5 @@ When modifying or extending this repository:
    - Use **TanStack Query** for server state.
    - Use **Zustand** (`store/`) for persistent app settings or UI flags.
    - Use **React Context** (`context/`) ONLY for top-level runtime providers.
-4. **Styling & Theming**: Use `components/ui/ThemedText.tsx` and `components/ui/ThemedView.tsx` to support light/dark modes automatically.
+4. **Styling & Theming**: Use `components/ui/ThemedText.tsx` and `components/ui/ThemedView.tsx` to support light/dark modes automatically. Ensure strict adherence to a flat, borderless design language globally—do NOT use `borderWidth`, `borderTopWidth`, `borderBottomWidth`, etc. All new cards, inputs, buttons, and tabs must rely on background colors, shadows, and spacing for visual hierarchy instead of borders. Ensure all icons and navigation links are properly synced with Dark Mode using `colors.text` or `colors.icon`.
 5. **Storage**: Prefer `react-native-mmkv` for fast key-value storage. Use `expo-secure-store` only for sensitive authentication tokens.

@@ -67,6 +67,23 @@ const EssentialSubmitForm = React.memo(({
             totalTeachers: editData?.metadata?.totalTeachers?.toString() || '' }
     });
 
+    const resetForm = () => {
+        setForm({
+            name: '',
+            address: '',
+            timing: '',
+            type: '',
+            tags: [],
+            contact: [{ name: '', number: '' }],
+            route: [{ city: '', time: '' }],
+            returnRoute: [{ city: '', time: '' }],
+            metadata: { principalName: '', totalStudents: '', totalTeachers: '' }
+        });
+        setFromTime('');
+        setToTime('');
+        setErrors({});
+    };
+
     const selectedTypeInfo = typesToRender.find((t: any) => t.key?.toLowerCase() === form.type?.toLowerCase());
     const availableTags = selectedTypeInfo?.tags || [];
 
@@ -304,6 +321,9 @@ const EssentialSubmitForm = React.memo(({
 
         submitMutation.mutate({ payload, isEditing, id: editData?._id }, {
             onSuccess: () => {
+                if (!isEditing) {
+                    resetForm();
+                }
                 onSuccess();
             }
         });
@@ -723,16 +743,17 @@ const EssentialSubmitForm = React.memo(({
             )}
 
             <Animated.View entering={FadeInDown.delay(500)} style={styles.footer}>
-
                 <CancelButton
                     onPress={onCancel}
+                    disabled={isPending || isUploading}
+                    style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 40 }}
                 />
-
                 <SubmitButton
-                    title={isEditing ? 'Update' : 'Submit'}
+                    title={isEditing ? 'Update' : 'Post Now'}
                     onPress={handleSubmit}
                     isLoading={isPending || isUploading}
                     disabled={isPending || isUploading || (isEditing && !hasChanges)}
+                    style={{ width: 160, height: 40, borderRadius: 30 }}
                 />
             </Animated.View>
             <LoaderOverlay

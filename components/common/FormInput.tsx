@@ -93,7 +93,7 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                     {
                         backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
                         minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52),
-                        borderWidth: 1.5
+                        borderWidth: 0
                     },
                     multiline && { alignItems: 'flex-start', paddingVertical: 10 },
                     inputBoxStyle,

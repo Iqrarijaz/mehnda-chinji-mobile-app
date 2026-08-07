@@ -256,7 +256,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC' }}
                         rightAccessory={
                             checkingAccount.email ? (
-                                <ActivityIndicator size="small" color="#006666" style={{ marginLeft: 8 }} />
+                                <ActivityIndicator size="small" color={colors.primary} style={{ marginLeft: 8 }} />
                             ) : renderValidationIcon('email')
                         }
                     />
@@ -283,7 +283,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC' }}
                         rightAccessory={
                             checkingAccount.phone ? (
-                                <ActivityIndicator size="small" color="#006666" style={{ marginLeft: 8 }} />
+                                <ActivityIndicator size="small" color={colors.primary} style={{ marginLeft: 8 }} />
                             ) : renderValidationIcon('phone')
                         }
                     />
@@ -374,7 +374,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, { borderWidth: 1, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.ageVerified && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                        <View style={[styles.checkbox, { borderWidth: 0, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.ageVerified && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                             {formData.ageVerified && <Ionicons name="checkmark" size={14} color="#FFF" />}
                         </View>
                     </TouchableOpacity>
@@ -393,7 +393,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, { borderWidth: 1, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.termsAccepted && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                        <View style={[styles.checkbox, { borderWidth: 0, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.termsAccepted && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                             {formData.termsAccepted && <Ionicons name="checkmark" size={14} color="#FFF" />}
                         </View>
                     </TouchableOpacity>
@@ -427,7 +427,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         }}
                         activeOpacity={0.7}
                     >
-                        <View style={[styles.checkbox, { borderWidth: 1, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.guidelinesAccepted && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                        <View style={[styles.checkbox, { borderWidth: 0, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : '#E2E8F0' }, formData.guidelinesAccepted && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                             {formData.guidelinesAccepted && <Ionicons name="checkmark" size={14} color="#FFF" />}
                         </View>
                     </TouchableOpacity>
@@ -445,7 +445,6 @@ export const RegisterForm = React.memo(function RegisterForm() {
 
                 {errors.guidelinesAccepted && <ThemedText style={[styles.errorText, { marginTop: -12, marginBottom: 16 }]}>{errors.guidelinesAccepted}</ThemedText>}
 
-                {/* Register Button */}
                 <SubmitButton
                     title="Sign Up"
                     onPress={handleRegister}
@@ -458,7 +457,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                 <TouchableOpacity
                     style={[
                         styles.registerButton,
-                        { backgroundColor: colors.cardBg, marginTop: 8, marginBottom: 8 }
+                        { backgroundColor: colors.cardBg, marginTop: 12, marginBottom: 20 }
                     ]}
                     onPress={handleGoogleLogin}
                     disabled={formData.googleLoading}
@@ -476,7 +475,7 @@ export const RegisterForm = React.memo(function RegisterForm() {
                         Already have an account?{' '}
                     </ThemedText>
                     <TouchableOpacity onPress={() => router.push('/login' as any)}>
-                        <ThemedText style={[styles.footerLink, { color: isDark ? '#FFFFFF' : '#006666', fontWeight: 'bold' }]}>Log In</ThemedText>
+                        <ThemedText style={[styles.footerLink, { color: isDark ? colors.text : colors.primary, fontWeight: 'bold' }]}>Log In</ThemedText>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -538,18 +537,15 @@ const styles = StyleSheet.create({
         fontSize: 10.5,
         fontWeight: '500' },
     registerButton: {
-        height: 52,
-        borderRadius: Layout.borderRadius,
+        height: 46,
+        borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 8,
-        marginBottom: 20,
         overflow: 'hidden' },
     registerButtonText: {
         color: '#FFFFFF',
-        fontSize: 10.5,
-        fontWeight: '700',
-        letterSpacing: 0.5 },
+        fontSize: 12.5,
+        fontWeight: '600' },
     footer: {
         flexDirection: 'row',
         justifyContent: 'center',

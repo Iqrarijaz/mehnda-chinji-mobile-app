@@ -138,7 +138,7 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
         }
 
         return (
-            <View style={[styles.resultItem, { borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', borderBottomWidth: 1 }]}>
+            <View style={[styles.resultItem, { borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', borderBottomWidth: 0 }]}>
                 <View style={[styles.iconBox, { backgroundColor: `${color}15` }]}>
                     <Ionicons name={icon} size={18} color={color} />
                 </View>

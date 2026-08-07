@@ -8,7 +8,8 @@ import Animated, {
     useReducedMotion,
     useSharedValue,
     withRepeat,
-    withTiming } from 'react-native-reanimated';
+    withTiming
+} from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -19,99 +20,119 @@ interface LoaderOverlayProps {
 }
 
 /**
- * Brand orbit — three dots (primary / lime / secondary) orbit a soft
- * breathing halo, gently floating. Runs entirely on the UI thread, is
- * reduce-motion aware, and uses no shadows/elevation (flat, matching the
- * app's existing convention).
+ * Single Wave Dot Component
+ * Renders an animated dot that moves vertically, scales, and fades along a continuous sine wave.
  */
-const ORBIT = 110;
-const R = 38;
-const DOT = 24;
-const CENTER = ORBIT / 2;
-
-const OrbitDot = memo(function OrbitDot({
-    spin,
+const WaveDot = memo(function WaveDot({
+    index,
     color,
-    angle,
-    phase }: {
-    spin: SharedValue<number>;
+    progress,
+    isReducedMotion
+}: {
+    index: number;
     color: string;
-    angle: number;
-    phase: number;
+    progress: SharedValue<number>;
+    isReducedMotion: boolean;
 }) {
-    const rad = (angle * Math.PI) / 180;
-    const left = CENTER + R * Math.cos(rad) - DOT / 2;
-    const top = CENTER + R * Math.sin(rad) - DOT / 2;
+    const animatedStyle = useAnimatedStyle(() => {
+        if (isReducedMotion) {
+            return {
+                transform: [{ translateY: 0 }, { scale: 1 }],
+                opacity: 0.8
+            };
+        }
 
-    const style = useAnimatedStyle(() => {
-        // A wave travels around the ring so dots "float", the leading one largest.
-        const t = spin.value * Math.PI * 2 + phase;
-        const wave = 0.5 + 0.5 * Math.sin(t);
+        // Phase shift each dot by ~0.75 radians so the wave flows left-to-right
+        const phase = progress.value * 2 * Math.PI - index * 0.75;
+        const sinValue = Math.sin(phase);
+
+        // Vertical sine wave offset (-7px to +7px)
+        const translateY = sinValue * 7;
+        // Smooth scale oscillation between 0.7 and 1.15
+        const scale = interpolate(sinValue, [-1, 1], [0.7, 1.15]);
+        // Smooth opacity fade between 40% (0.4) and 100% (1.0)
+        const opacity = interpolate(sinValue, [-1, 1], [0.4, 1.0]);
+
         return {
-            transform: [{ scale: 0.62 + 0.38 * wave }],
-            opacity: 0.55 + 0.45 * wave };
+            transform: [{ translateY }, { scale }],
+            opacity
+        };
     });
 
     return (
         <Animated.View
             style={[
-                { position: 'absolute', left, top, width: DOT, height: DOT, borderRadius: DOT / 2, backgroundColor: color },
-                style,
+                styles.dot,
+                { backgroundColor: color },
+                animatedStyle
             ]}
         />
     );
 });
 
-const BrandOrbit = memo(function BrandOrbit({ colors }: { colors: typeof Colors.light }) {
-    const reduced = useReducedMotion();
-    const spin = useSharedValue(0);
-    const breath = useSharedValue(0);
-    const float = useSharedValue(0);
+/**
+ * Horizontal Wave Loader Container
+ * Controls 4 brand-colored dots executing a synchronized sine-wave animation on the UI thread.
+ */
+const HorizontalWaveLoader = memo(function HorizontalWaveLoader({
+    colors,
+    isDark
+}: {
+    colors: typeof Colors.light;
+    isDark: boolean;
+}) {
+    const isReducedMotion = useReducedMotion();
+    const progress = useSharedValue(0);
 
-    const dots = [
-        { color: colors.primary, angle: -90 },
-        { color: colors.lime, angle: 30 },
-        { color: colors.secondary, angle: 150 },
-    ] as const;
+    // 4 Curated Brand Colors: Primary, Lime, Secondary, and Light Accent Tint
+    const dotColors = [
+        colors.primary || '#009688', // Brand Primary
+        colors.lime || '#A7D129',    // Brand Lime
+        colors.secondary || '#FCBD48', // Brand Secondary
+        isDark ? '#5EEAD4' : '#0F766E' // Light/Dark Tint
+    ];
 
     useEffect(() => {
-        if (reduced) {
-            spin.value = 0.5;
-            breath.value = 0.5;
+        if (isReducedMotion) {
+            progress.value = 0;
             return;
         }
-        spin.value = withRepeat(withTiming(1, { duration: 1600, easing: Easing.linear }), -1, false);
-        breath.value = withRepeat(withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.quad) }), -1, true);
-        float.value = withRepeat(withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.sin) }), -1, true);
-    }, [reduced]);
 
-    const groupStyle = useAnimatedStyle(() => ({
-        transform: [
-            { translateY: interpolate(float.value, [0, 1], [-3, 3]) },
-            { rotate: `${spin.value * 360}deg` },
-        ] }));
-    const haloStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: interpolate(breath.value, [0, 1], [0.82, 1.12]) }],
-        opacity: interpolate(breath.value, [0, 1], [0.18, 0.42]) }));
-    const coreStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: interpolate(breath.value, [0, 1], [0.9, 1.08]) }] }));
+        // Continuous smooth 60 FPS sine wave loop on the UI thread
+        progress.value = withRepeat(
+            withTiming(1, {
+                duration: 1350,
+                easing: Easing.linear
+            }),
+            -1,
+            false
+        );
+    }, [isReducedMotion, progress]);
 
     return (
-        <View style={styles.orbitBox}>
-            <Animated.View style={[styles.halo, { backgroundColor: colors.lime }, haloStyle]} />
-            <Animated.View style={[StyleSheet.absoluteFill, groupStyle]}>
-                {dots.map((d, i) => (
-                    <OrbitDot key={i} spin={spin} color={d.color} angle={d.angle} phase={(i * 2 * Math.PI) / 3} />
-                ))}
-            </Animated.View>
-            <Animated.View style={[styles.core, { backgroundColor: colors.primary }, coreStyle]} />
+        <View style={styles.waveContainer}>
+            {dotColors.map((color, idx) => (
+                <WaveDot
+                    key={idx}
+                    index={idx}
+                    color={color}
+                    progress={progress}
+                    isReducedMotion={!!isReducedMotion}
+                />
+            ))}
         </View>
     );
 });
 
-export const LoaderOverlay: React.FC<LoaderOverlayProps> = ({ visible, text }) => {
+/**
+ * Premium LoaderOverlay Component
+ * A flat, modern, non-intrusive full-screen loading modal with a centered card
+ * featuring a horizontal wave dot loader and clean loading message.
+ */
+export const LoaderOverlay: React.FC<LoaderOverlayProps> = memo(({ visible, text }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
+    const isDark = theme === 'dark';
 
     if (!visible) return null;
 
@@ -120,45 +141,87 @@ export const LoaderOverlay: React.FC<LoaderOverlayProps> = ({ visible, text }) =
             transparent
             animationType="fade"
             visible={visible}
-            onRequestClose={() => {}}
+            hardwareAccelerated
+            statusBarTranslucent
+            onRequestClose={() => { }}
         >
-            <View style={styles.overlay}>
-                <BrandOrbit colors={colors} />
-                {text ? (
-                    <ThemedText style={styles.text} numberOfLines={2}>
-                        {text}
-                    </ThemedText>
-                ) : null}
+            <View style={[
+                styles.backdrop,
+                { backgroundColor: isDark ? 'rgba(0, 0, 0, 0.65)' : 'rgba(0, 0, 0, 0.4)' }
+            ]}>
+                <View style={[
+                    styles.card,
+                    {
+                        backgroundColor: isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.96)',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'
+                    }
+                ]}>
+                    {/* 4-Dot Horizontal Wave Loader */}
+                    <HorizontalWaveLoader colors={colors} isDark={isDark} />
+
+                    {/* Loading Message */}
+                    {text ? (
+                        <ThemedText
+                            style={[
+                                styles.messageText,
+                                { color: isDark ? '#F1F5F9' : '#0F172A' }
+                            ]}
+                            numberOfLines={2}
+                        >
+                            {text}
+                        </ThemedText>
+                    ) : null}
+                </View>
             </View>
         </Modal>
     );
-};
+});
+
+LoaderOverlay.displayName = 'LoaderOverlay';
 
 const styles = StyleSheet.create({
-    overlay: {
+    backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 9999 },
-    orbitBox: {
-        width: ORBIT,
-        height: ORBIT,
+        paddingHorizontal: 24,
+        zIndex: 9999
+    },
+    card: {
+        width: '82%',
+        maxWidth: 290,
+        minHeight: 140,
+        borderRadius: 26,
+        paddingVertical: 26,
+        paddingHorizontal: 24,
         alignItems: 'center',
-        justifyContent: 'center' },
-    halo: {
-        position: 'absolute',
-        width: ORBIT,
-        height: ORBIT,
-        borderRadius: ORBIT / 2 },
-    core: {
-        width: 20,
-        height: 20,
-        borderRadius: 10 },
-    text: {
+        justifyContent: 'center',
+        borderWidth: 1,
+        // Strictly flat design - no shadows or elevation
+        elevation: 0,
+        shadowColor: 'transparent',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0
+    },
+    waveContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 36,
+        gap: 12
+    },
+    dot: {
+        width: 12,
+        height: 12,
+        borderRadius: 6
+    },
+    messageText: {
         marginTop: 18,
-        color: '#FFFFFF',
-        fontSize: 12.5,
-        fontWeight: '700',
+        fontSize: 13,
+        fontWeight: '600',
         textAlign: 'center',
-        letterSpacing: 0.2 } });
+        letterSpacing: 0.3,
+        lineHeight: 18
+    }
+});

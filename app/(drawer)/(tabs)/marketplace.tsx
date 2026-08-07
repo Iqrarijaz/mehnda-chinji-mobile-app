@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden' },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 4,
-        paddingBottom: 7 },
+        paddingBottom: 14 },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -458,7 +458,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 3 },
     listContent: {
-        paddingHorizontal: 13 },
+        paddingHorizontal: 13,
+        paddingTop: 14 },
     centered: {
         flex: 1,
         justifyContent: 'center',

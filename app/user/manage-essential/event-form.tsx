@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { addEvent, updateEvent, uploadUserImage } from '@/apis/essentials';
+import { addEvent, updateEvent, uploadUserImage, deleteUserImage } from '@/apis/essentials';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ThemedText } from '@/components/ThemedText';
 import { BackButton } from '@/components/common/BackButton';
@@ -110,8 +110,8 @@ const EventForm = () => {
             formData.append('folderName', 'events');
 
             const response: any = await uploadUserImage(formData);
-            if (response.success) {
-                const newUrl = response.data.imageUrl;
+            const newUrl = response?.data?.imageUrl || response?.imageUrl;
+            if (newUrl) {
                 setSelectedImages(prev => [...prev, newUrl]);
                 setForm(prev => ({ ...prev, images: [...prev.images, newUrl] }));
             }
@@ -123,6 +123,10 @@ const EventForm = () => {
     };
 
     const removeImage = (index: number) => {
+        const targetUrl = selectedImages[index];
+        if (targetUrl) {
+            deleteUserImage(targetUrl).catch((err) => console.log('Failed to delete image from server:', err));
+        }
         setSelectedImages(prev => prev.filter((_, i) => i !== index));
         setForm(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
     };

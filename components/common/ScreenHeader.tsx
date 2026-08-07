@@ -171,7 +171,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                                 containerStyle={{ marginRight: 12 }}
                             />
                             <TouchableOpacity onPress={() => router.push('/profile')} style={styles.avatarBtn}>
-                                <Avatar size={38} uri={user?.user?.profile_image_url || user?.user?.avatar} name={user?.user?.first_name || user?.user?.name || ''} />
+                                <Avatar size={38} uri={user?.user?.profileImage || user?.user?.profile_image_url || user?.user?.avatar} name={user?.user?.name || user?.user?.first_name || ''} />
                             </TouchableOpacity>
                         </>
                     )}
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: Platform.OS === 'android' ? 18 : 20
+        marginBottom: Platform.OS === 'android' ? 10 : 12
     },
     leftSide: {
         flexDirection: 'row',

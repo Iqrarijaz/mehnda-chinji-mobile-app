@@ -7,14 +7,12 @@ import React, { memo, useCallback } from 'react';
 import {
     Platform,
     StyleSheet,
+    Switch,
     TouchableOpacity,
     View } from 'react-native';
-import Animated, { FadeIn, FadeInLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useRewardedAd } from '@/ads/hooks/useAds';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
-import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { ThemedText } from '@/components/ThemedText';
 import Avatar from '@/components/ui/Avatar';
 import { Colors } from '@/constants/colors';
@@ -51,7 +49,6 @@ interface DrawerRowProps {
     item: MenuItem;
     isFocused: boolean;
     isDisabled: boolean;
-    delay: number;
     colors: typeof Colors.light;
     onPress: () => void;
 }
@@ -60,82 +57,126 @@ const DrawerRow = memo(function DrawerRow({
     item,
     isFocused,
     isDisabled,
-    delay,
     colors,
     onPress }: DrawerRowProps) {
     return (
-        <Animated.View entering={FadeInLeft.delay(delay).duration(300)}>
-            <PressableScale
-                intensity={0.03}
-                disabled={isDisabled}
-                onPress={onPress}
+        <TouchableOpacity
+            activeOpacity={0.7}
+            disabled={isDisabled}
+            onPress={onPress}
+            style={[
+                styles.menuItem,
+                isFocused && { backgroundColor: `${colors.primary}0F` },
+                isDisabled && { opacity: 0.5 },
+            ]}
+        >
+            {/* Active accent bar */}
+            {isFocused && <View style={[styles.activeBar, { backgroundColor: colors.lime }]} />}
+
+            {/* Icon tile */}
+            <View
                 style={[
-                    styles.menuItem,
-                    isFocused && { backgroundColor: `${colors.primary}0F` },
-                    isDisabled && { opacity: 0.5 },
+                    styles.iconTile,
+                    {
+                        backgroundColor: isFocused
+                            ? colors.primary
+                            : `${colors.primary}0D` },
                 ]}
             >
-                {/* Active accent bar */}
-                {isFocused && <View style={[styles.activeBar, { backgroundColor: colors.lime }]} />}
-
-                {/* Icon tile */}
-                <View
-                    style={[
-                        styles.iconTile,
-                        {
-                            backgroundColor: isFocused
-                                ? colors.primary
-                                : `${colors.primary}0D` },
-                    ]}
-                >
-                    <Ionicons
-                        name={item.icon}
-                        size={18}
-                        color={isFocused ? '#FFFFFF' : colors.textSecondary}
-                    />
-                </View>
-
-                <ThemedText
-                    style={[
-                        styles.menuLabel,
-                        { color: isFocused ? colors.primary : colors.text },
-                        isFocused && { fontWeight: '800' },
-                    ]}
-                    numberOfLines={1}
-                >
-                    {item.label}
-                </ThemedText>
-
                 <Ionicons
-                    name="chevron-forward"
-                    size={16}
-                    color={isFocused ? colors.primary : `${colors.textSecondary}66`}
+                    name={item.icon}
+                    size={18}
+                    color={isFocused ? '#FFFFFF' : colors.textSecondary}
                 />
-            </PressableScale>
-        </Animated.View>
+            </View>
+
+            <ThemedText
+                style={[
+                    styles.menuLabel,
+                    { color: isFocused ? colors.primary : colors.text },
+                    isFocused && { fontWeight: '800' },
+                ]}
+                numberOfLines={1}
+            >
+                {item.label}
+            </ThemedText>
+
+            <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={isFocused ? colors.primary : `${colors.textSecondary}66`}
+            />
+        </TouchableOpacity>
+    );
+});
+
+interface DarkModeDrawerRowProps {
+    colors: typeof Colors.light;
+    isDark: boolean;
+    onToggle: () => void;
+}
+
+const DarkModeDrawerRow = memo(function DarkModeDrawerRow({
+    colors,
+    isDark,
+    onToggle }: DarkModeDrawerRowProps) {
+    return (
+        <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={onToggle}
+            style={styles.menuItem}
+        >
+            <View
+                style={[
+                    styles.iconTile,
+                    {
+                        backgroundColor: isDark
+                            ? `${colors.primary}20`
+                            : `${colors.primary}0D` },
+                ]}
+            >
+                <Ionicons
+                    name={isDark ? 'moon' : 'moon-outline'}
+                    size={18}
+                    color={isDark ? colors.lime : colors.textSecondary}
+                />
+            </View>
+
+            <ThemedText
+                style={[
+                    styles.menuLabel,
+                    { color: colors.text },
+                ]}
+                numberOfLines={1}
+            >
+                Dark Mode
+            </ThemedText>
+
+            <Switch
+                value={isDark}
+                onValueChange={onToggle}
+                trackColor={{ false: `${colors.textSecondary}33`, true: colors.primary }}
+                thumbColor={isDark ? colors.lime : '#f5f5f5'}
+                ios_backgroundColor={`${colors.textSecondary}33`}
+                style={Platform.OS === 'ios' ? { transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] } : undefined}
+            />
+        </TouchableOpacity>
     );
 });
 
 const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
     const { user, logout } = useAuth();
-    const { theme } = useTheme();
+    const { theme, isDark, toggleTheme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { showAd, isAdLoaded } = useRewardedAd();
     const [isLoggingOut, setIsLoggingOut] = React.useState(false);
 
     const activeRoute = props.state.routes[props.state.index].name;
 
     const handleNavigation = useCallback((route: string) => {
-        if (route === 'REWARDED_AD') {
-            showAd(() => {
-                console.log('Reward earned from drawer!');
-            });
-            return;
-        }
         router.navigate(route as any);
-    }, [router, showAd]);
+    }, [router]);
 
     const handleLogout = useCallback(async () => {
         setIsLoggingOut(true);
@@ -168,8 +209,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
     return (
         <View style={[styles.container, { backgroundColor: colors.card }]}>
             {/* ── Premium hero header ─────────────────────────────────── */}
-            <Animated.View
-                entering={FadeIn.duration(400)}
+            <View
                 style={[
                     styles.header,
                     {
@@ -217,7 +257,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
 
                     <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.7)" />
                 </TouchableOpacity>
-            </Animated.View>
+            </View>
 
             {/* ── Menu ────────────────────────────────────────────────── */}
             <DrawerContentScrollView
@@ -227,48 +267,50 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
             >
                 {Object.entries(sections).map(([sectionName, items], sectionIndex) => (
                     <View key={sectionName} style={styles.section}>
-                        <Animated.View entering={FadeInLeft.delay(80 + sectionIndex * 40).duration(300)}>
+                        <View>
                             <View style={styles.sectionLabelRow}>
                                 <View style={[styles.sectionDot, { backgroundColor: colors.secondary }]} />
                                 <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>{sectionName}</ThemedText>
                             </View>
-                        </Animated.View>
+                        </View>
                         {items.map((item) => {
                             const isFocused =
                                 (item.route === '/(tabs)' && activeRoute === '(tabs)') ||
                                 item.route === `/${activeRoute}`;
-
-                            const isDisabled = item.route === 'REWARDED_AD' && !isAdLoaded;
-                            const delay = 120 + rowIndex * 40;
-                            rowIndex += 1;
 
                             return (
                                 <DrawerRow
                                     key={item.route}
                                     item={item}
                                     isFocused={isFocused}
-                                    isDisabled={isDisabled}
-                                    delay={delay}
+                                    isDisabled={false}
                                     colors={colors}
                                     onPress={() => handleNavigation(item.route)}
                                 />
                             );
                         })}
+                        {sectionName === 'Account' && (
+                            <DarkModeDrawerRow
+                                key="dark-mode-toggle"
+                                colors={colors}
+                                isDark={isDark}
+                                onToggle={toggleTheme}
+                            />
+                        )}
                     </View>
                 ))}
             </DrawerContentScrollView>
 
             {/* ── Footer ──────────────────────────────────────────────── */}
             <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
-                <PressableScale
-                    intensity={0.03}
+                <TouchableOpacity
+                    activeOpacity={0.7}
                     onPress={handleLogout}
-                    containerStyle={styles.logoutBtnWrap}
                     style={[styles.logoutBtn, { backgroundColor: `${colors.secondary}12` }]}
                 >
                     <Ionicons name="log-out-outline" size={18} color={colors.secondary} style={{ marginRight: 8 }} />
                     <ThemedText style={[styles.logoutText, { color: colors.secondary }]}>Sign Out</ThemedText>
-                </PressableScale>
+                </TouchableOpacity>
                 <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.4'}</ThemedText>
             </View>
             <LoaderOverlay visible={isLoggingOut} text="Logging out..." />

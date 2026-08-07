@@ -46,36 +46,29 @@ interface WeatherRowProps {
     pop?: number;
     colors: typeof Colors.light;
     animateTemp?: boolean;
+    updatedLabel?: string;
+    showFullForecast?: boolean;
 }
-const WeatherRow = React.memo(({ width, icon, temp, conditionLine, cityLabel, high, low, pop, colors, animateTemp }: WeatherRowProps) => {
+const WeatherRow = React.memo(({ width, icon, temp, conditionLine, cityLabel, high, low, pop, colors, animateTemp, updatedLabel, showFullForecast }: WeatherRowProps) => {
     const TempWrap = animateTemp ? Animated.View : View;
     return (
         <View style={[styles.weatherCol, width ? { width } : null]}>
-            <View style={styles.weatherRow}>
-                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                    <View style={styles.iconTempBlock}>
-                        <Ionicons name={getWeatherIconName(icon)} size={32} color="#FFFFFF" />
-                        <TempWrap {...(animateTemp ? { key: String(temp), entering: FadeIn.duration(400) } : {})}>
-                            <ThemedText style={styles.temp}>{temp}°</ThemedText>
-                        </TempWrap>
-                    </View>
-                    <ThemedText style={{ fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.85)', marginTop: 2, textAlign: 'center' }} numberOfLines={1}>
+            <View style={[styles.weatherRow, { justifyContent: 'space-between', width: '100%' }]}>
+                
+                {/* Left Side: City & Conditions */}
+                <View style={styles.weatherInfoBlockLeft}>
+                    <ThemedText style={styles.cityLabelHuge} numberOfLines={1}>
                         {cityLabel}
                     </ThemedText>
-                </View>
-
-                <View style={[styles.weatherDivider, { backgroundColor: `${colors.lime}55` }]} />
-
-                <View style={styles.weatherInfoBlock}>
                     <ThemedText style={styles.conditionCity} numberOfLines={1}>
                         {conditionLine}
                     </ThemedText>
                     <View style={styles.hiLoRow}>
-                        <Ionicons name="arrow-up" size={11} color={colors.lime} />
+                        <Ionicons name="arrow-up" size={10} color={colors.lime} />
                         <ThemedText style={[styles.highLow, { color: colors.lime }]}>
                             {high != null ? `${high}°` : '--'}
                         </ThemedText>
-                        <Ionicons name="arrow-down" size={11} color={colors.secondary} style={{ marginLeft: 8 }} />
+                        <Ionicons name="arrow-down" size={10} color={colors.secondary} style={{ marginLeft: 6 }} />
                         <ThemedText style={[styles.highLow, { color: colors.secondary }]}>
                             {low != null ? `${low}°` : '--'}
                         </ThemedText>
@@ -87,6 +80,33 @@ const WeatherRow = React.memo(({ width, icon, temp, conditionLine, cityLabel, hi
                         ) : null}
                     </View>
                 </View>
+
+                {/* Right Side: Big Icon, Temp, Updated, & Affordance */}
+                <View style={styles.iconTempBlockRight}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Ionicons name={getWeatherIconName(icon)} size={36} color="#FFFFFF" />
+                        <TempWrap key={animateTemp ? String(temp) : undefined} {...(animateTemp ? { entering: FadeIn.duration(400) } : {})}>
+                            <ThemedText style={styles.tempHuge}>{temp}°</ThemedText>
+                        </TempWrap>
+                    </View>
+                    
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                        {updatedLabel && (
+                            <View style={styles.updatedInner}>
+                                <Ionicons name="time-outline" size={9} color="rgba(255,255,255,0.7)" />
+                                <ThemedText style={styles.updated}>{updatedLabel}</ThemedText>
+                            </View>
+                        )}
+                        
+                        {showFullForecast && (
+                            <View style={styles.tapHint}>
+                                <ThemedText style={[styles.tapHintText, { color: colors.secondary }]}>Forecast</ThemedText>
+                                <Ionicons name="chevron-forward" size={10} color={colors.secondary} />
+                            </View>
+                        )}
+                    </View>
+                </View>
+                
             </View>
         </View>
     );
@@ -262,6 +282,8 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                                         low={low}
                                         colors={colors}
                                         animateTemp
+                                        updatedLabel={updatedLabel}
+                                        showFullForecast={true}
                                     />
                                     <WeatherRow
                                         width={pagerWidth}
@@ -273,6 +295,7 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                                         low={tomorrow!.low}
                                         pop={tomorrow!.pop}
                                         colors={colors}
+                                        showFullForecast={true}
                                     />
                                 </ScrollView>
                             ) : (
@@ -285,6 +308,8 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                                     low={low}
                                     colors={colors}
                                     animateTemp
+                                    updatedLabel={updatedLabel}
+                                    showFullForecast={true}
                                 />
                             )}
 
@@ -302,20 +327,6 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                                     </ThemedText>
                                 </View>
                             ) : null}
-                        </View>
-                    </View>
-
-                    <View style={styles.updatedRow}>
-                        {updatedLabel ? (
-                            <View style={styles.updatedInner}>
-                                <Ionicons name="time-outline" size={10} color="rgba(255,255,255,0.7)" />
-                                <ThemedText style={styles.updated}>Updated {updatedLabel}</ThemedText>
-                            </View>
-                        ) : <View />}
-                        {/* Tap affordance — the whole card opens the full weather screen */}
-                        <View style={styles.tapHint}>
-                            <ThemedText style={[styles.tapHintText, { color: colors.secondary }]}>Full forecast</ThemedText>
-                            <Ionicons name="chevron-forward" size={11} color={colors.secondary} />
                         </View>
                     </View>
                 </View>
@@ -339,9 +350,9 @@ function relativeTime(unixSec?: number): string {
 const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        marginBottom: 8
+        paddingHorizontal: 12,
+        paddingVertical: 5,
+        marginBottom: 4
     },
     row: {
         flexDirection: 'row',
@@ -359,25 +370,38 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center'
     },
-    iconTempBlock: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6
-    },
-    weatherDivider: {
-        width: 1,
-        height: 30,
-        marginHorizontal: 10
-    },
-    weatherInfoBlock: {
+    weatherInfoBlockLeft: {
         flex: 1,
+        justifyContent: 'center',
+        paddingRight: 8
+    },
+    cityLabelHuge: {
+        fontSize: 15,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        marginBottom: 1
+    },
+    iconTempBlockRight: {
+        flexDirection: 'column',
+        alignItems: 'flex-end',
         justifyContent: 'center'
+    },
+    tempHuge: {
+        fontSize: 30,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        lineHeight: 32
+    },
+    conditionCity: {
+        fontSize: 11.5,
+        fontWeight: '700',
+        color: '#FFFFFF'
     },
     pagerHintRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        marginTop: 6
+        marginTop: 2
     },
     pagerDots: {
         flexDirection: 'row',
@@ -400,39 +424,23 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 2,
-        marginLeft: 8,
-        paddingHorizontal: 5,
+        marginLeft: 6,
+        paddingHorizontal: 4,
         paddingVertical: 1,
-        borderRadius: 8
+        borderRadius: 6
     },
     popPillText: {
         fontSize: 9,
         fontWeight: '700'
     },
-    temp: {
-        fontSize: 26,
-        fontWeight: '800',
-        color: '#FFFFFF',
-        lineHeight: 30
-    },
-    condition: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.9)'
-    },
-    conditionCity: {
-        fontSize: 12.5,
-        fontWeight: '700',
-        color: '#FFFFFF'
-    },
     hiLoRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 4,
+        marginTop: 2,
         flexWrap: 'wrap'
     },
     highLow: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '700',
         marginLeft: 2
     },
@@ -441,15 +449,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginTop: 8
+        marginTop: 2
     },
     updatedInner: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4
+        gap: 3
     },
     updated: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.7)'
     },
@@ -459,7 +467,7 @@ const styles = StyleSheet.create({
         gap: 1
     },
     tapHintText: {
-        fontSize: 9.5,
+        fontSize: 9,
         fontWeight: '700'
     }
 });

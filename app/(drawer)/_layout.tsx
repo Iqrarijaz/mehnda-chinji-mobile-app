@@ -5,6 +5,8 @@ import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
+const renderDrawerContent = (props: any) => <CustomDrawerContent {...props} />;
+
 export default function DrawerLayout() {
     const { isAuthenticated } = useAuth();
     const { theme } = useTheme();
@@ -12,13 +14,14 @@ export default function DrawerLayout() {
     return (
         <View style={{ flex: 1, backgroundColor: theme === 'dark' ? Colors[theme].card : Colors[theme].background }}>
             <Drawer
-                drawerContent={(props: any) => <CustomDrawerContent {...props} />}
+                drawerContent={renderDrawerContent}
                 initialRouteName="(tabs)"
                 backBehavior="none"
                 screenOptions={{
                     headerShown: false,
                     swipeEnabled: isAuthenticated,
                     drawerType: 'front',
+                    overlayColor: 'rgba(0, 0, 0, 0.5)',
                     drawerStyle: { backgroundColor: theme === 'dark' ? Colors[theme].card : Colors[theme].background } }}
             >
                 <Drawer.Screen

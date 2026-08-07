@@ -51,6 +51,10 @@ export function uploadUserImage(formData: FormData) {
     });
 }
 
+export function deleteUserImage(imageUrl: string) {
+    return apiClient.post('/api/user/v1/delete-user-image', { imageUrl });
+}
+
 // Toppers
 export function addTopper(id: string, data: any) {
     return apiClient.post(`/api/user/v1/essential/${id}/topper`, data);

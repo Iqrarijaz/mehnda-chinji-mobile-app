@@ -50,6 +50,12 @@ const CategoryListingScreen = React.memo(() => {
     const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
     const [selectedType, setSelectedType] = useState<string>('');
 
+    React.useEffect(() => {
+        if (tab) {
+            setActiveTab(tab === 'requests' ? 'requests' : 'all');
+        }
+    }, [tab]);
+
     // Reporting state
     const reportModalRef = React.useRef<ReportModalRef>(null);
     const [reportTarget, setReportTarget] = useState<{ id: string; type: 'PLACE' | 'POST' } | null>(null);
@@ -352,6 +358,13 @@ const CategoryListingScreen = React.memo(() => {
                     </View>
                 ) : (
                     <>
+                        {activeTab === 'requests' && rawData.length > 0 && (
+                            <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 6 }}>
+                                <ThemedText style={{ fontSize: 13.5, fontWeight: '800', color: colors.text }}>
+                                    List of my essentials
+                                </ThemedText>
+                            </View>
+                        )}
                         <View style={{ flex: 1 }}>
                             <FlashList
                                 data={listData}

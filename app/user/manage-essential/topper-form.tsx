@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { addTopper, updateTopper, uploadUserImage } from '@/apis/essentials';
+import { addTopper, updateTopper, uploadUserImage, deleteUserImage } from '@/apis/essentials';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ThemedText } from '@/components/ThemedText';
 import { BackButton } from '@/components/common/BackButton';
@@ -126,14 +126,24 @@ const TopperForm = () => {
             formData.append('folderName', 'toppers');
 
             const response: any = await uploadUserImage(formData);
-            if (response.success) {
-                setForm(prev => ({ ...prev, image: response.data.imageUrl }));
+            const imageUrl = response?.data?.imageUrl || response?.imageUrl;
+            if (imageUrl) {
+                setForm(prev => ({ ...prev, image: imageUrl }));
             }
         } catch (error) {
             Toast.show({ type: 'error', text1: 'Upload Failed' });
         } finally {
             setIsUploading(false);
         }
+    };
+
+    const handleDeleteImage = () => {
+        const targetUrl = form.image || selectedImage;
+        if (targetUrl) {
+            deleteUserImage(targetUrl).catch((err) => console.log('Failed to delete image from server:', err));
+        }
+        setSelectedImage(null);
+        setForm(prev => ({ ...prev, image: '' }));
     };
 
     const mutation = useMutation({
@@ -199,10 +209,7 @@ const TopperForm = () => {
                         {!!selectedImage && !isUploading && (
                             <TouchableOpacity
                                 style={styles.deleteAvatarBtn}
-                                onPress={() => {
-                                    setSelectedImage(null);
-                                    setForm(prev => ({ ...prev, image: '' }));
-                                }}
+                                onPress={handleDeleteImage}
                             >
                                 <Ionicons name="close-circle" size={24} color="#EF4444" />
                             </TouchableOpacity>

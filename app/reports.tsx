@@ -175,7 +175,7 @@ export default function ReportsScreen() {
                                     </ThemedText>
                                 )}
 
-                                <View style={[styles.cardFooter, { borderTopWidth: 1, borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                                <View style={[styles.cardFooter, { borderTopWidth: 0, borderTopColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
                                     <ThemedText style={[styles.dateText, { color: colors.icon }]}>
                                         {dayjs(report.createdAt).format('MMM DD, YYYY • hh:mm A')}
                                     </ThemedText>

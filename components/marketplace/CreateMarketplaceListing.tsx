@@ -236,6 +236,28 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 text1: listingToEdit ? 'Listing Updated' : 'Listing Submitted',
                 text2: res.message || 'Your marketplace listing is pending admin audit!'
             });
+            if (!listingToEdit) {
+                setFormData({
+                    title: '',
+                    price: '',
+                    categoryEn: '',
+                    categoryUr: '',
+                    typeEn: '',
+                    typeUr: '',
+                    negotiable: false,
+                    address: '',
+                    city: user?.user?.city || '',
+                    village: user?.user?.village || '',
+                    showPhoneNumber: true,
+                    phone: user?.user?.phone || '',
+                    description: '',
+                    images: [],
+                    model: '',
+                    year: ''
+                });
+                setLocation(null);
+                setErrors({});
+            }
             setShowThankYou(true);
         },
         onError: (err: any) => {

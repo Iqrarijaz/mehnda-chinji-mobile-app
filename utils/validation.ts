@@ -83,7 +83,7 @@ export const businessSchema = yup.object().shape({
         .required('Business Name is required'),
     address: yup.string()
         .min(10, 'Address must be at least 10 characters')
-        .max(50, 'Address must not exceed 50 characters')
+        .max(100, 'Address must not exceed 50 characters')
         .required('Address is required'),
     phone: yup.string()
         .min(8, 'Phone number must be at least 8 digits')

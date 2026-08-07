@@ -317,12 +317,12 @@ export const LoginForm = React.memo(function LoginForm() {
                     title="Log In"
                     onPress={handleLogin}
                     isLoading={formData.loading}
-                    style={{ marginTop: 8, marginBottom: 10, alignSelf: 'center', width: '100%' }}
+                    style={{ marginTop: 8, alignSelf: 'center', width: '100%' }}
                 />
 
                 {/* Google Login Button */}
                 <TouchableOpacity
-                    style={[styles.loginButton, { backgroundColor: colors.cardBg }]}
+                    style={[styles.loginButton, { backgroundColor: colors.cardBg, marginTop: 12, marginBottom: 18 }]}
                     onPress={handleGoogleLogin}
                     disabled={formData.googleLoading}
                 >
@@ -412,18 +412,16 @@ const styles = StyleSheet.create({
         fontWeight: '600'
     },
     loginButton: {
-        height: 52,
-        borderRadius: Layout.borderRadius,
+        height: 46,
+        borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 18,
         overflow: 'hidden'
     },
     loginButtonText: {
         color: '#FFFFFF',
-        fontSize: 10.5,
-        fontWeight: '700',
-        letterSpacing: 0.5
+        fontSize: 12.5,
+        fontWeight: '600'
     },
     footer: {
         flexDirection: 'row',

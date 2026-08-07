@@ -40,7 +40,7 @@ import * as yup from 'yup';
 import { businessSchema } from '@/utils/validation';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
-import { uploadUserImage } from '@/apis/essentials';
+import { uploadUserImage, deleteUserImage } from '@/apis/essentials';
 
 const BusinessRegistrationScreen = () => {
     const router = useRouter();
@@ -86,13 +86,35 @@ const BusinessRegistrationScreen = () => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
 
+    const resetForm = () => {
+        setForm({
+            name: '',
+            description: '',
+            phone: user?.user?.phone || '',
+            address: user?.user?.address || user?.user?.village || '',
+            category: null as any,
+            tags: [],
+            timing: ''
+        });
+        setOpenTime('09:00 AM');
+        setCloseTime('09:00 PM');
+        setLocation(null);
+        setSelectedImage(null);
+        setUploadedImage(null);
+        setErrors({});
+    };
+
     const selectedProfessionInfo = professionsList.find(
         (p: any) => p && p.name_eng?.toLowerCase() === form.category?.name_eng?.toLowerCase()
     );
     const availableTags = selectedProfessionInfo?.tags || form.category?.tags || [];
 
-    const handleGoBack = () => {
-        router.replace('/(drawer)/(tabs)/business');
+    const handleGoBack = (tab?: string) => {
+        if (tab) {
+            router.replace({ pathname: '/(drawer)/(tabs)/business', params: { tab } });
+        } else {
+            router.replace('/(drawer)/(tabs)/business');
+        }
         return true;
     };
 
@@ -207,8 +229,9 @@ const BusinessRegistrationScreen = () => {
             const formData = new FormData();
             formData.append('image', { uri, name: filename, type } as any);
             const res: any = await uploadUserImage(formData);
-            if (res.data?.success) {
-                setUploadedImage(res.data.imageUrl);
+            const imageUrl = res?.data?.imageUrl || res?.imageUrl;
+            if (imageUrl) {
+                setUploadedImage(imageUrl);
             } else {
                 setSelectedImage(null);
                 setUploadedImage(null);
@@ -220,6 +243,19 @@ const BusinessRegistrationScreen = () => {
             Toast.show({ type: 'error', text1: 'Upload Failed', text2: 'Something went wrong.' });
         } finally {
             setIsUploadingImage(false);
+        }
+    };
+
+    const handleDeleteImage = async () => {
+        const imageToDelete = uploadedImage;
+        setUploadedImage(null);
+        setSelectedImage(null);
+        if (imageToDelete) {
+            try {
+                await deleteUserImage(imageToDelete);
+            } catch (error) {
+                console.error('Failed to delete image from server:', error);
+            }
         }
     };
 
@@ -264,6 +300,7 @@ const BusinessRegistrationScreen = () => {
                     onSuccess: (res: any) => {
                         if (res.success) {
                             analyticsService.trackEvent(AnalyticsEvents.BUSINESS_REGISTRATION_SUCCESS, { action: 'create' });
+                            resetForm();
                             setShowThankYou(true);
                         }
                     }
@@ -286,7 +323,7 @@ const BusinessRegistrationScreen = () => {
 
     const handleThankYouClose = () => {
         setShowThankYou(false);
-        handleGoBack();
+        handleGoBack('portal');
         if (user?.user?.role !== 'APP_ADMIN') {
             import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
                 InterstitialService.getInstance().show(true);
@@ -341,19 +378,40 @@ const BusinessRegistrationScreen = () => {
                         <Animated.View entering={FadeInDown.delay(150)} style={styles.inputField}>
                             <ThemedText style={[styles.label, { color: colors.text }]}>BUSINESS IMAGE</ThemedText>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                                <TouchableOpacity 
-                                    style={[{ width: 80, height: 80, borderRadius: Layout.borderRadius, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }]} 
-                                    onPress={pickImage} 
-                                    disabled={isUploadingImage}
-                                >
-                                    {isUploadingImage ? (
-                                        <ActivityIndicator color={colors.primary} />
-                                    ) : uploadedImage ? (
-                                        <Image source={{ uri: uploadedImage }} style={{ width: '100%', height: '100%' }} />
-                                    ) : (
-                                        <Ionicons name="camera-outline" size={30} color={colors.icon} />
+                                <View style={{ position: 'relative' }}>
+                                    <TouchableOpacity 
+                                        style={[{ width: 80, height: 80, borderRadius: Layout.borderRadius, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }]} 
+                                        onPress={pickImage} 
+                                        disabled={isUploadingImage}
+                                    >
+                                        {isUploadingImage ? (
+                                            <ActivityIndicator color={colors.primary} />
+                                        ) : (uploadedImage || selectedImage) ? (
+                                            <Image source={{ uri: (uploadedImage || selectedImage)! }} style={{ width: '100%', height: '100%' }} />
+                                        ) : (
+                                            <Ionicons name="camera-outline" size={30} color={colors.icon} />
+                                        )}
+                                    </TouchableOpacity>
+                                    
+                                    {(uploadedImage || selectedImage) && !isUploadingImage && (
+                                        <TouchableOpacity
+                                            style={{
+                                                position: 'absolute',
+                                                bottom: -4,
+                                                left: -4,
+                                                backgroundColor: '#EF4444',
+                                                width: 26,
+                                                height: 26,
+                                                borderRadius: Layout.borderRadius,
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
+                                            }}
+                                            onPress={handleDeleteImage}
+                                        >
+                                            <Ionicons name="trash" size={14} color="#FFFFFF" />
+                                        </TouchableOpacity>
                                     )}
-                                </TouchableOpacity>
+                                </View>
                                 <View style={{ flex: 1 }}>
                                     <ThemedText style={{ color: colors.textSecondary, fontSize: 11.5 }}>Add a photo of your business (Optional).</ThemedText>
                                     <ThemedText style={{ color: colors.textSecondary, fontSize: 10, marginTop: 4 }}>If no image is provided, category icon will be used.</ThemedText>

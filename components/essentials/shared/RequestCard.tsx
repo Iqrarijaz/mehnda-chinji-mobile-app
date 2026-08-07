@@ -60,8 +60,8 @@ const RequestCard = React.memo(({
 
     return (
         <TintedCard
-            tintColor={categoryColor}
-            bgColor={colors.card}
+            tintColor={colors.primary}
+            bgColor={colors.cardBg}
             style={styles.card}
         >
             {/* HEADER: name + status */}

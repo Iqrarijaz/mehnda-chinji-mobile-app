@@ -373,7 +373,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                                     style={[styles.resultsListFS, { backgroundColor: colors.background }]}
                                     renderItem={({ item }) => (
                                         <TouchableOpacity
-                                            style={[styles.resultRow, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', borderBottomWidth: 1 }]}
+                                            style={[styles.resultRow, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', borderBottomWidth: 0 }]}
                                             onPress={() => selectPlace(item)}
                                             activeOpacity={0.7}
                                         >

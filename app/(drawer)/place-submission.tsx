@@ -29,7 +29,7 @@ import { GovtHeroHeader } from '@/components/essentials/govt/GovtHeroHeader';
 import { EducationHeroHeader } from '@/components/essentials/education/EducationHeroHeader';
 
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
-import { uploadUserImage } from '@/apis/essentials';
+import { uploadUserImage, deleteUserImage } from '@/apis/essentials';
 import { ThankYouModal } from '@/components/common/ThankYou';
 import { ThemedText } from '@/components/ThemedText';
 import { BackButton } from '@/components/common/BackButton';
@@ -160,9 +160,9 @@ const PlaceSubmissionScreen = () => {
             formData.append('folderName', 'public');
 
             const response: any = await uploadUserImage(formData);
-            if (response.success) {
-                const imageUrl = response.data.imageUrl;
-                setUploadedImage(imageUrl);
+            const imageUrl = response?.data?.imageUrl || response?.imageUrl;
+            if (response?.success || imageUrl) {
+                if (imageUrl) setUploadedImage(imageUrl);
             }
         } catch (error) {
             console.error('Upload Error:', error);
@@ -172,6 +172,19 @@ const PlaceSubmissionScreen = () => {
                 text2: 'Could not upload image. Please try again.' });
         } finally {
             setIsUploading(false);
+        }
+    };
+
+    const handleDeleteImage = async () => {
+        const imageToDelete = uploadedImage;
+        setUploadedImage(null);
+        setSelectedImage(null);
+        if (imageToDelete) {
+            try {
+                await deleteUserImage(imageToDelete);
+            } catch (error) {
+                console.error('Failed to delete image from server:', error);
+            }
         }
     };
 
@@ -335,26 +348,47 @@ const PlaceSubmissionScreen = () => {
                             <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 24, gap: 6 }}>
                                 <ThemedText style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginLeft: 2, color: colors.text }}>PLACE IMAGE</ThemedText>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                                    <TouchableOpacity 
-                                        style={{ width: 80, height: 80, borderRadius: Layout.borderRadius, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }} 
-                                        onPress={pickImage} 
-                                        disabled={isUploading}
-                                    >
-                                        {(isUploading || isImageLoading) ? (
-                                            <ActivityIndicator color={colors.primary} />
-                                        ) : selectedImage ? (
-                                            <Image 
-                                                source={{ uri: selectedImage }} 
-                                                style={{ width: '100%', height: '100%' }}
-                                                contentFit="cover"
-                                                onLoadStart={() => setIsImageLoading(true)}
-                                                onLoadEnd={() => setIsImageLoading(false)}
-                                                onError={() => setIsImageLoading(false)} 
-                                            />
-                                        ) : (
-                                            <Ionicons name="camera-outline" size={30} color={colors.icon} />
+                                    <View style={{ position: 'relative' }}>
+                                        <TouchableOpacity 
+                                            style={{ width: 80, height: 80, borderRadius: Layout.borderRadius, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }} 
+                                            onPress={pickImage} 
+                                            disabled={isUploading}
+                                        >
+                                            {(isUploading || isImageLoading) ? (
+                                                <ActivityIndicator color={colors.primary} />
+                                            ) : (uploadedImage || selectedImage) ? (
+                                                <Image 
+                                                    source={{ uri: (uploadedImage || selectedImage)! }} 
+                                                    style={{ width: '100%', height: '100%' }}
+                                                    contentFit="cover"
+                                                    onLoadStart={() => setIsImageLoading(true)}
+                                                    onLoadEnd={() => setIsImageLoading(false)}
+                                                    onError={() => setIsImageLoading(false)} 
+                                                />
+                                            ) : (
+                                                <Ionicons name="camera-outline" size={30} color={colors.icon} />
+                                            )}
+                                        </TouchableOpacity>
+
+                                        {(uploadedImage || selectedImage) && !isUploading && (
+                                            <TouchableOpacity
+                                                style={{
+                                                    position: 'absolute',
+                                                    bottom: -4,
+                                                    left: -4,
+                                                    backgroundColor: '#EF4444',
+                                                    width: 26,
+                                                    height: 26,
+                                                    borderRadius: Layout.borderRadius,
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center'
+                                                }}
+                                                onPress={handleDeleteImage}
+                                            >
+                                                <Ionicons name="trash" size={14} color="#FFFFFF" />
+                                            </TouchableOpacity>
                                         )}
-                                    </TouchableOpacity>
+                                    </View>
                                     <View style={{ flex: 1 }}>
                                         <ThemedText style={{ color: colors.textSecondary, fontSize: 11.5 }}>Add a photo of this place (Optional).</ThemedText>
                                         <ThemedText style={{ color: colors.textSecondary, fontSize: 10, marginTop: 4 }}>If no image is provided, category icon will be used.</ThemedText>

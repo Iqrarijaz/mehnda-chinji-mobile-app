@@ -102,7 +102,7 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
                             styles.iconWrapper,
                             { backgroundColor: config.bg }
                         ]}>
-                            <Ionicons name={config.icon} size={22} color={config.color} />
+                            <Ionicons name={config.icon} size={20} color={config.color} />
                         </View>
                         <ThemedText style={[styles.title, { color: config.color }]}>{title}</ThemedText>
                     </View>
@@ -148,56 +148,58 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20 },
+        padding: 24 },
     modalContent: {
         width: '100%',
-        borderRadius: Layout.borderRadius,
-        padding: 20,
+        maxWidth: 320,
+        borderRadius: 20,
+        padding: 16,
         alignItems: 'center' },
     header: {
         alignItems: 'center',
-        marginBottom: 16 },
+        marginBottom: 8 },
     iconWrapper: {
-        width: 72,
-        height: 72,
-        borderRadius: Layout.borderRadius,
+        width: 48,
+        height: 48,
+        borderRadius: 24,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20 },
+        marginBottom: 10 },
     title: {
-        fontSize: 15.5,
+        fontSize: 14,
         fontWeight: '700',
         textAlign: 'center',
-        marginBottom: 8 },
+        marginBottom: 4 },
     message: {
-        fontSize: 11.5,
+        fontSize: 11,
         color: '#64748B',
         textAlign: 'center',
-        lineHeight: 20,
-        marginBottom: 24,
+        lineHeight: 16,
+        marginBottom: 16,
         fontWeight: '500' },
     footer: {
         flexDirection: 'row',
-        gap: 12,
-        marginTop: 8 },
+        gap: 10,
+        marginTop: 4,
+        width: '100%' },
     cancelBtn: {
-        flex: 1,
-        height: 40,
+        width: '100%',
+        height: 34,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
-        backgroundColor: '#F8FAFC' },
+        borderRadius: 999,
+        backgroundColor: '#F1F5F9' },
     cancelText: {
-        fontSize: 12.5,
-        fontWeight: '600',
+        fontSize: 11.5,
+        fontWeight: '700',
         color: '#64748B' },
     confirmBtnWrapper: {
-        flex: 1,
-        height: 40,
-        borderRadius: Layout.borderRadius,
+        width: '100%',
+        height: 34,
+        borderRadius: 999,
         justifyContent: 'center',
         alignItems: 'center' },
     confirmBtnText: {
-        fontSize: 12.5,
-        fontWeight: '600',
+        fontSize: 11.5,
+        fontWeight: '700',
         color: '#FFFFFF' } });

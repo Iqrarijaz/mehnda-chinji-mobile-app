@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8FAFC' },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 4,
-        paddingBottom: 7 },
+        paddingBottom: 14 },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         flex: 1 },
     listContent: {
         paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-        paddingTop: Platform.OS === 'android' ? 18 : 20,
+        paddingTop: 14,
         paddingBottom: 96 },
     loaderContainer: {
         flex: 1,
