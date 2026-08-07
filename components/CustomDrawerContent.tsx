@@ -16,7 +16,7 @@ import { useRewardedAd } from '@/ads/hooks/useAds';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { ThemedText } from '@/components/ThemedText';
-import Avatar from '@/components/ui/avatar';
+import Avatar from '@/components/ui/Avatar';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';

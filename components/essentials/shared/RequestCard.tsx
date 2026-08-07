@@ -9,7 +9,7 @@ import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
-import { TintedCard } from '@/components/ui/tintedCard';
+import { TintedCard } from '@/components/ui/TintedCard';
 import { Layout } from '@/constants/layout';
 
 interface RequestCardProps {

@@ -22,7 +22,7 @@ import Animated, {
     withTiming
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Avatar from '../ui/avatar';
+import Avatar from '../ui/Avatar';
 import { NotificationIcon } from './NotificationIcon';
 import { ThemedText } from '../ThemedText';
 import { BackButton } from './BackButton';
