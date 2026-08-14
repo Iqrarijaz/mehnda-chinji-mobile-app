@@ -49,3 +49,26 @@ export const GOLD_KARAT_LABELS: Record<string, string> = {
     k21: '21K',
     k18: '18K',
 };
+
+/**
+ * Base (industrial) metals — surfaced from the backend's `raw` field so the
+ * search bar on the Metals & Gold screen has more than 4 items to filter.
+ */
+export type BaseMetalKey = 'copper' | 'aluminum' | 'lead' | 'nickel' | 'zinc';
+
+export interface BaseMetalMeta {
+    key: BaseMetalKey;
+    label: string;
+    gradient: [string, string];
+    icon: keyof typeof MaterialCommunityIcons.glyphMap;
+}
+
+export const BASE_METALS_META: Record<BaseMetalKey, BaseMetalMeta> = {
+    copper: { key: 'copper', label: 'Copper', gradient: ['#E8956B', '#B85C38'], icon: 'pipe' },
+    aluminum: { key: 'aluminum', label: 'Aluminum', gradient: ['#D8DEE4', '#9CA8B4'], icon: 'cube-outline' },
+    lead: { key: 'lead', label: 'Lead', gradient: ['#8B8D93', '#54565C'], icon: 'weight' },
+    nickel: { key: 'nickel', label: 'Nickel', gradient: ['#DCD6C8', '#A69F8C'], icon: 'hexagon-outline' },
+    zinc: { key: 'zinc', label: 'Zinc', gradient: ['#B8C4CC', '#75838C'], icon: 'molecule' },
+};
+
+export const BASE_METALS_ORDER: BaseMetalKey[] = ['copper', 'aluminum', 'lead', 'nickel', 'zinc'];

@@ -1,15 +1,15 @@
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl, StyleSheet, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRewardedAd } from '@/ads/hooks/useAds';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
-import { BackButton } from '@/components/common/BackButton';
 import { SearchBar } from '@/components/common/SearchBar';
+import { CurrencyHeader } from '@/components/currency/CurrencyHeader';
 import { CurrencyListSkeleton } from '@/components/currency/CurrencyListSkeleton';
 import { CurrencyRow } from '@/components/currency/CurrencyRow';
 import { CurrencyTrendsModal } from '@/components/currency/CurrencyTrendsModal';
@@ -36,6 +36,7 @@ export default function CurrencyScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTrendCurrency, setSelectedTrendCurrency] = useState<string | null>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const trendsSheetRef = useRef<BottomSheetModal>(null);
 
     useEffect(() => {
         analyticsService.trackEvent(AnalyticsEvents.CURRENCY_VIEWED, { unlocked: isPremiumUnlocked });
@@ -84,41 +85,34 @@ export default function CurrencyScreen() {
         if (code === 'PKR') return; // base currency has no meaningful trend against itself
         analyticsService.trackEvent(AnalyticsEvents.CURRENCY_TRENDS_VIEWED, { code });
         setSelectedTrendCurrency(code);
+        trendsSheetRef.current?.present();
     }, []);
 
     const lastUpdatedLabel = useMemo(() => {
         if (!ratesData?.date) return null;
         const d = new Date(ratesData.date);
         if (Number.isNaN(d.getTime())) return null;
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }, [ratesData?.date]);
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            {/* Header */}
-            <Animated.View
-                entering={FadeIn.duration(300)}
-                style={[styles.header, { paddingTop: insets.top + 12, borderBottomColor: colors.border }]}
-            >
-                <View style={styles.headerTopRow}>
-                    <BackButton backgroundColor={colors.cardBg} color={colors.primary} size={20} />
-                    <View style={styles.headerTextWrap}>
-                        <ThemedText style={styles.headerTitle}>Currency Exchange</ThemedText>
-                        <ThemedText style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                            {lastUpdatedLabel ? `Last updated ${lastUpdatedLabel}` : 'Fetching latest rates…'}
-                        </ThemedText>
-                    </View>
-                </View>
+            <CurrencyHeader
+                lastUpdatedLabel={lastUpdatedLabel}
+                currencyCount={ratesData?.currencyCount}
+                isUnlocked={isPremiumUnlocked}
+            />
 
+            <View style={styles.searchWrap}>
                 <SearchBar
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                     placeholder="Search currency (e.g. USD, Euro)"
                     style={styles.searchBar}
                 />
-            </Animated.View>
+            </View>
 
             {/* List */}
             {isRatesLoading ? (
@@ -140,7 +134,7 @@ export default function CurrencyScreen() {
                         <CurrencyRow code={code} rate={rate} onPress={() => handleRowPress(code)} />
                     )}
                     contentContainerStyle={{
-                        paddingTop: 14,
+                        paddingTop: 6,
                         paddingBottom: insets.bottom + (isPremiumUnlocked ? 24 : 110),
                     }}
                     showsVerticalScrollIndicator={false}
@@ -169,7 +163,11 @@ export default function CurrencyScreen() {
                 </View>
             )}
 
-            <CurrencyTrendsModal currency={selectedTrendCurrency} onClose={() => setSelectedTrendCurrency(null)} />
+            <CurrencyTrendsModal
+                ref={trendsSheetRef}
+                currency={selectedTrendCurrency}
+                onDismiss={() => setSelectedTrendCurrency(null)}
+            />
         </View>
     );
 }
@@ -178,31 +176,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    header: {
+    searchWrap: {
         paddingHorizontal: 20,
-        paddingBottom: 14,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
-    headerTopRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 14,
-        gap: 12,
-    },
-    headerTextWrap: {
-        flex: 1,
-    },
-    headerTitle: {
-        fontSize: 19,
-        fontWeight: '700',
-    },
-    headerSubtitle: {
-        fontSize: 12,
-        fontWeight: '400',
-        marginTop: 2,
+        marginTop: 14,
     },
     searchBar: {
-        height: 44,
+        height: 46,
     },
     listWrap: {
         flex: 1,

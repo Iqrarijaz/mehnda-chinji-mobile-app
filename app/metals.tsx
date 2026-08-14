@@ -1,18 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
-import { BackButton } from '@/components/common/BackButton';
+import { SearchBar } from '@/components/common/SearchBar';
 import { MetalCard } from '@/components/metals/MetalCard';
+import { MetalsHeader } from '@/components/metals/MetalsHeader';
 import { MetalTrendsModal } from '@/components/metals/MetalTrendsModal';
 import { MetalsListSkeleton } from '@/components/metals/MetalsListSkeleton';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
-import { METALS_META, METALS_ORDER, MetalKey } from '@/constants/metals';
+import { BASE_METALS_META, BASE_METALS_ORDER, METALS_META, METALS_ORDER } from '@/constants/metals';
 import { useTheme } from '@/context/ThemeContext';
 import { useMetals } from '@/hooks/useMetals';
 
@@ -22,8 +23,10 @@ export default function MetalsScreen() {
     const colors = Colors[theme];
 
     const { metalsData, isMetalsLoading, isMetalsFetching, metalsError, refetchMetals } = useMetals();
-    const [selectedTrendMetal, setSelectedTrendMetal] = useState<MetalKey | null>(null);
+    const [selectedTrendMetal, setSelectedTrendMetal] = useState<string | null>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const trendsSheetRef = useRef<BottomSheetModal>(null);
 
     useEffect(() => {
         analyticsService.trackEvent(AnalyticsEvents.METALS_VIEWED);
@@ -38,36 +41,59 @@ export default function MetalsScreen() {
         }
     }, [refetchMetals]);
 
-    const handleCardPress = useCallback((metal: MetalKey) => {
+    const handleCardPress = useCallback((metal: string) => {
         analyticsService.trackEvent(AnalyticsEvents.METAL_ROW_CLICKED, { metal });
         analyticsService.trackEvent(AnalyticsEvents.METAL_TRENDS_VIEWED, { metal });
         setSelectedTrendMetal(metal);
+        trendsSheetRef.current?.present();
     }, []);
 
     const lastUpdatedLabel = useMemo(() => {
         if (!metalsData?.date) return null;
         const d = new Date(metalsData.date);
         if (Number.isNaN(d.getTime())) return null;
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }, [metalsData?.date]);
+
+    // Precious metals (gold/silver/platinum/palladium) — always present when data loads.
+    const preciousMetals = useMemo(() => {
+        return METALS_ORDER
+            .map((key) => {
+                const entry = metalsData?.metals?.[key];
+                if (!entry) return null;
+                return { key, meta: METALS_META[key], price: entry.price, karats: key === 'gold' ? entry.karats : undefined };
+            })
+            .filter((m): m is NonNullable<typeof m> => !!m);
+    }, [metalsData]);
+
+    // Base (industrial) metals, sourced from the backend's `raw` passthrough —
+    // gives the search bar real breadth beyond the 4 precious metals.
+    const baseMetals = useMemo(() => {
+        const raw = metalsData?.raw ?? {};
+        return BASE_METALS_ORDER
+            .filter((key) => typeof raw[key] === 'number')
+            .map((key) => ({ key, meta: BASE_METALS_META[key], price: raw[key], karats: undefined }));
+    }, [metalsData]);
+
+    const q = searchQuery.trim().toLowerCase();
+    const filteredPrecious = q ? preciousMetals.filter((m) => m.meta.label.toLowerCase().includes(q)) : preciousMetals;
+    const filteredBase = q ? baseMetals.filter((m) => m.meta.label.toLowerCase().includes(q)) : baseMetals;
+    const hasResults = filteredPrecious.length > 0 || filteredBase.length > 0;
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            {/* Header */}
-            <Animated.View
-                entering={FadeIn.duration(300)}
-                style={[styles.header, { paddingTop: insets.top + 12, borderBottomColor: colors.border }]}
-            >
-                <BackButton backgroundColor={colors.cardBg} color={colors.primary} size={20} />
-                <View style={styles.headerTextWrap}>
-                    <ThemedText style={styles.headerTitle}>Metals & Gold</ThemedText>
-                    <ThemedText style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                        {lastUpdatedLabel ? `Last updated ${lastUpdatedLabel}` : 'Fetching latest rates…'}
-                    </ThemedText>
-                </View>
-            </Animated.View>
+            <MetalsHeader lastUpdatedLabel={lastUpdatedLabel} />
+
+            <View style={styles.searchWrap}>
+                <SearchBar
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    placeholder="Search metals (e.g. Gold, Copper)"
+                    style={styles.searchBar}
+                />
+            </View>
 
             {/* List */}
             {isMetalsLoading ? (
@@ -83,7 +109,7 @@ export default function MetalsScreen() {
                 </View>
             ) : (
                 <ScrollView
-                    contentContainerStyle={{ paddingTop: 14, paddingBottom: insets.bottom + 24 }}
+                    contentContainerStyle={{ paddingTop: 6, paddingBottom: insets.bottom + 24 }}
                     showsVerticalScrollIndicator={false}
                     refreshControl={
                         <RefreshControl
@@ -93,24 +119,59 @@ export default function MetalsScreen() {
                         />
                     }
                 >
-                    {METALS_ORDER.map((key) => {
-                        const entry = metalsData?.metals?.[key];
-                        if (!entry) return null;
-                        return (
-                            <MetalCard
-                                key={key}
-                                meta={METALS_META[key]}
-                                price={entry.price}
-                                unit={metalsData?.unit || 'g'}
-                                karats={key === 'gold' ? entry.karats : undefined}
-                                onPress={() => handleCardPress(key)}
-                            />
-                        );
-                    })}
+                    {!hasResults ? (
+                        <View style={styles.centerWrap}>
+                            <Ionicons name="search-outline" size={36} color={colors.textSecondary} />
+                            <ThemedText style={[styles.errorText, { color: colors.textSecondary }]}>
+                                No metals match &ldquo;{searchQuery}&rdquo;
+                            </ThemedText>
+                        </View>
+                    ) : (
+                        <>
+                            {filteredPrecious.length > 0 && (
+                                <>
+                                    <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+                                        PRECIOUS METALS
+                                    </ThemedText>
+                                    {filteredPrecious.map((m) => (
+                                        <MetalCard
+                                            key={m.key}
+                                            meta={m.meta}
+                                            price={m.price}
+                                            unit={metalsData?.unit || 'g'}
+                                            karats={m.karats}
+                                            onPress={() => handleCardPress(m.key)}
+                                        />
+                                    ))}
+                                </>
+                            )}
+
+                            {filteredBase.length > 0 && (
+                                <>
+                                    <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary, marginTop: filteredPrecious.length > 0 ? 18 : 0 }]}>
+                                        BASE METALS
+                                    </ThemedText>
+                                    {filteredBase.map((m) => (
+                                        <MetalCard
+                                            key={m.key}
+                                            meta={m.meta}
+                                            price={m.price}
+                                            unit={metalsData?.unit || 'g'}
+                                            onPress={() => handleCardPress(m.key)}
+                                        />
+                                    ))}
+                                </>
+                            )}
+                        </>
+                    )}
                 </ScrollView>
             )}
 
-            <MetalTrendsModal metal={selectedTrendMetal} onClose={() => setSelectedTrendMetal(null)} />
+            <MetalTrendsModal
+                ref={trendsSheetRef}
+                metal={selectedTrendMetal}
+                onDismiss={() => setSelectedTrendMetal(null)}
+            />
         </View>
     );
 }
@@ -119,25 +180,19 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    searchWrap: {
         paddingHorizontal: 20,
-        paddingBottom: 14,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        gap: 12,
+        marginTop: 14,
     },
-    headerTextWrap: {
-        flex: 1,
+    searchBar: {
+        height: 46,
     },
-    headerTitle: {
-        fontSize: 19,
-        fontWeight: '700',
-    },
-    headerSubtitle: {
-        fontSize: 12,
-        fontWeight: '400',
-        marginTop: 2,
+    sectionLabel: {
+        fontSize: 10.5,
+        fontWeight: '800',
+        letterSpacing: 0.7,
+        marginHorizontal: 20,
+        marginBottom: 10,
     },
     listWrap: {
         flex: 1,

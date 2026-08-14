@@ -14,11 +14,8 @@ export function MetalsListSkeleton({ rows = 4 }: { rows?: number }) {
     return (
         <View>
             {Array.from({ length: rows }).map((_, i) => (
-                <View
-                    key={i}
-                    style={[styles.row, { backgroundColor: colors.card, borderColor: colors.border }]}
-                >
-                    <Skeleton width={42} height={42} borderRadius={Layout.borderRadius} />
+                <View key={i} style={[styles.row, { backgroundColor: colors.cardBg }]}>
+                    <Skeleton width={46} height={46} borderRadius={Layout.borderRadius} />
                     <View style={styles.textWrap}>
                         <Skeleton width="35%" height={14} borderRadius={4} style={{ marginBottom: 6 }} />
                         <Skeleton width="55%" height={11} borderRadius={4} />
@@ -34,10 +31,9 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
-        borderWidth: 1,
-        paddingVertical: 12,
-        paddingHorizontal: 14,
+        borderRadius: Layout.cardBorderRadius,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
         marginHorizontal: 20,
         marginBottom: 10,
     },
