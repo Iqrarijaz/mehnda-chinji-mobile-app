@@ -30,11 +30,13 @@ export const initConfig = async () => {
 
         // Always attempt to update from the latest activated configuration
         const fetchedUrl = remoteConfig().getValue(configKey).asString();
-        if (fetchedUrl && fetchedUrl.startsWith('http') && !fetchedUrl.includes('ngrok') && !fetchedUrl.includes('mehndachinji')) {
+        if (fetchedUrl && fetchedUrl.startsWith('http')) {
             API_URL = fetchedUrl;
         } else {
             API_URL = fallbackUrl;
         }
+
+        console.log(`🌐 [RemoteConfig] Current URL: ${API_URL}`);
 
         if (__DEV__) {
             console.log(`🌐 [RemoteConfig] Current URL: ${API_URL}`);
