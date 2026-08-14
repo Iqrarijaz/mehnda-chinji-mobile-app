@@ -22,6 +22,15 @@ export const AnalyticsEvents = {
     NOTIFICATION_OPENED: 'notification_opened',
     WEATHER_VIEWED: 'weather_viewed',
     PRAYER_TIMES_VIEWED: 'prayer_times_viewed',
+    CURRENCY_VIEWED: 'currency_viewed',
+    CURRENCY_ROW_CLICKED: 'currency_row_clicked',
+    CURRENCY_TRENDS_VIEWED: 'currency_trends_viewed',
+    CURRENCY_AD_UNLOCK_STARTED: 'currency_ad_unlock_started',
+    CURRENCY_AD_UNLOCK_COMPLETED: 'currency_ad_unlock_completed',
+    CURRENCY_AD_UNLOCK_FAILED: 'currency_ad_unlock_failed',
+    METALS_VIEWED: 'metals_viewed',
+    METAL_ROW_CLICKED: 'metal_row_clicked',
+    METAL_TRENDS_VIEWED: 'metal_trends_viewed',
 
     // Community Specific
     DONOR_CARD_CLICKED: 'donor_card_clicked',
