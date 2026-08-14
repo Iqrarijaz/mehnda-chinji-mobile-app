@@ -7,16 +7,23 @@ import { PremiumModal } from '@/components/common/PremiumModal';
 import { TrendChart } from '@/components/currency/TrendChart';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
-import { METALS_META, MetalKey } from '@/constants/metals';
+import { BASE_METALS_META, METALS_META } from '@/constants/metals';
 import { useTheme } from '@/context/ThemeContext';
 import { useMetalTrends } from '@/hooks/useMetals';
 
 interface MetalTrendsModalProps {
-    metal: MetalKey | null;
+    /** Any metal key the backend recognizes — primary (gold/silver/…) or base (copper/…). */
+    metal: string | null;
     onClose: () => void;
 }
 
 const SHEET_HORIZONTAL_PADDING = 20;
+
+function resolveMeta(metal: string) {
+    return (METALS_META as Record<string, { label: string; gradient: [string, string]; icon: any }>)[metal]
+        ?? (BASE_METALS_META as Record<string, { label: string; gradient: [string, string]; icon: any }>)[metal]
+        ?? null;
+}
 
 export function MetalTrendsModal({ metal, onClose }: MetalTrendsModalProps) {
     const { theme } = useTheme();
@@ -24,7 +31,7 @@ export function MetalTrendsModal({ metal, onClose }: MetalTrendsModalProps) {
     const { width: windowWidth } = useWindowDimensions();
     const { trendsData, isTrendsLoading, trendsError } = useMetalTrends(metal);
 
-    const meta = metal ? METALS_META[metal] : null;
+    const meta = metal ? resolveMeta(metal) : null;
     const chartWidth = windowWidth * 0.95 - SHEET_HORIZONTAL_PADDING * 2;
 
     const chartPoints = useMemo(() => {
@@ -49,7 +56,7 @@ export function MetalTrendsModal({ metal, onClose }: MetalTrendsModalProps) {
                             <View style={styles.headerText}>
                                 <ThemedText style={styles.title}>{meta.label} Trend</ThemedText>
                                 <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
-                                    Per gram (24K) · last 30 days
+                                    Per gram · last 30 days
                                 </ThemedText>
                             </View>
                         </View>

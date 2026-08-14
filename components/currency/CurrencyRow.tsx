@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -15,6 +16,8 @@ interface CurrencyRowProps {
     rate: number;
     onPress: () => void;
 }
+
+const TILE_SIZE = 46;
 
 function formatRate(value: number) {
     return value.toLocaleString('en-US', {
@@ -34,67 +37,75 @@ export const CurrencyRow = React.memo(function CurrencyRow({ code, rate, onPress
     const pkrPerUnit = isBaseCurrency ? 1 : rate > 0 ? 1 / rate : 0;
 
     return (
-        <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={onPress}
-            style={[styles.row, { backgroundColor: colors.card, borderColor: colors.border }]}
-        >
-            {flagUrl ? (
-                <Image source={{ uri: flagUrl }} style={styles.flag} contentFit="cover" transition={150} />
-            ) : (
-                <View style={[styles.flag, styles.flagFallback, { backgroundColor: colors.cardBg }]}>
-                    <Ionicons name="globe-outline" size={18} color={colors.icon} />
+        <PressableScale intensity={0.02} onPress={onPress} containerStyle={styles.pressWrap}>
+            <View style={[styles.row, { backgroundColor: colors.cardBg }]}>
+                {/* Flag tile — a framed rounded-square, not a bare circular thumbnail */}
+                <View style={[styles.flagTile, { backgroundColor: colors.primary + '12' }]}>
+                    {flagUrl ? (
+                        <Image source={{ uri: flagUrl }} style={styles.flagImage} contentFit="cover" transition={150} />
+                    ) : (
+                        <ThemedText style={[styles.flagFallbackText, { color: colors.primary }]}>{code.slice(0, 2)}</ThemedText>
+                    )}
                 </View>
-            )}
 
-            <View style={styles.textWrap}>
-                <ThemedText style={styles.code}>{code}</ThemedText>
-                <ThemedText style={[styles.name, { color: colors.textSecondary }]} numberOfLines={1}>
-                    {meta.name}
-                </ThemedText>
-            </View>
+                <View style={styles.textWrap}>
+                    <ThemedText style={styles.code}>{code}</ThemedText>
+                    <ThemedText style={[styles.name, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {meta.name}
+                    </ThemedText>
+                </View>
 
-            <View style={styles.rateWrap}>
-                {isBaseCurrency ? (
-                    <View style={[styles.baseBadge, { backgroundColor: colors.primary + '18' }]}>
-                        <ThemedText style={[styles.baseBadgeText, { color: colors.primary }]}>Base</ThemedText>
-                    </View>
-                ) : (
-                    <>
-                        <ThemedText style={styles.rateValue}>{formatRate(pkrPerUnit)} PKR</ThemedText>
-                        <ThemedText style={[styles.ratePer, { color: colors.textSecondary }]}>per 1 {code}</ThemedText>
-                    </>
+                <View style={styles.rateWrap}>
+                    {isBaseCurrency ? (
+                        <View style={[styles.baseBadge, { backgroundColor: colors.secondary }]}>
+                            <ThemedText style={styles.baseBadgeText}>Base</ThemedText>
+                        </View>
+                    ) : (
+                        <>
+                            <ThemedText style={styles.rateValue}>{formatRate(pkrPerUnit)} PKR</ThemedText>
+                            <ThemedText style={[styles.ratePer, { color: colors.textSecondary }]}>per 1 {code}</ThemedText>
+                        </>
+                    )}
+                </View>
+
+                {!isBaseCurrency && (
+                    <Ionicons name="stats-chart-outline" size={16} color={colors.icon} style={styles.trendIcon} />
                 )}
             </View>
-
-            {!isBaseCurrency && (
-                <Ionicons name="stats-chart-outline" size={16} color={colors.icon} style={styles.trendIcon} />
-            )}
-        </TouchableOpacity>
+        </PressableScale>
     );
 });
 
 const styles = StyleSheet.create({
+    pressWrap: {
+        marginHorizontal: 20,
+        marginBottom: 10,
+    },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
-        borderWidth: 1,
-        paddingVertical: 12,
-        paddingHorizontal: 14,
-        marginHorizontal: 20,
-        marginBottom: 10,
+        borderRadius: Layout.cardBorderRadius,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
         minHeight: 44,
     },
-    flag: {
-        width: 38,
-        height: 38,
-        borderRadius: 19,
+    flagTile: {
+        width: TILE_SIZE,
+        height: TILE_SIZE,
+        borderRadius: Layout.borderRadius,
         marginRight: 12,
-    },
-    flagFallback: {
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+    },
+    flagImage: {
+        width: '100%',
+        height: '100%',
+    },
+    flagFallbackText: {
+        fontSize: 13,
+        fontWeight: '800',
+        letterSpacing: 0.3,
     },
     textWrap: {
         flex: 1,
@@ -130,6 +141,7 @@ const styles = StyleSheet.create({
     baseBadgeText: {
         fontSize: 11,
         fontWeight: '700',
+        color: '#FFFFFF',
     },
     trendIcon: {
         marginLeft: 2,
