@@ -1,10 +1,10 @@
+import { BusinessListSkeleton } from '@/components/business/BusinessScreenSkeleton';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import BusinessCard from '@/components/business/BusinessCard';
 import { BusinessRegistration } from '@/components/business/BusinessRegistration';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { LoadingDots } from '@/components/common/LoadingDots';
 import EmptyListingState from '@/components/essentials/EmptyListingState';
-import { ListingCardSkeleton } from '@/components/essentials/ListingCardSkeleton';
 import { ProfessionPicker } from '@/components/common/ProfessionPicker';
 import { HeaderIconBtn, ScreenHeader } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
@@ -15,7 +15,7 @@ import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useBusinessAPI } from '@/hooks/useBusinessAPI';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -26,7 +26,6 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-
 
 export default function BusinessScreen() {
     const { theme } = useTheme();
@@ -84,6 +83,12 @@ export default function BusinessScreen() {
     const businesses = (infiniteData as any)?.pages?.flatMap((page: any) => Array.isArray(page?.data) ? page.data : []) || [];
     const loading = queryLoading || isRefetching;
 
+    useFocusEffect(
+        useCallback(() => {
+            refetch();
+        }, [refetch])
+    );
+
     // Track results viewed - only once per new search query
     useEffect(() => {
         if (!loading && businesses.length > 0 && debouncedSearch && lastTrackedQuery.current !== debouncedSearch) {
@@ -103,7 +108,6 @@ export default function BusinessScreen() {
     };
 
     const hasActiveFilters = selectedCategory !== 'All';
-
 
     const renderItem = React.useCallback(({ item, index }: { item: any; index: number }) => {
         const isBank = item?.category?.toLowerCase() === 'banks' || item?.categoryEn?.toLowerCase() === 'banks';
@@ -151,6 +155,7 @@ export default function BusinessScreen() {
             onAdd={() => router.push('/(drawer)/business-registration')}
         />
     ), [router]);
+
 
     return (
         <ErrorBoundary>
@@ -214,11 +219,7 @@ export default function BusinessScreen() {
                 <View style={[styles.content, { display: activeTab === 'find' ? 'flex' : 'none' }]}>
                     {/* Listing */}
                     {loading && businesses.length === 0 ? (
-                        <View style={styles.listContent}>
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <ListingCardSkeleton key={i} />
-                            ))}
-                        </View>
+                        <BusinessListSkeleton />
                     ) : (
                         <FlashList
                             data={businesses}

@@ -170,6 +170,14 @@ d:/mc/mobile_app/
 - **User Telemetry**: `analytics/analyticsService.ts` logs custom engagement events to Firebase Analytics.
 - **Screen Tracking**: `analytics/screenTracker.ts` automatically captures screen view events on Expo Router navigation state changes.
 
+### 3.9. Account Management, Data Control & Deletion
+- **Profile & Preferences**: `app/profile.tsx` and `app/settings.tsx` manage user credentials, avatar, notification topic preferences, and location settings.
+- **Granular Self-Service Content Management**:
+  - **Business Owners**: Can edit or delete registered business directory profiles.
+  - **Place Contributors**: Can edit or delete crowdsourced essential places & landmarks.
+  - **Marketplace Sellers**: Can mark listings as sold, toggle visibility (live/offline), or delete marketplace products.
+- **Account & Data Deletion**: Users can request full account deletion directly within the mobile app (Settings → Delete Account) or online via the dedicated Play Console-compliant URL at `https://rehbarapp.com/delete-account`.
+
 ---
 
 ## 4. Architectural Patterns & Data Flow

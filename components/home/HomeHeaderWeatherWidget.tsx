@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, View, Pressable, ScrollView } from 'react-native';
+import {
+    LayoutChangeEvent,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+    ScrollView
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
     FadeIn,
@@ -10,13 +18,13 @@ import Animated, {
     withRepeat,
     withSequence,
     withTiming,
-    withDelay } from 'react-native-reanimated';
+    withDelay
+} from 'react-native-reanimated';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { useWeather } from '@/hooks/useWeather';
 import { useWeatherLocation } from '@/hooks/useWeatherLocation';
-import { useNextPrayer } from '@/hooks/useNextPrayer';
 import { getWeatherIconName } from '@/utils/weatherTheme';
 import { ThemedText } from '../ThemedText';
 
@@ -24,19 +32,8 @@ interface HomeHeaderWeatherWidgetProps {
     onPress?: () => void;
 }
 
-// Prayer column gets a fixed share of the card's width, weather gets the
-// rest — expressed as flex weights so they always sum to the same ratio
-// regardless of device width.
-const WEATHER_FLEX = 65;
-const PRAYER_FLEX = 35;
-
-
-
-// ── One horizontal weather row: icon+temp beside a 2-line info stack ──────
-// Shared shape for both the "today" and "tomorrow" pager pages, so the
-// layout — and the reduced height it buys back — is identical either way.
+// ── One horizontal weather row: icon + temp beside info stack ──────
 interface WeatherRowProps {
-    width?: number;
     icon?: string;
     temp: number | string;
     conditionLine: string;
@@ -45,109 +42,119 @@ interface WeatherRowProps {
     low: number | null;
     pop?: number;
     colors: typeof Colors.light;
-    animateTemp?: boolean;
-    updatedLabel?: string;
-    showFullForecast?: boolean;
+    dayLabel?: string;
 }
-const WeatherRow = React.memo(({ width, icon, temp, conditionLine, cityLabel, high, low, pop, colors, animateTemp, updatedLabel, showFullForecast }: WeatherRowProps) => {
-    const TempWrap = animateTemp ? Animated.View : View;
+
+const WeatherRow = React.memo(({
+    icon,
+    temp,
+    conditionLine,
+    cityLabel,
+    high,
+    low,
+    pop,
+    colors,
+    dayLabel
+}: WeatherRowProps) => {
     return (
-        <View style={[styles.weatherCol, width ? { width } : null]}>
-            <View style={[styles.weatherRow, { justifyContent: 'space-between', width: '100%' }]}>
-                
-                {/* Left Side: City & Conditions */}
+        <View style={styles.weatherCol}>
+            <View style={styles.weatherRow}>
+                {/* Left Side: City, Day Badge & Conditions */}
                 <View style={styles.weatherInfoBlockLeft}>
-                    <ThemedText style={styles.cityLabelHuge} numberOfLines={1}>
-                        {cityLabel}
-                    </ThemedText>
+                    <View style={styles.cityHeaderRow}>
+                        <ThemedText style={styles.cityLabelHuge} numberOfLines={1}>
+                            {cityLabel}
+                        </ThemedText>
+                        {dayLabel ? (
+                            <View style={[styles.dayBadge, { backgroundColor: colors.lime }]}>
+                                <ThemedText style={styles.dayBadgeText}>{dayLabel}</ThemedText>
+                            </View>
+                        ) : null}
+                    </View>
+
                     <ThemedText style={styles.conditionCity} numberOfLines={1}>
                         {conditionLine}
                     </ThemedText>
+
                     <View style={styles.hiLoRow}>
-                        <Ionicons name="arrow-up" size={10} color={colors.lime} />
-                        <ThemedText style={[styles.highLow, { color: colors.lime }]}>
-                            {high != null ? `${high}°` : '--'}
-                        </ThemedText>
-                        <Ionicons name="arrow-down" size={10} color={colors.secondary} style={{ marginLeft: 6 }} />
-                        <ThemedText style={[styles.highLow, { color: colors.secondary }]}>
-                            {low != null ? `${low}°` : '--'}
-                        </ThemedText>
+                        <View style={styles.hiLoChip}>
+                            <Ionicons name="arrow-up" size={10} color={colors.lime} />
+                            <ThemedText style={[styles.highLow, { color: colors.lime }]}>
+                                {high != null ? `${high}°` : '--'}
+                            </ThemedText>
+                        </View>
+                        <View style={[styles.hiLoChip, { marginLeft: 6 }]}>
+                            <Ionicons name="arrow-down" size={10} color="rgba(255,255,255,0.7)" />
+                            <ThemedText style={[styles.highLow, { color: 'rgba(255,255,255,0.85)' }]}>
+                                {low != null ? `${low}°` : '--'}
+                            </ThemedText>
+                        </View>
                         {pop ? (
-                            <View style={[styles.popPill, { backgroundColor: `${colors.secondary}33` }]}>
-                                <Ionicons name="rainy" size={9} color={colors.secondary} />
-                                <ThemedText style={[styles.popPillText, { color: colors.secondary }]}>{pop}%</ThemedText>
+                            <View style={styles.popPill}>
+                                <Ionicons name="rainy" size={10} color="#38BDF8" />
+                                <ThemedText style={styles.popPillText}>{pop}% rain</ThemedText>
                             </View>
                         ) : null}
                     </View>
                 </View>
 
-                {/* Right Side: Big Icon, Temp, Updated, & Affordance */}
+                {/* Right Side: Icon & Temp */}
                 <View style={styles.iconTempBlockRight}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                        <Ionicons name={getWeatherIconName(icon)} size={36} color="#FFFFFF" />
-                        <TempWrap key={animateTemp ? String(temp) : undefined} {...(animateTemp ? { entering: FadeIn.duration(400) } : {})}>
-                            <ThemedText style={styles.tempHuge}>{temp}°</ThemedText>
-                        </TempWrap>
-                    </View>
-                    
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                        {updatedLabel && (
-                            <View style={styles.updatedInner}>
-                                <Ionicons name="time-outline" size={9} color="rgba(255,255,255,0.7)" />
-                                <ThemedText style={styles.updated}>{updatedLabel}</ThemedText>
-                            </View>
-                        )}
-                        
-                        {showFullForecast && (
-                            <View style={styles.tapHint}>
-                                <ThemedText style={[styles.tapHintText, { color: colors.secondary }]}>Forecast</ThemedText>
-                                <Ionicons name="chevron-forward" size={10} color={colors.secondary} />
-                            </View>
-                        )}
+                    <View style={styles.tempIconRow}>
+                        <Ionicons name={getWeatherIconName(icon)} size={38} color="#FFFFFF" />
+                        <ThemedText style={styles.tempHuge}>{temp}°</ThemedText>
                     </View>
                 </View>
-                
             </View>
         </View>
     );
 });
 WeatherRow.displayName = 'WeatherRow';
 
-// ── Loading skeleton (shimmering blocks) ──
-const Skeleton = ({ backgroundColor }: { backgroundColor: string }) => {
+// ── Skeleton Loader Component ──
+const Skeleton = React.memo(({ backgroundColor }: { backgroundColor: string }) => {
     const shimmer = useSharedValue(0.4);
-    React.useEffect(() => {
-        shimmer.value = withRepeat(withTiming(0.9, { duration: 850, easing: Easing.inOut(Easing.ease) }), -1, true);
-    }, []);
-    const style = useAnimatedStyle(() => ({ opacity: shimmer.value }));
-    const Block = ({ w, h, mt = 0 }: { w: number | string; h: number; mt?: number }) => (
-        <Animated.View style={[{ width: w as any, height: h, borderRadius: Layout.borderRadius, backgroundColor: 'rgba(255,255,255,0.25)', marginTop: mt }, style]} />
+    useEffect(() => {
+        shimmer.value = withRepeat(
+            withTiming(0.9, { duration: 850, easing: Easing.inOut(Easing.ease) }),
+            -1,
+            true
+        );
+    }, [shimmer]);
+    const animatedStyle = useAnimatedStyle(() => ({ opacity: shimmer.value }));
+    const Block = ({ w, h, mt = 0, br = Layout.borderRadius }: { w: number | string; h: number; mt?: number; br?: number }) => (
+        <Animated.View style={[{ width: w as any, height: h, borderRadius: br, backgroundColor: 'rgba(255,255,255,0.25)', marginTop: mt }, animatedStyle]} />
     );
     return (
-        <View style={[styles.card, { backgroundColor }]}>
-            <View style={styles.row}>
-                <View style={{ flex: WEATHER_FLEX, flexDirection: 'row', alignItems: 'center' }}>
-                    <Block w={44} h={44} />
-                    <View style={{ marginLeft: 12, flex: 1 }}>
-                        <Block w={'70%'} h={12} />
-                        <Block w={'50%'} h={10} mt={8} />
+        <View style={styles.wrapper}>
+            <View style={[styles.card, { backgroundColor, minHeight: 88 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={{ flex: 1, paddingRight: 12 }}>
+                        <Block w={'60%'} h={18} />
+                        <Block w={'40%'} h={13} mt={6} />
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                            <Block w={48} h={18} br={4} />
+                            <Block w={48} h={18} mt={0} br={4} />
+                        </View>
                     </View>
-                </View>
-                <View style={[styles.glassPanel, { justifyContent: 'center' }]}>
-                    <Block w={'70%'} h={10} />
-                    <Block w={'55%'} h={16} mt={6} />
-                    <Block w={'45%'} h={10} mt={6} />
+                    <View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <Block w={38} h={38} br={19} />
+                            <Block w={46} h={32} br={6} />
+                        </View>
+                    </View>
                 </View>
             </View>
         </View>
     );
-};
+});
+Skeleton.displayName = 'Skeleton';
 
 const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidgetProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    // Current location when permitted, else the profile/default city.
+    // Current location when permitted, else profile/default city
     const { coords, fallbackCity } = useWeatherLocation();
     const { weather, forecast, isWeatherLoading } = useWeather(
         fallbackCity,
@@ -156,7 +163,7 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
 
     const icon = weather?.weather?.[0]?.icon;
 
-    // Today's high / low from the 3-hourly forecast (falls back to current).
+    // Today's high / low
     const { high, low } = useMemo(() => {
         const list = (forecast as any)?.list;
         if (Array.isArray(list) && list.length) {
@@ -173,9 +180,7 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
         };
     }, [forecast, weather]);
 
-    // Tomorrow's outlook — same 3-hourly list, next calendar day. The
-    // representative icon/condition comes from whichever slot sits closest
-    // to midday, so "Tomorrow" doesn't show a random early-morning icon.
+    // Tomorrow's outlook
     const tomorrow = useMemo(() => {
         const list = (forecast as any)?.list;
         if (!Array.isArray(list) || !list.length) return null;
@@ -207,130 +212,58 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
     }, [forecast]);
 
     const [activePage, setActivePage] = useState(0);
-    const widgetWidth = useRef(0);
-    const [pagerWidth, setPagerWidth] = useState(0);
 
-    const handlePagerLayout = (e: LayoutChangeEvent) => {
-        widgetWidth.current = e.nativeEvent.layout.width;
-        setPagerWidth(e.nativeEvent.layout.width);
-    };
-
-    const handlePageScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-        if (!widgetWidth.current) return;
-        const page = Math.round(e.nativeEvent.contentOffset.x / widgetWidth.current);
-        setActivePage(page);
-    };
-
-    // One-time nudge on the swipe hint chevron so first-time users notice
-    // the card pages sideways, instead of relying on the dots alone.
-    const hasPager = !!tomorrow;
-    const nudge = useSharedValue(0);
+    // Auto carousel of 10 seconds: auto-shifts between Today (0) and Tomorrow (1)
     useEffect(() => {
-        if (!hasPager) return;
-        nudge.value = withDelay(
-            600,
-            withSequence(
-                withTiming(5, { duration: 260, easing: Easing.out(Easing.quad) }),
-                withTiming(0, { duration: 260, easing: Easing.in(Easing.quad) }),
-                withTiming(5, { duration: 260, easing: Easing.out(Easing.quad) }),
-                withTiming(0, { duration: 260, easing: Easing.in(Easing.quad) })
-            )
-        );
-    }, [hasPager, nudge]);
-    const nudgeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: nudge.value }] }));
+        if (!tomorrow) return;
+        const timer = setInterval(() => {
+            setActivePage((prev) => (prev === 0 ? 1 : 0));
+        }, 10000);
+        return () => clearInterval(timer);
+    }, [tomorrow]);
 
-    if (isWeatherLoading && !weather) {
-        return (
-            <Pressable onPress={onPress}>
-                <Skeleton backgroundColor={colors.primary} />
-            </Pressable>
-        );
+    if (!weather || isWeatherLoading) {
+        return <Skeleton backgroundColor={colors.primary} />;
     }
 
     const temp = weather ? Math.round(weather.main.temp) : '--';
     const condition = weather?.weather?.[0]?.main ?? '—';
     const city = (weather?.name || fallbackCity || '').split(',')[0].trim();
-    const prayerCity = city || 'Talagang';
-    // Fixed lime accent for the prayer panel — kept independent of the
-    // weather condition so it stays legible regardless of what the
-    // weather column is showing.
-    const accent = colors.lime;
-    const updatedLabel = relativeTime(weather?.dt);
 
     return (
-        <Animated.View entering={FadeInDown.duration(450)}>
-            <Pressable onPress={onPress} style={({ pressed }) => pressed && { opacity: 0.92 }}>
-                <View style={[styles.card, { backgroundColor: colors.primary }]}>
-                    <View style={styles.row}>
-                        {/* Weather column — swipes to Tomorrow's outlook when forecast data allows */}
-                        <View style={styles.weatherColWrap} onLayout={handlePagerLayout}>
-                            {hasPager && pagerWidth > 0 ? (
-                                <ScrollView
-                                    horizontal
-                                    pagingEnabled
-                                    showsHorizontalScrollIndicator={false}
-                                    onScroll={handlePageScroll}
-                                    scrollEventThrottle={32}
-                                >
-                                    <WeatherRow
-                                        width={pagerWidth}
-                                        icon={icon}
-                                        temp={temp}
-                                        conditionLine={condition}
-                                        cityLabel={city}
-                                        high={high}
-                                        low={low}
-                                        colors={colors}
-                                        animateTemp
-                                        updatedLabel={updatedLabel}
-                                        showFullForecast={true}
-                                    />
-                                    <WeatherRow
-                                        width={pagerWidth}
-                                        icon={tomorrow!.icon}
-                                        temp={tomorrow!.high}
-                                        conditionLine={`Tomorrow · ${tomorrow!.condition}`}
-                                        cityLabel={city}
-                                        high={tomorrow!.high}
-                                        low={tomorrow!.low}
-                                        pop={tomorrow!.pop}
-                                        colors={colors}
-                                        showFullForecast={true}
-                                    />
-                                </ScrollView>
-                            ) : (
-                                <WeatherRow
-                                    icon={icon}
-                                    temp={temp}
-                                    conditionLine={condition}
-                                    cityLabel={city}
-                                    high={high}
-                                    low={low}
-                                    colors={colors}
-                                    animateTemp
-                                    updatedLabel={updatedLabel}
-                                    showFullForecast={true}
-                                />
-                            )}
-
-                            {hasPager && pagerWidth > 0 ? (
-                                <View style={styles.pagerHintRow}>
-                                    <View style={styles.pagerDots}>
-                                        <View style={[styles.pagerDot, activePage === 0 && { backgroundColor: colors.lime, width: 14 }]} />
-                                        <View style={[styles.pagerDot, activePage === 1 && { backgroundColor: colors.lime, width: 14 }]} />
-                                    </View>
-                                    <Animated.View style={nudgeStyle}>
-                                        <Ionicons name="chevron-forward" size={12} color={colors.lime} />
-                                    </Animated.View>
-                                    <ThemedText style={[styles.swipeHintText, { color: colors.lime }]}>
-                                        {activePage === 0 ? 'Swipe for tomorrow' : 'Swipe back for today'}
-                                    </ThemedText>
-                                </View>
-                            ) : null}
-                        </View>
-                    </View>
-                </View>
-            </Pressable>
+        <Animated.View entering={FadeInDown.duration(450)} style={styles.wrapper}>
+            <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={onPress}
+                style={[styles.card, { backgroundColor: colors.primary, minHeight: 88 }]}
+            >
+                <Animated.View key={activePage} entering={FadeIn.duration(500)}>
+                    {activePage === 0 || !tomorrow ? (
+                        <WeatherRow
+                            icon={icon}
+                            temp={temp}
+                            conditionLine={condition}
+                            cityLabel={city}
+                            dayLabel="Today"
+                            high={high}
+                            low={low}
+                            colors={colors}
+                        />
+                    ) : (
+                        <WeatherRow
+                            icon={tomorrow.icon}
+                            temp={tomorrow.high}
+                            conditionLine={tomorrow.condition}
+                            cityLabel={city}
+                            dayLabel="Tomorrow"
+                            high={tomorrow.high}
+                            low={tomorrow.low}
+                            pop={tomorrow.pop}
+                            colors={colors}
+                        />
+                    )}
+                </Animated.View>
+            </TouchableOpacity>
         </Animated.View>
     );
 });
@@ -348,108 +281,128 @@ function relativeTime(unixSec?: number): string {
 }
 
 const styles = StyleSheet.create({
+    wrapper: {
+        width: '100%',
+        marginTop: 4,
+        marginBottom: 14
+    },
     card: {
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
-        paddingVertical: 5,
-        marginBottom: 4
-    },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'stretch'
+        paddingVertical: 10,
+        backgroundColor: 'rgba(255,255,255,0.12)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.18)',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 3
     },
     weatherColWrap: {
         width: '100%',
-        justifyContent: 'center',
-        paddingRight: 0
+        justifyContent: 'center'
     },
     weatherCol: {
         justifyContent: 'center'
     },
     weatherRow: {
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%'
     },
     weatherInfoBlockLeft: {
         flex: 1,
         justifyContent: 'center',
         paddingRight: 8
     },
+    cityHeaderRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6
+    },
     cityLabelHuge: {
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: '800',
         color: '#FFFFFF',
-        marginBottom: 1
+        letterSpacing: 0.2
     },
-    iconTempBlockRight: {
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        justifyContent: 'center'
+    dayBadge: {
+        paddingHorizontal: 6,
+        paddingVertical: 0,
+        borderRadius: 6
     },
-    tempHuge: {
-        fontSize: 30,
+    dayBadgeText: {
+        fontSize: 9,
         fontWeight: '800',
-        color: '#FFFFFF',
-        lineHeight: 32
+        color: '#0F172A',
+        textTransform: 'uppercase'
     },
     conditionCity: {
-        fontSize: 11.5,
+        fontSize: 12,
         fontWeight: '700',
-        color: '#FFFFFF'
-    },
-    pagerHintRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
+        color: 'rgba(255,255,255,0.9)',
         marginTop: 2
     },
-    pagerDots: {
+    hiLoRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-        marginRight: 2
+        marginTop: 6,
+        flexWrap: 'wrap'
     },
-    pagerDot: {
-        width: 5,
-        height: 5,
-        borderRadius: 3,
-        backgroundColor: 'rgba(255,255,255,0.35)'
+    hiLoChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.15)',
+        paddingHorizontal: 5,
+        paddingVertical: 2,
+        borderRadius: 4
     },
-    swipeHintText: {
-        fontSize: 9,
-        fontWeight: '700',
+    highLow: {
+        fontSize: 10.5,
+        fontWeight: '800',
         marginLeft: 2
     },
     popPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 2,
+        gap: 3,
         marginLeft: 6,
-        paddingHorizontal: 4,
-        paddingVertical: 1,
-        borderRadius: 6
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 6,
+        backgroundColor: 'rgba(56, 189, 248, 0.2)'
     },
     popPillText: {
-        fontSize: 9,
-        fontWeight: '700'
-    },
-    hiLoRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 2,
-        flexWrap: 'wrap'
-    },
-    highLow: {
-        fontSize: 11,
+        fontSize: 9.5,
         fontWeight: '700',
-        marginLeft: 2
+        color: '#38BDF8'
     },
-
-    updatedRow: {
+    iconTempBlockRight: {
+        alignItems: 'flex-end',
+        justifyContent: 'center'
+    },
+    forecastTapArea: {
+        alignItems: 'flex-end',
+        justifyContent: 'center'
+    },
+    tempIconRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 2
+        gap: 6
+    },
+    tempHuge: {
+        fontSize: 32,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        lineHeight: 34
+    },
+    forecastPillContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginTop: 4
     },
     updatedInner: {
         flexDirection: 'row',
@@ -457,17 +410,50 @@ const styles = StyleSheet.create({
         gap: 3
     },
     updated: {
-        fontSize: 9,
+        fontSize: 9.5,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.7)'
     },
-    tapHint: {
+    tapHintPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 1
+        gap: 2,
+        paddingHorizontal: 7,
+        paddingVertical: 3,
+        borderRadius: 12
     },
     tapHintText: {
-        fontSize: 9,
+        fontSize: 9.5,
+        fontWeight: '800',
+        color: '#0F172A'
+    },
+    pagerFooterRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 8,
+        paddingTop: 6,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.1)'
+    },
+    pagerDotsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5
+    },
+    pagerDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: 'rgba(255,255,255,0.3)'
+    },
+    swipeHintGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3
+    },
+    swipeHintText: {
+        fontSize: 9.5,
         fontWeight: '700'
     }
 });

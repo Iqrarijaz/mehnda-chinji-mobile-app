@@ -150,6 +150,14 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
         }
     }, [visible, listingToEdit, user]);
 
+    useEffect(() => {
+        if (user?.user?.role !== 'APP_ADMIN') {
+            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
+                InterstitialService.getInstance().load(true);
+            });
+        }
+    }, [user?.user?.role]);
+
     const pickImages = async () => {
         if (formData.images.length >= 5) {
             Toast.show({ type: 'info', text1: 'Limit reached', text2: 'You can attach up to 5 images.' });
@@ -354,12 +362,12 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
 
     const handleThankYouClose = () => {
         setShowThankYou(false);
-        onSuccess();
         if (user?.user?.role !== 'APP_ADMIN') {
             import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
                 InterstitialService.getInstance().show(true);
             });
         }
+        onSuccess();
     };
 
     return (

@@ -16,15 +16,13 @@ const WeatherHero = React.memo(({ weather, isLoading }: WeatherHeroProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    if (isLoading && !weather) {
+    if ((isLoading && !weather) || !weather) {
         return (
             <View style={[styles.loadingContainer, { backgroundColor: colors.primary }]}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
             </View>
         );
     }
-
-    if (!weather) return null;
 
     return (
         <View style={[styles.heroCard, { backgroundColor: colors.primary }]}>
@@ -83,7 +81,7 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 16 },
     loadingContainer: {
-        height: 160,
+        height: 180,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,

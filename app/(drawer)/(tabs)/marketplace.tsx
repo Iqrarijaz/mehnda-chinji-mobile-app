@@ -1,5 +1,5 @@
 import React, { useState, useCallback, memo, useRef, useEffect, useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Platform, RefreshControl } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Platform, RefreshControl } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ import { Layout } from '@/constants/layout';
 import { ThemedText } from '@/components/ThemedText';
 import { MarketplaceCard } from '@/components/marketplace/MarketplaceCard';
 import { MarketplaceCategoryPicker } from '@/components/marketplace/MarketplaceCategoryPicker';
+import { MarketplaceListSkeleton } from '@/components/marketplace/MarketplaceScreenSkeleton';
 import { useMarketplaceAPI } from '@/hooks/useMarketplaceAPI';
 import { ScreenHeader, HeaderIconBtn } from '@/components/common/ScreenHeader';
 import { SearchBar } from '@/components/common/SearchBar';
@@ -83,12 +84,6 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
 
     const { data: configData, refetch: refetchCategories } = categoriesConfigQuery;
 
-    useFocusEffect(
-        useCallback(() => {
-            refetchCategories();
-        }, [refetchCategories])
-    );
-
     const tabs = useMemo(() => {
         const baseTabs = [
             { id: '', label: 'All Items' }
@@ -118,6 +113,13 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
         fetchNextPage,
         isFetchingNextPage
     } = activeQuery;
+
+    useFocusEffect(
+        useCallback(() => {
+            refetchCategories();
+            refetch();
+        }, [refetchCategories, refetch])
+    );
 
     const rawListings = useMemo(() => {
         return infiniteData?.pages?.flatMap(page => Array.isArray(page?.data) ? page.data : []) || [];
@@ -318,9 +320,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
 
             {/* Listings Grid/List */}
             {isLoading ? (
-                <View style={styles.centered}>
-                    <ActivityIndicator size="large" color={colors.primary} />
-                </View>
+                <MarketplaceListSkeleton />
             ) : (
                 <View style={{ flex: 1 }}>
                     <FlashList

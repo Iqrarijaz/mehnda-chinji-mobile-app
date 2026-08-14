@@ -131,9 +131,9 @@ const BusinessRegistrationScreen = () => {
     );
 
     useEffect(() => {
-        if (!editData && user?.user?.role !== 'APP_ADMIN') {
+        if (user?.user?.role !== 'APP_ADMIN') {
             import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
-                InterstitialService.getInstance().load();
+                InterstitialService.getInstance().load(true);
             });
         }
         if (editData) {
@@ -323,12 +323,12 @@ const BusinessRegistrationScreen = () => {
 
     const handleThankYouClose = () => {
         setShowThankYou(false);
-        handleGoBack('portal');
         if (user?.user?.role !== 'APP_ADMIN') {
             import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
                 InterstitialService.getInstance().show(true);
             });
         }
+        handleGoBack('portal');
     };
 
     return (
@@ -625,7 +625,7 @@ const BusinessRegistrationScreen = () => {
 
                         <Animated.View entering={FadeInUp.delay(500).springify()} style={styles.buttonsRow}>
                             <CancelButton
-                                onPress={handleGoBack}
+                                onPress={() => handleGoBack()}
                                 disabled={isPending || isUploadingImage}
                                 style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 40 }}
                             />

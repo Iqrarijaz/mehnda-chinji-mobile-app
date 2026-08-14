@@ -38,6 +38,7 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import InterstitialService from '@/ads/interstitial.service';
 
 const PlaceSubmissionScreen = () => {
     const router = useRouter();
@@ -97,10 +98,8 @@ const PlaceSubmissionScreen = () => {
     );
 
     useEffect(() => {
-        if (!isEditing && user?.user?.role !== 'APP_ADMIN') {
-            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
-                InterstitialService.getInstance().load();
-            });
+        if (user?.user?.role !== 'APP_ADMIN') {
+            InterstitialService.getInstance().load(true);
         }
         if (editData) {
             const images = Array.isArray(editData.images) ? editData.images : [];
@@ -109,7 +108,7 @@ const PlaceSubmissionScreen = () => {
                 setUploadedImage(images[0]);
             }
         }
-    }, [editData]);
+    }, [editData, user?.user?.role]);
 
     const pickImage = async () => {
         if (Platform.OS === 'ios') {
@@ -210,9 +209,7 @@ const PlaceSubmissionScreen = () => {
     const handleThankYouClose = () => {
         setShowThankYou(false);
         if (user?.user?.role !== 'APP_ADMIN') {
-            import('@/ads/interstitial.service').then(({ default: InterstitialService }) => {
-                InterstitialService.getInstance().show(true);
-            });
+            InterstitialService.getInstance().show(true);
         }
         if (category) {
             router.replace({ pathname: '/listing/[category]', params: { category, tab: 'requests' } });

@@ -73,6 +73,8 @@ export const marketplaceListingSchema = yup.object().shape({
         .of(yup.string())
         .min(1, 'Please add at least one image of your item.')
         .required('Please add at least one image of your item.'),
+    latitude: yup.mixed().optional().nullable(),
+    longitude: yup.mixed().optional().nullable(),
 });
 
 export const businessSchema = yup.object().shape({
@@ -91,4 +93,6 @@ export const businessSchema = yup.object().shape({
         .matches(/^[0-9]+$/, 'Phone number must contain only digits')
         .required('Phone is required'),
     category: yup.object().nullable().required('Category is required'),
+    latitude: yup.mixed().optional().nullable(),
+    longitude: yup.mixed().optional().nullable(),
 });

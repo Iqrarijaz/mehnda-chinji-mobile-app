@@ -16,8 +16,8 @@ export function getEssentialsList(params: {
     category?: string;
     limit?: number;
     skip?: number;
-    lat?: number;
-    lng?: number;
+    latitude?: number;
+    longitude?: number;
     type?: string;
 }) {
     return apiClient.get('/api/user/v1/get-essentials', { params });

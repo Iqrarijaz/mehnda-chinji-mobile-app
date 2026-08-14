@@ -33,8 +33,7 @@ export default function CreateListingScreen() {
                         else router.replace('/(drawer)/(tabs)' as any);
                     }}
                     onSuccess={() => {
-                        if (router.canGoBack()) router.back();
-                        else router.replace('/(drawer)/(tabs)' as any);
+                        router.replace({ pathname: '/(drawer)/(tabs)/marketplace', params: { tab: 'mine' } });
                     }}
                     listingToEdit={listingToEdit}
                 />

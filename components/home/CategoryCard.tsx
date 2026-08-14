@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         flex: 1,
         margin: 6 },
     card: {
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         padding: 12,
         alignItems: 'center',
         justifyContent: 'center',
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 42,
         height: 42,
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8 },
