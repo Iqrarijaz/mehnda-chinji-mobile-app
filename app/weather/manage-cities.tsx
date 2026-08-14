@@ -87,7 +87,7 @@ export default function ManageCitiesScreen() {
                     <View style={[styles.limitNote, { backgroundColor: inputBg }]}>
                         <Ionicons name="information-circle-outline" size={16} color={colors.icon} />
                         <ThemedText style={[styles.limitText, { color: colors.textSecondary }]}>
-                            You've reached the {MAX_CITIES}-city limit. Remove one to add more.
+                            You&apos;ve reached the {MAX_CITIES}-city limit. Remove one to add more.
                         </ThemedText>
                     </View>
                 ) : (
@@ -108,11 +108,14 @@ export default function ManageCitiesScreen() {
                         {results.map((r, i) => (
                             <TouchableOpacity
                                 key={`${r.latitude}-${r.longitude}-${i}`}
+                                onPress={() => onAdd(r)}
+                                activeOpacity={0.7}
                                 style={[styles.resultRow, { borderBottomWidth: 0, borderBottomColor: colors.border }]}
                             >
                                 <ThemedText style={[styles.resultText, { color: colors.text }]} numberOfLines={2}>
                                     {r.displayName}
                                 </ThemedText>
+                                <Ionicons name="add-circle-outline" size={20} color={colors.primary} />
                             </TouchableOpacity>
                         ))}
                     </>
