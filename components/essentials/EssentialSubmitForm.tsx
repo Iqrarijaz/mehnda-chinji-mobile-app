@@ -256,18 +256,6 @@ const EssentialSubmitForm = React.memo(({
             }
         }
 
-        if (isTravel && form.type?.toLowerCase() === 'bus') {
-            const validRoutes = form.route.filter((r: any) => r.city.trim() !== '');
-            if (validRoutes.length < 2) {
-                newErrors.route = 'Bus route requires at least an origin and destination stop.';
-            }
-
-            const validReturnRoutes = form.returnRoute.filter((r: any) => r.city.trim() !== '');
-            if (validReturnRoutes.length < 2) {
-                newErrors.returnRoute = 'Bus return route requires at least an origin and destination stop.';
-            }
-        }
-
         if (!form.contact[0]?.number.trim()) {
             newErrors['contact_general'] = 'At least one contact number is required.';
         }
@@ -503,7 +491,7 @@ const EssentialSubmitForm = React.memo(({
                 <Animated.View entering={FadeInDown.delay(400)} style={[styles.field, { marginBottom: 20 }]}>
                     <View style={styles.labelRow}>
                         <ThemedText style={styles.label}>
-                            ROUTE / SCHEDULE <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
+                            ROUTE / SCHEDULE
                         </ThemedText>
                         {form.route.length < 10 && (
                             <TouchableOpacity onPress={addRoute}>
@@ -685,7 +673,7 @@ const EssentialSubmitForm = React.memo(({
                 <Animated.View entering={FadeInDown.delay(450)} style={styles.field}>
                     <View style={styles.labelRow}>
                         <ThemedText style={styles.label}>
-                            RETURN ROUTE <ThemedText style={{ color: '#EF4444' }}>*</ThemedText>
+                            RETURN ROUTE
                         </ThemedText>
                         {form.returnRoute.length < 10 && (
                             <TouchableOpacity onPress={addReturnRoute}>
