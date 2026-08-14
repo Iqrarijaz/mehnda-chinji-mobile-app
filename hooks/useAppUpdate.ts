@@ -36,8 +36,8 @@ export const useAppUpdate = () => {
         if (now - lastCheck > ONE_DAY_MS) {
           const info = await fetchAppVersionInfo();
 
-          // Fallback to EXPO_PUBLIC_APP_VERSION, then 1.2.5
-          let currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.4';
+          // Fallback to EXPO_PUBLIC_APP_VERSION, then 2.0.7
+          let currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.7';
           try {
             const packageJson = require('../../package.json');
             if (packageJson && packageJson.version) {

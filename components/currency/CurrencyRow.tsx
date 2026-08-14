@@ -49,9 +49,18 @@ export const CurrencyRow = React.memo(function CurrencyRow({ code, rate, onPress
                 </View>
 
                 <View style={styles.textWrap}>
-                    <ThemedText style={styles.code}>{code}</ThemedText>
+                    <View style={styles.codeRow}>
+                        <ThemedText style={styles.code}>{code}</ThemedText>
+                        {meta.symbol ? (
+                            <View style={[styles.symbolBadge, { backgroundColor: colors.primary + '14' }]}>
+                                <ThemedText style={[styles.symbolText, { color: colors.primary }]}>
+                                    {meta.symbol}
+                                </ThemedText>
+                            </View>
+                        ) : null}
+                    </View>
                     <ThemedText style={[styles.name, { color: colors.textSecondary }]} numberOfLines={1}>
-                        {meta.name}
+                        {meta.countryName ? `${meta.countryName} · ${meta.name}` : meta.name}
                     </ThemedText>
                 </View>
 
@@ -110,6 +119,20 @@ const styles = StyleSheet.create({
     textWrap: {
         flex: 1,
         marginRight: 8,
+    },
+    codeRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    symbolBadge: {
+        paddingHorizontal: 6,
+        paddingVertical: 1,
+        borderRadius: 6,
+    },
+    symbolText: {
+        fontSize: 11,
+        fontWeight: '700',
     },
     code: {
         fontSize: 15,

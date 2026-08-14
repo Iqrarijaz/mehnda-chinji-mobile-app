@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackButton } from '@/components/common/BackButton';
+import { SearchBar } from '@/components/common/SearchBar';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -12,15 +13,21 @@ interface CurrencyHeaderProps {
     lastUpdatedLabel: string | null;
     currencyCount?: number;
     isUnlocked: boolean;
+    searchQuery: string;
+    onSearchChange: (text: string) => void;
 }
 
 /**
  * Custom hero header for the Currency Exchange screen — primary-colored
- * rounded-bottom band, same visual language as the Manage Cities / ticket
- * screens — replacing the plain card-background header the screen
- * launched with.
+ * rounded-bottom band with integrated SearchBar input.
  */
-export function CurrencyHeader({ lastUpdatedLabel, currencyCount, isUnlocked }: CurrencyHeaderProps) {
+export const CurrencyHeader = React.memo(function CurrencyHeader({
+    lastUpdatedLabel,
+    currencyCount,
+    isUnlocked,
+    searchQuery,
+    onSearchChange,
+}: CurrencyHeaderProps) {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -45,14 +52,23 @@ export function CurrencyHeader({ lastUpdatedLabel, currencyCount, isUnlocked }: 
                     </ThemedText>
                 </View>
             </View>
+
+            <View style={styles.searchRow}>
+                <SearchBar
+                    value={searchQuery}
+                    onChangeText={onSearchChange}
+                    placeholder="Search country, symbol, code (e.g. $, USA, USD)"
+                    style={[styles.searchBar, { backgroundColor: theme === 'dark' ? colors.cardBg : '#FFFFFF' }]}
+                />
+            </View>
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 16,
-        paddingBottom: 18,
+        paddingBottom: 16,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
     },
@@ -91,5 +107,12 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: 'rgba(255,255,255,0.85)',
         marginTop: 3,
+    },
+    searchRow: {
+        marginTop: 14,
+        height: 44,
+    },
+    searchBar: {
+        height: 44,
     },
 });

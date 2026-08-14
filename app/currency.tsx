@@ -8,7 +8,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRewardedAd } from '@/ads/hooks/useAds';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
-import { SearchBar } from '@/components/common/SearchBar';
 import { CurrencyHeader } from '@/components/currency/CurrencyHeader';
 import { CurrencyListSkeleton } from '@/components/currency/CurrencyListSkeleton';
 import { CurrencyRow } from '@/components/currency/CurrencyRow';
@@ -61,7 +60,19 @@ export default function CurrencyScreen() {
         if (!q) return currencyEntries;
         return currencyEntries.filter(([code]) => {
             const meta = getCurrencyMeta(code);
-            return code.toLowerCase().includes(q) || meta.name.toLowerCase().includes(q);
+            const symbol = meta.symbol?.toLowerCase() ?? '';
+            const countryName = meta.countryName?.toLowerCase() ?? '';
+            const codeLower = code.toLowerCase();
+            const nameLower = meta.name.toLowerCase();
+            const aliases = meta.aliases?.map((a) => a.toLowerCase()) ?? [];
+
+            return (
+                codeLower.includes(q) ||
+                nameLower.includes(q) ||
+                symbol.includes(q) ||
+                countryName.includes(q) ||
+                aliases.some((alias) => alias.includes(q))
+            );
         });
     }, [currencyEntries, searchQuery]);
 
@@ -103,16 +114,9 @@ export default function CurrencyScreen() {
                 lastUpdatedLabel={lastUpdatedLabel}
                 currencyCount={ratesData?.currencyCount}
                 isUnlocked={isPremiumUnlocked}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
             />
-
-            <View style={styles.searchWrap}>
-                <SearchBar
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    placeholder="Search currency (e.g. USD, Euro)"
-                    style={[styles.searchBar, { backgroundColor: colors.cardBg }]}
-                />
-            </View>
 
             {/* List */}
             {isRatesLoading ? (
@@ -134,7 +138,7 @@ export default function CurrencyScreen() {
                         <CurrencyRow code={code} rate={rate} onPress={() => handleRowPress(code)} />
                     )}
                     contentContainerStyle={{
-                        paddingTop: 6,
+                        paddingTop: 12,
                         paddingBottom: insets.bottom + (isPremiumUnlocked ? 24 : 110),
                     }}
                     showsVerticalScrollIndicator={false}
@@ -175,13 +179,6 @@ export default function CurrencyScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    searchWrap: {
-        paddingHorizontal: 20,
-        marginTop: 14,
-    },
-    searchBar: {
-        height: 46,
     },
     listWrap: {
         flex: 1,
