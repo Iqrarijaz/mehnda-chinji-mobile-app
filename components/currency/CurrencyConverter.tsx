@@ -162,7 +162,9 @@ export function CurrencyConverter({ rates, codes, favorites }: CurrencyConverter
 const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.cardBorderRadius,
-        padding: 14,
+        paddingHorizontal: 14,
+        paddingTop: 8,
+        paddingBottom: 16,
         marginHorizontal: 20,
         marginTop: 14,
     },
