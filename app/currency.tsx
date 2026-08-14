@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRewardedAd } from '@/ads/hooks/useAds';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
+import { CurrencyConverter } from '@/components/currency/CurrencyConverter';
 import { CurrencyHeader } from '@/components/currency/CurrencyHeader';
 import { CurrencyListSkeleton } from '@/components/currency/CurrencyListSkeleton';
 import { CurrencyRow } from '@/components/currency/CurrencyRow';
@@ -18,7 +19,8 @@ import { Colors } from '@/constants/colors';
 import { currencyMatchesQuery, getCurrencyMeta, matchesAnyKnownCurrency } from '@/constants/currencies';
 import { useTheme } from '@/context/ThemeContext';
 import { useExchangeRates } from '@/hooks/useCurrency';
-import { useIsPremiumUnlocked, useCurrencyStore } from '@/store/currencyStore';
+import { useIsOffline } from '@/hooks/useIsOffline';
+import { useFavoriteCurrencies, useIsPremiumUnlocked, useCurrencyStore } from '@/store/currencyStore';
 
 type CurrencyEntry = [code: string, rate: number];
 
@@ -29,6 +31,9 @@ export default function CurrencyScreen() {
 
     const isPremiumUnlocked = useIsPremiumUnlocked();
     const unlockPremium = useCurrencyStore((s) => s.unlockPremium);
+    const toggleFavoriteCurrency = useCurrencyStore((s) => s.toggleFavoriteCurrency);
+    const favorites = useFavoriteCurrencies();
+    const isOffline = useIsOffline();
     const { ratesData, isRatesLoading, isRatesFetching, ratesError, refetchRates } = useExchangeRates(isPremiumUnlocked);
     const { showAd, isShowing: isAdShowing, isAdLoaded } = useRewardedAd();
 
@@ -46,14 +51,27 @@ export default function CurrencyScreen() {
     const currencyEntries: CurrencyEntry[] = useMemo(() => {
         if (!ratesData?.rates) return [];
         const entries = Object.entries(ratesData.rates) as CurrencyEntry[];
-        // PKR (the base currency) always leads; everything else A-Z.
+        // PKR (the base currency) always leads, then pinned favorites in pin
+        // order, then everything else A-Z.
         entries.sort(([a], [b]) => {
             if (a === 'PKR') return -1;
             if (b === 'PKR') return 1;
+            const favA = favorites.indexOf(a);
+            const favB = favorites.indexOf(b);
+            if (favA !== -1 || favB !== -1) {
+                if (favA === -1) return 1;
+                if (favB === -1) return -1;
+                return favA - favB;
+            }
             return a.localeCompare(b);
         });
         return entries;
-    }, [ratesData]);
+    }, [ratesData, favorites]);
+
+    const nonPkrCodes = useMemo(
+        () => currencyEntries.filter(([code]) => code !== 'PKR').map(([code]) => code),
+        [currencyEntries]
+    );
 
     const filteredEntries = useMemo(() => {
         if (!searchQuery.trim()) return currencyEntries;
@@ -107,6 +125,7 @@ export default function CurrencyScreen() {
                 isUnlocked={isPremiumUnlocked}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                isOffline={isOffline}
             />
 
             {/* List */}
@@ -126,8 +145,17 @@ export default function CurrencyScreen() {
                     data={filteredEntries}
                     keyExtractor={([code]) => code}
                     renderItem={({ item: [code, rate] }) => (
-                        <CurrencyRow code={code} rate={rate} onPress={() => handleRowPress(code)} />
+                        <CurrencyRow
+                            code={code}
+                            rate={rate}
+                            onPress={() => handleRowPress(code)}
+                            isFavorite={favorites.includes(code)}
+                            onToggleFavorite={() => toggleFavoriteCurrency(code)}
+                        />
                     )}
+                    ListHeaderComponent={
+                        <CurrencyConverter rates={ratesData?.rates} codes={nonPkrCodes} favorites={favorites} />
+                    }
                     contentContainerStyle={{
                         paddingTop: 12,
                         paddingBottom: insets.bottom + (isPremiumUnlocked ? 24 : 110),
