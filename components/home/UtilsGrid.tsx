@@ -51,6 +51,11 @@ const CATEGORIES: UtilCategory[] = [
                 label: 'Metals & Gold',
                 icon: 'diamond-outline',
                 route: '/metals' },
+            {
+                id: 'fuel',
+                label: 'Fuel Prices',
+                icon: 'car-outline',
+                route: '/fuel' },
         ] },
 ];
 
