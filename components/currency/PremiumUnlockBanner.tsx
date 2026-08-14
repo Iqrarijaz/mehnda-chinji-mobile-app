@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { ActivityIndicator, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -65,11 +65,6 @@ const styles = StyleSheet.create({
     touchable: {
         borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        shadowColor: '#0D9488',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.25,
-        shadowRadius: 16,
-        elevation: Platform.OS === 'android' ? 4 : 0,
     },
     gradient: {
         flexDirection: 'row',

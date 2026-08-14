@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
     Platform,
+    StyleProp,
     StyleSheet,
     TextInput,
     TouchableOpacity,
@@ -29,7 +30,7 @@ interface SearchBarProps {
     /** Renders inside the bar on the right, after the text input (e.g. a filter icon) */
     rightAction?: React.ReactNode;
     /** Outer container override */
-    style?: ViewStyle;
+    style?: StyleProp<ViewStyle>;
     /** Ref forwarded to the underlying TextInput */
     inputRef?: React.Ref<TextInput>;
 }
