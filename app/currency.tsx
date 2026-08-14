@@ -1,7 +1,8 @@
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -35,6 +36,7 @@ export default function CurrencyScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTrendCurrency, setSelectedTrendCurrency] = useState<string | null>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const trendsSheetRef = useRef<BottomSheetModal>(null);
 
     useEffect(() => {
         analyticsService.trackEvent(AnalyticsEvents.CURRENCY_VIEWED, { unlocked: isPremiumUnlocked });
@@ -83,6 +85,7 @@ export default function CurrencyScreen() {
         if (code === 'PKR') return; // base currency has no meaningful trend against itself
         analyticsService.trackEvent(AnalyticsEvents.CURRENCY_TRENDS_VIEWED, { code });
         setSelectedTrendCurrency(code);
+        trendsSheetRef.current?.present();
     }, []);
 
     const lastUpdatedLabel = useMemo(() => {
@@ -160,7 +163,11 @@ export default function CurrencyScreen() {
                 </View>
             )}
 
-            <CurrencyTrendsModal currency={selectedTrendCurrency} onClose={() => setSelectedTrendCurrency(null)} />
+            <CurrencyTrendsModal
+                ref={trendsSheetRef}
+                currency={selectedTrendCurrency}
+                onDismiss={() => setSelectedTrendCurrency(null)}
+            />
         </View>
     );
 }

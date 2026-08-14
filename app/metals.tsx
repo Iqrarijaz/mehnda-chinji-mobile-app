@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -25,6 +26,7 @@ export default function MetalsScreen() {
     const [selectedTrendMetal, setSelectedTrendMetal] = useState<string | null>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const trendsSheetRef = useRef<BottomSheetModal>(null);
 
     useEffect(() => {
         analyticsService.trackEvent(AnalyticsEvents.METALS_VIEWED);
@@ -43,6 +45,7 @@ export default function MetalsScreen() {
         analyticsService.trackEvent(AnalyticsEvents.METAL_ROW_CLICKED, { metal });
         analyticsService.trackEvent(AnalyticsEvents.METAL_TRENDS_VIEWED, { metal });
         setSelectedTrendMetal(metal);
+        trendsSheetRef.current?.present();
     }, []);
 
     const lastUpdatedLabel = useMemo(() => {
@@ -164,7 +167,11 @@ export default function MetalsScreen() {
                 </ScrollView>
             )}
 
-            <MetalTrendsModal metal={selectedTrendMetal} onClose={() => setSelectedTrendMetal(null)} />
+            <MetalTrendsModal
+                ref={trendsSheetRef}
+                metal={selectedTrendMetal}
+                onDismiss={() => setSelectedTrendMetal(null)}
+            />
         </View>
     );
 }
