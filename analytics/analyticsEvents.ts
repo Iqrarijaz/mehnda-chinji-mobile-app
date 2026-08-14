@@ -28,6 +28,9 @@ export const AnalyticsEvents = {
     CURRENCY_AD_UNLOCK_STARTED: 'currency_ad_unlock_started',
     CURRENCY_AD_UNLOCK_COMPLETED: 'currency_ad_unlock_completed',
     CURRENCY_AD_UNLOCK_FAILED: 'currency_ad_unlock_failed',
+    METALS_VIEWED: 'metals_viewed',
+    METAL_ROW_CLICKED: 'metal_row_clicked',
+    METAL_TRENDS_VIEWED: 'metal_trends_viewed',
 
     // Community Specific
     DONOR_CARD_CLICKED: 'donor_card_clicked',

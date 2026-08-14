@@ -7,6 +7,7 @@ import { CategoryGrid } from '@/components/home/categoryGrid';
 import { ContentCard } from '@/components/home/contentCard';
 import { CurrencyHomeCard } from '@/components/home/CurrencyHomeCard';
 import { HomeHeader } from '@/components/home/homeHeader';
+import { MetalsHomeCard } from '@/components/home/MetalsHomeCard';
 import { PasswordModal } from '@/components/setting/passwordModal';
 import { ThemedText } from '@/components/themedText';
 import { ThemedView } from '@/components/themedView';
@@ -57,6 +58,8 @@ export default function HomeScreen() {
           />
 
           <CurrencyHomeCard onPress={() => router.push('/currency' as any)} delay={525} />
+
+          <MetalsHomeCard onPress={() => router.push('/metals' as any)} delay={540} />
 
           <ContentCard
             icon="help-buoy-outline"
