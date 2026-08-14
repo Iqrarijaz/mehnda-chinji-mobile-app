@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +16,8 @@ interface CurrencyHeaderProps {
     isUnlocked: boolean;
     searchQuery: string;
     onSearchChange: (text: string) => void;
+    /** True when the device has no connectivity — rates shown are the last cached fetch. */
+    isOffline?: boolean;
 }
 
 /**
@@ -27,6 +30,7 @@ export const CurrencyHeader = React.memo(function CurrencyHeader({
     isUnlocked,
     searchQuery,
     onSearchChange,
+    isOffline,
 }: CurrencyHeaderProps) {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
@@ -44,10 +48,16 @@ export const CurrencyHeader = React.memo(function CurrencyHeader({
                                 <ThemedText style={styles.livePillText}>ALL UNLOCKED</ThemedText>
                             </View>
                         )}
+                        {isOffline && (
+                            <View style={styles.offlinePill}>
+                                <Ionicons name="cloud-offline-outline" size={9} color="#FFFFFF" />
+                                <ThemedText style={styles.offlinePillText}>OFFLINE</ThemedText>
+                            </View>
+                        )}
                     </View>
                     <ThemedText style={styles.subtitle} numberOfLines={1}>
                         {lastUpdatedLabel
-                            ? `Updated ${lastUpdatedLabel}${currencyCount ? ` · ${currencyCount} currencies` : ''}`
+                            ? `${isOffline ? 'Last known' : 'Updated'} ${lastUpdatedLabel}${currencyCount ? ` · ${currencyCount} currencies` : ''}`
                             : 'Fetching latest rates…'}
                     </ThemedText>
                 </View>
@@ -100,6 +110,21 @@ const styles = StyleSheet.create({
         fontSize: 8.5,
         fontWeight: '800',
         color: '#1E293B',
+        letterSpacing: 0.3,
+    },
+    offlinePill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
+        paddingHorizontal: 7,
+        paddingVertical: 2,
+        borderRadius: 10,
+        backgroundColor: 'rgba(0,0,0,0.22)',
+    },
+    offlinePillText: {
+        fontSize: 8.5,
+        fontWeight: '800',
+        color: '#FFFFFF',
         letterSpacing: 0.3,
     },
     subtitle: {

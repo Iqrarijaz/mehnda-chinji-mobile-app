@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import HomeHeaderCurrencyWidget from './HomeHeaderCurrencyWidget';
 import HomeHeaderWeatherWidget from './HomeHeaderWeatherWidget';
 import { ScreenHeader, HeaderIconBtn } from '../common/ScreenHeader';
 
@@ -22,10 +23,13 @@ export const HomeHeader = React.memo(({ setIsSearchActive }: HomeHeaderProps) =>
                 }
             >
                 <HomeHeaderWeatherWidget onPress={() => router.push('/weather')} />
+                <HomeHeaderCurrencyWidget onPress={() => router.push('/currency')} />
             </ScreenHeader>
         </View>
     );
 });
+
+HomeHeader.displayName = 'HomeHeader';
 
 const styles = StyleSheet.create({
     headerWrapper: {

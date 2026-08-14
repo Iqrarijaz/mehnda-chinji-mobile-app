@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { ThemedText } from '@/components/ThemedText';
@@ -15,6 +15,9 @@ interface CurrencyRowProps {
     /** 1 PKR expressed in this currency, as returned by the backend. */
     rate: number;
     onPress: () => void;
+    /** Star/pin toggle — omitted (no star shown) for the base currency, which can't be pinned. */
+    isFavorite?: boolean;
+    onToggleFavorite?: () => void;
 }
 
 const TILE_SIZE = 46;
@@ -26,7 +29,7 @@ function formatRate(value: number) {
     });
 }
 
-export const CurrencyRow = React.memo(function CurrencyRow({ code, rate, onPress }: CurrencyRowProps) {
+export const CurrencyRow = React.memo(function CurrencyRow({ code, rate, onPress, isFavorite, onToggleFavorite }: CurrencyRowProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const meta = getCurrencyMeta(code);
@@ -76,6 +79,20 @@ export const CurrencyRow = React.memo(function CurrencyRow({ code, rate, onPress
                         </>
                     )}
                 </View>
+
+                {!isBaseCurrency && onToggleFavorite && (
+                    <TouchableOpacity
+                        onPress={onToggleFavorite}
+                        hitSlop={8}
+                        style={styles.favoriteButton}
+                    >
+                        <Ionicons
+                            name={isFavorite ? 'star' : 'star-outline'}
+                            size={18}
+                            color={isFavorite ? colors.secondary : colors.icon}
+                        />
+                    </TouchableOpacity>
+                )}
 
                 {!isBaseCurrency && (
                     <Ionicons name="stats-chart-outline" size={16} color={colors.icon} style={styles.trendIcon} />
@@ -168,5 +185,9 @@ const styles = StyleSheet.create({
     },
     trendIcon: {
         marginLeft: 2,
+    },
+    favoriteButton: {
+        padding: 2,
+        marginLeft: 4,
     },
 });
