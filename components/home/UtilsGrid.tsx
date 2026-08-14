@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { Layout } from '@/constants/layout';
+import { CategoryCard } from './CategoryCard';
 
 interface UtilItem {
     id: string;
@@ -81,41 +82,21 @@ export function UtilsGrid() {
                     <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
                         {category.title}
                     </ThemedText>
+                    {/* Same CategoryCard used by "Explore Categories" — same rounded
+                        card, icon tile, and label treatment across the Home screen. */}
                     <View style={styles.grid}>
-                        {category.items.map((util) => (
-                            <View key={util.id} style={styles.gridItem}>
-                                <TouchableOpacity
+                        {category.items.map((util, index) => (
+                            <Animated.View
+                                key={util.id}
+                                entering={SlideInLeft.delay(100 + index * 80).duration(400)}
+                                style={styles.gridItem}
+                            >
+                                <CategoryCard
+                                    label={util.label}
+                                    icon={util.image ?? util.icon}
                                     onPress={() => router.push(util.route as any)}
-                                    activeOpacity={0.7}
-                                    style={styles.touchable}
-                                >
-                                    <View style={[styles.card, { backgroundColor: colors.cardBg }]}>
-                                        {util.image ? (
-                                            <Image
-                                                source={util.image}
-                                                style={styles.icon}
-                                                resizeMode="contain"
-                                            />
-                                        ) : (
-                                            <View style={[styles.iconContainer, { backgroundColor: colors.primary + '12' }]}>
-                                                <Ionicons
-                                                    name={util.icon as any}
-                                                    size={28}
-                                                    color={colors.primary}
-                                                />
-                                            </View>
-                                        )}
-                                        <ThemedText
-                                            style={[styles.label, { color: colors.text }]}
-                                            numberOfLines={2}
-                                            adjustsFontSizeToFit
-                                            minimumFontScale={0.8}
-                                        >
-                                            {util.label}
-                                        </ThemedText>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
+                                />
+                            </Animated.View>
                         ))}
                     </View>
                 </View>
@@ -145,36 +126,6 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap'
     },
     gridItem: {
-        width: '25%'
+        width: '33.33%'
     },
-    touchable: {
-        flex: 1,
-        margin: 6
-    },
-    card: {
-        borderRadius: Layout.borderRadius - 4,
-        padding: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: 90
-    },
-    icon: {
-        width: 50,
-        height: 50,
-        marginBottom: 4
-    },
-    iconContainer: {
-        width: 50,
-        height: 50,
-        borderRadius: Layout.borderRadius - 4,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 4
-    },
-    label: {
-        fontSize: 11,
-        fontWeight: '600',
-        textAlign: 'center',
-        lineHeight: 14
-    }
 });

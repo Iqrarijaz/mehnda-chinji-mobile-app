@@ -78,7 +78,7 @@ export const CurrencyHeader = React.memo(function CurrencyHeader({
 const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 16,
-        paddingBottom: 16,
+        paddingBottom: 8,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
     },
