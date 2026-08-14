@@ -37,6 +37,21 @@ const CATEGORIES: UtilCategory[] = [
                 image: require('@/assets/icons/prayer_icon.webp'),
                 route: '/prayerTimes' },
         ] },
+    {
+        id: 'finance',
+        title: 'Finance & Rates',
+        items: [
+            {
+                id: 'currency',
+                label: 'Currency',
+                icon: 'swap-horizontal',
+                route: '/currency' },
+            {
+                id: 'metals',
+                label: 'Metals & Gold',
+                icon: 'diamond-outline',
+                route: '/metals' },
+        ] },
 ];
 
 export function UtilsGrid() {
