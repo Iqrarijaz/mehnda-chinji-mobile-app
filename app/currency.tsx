@@ -15,7 +15,7 @@ import { CurrencyTrendsModal } from '@/components/currency/CurrencyTrendsModal';
 import { PremiumUnlockBanner } from '@/components/currency/PremiumUnlockBanner';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
-import { getCurrencyMeta } from '@/constants/currencies';
+import { currencyMatchesQuery, getCurrencyMeta, matchesAnyKnownCurrency } from '@/constants/currencies';
 import { useTheme } from '@/context/ThemeContext';
 import { useExchangeRates } from '@/hooks/useCurrency';
 import { useIsPremiumUnlocked, useCurrencyStore } from '@/store/currencyStore';
@@ -56,25 +56,16 @@ export default function CurrencyScreen() {
     }, [ratesData]);
 
     const filteredEntries = useMemo(() => {
-        const q = searchQuery.trim().toLowerCase();
-        if (!q) return currencyEntries;
-        return currencyEntries.filter(([code]) => {
-            const meta = getCurrencyMeta(code);
-            const symbol = meta.symbol?.toLowerCase() ?? '';
-            const countryName = meta.countryName?.toLowerCase() ?? '';
-            const codeLower = code.toLowerCase();
-            const nameLower = meta.name.toLowerCase();
-            const aliases = meta.aliases?.map((a) => a.toLowerCase()) ?? [];
-
-            return (
-                codeLower.includes(q) ||
-                nameLower.includes(q) ||
-                symbol.includes(q) ||
-                countryName.includes(q) ||
-                aliases.some((alias) => alias.includes(q))
-            );
-        });
+        if (!searchQuery.trim()) return currencyEntries;
+        return currencyEntries.filter(([code]) => currencyMatchesQuery(code, getCurrencyMeta(code), searchQuery));
     }, [currencyEntries, searchQuery]);
+
+    // Free tier only ever has 5 currencies loaded, so a search for anything
+    // outside that set always comes back empty — distinguish "no such
+    // currency" from "exists, but you haven't unlocked it yet" so the empty
+    // state can point at the unlock banner instead of looking like search is
+    // just broken.
+    const isSearchingLockedCurrency = !isPremiumUnlocked && !!searchQuery.trim() && filteredEntries.length === 0 && matchesAnyKnownCurrency(searchQuery);
 
     const handleRefresh = useCallback(async () => {
         setIsRefreshing(true);
@@ -151,9 +142,15 @@ export default function CurrencyScreen() {
                     }
                     ListEmptyComponent={
                         <View style={styles.centerWrap}>
-                            <Ionicons name="search-outline" size={36} color={colors.textSecondary} />
+                            <Ionicons
+                                name={isSearchingLockedCurrency ? 'lock-closed-outline' : 'search-outline'}
+                                size={36}
+                                color={colors.textSecondary}
+                            />
                             <ThemedText style={[styles.errorText, { color: colors.textSecondary }]}>
-                                No currencies match &ldquo;{searchQuery}&rdquo;
+                                {isSearchingLockedCurrency
+                                    ? `"${searchQuery}" is available after unlocking — watch a quick ad below to search all 160+ currencies.`
+                                    : `No currencies match "${searchQuery}"`}
                             </ThemedText>
                         </View>
                     }

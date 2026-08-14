@@ -193,6 +193,34 @@ export function getCurrencyMeta(code: string): CurrencyMeta {
     return CURRENCY_META[code] ?? { name: code, country: null };
 }
 
+/** Shared match rule for the Currency screen's search — code, name, symbol, country, or any alias. */
+export function currencyMatchesQuery(code: string, meta: CurrencyMeta, query: string): boolean {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+
+    const symbol = meta.symbol?.toLowerCase() ?? '';
+    const countryName = meta.countryName?.toLowerCase() ?? '';
+    const aliases = meta.aliases?.map((a) => a.toLowerCase()) ?? [];
+
+    return (
+        code.toLowerCase().includes(q) ||
+        meta.name.toLowerCase().includes(q) ||
+        symbol.includes(q) ||
+        countryName.includes(q) ||
+        aliases.some((alias) => alias.includes(q))
+    );
+}
+
+/**
+ * True if `query` matches any of the 160+ known currencies at all, regardless
+ * of free-tier availability — lets the free-tier empty search state tell "no
+ * such currency" apart from "exists, just locked behind the unlock-all ad".
+ */
+export function matchesAnyKnownCurrency(query: string): boolean {
+    if (!query.trim()) return false;
+    return Object.entries(CURRENCY_META).some(([code, meta]) => currencyMatchesQuery(code, meta, query));
+}
+
 /** flagcdn.com flag URL for a currency's representative country, or null if it has none (e.g. XDR). */
 export function getCurrencyFlagUrl(code: string, width: 40 | 80 | 160 = 80): string | null {
     const { country } = getCurrencyMeta(code);
