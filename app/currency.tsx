@@ -110,7 +110,7 @@ export default function CurrencyScreen() {
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                     placeholder="Search currency (e.g. USD, Euro)"
-                    style={styles.searchBar}
+                    style={[styles.searchBar, { backgroundColor: colors.cardBg }]}
                 />
             </View>
 

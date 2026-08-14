@@ -91,7 +91,7 @@ export default function MetalsScreen() {
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                     placeholder="Search metals (e.g. Gold, Copper)"
-                    style={styles.searchBar}
+                    style={[styles.searchBar, { backgroundColor: colors.cardBg }]}
                 />
             </View>
 
