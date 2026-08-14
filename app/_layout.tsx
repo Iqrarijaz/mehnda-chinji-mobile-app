@@ -119,6 +119,7 @@ function DrawerLayout() {
           <Stack.Screen name="weather" />
           <Stack.Screen name="currency" />
           <Stack.Screen name="metals" />
+          <Stack.Screen name="fuel" />
           <Stack.Screen name="dataUsage" />
           <Stack.Screen name="manageNotifications" />
           <Stack.Screen name="terms" />

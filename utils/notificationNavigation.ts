@@ -51,6 +51,12 @@ export function handleNotificationNavigation(data: NotificationData, router: Rou
         return;
     }
 
+    // ── Fuel price change (petrol moved from the previous day) ────────
+    if (type === 'FUEL') {
+        router.push('/fuel' as any);
+        return;
+    }
+
     if (!data.screen) return;
     const screen = data.screen;
 
