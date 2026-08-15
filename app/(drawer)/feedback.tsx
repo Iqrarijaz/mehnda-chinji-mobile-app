@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, memo } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useRouter } from 'expo-router';
@@ -18,6 +18,22 @@ import { EmptyFeedBackModal } from '@/components/feedback/EmptyFeedBackModal';
 import { ThankYouFeedBackModal } from '@/components/feedback/ThankYouFeedBackModal';
 import { submitFeedback, getMyFeedback } from '@/apis/feedback';
 import Toast from 'react-native-toast-message';
+import Skeleton from '@/components/common/Skeleton';
+
+/** Placeholder shown only on a true first load (isLoadingHistory, no cached feedback yet). */
+function FeedbackCardSkeleton({ colors }: { colors: any }) {
+    return (
+        <View style={[styles.card, { backgroundColor: colors.cardBg }]}>
+            <View style={styles.cardHeader}>
+                <Skeleton width={60} height={18} borderRadius={Layout.borderRadius} />
+                <Skeleton width={70} height={18} borderRadius={Layout.borderRadius} />
+            </View>
+            <Skeleton width="100%" height={14} borderRadius={4} style={{ marginBottom: 4 }} />
+            <Skeleton width="75%" height={14} borderRadius={4} style={{ marginBottom: 10 }} />
+            <Skeleton width={100} height={11} borderRadius={4} />
+        </View>
+    );
+}
 
 export default function FeedbackScreen() {
     const router = useRouter();
@@ -229,8 +245,8 @@ export default function FeedbackScreen() {
             ) : (
                 <View style={{ flex: 1 }}>
                     {isLoadingHistory ? (
-                        <View style={styles.center}>
-                            <ActivityIndicator size="large" color={colors.primary} />
+                        <View style={styles.listContent}>
+                            {[1, 2, 3].map((i) => <FeedbackCardSkeleton key={i} colors={colors} />)}
                         </View>
                     ) : (
                         <FlashList

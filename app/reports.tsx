@@ -14,7 +14,24 @@ import { Layout } from '@/constants/layout';
 import { getUserReports, updateReport, deleteReport, ReportPayload } from '@/apis/report';
 import Toast from 'react-native-toast-message';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import Skeleton from '@/components/common/Skeleton';
 import dayjs from '@/utils/dayjs';
+
+/** Placeholder shown only on a true first load (isLoading, no cached reports yet). */
+function ReportCardSkeleton({ colors }: { colors: any }) {
+    return (
+        <View style={[styles.reportCard, { backgroundColor: colors.card }]}>
+            <View style={styles.cardHeader}>
+                <Skeleton width={70} height={20} borderRadius={Layout.borderRadius} />
+                <Skeleton width={80} height={20} borderRadius={Layout.borderRadius} />
+            </View>
+            <Skeleton width="70%" height={16} borderRadius={4} style={{ marginBottom: 8 }} />
+            <Skeleton width="100%" height={14} borderRadius={4} style={{ marginBottom: 4 }} />
+            <Skeleton width="85%" height={14} borderRadius={4} style={{ marginBottom: 12 }} />
+            <Skeleton width={110} height={12} borderRadius={4} />
+        </View>
+    );
+}
 
 export default function ReportsScreen() {
     const router = useRouter();
@@ -126,8 +143,8 @@ export default function ReportsScreen() {
                 refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.primary} />}
             >
                 {isLoading ? (
-                    <View style={styles.loaderWrap}>
-                        <ActivityIndicator size="large" color={colors.primary} />
+                    <View>
+                        {[1, 2, 3].map((i) => <ReportCardSkeleton key={i} colors={colors} />)}
                     </View>
                 ) : reports.length === 0 ? (
                     <Animated.View entering={FadeIn.delay(300)} style={styles.emptyWrap}>
@@ -270,7 +287,6 @@ const styles = StyleSheet.create({
     headerSubtitle: { fontSize: 12.5, color: '#FFFFFF', opacity: 0.9 },
     scrollView: { flex: 1, marginTop: -20 },
     scrollContent: { paddingHorizontal: 13, paddingTop: 36 },
-    loaderWrap: { padding: 36, alignItems: 'center' },
     emptyWrap: { padding: 56, alignItems: 'center', justifyContent: 'center' },
     emptyTitle: { fontSize: 15.5, fontWeight: '700', marginTop: 16 },
     emptySubtitle: { fontSize: 12.5, marginTop: 8, textAlign: 'center' },
