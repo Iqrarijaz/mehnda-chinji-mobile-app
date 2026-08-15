@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BannerAd from '@/ads/components/BannerAd';
 import NativeAd from '@/ads/components/NativeAd';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import WeatherDaily from '@/components/weather/WeatherDaily';
 import WeatherHero from '@/components/weather/WeatherHero';
 import WeatherHourly from '@/components/weather/WeatherHourly';
@@ -231,6 +232,7 @@ export default function WeatherScreen() {
         : '--';
 
     return (
+        <ErrorBoundary>
         <View
             style={[
                 styles.container,
@@ -330,6 +332,7 @@ export default function WeatherScreen() {
                 </View>
             </KeyboardAvoidingView>
         </View>
+        </ErrorBoundary>
     );
 }
 

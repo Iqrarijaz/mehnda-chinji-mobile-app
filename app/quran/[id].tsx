@@ -16,6 +16,7 @@ import { analyticsService, AnalyticsEvents } from '@/analytics';
 // Import memoized components
 import { AyahItem } from '@/components/quran/AyahItem';
 import { QuranHeader } from '@/components/quran/QuranHeader';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { QuranSettingsModal } from '@/components/quran/QuranSettingsModal';
 import { AyahActionsModal } from '@/components/quran/AyahActionsModal';
 import { ShareAyahCard } from '@/components/quran/ShareAyahCard';
@@ -435,6 +436,7 @@ export default function SurahDetailScreen() {
     }, [ayahs, surahNumber, colors]);
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -597,6 +599,7 @@ export default function SurahDetailScreen() {
                 </View>
             )}
         </View>
+        </ErrorBoundary>
     );
 }
 

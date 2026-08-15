@@ -41,6 +41,7 @@ import { businessSchema } from '@/utils/validation';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { uploadUserImage, deleteUserImage } from '@/apis/essentials';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const BusinessRegistrationScreen = () => {
     const router = useRouter();
@@ -332,6 +333,7 @@ const BusinessRegistrationScreen = () => {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.mainContainer, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{
                 headerShown: false,
@@ -670,6 +672,7 @@ const BusinessRegistrationScreen = () => {
 
             <LoaderOverlay visible={isPending} />
         </View>
+        </ErrorBoundary>
     );
 };
 

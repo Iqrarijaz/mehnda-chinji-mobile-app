@@ -21,6 +21,7 @@ import { useSurahPlayer } from '@/hooks/useSurahPlayer';
 // Import memoized components
 import { SurahCard } from '@/components/quran/SurahCard';
 import { QuranHeader } from '@/components/quran/QuranHeader';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { MiniAudioPlayer } from '@/components/quran/MiniAudioPlayer';
 import Skeleton from '@/components/common/Skeleton';
 
@@ -205,6 +206,7 @@ export default function QuranListScreen() {
     }, [router]);
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -349,6 +351,7 @@ export default function QuranListScreen() {
                 />
             ) : null}
         </View>
+        </ErrorBoundary>
     );
 }
 

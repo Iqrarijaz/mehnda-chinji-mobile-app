@@ -4,6 +4,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { CreateMarketplaceListing } from '@/components/marketplace/CreateMarketplaceListing';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 export default function CreateListingScreen() {
     const router = useRouter();
@@ -24,6 +25,7 @@ export default function CreateListingScreen() {
     }, [params.listing]);
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
             <View style={{ flex: 1 }}>
@@ -39,6 +41,7 @@ export default function CreateListingScreen() {
                 />
             </View>
         </View>
+        </ErrorBoundary>
     );
 }
 

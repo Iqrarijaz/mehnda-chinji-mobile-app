@@ -32,6 +32,7 @@ import FAQAccordion from '@/components/support/FAQAccordion';
 import SupportContactCard from '@/components/support/SupportContactCard';
 import FeedbackForm from '@/components/support/FeedbackForm';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const FAQ_DATA = [
     {
@@ -102,6 +103,7 @@ export default function SupportScreen() {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
             <StatusBar barStyle="light-content" />
@@ -208,6 +210,7 @@ export default function SupportScreen() {
             </ScrollView>
             <LoaderOverlay visible={createTicketMutation.isPending} text="Submitting feedback..." />
         </View>
+        </ErrorBoundary>
     );
 }
 

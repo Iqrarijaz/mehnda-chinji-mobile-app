@@ -26,6 +26,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const ACADEMIC_CLASSES = [
     { label: 'Playgroup / Nursery', value: 'playgroup_nursery' },
@@ -175,6 +176,7 @@ const TopperForm = () => {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.mainContainer, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
 
@@ -375,6 +377,7 @@ const TopperForm = () => {
                 text={isUploading ? 'Uploading image...' : isEditing ? 'Saving changes...' : 'Adding topper...'}
             />
         </View>
+        </ErrorBoundary>
     );
 };
 

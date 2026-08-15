@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { GlobalSearchOverlay } from '@/components/common/GlobalSearchOverlay';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { UtilsGrid } from '@/components/home/UtilsGrid';
@@ -27,6 +28,7 @@ export default function HomeScreen() {
   }, []);
 
   return (
+    <ErrorBoundary>
     <ThemedView style={styles.container}>
       {/* Header */}
       <HomeHeader
@@ -67,6 +69,7 @@ export default function HomeScreen() {
         />
       </View>
     </ThemedView>
+    </ErrorBoundary>
   );
 }
 

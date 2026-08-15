@@ -13,6 +13,7 @@ import HadithCard from '@/components/prayers/HadithCard';
 import { PrayerHeader } from '@/components/prayers/PrayerHeader';
 import { Colors } from '@/constants/colors';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 
 
@@ -124,6 +125,7 @@ export default function PrayerTimesScreen() {
 
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: C.background }]}>
             <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
 
@@ -164,6 +166,7 @@ export default function PrayerTimesScreen() {
                 </View>
             </ScrollView>
         </View>
+        </ErrorBoundary>
     );
 }
 

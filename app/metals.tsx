@@ -6,6 +6,7 @@ import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { SearchBar } from '@/components/common/SearchBar';
 import { MetalCard } from '@/components/metals/MetalCard';
 import { MetalsHeader } from '@/components/metals/MetalsHeader';
@@ -81,6 +82,7 @@ export default function MetalsScreen() {
     const hasResults = filteredPrecious.length > 0 || filteredBase.length > 0;
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -173,6 +175,7 @@ export default function MetalsScreen() {
                 onDismiss={() => setSelectedTrendMetal(null)}
             />
         </View>
+        </ErrorBoundary>
     );
 }
 

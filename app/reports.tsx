@@ -16,6 +16,7 @@ import Toast from 'react-native-toast-message';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import Skeleton from '@/components/common/Skeleton';
 import dayjs from '@/utils/dayjs';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 /** Placeholder shown only on a true first load (isLoading, no cached reports yet). */
 function ReportCardSkeleton({ colors }: { colors: any }) {
@@ -120,6 +121,7 @@ export default function ReportsScreen() {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Header */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
@@ -256,6 +258,7 @@ export default function ReportsScreen() {
                 text={deleteMutation.isPending ? 'Deleting report...' : 'Updating report...'}
             />
         </View>
+        </ErrorBoundary>
     );
 }
 

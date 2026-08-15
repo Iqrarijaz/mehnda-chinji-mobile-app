@@ -26,6 +26,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { Layout } from '@/constants/layout';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const EVENT_TYPES = [
     { label: 'Admission', value: 'ADMISSION' },
@@ -157,6 +158,7 @@ const EventForm = () => {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.mainContainer, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
 
@@ -350,6 +352,7 @@ const EventForm = () => {
                 text={isUploading ? 'Uploading image...' : isEditing ? 'Saving event...' : 'Posting event...'}
             />
         </View>
+        </ErrorBoundary>
     );
 };
 

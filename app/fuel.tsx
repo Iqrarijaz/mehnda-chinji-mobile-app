@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { isFuelReading } from '@/apis/fuel';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { FuelCard } from '@/components/fuel/FuelCard';
 import { FuelCitiesSheet } from '@/components/fuel/FuelCitiesSheet';
 import { FuelHeader } from '@/components/fuel/FuelHeader';
@@ -103,6 +104,7 @@ export default function FuelScreen() {
     const hasResults = nationalProducts.length > 0 || octaneCities.length > 0;
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -174,6 +176,7 @@ export default function FuelScreen() {
                 representativePrice={octaneRepresentativePrice}
             />
         </View>
+        </ErrorBoundary>
     );
 }
 

@@ -2,6 +2,7 @@ import NativeAd from '@/ads/components/NativeAd';
 import { getAuthenticatedConfiguration } from '@/apis/configuration';
 import BusinessCard from '@/components/business/BusinessCard';
 import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { LoadingDots } from '@/components/common/LoadingDots';
 import { PillsList } from '@/components/common/PillsList';
 import { ReportModal, ReportModalRef } from '@/components/common/ReportModal';
@@ -254,6 +255,7 @@ const CategoryListingScreen = React.memo(() => {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false, gestureEnabled: true, gestureDirection: 'horizontal' }} />
 
@@ -430,6 +432,7 @@ const CategoryListingScreen = React.memo(() => {
                 targetType={reportTarget?.type || 'PLACE'}
             />
         </View>
+        </ErrorBoundary>
     );
 });
 

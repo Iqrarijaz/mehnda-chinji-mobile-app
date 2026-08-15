@@ -24,6 +24,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { FlashList } from '@shopify/flash-list';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const { width } = Dimensions.get('window');
 
@@ -249,6 +250,7 @@ export default function TicketListScreen() {
     );
 
     return (
+        <ErrorBoundary>
         <GestureHandlerRootView style={{ flex: 1 }}>
             <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
                 {/* Custom Nav Bar */}
@@ -290,6 +292,7 @@ export default function TicketListScreen() {
             </View>
             <LoaderOverlay visible={deleteMutation.isPending} text="Deleting ticket..." />
         </GestureHandlerRootView>
+        </ErrorBoundary>
     );
 }
 
