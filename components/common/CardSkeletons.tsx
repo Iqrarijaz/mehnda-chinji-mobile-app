@@ -27,6 +27,7 @@ export const BusinessCardSkeleton = React.memo(() => {
         </View>
     );
 });
+BusinessCardSkeleton.displayName = 'BusinessCardSkeleton';
 
 /**
  * DonorCardSkeleton matches the layout of components/blood/donorCard.tsx
@@ -47,6 +48,7 @@ export const DonorCardSkeleton = React.memo(() => {
         </View>
     );
 });
+DonorCardSkeleton.displayName = 'DonorCardSkeleton';
 
 /**
  * RequestCardSkeleton matches the layout of components/places/RequestCard.tsx
@@ -75,8 +77,7 @@ export const RequestCardSkeleton = React.memo(() => {
         </View>
     );
 });
-
-
+RequestCardSkeleton.displayName = 'RequestCardSkeleton';
 
 const styles = StyleSheet.create({
     businessCard: {

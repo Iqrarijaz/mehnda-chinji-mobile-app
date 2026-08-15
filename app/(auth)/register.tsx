@@ -1,3 +1,4 @@
+import React from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { Image } from 'expo-image';
 import {
@@ -49,7 +50,7 @@ const RegisterScreen = React.memo(function RegisterScreen() {
             </ScrollView>
         </KeyboardAvoidingView>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {

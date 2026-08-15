@@ -149,9 +149,9 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = Rea
     );
 });
 
+CleanConfirmationModal.displayName = 'CleanConfirmationModal';
+
 const styles = StyleSheet.create({
-    flexOne: {
-        flex: 1 },
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
@@ -186,28 +186,23 @@ const styles = StyleSheet.create({
         lineHeight: 16,
         marginBottom: 16,
         fontWeight: '500' },
-    footer: {
+    actionsContainer: {
         flexDirection: 'row',
         gap: 10,
         marginTop: 4,
         width: '100%' },
-    cancelBtn: {
-        width: '100%',
-        height: 34,
+    button: {
+        flex: 1,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 999,
-        backgroundColor: '#F1F5F9' },
-    cancelText: {
+        borderRadius: 999 },
+    cancelBtn: {
+        borderWidth: 1 },
+    cancelBtnText: {
         fontSize: 11.5,
-        fontWeight: '700',
-        color: '#64748B' },
-    confirmBtnWrapper: {
-        width: '100%',
-        height: 34,
-        borderRadius: 999,
-        justifyContent: 'center',
-        alignItems: 'center' },
+        fontWeight: '700' },
+    confirmBtn: {},
     confirmBtnText: {
         fontSize: 11.5,
         fontWeight: '700',

@@ -101,6 +101,8 @@ export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = React.mem
     );
 });
 
+EssentialsTypePills.displayName = 'EssentialsTypePills';
+
 const styles = StyleSheet.create({
     tagsContainer: {
         flexDirection: 'row',

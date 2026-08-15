@@ -111,6 +111,8 @@ export const PremiumModal: React.FC<PremiumModalProps> = React.memo(({
     );
 });
 
+PremiumModal.displayName = 'PremiumModal';
+
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,

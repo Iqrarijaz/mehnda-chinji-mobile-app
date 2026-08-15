@@ -91,7 +91,7 @@ const LoginScreen = React.memo(function LoginScreen() {
             </Modal>
         </KeyboardAvoidingView>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {

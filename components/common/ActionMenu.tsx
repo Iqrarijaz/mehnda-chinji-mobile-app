@@ -65,6 +65,8 @@ export const ActionMenu: React.FC<ActionMenuProps> = React.memo(({
     );
 });
 
+ActionMenu.displayName = 'ActionMenu';
+
 const styles = StyleSheet.create({
     trigger: {
         paddingHorizontal: 2 },

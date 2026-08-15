@@ -51,6 +51,10 @@ export const TimePicker = React.memo(function TimePicker({
         }
     }, [currentValue, visible]);
 
+    const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+    const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
+    const periods = ['AM', 'PM'];
+
     const handleConfirm = () => {
         onSelect(`${hour}:${minute} ${period}`);
         onClose();
@@ -154,7 +158,7 @@ export const TimePicker = React.memo(function TimePicker({
             </View>
         </Modal>
     );
-}
+});
 
 const styles = StyleSheet.create({
     overlay: {
