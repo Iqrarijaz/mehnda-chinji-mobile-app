@@ -10,6 +10,7 @@ import BannerAd from '@/ads/components/BannerAd';
 import { trackEntityInquiry } from '@/apis/inquiries';
 import { trackEntityView } from '@/apis/views';
 import { ActionMenu } from '@/components/common/ActionMenu';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ImageViewerModal } from '@/components/common/ImageViewerModal';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { ContactItem, ContactSection } from '@/components/essentials/shared/ContactSection';
@@ -164,6 +165,7 @@ export default function MarketplaceDetailsScreen() {
     ];
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
             {renderHeader()}
@@ -401,6 +403,7 @@ export default function MarketplaceDetailsScreen() {
 
             <LoaderOverlay visible={markSoldMutation.isPending || deleteMutation.isPending || toggleStatusMutation.isPending} text="Updating..." />
         </View>
+        </ErrorBoundary>
     );
 }
 

@@ -30,6 +30,7 @@ import Toast from 'react-native-toast-message';
 import { Alert } from 'react-native';
 import { useMutation } from '@tanstack/react-query';
 import { Layout } from '@/constants/layout';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const ACADEMIC_CLASSES = [
     { label: 'Playgroup / Nursery', value: 'playgroup_nursery' },
@@ -205,6 +206,7 @@ const ManageEssentialDashboard = () => {
     );
 
     return (
+        <ErrorBoundary>
         <View style={[styles.mainContainer, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -305,6 +307,7 @@ const ManageEssentialDashboard = () => {
             )}
             <LoaderOverlay visible={deleteMutation.isPending} text="Deleting..." />
         </View>
+        </ErrorBoundary>
     );
 };
 

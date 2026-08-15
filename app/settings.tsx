@@ -34,6 +34,7 @@ import { ScreenHeader } from '@/components/common/ScreenHeader';
 import { PasswordModal } from '@/components/setting/PasswordModal';
 import { DeleteAccountModal } from '@/components/setting/DeleteAccountModal';
 import { ThemeSelector } from '@/components/setting/ThemeSelector';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 export default function SettingsScreen() {
     const { theme } = useTheme();
@@ -186,6 +187,7 @@ export default function SettingsScreen() {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
 
             {/* ── Header ──────────────────────────────────────────── */}
@@ -303,6 +305,7 @@ export default function SettingsScreen() {
                 </View>
             </ThankYouModal>
         </View>
+        </ErrorBoundary>
     );
 }
 

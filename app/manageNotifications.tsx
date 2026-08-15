@@ -18,6 +18,7 @@ import NotificationSectionCard from '@/components/notification/NotificationSecti
 import NotificationToggleRow from '@/components/notification/NotificationToggleRow';
 import { ThemedText } from '@/components/ThemedText';
 import { BackButton } from '@/components/common/BackButton';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const ManageNotificationsScreen = React.memo(function ManageNotificationsScreen() {
     const { theme } = useTheme();
@@ -43,6 +44,7 @@ const ManageNotificationsScreen = React.memo(function ManageNotificationsScreen(
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -178,6 +180,7 @@ const ManageNotificationsScreen = React.memo(function ManageNotificationsScreen(
                 </ThemedText>
             </ScrollView>
         </View>
+        </ErrorBoundary>
     );
 });
 

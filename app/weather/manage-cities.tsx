@@ -13,6 +13,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useSavedCities } from '@/hooks/useSavedCities';
 import { searchPlaces, PlaceResult } from '@/utils/locationService';
 import { Layout } from '@/constants/layout';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const MAX_CITIES = 10;
 
@@ -64,6 +65,7 @@ export default function ManageCitiesScreen() {
     const inputBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)';
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -163,6 +165,7 @@ export default function ManageCitiesScreen() {
                 <View style={{ height: 32 }} />
             </ScrollView>
         </View>
+        </ErrorBoundary>
     );
 }
 

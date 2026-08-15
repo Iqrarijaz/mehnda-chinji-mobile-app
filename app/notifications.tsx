@@ -22,6 +22,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTooltipStore } from '@/store/tooltipStore';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 function getDayLabel(dateStr: string): string {
     const date = new Date(dateStr);
@@ -164,6 +165,7 @@ export default function NotificationsScreen() {
     }, [handlePress, handleDelete, deletingId]);
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
             {/* Fixed Header */}
@@ -197,6 +199,7 @@ export default function NotificationsScreen() {
                 </View>
             </View>
         </View>
+        </ErrorBoundary>
     );
 }
 

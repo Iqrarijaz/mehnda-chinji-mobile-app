@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const PREDEFINED_SUBJECTS = [
     'Profile Update Issue',
@@ -131,6 +132,7 @@ export default function CreateTicketScreen() {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
             <Stack.Screen options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
             {/* Header */}
@@ -220,6 +222,7 @@ export default function CreateTicketScreen() {
             </ScrollView>
             <LoaderOverlay visible={createTicketMutation.isPending} text="Creating ticket..." />
         </View>
+        </ErrorBoundary>
     );
 }
 

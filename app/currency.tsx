@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRewardedAd } from '@/ads/hooks/useAds';
 import { AnalyticsEvents, analyticsService } from '@/analytics';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { CurrencyConverter } from '@/components/currency/CurrencyConverter';
 import { CurrencyHeader } from '@/components/currency/CurrencyHeader';
 import { CurrencyListSkeleton } from '@/components/currency/CurrencyListSkeleton';
@@ -116,6 +117,7 @@ export default function CurrencyScreen() {
     }, [ratesData?.date]);
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -198,6 +200,7 @@ export default function CurrencyScreen() {
                 onDismiss={() => setSelectedTrendCurrency(null)}
             />
         </View>
+        </ErrorBoundary>
     );
 }
 

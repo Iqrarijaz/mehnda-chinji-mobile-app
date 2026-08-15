@@ -18,6 +18,7 @@ import { EmptyFeedBackModal } from '@/components/feedback/EmptyFeedBackModal';
 import { ThankYouFeedBackModal } from '@/components/feedback/ThankYouFeedBackModal';
 import { submitFeedback, getMyFeedback } from '@/apis/feedback';
 import Toast from 'react-native-toast-message';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 export default function FeedbackScreen() {
     const router = useRouter();
@@ -133,6 +134,7 @@ export default function FeedbackScreen() {
     }, [colors]);
 
     return (
+        <ErrorBoundary>
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={[styles.root, { backgroundColor: colors.background }]}
@@ -273,6 +275,7 @@ export default function FeedbackScreen() {
 
             <LoaderOverlay visible={submitMutation.isPending} text="Submitting feedback..." />
         </KeyboardAvoidingView>
+        </ErrorBoundary>
     );
 }
 

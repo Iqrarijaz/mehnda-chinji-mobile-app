@@ -21,6 +21,7 @@ import Animated, {
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { ReportModal } from '@/components/common/ReportModal';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
@@ -165,6 +166,7 @@ const PlaceDetailScreen = () => {
     const isGovt = category.toLowerCase() === 'govt' || category.toLowerCase() === 'govt office';
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: isDark ? '#1e293b' : '#FFFFFF' }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -436,6 +438,7 @@ const PlaceDetailScreen = () => {
                 targetType="PLACE"
             />
         </View>
+        </ErrorBoundary>
     );
 };
 

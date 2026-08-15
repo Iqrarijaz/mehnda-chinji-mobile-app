@@ -39,6 +39,7 @@ import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import InterstitialService from '@/ads/interstitial.service';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const PlaceSubmissionScreen = () => {
     const router = useRouter();
@@ -219,6 +220,7 @@ const PlaceSubmissionScreen = () => {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.mainContainer, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{
                 headerShown: false,
@@ -409,6 +411,7 @@ const PlaceSubmissionScreen = () => {
                 </View>
             </KeyboardAvoidingView>
         </View>
+        </ErrorBoundary>
     );
 };
 

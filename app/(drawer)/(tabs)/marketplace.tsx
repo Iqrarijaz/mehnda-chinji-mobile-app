@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { ThemedText } from '@/components/ThemedText';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { MarketplaceCard } from '@/components/marketplace/MarketplaceCard';
 import { MarketplaceCategoryPicker } from '@/components/marketplace/MarketplaceCategoryPicker';
 import { MarketplaceListSkeleton } from '@/components/marketplace/MarketplaceScreenSkeleton';
@@ -230,6 +231,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
 
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -363,6 +365,7 @@ const MarketplaceScreen = memo(function MarketplaceScreen() {
                 }}
             />
         </View>
+        </ErrorBoundary>
     );
 });
 

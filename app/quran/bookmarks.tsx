@@ -10,6 +10,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { QuranHeader } from '@/components/quran/QuranHeader';
 import { getBookmarks, removeBookmark, type Bookmark } from '@/utils/quranPrefs';
 import { Layout } from '@/constants/layout';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 export default function BookmarksScreen() {
     const router = useRouter();
@@ -38,6 +39,7 @@ export default function BookmarksScreen() {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Stack.Screen options={{ headerShown: false }} />
 
@@ -81,6 +83,7 @@ export default function BookmarksScreen() {
                 </ScrollView>
             )}
         </View>
+        </ErrorBoundary>
     );
 }
 

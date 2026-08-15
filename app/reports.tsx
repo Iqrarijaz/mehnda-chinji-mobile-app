@@ -15,6 +15,7 @@ import { getUserReports, updateReport, deleteReport, ReportPayload } from '@/api
 import Toast from 'react-native-toast-message';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import dayjs from '@/utils/dayjs';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 export default function ReportsScreen() {
     const router = useRouter();
@@ -103,6 +104,7 @@ export default function ReportsScreen() {
     };
 
     return (
+        <ErrorBoundary>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Header */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
@@ -239,6 +241,7 @@ export default function ReportsScreen() {
                 text={deleteMutation.isPending ? 'Deleting report...' : 'Updating report...'}
             />
         </View>
+        </ErrorBoundary>
     );
 }
 

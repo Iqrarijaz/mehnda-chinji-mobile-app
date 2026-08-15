@@ -13,6 +13,7 @@ import { ClearCacheSection } from '@/components/dataUsage/ClearCacheSection';
 import { DataUsageEmptyState } from '@/components/dataUsage/DataUsageEmptyState';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const DataUsageScreen = () => {
     const router = useRouter();
@@ -64,6 +65,7 @@ const DataUsageScreen = () => {
     }, [clearCache]);
 
     return (
+        <ErrorBoundary>
         <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
             <DataUsageHeader onBack={handleBack} onReset={handleReset} />
 
@@ -88,6 +90,7 @@ const DataUsageScreen = () => {
                 <ClearCacheSection onClear={handleClearCache} />
             </ScrollView>
         </SafeAreaView>
+        </ErrorBoundary>
     );
 };
 

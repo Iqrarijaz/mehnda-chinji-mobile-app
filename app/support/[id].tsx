@@ -24,6 +24,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const { width } = Dimensions.get('window');
 
@@ -133,6 +134,7 @@ export default function TicketDetailScreen() {
     }
 
     return (
+        <ErrorBoundary>
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: colors.background }}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -274,6 +276,7 @@ export default function TicketDetailScreen() {
             </View>
             <LoaderOverlay visible={replyMutation.isPending} text="Sending reply..." />
         </KeyboardAvoidingView>
+        </ErrorBoundary>
     );
 }
 
