@@ -52,7 +52,7 @@ export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(
     const animatedProps = delay > 0 ? { entering: FadeInDown.delay(delay) } : {};
 
     const valueLength = currentLength ?? (typeof rest.value === 'string' ? rest.value.length : 0);
-    const isOverLimit = maxLength && valueLength > maxLength;
+    const isOverLimit = !!maxLength && valueLength > maxLength;
 
     // Focus/blur border animation. Interpolates from whatever border color the
     // box already has at rest (usually none) up to the brand primary color, so
@@ -143,7 +143,7 @@ export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(
             ) : null}
         </AnimatedView>
     );
-});
+}));
 
 const styles = StyleSheet.create({
     inputField: {
@@ -169,11 +169,17 @@ const styles = StyleSheet.create({
         fontSize: 9,
         fontWeight: '600'
     },
+    overLimit: {
+        color: '#EF4444'
+    },
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 11
+    },
+    icon: {
+        marginRight: 8
     },
     textInput: {
         flex: 1,
@@ -181,6 +187,10 @@ const styles = StyleSheet.create({
         fontSize: 12.5,
         padding: 0,
         margin: 0
+    },
+    multilineInput: {
+        paddingTop: 2,
+        lineHeight: 18
     },
     errorText: {
         color: '#EF4444',

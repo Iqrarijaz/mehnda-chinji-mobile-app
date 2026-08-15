@@ -117,6 +117,8 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = React.memo(({
     );
 });
 
+ImageViewerModal.displayName = 'ImageViewerModal';
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

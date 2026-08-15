@@ -91,11 +91,12 @@ const styles = StyleSheet.create({
         marginLeft: 2 },
     required: {
         color: '#EF4444' },
-    dropdownTrigger: {
+    triggerBox: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: Layout.borderRadius,
+        height: Platform.OS === 'android' ? 48 : 52,
         paddingHorizontal: 11 },
     triggerContent: {
         flexDirection: 'row',

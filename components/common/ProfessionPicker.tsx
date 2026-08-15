@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
     Modal,
     StyleSheet,
@@ -127,7 +127,6 @@ export const ProfessionPicker = React.memo(function ProfessionPicker({ visible, 
                                 data={filteredProfessions}
                                 keyExtractor={keyExtractor}
                                 renderItem={renderItem}
-                                estimatedItemSize={50}
                             />
                         </View>
                     )}
@@ -151,61 +150,40 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         padding: 16,
         overflow: 'hidden' },
-    modalHeader: {
+    header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 16 },
-    modalTitle: {
+    title: {
         fontSize: 15.5,
         fontWeight: '800',
         letterSpacing: -0.5 },
-    searchBar: {
+    closeButton: {
+        padding: 4 },
+    searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         height: 42,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 10,
         marginBottom: 16 },
+    searchIcon: {
+        marginRight: 8 },
     searchInput: {
         flex: 1,
-        marginLeft: 8,
         fontSize: 12.5,
         paddingVertical: 7 },
-    listContent: {
-        paddingBottom: 7 },
     item: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: 10,
         paddingHorizontal: 10,
-        marginVertical: 4,
-        borderRadius: Layout.borderRadius },
-    labelContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flex: 1,
-        marginRight: 15 },
-    itemTextEng: {
-        fontSize: 11.5,
+        borderBottomWidth: 1 },
+    itemEngText: {
+        fontSize: 12.5,
         fontWeight: '600',
         textTransform: 'capitalize' },
-    itemTextUr: {
-        fontSize: 10.5,
-        fontWeight: '500' },
-    footerContainer: {
-        marginTop: 16,
-        alignItems: 'center',
-        justifyContent: 'center' },
-    closePill: {
-        width: 90,
-        height: 34,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center' },
-    closePillText: {
-        color: '#FFFFFF',
-        fontSize: 11.5,
-        fontWeight: '600' } });
+    itemUrText: {
+        fontSize: 11 } });

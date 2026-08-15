@@ -56,7 +56,7 @@ export const AppUpdateModal = React.memo(({
                 <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
                     <View style={styles.animationContainer}>
                         <LottieView
-                            source={require('@/assets/animations/update-available.json')}
+                            source={require('@/public/json/loading.json')}
                             autoPlay
                             loop
                             style={styles.lottie}
@@ -73,14 +73,14 @@ export const AppUpdateModal = React.memo(({
 
                     {releaseNotes ? (
                         <View style={[styles.releaseNotesBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}>
-                            <ThemedText style={[styles.releaseNotesTitle, { color: colors.text }]}>What's New:</ThemedText>
+                            <ThemedText style={[styles.releaseNotesTitle, { color: colors.text }]}>What&apos;s New:</ThemedText>
                             <ThemedText style={[styles.releaseNotesText, { color: colors.textSecondary }]}>
                                 {releaseNotes}
                             </ThemedText>
                         </View>
                     ) : (
                         <ThemedText style={[styles.description, { color: colors.textSecondary }]}>
-                            We've added new features, improved performance, and fixed bugs to give you a better experience.
+                            We&apos;ve added new features, improved performance, and fixed bugs to give you a better experience.
                         </ThemedText>
                     )}
 
@@ -115,6 +115,8 @@ export const AppUpdateModal = React.memo(({
     );
 });
 
+AppUpdateModal.displayName = 'AppUpdateModal';
+
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
@@ -127,7 +129,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         padding: 20,
         alignItems: 'center' },
-    lottieContainer: {
+    animationContainer: {
         width: 180,
         height: 180,
         marginBottom: 16,
@@ -136,44 +138,52 @@ const styles = StyleSheet.create({
     lottie: {
         width: '100%',
         height: '100%' },
-    textContainer: {
-        marginBottom: 24,
-        alignItems: 'center',
-        width: '100%' },
     title: {
-        fontSize: 15.5,
+        fontSize: 17,
         fontWeight: '800',
-        marginBottom: 8,
         textAlign: 'center' },
-    subtitle: {
+    versionText: {
         fontSize: 12.5,
-        lineHeight: 20,
-        textAlign: 'center' },
-    notesContainer: {
-        width: '100%',
-        padding: 10,
-        borderRadius: Layout.borderRadius,
-        marginTop: 16 },
-    notesTitle: {
-        fontSize: 10,
         fontWeight: '700',
-        marginBottom: 4,
+        marginTop: 4,
+        marginBottom: 16,
+        textAlign: 'center' },
+    releaseNotesBox: {
+        width: '100%',
+        padding: 14,
+        borderRadius: Layout.borderRadius,
+        marginBottom: 20 },
+    releaseNotesTitle: {
+        fontSize: 11,
+        fontWeight: '700',
+        marginBottom: 6,
         textTransform: 'uppercase',
         letterSpacing: 0.5 },
-    notesText: {
-        fontSize: 10,
-        lineHeight: 16 },
-    buttonContainer: {
+    releaseNotesText: {
+        fontSize: 12.5,
+        lineHeight: 20 },
+    description: {
+        fontSize: 12.5,
+        lineHeight: 20,
+        textAlign: 'center',
+        marginBottom: 20 },
+    actionRow: {
         flexDirection: 'row',
+        width: '100%',
         gap: 12 },
-    modalButton: {
-        width: 120,
-        height: 40,
+    button: {
+        flex: 1,
+        height: 46,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },
-    modalButtonText: {
-        color: '#FFFFFF',
-        fontSize: 12.5,
-        fontWeight: '600' }
+    cancelButton: {},
+    cancelText: {
+        fontSize: 13,
+        fontWeight: '600' },
+    updateButton: {},
+    updateText: {
+        color: '#1E293B',
+        fontSize: 13,
+        fontWeight: '700' }
 });

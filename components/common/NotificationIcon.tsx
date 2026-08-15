@@ -1,3 +1,4 @@
+import React from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';

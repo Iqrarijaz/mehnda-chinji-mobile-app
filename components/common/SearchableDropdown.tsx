@@ -119,10 +119,13 @@ export const SearchableDropdown = React.memo(function SearchableDropdown({
                                                 {item.label}
                                             </ThemedText>
                                         </View>
-                            renderItem={renderItem}
-                            estimatedItemSize={50}
-                            keyExtractor={(item, index) => `${item.value}-${index}`}
-                            keyboardShouldPersistTaps="handled"
+                                        {isSelected && (
+                                            <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                                        )}
+                                    </TouchableOpacity>
+                                );
+                            }}
+                            contentContainerStyle={styles.listContent}
                             ListEmptyComponent={
                                 <View style={styles.emptyContainer}>
                                     {searchQuery.length > 0 ? (
@@ -146,6 +149,15 @@ export const SearchableDropdown = React.memo(function SearchableDropdown({
                                 </View>
                             }
                         />
+                    </View>
+
+                    <View style={styles.footerContainer}>
+                        <TouchableOpacity
+                            style={[styles.closePill, { backgroundColor: colors.primary }]}
+                            onPress={onClose}
+                        >
+                            <ThemedText style={styles.closePillText}>Close</ThemedText>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>

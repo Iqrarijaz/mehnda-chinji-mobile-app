@@ -179,7 +179,7 @@ const ManageNotificationsScreen = React.memo(function ManageNotificationsScreen(
             </ScrollView>
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
