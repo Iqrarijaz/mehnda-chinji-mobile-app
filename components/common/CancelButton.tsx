@@ -12,7 +12,7 @@ interface CancelButtonProps extends TouchableOpacityProps {
     icon?: keyof typeof Ionicons.glyphMap;
 }
 
-export function CancelButton({ title = 'Cancel', disabled, style, icon, ...rest }: CancelButtonProps) {
+export const CancelButton = React.memo(function CancelButton({ title = 'Cancel', disabled, style, icon, ...rest }: CancelButtonProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -33,7 +33,7 @@ export function CancelButton({ title = 'Cancel', disabled, style, icon, ...rest 
             </View>
         </TouchableOpacity>
     );
-}
+});
 
 const styles = StyleSheet.create({
     cancelButton: {

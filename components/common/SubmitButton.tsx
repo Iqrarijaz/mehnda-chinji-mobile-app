@@ -17,7 +17,7 @@ interface SubmitButtonProps extends TouchableOpacityProps {
     icon?: keyof typeof Ionicons.glyphMap;
 }
 
-export function SubmitButton({ title, isLoading, disabled, style, icon, onPress, ...rest }: SubmitButtonProps) {
+export const SubmitButton = React.memo(function SubmitButton({ title, isLoading, disabled, style, icon, onPress, ...rest }: SubmitButtonProps) {
     const isDisabled = disabled || isLoading;
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -43,10 +43,10 @@ export function SubmitButton({ title, isLoading, disabled, style, icon, onPress,
         >
             <Animated.View style={[styles.buttonContent, contentStyle]}>
                 {isLoading && (
-                    <ActivityIndicator size="small" color="#FFFFFF" style={{ marginRight: 8 }} />
+                    <ActivityIndicator color="#FFFFFF" size="small" style={{ marginRight: 8 }} />
                 )}
-                {icon && !isLoading && (
-                    <Ionicons name={icon} size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                {!isLoading && icon && (
+                    <Ionicons name={icon} size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
                 )}
                 <ThemedText style={styles.updateButtonText}>
                     {isLoading ? 'Processing...' : title}
@@ -54,7 +54,7 @@ export function SubmitButton({ title, isLoading, disabled, style, icon, onPress,
             </Animated.View>
         </PressableScale>
     );
-}
+});
 
 const styles = StyleSheet.create({
     updateButton: {

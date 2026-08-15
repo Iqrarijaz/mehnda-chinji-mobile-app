@@ -28,7 +28,7 @@ interface SearchableDropdownProps {
     currentValue?: string;
 }
 
-export function SearchableDropdown({
+export const SearchableDropdown = React.memo(function SearchableDropdown({
     visible,
     onClose,
     onSelect,
@@ -119,13 +119,10 @@ export function SearchableDropdown({
                                                 {item.label}
                                             </ThemedText>
                                         </View>
-                                        {isSelected && (
-                                            <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-                                        )}
-                                    </TouchableOpacity>
-                                );
-                            }}
-                            contentContainerStyle={styles.listContent}
+                            renderItem={renderItem}
+                            estimatedItemSize={50}
+                            keyExtractor={(item, index) => `${item.value}-${index}`}
+                            keyboardShouldPersistTaps="handled"
                             ListEmptyComponent={
                                 <View style={styles.emptyContainer}>
                                     {searchQuery.length > 0 ? (
@@ -150,26 +147,16 @@ export function SearchableDropdown({
                             }
                         />
                     </View>
-
-                    <View style={styles.footerContainer}>
-                        <TouchableOpacity
-                            style={[styles.closePill, { backgroundColor: colors.primary }]}
-                            onPress={onClose}
-                        >
-                            <ThemedText style={styles.closePillText}>Close</ThemedText>
-                        </TouchableOpacity>
-                    </View>
                 </View>
             </View>
         </Modal>
     );
-}
+});
 
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
         alignItems: 'center',
         padding: 16 },
     modalContent: {

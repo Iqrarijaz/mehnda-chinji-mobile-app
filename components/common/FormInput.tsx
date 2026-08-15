@@ -27,7 +27,7 @@ export interface FormInputProps extends TextInputProps {
     error?: string;
 }
 
-export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
+export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(({
     label,
     required = false,
     icon,
@@ -58,7 +58,6 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
     // box already has at rest (usually none) up to the brand primary color, so
     // there's no visual change unless a field is actually focused.
     const focusProgress = useSharedValue(0);
-    const restBorderColor = StyleSheet.flatten(inputBoxStyle)?.borderColor ?? 'transparent';
 
     const handleFocus = (e: any) => {
         focusProgress.value = withTiming(1, { duration: 180 });
@@ -69,9 +68,16 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
         onBlur?.(e);
     };
 
-    const animatedBorderStyle = useAnimatedStyle(() => ({
-        borderColor: interpolateColor(focusProgress.value, [0, 1], [restBorderColor, colors.primary])
-    }));
+    const animatedBoxStyle = useAnimatedStyle(() => {
+        const restBorder = isDark ? 'rgba(255,255,255,0.06)' : colors.border;
+        return {
+            borderColor: interpolateColor(
+                focusProgress.value,
+                [0, 1],
+                [restBorder, colors.primary]
+            ),
+        };
+    });
 
     return (
         <AnimatedView {...animatedProps} style={[styles.inputField, containerStyle]}>
@@ -80,42 +86,46 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(({
                     <ThemedText style={[styles.label, { color: colors.text }, labelStyle]}>
                         {label} {required && <ThemedText style={styles.required}>*</ThemedText>}
                     </ThemedText>
-                    {showCharCount && maxLength && (
-                        <ThemedText style={[styles.charCount, isOverLimit ? { color: '#EF4444' } : { color: colors.icon }]}>
+                    {showCharCount && maxLength ? (
+                        <ThemedText style={[styles.charCount, isOverLimit && styles.overLimit]}>
                             {valueLength}/{maxLength}
                         </ThemedText>
-                    )}
+                    ) : null}
                 </View>
             )}
             <Animated.View
                 style={[
                     styles.inputBox,
                     {
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                        minHeight: multiline ? 100 : (Platform.OS === 'android' ? 48 : 52),
-                        borderWidth: 0
+                        backgroundColor: colors.card,
+                        height: multiline ? (Platform.OS === 'android' ? 90 : 100) : (Platform.OS === 'android' ? 48 : 52),
+                        alignItems: multiline ? 'flex-start' : 'center',
+                        paddingTop: multiline ? 12 : 0,
                     },
-                    multiline && { alignItems: 'flex-start', paddingVertical: 10 },
+                    animatedBoxStyle,
+                    error ? { borderColor: colors.danger } : null,
                     inputBoxStyle,
-                    animatedBorderStyle
                 ]}
             >
                 {icon && (
                     <Ionicons
                         name={icon}
                         size={18}
-                        color={colors.icon}
-                        style={[{ marginRight: 10 }, multiline && { marginTop: 2 }]}
+                        color={colors.primary}
+                        style={[
+                            styles.icon,
+                            multiline && { marginTop: 2 }
+                        ]}
                     />
                 )}
                 <TextInput
                     ref={ref}
                     allowFontScaling={false}
-                    placeholderTextColor={colors.icon}
+                    placeholderTextColor={colors.placeholder}
                     style={[
                         styles.textInput,
                         { color: colors.text },
-                        multiline && { minHeight: 80 }
+                        multiline && styles.multilineInput
                     ]}
                     maxLength={maxLength}
                     multiline={multiline}

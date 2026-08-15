@@ -13,7 +13,7 @@ import { Layout } from '../../constants/layout';
 import { useTheme } from '../../context/ThemeContext';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 
-export default function RegisterScreen() {
+const RegisterScreen = React.memo(function RegisterScreen() {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -72,3 +72,5 @@ const styles = StyleSheet.create({
         fontSize: 12.5,
         color: 'rgba(255, 255, 255, 0.9)',
         lineHeight: 22 } });
+
+export default RegisterScreen;

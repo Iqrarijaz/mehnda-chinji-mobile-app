@@ -18,7 +18,7 @@ interface ModalPickerTriggerProps {
     containerStyle?: any;
 }
 
-export function ModalPickerTrigger({
+export const ModalPickerTrigger = React.memo(function ModalPickerTrigger({
     label,
     required = false,
     icon,
@@ -43,10 +43,10 @@ export function ModalPickerTrigger({
             </View>
             <TouchableOpacity
                 style={[
-                    styles.dropdownTrigger, 
+                    styles.triggerBox,
                     { 
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', 
-                        height: Platform.OS === 'android' ? 48 : 52 
+                        backgroundColor: colors.card,
+                        borderColor: isDark ? 'rgba(255,255,255,0.06)' : colors.border
                     }
                 ]}
                 onPress={onPress}
@@ -56,7 +56,7 @@ export function ModalPickerTrigger({
                     <Ionicons 
                         name={icon} 
                         size={18} 
-                        color={value ? colors.primary : colors.icon} 
+                        color={colors.primary} 
                         style={{ marginRight: 10 }} 
                     />
                     <ThemedText 
@@ -74,7 +74,7 @@ export function ModalPickerTrigger({
             </TouchableOpacity>
         </AnimatedView>
     );
-}
+});
 
 const styles = StyleSheet.create({
     inputField: {

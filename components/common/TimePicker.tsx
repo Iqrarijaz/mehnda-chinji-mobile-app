@@ -21,7 +21,7 @@ interface TimePickerProps {
     currentValue?: string;
 }
 
-export function TimePicker({
+export const TimePicker = React.memo(function TimePicker({
     visible,
     onClose,
     onSelect,
@@ -46,14 +46,10 @@ export function TimePicker({
                     setPeriod(p);
                 }
             } catch (e) {
-                console.warn('Failed to parse current value in TimePicker', e);
+                console.log('Error parsing time:', e);
             }
         }
     }, [currentValue, visible]);
-
-    const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
-    const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
-    const periods = ['AM', 'PM'];
 
     const handleConfirm = () => {
         onSelect(`${hour}:${minute} ${period}`);

@@ -10,7 +10,7 @@ const { width } = Dimensions.get('window');
 /**
  * BusinessCardSkeleton matches the layout of components/business/businessCard.tsx
  */
-export const BusinessCardSkeleton = () => {
+export const BusinessCardSkeleton = React.memo(() => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     return (
@@ -26,15 +26,12 @@ export const BusinessCardSkeleton = () => {
             </View>
         </View>
     );
-};
-
-
-
+});
 
 /**
  * DonorCardSkeleton matches the layout of components/blood/donorCard.tsx
  */
-export const DonorCardSkeleton = () => {
+export const DonorCardSkeleton = React.memo(() => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     return (
@@ -49,12 +46,12 @@ export const DonorCardSkeleton = () => {
             </View>
         </View>
     );
-};
+});
 
 /**
  * RequestCardSkeleton matches the layout of components/places/RequestCard.tsx
  */
-export const RequestCardSkeleton = () => {
+export const RequestCardSkeleton = React.memo(() => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     return (
@@ -77,7 +74,7 @@ export const RequestCardSkeleton = () => {
             </View>
         </View>
     );
-};
+});
 
 
 

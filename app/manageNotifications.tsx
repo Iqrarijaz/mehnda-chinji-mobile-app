@@ -19,7 +19,7 @@ import NotificationToggleRow from '@/components/notification/NotificationToggleR
 import { ThemedText } from '@/components/ThemedText';
 import { BackButton } from '@/components/common/BackButton';
 
-export default function ManageNotificationsScreen() {
+const ManageNotificationsScreen = React.memo(function ManageNotificationsScreen() {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
@@ -228,3 +228,5 @@ const styles = StyleSheet.create({
         marginTop: 8,
         lineHeight: 18,
         paddingHorizontal: 16 } });
+
+export default ManageNotificationsScreen;

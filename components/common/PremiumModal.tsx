@@ -33,7 +33,7 @@ export interface PremiumModalProps {
  * - FadeInUp animations for both backdrop and sheet
  * - Consistent rounding and elevated sheet design
  */
-export const PremiumModal: React.FC<PremiumModalProps> = ({
+export const PremiumModal: React.FC<PremiumModalProps> = React.memo(({
     visible,
     onClose,
     children,
@@ -49,18 +49,21 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
         if (visible) {
             blurIntensity.value = withTiming(40, { duration: 500 });
         } else {
-            blurIntensity.value = withTiming(0, { duration: 300 });
+            blurIntensity.value = 0;
         }
-    }, [visible]);
+    }, [visible, blurIntensity]);
 
-    const animatedProps = useAnimatedProps(() => ({
-        intensity: blurIntensity.value } as any));
+    const animatedBlurProps = useAnimatedProps(() => ({
+        intensity: blurIntensity.value,
+    }));
+
+    if (!visible) return null;
 
     return (
         <Modal
-            visible={visible}
             transparent
-            animationType="none"
+            visible={visible}
+            animationType="fade"
             onRequestClose={closable ? onClose : undefined}
         >
             <View style={[
@@ -69,18 +72,16 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
                 type === 'fullscreen' && styles.overlayFullscreen,
                 overlayStyle
             ]}>
-                {/* 1. Animated Blur Backdrop */}
-                <AnimatedBlurView
-                    tint={theme === 'dark' ? 'dark' : 'light'}
-                    style={StyleSheet.absoluteFill}
-                    animatedProps={animatedProps}
-                />
-
-                {/* 2. Extra Dimming Layer (Animated) */}
-                <Animated.View
-                    entering={FadeInUp.duration(400)}
-                    style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]}
-                />
+                {!isAndroid && (
+                    <AnimatedBlurView
+                        tint={theme === 'dark' ? 'dark' : 'light'}
+                        animatedProps={animatedBlurProps}
+                        style={StyleSheet.absoluteFill}
+                    />
+                )}
+                {isAndroid && (
+                    <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0, 0, 0, 0.75)' }]} />
+                )}
 
                 {/* 3. Tap-to-close Backdrop Area (Disabled if not closable or fullscreen) */}
                 {type !== 'fullscreen' && closable && (
@@ -108,7 +109,7 @@ export const PremiumModal: React.FC<PremiumModalProps> = ({
             <Toast config={ToastConfig} topOffset={Platform.OS === 'ios' ? 50 : 20} />
         </Modal>
     );
-};
+});
 
 const styles = StyleSheet.create({
     overlay: {

@@ -22,7 +22,7 @@ interface ImageViewerModalProps {
     name?: string;
 }
 
-export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
+export const ImageViewerModal: React.FC<ImageViewerModalProps> = React.memo(({
     visible,
     onClose,
     images: propImages,
@@ -50,33 +50,22 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
         itemVisiblePercentThreshold: 50
     }).current;
 
-    // Slight scale-up to accompany the content's fade-in, driven the same way
-    // PremiumModal drives its blur intensity, so it re-triggers on every open.
-    const contentScale = useSharedValue(0.96);
-    useEffect(() => {
-        contentScale.value = visible
-            ? withTiming(1, { duration: 260 })
-            : 0.96;
-    }, [visible]);
-    const contentAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: contentScale.value }]
-    }));
+    if (!visible) return null;
 
     return (
         <Modal
             visible={visible}
-            transparent={true}
-            animationType="none"
+            transparent={false}
+            animationType="fade"
             onRequestClose={onClose}
+            statusBarTranslucent
         >
-            <Animated.View entering={FadeIn.duration(220)} style={styles.container}>
-                <Animated.View style={[styles.content, { paddingTop: insets.top, paddingBottom: insets.bottom }, contentAnimatedStyle]}>
-                    <PressableScale
-                        containerStyle={[styles.closeButton, { top: insets.top + (Platform.OS === 'android' ? 20 : 10) }]}
-                        style={styles.closeButtonSurface}
-                        onPress={onClose}
-                    >
-                        <Ionicons name="close" size={28} color="#FFFFFF" />
+            <Animated.View entering={FadeIn.duration(200)} style={styles.container}>
+                <Animated.View style={styles.content}>
+                    <PressableScale onPress={onClose} style={[styles.closeButton, { top: insets.top + 10 }]}>
+                        <View style={styles.closeButtonSurface}>
+                            <Ionicons name="close" size={24} color="#FFFFFF" />
+                        </View>
                     </PressableScale>
 
                     {images.length > 0 ? (
@@ -85,15 +74,16 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
                                 data={images}
                                 horizontal
                                 pagingEnabled
-                                initialScrollIndex={initialIndex}
                                 showsHorizontalScrollIndicator={false}
-                                onViewableItemsChanged={onViewableItemsChanged}
-                                viewabilityConfig={viewabilityConfig}
-                                keyExtractor={(_, index) => `viewer-${index}`}
+                                initialScrollIndex={initialIndex}
                                 getItemLayout={(_, index) => ({
                                     length: Dimensions.get('window').width,
                                     offset: Dimensions.get('window').width * index,
-                                    index })}
+                                    index,
+                                })}
+                                onViewableItemsChanged={onViewableItemsChanged}
+                                viewabilityConfig={viewabilityConfig}
+                                keyExtractor={(item, index) => `${item}-${index}`}
                                 renderItem={({ item }) => (
                                     <View style={styles.listImageWrapper}>
                                         <Image
@@ -105,8 +95,9 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
                                     </View>
                                 )}
                             />
+
                             {images.length > 1 && (
-                                <View style={[styles.pagination, { bottom: insets.bottom + 40 }]}>
+                                <View style={[styles.pagination, { bottom: insets.bottom + 20 }]}>
                                     <View style={styles.paginationBadge}>
                                         <ThemedText style={styles.paginationText}>
                                             {currentIndex + 1} / {images.length}
@@ -124,7 +115,7 @@ export const ImageViewerModal: React.FC<ImageViewerModalProps> = ({
             </Animated.View>
         </Modal>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

@@ -51,7 +51,7 @@ interface LocationLoadingModalProps {
  * Drop it in anywhere location is being fetched:
  *   <LocationLoadingModal visible={isLocating} />
  */
-export function LocationLoadingModal({ visible, messages = DEFAULT_MESSAGES, title = 'Finding your location' }: LocationLoadingModalProps) {
+export const LocationLoadingModal = React.memo(function LocationLoadingModal({ visible, messages = DEFAULT_MESSAGES, title = 'Finding your location' }: LocationLoadingModalProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -160,7 +160,7 @@ export function LocationLoadingModal({ visible, messages = DEFAULT_MESSAGES, tit
             </View>
         </Modal>
     );
-}
+});
 
 const ICON_SIZE = 96;
 

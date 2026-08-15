@@ -24,7 +24,7 @@ interface CleanConfirmationModalProps {
     isLoading?: boolean;
 }
 
-export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
+export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = React.memo(({
     visible,
     onClose,
     onConfirm,
@@ -43,89 +43,98 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
         switch (type) {
             case 'danger':
                 return {
-                    bg: '#FEF2F2',
-                    icon: 'alert-circle' as const,
-                    color: '#EF4444',
-                    btnBg: '#EF4444'
-                };
-            case 'success':
-                return {
-                    bg: '#F0FDF4',
-                    icon: 'checkmark-circle' as const,
-                    color: '#22C55E',
-                    btnBg: '#22C55E'
+                    iconBg: `${colors.danger}15`,
+                    iconColor: colors.danger,
+                    confirmBg: colors.danger,
+                    iconName: 'trash-outline' as const,
                 };
             case 'warning':
                 return {
-                    bg: '#FFFBEB',
-                    icon: 'warning' as const,
-                    color: '#F59E0B',
-                    btnBg: '#F59E0B'
+                    iconBg: `${colors.warning}15`,
+                    iconColor: colors.warning,
+                    confirmBg: colors.warning,
+                    iconName: 'warning-outline' as const,
+                };
+            case 'success':
+                return {
+                    iconBg: `${colors.success}15`,
+                    iconColor: colors.success,
+                    confirmBg: colors.success,
+                    iconName: 'checkmark-circle-outline' as const,
                 };
             case 'info':
             default:
                 return {
-                    bg: '#F8FAFC',
-                    icon: 'information-circle' as const,
-                    color: '#000000',
-                    btnBg: '#000000'
+                    iconBg: `${colors.primary}15`,
+                    iconColor: colors.primary,
+                    confirmBg: colors.primary,
+                    iconName: 'information-circle-outline' as const,
                 };
         }
     };
 
-    const config = getStyles();
+    const typeStyles = getStyles();
 
-    // Slight scale-up to accompany the sheet's fade-in, driven the same way
-    // PremiumModal drives its blur intensity, so it re-triggers on every open.
-    const sheetScale = useSharedValue(0.94);
-    useEffect(() => {
-        sheetScale.value = visible
-            ? withTiming(1, { duration: 240 })
-            : 0.94;
-    }, [visible]);
-    const sheetAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: sheetScale.value }]
-    }));
+    if (!visible) return null;
 
     return (
         <Modal
-            visible={visible}
             transparent
-            animationType="none"
+            visible={visible}
             onRequestClose={onClose}
+            animationType="fade"
+            statusBarTranslucent
         >
-            <Animated.View entering={FadeIn.duration(200)} style={styles.modalOverlay}>
-                <Animated.View style={[styles.modalContent, { backgroundColor: colors.card }, sheetAnimatedStyle]}>
-                    {/* Header with Icon */}
+            <Animated.View
+                entering={FadeIn.duration(200)}
+                style={styles.modalOverlay}
+            >
+                <Animated.View
+                    style={[
+                        styles.modalContent,
+                        { backgroundColor: colors.card },
+                    ]}
+                >
+                    {/* Header */}
                     <View style={styles.header}>
-                        <View style={[
-                            styles.iconWrapper,
-                            { backgroundColor: config.bg }
-                        ]}>
-                            <Ionicons name={config.icon} size={20} color={config.color} />
+                        <View style={[styles.iconWrapper, { backgroundColor: typeStyles.iconBg }]}>
+                            <Ionicons name={typeStyles.iconName} size={28} color={typeStyles.iconColor} />
                         </View>
-                        <ThemedText style={[styles.title, { color: config.color }]}>{title}</ThemedText>
                     </View>
 
-                    {/* Message */}
-                    <ThemedText style={styles.message}>{message}</ThemedText>
+                    {/* Title & Message */}
+                    <ThemedText style={[styles.title, { color: colors.text }]}>
+                        {title}
+                    </ThemedText>
 
-                    {/* Footer Actions */}
-                    <View style={styles.footer}>
+                    <ThemedText style={[styles.message, { color: colors.textSecondary }]}>
+                        {message}
+                    </ThemedText>
+
+                    {/* Action Buttons */}
+                    <View style={styles.actionsContainer}>
                         <PressableScale
-                            containerStyle={styles.flexOne}
-                            style={styles.cancelBtn}
                             onPress={onClose}
                             disabled={isLoading}
+                            style={[
+                                styles.button,
+                                styles.cancelBtn,
+                                { backgroundColor: colors.inputBackground, borderColor: colors.border }
+                            ]}
                         >
-                            <ThemedText style={styles.cancelText}>{cancelText}</ThemedText>
+                            <ThemedText style={[styles.cancelBtnText, { color: colors.text }]}>
+                                {cancelText}
+                            </ThemedText>
                         </PressableScale>
 
                         <PressableScale
-                            containerStyle={styles.flexOne}
-                            style={[styles.confirmBtnWrapper, { backgroundColor: config.btnBg }]}
                             onPress={onConfirm}
                             disabled={isLoading}
+                            style={[
+                                styles.button,
+                                styles.confirmBtn,
+                                { backgroundColor: typeStyles.confirmBg }
+                            ]}
                         >
                             {isLoading ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" />
@@ -138,7 +147,7 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
             </Animated.View>
         </Modal>
     );
-};
+});
 
 const styles = StyleSheet.create({
     flexOne: {

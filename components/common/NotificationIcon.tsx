@@ -15,7 +15,7 @@ interface NotificationIconProps {
     containerStyle?: any;
 }
 
-export function NotificationIcon({
+export const NotificationIcon = React.memo(function NotificationIcon({
     color,
     size = 22,
     badgeStyle,
@@ -44,7 +44,8 @@ export function NotificationIcon({
                     router.push('/notifications');
                 }
             }}
-            style={[styles.iconButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#FFFFFF' }, containerStyle]}
+            style={[styles.iconButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9' }, containerStyle]}
+            activeOpacity={0.7}
         >
             <Ionicons name="notifications-outline" size={size} color={iconColor} />
             {unreadCount > 0 && (
@@ -56,7 +57,7 @@ export function NotificationIcon({
             )}
         </TouchableOpacity>
     );
-}
+});
 
 const styles = StyleSheet.create({
     iconButton: {

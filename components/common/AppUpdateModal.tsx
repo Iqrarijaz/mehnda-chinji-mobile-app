@@ -23,7 +23,7 @@ interface UpdateModalProps {
     releaseNotes?: string;
 }
 
-export const AppUpdateModal = ({
+export const AppUpdateModal = React.memo(({
     visible,
     isMandatory,
     latestVersion,
@@ -50,59 +50,70 @@ export const AppUpdateModal = ({
             visible={visible}
             transparent
             animationType="fade"
-            hardwareAccelerated
+            onRequestClose={isMandatory ? () => { } : onClose}
         >
             <View style={styles.modalOverlay}>
                 <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
-                    <View style={styles.lottieContainer}>
+                    <View style={styles.animationContainer}>
                         <LottieView
-                            source={require('@/public/json/loading.json')}
+                            source={require('@/assets/animations/update-available.json')}
                             autoPlay
                             loop
                             style={styles.lottie}
                         />
                     </View>
 
-                    <View style={styles.textContainer}>
-                        <ThemedText style={styles.title}>
-                            {isMandatory ? "Update Required" : "New Version Available"}
+                    <ThemedText style={[styles.title, { color: colors.text }]}>
+                        App Update Available
+                    </ThemedText>
+
+                    <ThemedText style={[styles.versionText, { color: colors.primary }]}>
+                        Version {latestVersion} is now live!
+                    </ThemedText>
+
+                    {releaseNotes ? (
+                        <View style={[styles.releaseNotesBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}>
+                            <ThemedText style={[styles.releaseNotesTitle, { color: colors.text }]}>What's New:</ThemedText>
+                            <ThemedText style={[styles.releaseNotesText, { color: colors.textSecondary }]}>
+                                {releaseNotes}
+                            </ThemedText>
+                        </View>
+                    ) : (
+                        <ThemedText style={[styles.description, { color: colors.textSecondary }]}>
+                            We've added new features, improved performance, and fixed bugs to give you a better experience.
                         </ThemedText>
+                    )}
 
-                        <ThemedText style={[styles.subtitle, { color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748B' }]}>
-                            A new version {latestVersion} is available. {isMandatory ? "Please update to continue using the app." : "Would you like to update now?"}
-                        </ThemedText>
-
-                        {releaseNotes ? (
-                            <View style={[styles.notesContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC' }]}>
-                                <ThemedText style={styles.notesTitle}>What's New:</ThemedText>
-                                <ThemedText style={[styles.notesText, { color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#475569' }]}>
-                                    {releaseNotes}
-                                </ThemedText>
-                            </View>
-                        ) : null}
-                    </View>
-
-                    <View style={styles.buttonContainer}>
+                    <View style={styles.actionRow}>
                         {!isMandatory && (
                             <TouchableOpacity
-                                style={[styles.modalButton, { backgroundColor: 'transparent' }]}
+                                style={[styles.button, styles.cancelButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}
                                 onPress={onClose}
                             >
-                                <ThemedText style={[styles.modalButtonText, { color: colors.textSecondary }]}>Later</ThemedText>
+                                <ThemedText style={[styles.cancelText, { color: colors.textSecondary }]}>
+                                    Later
+                                </ThemedText>
                             </TouchableOpacity>
                         )}
                         <TouchableOpacity
-                            style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                            style={[
+                                styles.button,
+                                styles.updateButton,
+                                { backgroundColor: colors.lime },
+                                isMandatory && { flex: 1 }
+                            ]}
                             onPress={handleUpdate}
                         >
-                            <ThemedText style={styles.modalButtonText}>Update Now</ThemedText>
+                            <ThemedText style={styles.updateText}>
+                                Update Now
+                            </ThemedText>
                         </TouchableOpacity>
                     </View>
                 </View>
             </View>
         </Modal>
     );
-};
+});
 
 const styles = StyleSheet.create({
     modalOverlay: {

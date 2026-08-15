@@ -35,7 +35,7 @@ interface SearchBarProps {
     inputRef?: React.Ref<TextInput>;
 }
 
-export function SearchBar({
+export const SearchBar = React.memo(function SearchBar({
     value,
     onChangeText,
     placeholder = 'Search...',
@@ -113,7 +113,7 @@ export function SearchBar({
     }
 
     return inner(true);
-}
+});
 
 const styles = StyleSheet.create({
     container: {

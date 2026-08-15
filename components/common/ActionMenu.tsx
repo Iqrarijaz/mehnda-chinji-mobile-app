@@ -22,7 +22,7 @@ interface ActionMenuProps {
     triggerIconColor?: string;
 }
 
-export const ActionMenu: React.FC<ActionMenuProps> = ({
+export const ActionMenu: React.FC<ActionMenuProps> = React.memo(({
     actions,
     triggerIcon = 'ellipsis-horizontal',
     triggerIconSize = 18,
@@ -63,7 +63,7 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
             </MenuOptions>
         </Menu>
     );
-};
+});
 
 const styles = StyleSheet.create({
     trigger: {

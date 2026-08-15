@@ -13,7 +13,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 
-function Dot({ delay, color }: { delay: number; color: string }) {
+const Dot = React.memo(function Dot({ delay, color }: { delay: number; color: string }) {
     const progress = useSharedValue(0);
 
     useEffect(() => {
@@ -37,13 +37,13 @@ function Dot({ delay, color }: { delay: number; color: string }) {
         transform: [{ translateY: -progress.value * 5 }] }));
 
     return <Animated.View style={[styles.dot, { backgroundColor: color }, style]} />;
-}
+});
 
 /**
  * Three softly bouncing brand-colored dots — the app's premium loading
  * indicator for list footers and inline waits.
  */
-export function LoadingDots() {
+export const LoadingDots = React.memo(function LoadingDots() {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -54,7 +54,7 @@ export function LoadingDots() {
             <Dot delay={280} color={colors.lime} />
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     row: {

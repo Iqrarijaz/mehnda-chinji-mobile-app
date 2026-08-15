@@ -23,7 +23,7 @@ interface EssentialsTypePillsProps {
     activeColor?: string;
 }
 
-export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = ({
+export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = React.memo(({
     availableTags,
     selectedTags,
     onToggleTag,
@@ -44,39 +44,54 @@ export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = ({
                     return tKey?.toLowerCase() === itemKey?.toLowerCase();
                 });
 
-                const label = tag.label || tag.eng;
-                const subLabel = tag.ur;
-                const resolvedActiveColor = activeColor || colors.lime;
+                const effectiveActiveColor = activeColor || colors.primary;
 
                 return (
                     <TouchableOpacity
                         key={itemKey}
+                        activeOpacity={0.7}
+                        onPress={() => onToggleTag(tag)}
                         style={[
                             styles.tagChip,
                             {
-                                backgroundColor: isSelected ? resolvedActiveColor : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)') }
+                                backgroundColor: isSelected
+                                    ? effectiveActiveColor
+                                    : (isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9'),
+                            },
                         ]}
-                        onPress={() => onToggleTag(tag)}
-                        activeOpacity={0.8}
                     >
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                            {tag.icon && (
+                            {tag.icon ? (
                                 <View style={styles.typeChipImageContainer}>
                                     <Image
                                         source={{ uri: tag.icon }}
                                         style={{ width: '100%', height: '100%' }}
-                                        contentFit="cover"
+                                        contentFit="contain"
                                     />
                                 </View>
+                            ) : (
+                                <Ionicons
+                                    name={isSelected ? 'checkmark-circle' : 'add-circle-outline'}
+                                    size={14}
+                                    color={
+                                        isSelected
+                                            ? '#FFFFFF'
+                                            : (isDark ? 'rgba(255,255,255,0.45)' : colors.textSecondary)
+                                    }
+                                />
                             )}
-                            {isSelected && !isSingleSelect && !tag.icon && <Ionicons name="checkmark" size={12} color="#FFFFFF" />}
                             <ThemedText
                                 style={[
                                     styles.tagChipText,
-                                    { color: isSelected ? '#FFFFFF' : colors.text }
+                                    {
+                                        color: isSelected
+                                            ? '#FFFFFF'
+                                            : (isDark ? 'rgba(255,255,255,0.7)' : colors.textSecondary),
+                                        fontWeight: isSelected ? '700' : '500',
+                                    },
                                 ]}
                             >
-                                {label} {subLabel ? `| ${subLabel}` : ''}
+                                {tag.label || tag.eng}
                             </ThemedText>
                         </View>
                     </TouchableOpacity>
@@ -84,7 +99,7 @@ export const EssentialsTypePills: React.FC<EssentialsTypePillsProps> = ({
             })}
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     tagsContainer: {

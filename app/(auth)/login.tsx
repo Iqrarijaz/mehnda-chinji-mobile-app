@@ -19,7 +19,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, TouchableOpacity } from 'react-native';
 
 
-export default function LoginScreen() {
+const LoginScreen = React.memo(function LoginScreen() {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -151,3 +151,5 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 13.5,
         fontWeight: '700' } });
+
+export default LoginScreen;
