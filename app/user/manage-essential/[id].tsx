@@ -28,6 +28,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
 import Toast from 'react-native-toast-message';
 import { Alert } from 'react-native';
+import Skeleton from '@/components/common/Skeleton';
 import { useMutation } from '@tanstack/react-query';
 import { Layout } from '@/constants/layout';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
@@ -56,6 +57,22 @@ const ACADEMIC_CLASSES = [
 ];
 
 const { width } = Dimensions.get('window');
+
+/** Placeholder item cards shown only on a true first load (no cached request data yet). */
+function ManageEssentialItemSkeleton({ isDark }: { isDark: boolean }) {
+    return (
+        <View style={[styles.itemCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#FFF' }]}>
+            <View style={styles.itemMain}>
+                <Skeleton width={50} height={50} borderRadius={Layout.borderRadius} />
+                <View style={[styles.itemInfo, { marginLeft: 12 }]}>
+                    <Skeleton width="55%" height={14} borderRadius={4} style={{ marginBottom: 6 }} />
+                    <Skeleton width="70%" height={11} borderRadius={4} style={{ marginBottom: 4 }} />
+                    <Skeleton width="40%" height={11} borderRadius={4} />
+                </View>
+            </View>
+        </View>
+    );
+}
 
 const ManageEssentialDashboard = () => {
     const { id, name: initialName, category: initialCategory } = useLocalSearchParams<{ id: string; name: string; category: string }>();
@@ -266,7 +283,11 @@ const ManageEssentialDashboard = () => {
                 }}
                 refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
             >
-                {activeTab === 'toppers' ? (
+                {isLoading && !requestData ? (
+                    <View style={styles.list}>
+                        {[1, 2, 3].map((i) => <ManageEssentialItemSkeleton key={i} isDark={isDark} />)}
+                    </View>
+                ) : activeTab === 'toppers' ? (
                     essential.toppers?.length > 0 ? (
                         <View style={styles.list}>
                             {essential.toppers.map(renderTopperItem)}

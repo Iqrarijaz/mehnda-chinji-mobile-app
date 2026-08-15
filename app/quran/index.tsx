@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, RefreshControl } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,8 +23,33 @@ import { SurahCard } from '@/components/quran/SurahCard';
 import { QuranHeader } from '@/components/quran/QuranHeader';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { MiniAudioPlayer } from '@/components/quran/MiniAudioPlayer';
+import Skeleton from '@/components/common/Skeleton';
 
 const FAV_STORAGE_KEY = 'quran_favourites';
+
+/** Placeholder Surah rows shown only on a true first load (no cached list yet). */
+function SurahCardSkeleton({ cardColor }: { cardColor: string }) {
+    return (
+        <View style={[skeletonStyles.card, { backgroundColor: cardColor }]}>
+            <Skeleton width={40} height={40} borderRadius={Layout.borderRadius} />
+            <View style={{ flex: 1, marginLeft: 12 }}>
+                <Skeleton width="45%" height={14} borderRadius={4} style={{ marginBottom: 6 }} />
+                <Skeleton width="60%" height={10} borderRadius={4} />
+            </View>
+            <Skeleton width={60} height={18} borderRadius={4} />
+        </View>
+    );
+}
+
+const skeletonStyles = StyleSheet.create({
+    card: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: Layout.borderRadius,
+        padding: 11,
+        marginBottom: 12,
+    },
+});
 type TabType = 'all' | 'favourites';
 
 export default function QuranListScreen() {
@@ -262,9 +287,8 @@ export default function QuranListScreen() {
 
             {/* Content List */}
             {isLoading ? (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={colors.primary} />
-                    <ThemedText style={styles.loadingText}>Loading Surahs...</ThemedText>
+                <View style={styles.listContent}>
+                    {[1, 2, 3, 4, 5, 6].map((i) => <SurahCardSkeleton key={i} cardColor={colors.cardBg} />)}
                 </View>
             ) : isError ? (
                 <View style={styles.errorContainer}>
