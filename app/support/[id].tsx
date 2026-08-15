@@ -24,8 +24,36 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import Skeleton from '@/components/common/Skeleton';
 
 const { width } = Dimensions.get('window');
+
+/** Placeholder message bubbles shown only on a true first load (no cached ticket yet). */
+function TicketSkeleton({ colors }: { colors: any }) {
+    const bubbleWidths = [70, 55, 80, 45];
+    return (
+        <View style={{ padding: 16 }}>
+            {bubbleWidths.map((w, i) => (
+                <View
+                    key={i}
+                    style={[
+                        skeletonStyles.row,
+                        i % 2 === 0 ? { justifyContent: 'flex-start' } : { justifyContent: 'flex-end' },
+                    ]}
+                >
+                    <Skeleton width={`${w}%`} height={44} borderRadius={Layout.borderRadius} style={{ backgroundColor: colors.cardBg }} />
+                </View>
+            ))}
+        </View>
+    );
+}
+
+const skeletonStyles = StyleSheet.create({
+    row: {
+        flexDirection: 'row',
+        marginBottom: 14,
+    },
+});
 
 interface Message {
     sender: 'user' | 'admin';
@@ -115,8 +143,8 @@ export default function TicketDetailScreen() {
 
     if (isLoading) {
         return (
-            <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
-                <ActivityIndicator size="large" color={colors.primary} />
+            <View style={{ flex: 1, backgroundColor: colors.background }}>
+                <TicketSkeleton colors={colors} />
             </View>
         );
     }

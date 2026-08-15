@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Alert, Share } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Alert, Share } from 'react-native';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,11 +21,32 @@ import { AyahActionsModal } from '@/components/quran/AyahActionsModal';
 import { ShareAyahCard } from '@/components/quran/ShareAyahCard';
 import { startSurahDownload, getPlayableAyahUri, cleanupExpiredCache } from '@/utils/quranAudioCache';
 import { Layout } from '@/constants/layout';
+import Skeleton from '@/components/common/Skeleton';
 import {
     getFontSize, setFontSize as persistFontSize,
     getLastPosition, setLastPosition,
     getBookmarks, toggleBookmark as toggleBookmarkStore, isBookmarked as isBookmarkedIn,
     FONT_SIZE_DEFAULT, type Bookmark } from '@/utils/quranPrefs';
+
+/** Placeholder ayah cards shown only on a true first load (no cached Surah yet). */
+function AyahSkeleton({ cardColor }: { cardColor: string }) {
+    return (
+        <View style={[skeletonStyles.card, { backgroundColor: cardColor }]}>
+            <Skeleton width={26} height={26} borderRadius={13} style={{ marginBottom: 10 }} />
+            <Skeleton width="90%" height={20} borderRadius={4} style={{ marginBottom: 8, alignSelf: 'flex-end' }} />
+            <Skeleton width="65%" height={20} borderRadius={4} style={{ alignSelf: 'flex-end' }} />
+        </View>
+    );
+}
+
+const skeletonStyles = StyleSheet.create({
+    card: {
+        paddingVertical: 11,
+        paddingHorizontal: 10,
+        borderRadius: Layout.borderRadius,
+        marginBottom: 6,
+    },
+});
 
 export default function SurahDetailScreen() {
     const { id, autoplay, ayah: ayahParam } = useLocalSearchParams<{ id: string; autoplay?: string; ayah?: string }>();
@@ -512,9 +533,8 @@ export default function SurahDetailScreen() {
 
             {/* Main Content */}
             {isLoading ? (
-                <View style={styles.centerContainer}>
-                    <ActivityIndicator size="large" color={colors.primary} />
-                    <ThemedText style={styles.loadingText}>Fetching verses...</ThemedText>
+                <View style={{ padding: 12 }}>
+                    {[1, 2, 3, 4, 5].map((i) => <AyahSkeleton key={i} cardColor={colors.cardBg} />)}
                 </View>
             ) : isError ? (
                 <View style={styles.centerContainer}>
