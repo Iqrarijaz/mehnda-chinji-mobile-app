@@ -7,6 +7,7 @@ import { usePushNotifications } from '@/hooks/notificationHooks/usePushNotificat
 import { useFcmNotifications } from '@/hooks/notificationHooks/useFcmNotifications';
 import { useSystemPushNotifications } from '@/hooks/notificationHooks/useSystemPushNotifications';
 import { useAppOpenAd } from '@/ads/hooks/useAppOpenAd';
+import { useIsRestoring } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
@@ -268,6 +269,44 @@ function AppInitializer() {
   );
 }
 
+/**
+ * Holds the splash screen up until the persisted react-query cache has
+ * finished rehydrating from AsyncStorage (`useIsRestoring`), not just until
+ * fonts/config/minimum-time are ready. Without this, `isAppReady` could flip
+ * true and reveal a screen before its cache-backed query has data, showing a
+ * skeleton for a moment even though cached data existed on disk — the exact
+ * flash "instant cache-first display" is meant to avoid. Must render inside
+ * PersistQueryClientProvider (useIsRestoring reads its context), which is
+ * why this isn't just inlined in RootLayout.
+ */
+function AppReadyGate({
+  isAppReady,
+  splashVisible,
+  onSplashFinish,
+}: {
+  isAppReady: boolean;
+  splashVisible: boolean;
+  onSplashFinish: () => void;
+}) {
+  const isRestoringCache = useIsRestoring();
+  const isReady = isAppReady && !isRestoringCache;
+
+  return (
+    <>
+      {isReady && (
+        <>
+          <AppInitializer />
+          <DrawerLayout />
+          <NetworkMonitor />
+        </>
+      )}
+      {splashVisible && (
+        <CustomSplashScreen isAppReady={isReady} onFinish={onSplashFinish} />
+      )}
+    </>
+  );
+}
+
 function RootLayout() {
   const fontsLoaded = useAppFonts();
   const [configLoaded, setConfigLoaded] = useState(false);
@@ -312,19 +351,11 @@ function RootLayout() {
                     <MenuProvider>
                       <AppStatusBar />
 
-                      {isAppReady && (
-                        <>
-                          <AppInitializer />
-                          <DrawerLayout />
-                          <NetworkMonitor />
-                        </>
-                      )}
-                      {splashVisible && (
-                        <CustomSplashScreen
-                          isAppReady={isAppReady}
-                          onFinish={() => setSplashVisible(false)}
-                        />
-                      )}
+                      <AppReadyGate
+                        isAppReady={isAppReady}
+                        splashVisible={splashVisible}
+                        onSplashFinish={() => setSplashVisible(false)}
+                      />
                     </MenuProvider>
                   </SocketProvider>
                 </WeatherProvider>
