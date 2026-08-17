@@ -247,6 +247,9 @@ const styles = StyleSheet.create({
         height: 58,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.35)' },
+    pulseRingSlow: {
+        opacity: 0.6,
+        transform: [{ scale: 1.15 }] },
     serviceTile: {
         width: 58,
         height: 58,
