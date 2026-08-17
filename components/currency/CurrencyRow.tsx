@@ -12,8 +12,10 @@ import { useTheme } from '@/context/ThemeContext';
 
 interface CurrencyRowProps {
     code: string;
-    /** 1 PKR expressed in this currency, as returned by the backend. */
+    /** 1 unit of `baseCode` expressed in this currency. */
     rate: number;
+    /** Currency the whole list is currently shown relative to (defaults to PKR). */
+    baseCode: string;
     onPress: () => void;
     /** Star/pin toggle — omitted (no star shown) for the base currency, which can't be pinned. */
     isFavorite?: boolean;
@@ -29,15 +31,15 @@ function formatRate(value: number) {
     });
 }
 
-export const CurrencyRow = React.memo(function CurrencyRow({ code, rate, onPress, isFavorite, onToggleFavorite }: CurrencyRowProps) {
+export const CurrencyRow = React.memo(function CurrencyRow({ code, rate, baseCode, onPress, isFavorite, onToggleFavorite }: CurrencyRowProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const meta = getCurrencyMeta(code);
     const flagUrl = getCurrencyFlagUrl(code);
-    const isBaseCurrency = code === 'PKR';
-    // rate = how many units of `code` equal 1 PKR; flip it so we can show
-    // the far more useful "1 <code> = X PKR" for a Pakistan-based audience.
-    const pkrPerUnit = isBaseCurrency ? 1 : rate > 0 ? 1 / rate : 0;
+    const isBaseCurrency = code === baseCode;
+    // rate = how many units of `code` equal 1 unit of `baseCode`; flip it so
+    // we can show the far more useful "1 <code> = X <baseCode>".
+    const basePerUnit = isBaseCurrency ? 1 : rate > 0 ? 1 / rate : 0;
 
     return (
         <PressableScale intensity={0.02} onPress={onPress} containerStyle={styles.pressWrap}>
@@ -74,7 +76,7 @@ export const CurrencyRow = React.memo(function CurrencyRow({ code, rate, onPress
                         </View>
                     ) : (
                         <>
-                            <ThemedText style={styles.rateValue}>{formatRate(pkrPerUnit)} PKR</ThemedText>
+                            <ThemedText style={styles.rateValue}>{formatRate(basePerUnit)} {baseCode}</ThemedText>
                             <ThemedText style={[styles.ratePer, { color: colors.textSecondary }]}>per 1 {code}</ThemedText>
                         </>
                     )}
