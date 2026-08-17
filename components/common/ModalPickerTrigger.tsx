@@ -45,7 +45,7 @@ export const ModalPickerTrigger = React.memo(function ModalPickerTrigger({
                 style={[
                     styles.triggerBox,
                     { 
-                        backgroundColor: colors.card,
+                        backgroundColor: colors.cardBg,
                         borderColor: isDark ? 'rgba(255,255,255,0.06)' : colors.border
                     }
                 ]}

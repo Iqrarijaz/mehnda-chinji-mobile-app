@@ -97,7 +97,7 @@ export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(
                 style={[
                     styles.inputBox,
                     {
-                        backgroundColor: colors.card,
+                        backgroundColor: colors.cardBg,
                         height: multiline ? (Platform.OS === 'android' ? 90 : 100) : (Platform.OS === 'android' ? 48 : 52),
                         alignItems: multiline ? 'flex-start' : 'center',
                         paddingTop: multiline ? 12 : 0,

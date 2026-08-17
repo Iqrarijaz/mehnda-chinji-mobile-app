@@ -43,7 +43,44 @@ d:/mc/mobile_app/
 │   ├── business/               # Business detail & category screens
 │   ├── listing/                # Search & filtered directory listing screens
 │   ├── marketplace/            # Marketplace item detail & category screens
+│   ├── cricket/                # Local Cricket Platform (Tournaments, Matches, Standings, Live Scorer)
+│   │   ├── index.tsx           # Tournament Feed with city filter & isCricketAdmin FAB
+│   │   ├── create-tournament.tsx # Create/Edit Tournament Form (Admin Only)
+│   │   ├── [id]/               # Tournament Hub detail routes
+│   │   │   ├── index.tsx       # Tournament Hub (Overview, Fixtures, Teams, Standings)
+│   │   │   ├── add-team.tsx    # Register Team & Player Roster with photo picker (Admin Only)
+│   │   │   └── schedule-match.tsx # Schedule Match Fixture with maxOvers override (Admin Only)
+│   │   └── match/              # Live Match detail routes
+│   │       ├── [id].tsx        # Spectator Live Scorecard & Win Prediction voting
+│   │       └── [id]/
+│   │           └── scorer.tsx  # Over-by-Over Live Scorer Panel (Admin Only)
 │   ├── place/                  # Individual place detail screens
+
+// In APIs:
+│   ├── cricket.ts              # Cricket tournament & match API service methods
+
+// In Components:
+│   ├── cricket/                # Reusable Cricket UI components (wrapped in React.memo)
+│   │   ├── TournamentCard.tsx   # Feed tournament card
+│   │   ├── PrizePoolCard.tsx    # Gold-tinted winner/runner-up prize pool container
+│   │   ├── OrganizerCard.tsx    # Organizer card with photo & 1-tap phone call button
+│   │   ├── GuestCard.tsx        # Chief Guest designation card
+│   │   ├── PointsTableCard.tsx  # Standings table (P, W, L, Pts, NRR)
+│   │   ├── WinPredictionCard.tsx# Fan voting card with probability % bars
+│   │   ├── PlayerRow.tsx        # Team roster row with photo picker
+│   │   ├── LiveScorecardCard.tsx# Match status summary card
+│   │   └── OverScorerBox.tsx    # Scorer input box for runs, wickets & extras
+
+// Feature Section
+### 3.10. Local Cricket Tournament Platform & Live Scoring (`app/cricket/`, `hooks/useCricketAPI.ts`)
+- **Permission Guard (`isCricketAdmin`)**: `user?.user?.isCricketAdmin` controls access. Non-admin users see read-only spectator features; Cricket Admins get creation FABs and access to the Over-by-Over Scorer panel.
+- **Home Integration**: `components/home/UtilsGrid.tsx` features a "Local Sports & Community" category with a Cricket Hub card linking to `/cricket`.
+- **Tournament Hub**: Renders Tournament Banner, Prize Pool card (Winner, Runner-up, Special prizes), Organizers carousel (with 1-tap call), Chief Guests grid, Teams list, Fixtures list, and auto-sorted Points Table with Net Run Rate (NRR).
+- **Team & Player Roster**: Teams register player rosters with roles, captain status, and optional player avatar photos (compressed JPEG 300x300 via `expo-image-manipulator`).
+- **Over-by-Over Live Scorer Panel**: Mobile-optimized scoring panel (`app/cricket/match/[id]/scorer.tsx`). Scorer submits over records (runs, wickets, extras, commentary), automatically handling target checks, inning transitions, and match completion.
+- **Real-Time Socket.IO Broadcasts**: `useLiveMatchSocket` hook joins room `match_<id>` and updates match state live on `OVER_UPDATED`, `PREDICTION_UPDATED`, and `MATCH_COMPLETED`.
+- **Fan Win Predictions**: Spectators vote for their predicted winner (`WinPredictionCard.tsx`), displaying real-time win probability % progress bars.
+
 │   ├── quran/                  # Quran Surah list, reader & audio player screens
 │   ├── support/                # Customer support & help desk
 │   ├── user/                   # User profile, history & management

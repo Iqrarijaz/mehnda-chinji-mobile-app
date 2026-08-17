@@ -71,6 +71,18 @@ const CATEGORIES: UtilCategory[] = [
             },
         ]
     },
+    {
+        id: 'sports',
+        title: 'Local Sports & Community',
+        items: [
+            {
+                id: 'cricket',
+                label: 'Cricket Hub',
+                icon: 'trophy-outline',
+                route: '/cricket'
+            },
+        ]
+    },
 ];
 
 export function UtilsGrid() {

@@ -95,8 +95,40 @@ export const ScreenHeader = React.memo(function ScreenHeader({
     const router = useRouter();
 
     const openDrawer = useCallback(() => {
-        navigation.dispatch(DrawerActions.openDrawer());
-    }, [navigation]);
+        let currentNav: any = navigation;
+        let drawerNav: any = null;
+
+        while (currentNav) {
+            try {
+                const state = currentNav.getState?.();
+                if (state?.type === 'drawer' || typeof currentNav.openDrawer === 'function') {
+                    drawerNav = currentNav;
+                    break;
+                }
+            } catch (e) {
+                // Ignore state inspection errors
+            }
+            currentNav = currentNav.getParent ? currentNav.getParent() : null;
+        }
+
+        if (drawerNav) {
+            try {
+                if (typeof drawerNav.openDrawer === 'function') {
+                    drawerNav.openDrawer();
+                } else {
+                    drawerNav.dispatch(DrawerActions.openDrawer());
+                }
+            } catch (err) {
+                router.push('/(drawer)/(tabs)' as any);
+            }
+        } else {
+            if (router.canGoBack()) {
+                router.back();
+            } else {
+                router.replace('/(drawer)/(tabs)' as any);
+            }
+        }
+    }, [navigation, router]);
 
     // Pulsing hero tile (only animates when a hero is rendered).
     const pulse = useSharedValue(0);

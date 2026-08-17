@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, TouchableOpacityProps, StyleSheet } from 'react-native';
+import { ActivityIndicator, TouchableOpacityProps, StyleSheet, Platform } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -58,7 +58,7 @@ export const SubmitButton = React.memo(function SubmitButton({ title, isLoading,
 
 const styles = StyleSheet.create({
     updateButton: {
-        height: 46,
+        height: Platform.OS === 'android' ? 48 : 52,
         borderRadius: 30,
         overflow: 'hidden',
         justifyContent: 'center',

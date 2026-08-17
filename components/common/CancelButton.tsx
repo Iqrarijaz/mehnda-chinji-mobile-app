@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, TouchableOpacityProps, View, StyleSheet } from 'react-native';
+import { TouchableOpacity, TouchableOpacityProps, View, StyleSheet, Platform } from 'react-native';
+
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -37,7 +38,7 @@ export const CancelButton = React.memo(function CancelButton({ title = 'Cancel',
 
 const styles = StyleSheet.create({
     cancelButton: {
-        height: 46,
+        height: Platform.OS === 'android' ? 48 : 52,
         borderRadius: 30,
         overflow: 'hidden',
         justifyContent: 'center',
