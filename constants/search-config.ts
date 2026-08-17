@@ -86,13 +86,3 @@ export const SEARCH_CATEGORIES_CONFIG: SearchCategoryResult[] = [
         keywords: ['bank', 'atm', 'cash', 'money', 'hbl', 'meezan', 'mcb', 'uabl', 'branch']
     },
 ];
-
-export const POPULAR_SEARCHES = [
-
-    "Govt School",
-    "Masjid Timings",
-    "Clinic",
-    "Police Station",
-    "Bus Timings",
-    "ATM"
-];

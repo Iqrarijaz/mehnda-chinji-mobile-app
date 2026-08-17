@@ -19,8 +19,10 @@ import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useGlobalSearch, GlobalSearchResult } from '@/hooks/useGlobalSearch';
+import { useTrendingSearches } from '@/hooks/useTrendingSearches';
+import { trackSearch } from '@/apis/search';
 import { clientStorage } from '@/utils/storage';
-import { SEARCH_CATEGORIES_CONFIG, SEARCH_NAV_ITEMS, SearchCategoryResult, SearchNavResult } from '@/constants/search-config';
+import { SEARCH_CATEGORIES_CONFIG, SEARCH_NAV_ITEMS } from '@/constants/search-config';
 
 interface GlobalSearchOverlayProps {
     searchQuery: string;
@@ -32,7 +34,7 @@ interface GlobalSearchOverlayProps {
 
 const RECENT_SEARCHES_KEY = '@rehbar_global_recent_searches';
 
-export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchChange, onAction, topPadding }: GlobalSearchOverlayProps) => {
+function GlobalSearchOverlayComponent({ searchQuery, onClose, onSearchChange, onAction, topPadding }: GlobalSearchOverlayProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const isDark = theme === 'dark';
@@ -41,6 +43,7 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
 
     const [recents, setRecents] = useState<GlobalSearchResult[]>([]);
     const { results: apiResults, isLoading } = useGlobalSearch(searchQuery);
+    const { trending } = useTrendingSearches();
 
     // Load recents on mount
     useEffect(() => {
@@ -91,6 +94,13 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
     }, [searchQuery]);
 
     const handleSelect = useCallback((item: any) => {
+        if (item.type === 'trending') {
+            // Fill the search box with the trending term rather than navigating —
+            // the user still gets to pick from the live results it produces.
+            onSearchChange(item.label);
+            return;
+        }
+
         if (item.type === 'nav') {
             if (item.data.action) {
                 // Special action (e.g., open a modal)
@@ -112,8 +122,14 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
             saveToRecents(item as GlobalSearchResult);
         }
 
+        // A tapped result for a typed query is the strongest "this search
+        // actually worked" signal — feed it to the trending-searches endpoint.
+        if (searchQuery.trim()) {
+            trackSearch(searchQuery.trim());
+        }
+
         setTimeout(onClose, 100);
-    }, [onClose, onAction, router, saveToRecents]);
+    }, [onClose, onAction, onSearchChange, router, saveToRecents, searchQuery]);
 
     const renderResultItem = (item: any) => {
         let label = item.title || item.label || '';
@@ -135,6 +151,9 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
         } else if (item.type === 'place') {
             icon = 'location';
             color = '#10B981';
+        } else if (item.type === 'trending') {
+            icon = 'trending-up';
+            color = colors.primary;
         }
 
         return (
@@ -191,11 +210,11 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
 
             <FlashList
                 contentContainerStyle={styles.listContent}
-                data={hasQuery ? [
+                data={(hasQuery ? [
                     ...filteredNav.map(n => ({ type: 'nav', data: n, title: n.label, id: n.id })),
                     ...filteredCategories.map(c => ({ type: 'category', data: c, title: c.label, id: c.id })),
                     ...apiResults
-                ] : recents}
+                ] : recents.length > 0 ? recents : trending.map(t => ({ type: 'trending', label: t, id: t }))) as any[]}
                 keyExtractor={(item, index) => `${item.type}-${item.id || index}`}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleSelect(item)} activeOpacity={0.7}>
@@ -204,14 +223,14 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
                 )}
                 ListHeaderComponent={() => (
                     <ThemedText style={styles.sectionTitle}>
-                        {hasQuery ? 'Results' : (recents.length > 0 ? 'Recent Searches' : 'Suggestions')}
+                        {hasQuery ? 'Results' : recents.length > 0 ? 'Recent Searches' : trending.length > 0 ? 'Trending Searches' : 'Suggestions'}
                     </ThemedText>
                 )}
                 ListEmptyComponent={() => (
                     hasQuery && !isLoading ? (
                         <View style={styles.emptyState}>
                             <Ionicons name="search-outline" size={48} color={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} />
-                            <ThemedText style={styles.emptyText}>No results found for "{searchQuery}"</ThemedText>
+                            <ThemedText style={styles.emptyText}>No results found for &quot;{searchQuery}&quot;</ThemedText>
                         </View>
                     ) : null
                 )}
@@ -223,7 +242,9 @@ export const GlobalSearchOverlay = React.memo(({ searchQuery, onClose, onSearchC
             />
         </Animated.View>
     );
-});
+}
+
+export const GlobalSearchOverlay = React.memo(GlobalSearchOverlayComponent);
 
 const styles = StyleSheet.create({
     overlay: {
