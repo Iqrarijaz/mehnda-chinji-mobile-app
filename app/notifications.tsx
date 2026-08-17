@@ -62,6 +62,7 @@ export default function NotificationsScreen() {
 
     const {
         notificationsQuery,
+        unreadCountsQuery,
         markAsReadMutation,
         markAllReadMutation,
         deleteMutation
@@ -71,6 +72,7 @@ export default function NotificationsScreen() {
     });
 
     const { data: response, isLoading, isFetching, refetch } = notificationsQuery;
+    const unreadCounts = unreadCountsQuery.data?.data;
 
     const notifications = response?.data || [];
     const unreadCount = response?.unreadCount || 0;
@@ -182,7 +184,7 @@ export default function NotificationsScreen() {
             <View style={{ flex: 1, backgroundColor: colors.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden' }}>
                 {/* Fixed Filter Tabs */}
                 <View style={styles.filtersWrap}>
-                    <NotificationFilterTabs active={activeFilter} onSelect={setActiveFilter} />
+                    <NotificationFilterTabs active={activeFilter} onSelect={setActiveFilter} unreadCounts={unreadCounts} />
                 </View>
                 {/* Scrollable List */}
                 <View style={{ flex: 1 }}>

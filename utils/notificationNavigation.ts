@@ -57,6 +57,17 @@ export function handleNotificationNavigation(data: NotificationData, router: Rou
         return;
     }
 
+    // ── Rate-module updates (reserved for when Currency/Metals start
+    // sending their own change notifications, mirroring FUEL above). ───
+    if (type === 'CURRENCY') {
+        router.push('/currency' as any);
+        return;
+    }
+    if (type === 'METALS') {
+        router.push('/metals' as any);
+        return;
+    }
+
     if (!data.screen) return;
     const screen = data.screen;
 

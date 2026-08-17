@@ -10,6 +10,8 @@ import { Layout } from '@/constants/layout';
 export interface PillItem {
     id: string;
     label: string;
+    /** Small count badge shown on the pill (e.g. unread count) — omitted when falsy. */
+    badgeCount?: number;
 }
 
 export interface PillsListProps {
@@ -60,6 +62,16 @@ export const PillsList = React.memo(function PillsList({
                             ]}>
                                 {item.label}
                             </ThemedText>
+                            {!!item.badgeCount && (
+                                <View style={[
+                                    styles.countBadge,
+                                    { backgroundColor: isActive ? 'rgba(255,255,255,0.3)' : resolvedActiveColor },
+                                ]}>
+                                    <ThemedText style={styles.countBadgeText}>
+                                        {item.badgeCount > 99 ? '99+' : item.badgeCount}
+                                    </ThemedText>
+                                </View>
+                            )}
                         </PressableScale>
                     );
                 }}
@@ -93,4 +105,15 @@ const styles = StyleSheet.create({
         fontWeight: '700' },
     tabTextActive: {
         fontWeight: '800',
-        letterSpacing: 0.2 } });
+        letterSpacing: 0.2 },
+    countBadge: {
+        minWidth: 16,
+        height: 16,
+        borderRadius: 8,
+        paddingHorizontal: 4,
+        alignItems: 'center',
+        justifyContent: 'center' },
+    countBadgeText: {
+        fontSize: 9,
+        fontWeight: '800',
+        color: '#FFFFFF' } });
