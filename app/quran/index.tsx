@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, RefreshControl } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +15,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Layout } from '@/constants/layout';
 import { getDownloadedSurahSet, downloadSurahAudio } from '@/utils/quranAudioCache';
+import { getContinueListening, clearContinueListening, type ContinueListening } from '@/utils/quranPrefs';
 
 import { useSurahPlayer } from '@/hooks/useSurahPlayer';
 
@@ -23,6 +24,8 @@ import { SurahCard } from '@/components/quran/SurahCard';
 import { QuranHeader } from '@/components/quran/QuranHeader';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { MiniAudioPlayer } from '@/components/quran/MiniAudioPlayer';
+import { ContinueListeningCard } from '@/components/quran/ContinueListeningCard';
+import { QuranProgressCard } from '@/components/quran/QuranProgressCard';
 import Skeleton from '@/components/common/Skeleton';
 
 const FAV_STORAGE_KEY = 'quran_favourites';
@@ -61,6 +64,7 @@ export default function QuranListScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<TabType>('all');
     const [favourites, setFavourites] = useState<Set<number>>(new Set());
+    const [continueListening, setContinueListeningState] = useState<ContinueListening | null>(null);
 
     // Offline audio download state
     const [downloadedSet, setDownloadedSet] = useState<Set<number>>(new Set());
@@ -91,6 +95,26 @@ export default function QuranListScreen() {
         stopPlayer();
         router.push(`/quran/${item.number}` as any);
     }, [stopPlayer, router]);
+
+    // Refresh the "Continue Listening" checkpoint every time this screen
+    // regains focus — playback may have advanced (or been dismissed) while
+    // the user was in the reader screen.
+    useFocusEffect(
+        useCallback(() => {
+            getContinueListening().then(setContinueListeningState);
+        }, [])
+    );
+
+    const handleResumeListening = useCallback(() => {
+        if (!continueListening) return;
+        stopPlayer();
+        router.push(`/quran/${continueListening.surahNumber}?ayah=${continueListening.ayahIndex}&autoplay=1` as any);
+    }, [continueListening, stopPlayer, router]);
+
+    const handleDismissResume = useCallback(() => {
+        setContinueListeningState(null);
+        clearContinueListening();
+    }, []);
 
     const handleDownload = useCallback(async (item: SurahListItem) => {
         const n = item.number;
@@ -219,6 +243,19 @@ export default function QuranListScreen() {
             />
 
             <View style={styles.headerAddon}>
+                {/* Continue Listening — hidden while that same Surah is already
+                    playing inline, since the mini player below covers that. */}
+                {continueListening && playingSurah?.number !== continueListening.surahNumber && (
+                    <ContinueListeningCard
+                        data={continueListening}
+                        onPress={handleResumeListening}
+                        onDismiss={handleDismissResume}
+                    />
+                )}
+
+                {/* Reading progress: Surah/Juz completion + optional goal */}
+                {surahs.length > 0 && <QuranProgressCard surahs={surahs} />}
+
                 {/* Search Bar */}
                 <View style={[styles.searchBarContainer, { backgroundColor: colors.cardBg }]}>
                     <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />

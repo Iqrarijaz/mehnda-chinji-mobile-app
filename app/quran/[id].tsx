@@ -27,7 +27,9 @@ import {
     getFontSize, setFontSize as persistFontSize,
     getLastPosition, setLastPosition,
     getBookmarks, toggleBookmark as toggleBookmarkStore, isBookmarked as isBookmarkedIn,
+    setContinueListening,
     FONT_SIZE_DEFAULT, type Bookmark } from '@/utils/quranPrefs';
+import { markSurahCompleted } from '@/utils/quranProgress';
 
 /** Placeholder ayah cards shown only on a true first load (no cached Surah yet). */
 function AyahSkeleton({ cardColor }: { cardColor: string }) {
@@ -82,6 +84,10 @@ export default function SurahDetailScreen() {
     const shareCardRef = useRef<View>(null);
     const savedPosRef = useRef<number>(-1);
     const restoredRef = useRef(false);
+    // Flips once the resume/deep-link ayah index has been applied to
+    // lastPlayedIndex, so the autoplay effect below waits for it rather
+    // than racing it (both would otherwise fire from the same query load).
+    const [positionRestored, setPositionRestored] = useState(false);
 
     // Load persisted preferences + bookmarks once.
     useEffect(() => {
@@ -105,6 +111,15 @@ export default function SurahDetailScreen() {
         if (typeof top === 'number' && top !== savedPosRef.current) {
             savedPosRef.current = top;
             setLastPosition(surahNumber, top);
+        }
+
+        // Reaching the last ayah counts as having read the whole Surah —
+        // uses ayahsRef (not the closed-over `ayahs`, which this ref-bound
+        // callback would otherwise see as its stale first-render value).
+        const bottom = viewableItems[viewableItems.length - 1]?.index;
+        const total = ayahsRef.current?.length || 0;
+        if (typeof bottom === 'number' && total > 0 && bottom >= total - 1) {
+            markSurahCompleted(surahNumber);
         }
     }).current;
 
@@ -138,11 +153,13 @@ export default function SurahDetailScreen() {
             const target = Number.isFinite(deepLink) ? deepLink : await getLastPosition(surahNumber);
             savedPosRef.current = target;
             if (target > 0 && target < ayahs.length) {
+                setLastPlayedIndex(target);
                 setTimeout(() => {
                     flatListRef.current?.scrollToIndex({ index: target, animated: false, viewPosition: 0 });
                 }, 350);
             }
             restoredRef.current = true;
+            setPositionRestored(true);
         })();
     }, [ayahs.length, surahNumber, ayahParam]);
 
@@ -166,6 +183,28 @@ export default function SurahDetailScreen() {
     useEffect(() => {
         playingIndexRef.current = playingIndex;
     }, [playingIndex]);
+
+    const surahInfoRef = useRef(surahInfo);
+    useEffect(() => {
+        surahInfoRef.current = surahInfo;
+    }, [surahInfo]);
+
+    // Throttles "continue listening" writes to roughly once every 5s of
+    // active playback, rather than on every status tick.
+    const lastPersistRef = useRef(0);
+    const persistContinueListening = useCallback((index: number, positionMillis: number, durationMillis: number) => {
+        const info = surahInfoRef.current;
+        if (!info) return;
+        setContinueListening({
+            surahNumber,
+            surahName: info.name,
+            englishName: info.englishName,
+            ayahIndex: index,
+            positionMillis,
+            durationMillis,
+            updatedAt: Date.now(),
+        });
+    }, [surahNumber]);
 
     // Trigger background download and clean up expired cache on mount/load
     useEffect(() => {
@@ -195,7 +234,14 @@ export default function SurahDetailScreen() {
         };
     }, []);
 
+    // Last known playback status, so stopAudio can save an accurate
+    // snapshot even though it doesn't otherwise see position/duration.
+    const lastStatusRef = useRef({ positionMillis: 0, durationMillis: 0 });
+
     const stopAudio = useCallback(async () => {
+        if (playingIndexRef.current !== null) {
+            persistContinueListening(playingIndexRef.current, lastStatusRef.current.positionMillis, lastStatusRef.current.durationMillis);
+        }
         if (soundRef.current) {
             await soundRef.current.stopAsync().catch(() => { });
             await soundRef.current.unloadAsync().catch(() => { });
@@ -204,7 +250,7 @@ export default function SurahDetailScreen() {
         }
         setPlayingIndex(null);
         setBufferingIndex(null);
-    }, []);
+    }, [persistContinueListening]);
 
     const playAudio = useCallback(async (url: string, index: number) => {
         try {
@@ -255,6 +301,16 @@ export default function SurahDetailScreen() {
                 if (!status.isBuffering) {
                     setBufferingIndex(null);
                 }
+
+                lastStatusRef.current = { positionMillis: status.positionMillis || 0, durationMillis: status.durationMillis || 0 };
+                if (status.isPlaying) {
+                    const now = Date.now();
+                    if (now - lastPersistRef.current > 5000) {
+                        lastPersistRef.current = now;
+                        persistContinueListening(index, status.positionMillis || 0, status.durationMillis || 0);
+                    }
+                }
+
                 if (status.didJustFinish) {
                     setPlayingIndex(null);
 
@@ -287,7 +343,7 @@ export default function SurahDetailScreen() {
             setPlayingIndex(null);
             Alert.alert('Audio Error', 'Failed to play audio. Please check your network connection.');
         }
-    }, [surahNumber, stopAudio]);
+    }, [surahNumber, stopAudio, persistContinueListening]);
 
     const playAudioRef = useRef<typeof playAudio | null>(null);
     useEffect(() => {
@@ -312,14 +368,17 @@ export default function SurahDetailScreen() {
         router.back();
     }, [stopAudio, router]);
 
-    // Auto-start playback when opened via the "Play" button on a Surah card.
+    // Auto-start playback when opened via the "Play" button on a Surah card,
+    // or via the Continue Listening card's ?ayah=&autoplay=1 deep link.
+    // Waits for positionRestored so lastPlayedIndex reflects the deep-linked
+    // ayah before playback starts, instead of racing the restore effect above.
     const autoplayTriggered = useRef(false);
     useEffect(() => {
-        if (autoplay === '1' && !autoplayTriggered.current && audioEdition?.ayahs?.length) {
+        if (autoplay === '1' && !autoplayTriggered.current && positionRestored && audioEdition?.ayahs?.length) {
             autoplayTriggered.current = true;
             handlePlaySurah();
         }
-    }, [autoplay, audioEdition, handlePlaySurah]);
+    }, [autoplay, positionRestored, audioEdition, handlePlaySurah]);
 
     // ── Long-press actions: bookmark + share ────────────────────────────────
     const openAyahActions = useCallback((index: number) => {

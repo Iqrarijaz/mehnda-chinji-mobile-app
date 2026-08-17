@@ -3,6 +3,7 @@ import { Audio } from 'expo-av';
 
 import { getSurah, SurahListItem } from '@/apis/quran';
 import { getPlayableAyahUri } from '@/utils/quranAudioCache';
+import { setContinueListening } from '@/utils/quranPrefs';
 
 /**
  * A single, screen-level Quran audio player. Fetches a surah's recitation
@@ -24,9 +25,31 @@ export function useSurahPlayer() {
     const ayahIndexRef = useRef(0);
     const surahRef = useRef<SurahListItem | null>(null);
     const playIndexRef = useRef<((index: number) => Promise<void>) | null>(null);
+    // Throttles "continue listening" writes to roughly once every 5s of
+    // active playback, rather than on every ~500ms status tick.
+    const lastPersistRef = useRef(0);
+
+    const persistContinueListening = useCallback((positionMillis: number, durationMillis: number) => {
+        const s = surahRef.current;
+        if (!s) return;
+        setContinueListening({
+            surahNumber: s.number,
+            surahName: s.name,
+            englishName: s.englishName,
+            ayahIndex: ayahIndexRef.current,
+            positionMillis,
+            durationMillis,
+            updatedAt: Date.now(),
+        });
+    }, []);
+
+    const positionRef = useRef(0);
+    const durationRef = useRef(0);
 
     useEffect(() => { ayahIndexRef.current = ayahIndex; }, [ayahIndex]);
     useEffect(() => { surahRef.current = surah; }, [surah]);
+    useEffect(() => { positionRef.current = position; }, [position]);
+    useEffect(() => { durationRef.current = duration; }, [duration]);
 
     const unload = useCallback(async () => {
         if (soundRef.current) {
@@ -40,6 +63,15 @@ export function useSurahPlayer() {
         setIsPlaying(status.isPlaying);
         setPosition(status.positionMillis || 0);
         setDuration(status.durationMillis || 0);
+
+        if (status.isPlaying) {
+            const now = Date.now();
+            if (now - lastPersistRef.current > 5000) {
+                lastPersistRef.current = now;
+                persistContinueListening(status.positionMillis || 0, status.durationMillis || 0);
+            }
+        }
+
         if (status.didJustFinish) {
             const next = ayahIndexRef.current + 1;
             if (next < audioAyahsRef.current.length) {
@@ -48,7 +80,7 @@ export function useSurahPlayer() {
                 setIsPlaying(false);
             }
         }
-    }, []);
+    }, [persistContinueListening]);
 
     const playIndex = useCallback(async (index: number) => {
         const ayahs = audioAyahsRef.current;
@@ -114,12 +146,18 @@ export function useSurahPlayer() {
         if (!soundRef.current) return;
         if (isPlaying) {
             await soundRef.current.pauseAsync().catch(() => { });
+            // Pausing is a deliberate stopping point — save an up-to-date
+            // snapshot immediately rather than waiting for the next throttle tick.
+            persistContinueListening(positionRef.current, durationRef.current);
         } else {
             await soundRef.current.playAsync().catch(() => { });
         }
-    }, [isPlaying]);
+    }, [isPlaying, persistContinueListening]);
 
     const stop = useCallback(async () => {
+        if (surahRef.current) {
+            persistContinueListening(positionRef.current, durationRef.current);
+        }
         await unload();
         setSurah(null);
         surahRef.current = null;
@@ -130,7 +168,7 @@ export function useSurahPlayer() {
         setPosition(0);
         setDuration(0);
         audioAyahsRef.current = [];
-    }, [unload]);
+    }, [unload, persistContinueListening]);
 
     const seek = useCallback(async (ratio: number) => {
         if (soundRef.current && duration) {
