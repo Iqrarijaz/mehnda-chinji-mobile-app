@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clientStorage } from '@/utils/storage';
 
 /**
  * Persistent Quran preferences & state (reading position, font size, bookmarks),
@@ -100,4 +101,44 @@ export const removeBookmark = async (surah: number, ayahIndex: number): Promise<
     const next = list.filter((b) => bookmarkId(b.surah, b.ayahIndex) !== bookmarkId(surah, ayahIndex));
     await saveBookmarks(next);
     return next;
+};
+
+// ── Continue listening (last-played audio, for the resume card) ─────────────
+// Backed by MMKV (via clientStorage) rather than AsyncStorage — this is
+// written on every throttled playback tick, and MMKV's sync engine handles
+// that write frequency far better than AsyncStorage's bridge round-trips.
+
+const KEY_CONTINUE_LISTENING = 'quran:continueListening';
+
+export interface ContinueListening {
+    surahNumber: number;
+    surahName: string;      // Arabic name
+    englishName: string;
+    ayahIndex: number;      // 0-based index of the ayah currently/last playing
+    positionMillis: number; // playback position within that ayah's audio
+    durationMillis: number;
+    updatedAt: number;
+}
+
+export const getContinueListening = async (): Promise<ContinueListening | null> => {
+    try {
+        const raw = await clientStorage.getItem(KEY_CONTINUE_LISTENING);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed.surahNumber === 'number' ? parsed : null;
+    } catch {
+        return null;
+    }
+};
+
+export const setContinueListening = async (data: ContinueListening): Promise<void> => {
+    try {
+        await clientStorage.setItem(KEY_CONTINUE_LISTENING, JSON.stringify(data));
+    } catch { }
+};
+
+export const clearContinueListening = async (): Promise<void> => {
+    try {
+        await clientStorage.removeItem(KEY_CONTINUE_LISTENING);
+    } catch { }
 };
