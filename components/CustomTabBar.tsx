@@ -16,10 +16,8 @@ import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withTiming,
-    withSpring,
     interpolate,
-    Extrapolate,
-    ReduceMotion,
+    Extrapolation,
     useAnimatedKeyboard } from 'react-native-reanimated';
 
 const isAndroid = Platform.OS === 'android';
@@ -95,9 +93,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     // ─── Consolidated Route & Dimensions Selector ────────────────────────────
     const { visibleRoutes, tabWidth, FULL_WIDTH } = React.useMemo(() => {
         // Routes hidden from the tab bar (registered with href: null in _layout)
-        const HIDDEN_ROUTES = new Set<string>([]);
         const routes = state.routes.filter((route) => {
-            if (HIDDEN_ROUTES.has(route.name)) return false;
             const { options } = descriptors[route.key];
             if ((options as any).href === null) return false;
             return true;
@@ -129,26 +125,22 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
     // ─── UI-Thread Animated Styles ───────────────────────────────────────────
     const animatedContainerStyle = useAnimatedStyle(() => {
-        const slideDownY = 0; // Removed chat slide logic
-
         const keyboardY = interpolate(
             keyboard.height.value,
             [0, 100], // Start sliding down as keyboard opens
             [0, BAR_HEIGHT + insets.bottom + 30],
-            Extrapolate.CLAMP
+            Extrapolation.CLAMP
         );
-
-        const combinedTranslateY = Math.max(slideDownY, keyboardY);
 
         return {
             transform: [
-                { translateY: combinedTranslateY }
+                { translateY: keyboardY }
             ],
             opacity: interpolate(
-                combinedTranslateY,
+                keyboardY,
                 [0, BAR_HEIGHT + insets.bottom + 30],
                 [1, 0],
-                Extrapolate.CLAMP
+                Extrapolation.CLAMP
             ) };
     });
 
@@ -171,19 +163,6 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     const handleLongPress = React.useCallback((routeKey: string) => {
         navigation.emit({ type: 'tabLongPress', target: routeKey });
     }, [navigation]);
-
-    const homeRoute = visibleRoutes[0];
-    const onHomePress = React.useCallback(() => {
-        if (!homeRoute) return;
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => { });
-        const event = navigation.emit({
-            type: 'tabPress',
-            target: homeRoute.key,
-            canPreventDefault: true });
-        if (!event.defaultPrevented) {
-            navigation.navigate(homeRoute.name, homeRoute.params);
-        }
-    }, [homeRoute, navigation]);
 
     const bottomPadding = isAndroid ? insets.bottom + 6 : insets.bottom + 8;
 

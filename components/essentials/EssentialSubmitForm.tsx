@@ -339,7 +339,7 @@ const EssentialSubmitForm = React.memo(({
                     />
                 </View>
                 {errors['name'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginTop: 4 }}>{errors['name']}</ThemedText>}
-            </Animated.View>
+            </View>
 
             <View style={styles.field}>
                 <View style={styles.labelRow}>
@@ -391,7 +391,7 @@ const EssentialSubmitForm = React.memo(({
             )}
 
             {!isTravel && (
-                <Animated.View entering={FadeInDown.delay(250)} style={styles.field}>
+                <View style={styles.field}>
                     <View style={styles.labelRow}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                             <ThemedText style={styles.label}>ADDRESS <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
@@ -427,10 +427,10 @@ const EssentialSubmitForm = React.memo(({
                         />
                     </View>
                     {errors['address'] && <ThemedText style={{ color: '#EF4444', fontSize: 10.5, marginTop: 4 }}>{errors['address']}</ThemedText>}
-                </Animated.View>
+                </View>
             )}
 
-            <Animated.View entering={FadeInDown.delay(350)} style={styles.field}>
+            <View style={styles.field}>
                 <View style={styles.labelRow}>
                     <ThemedText style={styles.label}>CONTACTS (MAX 3) <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                     {form.contact.length < 3 && (
@@ -484,10 +484,10 @@ const EssentialSubmitForm = React.memo(({
                         </View>
                     </View>
                 ))}
-            </Animated.View>
+            </View>
 
             {isTravel && form.type?.toLowerCase() === 'bus' && (
-                <Animated.View entering={FadeInDown.delay(400)} style={[styles.field, { marginBottom: 20 }]}>
+                <View style={[styles.field, { marginBottom: 20 }]}>
                     <View style={styles.labelRow}>
                         <ThemedText style={styles.label}>
                             ROUTE / SCHEDULE
@@ -544,11 +544,11 @@ const EssentialSubmitForm = React.memo(({
                         title="Departure Time"
                         currentValue={routePickerIndex !== null ? form.route[routePickerIndex].time : ''}
                     />
-                </Animated.View>
+                </View>
             )}
 
             {isEducation && (
-                <Animated.View entering={FadeInDown.delay(420)} style={[styles.field, { gap: 12 }]}>
+                <View style={[styles.field, { gap: 12 }]}>
                     <ThemedText style={styles.label}>SCHOOL / COLLEGE DETAILS</ThemedText>
 
                     <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
@@ -586,11 +586,11 @@ const EssentialSubmitForm = React.memo(({
                             />
                         </View>
                     </View>
-                </Animated.View>
+                </View>
             )}
 
             {(isHealth || isEducation || isGovt) && (
-                <Animated.View entering={FadeInDown.delay(440)} style={styles.field}>
+                <View style={styles.field}>
                     <ThemedText style={[styles.label, { marginBottom: 6 }]}>TIMING <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                     <View style={{ flexDirection: 'row', gap: 12 }}>
                         <View style={{ flex: 1 }}>
@@ -664,12 +664,12 @@ const EssentialSubmitForm = React.memo(({
                         title="Closing Time"
                         currentValue={toTime}
                     />
-                </Animated.View>
+                </View>
             )}
 
             {/* ── Travel: Return Route (bus only) ─────────────────── */}
             {isTravel && form.type?.toLowerCase() === 'bus' && (
-                <Animated.View entering={FadeInDown.delay(450)} style={styles.field}>
+                <View style={styles.field}>
                     <View style={styles.labelRow}>
                         <ThemedText style={styles.label}>
                             RETURN ROUTE
@@ -726,10 +726,10 @@ const EssentialSubmitForm = React.memo(({
                         title="Return Departure Time"
                         currentValue={returnRoutePickerIndex !== null ? form.returnRoute[returnRoutePickerIndex]?.time : ''}
                     />
-                </Animated.View>
+                </View>
             )}
 
-            <Animated.View entering={FadeInDown.delay(500)} style={styles.footer}>
+            <View style={styles.footer}>
                 <CancelButton
                     onPress={onCancel}
                     disabled={isPending || isUploading}
@@ -742,7 +742,7 @@ const EssentialSubmitForm = React.memo(({
                     disabled={isPending || isUploading || (isEditing && !hasChanges)}
                     style={{ width: 160, height: 40, borderRadius: 30 }}
                 />
-            </Animated.View>
+            </View>
             <LoaderOverlay
                 visible={isPending || isUploading}
                 text={isUploading ? 'Uploading image...' : isEditing ? 'Updating...' : 'Submitting...'}
@@ -788,24 +788,6 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 12.5,
         fontWeight: '500' },
-    input: {
-        borderRadius: Layout.borderRadius,
-        padding: 11 },
-    textArea: {
-        minHeight: 120,
-        textAlignVertical: 'top' },
-
-    formatToolbar: {
-        flexDirection: 'row',
-        gap: 8,
-        marginBottom: 8 },
-    formatBtn: {
-        paddingHorizontal: 7,
-        paddingVertical: 4,
-        borderRadius: Layout.borderRadius },
-    formatBtnText: {
-        fontSize: 10,
-        fontWeight: '600' },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',

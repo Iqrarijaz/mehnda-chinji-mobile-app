@@ -24,8 +24,6 @@ export interface SettingRowItemProps {
     isLast?: boolean;
 }
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
-
 export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
     icon,
     label,
@@ -43,30 +41,15 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
     const { theme } = useTheme();
     const colors = Colors[theme];
     const textColor = color || colors.text;
-    const scale = useSharedValue(1);
-
-    const animatedContainer = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }] }));
-
-    const handlePressIn = () => {
-        scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
-    };
-
-    const handlePressOut = () => {
-        scale.value = withSpring(1, { damping: 12, stiffness: 200 });
-    };
 
     return (
-        <AnimatedTouchable
+        <TouchableOpacity
             style={[
                 styles.settingRow,
                 !isLast && styles.settingRowBorder,
-                animatedContainer,
             ]}
-            activeOpacity={1}
+            activeOpacity={0.7}
             onPress={isToggle ? undefined : onPress}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
             disabled={isToggle}
         >
             <View style={styles.settingRowLeft}>
@@ -85,7 +68,7 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
             ) : showChevron ? (
                 <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
             ) : null}
-        </AnimatedTouchable>
+        </TouchableOpacity>
     );
 });
 

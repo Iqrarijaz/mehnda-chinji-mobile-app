@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -59,12 +58,8 @@ export const TagChips = React.memo(({
                         ? colors.lime
                         : accents[index % accents.length];
                     return (
-                        <Animated.View
+                        <View
                             key={index}
-                            entering={FadeInDown.delay(60 + index * 45)
-                                .duration(350)
-                                .springify()
-                                .damping(16)}
                             style={[
                                 styles.chip,
                                 {
@@ -79,7 +74,7 @@ export const TagChips = React.memo(({
                             <ThemedText style={[styles.chipText, { color: colors.primary }]}>
                                 {text}
                             </ThemedText>
-                        </Animated.View>
+                        </View>
                     );
                 })}
             </View>

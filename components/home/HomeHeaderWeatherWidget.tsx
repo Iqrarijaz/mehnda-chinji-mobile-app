@@ -1,25 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-    LayoutChangeEvent,
-    NativeScrollEvent,
-    NativeSyntheticEvent,
     StyleSheet,
     TouchableOpacity,
-    View,
-    ScrollView
+    View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-    FadeIn,
-    FadeInDown,
-    Easing,
-    useSharedValue,
-    useAnimatedStyle,
-    withRepeat,
-    withSequence,
-    withTiming,
-    withDelay
-} from 'react-native-reanimated';
+import Skeleton from '@/components/common/Skeleton';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -112,43 +98,31 @@ const WeatherRow = React.memo(({
 WeatherRow.displayName = 'WeatherRow';
 
 // ── Skeleton Loader Component ──
-const Skeleton = React.memo(({ backgroundColor }: { backgroundColor: string }) => {
-    const shimmer = useSharedValue(0.4);
-    useEffect(() => {
-        shimmer.value = withRepeat(
-            withTiming(0.9, { duration: 850, easing: Easing.inOut(Easing.ease) }),
-            -1,
-            true
-        );
-    }, [shimmer]);
-    const animatedStyle = useAnimatedStyle(() => ({ opacity: shimmer.value }));
-    const Block = ({ w, h, mt = 0, br = Layout.borderRadius }: { w: number | string; h: number; mt?: number; br?: number }) => (
-        <Animated.View style={[{ width: w as any, height: h, borderRadius: br, backgroundColor: 'rgba(255,255,255,0.25)', marginTop: mt }, animatedStyle]} />
-    );
-    return (
-        <View style={styles.wrapper}>
-            <View style={[styles.card, { backgroundColor, minHeight: 88 }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <View style={{ flex: 1, paddingRight: 12 }}>
-                        <Block w={'60%'} h={18} />
-                        <Block w={'40%'} h={13} mt={6} />
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                            <Block w={48} h={18} br={4} />
-                            <Block w={48} h={18} mt={0} br={4} />
-                        </View>
+const WeatherSkeleton = React.memo(({ backgroundColor }: { backgroundColor: string }) => (
+    <View style={styles.wrapper}>
+        <View style={[styles.card, { backgroundColor, minHeight: 88 }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flex: 1, paddingRight: 12 }}>
+                    <Skeleton width={'60%'} height={18} />
+                    <View style={{ height: 6 }} />
+                    <Skeleton width={'40%'} height={13} />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                        <Skeleton width={48} height={18} borderRadius={4} />
+                        <View style={{ width: 6 }} />
+                        <Skeleton width={48} height={18} borderRadius={4} />
                     </View>
-                    <View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                            <Block w={38} h={38} br={19} />
-                            <Block w={46} h={32} br={6} />
-                        </View>
+                </View>
+                <View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Skeleton width={38} height={38} borderRadius={19} />
+                        <Skeleton width={46} height={32} borderRadius={6} />
                     </View>
                 </View>
             </View>
         </View>
-    );
-});
-Skeleton.displayName = 'Skeleton';
+    </View>
+));
+WeatherSkeleton.displayName = 'WeatherSkeleton';
 
 const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidgetProps) => {
     const { theme } = useTheme();
