@@ -1,14 +1,15 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, TouchableOpacity, Platform, TextInput } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { ScreenHeader } from '@/components/common/ScreenHeader';
+import { SearchBar } from '@/components/common/SearchBar';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { TournamentCard } from '@/components/cricket/TournamentCard';
 import { Colors } from '@/constants/colors';
-import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useCricketAPI } from '@/hooks/useCricketAPI';
@@ -56,31 +57,13 @@ export default function CricketFeedScreen() {
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                {/* Redesigned Header with Integrated Search */}
-                <View style={[styles.header, { backgroundColor: colors.surface }]}>
-                    <View style={styles.headerContent}>
-                        <ThemedText style={[styles.headerTitle, { color: colors.text }]}>Tournaments</ThemedText>
-                        <Ionicons name="trophy-outline" size={20} color={colors.primary} />
-                    </View>
-
-                    {/* Search Bar */}
-                    <View style={[styles.searchContainer, { backgroundColor: colors.cardBg }]}>
-                        <Ionicons name="search" size={18} color={colors.primary} />
-                        <TextInput
-                            style={[styles.searchInput, { color: colors.text }]}
-                            placeholder="Search by name, city, venue..."
-                            placeholderTextColor={colors.textSecondary}
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                            clearButtonMode="while-editing"
-                        />
-                        {searchQuery ? (
-                            <TouchableOpacity onPress={() => setSearchQuery('')}>
-                                <Ionicons name="close-circle" size={18} color={colors.icon} />
-                            </TouchableOpacity>
-                        ) : null}
-                    </View>
-                </View>
+                <ScreenHeader hero={{ title: 'Tournaments', icon: 'trophy-outline' }} showMenuIcon={false}>
+                    <SearchBar
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        placeholder="Search by name, city, venue..."
+                    />
+                </ScreenHeader>
 
                 {/* Tournament List */}
                 <FlatList
@@ -133,36 +116,6 @@ export default function CricketFeedScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1
-    },
-    header: {
-        paddingHorizontal: 14,
-        paddingTop: 12,
-        paddingBottom: 12,
-        gap: 10
-    },
-    headerContent: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: '800',
-        letterSpacing: -0.3
-    },
-    searchContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 40,
-        paddingHorizontal: 12,
-        borderRadius: Layout.borderRadius - 2,
-        gap: 8
-    },
-    searchInput: {
-        flex: 1,
-        fontSize: 13,
-        padding: 0,
-        height: '100%'
     },
     listContent: {
         padding: 10,
