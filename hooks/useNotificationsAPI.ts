@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     getNotifications,
+    getNotificationUnreadCounts,
     markNotificationAsRead,
     markAllNotificationsAsRead,
     deleteNotification
@@ -28,11 +29,19 @@ export function useNotificationsAPI(options?: UseNotificationsAPIOptions) {
         enabled: enabled !== false,
     });
 
+    // Per-category unread counts, for the filter-chip badges.
+    const unreadCountsQuery = useQuery({
+        queryKey: ['notifications-unread-counts'],
+        queryFn: getNotificationUnreadCounts,
+        enabled: enabled !== false,
+    });
+
     const markAsReadMutation = useMutation({
         mutationFn: markNotificationAsRead,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
             queryClient.invalidateQueries({ queryKey: ['notifications-badge'] });
+            queryClient.invalidateQueries({ queryKey: ['notifications-unread-counts'] });
         },
     });
 
@@ -41,6 +50,7 @@ export function useNotificationsAPI(options?: UseNotificationsAPIOptions) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
             queryClient.invalidateQueries({ queryKey: ['notifications-badge'] });
+            queryClient.invalidateQueries({ queryKey: ['notifications-unread-counts'] });
         },
     });
 
@@ -49,12 +59,14 @@ export function useNotificationsAPI(options?: UseNotificationsAPIOptions) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
             queryClient.invalidateQueries({ queryKey: ['notifications-badge'] });
+            queryClient.invalidateQueries({ queryKey: ['notifications-unread-counts'] });
         },
     });
 
     return {
         notificationsQuery,
         badgeQuery,
+        unreadCountsQuery,
         markAsReadMutation,
         markAllReadMutation,
         deleteMutation

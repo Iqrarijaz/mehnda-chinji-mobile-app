@@ -13,9 +13,20 @@ import { useTheme } from '@/context/ThemeContext';
 
 function getTypeStyle(type: string, primary: string): { icon: string; color: string } {
     switch (type) {
+        // Prayers
+        case 'RELIGIOUS': return { icon: 'moon-outline', color: primary };
+        // Finance
+        case 'CURRENCY': return { icon: 'cash-outline', color: primary };
+        case 'METALS': return { icon: 'diamond-outline', color: primary };
+        case 'FUEL': return { icon: 'speedometer-outline', color: primary };
+        // Marketplace
+        case 'MARKETPLACE': return { icon: 'storefront-outline', color: primary };
+        // System (and everything else that isn't its own chip)
         case 'SYSTEM': return { icon: 'settings-outline', color: primary };
         case 'COMMUNITY': return { icon: 'people-outline', color: primary };
         case 'ACTIVITY': return { icon: 'flash-outline', color: primary };
+        case 'BUSINESS': return { icon: 'briefcase-outline', color: primary };
+        case 'ESSENTIAL': return { icon: 'bookmark-outline', color: primary };
         default: return { icon: 'notifications-outline', color: primary };
     }
 }
@@ -40,7 +51,7 @@ interface Props {
     delay?: number;
 }
 
-const NotificationItem = React.memo(({ item, onPress, delay = 0 }: Props) => {
+function NotificationItemComponent({ item, onPress, delay = 0 }: Props) {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const scale = useSharedValue(1);
@@ -99,7 +110,9 @@ const NotificationItem = React.memo(({ item, onPress, delay = 0 }: Props) => {
             </TouchableOpacity>
         </Animated.View>
     );
-});
+}
+
+const NotificationItem = React.memo(NotificationItemComponent);
 
 export default NotificationItem;
 

@@ -18,6 +18,18 @@ export const getNotifications = async ({ type, page = 1, limit = 20 }: { type?: 
     });
 };
 
+export interface NotificationUnreadCounts {
+    ALL: number;
+    PRAYERS: number;
+    FINANCE: number;
+    MARKETPLACE: number;
+    SYSTEM: number;
+}
+
+export const getNotificationUnreadCounts = async (): Promise<{ success: boolean; data: NotificationUnreadCounts }> => {
+    return apiClient.get('/api/user/v1/notifications/unread-counts');
+};
+
 export const markNotificationAsRead = async (id: string) => {
     return apiClient.put(`/api/user/v1/notification/${id}/read`, {});
 };
