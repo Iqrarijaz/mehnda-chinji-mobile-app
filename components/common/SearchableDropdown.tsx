@@ -190,12 +190,12 @@ const styles = StyleSheet.create({
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 10,
         marginBottom: 16 },
     searchInput: {
         flex: 1,
-        height: 40,
+        height: 38,
         marginLeft: 8,
         fontFamily: 'Inter-Regular' },
     listContent: {

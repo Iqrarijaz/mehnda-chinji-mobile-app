@@ -185,7 +185,7 @@ const EventForm = () => {
                                     EVENT TITLE <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}>
                                 <Ionicons name="document-text-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -205,7 +205,7 @@ const EventForm = () => {
                                 </ThemedText>
                             </View>
                             <TouchableOpacity
-                                style={[styles.dropdownTrigger, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}
+                                style={[styles.dropdownTrigger, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}
                                 onPress={() => setShowTypePicker(true)}
                             >
                                 <View style={styles.triggerContent}>
@@ -233,7 +233,7 @@ const EventForm = () => {
                                     DATE / TIME <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}>
                                 <Ionicons name="calendar-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -252,7 +252,7 @@ const EventForm = () => {
                                     EXTERNAL LINK
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}>
                                 <Ionicons name="link-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -413,14 +413,14 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 11 },
     textInput: { flex: 1, fontWeight: '500' },
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 11 },
     triggerContent: {
         flexDirection: 'row',
@@ -447,8 +447,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: Platform.OS === 'android' ? 10 : 12 },
     updateButton: {
-        height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: Layout.borderRadius,
+        height: Platform.OS === 'android' ? 46 : 50,
+        borderRadius: Layout.borderRadius - 2,
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden' },

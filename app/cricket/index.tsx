@@ -142,9 +142,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        height: Platform.OS === 'android' ? 48 : 52,
+        height: Platform.OS === 'android' ? 46 : 50,
         paddingHorizontal: 16,
-        borderRadius: 30,
+        borderRadius: 28,
         gap: 8
     },
     fabText: {

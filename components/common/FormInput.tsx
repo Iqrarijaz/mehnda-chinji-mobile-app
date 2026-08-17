@@ -79,7 +79,7 @@ export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(
                     styles.inputBox,
                     {
                         backgroundColor: colors.cardBg,
-                        height: multiline ? (Platform.OS === 'android' ? 90 : 100) : (Platform.OS === 'android' ? 48 : 52),
+                        height: multiline ? (Platform.OS === 'android' ? 90 : 100) : (Platform.OS === 'android' ? 46 : 50),
                         alignItems: multiline ? 'flex-start' : 'center',
                         paddingTop: multiline ? 12 : 0,
                         borderColor: isFocused ? colors.primary : restBorder,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 11
     },
     icon: {

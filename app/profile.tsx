@@ -520,8 +520,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: Layout.borderRadius,
+        height: Platform.OS === 'android' ? 46 : 50,
+        borderRadius: Layout.borderRadius - 2,
         gap: 6 },
     genderText: {
         fontSize: 10.5,
@@ -539,8 +539,8 @@ const styles = StyleSheet.create({
         flex: 1,
         lineHeight: 18 },
     updateButton: {
-        height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: Layout.borderRadius,
+        height: Platform.OS === 'android' ? 46 : 50,
+        borderRadius: Layout.borderRadius - 2,
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden' },

@@ -327,7 +327,7 @@ const EssentialSubmitForm = React.memo(({
                 </View>
                 <View style={[styles.inputBox, {
                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                    height: Platform.OS === 'android' ? 48 : 52 }]}>
+                    height: Platform.OS === 'android' ? 46 : 50 }]}>
                     <Ionicons name="storefront-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                     <TextInput
                         style={[styles.inputText, { color: colors.text }]}
@@ -447,7 +447,7 @@ const EssentialSubmitForm = React.memo(({
                             <View style={{ flex: 1, gap: 8 }}>
                                 <View style={[styles.inputBox, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                    height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                    height: Platform.OS === 'android' ? 46 : 50 }]}>
                                     <Ionicons name="person-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         style={[styles.inputText, { color: colors.text }]}
@@ -459,7 +459,7 @@ const EssentialSubmitForm = React.memo(({
                                 </View>
                                 <View style={[styles.inputBox, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                    height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                    height: Platform.OS === 'android' ? 46 : 50 }]}>
                                     <Ionicons name="call-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         style={[styles.inputText, { color: colors.text }]}
@@ -503,7 +503,7 @@ const EssentialSubmitForm = React.memo(({
                     {form.route.map((r: any, index: number) => (
                         <View key={index} style={{ marginBottom: 10 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                <View style={[styles.inputBox, { flex: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                <View style={[styles.inputBox, { flex: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 46 : 50 }]}>
                                     <Ionicons name="location-outline" size={16} color={colors.icon} style={{ marginRight: 8 }} />
                                     <TextInput
                                         style={[styles.inputText, { color: colors.text }]}
@@ -515,7 +515,7 @@ const EssentialSubmitForm = React.memo(({
                                 </View>
                                 <TouchableOpacity
                                     onPress={() => setRoutePickerIndex(index)}
-                                    style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}
+                                    style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 46 : 50 }]}
                                 >
                                     <Ionicons name="time-outline" size={16} color={colors.icon} style={{ marginRight: 6 }} />
                                     <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 11.5, fontWeight: '600' }}>
@@ -551,7 +551,7 @@ const EssentialSubmitForm = React.memo(({
                 <View style={[styles.field, { gap: 12 }]}>
                     <ThemedText style={styles.label}>SCHOOL / COLLEGE DETAILS</ThemedText>
 
-                    <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                    <View style={[styles.inputBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 46 : 50 }]}>
                         <Ionicons name="person-circle-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                         <TextInput
                             style={[styles.inputText, { color: colors.text }]}
@@ -563,7 +563,7 @@ const EssentialSubmitForm = React.memo(({
                     </View>
 
                     <View style={{ flexDirection: 'row', gap: 12 }}>
-                        <View style={[styles.inputBox, { flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                        <View style={[styles.inputBox, { flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 46 : 50 }]}>
                             <Ionicons name="people-outline" size={18} color={colors.icon} style={{ marginRight: 8 }} />
                             <TextInput
                                 style={[styles.inputText, { color: colors.text }]}
@@ -574,7 +574,7 @@ const EssentialSubmitForm = React.memo(({
                                 keyboardType="number-pad"
                             />
                         </View>
-                        <View style={[styles.inputBox, { flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                        <View style={[styles.inputBox, { flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 46 : 50 }]}>
                             <Ionicons name="school-outline" size={18} color={colors.icon} style={{ marginRight: 8 }} />
                             <TextInput
                                 style={[styles.inputText, { color: colors.text }]}
@@ -599,7 +599,7 @@ const EssentialSubmitForm = React.memo(({
                                 onPress={() => setShowFromPicker(true)}
                                 style={[styles.inputBox, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                    height: Platform.OS === 'android' ? 48 : 52,
+                                    height: Platform.OS === 'android' ? 46 : 50,
                                     justifyContent: 'space-between' }]}
                                 activeOpacity={0.7}
                             >
@@ -618,7 +618,7 @@ const EssentialSubmitForm = React.memo(({
                                 onPress={() => setShowToPicker(true)}
                                 style={[styles.inputBox, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                    height: Platform.OS === 'android' ? 48 : 52,
+                                    height: Platform.OS === 'android' ? 46 : 50,
                                     justifyContent: 'space-between' }]}
                                 activeOpacity={0.7}
                             >
@@ -685,7 +685,7 @@ const EssentialSubmitForm = React.memo(({
                     {form.returnRoute.map((r: any, index: number) => (
                         <View key={index} style={{ marginBottom: 10 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                <View style={[styles.inputBox, { flex: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                <View style={[styles.inputBox, { flex: 2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 46 : 50 }]}>
                                     <Ionicons name="location-outline" size={16} color={colors.icon} style={{ marginRight: 8 }} />
                                     <TextInput
                                         style={[styles.inputText, { color: colors.text }]}
@@ -697,7 +697,7 @@ const EssentialSubmitForm = React.memo(({
                                 </View>
                                 <TouchableOpacity
                                     onPress={() => setReturnRoutePickerIndex(index)}
-                                    style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 48 : 52 }]}
+                                    style={[styles.inputBox, { flex: 1.2, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)', height: Platform.OS === 'android' ? 46 : 50 }]}
                                 >
                                     <Ionicons name="time-outline" size={16} color={colors.icon} style={{ marginRight: 6 }} />
                                     <ThemedText style={{ color: r.time ? colors.text : colors.icon, fontSize: 11.5, fontWeight: '600' }}>
@@ -733,14 +733,14 @@ const EssentialSubmitForm = React.memo(({
                 <CancelButton
                     onPress={onCancel}
                     disabled={isPending || isUploading}
-                    style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 40 }}
+                    style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 38 }}
                 />
                 <SubmitButton
                     title={isEditing ? 'Update' : 'Post Now'}
                     onPress={handleSubmit}
                     isLoading={isPending || isUploading}
                     disabled={isPending || isUploading || (isEditing && !hasChanges)}
-                    style={{ width: 160, height: 40, borderRadius: 30 }}
+                    style={{ width: 160, height: 38, borderRadius: 28 }}
                 />
             </View>
             <LoaderOverlay
@@ -782,7 +782,7 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 11 },
     inputText: {
         flex: 1,

@@ -261,8 +261,8 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        height: 48,
-        borderRadius: Layout.borderRadius,
+        height: 46,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 13 },
     input: {
         flex: 1,
