@@ -197,25 +197,6 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
                         </View>
                         {isOwner && showActions ? <View style={styles.actionsWrapper}><ActionMenu actions={actions} /></View> : null}
                     </View>
-
-                    {/* Metadata details rendering for Vehicles */}
-                    {/* {item.metadata && Object.keys(item.metadata).filter(key => key.toLowerCase() !== 'model' && key.toLowerCase() !== 'year').length > 0 && (
-                        <View style={[styles.metadataContainer, { backgroundColor: colors.background }]}>
-                            {Object.entries(item.metadata)
-                                .filter(([key]) => key.toLowerCase() !== 'model' && key.toLowerCase() !== 'year')
-                                .map(([key, val]) => (
-                                    <View key={key} style={styles.metadataTag}>
-                                        <ThemedText style={[styles.metaTagKey, { color: colors.textSecondary }]}>
-                                            {key.toUpperCase()}:
-                                        </ThemedText>
-                                        <ThemedText style={[styles.metaTagVal, { color: colors.text }]}>
-                                            {String(val)}
-                                        </ThemedText>
-                                    </View>
-                                ))}
-                        </View>
-                    )} */}
-
                 </View>
             </PressableScale>
             </Animated.View>
@@ -265,14 +246,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         overflow: 'hidden',
         flex: 1 },
-    header: {
-        position: 'absolute',
-        top: 8,
-        right: 8,
-        zIndex: 10 },
-    dateText: {
-        fontSize: 10 },
-
     imageContainer: {
         height: 130,
         width: '100%',
@@ -319,24 +292,6 @@ const styles = StyleSheet.create({
     contentBlock: {
         marginTop: 0,
         marginBottom: 0 },
-    categoryRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center' },
-    categoryBadge: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: Layout.borderRadius },
-    categoryText: {
-        fontSize: 10,
-        fontWeight: '600' },
-    statusBadge: {
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: Layout.borderRadius },
-    statusText: {
-        fontSize: 10,
-        fontWeight: '700' },
     priceRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -346,76 +301,11 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 0.15,
         flexShrink: 1 },
-    negotiableBadge: {
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: Layout.borderRadius },
-    negotiableText: {
-        fontSize: 8.5,
-        fontWeight: '800',
-        letterSpacing: 0.4 },
     title: {
         fontSize: 11.5,
         fontWeight: '700',
         marginTop: 0,
         lineHeight: 13.5 },
-    description: {
-        fontSize: 11,
-        marginTop: 3,
-        lineHeight: 16 },
-    locationRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 0 },
-    locationContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1,
-        paddingRight: 8 },
-    locationText: {
-        color: '#9CA3AF',
-        fontSize: 10,
-        marginLeft: 4 },
-    metadataContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        padding: 6,
-        borderRadius: Layout.borderRadius,
-        marginTop: 8,
-        gap: 6 },
-    metadataTag: {
-        flexDirection: 'row',
-        backgroundColor: 'rgba(0,0,0,0.03)',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: Layout.borderRadius,
-        alignItems: 'center' },
-    metaTagKey: {
-        fontSize: 9,
-        fontWeight: '700' },
-    metaTagVal: {
-        fontSize: 10,
-        fontWeight: '600',
-        marginLeft: 2 },
-    actionRow: {
-        flexDirection: 'row',
-        marginTop: 10,
-        gap: 8 },
-    actionButton: {
-        flex: 1,
-        height: 38,
-        borderRadius: Layout.borderRadius,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 4 },
-    chatButton: {
-    },
-    callButton: {},
-    actionButtonText: {
-        fontSize: 12,
-        fontWeight: '600' },
     actionsWrapper: {
         position: 'absolute',
         top: 8,

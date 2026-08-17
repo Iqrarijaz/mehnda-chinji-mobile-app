@@ -272,30 +272,4 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'transparent' },
-    menuPopover: {
-        width: 130,
-        borderRadius: Layout.borderRadius,
-        zIndex: 100,
-        paddingHorizontal: 4,
-        paddingVertical: 4 },
-    menuItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 5,
-        paddingHorizontal: 5,
-        borderRadius: Layout.borderRadius - 4,
-        gap: 8 },
-    menuIconBox: {
-        width: 24,
-        height: 24,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center' },
-    menuItemText: {
-        fontSize: 10.5,
-        fontWeight: '600' },
-    menuSeparator: {
-        height: 1,
-        width: '100%',
-        marginVertical: 4 } });
+        backgroundColor: 'transparent' } });

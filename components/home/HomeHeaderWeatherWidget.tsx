@@ -185,19 +185,10 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
         };
     }, [forecast]);
 
-    const [activePage, setActivePage] = useState(0);
-
-    // Auto carousel of 10 seconds: auto-shifts between Today (0) and Tomorrow (1)
-    useEffect(() => {
-        if (!tomorrow) return;
-        const timer = setInterval(() => {
-            setActivePage((prev) => (prev === 0 ? 1 : 0));
-        }, 10000);
-        return () => clearInterval(timer);
-    }, [tomorrow]);
+    const [activePage] = useState(0);
 
     if (!weather || isWeatherLoading) {
-        return <Skeleton backgroundColor={colors.primary} />;
+        return <WeatherSkeleton backgroundColor={colors.primary} />;
     }
 
     const temp = weather ? Math.round(weather.main.temp) : '--';
@@ -205,13 +196,13 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
     const city = (weather?.name || fallbackCity || '').split(',')[0].trim();
 
     return (
-        <Animated.View entering={FadeInDown.duration(450)} style={styles.wrapper}>
+        <View style={styles.wrapper}>
             <TouchableOpacity
                 activeOpacity={0.85}
                 onPress={onPress}
                 style={[styles.card, { backgroundColor: colors.primary, minHeight: 88 }]}
             >
-                <Animated.View key={activePage} entering={FadeIn.duration(500)}>
+                <View key={activePage}>
                     {activePage === 0 || !tomorrow ? (
                         <WeatherRow
                             icon={icon}
@@ -236,9 +227,9 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                             colors={colors}
                         />
                     )}
-                </Animated.View>
+                </View>
             </TouchableOpacity>
-        </Animated.View>
+        </View>
     );
 });
 
