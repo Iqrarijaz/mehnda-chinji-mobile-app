@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useMemo } from 'react';
 import { Platform, StyleSheet, TextInput, TouchableOpacity, View, ActivityIndicator, ScrollView } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { TimePicker } from '@/components/common/TimePicker';
 import { EssentialsTypePills } from '@/components/common/EssentialsTypePills';
@@ -319,7 +318,7 @@ const EssentialSubmitForm = React.memo(({
 
     return (
         <View style={styles.container}>
-            <Animated.View entering={FadeInDown.delay(200)} style={styles.field}>
+            <View style={styles.field}>
                 <View style={styles.labelRow}>
                     <ThemedText style={styles.label}>NAME <ThemedText style={{ color: '#EF4444' }}>*</ThemedText></ThemedText>
                     <ThemedText style={[styles.charCount, form.name.length >= 100 && { color: '#EF4444' }]}>

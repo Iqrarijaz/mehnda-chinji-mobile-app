@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import FAQItem from './FAQItem';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -25,19 +25,16 @@ const FAQAccordion: React.FC<FAQAccordionProps> = ({ data }) => {
 
     return (
         <View style={styles.container}>
-            <Text allowFontScaling={false} style={[styles.title, { color: colors.textSecondary }]}>Frequently Asked Questions</Text>
+            <ThemedText allowFontScaling={false} style={[styles.title, { color: colors.textSecondary }]}>Frequently Asked Questions</ThemedText>
             {data.map((item, index) => (
-                <Animated.View
-                    key={index}
-                    entering={FadeInUp.delay(index * 100).duration(500)}
-                >
+                <View key={index}>
                     <FAQItem
                         question={item.question}
                         answer={item.answer}
                         isOpen={openIndex === index}
                         onToggle={() => handleToggle(index)}
                     />
-                </Animated.View>
+                </View>
             ))}
         </View>
     );

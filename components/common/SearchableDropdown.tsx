@@ -95,6 +95,7 @@ export const SearchableDropdown = React.memo(function SearchableDropdown({
                     <View style={{ flex: 1, width: '100%' }}>
                         <FlashList
                             data={filteredOptions}
+                            estimatedItemSize={44}
                             keyExtractor={(item) => item.value}
                             renderItem={({ item }) => {
                                 const isSelected = currentValue === item.value;

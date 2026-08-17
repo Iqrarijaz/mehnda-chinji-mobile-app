@@ -5,10 +5,6 @@ import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring } from 'react-native-reanimated';
 import { AnimatedToggle } from './AnimatedToggle';
 
 

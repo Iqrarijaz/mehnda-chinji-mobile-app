@@ -11,7 +11,6 @@ import {
     TextInput } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import * as yup from 'yup';
 
 import * as ImagePicker from 'expo-image-picker';
@@ -414,7 +413,6 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                 <View style={styles.formSection}>
                     {/* Title */}
                     <FormInput
-                        delay={200}
                         label="TITLE"
                         required
                         icon="pricetag-outline"
@@ -426,7 +424,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                     />
 
                     {/* Price */}
-                    <Animated.View entering={FadeInDown.delay(250)} style={styles.inputField}>
+                    <View style={styles.inputField}>
                         <FormInput
                             label="PRICE (RS.)"
                             required
@@ -437,11 +435,11 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             onChangeText={handlePriceChange}
                             maxLength={8}
                         />
-                    </Animated.View>
+                    </View>
 
 
                     {/* Address Map Picker */}
-                    <Animated.View entering={FadeInDown.delay(260)} style={styles.inputField}>
+                    <View style={styles.inputField}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                                 <ThemedText style={[styles.label, { color: colors.text }]}>ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
@@ -488,10 +486,10 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                                 {errors.address}
                             </ThemedText>
                         ) : null}
-                    </Animated.View>
+                    </View>
 
                     {/* City & Village */}
-                    <Animated.View entering={FadeInDown.delay(265)} style={styles.row}>
+                    <View style={styles.row}>
                         <FormInput
                             containerStyle={{ flex: 1 }}
                             label="CITY"
@@ -514,10 +512,10 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             maxLength={30}
                             autoCapitalize="words"
                         />
-                    </Animated.View>
+                    </View>
 
                     {/* Phone Number */}
-                    <Animated.View entering={FadeInDown.delay(280)} style={styles.inputField}>
+                    <View style={styles.inputField}>
                         <FormInput
                             label="MOBILE NUMBER"
                             required
@@ -528,10 +526,10 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             onChangeText={handlePhoneChange}
                             maxLength={11}
                         />
-                    </Animated.View>
+                    </View>
 
                     {/* Category Dropdown Picker Trigger */}
-                    <Animated.View entering={FadeInDown.delay(300)} style={styles.inputField}>
+                    <View style={styles.inputField}>
                         <ThemedText style={[styles.label, { color: colors.text }]}>
                             CATEGORY & TYPE <ThemedText style={styles.required}>*</ThemedText>
                         </ThemedText>
@@ -547,11 +545,11 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             </View>
                             <Ionicons name="chevron-down" size={16} color={colors.icon} />
                         </TouchableOpacity>
-                    </Animated.View>
+                    </View>
 
                     {/* Vehicle details section (Shown conditionally) */}
                     {isVehicle && (
-                        <Animated.View entering={FadeInDown.delay(350)} style={styles.vehicleSection}>
+                        <View style={styles.vehicleSection}>
                             <ThemedText style={[styles.sectionTitle, { color: colors.primary }]}>Vehicle Specifications</ThemedText>
                             <View style={styles.row}>
                                 <FormInput
@@ -570,11 +568,11 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                                     onChangeText={handleYearChange}
                                 />
                             </View>
-                        </Animated.View>
+                        </View>
                     )}
 
                     {/* Switches */}
-                    <Animated.View entering={FadeInDown.delay(450)} style={styles.switchGroup}>
+                    <View style={styles.switchGroup}>
                         <View style={styles.switchRow}>
                             <View style={styles.switchLabelContainer}>
                                 <ThemedText style={[styles.switchLabel, { color: colors.text }]}>Negotiable Price</ThemedText>
@@ -590,11 +588,10 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             </View>
                             <Switch value={formData.showPhoneNumber} onValueChange={(val) => updateForm('showPhoneNumber', val)} trackColor={{ true: colors.primary }} />
                         </View> */}
-                    </Animated.View>
+                    </View>
 
                     {/* Description */}
                     <FormInput
-                        delay={500}
                         label="DESCRIPTION"
                         required
                         multiline
@@ -604,7 +601,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                     />
 
                     {/* Pick Images */}
-                    <Animated.View entering={FadeInDown.delay(550)} style={styles.inputField}>
+                    <View style={styles.inputField}>
                         <ThemedText style={[styles.label, { color: colors.text }]}>
                             Images (Max 5) <ThemedText style={styles.required}>*</ThemedText>
                         </ThemedText>
@@ -627,10 +624,10 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                         {errors.images ? (
                             <ThemedText style={styles.errorText}>{errors.images}</ThemedText>
                         ) : null}
-                    </Animated.View>
+                    </View>
 
                     {/* Footer Buttons inline */}
-                    <Animated.View entering={FadeInUp.delay(600).springify()} style={styles.buttonsRow}>
+                    <View style={styles.buttonsRow}>
                         <CancelButton
                             onPress={onClose}
                             disabled={mutation.isPending || isUploadingImages}
@@ -642,7 +639,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             isLoading={mutation.isPending || isUploadingImages}
                             style={{ width: 160, height: 40, borderRadius: 30 }}
                         />
-                    </Animated.View>
+                    </View>
 
                 </View>
             </ScrollView>

@@ -1,14 +1,9 @@
 import React from 'react';
-import { ActivityIndicator, TouchableOpacityProps, StyleSheet, Platform } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, TouchableOpacityProps, View, StyleSheet, Platform } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming } from 'react-native-reanimated';
-import { PressableScale } from '@/components/essentials/shared/PressableScale';
 import { Ionicons } from '@expo/vector-icons';
 
 interface SubmitButtonProps extends TouchableOpacityProps {
@@ -22,26 +17,15 @@ export const SubmitButton = React.memo(function SubmitButton({ title, isLoading,
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    // Gentle cross-fade whenever the label/spinner content swaps, instead of
-    // an instant cut, without changing the row's normal (non-absolute) layout flow.
-    const contentOpacity = useSharedValue(1);
-
-    React.useEffect(() => {
-        contentOpacity.value = 0.35;
-        contentOpacity.value = withTiming(1, { duration: 180 });
-    }, [isLoading]);
-
-    const contentStyle = useAnimatedStyle(() => ({ opacity: contentOpacity.value }));
-
     return (
-        <PressableScale
-            intensity={0.04}
+        <TouchableOpacity
+            activeOpacity={0.7}
             disabled={isDisabled}
-            onPress={onPress as (() => void) | undefined}
+            onPress={onPress}
             style={[styles.updateButton, { backgroundColor: colors.lime }, isDisabled && { opacity: 0.6 }, style]}
-            {...(rest as any)}
+            {...rest}
         >
-            <Animated.View style={[styles.buttonContent, contentStyle]}>
+            <View style={[styles.buttonContent, { opacity: isLoading ? 0.6 : 1 }]}>
                 {isLoading && (
                     <ActivityIndicator color="#FFFFFF" size="small" style={{ marginRight: 8 }} />
                 )}
@@ -51,8 +35,8 @@ export const SubmitButton = React.memo(function SubmitButton({ title, isLoading,
                 <ThemedText style={styles.updateButtonText}>
                     {isLoading ? 'Processing...' : title}
                 </ThemedText>
-            </Animated.View>
-        </PressableScale>
+            </View>
+        </TouchableOpacity>
     );
 });
 

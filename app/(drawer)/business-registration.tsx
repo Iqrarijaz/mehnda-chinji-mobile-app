@@ -511,11 +511,10 @@ const BusinessRegistrationScreen = () => {
                                     {errors.address}
                                 </ThemedText>
                             ) : null}
-                        </Animated.View>
+                        </View>
 
                         {/* Phone */}
                         <FormInput
-                            delay={350}
                             label="PRIMARY PHONE"
                             required
                             icon="call-outline"
@@ -532,7 +531,7 @@ const BusinessRegistrationScreen = () => {
                         />
 
                         {/* Timings */}
-                        <Animated.View entering={FadeInDown.delay(400)} style={styles.inputField}>
+                        <View style={styles.inputField}>
                             <ThemedText style={[styles.label, { color: colors.text }]}>BUSINESS TIMINGS</ThemedText>
                             <View style={{ flexDirection: 'row', gap: 12 }}>
                                 {/* Open */}
@@ -574,11 +573,11 @@ const BusinessRegistrationScreen = () => {
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        </Animated.View>
+                        </View>
 
 {/* Tags */}
                         {availableTags && availableTags.length > 0 && (
-                            <Animated.View entering={FadeInDown.delay(450)} style={styles.inputField}>
+                            <View style={styles.inputField}>
                                 <ThemedText style={[styles.label, { color: colors.text }]}>SELECT SERVICES / TAGS</ThemedText>
                                 <View style={styles.tagsContainer}>
                                     {availableTags.map((tag: any) => {
@@ -619,10 +618,10 @@ const BusinessRegistrationScreen = () => {
                                         );
                                     })}
                                 </View>
-                            </Animated.View>
+                            </View>
                         )}
 
-                        <Animated.View entering={FadeInUp.delay(500).springify()} style={styles.buttonsRow}>
+                        <View style={styles.buttonsRow}>
                             <CancelButton
                                 onPress={() => handleGoBack()}
                                 disabled={isPending || isUploadingImage}
@@ -634,7 +633,7 @@ const BusinessRegistrationScreen = () => {
                                 isLoading={isPending || isUploadingImage}
                                 style={{ width: 160, height: 40, borderRadius: 30 }}
                             />
-                        </Animated.View>
+                        </View>
 
                     </View>
                 </ScrollView>

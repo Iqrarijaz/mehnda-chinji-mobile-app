@@ -42,39 +42,26 @@ export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
-    const AnimatedView = delay > 0 ? Animated.View : View;
-    const animatedProps = delay > 0 ? { entering: FadeInDown.delay(delay) } : {};
-
     const valueLength = currentLength ?? (typeof rest.value === 'string' ? rest.value.length : 0);
     const isOverLimit = !!maxLength && valueLength > maxLength;
 
-    // Focus/blur border animation. Interpolates from whatever border color the
-    // box already has at rest (usually none) up to the brand primary color, so
-    // there's no visual change unless a field is actually focused.
-    const focusProgress = useSharedValue(0);
+    // Focus/blur border color. Switches from whatever border color the box
+    // already has at rest (usually none) to the brand primary color when a
+    // field is actually focused.
+    const [isFocused, setIsFocused] = React.useState(false);
+    const restBorder = isDark ? 'rgba(255,255,255,0.06)' : colors.border;
 
     const handleFocus = (e: any) => {
-        focusProgress.value = withTiming(1, { duration: 180 });
+        setIsFocused(true);
         onFocus?.(e);
     };
     const handleBlur = (e: any) => {
-        focusProgress.value = withTiming(0, { duration: 180 });
+        setIsFocused(false);
         onBlur?.(e);
     };
 
-    const animatedBoxStyle = useAnimatedStyle(() => {
-        const restBorder = isDark ? 'rgba(255,255,255,0.06)' : colors.border;
-        return {
-            borderColor: interpolateColor(
-                focusProgress.value,
-                [0, 1],
-                [restBorder, colors.primary]
-            ),
-        };
-    });
-
     return (
-        <AnimatedView {...animatedProps} style={[styles.inputField, containerStyle]}>
+        <View style={[styles.inputField, containerStyle]}>
             {label && (
                 <View style={styles.labelContainer}>
                     <ThemedText style={[styles.label, { color: colors.text }, labelStyle]}>
@@ -87,7 +74,7 @@ export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(
                     ) : null}
                 </View>
             )}
-            <Animated.View
+            <View
                 style={[
                     styles.inputBox,
                     {
@@ -95,8 +82,8 @@ export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(
                         height: multiline ? (Platform.OS === 'android' ? 90 : 100) : (Platform.OS === 'android' ? 48 : 52),
                         alignItems: multiline ? 'flex-start' : 'center',
                         paddingTop: multiline ? 12 : 0,
+                        borderColor: isFocused ? colors.primary : restBorder,
                     },
-                    animatedBoxStyle,
                     error ? { borderColor: colors.danger } : null,
                     inputBoxStyle,
                 ]}
@@ -129,13 +116,13 @@ export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(
                     {...rest}
                 />
                 {rightAccessory}
-            </Animated.View>
+            </View>
             {error ? (
                 <ThemedText style={styles.errorText}>
                     {error}
                 </ThemedText>
             ) : null}
-        </AnimatedView>
+        </View>
     );
 }));
 

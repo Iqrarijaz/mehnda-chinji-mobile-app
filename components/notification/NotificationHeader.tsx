@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
@@ -69,11 +68,11 @@ const NotificationHeader = React.memo(({
             }
         >
             {/* Subtitle */}
-            <Animated.View entering={FadeIn.delay(400).duration(500)} style={styles.headerSubtitleWrap}>
+            <View style={styles.headerSubtitleWrap}>
                 <ThemedText style={styles.headerSubtitle}>
                     {unreadCount > 0 ? `${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}` : 'Stay updated with recent activity'}
                 </ThemedText>
-            </Animated.View>
+            </View>
         </ScreenHeader>
     );
 });
