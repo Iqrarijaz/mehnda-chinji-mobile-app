@@ -41,21 +41,6 @@ const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius,
         overflow: 'hidden' },
-    blob: {
-        position: 'absolute',
-        borderRadius: Layout.borderRadius,
-        opacity: 0.1 },
-    blob1: {
-        top: -30,
-        left: -30,
-        width: 100,
-        height: 100 },
-    blob2: {
-        bottom: -20,
-        right: '10%',
-        width: 80,
-        height: 80,
-        opacity: 0.05 },
     content: {
         zIndex: 1 }
 });

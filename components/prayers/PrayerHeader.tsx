@@ -137,10 +137,6 @@ export const PrayerHeader = React.memo(({
 const styles = StyleSheet.create({
     headerContainer: { width: '100%', position: 'relative' },
     headerImage: { width: '100%' },
-    gradTop: {
-        position: 'absolute', top: 0, left: 0, right: 0, height: '55%' },
-    gradBottom: {
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%' },
     backButton: {
         position: 'absolute', left: 16,
         width: 36, height: 36, borderRadius: Layout.borderRadius,

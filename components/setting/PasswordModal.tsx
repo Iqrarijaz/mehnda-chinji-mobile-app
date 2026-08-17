@@ -1,16 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
-    Easing,
     FadeIn,
     SlideInLeft,
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
     withTiming } from 'react-native-reanimated';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
-    Platform,
     ScrollView,
     StyleSheet,
     TextInput,
@@ -281,18 +278,6 @@ const styles = StyleSheet.create({
 
     // Buttons
     actions: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 12 },
-    primaryBtn: {
-        backgroundColor: '#006666',
-        height: 40,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 16 },
-    primaryBtnDisabled: { opacity: 0.45 },
-    primaryBtnText: {
-        color: '#FFFFFF',
-        fontSize: 12.5,
-        fontWeight: '600' },
     cancelBtn: {
         flex: 1,
         height: 40,

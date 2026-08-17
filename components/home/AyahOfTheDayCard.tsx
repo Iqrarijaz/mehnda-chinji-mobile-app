@@ -37,9 +37,9 @@ export function AyahOfTheDayCard() {
     if (isLoading || !ayah) {
         return (
             <View style={[styles.wrap, { backgroundColor: colors.cardBg }]}>
-                <Skeleton width="40%" height={12} borderRadius={4} style={{ marginBottom: 16 }} />
-                <Skeleton width="90%" height={22} borderRadius={4} style={{ marginBottom: 10, alignSelf: 'flex-end' }} />
-                <Skeleton width="70%" height={22} borderRadius={4} style={{ marginBottom: 16, alignSelf: 'flex-end' }} />
+                <Skeleton width="40%" height={12} borderRadius={4} style={styles.skeletonBadge} />
+                <Skeleton width="90%" height={22} borderRadius={4} style={styles.skeletonLineWide} />
+                <Skeleton width="70%" height={22} borderRadius={4} style={styles.skeletonLineNarrow} />
                 <Skeleton width="60%" height={14} borderRadius={4} />
             </View>
         );
@@ -77,6 +77,17 @@ export function AyahOfTheDayCard() {
 }
 
 const styles = StyleSheet.create({
+    skeletonBadge: {
+        marginBottom: 16,
+    },
+    skeletonLineWide: {
+        marginBottom: 10,
+        alignSelf: 'flex-end',
+    },
+    skeletonLineNarrow: {
+        marginBottom: 16,
+        alignSelf: 'flex-end',
+    },
     wrap: {
         marginHorizontal: 14,
         marginTop: 8,

@@ -1,7 +1,6 @@
 import React, { memo, useCallback } from 'react';
 import { View, StyleSheet, ActivityIndicator, TouchableOpacity, Share, Platform, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/ThemedText';
 import { Layout } from '@/constants/layout';
 import type { Hadith } from '@/apis/hadith';
@@ -45,13 +44,12 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
     };
 
     if (!hadith && !isLoading && !error) return null;
-    const cardBg = isDark ? [C.card, C.card] : ['#FFFFFF', '#F9FBF9'];
+    const cardBg = isDark ? C.card : '#FFFFFF';
 
     return (
         <View style={styles.outerContainer}>
-            <LinearGradient
-                colors={cardBg as any}
-                style={styles.hadithCard}
+            <View
+                style={[styles.hadithCard, { backgroundColor: cardBg }]}
             >
                 {/* Decorative Motif */}
                 <Ionicons
@@ -115,7 +113,7 @@ const HadithCard = memo(({ hadith, isLoading, error, colors: C, isDark }: Hadith
                         </View>
                     ) : null}
                 </View>
-            </LinearGradient>
+            </View>
         </View>
     );
 });

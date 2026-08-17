@@ -113,16 +113,6 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
 };
 
 const styles = StyleSheet.create({
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'flex-end' },
-    modalContent: {
-        borderTopLeftRadius: 28,
-        borderTopRightRadius: 28,
-        padding: 20,
-        paddingBottom: 36 },
-
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',

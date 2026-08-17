@@ -3,8 +3,7 @@ import {
     View,
     StyleSheet,
     Modal,
-    TouchableOpacity,
-    Platform } from 'react-native';
+    TouchableOpacity } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { ThemedText } from '../ThemedText';
 import { Colors } from '@/constants/colors';
@@ -45,7 +44,7 @@ const RatingModalComponent: React.FC<RatingModalProps> = ({ visible, onClose }) 
                         <LottieView
                             source={require('@/public/json/rating.json')}
                             autoPlay
-                            loop
+                            loop={false}
                             style={styles.lottie}
                         />
                     </View>
@@ -93,15 +92,7 @@ const styles = StyleSheet.create({
         width: '100%',
         borderRadius: Layout.borderRadius,
         padding: 20,
-        alignItems: 'center',
-
-
-
-
-        ...Platform.select({
-            android: {
-
-            } }) },
+        alignItems: 'center' },
     lottieContainer: {
         width: 220,
         height: 180,
