@@ -103,12 +103,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         marginHorizontal: 4,
         marginBottom: 10,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 2
+        overflow: 'hidden'
     },
     imageContainer: {
         height: 100,
