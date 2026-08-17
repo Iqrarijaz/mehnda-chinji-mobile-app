@@ -215,14 +215,14 @@ export default function ScheduleMatchScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    scrollContent: { padding: 16, gap: 12, paddingBottom: 40 },
-    section: { gap: 6 },
-    label: { fontSize: 10.5, fontWeight: '700', letterSpacing: 0.5 },
-    pillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-    pill: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: Layout.borderRadius - 6 },
-    pillText: { fontSize: 11, fontWeight: '700' },
-    teamsList: { gap: 6 },
-    teamItem: { padding: 10, borderRadius: Layout.borderRadius - 6, borderWidth: 1 },
-    teamItemText: { fontSize: 12.5, fontWeight: '700' },
+    scrollContent: { padding: 14, gap: 10, paddingBottom: 40 },
+    section: { gap: 4 },
+    label: { fontSize: 10, fontWeight: '600', letterSpacing: 0.3 },
+    pillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
+    pill: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: Layout.borderRadius - 6 },
+    pillText: { fontSize: 10.5, fontWeight: '600' },
+    teamsList: { gap: 5 },
+    teamItem: { padding: 9, borderRadius: Layout.borderRadius - 6 },
+    teamItemText: { fontSize: 12, fontWeight: '600' },
     rowTwo: { flexDirection: 'row', gap: 10 }
 });

@@ -1,11 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, TouchableOpacity, Platform } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl, TouchableOpacity, Platform, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
-import { ScreenHeader } from '@/components/common/ScreenHeader';
-import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { TournamentCard } from '@/components/cricket/TournamentCard';
@@ -14,7 +12,6 @@ import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useCricketAPI } from '@/hooks/useCricketAPI';
-import citiesDataFallback from '@/data/cities.json';
 import { Tournament } from '@/types/cricket';
 
 export default function CricketFeedScreen() {
@@ -26,17 +23,22 @@ export default function CricketFeedScreen() {
     // Check if user has administrative rights for cricket
     const isCricketAdmin = !!user?.user?.isCricketAdmin;
 
-    const [selectedCity, setSelectedCity] = useState('');
-    const [cityPickerVisible, setCityPickerVisible] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const [searchQuery, setSearchQuery] = useState('');
 
     const { useTournamentsFeedQuery } = useCricketAPI();
-    const { data, isLoading, isError, refetch, isRefetching } = useTournamentsFeedQuery({
-        city: selectedCity || undefined,
-        status: (selectedStatus as any) || undefined
-    });
+    const { data, isLoading, isError, refetch, isRefetching } = useTournamentsFeedQuery({});
 
-    const tournamentsList: Tournament[] = data?.data || [];
+    let tournamentsList: Tournament[] = data?.data || [];
+
+    // Filter tournaments based on search query
+    if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        tournamentsList = tournamentsList.filter(t =>
+            t.name.toLowerCase().includes(query) ||
+            t.city.toLowerCase().includes(query) ||
+            t.venue.toLowerCase().includes(query)
+        );
+    }
 
     const handleSelectTournament = useCallback((id: string) => {
         router.push(`/cricket/${id}` as any);
@@ -54,45 +56,29 @@ export default function CricketFeedScreen() {
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <ScreenHeader hero={{ title: "Cricket Tournaments" }} showMenuIcon={!router.canGoBack()} />
+                {/* Redesigned Header with Integrated Search */}
+                <View style={[styles.header, { backgroundColor: colors.surface }]}>
+                    <View style={styles.headerContent}>
+                        <ThemedText style={[styles.headerTitle, { color: colors.text }]}>Tournaments</ThemedText>
+                        <Ionicons name="trophy-outline" size={20} color={colors.primary} />
+                    </View>
 
-                {/* Filter Bar */}
-                <View style={[styles.filterBar, { backgroundColor: colors.surface }]}>
-                    <TouchableOpacity
-                        style={[styles.cityChip, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
-                        onPress={() => setCityPickerVisible(true)}
-                    >
-                        <Ionicons name="location-outline" size={14} color={colors.primary} />
-                        <ThemedText style={[styles.filterText, { color: colors.text }]} numberOfLines={1}>
-                            {selectedCity || 'All Cities'}
-                        </ThemedText>
-                        <Ionicons name="chevron-down" size={14} color={colors.icon} />
-                    </TouchableOpacity>
-
-                    {/* Status Pill Filters */}
-                    <View style={styles.statusPills}>
-                        {['', 'LIVE', 'UPCOMING', 'COMPLETED'].map((st) => {
-                            const isSelected = selectedStatus === st;
-                            return (
-                                <TouchableOpacity
-                                    key={st}
-                                    style={[
-                                        styles.statusPill,
-                                        { backgroundColor: isSelected ? colors.primary : colors.cardBg }
-                                    ]}
-                                    onPress={() => setSelectedStatus(st)}
-                                >
-                                    <ThemedText
-                                        style={[
-                                            styles.pillText,
-                                            { color: isSelected ? '#FFFFFF' : colors.textSecondary }
-                                        ]}
-                                    >
-                                        {st || 'All'}
-                                    </ThemedText>
-                                </TouchableOpacity>
-                            );
-                        })}
+                    {/* Search Bar */}
+                    <View style={[styles.searchContainer, { backgroundColor: colors.cardBg }]}>
+                        <Ionicons name="search" size={18} color={colors.primary} />
+                        <TextInput
+                            style={[styles.searchInput, { color: colors.text }]}
+                            placeholder="Search by name, city, venue..."
+                            placeholderTextColor={colors.textSecondary}
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                            clearButtonMode="while-editing"
+                        />
+                        {searchQuery ? (
+                            <TouchableOpacity onPress={() => setSearchQuery('')}>
+                                <Ionicons name="close-circle" size={18} color={colors.icon} />
+                            </TouchableOpacity>
+                        ) : null}
                     </View>
                 </View>
 
@@ -162,40 +148,38 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    filterBar: {
+    header: {
         paddingHorizontal: 14,
-        paddingVertical: 10,
-        gap: 8
+        paddingTop: 12,
+        paddingBottom: 12,
+        gap: 10
     },
-    cityChip: {
+    headerContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        letterSpacing: -0.3
+    },
+    searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        height: 40,
         paddingHorizontal: 12,
-        paddingVertical: 7,
-        borderRadius: Layout.borderRadius - 4,
-        borderWidth: 1,
-        gap: 6
+        borderRadius: Layout.borderRadius - 2,
+        gap: 8
     },
-    filterText: {
-        fontSize: 12,
-        fontWeight: '600',
-        flex: 1
-    },
-    statusPills: {
-        flexDirection: 'row',
-        gap: 6
-    },
-    statusPill: {
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 6
-    },
-    pillText: {
-        fontSize: 11,
-        fontWeight: '700'
+    searchInput: {
+        flex: 1,
+        fontSize: 13,
+        padding: 0,
+        height: '100%'
     },
     listContent: {
-        padding: 14,
+        padding: 10,
         paddingBottom: 90
     },
     emptyContainer: {
