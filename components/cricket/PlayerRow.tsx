@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
     rowContainer: {
         padding: 10,
         borderRadius: Layout.borderRadius - 4,
-        borderWidth: 1,
         marginBottom: 10,
         gap: 8
     },

@@ -305,18 +305,18 @@ export default function CreateTournamentScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    scrollContent: { padding: 16, gap: 12, paddingBottom: 40 },
-    bannerPicker: { height: 130, borderRadius: Layout.borderRadius, borderWidth: 0, overflow: 'hidden', marginBottom: 6 },
+    scrollContent: { padding: 14, gap: 10, paddingBottom: 40 },
+    bannerPicker: { height: 120, borderRadius: Layout.borderRadius, borderWidth: 0, overflow: 'hidden', marginBottom: 4 },
     bannerImage: { width: '100%', height: '100%' },
     bannerPlaceholder: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 6 },
     bannerText: { fontSize: 12, fontWeight: '600' },
     inputRow: { marginBottom: 6 },
     rowTwo: { flexDirection: 'row', gap: 10 },
-    sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
-    sectionTitle: { fontSize: 14, fontWeight: '800' },
-    dynamicCard: { padding: 10, borderRadius: Layout.borderRadius - 4, borderWidth: 0, gap: 8, marginBottom: 8 },
+    sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+    sectionTitle: { fontSize: 13, fontWeight: '700' },
+    dynamicCard: { padding: 10, borderRadius: Layout.borderRadius - 4, borderWidth: 0, gap: 8, marginBottom: 6 },
     dynamicRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 48 : 52, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 8 },
+    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 48 : 52, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 6, marginTop: 2 },
     addBtnText: { fontSize: 12, fontWeight: '700' },
-    actionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 16 }
+    actionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 12 }
 });

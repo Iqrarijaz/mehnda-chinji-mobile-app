@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     scrollContent: { padding: 14, paddingBottom: 80, gap: 10 },
     overSection: { gap: 8, marginTop: 4 },
     sectionTitle: { fontSize: 14, fontWeight: '800' },
-    overRow: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: Layout.borderRadius - 4, borderWidth: 1, gap: 10 },
+    overRow: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: Layout.borderRadius - 4, gap: 10 },
     overBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
     overBadgeText: { color: '#FFF', fontSize: 11, fontWeight: '800' },
     bowlerText: { fontSize: 13, fontWeight: '700' },

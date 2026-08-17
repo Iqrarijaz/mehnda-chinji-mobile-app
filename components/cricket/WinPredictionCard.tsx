@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
     card: {
         padding: 12,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         marginBottom: 14,
         gap: 10
     },
@@ -153,7 +152,6 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 10,
         borderRadius: Layout.borderRadius - 4,
-        borderWidth: 1,
         gap: 4
     },
     btnText: {

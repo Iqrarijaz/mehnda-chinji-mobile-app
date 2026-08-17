@@ -51,14 +51,20 @@ export default function AddTeamScreen() {
     // Team State
     const [teamName, setTeamName] = useState('');
     const [shortName, setShortName] = useState('');
-    const [captainName, setCaptainName] = useState('');
-    const [captainPhone, setCaptainPhone] = useState('');
 
     // Roster State (Default 2 empty players)
     const [players, setPlayers] = useState<Player[]>([
         { name: '', role: 'BATSMAN', isCaptain: true },
         { name: '', role: 'BOWLER', isCaptain: false }
     ]);
+
+    // Handle captain selection - only one captain allowed
+    const handleSetCaptain = useCallback((index: number) => {
+        setPlayers(prev => prev.map((p, i) => ({
+            ...p,
+            isCaptain: i === index
+        })));
+    }, []);
 
     const handleAddPlayer = () => {
         setPlayers(prev => [...prev, { name: '', role: 'ALL_ROUNDER', isCaptain: false }]);
@@ -122,8 +128,6 @@ export default function AddTeamScreen() {
         const payload = {
             name: teamName.trim(),
             shortName: shortName.trim().toUpperCase(),
-            captainName: captainName.trim() || undefined,
-            captainPhone: captainPhone.trim() || undefined,
             players: validPlayers
         };
 
@@ -150,15 +154,6 @@ export default function AddTeamScreen() {
                         <FormInput label="TEAM NAME" required icon="shield-outline" placeholder="e.g. Lahore Lions" value={teamName} onChangeText={setTeamName} />
                         <FormInput label="SHORT CODE (MAX 5 CHARS)" required icon="text-outline" placeholder="e.g. LHR" maxLength={5} value={shortName} onChangeText={setShortName} />
 
-                        <View style={styles.rowTwo}>
-                            <View style={{ flex: 1 }}>
-                                <FormInput label="CAPTAIN NAME" icon="person-outline" placeholder="Captain name" value={captainName} onChangeText={setCaptainName} />
-                            </View>
-                            <View style={{ flex: 1 }}>
-                                <FormInput label="CAPTAIN PHONE" icon="call-outline" keyboardType="phone-pad" placeholder="Phone" value={captainPhone} onChangeText={setCaptainPhone} />
-                            </View>
-                        </View>
-
                         {/* Player Roster Section */}
                         <View style={styles.sectionHeader}>
                             <Ionicons name="people-outline" size={18} color={colors.primary} />
@@ -170,7 +165,13 @@ export default function AddTeamScreen() {
                                 key={idx}
                                 index={idx}
                                 player={p}
-                                onUpdate={handleUpdatePlayer}
+                                onUpdate={(index, updated) => {
+                                    handleUpdatePlayer(index, updated);
+                                    // If captain checkbox is toggled, ensure only one captain
+                                    if (updated.isCaptain && !p.isCaptain) {
+                                        handleSetCaptain(index);
+                                    }
+                                }}
                                 onRemove={handleRemovePlayer}
                                 onPickImage={handlePickPlayerImage}
                             />
@@ -194,10 +195,10 @@ export default function AddTeamScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    scrollContent: { padding: 16, gap: 10, paddingBottom: 40 },
+    scrollContent: { padding: 14, gap: 8, paddingBottom: 40 },
     rowTwo: { flexDirection: 'row', gap: 10 },
-    sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
-    sectionTitle: { fontSize: 14, fontWeight: '800' },
-    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 48 : 52, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 10 },
-    addBtnText: { fontSize: 12.5, fontWeight: '700' }
+    sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+    sectionTitle: { fontSize: 13, fontWeight: '700' },
+    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 48 : 52, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 8, marginTop: 2 },
+    addBtnText: { fontSize: 12, fontWeight: '700' }
 });

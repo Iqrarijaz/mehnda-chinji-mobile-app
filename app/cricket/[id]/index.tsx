@@ -19,6 +19,7 @@ import { PrizePoolCard } from '@/components/cricket/PrizePoolCard';
 import { OrganizerCard } from '@/components/cricket/OrganizerCard';
 import { GuestCard } from '@/components/cricket/GuestCard';
 import { PointsTableCard } from '@/components/cricket/PointsTableCard';
+import { StatusBadge } from '@/components/cricket/StatusBadge';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -57,12 +58,8 @@ export default function TournamentHubScreen() {
             activeOpacity={0.8}
         >
             <View style={styles.matchHeader}>
-                <ThemedText style={[styles.stageText, { color: colors.primary }]}>{item.matchTitle}</ThemedText>
-                <View style={[styles.statusBadge, { backgroundColor: item.status === 'LIVE' ? colors.danger : colors.surface }]}>
-                    <ThemedText style={[styles.statusText, { color: item.status === 'LIVE' ? '#FFF' : colors.textSecondary }]}>
-                        {item.status}
-                    </ThemedText>
-                </View>
+                <ThemedText style={[styles.stageText, { color: colors.primary }]} numberOfLines={1}>{item.matchTitle}</ThemedText>
+                <StatusBadge status={item.status} />
             </View>
 
             <View style={styles.teamsRow}>
@@ -256,35 +253,33 @@ export default function TournamentHubScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1 },
     centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    tabBar: { flexDirection: 'row', padding: 6, gap: 4 },
-    tabItem: { flex: 1, paddingVertical: 8, borderRadius: Layout.borderRadius - 6, alignItems: 'center' },
-    tabText: { fontSize: 10.5, fontWeight: '800' },
-    scrollContent: { padding: 14, paddingBottom: 40 },
-    tabContent: { gap: 14 },
-    heroBanner: { height: 140, borderRadius: Layout.borderRadius, overflow: 'hidden', position: 'relative', marginBottom: 6 },
+    tabBar: { flexDirection: 'row', padding: 4, gap: 3 },
+    tabItem: { flex: 1, paddingVertical: 6, borderRadius: Layout.borderRadius - 6, alignItems: 'center' },
+    tabText: { fontSize: 10, fontWeight: '800' },
+    scrollContent: { padding: 10, paddingBottom: 40 },
+    tabContent: { gap: 10 },
+    heroBanner: { height: 120, borderRadius: Layout.borderRadius, overflow: 'hidden', position: 'relative', marginBottom: 4 },
     bannerImg: { width: '100%', height: '100%' },
     defaultHero: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' },
-    heroInfo: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.6)', padding: 10 },
-    heroTitle: { color: '#FFF', fontSize: 16, fontWeight: '800' },
-    heroSub: { color: 'rgba(255,255,255,0.8)', fontSize: 11.5 },
-    section: { gap: 8 },
-    sectionTitle: { fontSize: 14, fontWeight: '800' },
-    actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 8 },
-    actionBtnText: { color: '#FFF', fontSize: 12.5, fontWeight: '700' },
-    matchCard: { padding: 12, borderRadius: Layout.borderRadius - 4, borderWidth: 1, marginBottom: 10, gap: 8 },
-    matchHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    stageText: { fontSize: 11, fontWeight: '800' },
-    statusBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-    statusText: { fontSize: 9.5, fontWeight: '800' },
-    teamsRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    teamName: { fontSize: 14, fontWeight: '700', flex: 1 },
-    vsText: { fontSize: 12, fontWeight: '800' },
-    resultText: { fontSize: 11.5, fontWeight: '700' },
-    venueText: { fontSize: 11 },
-    teamTile: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: Layout.borderRadius - 4, borderWidth: 1, marginBottom: 8, gap: 10 },
-    logoCircle: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-    logoText: { fontSize: 13, fontWeight: '800' },
-    teamTileName: { fontSize: 14, fontWeight: '700' },
-    teamTileSub: { fontSize: 11.5 },
-    emptyBox: { padding: 30, alignItems: 'center' }
+    heroInfo: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.6)', padding: 8 },
+    heroTitle: { color: '#FFF', fontSize: 15, fontWeight: '800' },
+    heroSub: { color: 'rgba(255,255,255,0.8)', fontSize: 11 },
+    section: { gap: 6 },
+    sectionTitle: { fontSize: 13, fontWeight: '700' },
+    actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 8, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 6 },
+    actionBtnText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
+    matchCard: { padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 8, gap: 6 },
+    matchHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+    stageText: { fontSize: 11, fontWeight: '700', flex: 1 },
+    teamsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    teamName: { fontSize: 13, fontWeight: '600', flex: 1 },
+    vsText: { fontSize: 11, fontWeight: '700' },
+    resultText: { fontSize: 11, fontWeight: '600' },
+    venueText: { fontSize: 10.5 },
+    teamTile: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 6, gap: 8 },
+    logoCircle: { width: 38, height: 38, borderRadius: 19, justifyContent: 'center', alignItems: 'center' },
+    logoText: { fontSize: 12, fontWeight: '700' },
+    teamTileName: { fontSize: 13, fontWeight: '600' },
+    teamTileSub: { fontSize: 11 },
+    emptyBox: { padding: 20, alignItems: 'center' }
 });

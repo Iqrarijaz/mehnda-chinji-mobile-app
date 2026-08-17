@@ -167,7 +167,6 @@ const styles = StyleSheet.create({
     container: {
         padding: 14,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         marginBottom: 16,
         gap: 12
     },
