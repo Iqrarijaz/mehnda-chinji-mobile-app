@@ -6,7 +6,6 @@ import { GlobalSearchOverlay } from '@/components/common/GlobalSearchOverlay';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { UtilsGrid } from '@/components/home/UtilsGrid';
 import { HomeHeader } from '@/components/home/HomeHeader';
-import { AyahOfTheDayCard } from '@/components/home/AyahOfTheDayCard';
 import BannerAd from '@/ads/components/BannerAd';
 import { ThemedView } from '@/components/ThemedView';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -45,9 +44,6 @@ export default function HomeScreen() {
         >
           {/* Categories */}
           <CategoryGrid />
-
-          {/* Daily spiritual touchpoint */}
-          <AyahOfTheDayCard />
 
           {/* Daily Utilities */}
           <UtilsGrid />
