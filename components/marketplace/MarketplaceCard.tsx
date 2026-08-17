@@ -242,7 +242,7 @@ MarketplaceCard.displayName = 'MarketplaceCard';
 
 const styles = StyleSheet.create({
     container: {
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         marginBottom: 10,
         overflow: 'hidden',
         flex: 1 },

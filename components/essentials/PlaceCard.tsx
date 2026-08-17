@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     tile: {
         width: TILE_SIZE,
         height: TILE_SIZE,
-        borderRadius: Layout.borderRadius },
+        borderRadius: Layout.borderRadius - 2 },
     tilePlaceholder: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -203,9 +203,9 @@ const styles = StyleSheet.create({
         right: 0,
         maxWidth: '60%',
         paddingHorizontal: 8,
-        borderTopRightRadius: 28,
-        borderTopLeftRadius: 28,
-        borderBottomLeftRadius: 28 },
+        borderTopRightRadius: 26,
+        borderTopLeftRadius: 26,
+        borderBottomLeftRadius: 26 },
     typeBadgeText: {
         fontSize: 9,
         fontWeight: '800',

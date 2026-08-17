@@ -39,7 +39,7 @@ export const TintedCard = React.memo(({
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         overflow: 'hidden' },
     content: {
         zIndex: 1 }

@@ -16,7 +16,7 @@ export const ListingCardSkeleton = () => {
 
     return (
         <View style={[styles.card, { backgroundColor: colors.cardBg }]}>
-            <Skeleton width={84} height={84} borderRadius={14} />
+            <Skeleton width={84} height={84} borderRadius={12} />
             <View style={styles.info}>
                 <Skeleton width={64} height={16} borderRadius={999} />
                 <Skeleton width="72%" height={15} borderRadius={4} style={{ marginTop: 8 }} />
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 8,
         gap: 12,
-        borderRadius: Layout.cardBorderRadius,
+        borderRadius: Layout.cardBorderRadius - 2,
         marginBottom: 12 },
     info: {
         flex: 1 } });

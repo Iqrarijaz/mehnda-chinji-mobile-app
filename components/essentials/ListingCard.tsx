@@ -26,7 +26,7 @@ export const ListingCard = ({ children, style, ...rest }: ViewProps) => {
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.cardBorderRadius,
+        borderRadius: Layout.cardBorderRadius - 2,
         marginBottom: 16,
         overflow: 'hidden' }
 });
