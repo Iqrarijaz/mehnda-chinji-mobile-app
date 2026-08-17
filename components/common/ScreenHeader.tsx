@@ -5,7 +5,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions } from '@react-navigation/native';
 import { useNavigation, useRouter } from 'expo-router';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import {
     Platform,
     StyleSheet,
@@ -14,12 +14,7 @@ import {
     ViewStyle
 } from 'react-native';
 import Animated, {
-    Easing,
     FadeInDown,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Avatar from '../ui/Avatar';
@@ -130,26 +125,6 @@ export const ScreenHeader = React.memo(function ScreenHeader({
         }
     }, [navigation, router]);
 
-    // Pulsing hero tile (only animates when a hero is rendered).
-    const pulse = useSharedValue(0);
-    useEffect(() => {
-        if (!hero) return;
-        pulse.value = withRepeat(
-            withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.sin) }),
-            -1,
-            true
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [!!hero]);
-
-    const haloStyle = useAnimatedStyle(() => ({
-        opacity: 0.15 + pulse.value * 0.12,
-        transform: [{ scale: 1.05 + pulse.value * 0.08 }]
-    }));
-    const tileStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 + pulse.value * 0.03 }]
-    }));
-
     const heroIcon = hero?.icon || (decor ? DECOR_ICON[decor] : 'apps');
 
     return (
@@ -217,10 +192,10 @@ export const ScreenHeader = React.memo(function ScreenHeader({
             {hero && (
                 <Animated.View entering={FadeInDown.delay(120).duration(450)} style={styles.heroBand}>
                     <View style={styles.heroIconWrap}>
-                        <Animated.View style={[styles.heroHalo, haloStyle]} />
-                        <Animated.View style={[styles.heroTile, tileStyle]}>
+                        <View style={styles.heroHalo} />
+                        <View style={styles.heroTile}>
                             <Ionicons name={heroIcon} size={20} color={colors.primary} />
-                        </Animated.View>
+                        </View>
                     </View>
                     <View style={styles.heroTitleRow}>
                         <ThemedText style={styles.heroTitle}>{hero.title}</ThemedText>
@@ -366,8 +341,5 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 6,
         lineHeight: 18
-    },
-    heroWave: {
-        marginTop: 10
     }
 });

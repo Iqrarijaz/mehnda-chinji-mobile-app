@@ -4,12 +4,6 @@ import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import Animated, {
-    FadeInDown,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-    interpolateColor } from 'react-native-reanimated';
 import { Layout } from '@/constants/layout';
 
 export interface FormInputProps extends TextInputProps {

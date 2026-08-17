@@ -3,8 +3,7 @@ import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { ThemedText } from '@/components/ThemedText';
 import React from 'react';
-import { Platform, StyleSheet } from 'react-native';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
+import { Platform, StyleSheet, View } from 'react-native';
 
 interface SectionCardProps {
     title?: string;
@@ -17,10 +16,10 @@ export const SectionCard: React.FC<SectionCardProps> = React.memo(({ title, chil
     const colors = Colors[theme];
 
     return (
-        <Animated.View entering={SlideInLeft.delay(delay).duration(450)} style={[styles.sectionCard, { backgroundColor: colors.card }]}>
+        <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
             {title ? <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>{title}</ThemedText> : null}
             {children}
-        </Animated.View>
+        </View>
     );
 });
 

@@ -23,7 +23,6 @@ import {
     TouchableOpacity,
     View,
     Linking } from 'react-native';
-import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -119,7 +118,7 @@ export default function SettingsScreen() {
         switch (activeTab) {
             case 'account':
                 return (
-                    <Animated.View key="account" entering={FadeIn.duration(400)}>
+                    <View key="account">
                         <SectionCard title="Account Details" delay={100}>
                             <SettingRowItem icon="person-outline" label="Edit Profile" subtitle="Update your personal info" onPress={() => router.push('/profile')} />
                             <SettingRowItem icon="lock-closed-outline" label="Change Password" subtitle="Keep your account secure" onPress={() => setIsPasswordModalVisible(true)} />
@@ -133,11 +132,11 @@ export default function SettingsScreen() {
                         <SectionCard title="Danger Zone" delay={300}>
                             <SettingRowItem icon="trash-outline" label="Delete Account" subtitle="This action cannot be undone" color="#F87171" iconColor="#F87171" iconBg="rgba(248, 113, 113, 0.08)" showChevron={false} onPress={() => setIsDeleteModalVisible(true)} isLast />
                         </SectionCard>
-                    </Animated.View>
+                    </View>
                 );
             case 'app':
                 return (
-                    <Animated.View key="app" entering={FadeIn.duration(400)}>
+                    <View key="app">
                         <SectionCard title="Appearance" delay={50}>
                             <ThemeSelector />
                         </SectionCard>
@@ -167,11 +166,11 @@ export default function SettingsScreen() {
                             />
                             <SettingRowItem icon="analytics-outline" label="Data Usage" subtitle="Manage your data preferences" onPress={() => router.push('/dataUsage')} isLast />
                         </SectionCard>
-                    </Animated.View>
+                    </View>
                 );
             case 'legal':
                 return (
-                    <Animated.View key="legal" entering={FadeIn.duration(400)}>
+                    <View key="legal">
                         <SectionCard title="My Activity" delay={100}>
                             <SettingRowItem icon="flag-outline" label="My Reports" subtitle="View and manage your submissions" onPress={() => router.push('/reports')} isLast />
                         </SectionCard>
@@ -181,7 +180,7 @@ export default function SettingsScreen() {
                             <SettingRowItem icon="document-text-outline" label="Terms & Conditions" onPress={() => router.push('/terms')} />
                             <SettingRowItem icon="people-outline" label="Community Guidelines" onPress={() => router.push('/communityGuidelines')} isLast />
                         </SectionCard>
-                    </Animated.View>
+                    </View>
                 );
         }
     };
@@ -231,9 +230,9 @@ export default function SettingsScreen() {
                 {renderTabContent()}
 
                 {/* Version */}
-                <Animated.View entering={FadeIn.delay(400).duration(400)} style={styles.versionWrap}>
+                <View style={styles.versionWrap}>
                     <ThemedText style={[styles.versionText, { color: colors.placeholder }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.7'}</ThemedText>
-                </Animated.View>
+                </View>
             </ScrollView>
 
             {/* ── Modals ──────────────────────────────────────────── */}

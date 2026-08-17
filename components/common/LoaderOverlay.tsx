@@ -2,12 +2,11 @@ import React, { memo, useEffect } from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 import Animated, {
     Easing,
-    interpolate,
-    type SharedValue,
     useAnimatedStyle,
     useReducedMotion,
     useSharedValue,
     withRepeat,
+    withSequence,
     withTiming
 } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
@@ -20,59 +19,8 @@ interface LoaderOverlayProps {
 }
 
 /**
- * Single Wave Dot Component
- * Renders an animated dot that moves vertically, scales, and fades along a continuous sine wave.
- */
-const WaveDot = memo(function WaveDot({
-    index,
-    color,
-    progress,
-    isReducedMotion
-}: {
-    index: number;
-    color: string;
-    progress: SharedValue<number>;
-    isReducedMotion: boolean;
-}) {
-    const animatedStyle = useAnimatedStyle(() => {
-        if (isReducedMotion) {
-            return {
-                transform: [{ translateY: 0 }, { scale: 1 }],
-                opacity: 0.8
-            };
-        }
-
-        // Phase shift each dot by ~0.75 radians so the wave flows left-to-right
-        const phase = progress.value * 2 * Math.PI - index * 0.75;
-        const sinValue = Math.sin(phase);
-
-        // Vertical sine wave offset (-7px to +7px)
-        const translateY = sinValue * 7;
-        // Smooth scale oscillation between 0.7 and 1.15
-        const scale = interpolate(sinValue, [-1, 1], [0.7, 1.15]);
-        // Smooth opacity fade between 40% (0.4) and 100% (1.0)
-        const opacity = interpolate(sinValue, [-1, 1], [0.4, 1.0]);
-
-        return {
-            transform: [{ translateY }, { scale }],
-            opacity
-        };
-    });
-
-    return (
-        <Animated.View
-            style={[
-                styles.dot,
-                { backgroundColor: color },
-                animatedStyle
-            ]}
-        />
-    );
-});
-
-/**
  * Horizontal Wave Loader Container
- * Controls 4 brand-colored dots executing a synchronized sine-wave animation on the UI thread.
+ * Renders 4 brand-colored dots with a single shared opacity pulse.
  */
 const HorizontalWaveLoader = memo(function HorizontalWaveLoader({
     colors,
@@ -82,7 +30,7 @@ const HorizontalWaveLoader = memo(function HorizontalWaveLoader({
     isDark: boolean;
 }) {
     const isReducedMotion = useReducedMotion();
-    const progress = useSharedValue(0);
+    const pulse = useSharedValue(0.8);
 
     // 4 Curated Brand Colors: Primary, Lime, Secondary, and Light Accent Tint
     const dotColors = [
@@ -94,30 +42,28 @@ const HorizontalWaveLoader = memo(function HorizontalWaveLoader({
 
     useEffect(() => {
         if (isReducedMotion) {
-            progress.value = 0;
+            pulse.value = 0.8;
             return;
         }
 
-        // Continuous smooth 60 FPS sine wave loop on the UI thread
-        progress.value = withRepeat(
-            withTiming(1, {
-                duration: 1350,
-                easing: Easing.linear
-            }),
+        pulse.value = withRepeat(
+            withSequence(
+                withTiming(1, { duration: 500, easing: Easing.inOut(Easing.ease) }),
+                withTiming(0.4, { duration: 500, easing: Easing.inOut(Easing.ease) })
+            ),
             -1,
-            false
+            true
         );
-    }, [isReducedMotion, progress]);
+    }, [isReducedMotion, pulse]);
+
+    const animatedStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
 
     return (
         <View style={styles.waveContainer}>
             {dotColors.map((color, idx) => (
-                <WaveDot
+                <Animated.View
                     key={idx}
-                    index={idx}
-                    color={color}
-                    progress={progress}
-                    isReducedMotion={!!isReducedMotion}
+                    style={[styles.dot, { backgroundColor: color }, animatedStyle]}
                 />
             ))}
         </View>

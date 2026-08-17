@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
+import { StyleSheet, View } from 'react-native';
 import { PillsList } from '@/components/common/PillsList';
 import type { NotificationUnreadCounts } from '@/apis/notifications';
 
@@ -26,14 +25,14 @@ function NotificationFilterTabsComponent({ active, onSelect, unreadCounts }: Pro
     );
 
     return (
-        <Animated.View entering={SlideInLeft.delay(180).duration(400)}>
+        <View>
             <PillsList
                 data={data}
                 selectedId={active}
                 onSelect={onSelect}
                 containerStyle={styles.bar}
             />
-        </Animated.View>
+        </View>
     );
 }
 

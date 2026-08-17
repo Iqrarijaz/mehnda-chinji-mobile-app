@@ -33,9 +33,6 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import Animated, {
-    FadeInDown,
-    FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -196,8 +193,8 @@ export default function ProfileScreen() {
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                {/* Animated Header — premium account dashboard hero */}
-                <Animated.View entering={FadeInUp.duration(450)} style={styles.header}>
+                {/* Header — premium account dashboard hero */}
+                <View style={styles.header}>
                     <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
                     {/* Soft decor: circles, shield, brand accent dots — static, memoized,
                         so it doesn't re-render on every keystroke below it. */}
@@ -209,7 +206,7 @@ export default function ProfileScreen() {
                         <View style={{ width: 42 }} />
                     </View>
 
-                    <Animated.View entering={FadeInDown.delay(120).duration(450)} style={styles.headerIdentity}>
+                    <View style={styles.headerIdentity}>
                         <ProfileAvatar
                             uri={user?.user?.profileImage}
                             name={user?.user?.name}
@@ -233,8 +230,8 @@ export default function ProfileScreen() {
                         <ThemedText style={styles.subtitleText}>
                             Keep your profile complete for better community trust
                         </ThemedText>
-                    </Animated.View>
-                </Animated.View>
+                    </View>
+                </View>
 
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
@@ -254,7 +251,7 @@ export default function ProfileScreen() {
                         <View style={styles.formSection}>
 
                             {/* Full Name */}
-                            <Animated.View entering={FadeInDown.delay(300)}>
+                            <View>
                                 <FormInput
                                     label="FULL NAME"
                                     required
@@ -271,10 +268,10 @@ export default function ProfileScreen() {
                                     autoCorrect={false}
                                     error={validationErrors.name}
                                 />
-                            </Animated.View>
+                            </View>
 
                             {/* Email Address */}
-                            <Animated.View entering={FadeInDown.delay(350)}>
+                            <View>
                                 <FormInput
                                     label="EMAIL ADDRESS"
                                     icon="mail-outline"
@@ -282,10 +279,10 @@ export default function ProfileScreen() {
                                     editable={false}
                                     containerStyle={{ opacity: 0.8 }}
                                 />
-                            </Animated.View>
+                            </View>
 
                             {/* Phone Field */}
-                            <Animated.View entering={FadeInDown.delay(400)}>
+                            <View>
                                 <FormInput
                                     label="PHONE NUMBER"
                                     required
@@ -300,10 +297,10 @@ export default function ProfileScreen() {
                                     maxLength={11}
                                     error={validationErrors.phone}
                                 />
-                            </Animated.View>
+                            </View>
 
                             {/* Gender Selector */}
-                            <Animated.View entering={FadeInDown.delay(450)} style={styles.inputField}>
+                            <View style={styles.inputField}>
                                 <ThemedText style={[styles.label, { color: colors.text }]}>GENDER</ThemedText>
                                 <View style={styles.genderRow}>
                                     <TouchableOpacity
@@ -321,7 +318,7 @@ export default function ProfileScreen() {
                                         <ThemedText style={[styles.genderText, formData.gender?.toUpperCase() === 'FEMALE' && { color: '#FFF' }, theme === 'dark' && { color: colors.textSecondary }]}>Female</ThemedText>
                                     </TouchableOpacity>
                                 </View>
-                            </Animated.View>
+                            </View>
 
                             {/* City Picker */}
                             <View>
@@ -332,7 +329,6 @@ export default function ProfileScreen() {
                                     value={formData.city}
                                     placeholder="Select your city"
                                     onPress={() => setCityPickerVisible(true)}
-                                    delay={500}
                                 />
                                 {validationErrors.city ? (
                                     <ThemedText style={styles.errorText}>{validationErrors.city}</ThemedText>
@@ -348,7 +344,6 @@ export default function ProfileScreen() {
                                     value={formData.village}
                                     placeholder="Select your village/town"
                                     onPress={() => setVillagePickerVisible(true)}
-                                    delay={550}
                                 />
                                 {validationErrors.village ? (
                                     <ThemedText style={styles.errorText}>{validationErrors.village}</ThemedText>

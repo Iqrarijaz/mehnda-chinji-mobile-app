@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Switch, StyleSheet, Platform } from 'react-native';
-import Animated, { FadeInRight } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -31,9 +30,7 @@ const NotificationToggleRow: React.FC<NotificationToggleRowProps> = React.memo((
     const colors = Colors[theme];
 
     return (
-        <Animated.View
-            entering={FadeInRight.delay(index * 100).duration(400)}
-            style={styles.container}>
+        <View style={styles.container}>
             <View style={[styles.iconContainer, { backgroundColor: `${color}18` }]}>
                 <Ionicons name={icon} size={22} color={color} />
             </View>
@@ -50,7 +47,7 @@ const NotificationToggleRow: React.FC<NotificationToggleRowProps> = React.memo((
                 thumbColor={value ? color : (theme === 'dark' ? colors.card : '#f5f5f5')}
                 ios_backgroundColor={colors.border}
             />
-        </Animated.View>
+        </View>
     );
 });
 

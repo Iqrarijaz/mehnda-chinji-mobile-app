@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -14,7 +13,6 @@ import {
     Image,
     ActivityIndicator
 } from 'react-native';
-import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -377,7 +375,7 @@ const BusinessRegistrationScreen = () => {
                     <View style={styles.formSection}>
                         
                         {/* Image Upload */}
-                        <Animated.View entering={FadeInDown.delay(150)} style={styles.inputField}>
+                        <View style={styles.inputField}>
                             <ThemedText style={[styles.label, { color: colors.text }]}>BUSINESS IMAGE</ThemedText>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
                                 <View style={{ position: 'relative' }}>
@@ -419,11 +417,10 @@ const BusinessRegistrationScreen = () => {
                                     <ThemedText style={{ color: colors.textSecondary, fontSize: 10, marginTop: 4 }}>If no image is provided, category icon will be used.</ThemedText>
                                 </View>
                             </View>
-                        </Animated.View>
+                        </View>
 
                         {/* Business Name */}
                         <FormInput
-                            delay={200}
                             label="BUSINESS NAME"
                             required
                             icon="storefront-outline"
@@ -438,7 +435,7 @@ const BusinessRegistrationScreen = () => {
                         />
 
                         {/* Category */}
-                        <Animated.View entering={FadeInDown.delay(250)} style={styles.inputField}>
+                        <View style={styles.inputField}>
                             <ThemedText style={[styles.label, { color: colors.text }]}>
                                 CATEGORY <ThemedText style={styles.required}>*</ThemedText>
                             </ThemedText>
@@ -466,10 +463,10 @@ const BusinessRegistrationScreen = () => {
                                     {errors.category}
                                 </ThemedText>
                             ) : null}
-                        </Animated.View>
+                        </View>
 
                         {/* Address */}
-                        <Animated.View entering={FadeInDown.delay(300)} style={styles.inputField}>
+                        <View style={styles.inputField}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                                     <ThemedText style={[styles.label, { color: colors.text }]}>ADDRESS <ThemedText style={styles.required}>*</ThemedText></ThemedText>
