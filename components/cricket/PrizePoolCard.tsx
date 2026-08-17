@@ -70,8 +70,7 @@ export const PrizePoolCard = React.memo(function PrizePoolCard({ prizes }: Prize
 const styles = StyleSheet.create({
     container: {
         padding: 14,
-        borderRadius: Layout.borderRadius,
-        borderWidth: 1,
+        borderRadius: Layout.borderRadius
         marginBottom: 16,
         gap: 12
     },
@@ -112,7 +111,6 @@ const styles = StyleSheet.create({
     },
     extraRow: {
         paddingTop: 8,
-        borderTopWidth: 1,
         borderTopColor: 'rgba(150,150,150,0.15)',
         gap: 4
     },

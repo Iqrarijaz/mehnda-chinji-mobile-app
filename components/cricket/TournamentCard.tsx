@@ -106,8 +106,7 @@ export const TournamentCard = React.memo(function TournamentCard({ tournament, o
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.borderRadius,
-        borderWidth: 1,
+        borderRadius: Layout.borderRadius
         marginBottom: 14,
         overflow: 'hidden'
     },
@@ -198,7 +197,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 4,
         paddingTop: 6,
-        borderTopWidth: 1,
         borderTopColor: 'rgba(150,150,150,0.1)'
     },
     teamBadge: {

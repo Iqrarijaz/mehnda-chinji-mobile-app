@@ -166,8 +166,7 @@ export const OverScorerBox = React.memo(function OverScorerBox({
 const styles = StyleSheet.create({
     container: {
         padding: 14,
-        borderRadius: Layout.borderRadius,
-        borderWidth: 1,
+        borderRadius: Layout.borderRadius
         marginBottom: 16,
         gap: 12
     },

@@ -50,8 +50,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
-        borderRadius: Layout.borderRadius - 4,
-        borderWidth: 1,
+        borderRadius: Layout.borderRadius - 4
         marginBottom: 8,
         gap: 10
     },
