@@ -78,7 +78,7 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = ({
                     <View style={styles.header}>
                         <View style={[
                             styles.iconWrapper,
-                            { backgroundColor: config.bg, borderColor: config.color + '10', borderWidth: 1 }
+                            { backgroundColor: config.bg, borderColor: config.color + '10',}
                         ]}>
                             <Ionicons
                                 name={config.icon}
@@ -181,8 +181,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        backgroundColor: '#F8FAFC',
-        borderWidth: 1.5,
+        backgroundColor: '#F8FAFC',.5,
         borderColor: '#E2E8F0',
     },
     cancelText: {

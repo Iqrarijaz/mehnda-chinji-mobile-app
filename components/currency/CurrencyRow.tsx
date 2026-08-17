@@ -79,7 +79,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         paddingVertical: 12,
         paddingHorizontal: 14,
         marginHorizontal: 20,
@@ -89,7 +88,7 @@ const styles = StyleSheet.create({
     flag: {
         width: 38,
         height: 38,
-        borderRadius: 19,
+        borderRadius: 16,
         marginRight: 12,
     },
     flagFallback: {
@@ -125,7 +124,7 @@ const styles = StyleSheet.create({
     baseBadge: {
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 12,
+        borderRadius: 10,
     },
     baseBadgeText: {
         fontSize: 11,

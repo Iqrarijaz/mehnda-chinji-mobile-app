@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     closeButton: {
         width: 32,
         height: 32,
-        borderRadius: 16,
+        borderRadius: 13,
         backgroundColor: '#F1F5F9',
         justifyContent: 'center',
         alignItems: 'center',
@@ -155,7 +155,6 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 48 : 52,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
         borderColor: '#E2E8F0',
         borderRadius: Layout.borderRadius,
     },

@@ -305,7 +305,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
     },
     categoryText: {
         fontSize: 13,
@@ -343,7 +342,6 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         borderStyle: 'dashed',
         justifyContent: 'center',
         alignItems: 'center',

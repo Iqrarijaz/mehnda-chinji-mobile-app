@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     closeButton: {
         width: 32,
         height: 32,
-        borderRadius: 16,
+        borderRadius: 13,
         backgroundColor: '#F1F5F9',
         justifyContent: 'center',
         alignItems: 'center',
@@ -435,7 +435,6 @@ const styles = StyleSheet.create({
         height: 52,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
-        borderWidth: 1,
     },
     textInput: {
         flex: 1,
@@ -468,7 +467,6 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 44 : 46,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
         borderColor: '#E2E8F0',
         borderRadius: Layout.borderRadius,
     },
@@ -489,7 +487,6 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         padding: 24,
         overflow: 'hidden',
-        borderWidth: 1,
     },
     modalHeader: {
         marginBottom: 16,
@@ -503,7 +500,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginVertical: 10,
-        borderRadius: 16,
+        borderRadius: 13,
         padding: 10,
     },
     modalFooter: {
@@ -543,7 +540,6 @@ const styles = StyleSheet.create({
         padding: 20,
         paddingBottom: 40,
         overflow: 'hidden',
-        borderWidth: 1,
     },
     groupItem: {
         flexDirection: 'row',

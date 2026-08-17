@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     closeBtn: {
         width: 34,
         height: 34,
-        borderRadius: 17,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -322,8 +322,7 @@ const styles = StyleSheet.create({
     inputRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
-        borderWidth: 1.5,
+        borderRadius: Layout.borderRadius,.5,
         borderColor: '#E2E8F0', // Overridden in wrapStyle
         paddingHorizontal: 14,
         height: Platform.OS === 'android' ? 48 : 52,
@@ -352,13 +351,13 @@ const styles = StyleSheet.create({
     strengthTrack: {
         flex: 1,
         height: 4,
-        borderRadius: 2,
+        borderRadius: 0,
         backgroundColor: '#E2E8F0',
         overflow: 'hidden',
     },
     strengthFill: {
         height: '100%',
-        borderRadius: 2,
+        borderRadius: 0,
     },
     strengthLabel: {
         fontSize: 11,
@@ -402,7 +401,6 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 48 : 52,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
         borderRadius: Layout.borderRadius,
     },
     cancelText: {

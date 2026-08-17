@@ -138,7 +138,6 @@ const styles = StyleSheet.create({
         borderRadius: Layout.headerBorderRadius,
         marginBottom: 16,
         alignItems: 'center',
-        borderWidth: 1,
     },
     leftSection: {
         flex: 3,

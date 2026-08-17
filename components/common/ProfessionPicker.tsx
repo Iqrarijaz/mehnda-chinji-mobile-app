@@ -148,16 +148,15 @@ modalTitle: {
     },
 closeButton: {
     padding: 4,
-        borderRadius: 20,
+        borderRadius: 16,
     },
 searchBar: {
     flexDirection: 'row',
         alignItems: 'center',
-            height: 52,
+            height: 50,
                 borderRadius: Layout.borderRadius,
                     paddingHorizontal: 16,
                         marginBottom: 20,
-                            borderWidth: 1,
     },
 searchInput: {
     flex: 1,

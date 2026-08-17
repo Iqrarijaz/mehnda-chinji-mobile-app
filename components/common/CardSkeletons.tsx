@@ -98,30 +98,29 @@ export const ChatCardSkeleton = () => {
 
 const styles = StyleSheet.create({
     businessCard: {
-        borderRadius: 16,
+        borderRadius: 13,
         padding: 14,
         marginBottom: 12,
     },
     postCard: {
-        borderRadius: 16,
+        borderRadius: 13,
         padding: 12,
         marginTop: 12,
         marginHorizontal: 16,
         marginBottom: 4,
     },
     donorCard: {
-        borderRadius: 16,
+        borderRadius: 13,
         paddingHorizontal: 16,
         paddingVertical: 12,
         marginBottom: 16,
-        borderWidth: 1,
     },
     chatCard: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 12,
         paddingHorizontal: 16,
-        borderRadius: 16,
+        borderRadius: 13,
         marginBottom: 8,
     },
     row: {

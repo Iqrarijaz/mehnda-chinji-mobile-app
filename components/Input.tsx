@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 50,
-        borderWidth: 1,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
         fontSize: 16,

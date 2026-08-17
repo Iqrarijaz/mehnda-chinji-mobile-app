@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
@@ -33,7 +34,6 @@ export default function Button({ title, onPress, loading, variant = 'primary', s
             style={[
                 styles.button,
                 { backgroundColor: getBackgroundColor() },
-                variant === 'outline' && { borderColor: colors.primary, borderWidth: 1 },
                 style,
             ]}
             onPress={onPress}
@@ -52,7 +52,7 @@ export default function Button({ title, onPress, loading, variant = 'primary', s
 const styles = StyleSheet.create({
     button: {
         height: 50,
-        borderRadius: 12,
+        borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,

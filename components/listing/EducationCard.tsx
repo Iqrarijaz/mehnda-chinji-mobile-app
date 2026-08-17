@@ -235,10 +235,9 @@ export default EducationCard;
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 20,
+        borderRadius: 16,
         marginBottom: 16,
         overflow: 'hidden',
-        borderWidth: 1,
         // Soft lifted shadow
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.12,
@@ -263,8 +262,7 @@ const styles = StyleSheet.create({
     },
     ring: {
         position: 'absolute',
-        borderRadius: 999,
-        borderWidth: 1,
+        borderRadius: 995,
     },
     ringOuter: {
         width: 120,
@@ -277,7 +275,7 @@ const styles = StyleSheet.create({
     iconCircle: {
         width: 64,
         height: 64,
-        borderRadius: 32,
+        borderRadius: 28,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -302,7 +300,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
         paddingVertical: 5,
-        borderRadius: 8,
+        borderRadius: 6,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
@@ -319,11 +317,10 @@ const styles = StyleSheet.create({
     actionBtn: {
         width: 30,
         height: 30,
-        borderRadius: 15,
+        borderRadius: 12,
         backgroundColor: 'rgba(0,0,0,0.38)',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: StyleSheet.hairlineWidth,
         borderColor: 'rgba(255,255,255,0.25)',
     },
     imageLabel: {
@@ -362,12 +359,12 @@ const styles = StyleSheet.create({
     dividerAccent: {
         width: 24,
         height: 3,
-        borderRadius: 2,
+        borderRadius: 0,
     },
     dividerLine: {
         flex: 1,
         height: 1,
-        borderRadius: 1,
+        borderRadius: -1,
     },
     locationRow: {
         flexDirection: 'row',
@@ -378,7 +375,7 @@ const styles = StyleSheet.create({
     locationIconWrap: {
         width: 24,
         height: 24,
-        borderRadius: 8,
+        borderRadius: 6,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -406,8 +403,7 @@ const styles = StyleSheet.create({
         gap: 4,
         paddingHorizontal: 12,
         paddingVertical: 7,
-        borderRadius: 10,
-        borderWidth: 1,
+        borderRadius: 8,
     },
     detailsPillText: {
         fontSize: 12,
@@ -420,7 +416,7 @@ const styles = StyleSheet.create({
         gap: 4,
         paddingHorizontal: 10,
         paddingVertical: 7,
-        borderRadius: 10,
+        borderRadius: 8,
     },
     contactChipText: {
         fontSize: 12,

@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     avatarWrapper: {
         width: 44,
         height: 44,
-        borderRadius: 22,
+        borderRadius: 18,
         overflow: 'hidden',
     },
     avatarImage: {
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     statusDot: {
         width: 5,
         height: 5,
-        borderRadius: 2.5,
+        borderRadius: 0.5,
     },
     statusText: {
         fontSize: 10,
@@ -303,14 +303,13 @@ const styles = StyleSheet.create({
     },
     moreBtn: {
         padding: 4,
-        borderRadius: 20,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
     menuPopover: {
         width: 170,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.12,
@@ -331,7 +330,7 @@ const styles = StyleSheet.create({
     menuIconBox: {
         width: 28,
         height: 28,
-        borderRadius: 8,
+        borderRadius: 6,
         justifyContent: 'center',
         alignItems: 'center',
     },

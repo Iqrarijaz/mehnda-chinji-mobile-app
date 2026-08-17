@@ -250,13 +250,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: 6,
         gap: 6,
     },
     statusDot: {
         width: 6,
         height: 6,
-        borderRadius: 3,
+        borderRadius: 1,
     },
     statusText: {
         fontSize: 10,
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     },
     moreBtn: {
         padding: 4,
-        borderRadius: 20,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'transparent',
@@ -350,7 +350,6 @@ const styles = StyleSheet.create({
     menuPopover: {
         width: 170,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.12,
@@ -371,7 +370,7 @@ const styles = StyleSheet.create({
     menuIconBox: {
         width: 28,
         height: 28,
-        borderRadius: 8,
+        borderRadius: 6,
         justifyContent: 'center',
         alignItems: 'center',
     },

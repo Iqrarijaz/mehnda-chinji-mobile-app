@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius,
         padding: 12,
-        borderWidth: 1,
         position: 'relative',
     },
     specularHandle: {

@@ -125,7 +125,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.05,
         shadowRadius: 8,
         elevation: 2,
-        borderWidth: 1,
     },
     row: {
         flexDirection: 'row',
@@ -136,7 +135,6 @@ const styles = StyleSheet.create({
         height: 80,
         borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        borderWidth: 1,
         marginRight: 14,
         position: 'relative',
     },

@@ -158,9 +158,8 @@ const styles = StyleSheet.create({
     },
     card: {
         flexDirection: 'row',
-        borderRadius: 16,
+        borderRadius: 13,
         overflow: 'hidden',
-        borderWidth: 1,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.08,
         shadowRadius: 12,
@@ -192,7 +191,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 7,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: 6,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
@@ -231,12 +230,12 @@ const styles = StyleSheet.create({
     dividerAccent: {
         width: 18,
         height: 2.5,
-        borderRadius: 2,
+        borderRadius: 0,
     },
     dividerLine: {
         flex: 1,
         height: 1,
-        borderRadius: 1,
+        borderRadius: -1,
     },
     locationRow: {
         flexDirection: 'row',
@@ -246,7 +245,7 @@ const styles = StyleSheet.create({
     locationIconWrap: {
         width: 20,
         height: 20,
-        borderRadius: 6,
+        borderRadius: 4,
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,

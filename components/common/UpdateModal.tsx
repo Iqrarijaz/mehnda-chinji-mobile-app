@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 80,
         height: 80,
-        borderRadius: 40,
+        borderRadius: 36,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     button: {
-        height: 52,
+        height: 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
@@ -175,7 +175,6 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
     },
     secondaryButton: {
-        borderWidth: 1,
         borderColor: '#E2E8F0',
     },
     buttonText: {

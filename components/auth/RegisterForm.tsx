@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
     strengthBar: {
         flex: 1,
         height: '100%',
-        borderRadius: 2,
+        borderRadius: 0,
         backgroundColor: '#E2E8F0',
     },
     strengthText: {
@@ -522,7 +522,6 @@ const styles = StyleSheet.create({
         height: 52,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 14,
-        borderWidth: 1,
     },
     input: {
         flex: 1,
@@ -571,7 +570,7 @@ const styles = StyleSheet.create({
     checkbox: {
         width: 22,
         height: 22,
-        borderRadius: 6,
+        borderRadius: 4,
         borderWidth: 2,
         borderColor: '#E2E8F0',
         justifyContent: 'center',

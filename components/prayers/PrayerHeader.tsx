@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         position: 'absolute', left: 16,
-        width: 36, height: 36, borderRadius: 18,
+        width: 36, height: 36, borderRadius: 15,
         backgroundColor: 'rgba(0,0,0,0.35)',
         justifyContent: 'center', alignItems: 'center', zIndex: 10,
     },
@@ -154,9 +154,8 @@ const styles = StyleSheet.create({
     pill: {
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 20,
+        borderRadius: 16,
         alignSelf: 'flex-start',
-        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.2)',
     },
     gregorianDate: {
@@ -185,7 +184,7 @@ const styles = StyleSheet.create({
     nextPrayerTime: { fontSize: 20, fontWeight: '900', paddingVertical: 2, letterSpacing: -0.5, fontVariant: ['tabular-nums'] },
     countdownWrap: {
         flexDirection: 'row', alignItems: 'center',
-        paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, marginTop: 6,
+        paddingHorizontal: 10, paddingVertical: 5, borderRadius: 16, marginTop: 6,
     },
     countdownText: { fontSize: 13, fontWeight: '800', letterSpacing: 1, fontVariant: ['tabular-nums'] },
 });

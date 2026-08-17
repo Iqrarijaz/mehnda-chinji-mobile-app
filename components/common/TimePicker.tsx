@@ -77,9 +77,8 @@ export function TimePicker({
                             styles.optionItem,
                             value === item && { 
                                 backgroundColor: colors.primary + '15', 
-                                borderRadius: 12,
+                                borderRadius: 10,
                                 borderColor: colors.primary + '30',
-                                borderWidth: 1
                             }
                         ]}
                     >
@@ -161,7 +160,6 @@ const styles = StyleSheet.create({
         padding: 24,
         paddingBottom: 48,
         overflow: 'hidden',
-        borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     modalHeader: {
@@ -178,7 +176,7 @@ const styles = StyleSheet.create({
     closeBtn: {
         width: 32,
         height: 32,
-        borderRadius: 16,
+        borderRadius: 13,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -211,7 +209,7 @@ const styles = StyleSheet.create({
     },
     confirmBtn: {
         height: 56,
-        borderRadius: 16,
+        borderRadius: 13,
         overflow: 'hidden',
         marginTop: 10,
         elevation: 4,

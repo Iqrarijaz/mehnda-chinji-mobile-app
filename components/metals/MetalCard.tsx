@@ -76,7 +76,6 @@ export const MetalCard = React.memo(function MetalCard({ meta, price, unit, kara
 const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         marginHorizontal: 20,
         marginBottom: 10,
         overflow: 'hidden',
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
     },
     karatChip: {
         flex: 1,
-        borderRadius: 10,
+        borderRadius: 8,
         paddingVertical: 6,
         alignItems: 'center',
     },

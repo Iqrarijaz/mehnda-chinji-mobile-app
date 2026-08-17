@@ -135,7 +135,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F8FAFC',
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         borderColor: '#F1F5F9',
         marginBottom: 16,
         paddingHorizontal: 14,
