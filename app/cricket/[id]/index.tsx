@@ -19,6 +19,7 @@ import { PrizePoolCard } from '@/components/cricket/PrizePoolCard';
 import { OrganizerCard } from '@/components/cricket/OrganizerCard';
 import { GuestCard } from '@/components/cricket/GuestCard';
 import { PointsTableCard } from '@/components/cricket/PointsTableCard';
+import { StatusBadge } from '@/components/cricket/StatusBadge';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -57,12 +58,8 @@ export default function TournamentHubScreen() {
             activeOpacity={0.8}
         >
             <View style={styles.matchHeader}>
-                <ThemedText style={[styles.stageText, { color: colors.primary }]}>{item.matchTitle}</ThemedText>
-                <View style={[styles.statusBadge, { backgroundColor: item.status === 'LIVE' ? colors.danger : colors.surface }]}>
-                    <ThemedText style={[styles.statusText, { color: item.status === 'LIVE' ? '#FFF' : colors.textSecondary }]}>
-                        {item.status}
-                    </ThemedText>
-                </View>
+                <ThemedText style={[styles.stageText, { color: colors.primary }]} numberOfLines={1}>{item.matchTitle}</ThemedText>
+                <StatusBadge status={item.status} />
             </View>
 
             <View style={styles.teamsRow}>
@@ -272,10 +269,8 @@ const styles = StyleSheet.create({
     actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 8, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 6 },
     actionBtnText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
     matchCard: { padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 8, gap: 6 },
-    matchHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    stageText: { fontSize: 11, fontWeight: '700' },
-    statusBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-    statusText: { fontSize: 9, fontWeight: '700' },
+    matchHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+    stageText: { fontSize: 11, fontWeight: '700', flex: 1 },
     teamsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     teamName: { fontSize: 13, fontWeight: '600', flex: 1 },
     vsText: { fontSize: 11, fontWeight: '700' },

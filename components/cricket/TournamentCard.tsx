@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
+import { StatusBadge } from '@/components/cricket/StatusBadge';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -16,15 +17,6 @@ interface TournamentCardProps {
 export const TournamentCard = React.memo(function TournamentCard({ tournament, onPress, onEdit }: TournamentCardProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'LIVE': return colors.danger;
-            case 'UPCOMING': return colors.primary;
-            case 'COMPLETED': return colors.success;
-            default: return colors.icon;
-        }
-    };
 
     return (
         <TouchableOpacity
@@ -48,9 +40,8 @@ export const TournamentCard = React.memo(function TournamentCard({ tournament, o
                 )}
 
                 {/* Status Badge */}
-                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(tournament.status) }]}>
-                    {tournament.status === 'LIVE' && <View style={styles.liveDot} />}
-                    <ThemedText style={styles.statusText}>{tournament.status}</ThemedText>
+                <View style={styles.statusBadge}>
+                    <StatusBadge status={tournament.status} />
                 </View>
 
                 {/* Format Pill */}
@@ -137,25 +128,7 @@ const styles = StyleSheet.create({
     statusBadge: {
         position: 'absolute',
         top: 8,
-        left: 8,
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 7,
-        paddingVertical: 2,
-        borderRadius: 12,
-        gap: 3
-    },
-    liveDot: {
-        width: 5,
-        height: 5,
-        borderRadius: 2.5,
-        backgroundColor: '#FFFFFF'
-    },
-    statusText: {
-        color: '#FFFFFF',
-        fontSize: 9,
-        fontWeight: '800',
-        letterSpacing: 0.3
+        left: 8
     },
     formatBadge: {
         position: 'absolute',

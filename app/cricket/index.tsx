@@ -105,8 +105,8 @@ export default function CricketFeedScreen() {
                                     No Tournaments Found
                                 </ThemedText>
                                 <ThemedText style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-                                    {selectedCity
-                                        ? `No active tournaments in ${selectedCity}. Try resetting your filter.`
+                                    {searchQuery
+                                        ? `No tournaments match "${searchQuery}". Try a different search.`
                                         : 'Check back soon for upcoming cricket tournaments!'}
                                 </ThemedText>
                             </View>
@@ -125,20 +125,6 @@ export default function CricketFeedScreen() {
                         <ThemedText style={styles.fabText}>Create Tournament</ThemedText>
                     </TouchableOpacity>
                 )}
-
-                {/* City Picker Dropdown */}
-                <SearchableDropdown
-                    visible={cityPickerVisible}
-                    onClose={() => setCityPickerVisible(false)}
-                    onSelect={(city) => {
-                        setSelectedCity(city);
-                        setCityPickerVisible(false);
-                    }}
-                    currentValue={selectedCity}
-                    options={citiesDataFallback}
-                    title="Select City"
-                    placeholder="Search city..."
-                />
             </View>
         </ErrorBoundary>
     );

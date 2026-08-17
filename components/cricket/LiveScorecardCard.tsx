@@ -2,70 +2,112 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
+import { StatusBadge } from '@/components/cricket/StatusBadge';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import { CricketMatch } from '@/types/cricket';
+import { CricketMatch, Innings } from '@/types/cricket';
 
 interface LiveScorecardCardProps {
     match: CricketMatch;
+}
+
+interface TeamScoreLine {
+    name: string;
+    innings: Innings | null | undefined;
+    hasBatted: boolean;
+    isBatting: boolean;
 }
 
 export const LiveScorecardCard = React.memo(function LiveScorecardCard({ match }: LiveScorecardCardProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    const currentInning = match.currentInnings === 1 ? match.innings1 : match.innings2;
-    const battingTeamName = match.currentInnings === 1 ? match.teamA.name : match.teamB.name;
-    const bowlingTeamName = match.currentInnings === 1 ? match.teamB.name : match.teamA.name;
+    const battingInningsNumber = match.currentInnings;
+    const currentInning = battingInningsNumber === 1 ? match.innings1 : match.innings2;
+
+    // Resolve each team's innings by matching battingTeamId, so scores are
+    // shown against the correct team regardless of who batted first.
+    const inningsForTeam = (teamId: string): Innings | null | undefined => {
+        if (match.innings1?.battingTeamId === teamId) return match.innings1;
+        if (match.innings2?.battingTeamId === teamId) return match.innings2;
+        return null;
+    };
+
+    const teamALine: TeamScoreLine = {
+        name: match.teamA.name,
+        innings: inningsForTeam(match.teamA.id),
+        hasBatted: !!inningsForTeam(match.teamA.id),
+        isBatting: currentInning?.battingTeamId === match.teamA.id && match.status === 'LIVE'
+    };
+    const teamBLine: TeamScoreLine = {
+        name: match.teamB.name,
+        innings: inningsForTeam(match.teamB.id),
+        hasBatted: !!inningsForTeam(match.teamB.id),
+        isBatting: currentInning?.battingTeamId === match.teamB.id && match.status === 'LIVE'
+    };
 
     const runs = currentInning?.totalRuns ?? 0;
     const wickets = currentInning?.totalWickets ?? 0;
-    const overs = currentInning?.totalOvers ?? 0.0;
-    const maxOvers = currentInning?.maxOvers ?? match.maxOvers;
-
+    const overs = currentInning?.totalOvers ?? 0;
     const crr = overs > 0 ? (runs / overs).toFixed(2) : '0.00';
 
-    let target = null;
-    let rrr = null;
+    let target: number | null = null;
+    let rrr: string | null = null;
     if (match.currentInnings === 2 && match.innings1) {
+        const maxOvers = currentInning?.maxOvers ?? match.maxOvers;
         target = match.innings1.totalRuns + 1;
         const runsNeeded = target - runs;
         const oversRemaining = maxOvers - overs;
         rrr = oversRemaining > 0 ? (runsNeeded / oversRemaining).toFixed(2) : '0.00';
     }
 
+    const renderTeamRow = (line: TeamScoreLine) => (
+        <View style={styles.teamRow}>
+            <View style={styles.teamNameWrap}>
+                {line.isBatting && <View style={styles.battingDot} />}
+                <ThemedText style={[styles.teamName, line.isBatting && styles.teamNameActive]} numberOfLines={1}>
+                    {line.name}
+                </ThemedText>
+            </View>
+            {line.hasBatted && line.innings ? (
+                <ThemedText style={styles.teamScore}>
+                    {line.innings.totalRuns}/{line.innings.totalWickets}
+                    <ThemedText style={styles.teamOvers}> ({line.innings.totalOvers} ov)</ThemedText>
+                </ThemedText>
+            ) : (
+                <ThemedText style={styles.yetToBat}>Yet to bat</ThemedText>
+            )}
+        </View>
+    );
+
     return (
-        <View style={[styles.card, { backgroundColor: colors.primary, borderColor: colors.border }]}>
+        <View style={[styles.card, { backgroundColor: colors.primary }]}>
             {/* Status Header */}
             <View style={styles.header}>
-                <View style={styles.liveIndicator}>
-                    {match.status === 'LIVE' && <View style={styles.liveDot} />}
-                    <ThemedText style={styles.statusText}>{match.status}</ThemedText>
-                </View>
-                <ThemedText style={styles.stageText}>{match.matchTitle}</ThemedText>
+                <StatusBadge status={match.status} />
+                <ThemedText style={styles.stageText} numberOfLines={1}>{match.matchTitle}</ThemedText>
             </View>
 
-            {/* Live Score Block */}
-            <View style={styles.scoreBlock}>
-                <ThemedText style={styles.battingTeam}>{battingTeamName}</ThemedText>
-                <ThemedText style={styles.scoreText}>
-                    {runs}/{wickets} <ThemedText style={styles.oversText}>({overs} / {maxOvers} ov)</ThemedText>
-                </ThemedText>
+            {/* Side-by-side Team Scores */}
+            <View style={styles.scoresBlock}>
+                {renderTeamRow(teamALine)}
+                <View style={styles.divider} />
+                {renderTeamRow(teamBLine)}
             </View>
 
             {/* Run Rate & Target Stats */}
-            <View style={styles.statsRow}>
-                <ThemedText style={styles.statPill}>CRR: {crr}</ThemedText>
-                {target !== null ? (
-                    <>
-                        <ThemedText style={styles.statPill}>Target: {target}</ThemedText>
-                        <ThemedText style={styles.statPill}>RRR: {rrr}</ThemedText>
-                    </>
-                ) : (
-                    <ThemedText style={styles.statPill}>vs {bowlingTeamName}</ThemedText>
-                )}
-            </View>
+            {match.status === 'LIVE' && (
+                <View style={styles.statsRow}>
+                    <ThemedText style={styles.statPill}>CRR: {crr}</ThemedText>
+                    {target !== null && (
+                        <>
+                            <ThemedText style={styles.statPill}>Target: {target}</ThemedText>
+                            <ThemedText style={styles.statPill}>RRR: {rrr}</ThemedText>
+                        </>
+                    )}
+                </View>
+            )}
 
             {/* Result display if match completed */}
             {match.result ? (
@@ -83,56 +125,69 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: Layout.borderRadius,
         marginBottom: 14,
-        gap: 10
+        gap: 12
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
-    liveIndicator: {
-        flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 6,
-        gap: 4
-    },
-    liveDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#EF4444'
-    },
-    statusText: {
-        color: '#FFFFFF',
-        fontSize: 10.5,
-        fontWeight: '800'
+        gap: 8
     },
     stageText: {
         color: 'rgba(255,255,255,0.85)',
         fontSize: 11.5,
-        fontWeight: '600'
+        fontWeight: '600',
+        flex: 1
     },
-    scoreBlock: {
-        gap: 2
+    scoresBlock: {
+        gap: 8
     },
-    battingTeam: {
-        color: '#FFFFFF',
+    divider: {
+        height: 1,
+        backgroundColor: 'rgba(255,255,255,0.15)'
+    },
+    teamRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 8
+    },
+    teamNameWrap: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        flex: 1
+    },
+    battingDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: '#FFFFFF'
+    },
+    teamName: {
+        color: 'rgba(255,255,255,0.75)',
         fontSize: 16,
+        fontWeight: '700'
+    },
+    teamNameActive: {
+        color: '#FFFFFF',
         fontWeight: '800'
     },
-    scoreText: {
+    teamScore: {
         color: '#FFFFFF',
-        fontSize: 28,
+        fontSize: 20,
         fontWeight: '900',
-        letterSpacing: -0.5
+        letterSpacing: -0.3
     },
-    oversText: {
-        color: 'rgba(255,255,255,0.8)',
-        fontSize: 16,
+    teamOvers: {
+        color: 'rgba(255,255,255,0.75)',
+        fontSize: 13,
         fontWeight: '600'
+    },
+    yetToBat: {
+        color: 'rgba(255,255,255,0.65)',
+        fontSize: 13,
+        fontWeight: '600',
+        fontStyle: 'italic'
     },
     statsRow: {
         flexDirection: 'row',
@@ -153,8 +208,7 @@ const styles = StyleSheet.create({
         gap: 6,
         backgroundColor: 'rgba(0,0,0,0.25)',
         padding: 8,
-        borderRadius: 6,
-        marginTop: 4
+        borderRadius: 6
     },
     resultText: {
         color: '#FFFFFF',
