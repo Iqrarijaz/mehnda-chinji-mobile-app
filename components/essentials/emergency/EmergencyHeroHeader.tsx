@@ -85,7 +85,7 @@ export const EmergencyHeroHeader = React.memo(function EmergencyHeroHeader({
             </View>
 
             {/* Identity row */}
-            <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.identityRow}>
+            <View style={styles.identityRow}>
                 <View style={styles.identityText}>
                     <View style={styles.chipRow}>
                         <View style={[styles.typeChip, { backgroundColor: colors.lime }]}>
@@ -113,8 +113,8 @@ export const EmergencyHeroHeader = React.memo(function EmergencyHeroHeader({
                 </View>
 
                 <View style={styles.tileWrap}>
-                    <Animated.View style={[styles.pulseRing, ringStyleSlow]} />
-                    <Animated.View style={[styles.pulseRing, ringStyle]} />
+                    <View style={[styles.pulseRing, styles.pulseRingSlow]} />
+                    <View style={styles.pulseRing} />
                     <View style={styles.serviceTile}>
                         {placeImage ? (
                             <Image source={{ uri: placeImage }} style={styles.serviceImage} contentFit="cover" />
@@ -123,10 +123,10 @@ export const EmergencyHeroHeader = React.memo(function EmergencyHeroHeader({
                         )}
                     </View>
                 </View>
-            </Animated.View>
+            </View>
 
             {/* Heartbeat ribbon */}
-            <Animated.View entering={FadeInDown.delay(220).duration(450)} style={styles.ecgWrap}>
+            <View style={styles.ecgWrap}>
                 <Svg width="100%" height={40} viewBox="0 0 340 40" preserveAspectRatio="none">
                     <Path
                         d={ECG_PATH}
@@ -136,7 +136,7 @@ export const EmergencyHeroHeader = React.memo(function EmergencyHeroHeader({
                         strokeLinejoin="round"
                         fill="none"
                     />
-                    <AnimatedPath
+                    <Path
                         d={ECG_PATH}
                         stroke={colors.lime}
                         strokeWidth={2.5}
@@ -144,11 +144,10 @@ export const EmergencyHeroHeader = React.memo(function EmergencyHeroHeader({
                         strokeLinejoin="round"
                         fill="none"
                         strokeDasharray={`70 ${ECG_SWEEP - 70}`}
-                        animatedProps={sweepProps}
                     />
                 </Svg>
-            </Animated.View>
-        </Animated.View>
+            </View>
+        </View>
     );
 });
 
