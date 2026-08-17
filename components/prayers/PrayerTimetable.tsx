@@ -67,11 +67,10 @@ const PrayerRow = memo(({ prayer, isNext, pulseAnim, C, isDark }: PrayerRowProps
     };
 
     return (
-        <Animated.View
+        <View
             style={[
                 styles.gridCard,
                 { backgroundColor: rowBg },
-                isNext && { opacity: pulseAnim }
             ]}
         >
             {/* Micro Content Stack */}
@@ -95,7 +94,7 @@ const PrayerRow = memo(({ prayer, isNext, pulseAnim, C, isDark }: PrayerRowProps
                     {formatTime12h(prayer.adhan).replace(' ', '')}
                 </ThemedText>
             </View>
-        </Animated.View>
+        </View>
     );
 });
 
@@ -174,10 +173,6 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         minHeight: 65,
         justifyContent: 'center' },
-    miniHeader: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        height: 12 },
     miniBody: {
         alignItems: 'center',
         paddingBottom: 2 },

@@ -1,8 +1,6 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, Share } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -48,12 +46,9 @@ export function AyahOfTheDayCard() {
     }
 
     return (
-        <Animated.View entering={FadeIn.duration(400)} style={styles.wrap}>
-            <LinearGradient
-                colors={[colors.primary, '#0b3b3b']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.card}
+        <View style={styles.wrap}>
+            <View
+                style={[styles.card, { backgroundColor: colors.primary }]}
             >
                 <View style={styles.topRow}>
                     <View style={[styles.badge, { backgroundColor: 'rgba(255,255,255,0.16)' }]}>
@@ -76,8 +71,8 @@ export function AyahOfTheDayCard() {
                         {ayah.surahEnglishName} ({ayah.surahName}) · {ayah.numberInSurah}
                     </ThemedText>
                 </View>
-            </LinearGradient>
-        </Animated.View>
+            </View>
+        </View>
     );
 }
 

@@ -247,37 +247,6 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         textAlign: 'center',
         marginBottom: 3 },
-    subtitle: {
-        fontSize: 10,
-        fontWeight: '500' },
-    closeBtn: {
-        width: 30,
-        height: 30,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center' },
-
-    // Input
-    fieldWrap: { marginBottom: 10 },
-    label: {
-        fontSize: 10,
-        fontWeight: '700',
-        color: '#94A3B8',
-        letterSpacing: 0.8,
-        marginBottom: 4,
-        marginLeft: 2 },
-    inputRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: Layout.borderRadius, // Overridden in wrapStyle
-        paddingHorizontal: 11,
-        height: Platform.OS === 'android' ? 42 : 48 },
-    inputIcon: { marginRight: 10 },
-    input: {
-        flex: 1,
-        fontSize: 10,
-        fontWeight: '500' },
-    eyeBtn: { padding: 4 },
 
     // Strength bar
     strengthWrap: {

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
     View,
-    Text,
     StyleSheet
 } from 'react-native';
 import { Layout } from '@/constants/layout';
@@ -10,6 +9,7 @@ import { useTheme } from '@/context/ThemeContext';
 import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
+import { ThemedText } from '@/components/ThemedText';
 
 interface FeedbackFormProps {
     onSubmit: (subject: string, description: string) => Promise<void>;
@@ -36,7 +36,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) =
             entering={SlideInLeft.delay(600).duration(450)}
             style={styles.container}
         >
-            <Text allowFontScaling={false} style={[styles.title, { color: colors.textSecondary }]}>Send us Feedback</Text>
+            <ThemedText allowFontScaling={false} style={[styles.title, { color: colors.textSecondary }]}>Send us Feedback</ThemedText>
             <View style={[styles.card, { backgroundColor: colors.card }]}>
                 <FormInput
                     label="SUBJECT"
@@ -84,42 +84,6 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#FFFFFF',
         borderRadius: Layout.borderRadius,
-        padding: 16 },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F8FAFC',
-        borderRadius: Layout.borderRadius,
-        marginBottom: 16,
-        paddingHorizontal: 11 },
-    inputFocused: {
-        backgroundColor: '#FFFFFF' },
-    inputIcon: {
-        marginRight: 10 },
-    input: {
-        flex: 1,
-        height: 52,
-        fontSize: 12.5,
-        color: '#1E293B' },
-    textAreaContainer: {
-        alignItems: 'flex-start',
-        height: 120 },
-    textArea: {
-        height: 110,
-        paddingTop: 11 },
-    submitButton: {
-        flexDirection: 'row',
-        backgroundColor: '#009688',
-        height: 54,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 8 },
-    submitButtonDisabled: {
-        backgroundColor: '#CBD5E1' },
-    submitText: {
-        color: '#FFFFFF',
-        fontSize: 13.5,
-        fontWeight: '700' } });
+        padding: 16 } });
 
 export default FeedbackForm;

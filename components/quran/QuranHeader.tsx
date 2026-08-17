@@ -39,8 +39,7 @@ export const QuranHeader = memo(({
     const colors = Colors[theme];
 
     return (
-        <Animated.View
-            entering={FadeInUp.duration(450)}
+        <View
             style={[styles.container, { backgroundColor: colors.primary, paddingTop }]}
         >
             {/* Faint crescent + star decor */}
@@ -52,7 +51,7 @@ export const QuranHeader = memo(({
                     <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
 
-                <Animated.View entering={FadeInDown.delay(80).duration(400)} style={styles.titleWrap}>
+                <View style={styles.titleWrap}>
                     <ThemedText
                         style={[styles.title, arabicTitle && styles.titleArabic]}
                         numberOfLines={1}
@@ -62,16 +61,16 @@ export const QuranHeader = memo(({
                     {subtitle ? (
                         <ThemedText style={styles.subtitle} numberOfLines={1}>{subtitle}</ThemedText>
                     ) : null}
-                </Animated.View>
+                </View>
             </View>
 
             {/* Optional controls, centered below the title */}
             {rightSlot ? (
-                <Animated.View entering={FadeInDown.delay(140).duration(400)} style={styles.controlsRow}>
+                <View style={styles.controlsRow}>
                     {rightSlot}
-                </Animated.View>
+                </View>
             ) : null}
-        </Animated.View>
+        </View>
     );
 });
 

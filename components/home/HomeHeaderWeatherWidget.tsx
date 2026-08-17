@@ -264,10 +264,6 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 3
     },
-    weatherColWrap: {
-        width: '100%',
-        justifyContent: 'center'
-    },
     weatherCol: {
         justifyContent: 'center'
     },
@@ -348,10 +344,6 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         justifyContent: 'center'
     },
-    forecastTapArea: {
-        alignItems: 'flex-end',
-        justifyContent: 'center'
-    },
     tempIconRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -363,62 +355,4 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         lineHeight: 34
     },
-    forecastPillContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        marginTop: 4
-    },
-    updatedInner: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 3
-    },
-    updated: {
-        fontSize: 9.5,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.7)'
-    },
-    tapHintPill: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 2,
-        paddingHorizontal: 7,
-        paddingVertical: 3,
-        borderRadius: 12
-    },
-    tapHintText: {
-        fontSize: 9.5,
-        fontWeight: '800',
-        color: '#0F172A'
-    },
-    pagerFooterRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 8,
-        paddingTop: 6,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.1)'
-    },
-    pagerDotsContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5
-    },
-    pagerDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: 'rgba(255,255,255,0.3)'
-    },
-    swipeHintGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 3
-    },
-    swipeHintText: {
-        fontSize: 9.5,
-        fontWeight: '700'
-    }
 });
