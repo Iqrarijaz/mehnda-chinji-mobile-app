@@ -101,7 +101,7 @@ export const WinPredictionCard = React.memo(function WinPredictionCard({
 const styles = StyleSheet.create({
     card: {
         padding: 12,
-        borderRadius: Layout.borderRadius
+        borderRadius: Layout.borderRadius,
         marginBottom: 14,
         gap: 10
     },
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 8,
         paddingHorizontal: 10,
-        borderRadius: Layout.borderRadius - 4
+        borderRadius: Layout.borderRadius - 4,
         gap: 4
     },
     btnText: {

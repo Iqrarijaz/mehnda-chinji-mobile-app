@@ -70,7 +70,7 @@ export const PointsTableCard = React.memo(function PointsTableCard({ teams }: Po
 
 const styles = StyleSheet.create({
     container: {
-        borderRadius: Layout.borderRadius
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
         marginBottom: 16
     },
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 12
     },
-    headerRow: {,
+    headerRow: {
         borderBottomColor: 'rgba(150,150,150,0.15)'
     },
     headerText: {

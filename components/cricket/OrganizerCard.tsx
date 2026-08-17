@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
-        borderRadius: Layout.borderRadius
+        borderRadius: Layout.borderRadius,
         width: 220,
         marginRight: 10,
         gap: 10

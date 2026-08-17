@@ -70,7 +70,7 @@ export const PrizePoolCard = React.memo(function PrizePoolCard({ prizes }: Prize
 const styles = StyleSheet.create({
     container: {
         padding: 14,
-        borderRadius: Layout.borderRadius
+        borderRadius: Layout.borderRadius,
         marginBottom: 16,
         gap: 12
     },
