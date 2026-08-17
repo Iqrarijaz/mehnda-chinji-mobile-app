@@ -39,6 +39,12 @@ const CATEGORIES: UtilCategory[] = [
                 image: require('@/assets/icons/prayer_icon.webp'),
                 route: '/prayerTimes'
             },
+            {
+                id: 'qibla',
+                label: 'Qibla',
+                icon: 'compass-outline',
+                route: '/qibla'
+            },
         ]
     },
     {
