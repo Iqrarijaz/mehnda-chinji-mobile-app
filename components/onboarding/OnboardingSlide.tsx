@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Dimensions, Animated } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { ThemedText } from '@/components/ThemedText';
@@ -17,11 +17,24 @@ interface OnboardingSlideProps {
     };
     index: number;
     scrollX: Animated.Value;
+    /** Whether this slide is the currently active/visible one. Off-screen
+     * slides pause their Lottie animation instead of playing in the
+     * background. Defaults to true so existing callers keep working. */
+    isActive?: boolean;
 }
 
-export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, scrollX }) => {
+export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, scrollX, isActive = true }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
+    const lottieRef = useRef<LottieView>(null);
+
+    useEffect(() => {
+        if (isActive) {
+            lottieRef.current?.play();
+        } else {
+            lottieRef.current?.pause();
+        }
+    }, [isActive]);
 
     // Slide animations mapping scroll position
     const translateY = scrollX.interpolate({
@@ -44,8 +57,9 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
             {/* Lottie Animation Display */}
             <Animated.View style={[styles.animationContainer, { transform: [{ scale }] }]}>
                 <LottieView
+                    ref={lottieRef}
                     source={item.animation}
-                    autoPlay
+                    autoPlay={isActive}
                     loop
                     style={styles.lottie}
                     hardwareAccelerationAndroid

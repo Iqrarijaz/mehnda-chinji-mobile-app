@@ -1,18 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import Svg, { Circle, Path } from 'react-native-svg';
-import Animated, {
-    Easing,
-    FadeInDown,
-    FadeInUp,
-    useAnimatedProps,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withRepeat,
-    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -20,8 +10,6 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
 import { Layout } from '@/constants/layout';
-
-const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 // Two heartbeats across the ribbon; ~470 units of stroke including zigzags.
 const ECG_PATH =
@@ -59,45 +47,10 @@ export const EmergencyHeroHeader = React.memo(function EmergencyHeroHeader({
     const area = [place?.village, place?.city].filter(Boolean).map(capitalizeString).join(', ');
     const placeImage = place?.images?.length > 0 ? place.images[0] : null;
 
-    // Heartbeat: a bright segment sweeps along the ECG line, then rests —
-    // reads as a periodic pulse rather than constant motion.
-    const sweep = useSharedValue(0);
-    // Soft double ring expanding from the service tile.
-    const pulse = useSharedValue(0);
-
-    useEffect(() => {
-        sweep.value = withRepeat(
-            withTiming(1, { duration: 2600, easing: Easing.inOut(Easing.quad) }),
-            -1,
-            false
-        );
-        pulse.value = withDelay(
-            400,
-            withRepeat(withTiming(1, { duration: 2200, easing: Easing.out(Easing.quad) }), -1, false)
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const sweepProps = useAnimatedProps(() => ({
-        strokeDashoffset: -ECG_SWEEP * sweep.value }));
-
-    const ringStyle = useAnimatedStyle(() => ({
-        opacity: (1 - pulse.value) * 0.45,
-        transform: [{ scale: 1 + pulse.value * 0.55 }] }));
-    const ringStyleSlow = useAnimatedStyle(() => {
-        const p = Math.min(1, pulse.value * 1.35);
-        return {
-            opacity: (1 - p) * 0.3,
-            transform: [{ scale: 1 + p * 0.85 }] };
-    });
-
     const BG = primaryColor || '#b91c1c';
 
     return (
-        <Animated.View
-            entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: BG }]}
-        >
+        <View style={[styles.container, { backgroundColor: BG }]}>
             {/* Emergency-themed decor: faint shield, cross, and circles */}
             <EmergencyBackgroundDecor limeColor={colors.lime} secondaryColor={colors.secondary} />
 
