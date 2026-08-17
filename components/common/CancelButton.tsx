@@ -38,8 +38,8 @@ export const CancelButton = React.memo(function CancelButton({ title = 'Cancel',
 
 const styles = StyleSheet.create({
     cancelButton: {
-        height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: 30,
+        height: Platform.OS === 'android' ? 46 : 50,
+        borderRadius: 28,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',

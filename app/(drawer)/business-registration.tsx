@@ -442,7 +442,7 @@ const BusinessRegistrationScreen = () => {
                             <TouchableOpacity
                                 style={[styles.dropdownTrigger, {
                                     backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                    height: Platform.OS === 'android' ? 48 : 52
+                                    height: Platform.OS === 'android' ? 46 : 50
                                 }]}
                                 onPress={() => setProfessionModalVisible(true)}
                             >
@@ -540,7 +540,7 @@ const BusinessRegistrationScreen = () => {
                                     <TouchableOpacity
                                         style={[styles.dropdownTrigger, {
                                             backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                            height: Platform.OS === 'android' ? 48 : 52 }]}
+                                            height: Platform.OS === 'android' ? 46 : 50 }]}
                                         onPress={() => setOpenTimePickerVisible(true)}
                                         activeOpacity={0.7}
                                     >
@@ -559,7 +559,7 @@ const BusinessRegistrationScreen = () => {
                                     <TouchableOpacity
                                         style={[styles.dropdownTrigger, {
                                             backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)',
-                                            height: Platform.OS === 'android' ? 48 : 52 }]}
+                                            height: Platform.OS === 'android' ? 46 : 50 }]}
                                         onPress={() => setCloseTimePickerVisible(true)}
                                         activeOpacity={0.7}
                                     >
@@ -625,13 +625,13 @@ const BusinessRegistrationScreen = () => {
                             <CancelButton
                                 onPress={() => handleGoBack()}
                                 disabled={isPending || isUploadingImage}
-                                style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 40 }}
+                                style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 38 }}
                             />
                             <SubmitButton
                                 title={editData ? 'Update' : 'Post Now'}
                                 onPress={handleSubmit}
                                 isLoading={isPending || isUploadingImage}
-                                style={{ width: 160, height: 40, borderRadius: 30 }}
+                                style={{ width: 160, height: 38, borderRadius: 28 }}
                             />
                         </View>
 
@@ -763,7 +763,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 11 },
     triggerContent: {
         flex: 1,

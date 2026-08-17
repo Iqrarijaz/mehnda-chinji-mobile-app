@@ -383,8 +383,8 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        height: 52,
-        borderRadius: Layout.borderRadius,
+        height: 50,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 10
     },
     input: {
@@ -412,8 +412,8 @@ const styles = StyleSheet.create({
         fontWeight: '600'
     },
     loginButton: {
-        height: 46,
-        borderRadius: 30,
+        height: 44,
+        borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden'

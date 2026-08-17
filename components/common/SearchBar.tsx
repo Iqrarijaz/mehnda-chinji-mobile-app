@@ -120,9 +120,9 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        height: 42,
+        height: 40,
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
-        borderRadius: Layout.borderRadius },
+        borderRadius: Layout.borderRadius - 2 },
     icon: {
         marginRight: 10 },
     input: {

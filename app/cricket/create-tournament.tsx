@@ -284,13 +284,13 @@ export default function CreateTournamentScreen() {
                             <CancelButton
                                 title="Cancel"
                                 onPress={() => router.back()}
-                                style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: Platform.OS === 'android' ? 48 : 52 }}
+                                style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: Platform.OS === 'android' ? 46 : 50 }}
                             />
                             <SubmitButton
                                 title="Create Tournament"
                                 onPress={handleSubmit}
                                 isLoading={createTournamentMutation.isPending}
-                                style={{ width: 180, height: Platform.OS === 'android' ? 48 : 52, borderRadius: 30 }}
+                                style={{ width: 180, height: Platform.OS === 'android' ? 46 : 50, borderRadius: 28 }}
                             />
                         </View>
                     </ScrollView>
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     sectionTitle: { fontSize: 13, fontWeight: '700' },
     dynamicCard: { padding: 10, borderRadius: Layout.borderRadius - 4, borderWidth: 0, gap: 8, marginBottom: 6 },
     dynamicRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 48 : 52, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 6, marginTop: 2 },
+    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 46 : 50, borderRadius: Layout.borderRadius - 6, gap: 6, marginBottom: 6, marginTop: 2 },
     addBtnText: { fontSize: 12, fontWeight: '700' },
     actionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 12 }
 });

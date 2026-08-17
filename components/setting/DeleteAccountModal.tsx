@@ -139,15 +139,15 @@ const styles = StyleSheet.create({
         marginBottom: 4,
         marginLeft: 2 },
     input: {
-        height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: Layout.borderRadius,
+        height: Platform.OS === 'android' ? 46 : 50,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 15,
         fontSize: 12.5,
         fontWeight: '500',
         backgroundColor: 'transparent' },
     saveButton: {
-        height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: Layout.borderRadius,
+        height: Platform.OS === 'android' ? 46 : 50,
+        borderRadius: Layout.borderRadius - 2,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 10 },
@@ -168,10 +168,10 @@ const styles = StyleSheet.create({
         marginTop: 12 },
     cancelBtn: {
         flex: 1,
-        height: Platform.OS === 'android' ? 48 : 52,
+        height: Platform.OS === 'android' ? 46 : 50,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius },
+        borderRadius: Layout.borderRadius - 2 },
     cancelText: {
         fontSize: 12.5,
         color: '#94A3B8',

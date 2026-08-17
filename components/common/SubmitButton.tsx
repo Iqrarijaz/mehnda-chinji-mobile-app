@@ -42,8 +42,8 @@ export const SubmitButton = React.memo(function SubmitButton({ title, isLoading,
 
 const styles = StyleSheet.create({
     updateButton: {
-        height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: 30,
+        height: Platform.OS === 'android' ? 46 : 50,
+        borderRadius: 28,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',

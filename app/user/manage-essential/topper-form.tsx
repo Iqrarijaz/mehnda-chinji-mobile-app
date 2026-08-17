@@ -235,7 +235,7 @@ const TopperForm = () => {
                                     FULL NAME <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}>
                                 <Ionicons name="person-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -254,7 +254,7 @@ const TopperForm = () => {
                                     FATHER'S NAME <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}>
                                 <Ionicons name="people-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -274,7 +274,7 @@ const TopperForm = () => {
                                 </ThemedText>
                             </View>
                             <TouchableOpacity
-                                style={[styles.dropdownTrigger, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}
+                                style={[styles.dropdownTrigger, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}
                                 onPress={() => setShowClassPicker(true)}
                             >
                                 <View style={styles.triggerContent}>
@@ -302,7 +302,7 @@ const TopperForm = () => {
                                     PASSING YEAR <ThemedText style={styles.required}>*</ThemedText>
                                 </ThemedText>
                             </View>
-                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                            <View style={[styles.inputBox, { backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}>
                                 <Ionicons name="calendar-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                 <TextInput
                                     style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -323,7 +323,7 @@ const TopperForm = () => {
                                 </ThemedText>
                             </View>
                             <View style={{ flexDirection: 'row', gap: 12 }}>
-                                <View style={[styles.inputBox, { flex: 1, backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                <View style={[styles.inputBox, { flex: 1, backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}>
                                     <Ionicons name="star-outline" size={18} color={colors.icon} style={{ marginRight: 10 }} />
                                     <TextInput
                                         style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
@@ -334,7 +334,7 @@ const TopperForm = () => {
                                         placeholderTextColor={colors.icon}
                                     />
                                 </View>
-                                <View style={[styles.inputBox, { flex: 1, backgroundColor: colors.card, height: Platform.OS === 'android' ? 48 : 52 }]}>
+                                <View style={[styles.inputBox, { flex: 1, backgroundColor: colors.card, height: Platform.OS === 'android' ? 46 : 50 }]}>
                                     <TextInput
                                         style={[styles.textInput, { color: colors.text, fontSize: Platform.OS === 'android' ? 13 : 14 }]}
                                         value={form.totalMarks}
@@ -464,14 +464,14 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 11 },
     textInput: { flex: 1, fontWeight: '500' },
     dropdownTrigger: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: Layout.borderRadius,
+        borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 11 },
     triggerContent: {
         flexDirection: 'row',
@@ -486,8 +486,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: Platform.OS === 'android' ? 10 : 12 },
     updateButton: {
-        height: Platform.OS === 'android' ? 48 : 52,
-        borderRadius: Layout.borderRadius,
+        height: Platform.OS === 'android' ? 46 : 50,
+        borderRadius: Layout.borderRadius - 2,
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden' },

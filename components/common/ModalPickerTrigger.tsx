@@ -90,8 +90,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: Layout.borderRadius,
-        height: Platform.OS === 'android' ? 48 : 52,
+        borderRadius: Layout.borderRadius - 2,
+        height: Platform.OS === 'android' ? 46 : 50,
         paddingHorizontal: 11 },
     triggerContent: {
         flexDirection: 'row',
