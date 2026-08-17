@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
         height: 44,
         borderRadius: Layout.borderRadius,
         overflow: 'hidden',
-        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.25)',
         backgroundColor: 'rgba(255,255,255,0.1)',
     },

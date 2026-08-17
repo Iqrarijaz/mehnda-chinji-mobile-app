@@ -111,17 +111,15 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.04,
         shadowRadius: 10,
         elevation: 2,
-        borderWidth: 1,
     },
     imageContainer: {
         width: 70,
         height: 70,
-        borderRadius: 35,
+        borderRadius: 31,
         marginBottom: 10,
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',
-        borderWidth: 1,
     },
     bankImage: {
         width: '80%',

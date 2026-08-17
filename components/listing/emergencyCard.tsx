@@ -179,7 +179,6 @@ const styles = StyleSheet.create({
     },
     cardContainer: {
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         borderLeftWidth: 4,
         padding: 16,
         paddingBottom: 14,
@@ -192,7 +191,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 48,
         height: 48,
-        borderRadius: 24,
+        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 14,
@@ -216,7 +215,7 @@ const styles = StyleSheet.create({
     badge: {
         paddingHorizontal: 8,
         paddingVertical: 3,
-        borderRadius: 12,
+        borderRadius: 10,
     },
     badgeText: {
         fontSize: 10,
@@ -267,7 +266,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 8,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         gap: 6,
     },
     navText: {

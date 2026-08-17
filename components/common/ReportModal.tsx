@@ -332,7 +332,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 16,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
     },
     reasonText: {
         fontSize: 15,
@@ -352,7 +351,6 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 120,
-        borderWidth: 1,
         borderRadius: Layout.borderRadius,
         padding: 16,
         fontSize: 15,

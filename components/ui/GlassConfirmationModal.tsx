@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         padding: 24,
         overflow: 'hidden',
-        borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.15)',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
@@ -134,7 +133,7 @@ const styles = StyleSheet.create({
     iconWrapper: {
         width: 64,
         height: 64,
-        borderRadius: 32,
+        borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
@@ -164,7 +163,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     cancelText: {

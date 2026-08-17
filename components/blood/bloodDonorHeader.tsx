@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     profileButton: {
         width: 38,
         height: 38,
-        borderRadius: 19,
+        borderRadius: 16,
         borderWidth: 2,
         borderColor: 'rgba(255,255,255,0.5)',
         justifyContent: 'center',
@@ -214,7 +214,6 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         height: Platform.OS === 'android' ? 42 : 48,
-        borderWidth: 1,
     },
     searchInput: {
         flex: 1,
@@ -230,7 +229,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         height: Platform.OS === 'android' ? 42 : 48,
         gap: 6,
-        borderWidth: 1,
     },
     bloodGroupText: {
         fontSize: Platform.OS === 'android' ? 12 : 14,
@@ -249,7 +247,6 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.3)',
     },
     mainToggleBtnActive: {
@@ -278,7 +275,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
-        borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
         gap: 12,
     },

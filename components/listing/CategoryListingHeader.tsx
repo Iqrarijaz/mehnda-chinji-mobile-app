@@ -143,7 +143,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
-        borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
         gap: 12,
     },
@@ -176,7 +175,7 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: 16,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -196,7 +195,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 12,
         height: 44,
-        borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
     },
     searchInput: {
@@ -214,7 +212,6 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         borderRadius: Layout.borderRadius,
         backgroundColor: 'rgba(255,255,255,0.2)',
-        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.3)',
     },
     activeFilterChip: {

@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     backBtn: {
         width: 42,
         height: 42,
-        borderRadius: 21,
+        borderRadius: 17,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     markBtn: {
         width: 42,
         height: 42,
-        borderRadius: 21,
+        borderRadius: 17,
         backgroundColor: 'rgba(255,255,255,0.18)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -147,7 +147,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
-        borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
         gap: 12,
     },

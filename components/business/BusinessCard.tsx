@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     avatarContainer: {
         width: 52,
         height: 52,
-        borderRadius: 26,
+        borderRadius: 22,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     badge: {
         paddingHorizontal: 8,
         paddingVertical: 3,
-        borderRadius: 12,
+        borderRadius: 10,
     },
     badgeText: {
         fontSize: 10,
@@ -344,7 +344,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         height: 38,
         borderRadius: Layout.borderRadius - 4,
-        borderWidth: 1,
         gap: 6,
     },
     viewBtnText: {
@@ -353,14 +352,13 @@ const styles = StyleSheet.create({
     },
     moreBtn: {
         padding: 4,
-        borderRadius: 20,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
     menuPopover: {
         width: 150,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.12,
@@ -381,7 +379,7 @@ const styles = StyleSheet.create({
     menuIconBox: {
         width: 24,
         height: 24,
-        borderRadius: 6,
+        borderRadius: 4,
         justifyContent: 'center',
         alignItems: 'center',
     },

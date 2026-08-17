@@ -37,7 +37,6 @@ const Avatar: React.FC<AvatarProps> = ({ uri, name, size = 40, style }) => {
             backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#FFFFFF',
             justifyContent: 'center',
             alignItems: 'center',
-            borderWidth: 1,
             borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
         }, style]}>
             <Text style={{

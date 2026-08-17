@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 2,
     },
     sectionTitle: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.6 },
-    sectionPill: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 12 },
+    sectionPill: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 10 },
     sectionPillText: { fontSize: 9, fontWeight: '700' },
 
     gridContainer: {
@@ -175,7 +175,6 @@ const styles = StyleSheet.create({
         width: '23.5%', // 4 columns per row
         padding: 6,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         minHeight: 65,
         justifyContent: 'center',
         shadowOffset: { width: 0, height: 1 },

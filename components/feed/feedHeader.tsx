@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 38,
         height: 38,
-        borderRadius: 11,
+        borderRadius: 9,
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     profileButton: {
         width: 38,
         height: 38,
-        borderRadius: 19,
+        borderRadius: 16,
         borderWidth: 2,
         borderColor: 'rgba(255,255,255,0.5)',
         justifyContent: 'center',
@@ -165,7 +165,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         height: Platform.OS === 'android' ? 40 : 48,
-        borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
     },
     searchInput: {
@@ -183,9 +182,8 @@ const styles = StyleSheet.create({
     filterChip: {
         paddingHorizontal: Platform.OS === 'android' ? 12 : 14,
         paddingVertical: 4,
-        borderRadius: 20,
+        borderRadius: 16,
         backgroundColor: 'rgba(255,255,255,0.2)',
-        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.3)',
     },
     activeFilterChip: {

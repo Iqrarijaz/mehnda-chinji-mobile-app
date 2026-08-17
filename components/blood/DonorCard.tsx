@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     bloodCircle: {
         width: 30,
         height: 30,
-        borderRadius: 15,
+        borderRadius: 12,
         backgroundColor: '#a91111ff',
         alignItems: 'center',
         justifyContent: 'center',
@@ -298,13 +298,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 8,
         paddingVertical: 2,
-        borderRadius: 6,
+        borderRadius: 4,
         gap: 4,
     },
     statusDot: {
         width: 5,
         height: 5,
-        borderRadius: 2.5,
+        borderRadius: 0.5,
     },
     statusText: {
         fontSize: 10,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     },
     moreBtn: {
         padding: 4,
-        borderRadius: 20,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -345,7 +345,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: 170,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.12,
@@ -366,7 +365,7 @@ const styles = StyleSheet.create({
     menuIconBox: {
         width: 28,
         height: 28,
-        borderRadius: 8,
+        borderRadius: 6,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -377,7 +376,7 @@ const styles = StyleSheet.create({
     callBtn: {
         width: 32,
         height: 32,
-        borderRadius: 16,
+        borderRadius: 13,
         alignItems: 'center',
         justifyContent: 'center',
     },

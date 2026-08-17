@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: Platform.OS === 'android' ? 14 : 16,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
+        height: 50,
     },
     icon: {
         marginRight: 10,

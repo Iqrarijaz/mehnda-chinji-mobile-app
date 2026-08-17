@@ -245,10 +245,9 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        height: 48,
+        height: 50,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 16,
-        borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
     },
     input: {
@@ -282,7 +281,7 @@ const styles = StyleSheet.create({
     iconBox: {
         width: 40,
         height: 40,
-        borderRadius: 12,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 14,

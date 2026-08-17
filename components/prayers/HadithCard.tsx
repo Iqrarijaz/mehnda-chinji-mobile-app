@@ -130,7 +130,6 @@ const styles = StyleSheet.create({
     },
     hadithCard: {
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         paddingVertical: 24,
         paddingHorizontal: 20,
         minHeight: 220,
@@ -177,7 +176,7 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
     },

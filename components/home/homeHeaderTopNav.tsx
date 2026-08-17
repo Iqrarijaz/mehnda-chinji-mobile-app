@@ -52,7 +52,7 @@ export function HomeHeaderTopNav({ onSearchPress }: HomeHeaderTopNavProps) {
                         uri={user?.user?.profileImage}
                         name={user?.user?.name}
                         size={34}
-                        style={{ borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}
+                        style={{, borderColor: 'rgba(255,255,255,0.2)' }}
                     />
                 </TouchableOpacity>
             </View>

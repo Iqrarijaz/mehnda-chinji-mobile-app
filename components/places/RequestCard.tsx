@@ -227,7 +227,6 @@ const styles = StyleSheet.create({
     card: {
         marginBottom: 12,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         borderLeftWidth: 4,
         padding: 14,
         elevation: 2,
@@ -256,7 +255,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         paddingHorizontal: 8,
         paddingVertical: 3,
-        borderRadius: 6,
+        borderRadius: 4,
         marginTop: 6,
     },
 
@@ -271,14 +270,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 12,
+        borderRadius: 10,
         gap: 4,
     },
 
     statusDot: {
         width: 6,
         height: 6,
-        borderRadius: 3,
+        borderRadius: 1,
     },
 
     statusText: {
@@ -331,8 +330,7 @@ const styles = StyleSheet.create({
 
     menu: {
         width: 150,
-        borderRadius: 10,
-        borderWidth: 1,
+        borderRadius: 8,
         padding: 8,
         elevation: 6,
     },
