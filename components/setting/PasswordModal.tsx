@@ -1,16 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
-    Easing,
     FadeIn,
     SlideInLeft,
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
     withTiming } from 'react-native-reanimated';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
-    Platform,
     ScrollView,
     StyleSheet,
     TextInput,
@@ -247,37 +244,6 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         textAlign: 'center',
         marginBottom: 3 },
-    subtitle: {
-        fontSize: 10,
-        fontWeight: '500' },
-    closeBtn: {
-        width: 30,
-        height: 30,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center' },
-
-    // Input
-    fieldWrap: { marginBottom: 10 },
-    label: {
-        fontSize: 10,
-        fontWeight: '700',
-        color: '#94A3B8',
-        letterSpacing: 0.8,
-        marginBottom: 4,
-        marginLeft: 2 },
-    inputRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: Layout.borderRadius, // Overridden in wrapStyle
-        paddingHorizontal: 11,
-        height: Platform.OS === 'android' ? 42 : 48 },
-    inputIcon: { marginRight: 10 },
-    input: {
-        flex: 1,
-        fontSize: 10,
-        fontWeight: '500' },
-    eyeBtn: { padding: 4 },
 
     // Strength bar
     strengthWrap: {
@@ -312,18 +278,6 @@ const styles = StyleSheet.create({
 
     // Buttons
     actions: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 12 },
-    primaryBtn: {
-        backgroundColor: '#006666',
-        height: 40,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 16 },
-    primaryBtnDisabled: { opacity: 0.45 },
-    primaryBtnText: {
-        color: '#FFFFFF',
-        fontSize: 12.5,
-        fontWeight: '600' },
     cancelBtn: {
         flex: 1,
         height: 40,

@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { ThemedText } from '@/components/ThemedText';
@@ -30,10 +29,9 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
         <View style={styles.container}>
             <ThemedText style={styles.sectionTitle}>Explore Categories</ThemedText>
             <View style={styles.grid}>
-                {CATEGORIES_CONFIG.map((cat, index) => (
-                    <Animated.View
+                {CATEGORIES_CONFIG.map((cat) => (
+                    <View
                         key={cat.id}
-                        entering={SlideInLeft.delay(100 + index * 80).duration(400)}
                         style={styles.gridItem}
                     >
                         <CategoryCard
@@ -41,12 +39,11 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                             icon={cat.icon}
                             onPress={() => handlePress(cat.id)}
                         />
-                    </Animated.View>
+                    </View>
                 ))}
 
                 {MORE_CATEGORIES_CONFIG.length > 0 && (
-                    <Animated.View
-                        entering={SlideInLeft.delay(100 + CATEGORIES_CONFIG.length * 80).duration(400)}
+                    <View
                         style={styles.gridItem}
                     >
                         <CategoryCard
@@ -54,7 +51,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                             icon="ellipsis-horizontal"
                             onPress={() => setIsModalVisible(true)}
                         />
-                    </Animated.View>
+                    </View>
                 )}
             </View>
 
@@ -70,10 +67,9 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                             <ThemedText style={[styles.modalTitle, { color: colors.text }]}>More Categories</ThemedText>
                         </View>
                         <ScrollView contentContainerStyle={styles.modalGrid} showsVerticalScrollIndicator={false}>
-                            {MORE_CATEGORIES_CONFIG.map((cat, index) => (
-                                <Animated.View
+                            {MORE_CATEGORIES_CONFIG.map((cat) => (
+                                <View
                                     key={cat.id}
-                                    entering={SlideInLeft.delay(index * 50).duration(300)}
                                     style={styles.gridItem}
                                 >
                                     <CategoryCard
@@ -84,7 +80,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                                             handlePress(cat.id);
                                         }}
                                     />
-                                </Animated.View>
+                                </View>
                             ))}
                         </ScrollView>
 

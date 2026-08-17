@@ -20,7 +20,7 @@ import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { signup, checkAccountExistsApi, googleLoginApi } from '@/apis/login';
-import { registerSchema, getPasswordStrength } from '@/utils/validation';
+import { registerSchema } from '@/utils/validation';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
@@ -209,10 +209,6 @@ export const RegisterForm = React.memo(function RegisterForm() {
         }
         return null;
     };
-
-    const strength = getPasswordStrength(formData.password);
-    const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-    const strengthColors = ['', '#EF4444', '#F59E0B', '#10B981', '#059669'];
 
     return (
         <View style={styles.formContainer}>
@@ -500,23 +496,6 @@ const styles = StyleSheet.create({
         marginTop: 6,
         marginLeft: 4,
         fontWeight: '500' },
-    strengthContainer: {
-        marginTop: 8,
-        paddingHorizontal: 2 },
-    strengthBarContainer: {
-        flexDirection: 'row',
-        height: 4,
-        gap: 4,
-        marginBottom: 4 },
-    strengthBar: {
-        flex: 1,
-        height: '100%',
-        borderRadius: Layout.borderRadius,
-        backgroundColor: '#E2E8F0' },
-    strengthText: {
-        fontSize: 10,
-        fontWeight: '600',
-        textAlign: 'right' },
     label: {
         fontSize: 10,
         fontWeight: '700',
@@ -532,10 +511,6 @@ const styles = StyleSheet.create({
         height: 52,
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 11 },
-    input: {
-        flex: 1,
-        fontSize: 10.5,
-        fontWeight: '500' },
     registerButton: {
         height: 46,
         borderRadius: 30,

@@ -1,14 +1,8 @@
-import React, { useEffect, useMemo, memo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-  withSequence } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -22,8 +16,6 @@ interface OnboardingNavigationProps {
   isLoading?: boolean;
 }
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
 const OnboardingNavigation = memo(function OnboardingNavigation({
   step,
   totalSteps,
@@ -35,19 +27,6 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
   const insets = useSafeAreaInsets();
   const isDark = theme === 'dark';
 
-  // Navigation mounting fade-in
-  const navOpacity = useSharedValue(0);
-  useEffect(() => {
-    navOpacity.value = withTiming(1, { duration: 500 });
-  }, []);
-
-  const animatedNavStyle = useAnimatedStyle(() => {
-    return {
-      opacity: navOpacity.value };
-  });
-
-
-
   // CTA Text depending on step
   const ctaText = useMemo(() => {
     if (step === totalSteps) {
@@ -55,38 +34,6 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
     }
     return 'Next';
   }, [step, totalSteps]);
-
-  // CTA Arrow Nudge Animation
-  const arrowTranslateX = useSharedValue(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!isLoading) {
-        arrowTranslateX.value = withSequence(
-          withTiming(4, { duration: 150 }),
-          withSpring(0, { damping: 6, stiffness: 100 })
-        );
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [isLoading]);
-
-  const animatedArrowStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: arrowTranslateX.value }] };
-  });
-
-  const backScale = useSharedValue(1);
-  const nextScale = useSharedValue(1);
-
-  const animatedBackBtnStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: backScale.value }] };
-  });
-
-  const animatedNextBtnStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: nextScale.value }] };
-  });
 
   const progressDots = useMemo(() => {
     const dots = [];
@@ -107,27 +54,27 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
   };
 
   return (
-    <Animated.View
+    <View
       style={[
         styles.container,
         {
           backgroundColor: colors.cardBg,
           paddingBottom: Math.max(insets.bottom, 16) },
-        animatedNavStyle,
       ]}
     >
-
 
       {/* Progress Dots Indicator */}
       <View style={styles.dotsRow}>
         {progressDots.map((dotIndex) => {
           const isActive = dotIndex === step;
           return (
-            <Dot
+            <View
               key={dotIndex}
-              isActive={isActive}
-              theme={theme}
-              colors={colors}
+              style={[
+                styles.progressDot,
+                isActive ? styles.progressDotActive : styles.progressDotInactive,
+                { backgroundColor: isActive ? colors.secondary : colors.icon },
+              ]}
             />
           );
         })}
@@ -136,13 +83,7 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
       {/* Buttons Container */}
       <View style={styles.buttonsContainer}>
         {/* Back Button */}
-        <AnimatedPressable
-          onPressIn={() => {
-            if (step > 1 && !isLoading) backScale.value = withTiming(0.95, { duration: 100 });
-          }}
-          onPressOut={() => {
-            backScale.value = withSpring(1, {});
-          }}
+        <Pressable
           onPress={handleBackPress}
           disabled={step === 1 || isLoading}
           style={[
@@ -150,27 +91,19 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
             {
               opacity: step === 1 ? 0 : 1,
               backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)' },
-            animatedBackBtnStyle,
           ]}
         >
           <Ionicons name="arrow-back" size={14} color={colors.text} style={{ marginRight: 4 }} />
           <Text allowFontScaling={false} style={[styles.backBtnText, { color: colors.text }]}>Back</Text>
-        </AnimatedPressable>
+        </Pressable>
 
         {/* Continue CTA */}
-        <AnimatedPressable
-          onPressIn={() => {
-            if (!isLoading) nextScale.value = withTiming(0.95, { duration: 100 });
-          }}
-          onPressOut={() => {
-            nextScale.value = withSpring(1, {});
-          }}
+        <Pressable
           onPress={handleNextPress}
           disabled={isLoading}
           style={[
             styles.nextBtn,
             { backgroundColor: colors.primary },
-            animatedNextBtnStyle,
           ]}
         >
           {isLoading ? (
@@ -180,45 +113,16 @@ const OnboardingNavigation = memo(function OnboardingNavigation({
               <Text allowFontScaling={false} style={styles.nextBtnText}>
                 {ctaText}
               </Text>
-              <Animated.View style={animatedArrowStyle}>
-                <Ionicons name="arrow-forward" size={14} color="#FFFFFF" style={{ marginLeft: 4 }} />
-              </Animated.View>
+              <Ionicons name="arrow-forward" size={14} color="#FFFFFF" style={{ marginLeft: 4 }} />
             </View>
           )}
-        </AnimatedPressable>
+        </Pressable>
       </View>
-    </Animated.View>
+    </View>
   );
 });
 
 export default OnboardingNavigation;
-
-function Dot({ isActive, theme, colors }: { isActive: boolean; theme: any; colors: any }) {
-  const dotWidth = useSharedValue(8);
-  const dotOpacity = useSharedValue(0.3);
-
-  useEffect(() => {
-    dotWidth.value = withSpring(isActive ? 18 : 8, { damping: 10, stiffness: 120 });
-    dotOpacity.value = withTiming(isActive ? 1.0 : 0.3, { duration: 250 });
-  }, [isActive]);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      width: dotWidth.value,
-      opacity: dotOpacity.value };
-  });
-
-  return (
-    <Animated.View
-      style={[
-        styles.progressDot,
-        {
-          backgroundColor: isActive ? colors.secondary : colors.icon },
-        animatedStyle,
-      ]}
-    />
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -239,6 +143,12 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: Layout.borderRadius,
     marginHorizontal: 3 },
+  progressDotActive: {
+    width: 18,
+    opacity: 1.0 },
+  progressDotInactive: {
+    width: 8,
+    opacity: 0.3 },
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 import { analyticsService, AnalyticsEvents } from '@/analytics';
 import { useDataUsageStore } from '@/store/dataUsageStore';
@@ -10,13 +10,18 @@ import OfflineIndicator from './OfflineIndicator';
  */
 const NetworkMonitor = () => {
     const [isOffline, setIsOffline] = useState(false);
+    const isOfflineRef = useRef(isOffline);
+
+    useEffect(() => {
+        isOfflineRef.current = isOffline;
+    }, [isOffline]);
 
     useEffect(() => {
         const unsubscribe = NetInfo.addEventListener(state => {
             const isConnected = !!state.isConnected && !!state.isInternetReachable !== false;
 
             // Track connection changes
-            if (isOffline !== !isConnected) {
+            if (isOfflineRef.current !== !isConnected) {
                 analyticsService.trackEvent(AnalyticsEvents.CONNECTION_CHANGED, {
                     status: isConnected ? 'online' : 'offline',
                     type: state.type
@@ -39,7 +44,7 @@ const NetworkMonitor = () => {
         });
 
         return () => unsubscribe();
-    }, [isOffline]);
+    }, []);
 
     return (
         <OfflineIndicator visible={isOffline} />

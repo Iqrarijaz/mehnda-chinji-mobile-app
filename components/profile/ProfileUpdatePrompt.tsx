@@ -2,8 +2,7 @@ import React from 'react';
 import {
     StyleSheet,
     View,
-    TouchableOpacity,
-    Platform } from 'react-native';
+    TouchableOpacity } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { PremiumModal } from '../common/PremiumModal';
 import { ThemedText } from '@/components/ThemedText';
@@ -40,7 +39,7 @@ export const ProfileUpdatePrompt = React.memo(({
                     <LottieView
                         source={require('@/public/json/edit_profile.json')}
                         autoPlay
-                        loop
+                        loop={false}
                         style={styles.lottie}
                     />
                 </View>
@@ -69,32 +68,6 @@ export const ProfileUpdatePrompt = React.memo(({
 const styles = StyleSheet.create({
     modalContent: {
         width: '100%' },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 12 },
-    titleSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10 },
-    closeButton: {
-        width: 32,
-        height: 32,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: '#F1F5F9',
-        justifyContent: 'center',
-        alignItems: 'center' },
-    iconBox: {
-        width: 38,
-        height: 38,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center' },
-    title: {
-        fontSize: 13.5,
-        fontWeight: '800',
-        letterSpacing: -0.4 },
     description: {
         fontSize: 12,
         lineHeight: 19,
@@ -114,15 +87,6 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     primaryBtnText: {
         color: '#FFF',
-        fontSize: 12.5,
-        fontWeight: '600' },
-    cancelBtn: {
-        flex: 1,
-        height: Platform.OS === 'android' ? 48 : 52,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: Layout.borderRadius },
-    cancelText: {
         fontSize: 12.5,
         fontWeight: '600' },
     lottieContainer: {

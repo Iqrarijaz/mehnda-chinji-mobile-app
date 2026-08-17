@@ -10,22 +10,9 @@ import Animated, {
     withSequence,
     withTiming } from 'react-native-reanimated';
 
-const SkimBox = React.memo(({ w, h, radius = 8, color }: { w: number | string; h: number; radius?: number; color: string }) => {
-    const opacity = useSharedValue(0.35);
-    useEffect(() => {
-        opacity.value = withRepeat(
-            withSequence(withTiming(0.7, { duration: 650 }), withTiming(0.35, { duration: 650 })),
-            -1,
-            true
-        );
-    }, []);
-    const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
-    return (
-        <Animated.View
-            style={[{ width: w as any, height: h, borderRadius: radius, backgroundColor: color }, style]}
-        />
-    );
-});
+const SkimBox = React.memo(({ w, h, radius = 8, color }: { w: number | string; h: number; radius?: number; color: string }) => (
+    <View style={{ width: w as any, height: h, borderRadius: radius, backgroundColor: color }} />
+));
 
 const SkeletonCard = React.memo(({ colors }: { colors: typeof Colors.light }) => (
     <View style={[styles.card, { backgroundColor: colors.card }]}>
@@ -45,10 +32,23 @@ const SkeletonCard = React.memo(({ colors }: { colors: typeof Colors.light }) =>
 const NotificationSkeleton = React.memo(() => {
     const { theme } = useTheme();
     const colors = Colors[theme];
+
+    // Single shared opacity pulse for the whole skeleton, instead of one
+    // loop per skeleton box.
+    const opacity = useSharedValue(0.35);
+    useEffect(() => {
+        opacity.value = withRepeat(
+            withSequence(withTiming(0.7, { duration: 650 }), withTiming(0.35, { duration: 650 })),
+            -1,
+            true
+        );
+    }, [opacity]);
+    const pulseStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+
     return (
-        <View style={styles.container}>
+        <Animated.View style={[styles.container, pulseStyle]}>
             {[...Array(6)].map((_, i) => <SkeletonCard key={i} colors={colors} />)}
-        </View>
+        </Animated.View>
     );
 });
 

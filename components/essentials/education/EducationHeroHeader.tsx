@@ -1,16 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import Svg, { Circle, Path } from 'react-native-svg';
-import Animated, {
-    Easing,
-    FadeInDown,
-    FadeInUp,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -51,31 +43,10 @@ export const EducationHeroHeader = React.memo(function EducationHeroHeader({
     const area = [place?.village, place?.city].filter(Boolean).map(capitalizeString).join(', ');
     const placeImage = place?.images?.length > 0 ? place.images[0] : null;
 
-    // The institution tile floats: a slow vertical bob with a hint of tilt,
-    // like a drifting graduation cap.
-    const float = useSharedValue(0);
-    useEffect(() => {
-        float.value = withRepeat(
-            withTiming(1, { duration: 2400, easing: Easing.inOut(Easing.sin) }),
-            -1,
-            true
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const floatStyle = useAnimatedStyle(() => ({
-        transform: [
-            { translateY: -3 + float.value * 6 },
-            { rotate: `${-2 + float.value * 4}deg` },
-        ] }));
-
     const BG = primaryColor || '#312e81';
 
     return (
-        <Animated.View
-            entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: BG }]}
-        >
+        <View style={[styles.container, { backgroundColor: BG }]}>
             {/* Education decor: faint circles, graduation cap, open book */}
             <EducationBackgroundDecor limeColor={colors.lime} secondaryColor={colors.secondary} />
 
@@ -110,7 +81,7 @@ export const EducationHeroHeader = React.memo(function EducationHeroHeader({
             </View>
 
             {/* Identity row */}
-            <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.identityRow}>
+            <View style={styles.identityRow}>
                 <View style={styles.identityText}>
                     <View style={styles.chipRow}>
                         <View style={[styles.typeChip, { backgroundColor: colors.lime }]}>
@@ -137,15 +108,15 @@ export const EducationHeroHeader = React.memo(function EducationHeroHeader({
                     </View>
                 </View>
 
-                <Animated.View style={[styles.institutionTile, floatStyle]}>
+                <View style={styles.institutionTile}>
                     {placeImage ? (
                         <Image source={{ uri: placeImage }} style={styles.institutionImage} contentFit="cover" />
                     ) : (
                         <Ionicons name="school" size={30} color="#FFFFFF" />
                     )}
-                </Animated.View>
-            </Animated.View>
-        </Animated.View>
+                </View>
+            </View>
+        </View>
     );
 });
 

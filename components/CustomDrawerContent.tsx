@@ -3,7 +3,7 @@ import {
     DrawerContentComponentProps,
     DrawerContentScrollView } from '@react-navigation/drawer';
 import { useRouter } from 'expo-router';
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import {
     Platform,
     StyleSheet,
@@ -189,9 +189,11 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
         }
     }, [logout]);
 
-    const userName = user?.user?.name
-        ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
-        : 'User';
+    const userName = useMemo(() => (
+        user?.user?.name
+            ? user.user.name.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+            : 'User'
+    ), [user?.user?.name]);
 
     const userEmail = user?.user?.email || '';
 
@@ -202,9 +204,6 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
         acc[section].push(item);
         return acc;
     }, {});
-
-    // Running index so menu rows stagger in continuously across sections.
-    let rowIndex = 0;
 
     return (
         <View style={[styles.container, { backgroundColor: colors.card }]}>
@@ -267,11 +266,9 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
             >
                 {Object.entries(sections).map(([sectionName, items], sectionIndex) => (
                     <View key={sectionName} style={styles.section}>
-                        <View>
-                            <View style={styles.sectionLabelRow}>
-                                <View style={[styles.sectionDot, { backgroundColor: colors.secondary }]} />
-                                <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>{sectionName}</ThemedText>
-                            </View>
+                        <View style={styles.sectionLabelRow}>
+                            <View style={[styles.sectionDot, { backgroundColor: colors.secondary }]} />
+                            <ThemedText style={[styles.sectionLabel, { color: colors.textSecondary }]}>{sectionName}</ThemedText>
                         </View>
                         {items.map((item) => {
                             const isFocused =

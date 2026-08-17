@@ -4,7 +4,6 @@ import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Layout } from '@/constants/layout';
 
 interface ModalPickerTriggerProps {
@@ -30,12 +29,8 @@ export const ModalPickerTrigger = React.memo(function ModalPickerTrigger({
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
-    // If delay > 0, we animate the view
-    const AnimatedView = delay > 0 ? Animated.View : View;
-    const animatedProps = delay > 0 ? { entering: FadeInDown.delay(delay) } : {};
-
     return (
-        <AnimatedView {...animatedProps} style={[styles.inputField, containerStyle]}>
+        <View style={[styles.inputField, containerStyle]}>
             <View style={styles.labelContainer}>
                 <ThemedText style={[styles.label, { color: colors.text }]}>
                     {label} {required && <ThemedText style={styles.required}>*</ThemedText>}
@@ -72,7 +67,7 @@ export const ModalPickerTrigger = React.memo(function ModalPickerTrigger({
                 </View>
                 <Ionicons name="chevron-down" size={16} color={colors.icon} />
             </TouchableOpacity>
-        </AnimatedView>
+        </View>
     );
 });
 

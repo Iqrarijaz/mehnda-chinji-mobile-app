@@ -32,7 +32,6 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Layout } from '@/constants/layout';
 
@@ -277,9 +276,9 @@ const CategoryListingScreen = React.memo(() => {
                 <View style={styles.headerRow}>
                     <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
 
-                    <Animated.View entering={FadeInDown.delay(80).duration(350)} style={styles.headerTitleWrap}>
+                    <View style={styles.headerTitleWrap}>
                         <ThemedText style={styles.headerTitle} numberOfLines={1}>{categoryTitle}</ThemedText>
-                    </Animated.View>
+                    </View>
 
                     <View style={styles.headerRight}>
                         <TouchableOpacity

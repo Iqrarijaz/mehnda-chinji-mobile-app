@@ -1,13 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import Animated, {
-    FadeIn,
-    SlideInLeft,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming } from 'react-native-reanimated';
-import React, { useCallback, useEffect } from 'react';
+import React from 'react';
 import {
     ActivityIndicator,
     Platform,
@@ -57,60 +50,50 @@ interface SessionCardProps {
 }
 
 const SessionCard = React.memo(({ session, delay, onRevoke, isRevoking, colors }: SessionCardProps) => {
-    const scale = useSharedValue(1);
-    const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-
-    const onPressIn = useCallback(() => { scale.value = withSpring(0.97, { damping: 15 }); }, []);
-    const onPressOut = useCallback(() => { scale.value = withSpring(1, { damping: 12 }); }, []);
-
     return (
-        <Animated.View entering={SlideInLeft.delay(delay).duration(400)} style={animStyle}>
-            <View style={[styles.card, { backgroundColor: colors.background }, session.isCurrent && styles.cardCurrent]}>
-                {/* Left icon */}
-                <View style={[styles.iconCircle, session.isCurrent && styles.iconCircleCurrent]}>
-                    <Ionicons
-                        name={getPlatformIcon(session.platform) as any}
-                        size={22}
-                        color={session.isCurrent ? colors.primary : colors.textSecondary}
-                    />
-                </View>
-
-                {/* Info */}
-                <View style={styles.info}>
-                    <View style={styles.nameRow}>
-                        <ThemedText style={styles.deviceName} numberOfLines={1}>
-                            {session.deviceName || 'Unknown Device'}
-                        </ThemedText>
-                        {session.isCurrent && (
-                            <Animated.View entering={FadeIn.delay(delay + 150).duration(300)} style={styles.badge}>
-                                <ThemedText style={styles.badgeText}>Current</ThemedText>
-                            </Animated.View>
-                        )}
-                    </View>
-                    <ThemedText style={styles.meta}>
-                        {session.platform && `${session.platform}  ·  `}{formatLastActive(session.lastActiveAt)}
-                    </ThemedText>
-                </View>
-
-                {/* Revoke */}
-                {!session.isCurrent && (
-                    <TouchableOpacity
-                        onPress={() => onRevoke(session._id)}
-                        onPressIn={onPressIn}
-                        onPressOut={onPressOut}
-                        disabled={isRevoking}
-                        activeOpacity={0.8}
-                        style={styles.revokeBtn}
-                    >
-                        {isRevoking ? (
-                            <ActivityIndicator size="small" color="#EF4444" />
-                        ) : (
-                            <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-                        )}
-                    </TouchableOpacity>
-                )}
+        <View style={[styles.card, { backgroundColor: colors.background }, session.isCurrent && styles.cardCurrent]}>
+            {/* Left icon */}
+            <View style={[styles.iconCircle, session.isCurrent && styles.iconCircleCurrent]}>
+                <Ionicons
+                    name={getPlatformIcon(session.platform) as any}
+                    size={22}
+                    color={session.isCurrent ? colors.primary : colors.textSecondary}
+                />
             </View>
-        </Animated.View>
+
+            {/* Info */}
+            <View style={styles.info}>
+                <View style={styles.nameRow}>
+                    <ThemedText style={styles.deviceName} numberOfLines={1}>
+                        {session.deviceName || 'Unknown Device'}
+                    </ThemedText>
+                    {session.isCurrent && (
+                        <View style={styles.badge}>
+                            <ThemedText style={styles.badgeText}>Current</ThemedText>
+                        </View>
+                    )}
+                </View>
+                <ThemedText style={styles.meta}>
+                    {session.platform && `${session.platform}  ·  `}{formatLastActive(session.lastActiveAt)}
+                </ThemedText>
+            </View>
+
+            {/* Revoke */}
+            {!session.isCurrent && (
+                <TouchableOpacity
+                    onPress={() => onRevoke(session._id)}
+                    disabled={isRevoking}
+                    activeOpacity={0.7}
+                    style={styles.revokeBtn}
+                >
+                    {isRevoking ? (
+                        <ActivityIndicator size="small" color="#EF4444" />
+                    ) : (
+                        <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+                    )}
+                </TouchableOpacity>
+            )}
+        </View>
     );
 });
 
@@ -123,13 +106,13 @@ const SkeletonCard = React.memo(({ delay }: { delay: number }) => {
     const subBg = isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9';
 
     return (
-        <Animated.View entering={SlideInLeft.delay(delay).duration(300)} style={[styles.card, { backgroundColor: colors.background, opacity: 0.5 }]}>
+        <View style={[styles.card, { backgroundColor: colors.background, opacity: 0.5 }]}>
             <View style={[styles.iconCircle, { backgroundColor: skeletonBg }]} />
             <View style={styles.info}>
                 <View style={{ width: '60%', height: 13, borderRadius: Layout.borderRadius, backgroundColor: skeletonBg, marginBottom: 8 }} />
                 <View style={{ width: '40%', height: 11, borderRadius: Layout.borderRadius, backgroundColor: subBg }} />
             </View>
-        </Animated.View>
+        </View>
     );
 });
 
@@ -189,10 +172,10 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
                         <SkeletonCard delay={160} />
                     </>
                 ) : sessions.length === 0 ? (
-                    <Animated.View entering={FadeIn.delay(200).duration(400)} style={styles.empty}>
+                    <View style={styles.empty}>
                         <Ionicons name="phone-portrait-outline" size={40} color="#CBD5E1" />
                         <ThemedText style={styles.emptyText}>No active sessions found</ThemedText>
-                    </Animated.View>
+                    </View>
                 ) : (
                     sessions.map((session, i) => (
                         <SessionCard

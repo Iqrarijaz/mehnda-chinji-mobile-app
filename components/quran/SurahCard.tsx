@@ -6,7 +6,6 @@ import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { memo } from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Layout } from '@/constants/layout';
 
 interface SurahCardProps {
@@ -43,7 +42,7 @@ export const SurahCard = memo(({
     const colors = Colors[theme];
 
     return (
-        <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(320)}>
+        <View>
             <PressableScale
                 intensity={0.02}
                 onPress={onPress}
@@ -139,7 +138,7 @@ export const SurahCard = memo(({
                     </TouchableOpacity>
                 </View>
             </PressableScale>
-        </Animated.View>
+        </View>
     );
 });
 

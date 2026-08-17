@@ -1,8 +1,6 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, Share } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -39,21 +37,18 @@ export function AyahOfTheDayCard() {
     if (isLoading || !ayah) {
         return (
             <View style={[styles.wrap, { backgroundColor: colors.cardBg }]}>
-                <Skeleton width="40%" height={12} borderRadius={4} style={{ marginBottom: 16 }} />
-                <Skeleton width="90%" height={22} borderRadius={4} style={{ marginBottom: 10, alignSelf: 'flex-end' }} />
-                <Skeleton width="70%" height={22} borderRadius={4} style={{ marginBottom: 16, alignSelf: 'flex-end' }} />
+                <Skeleton width="40%" height={12} borderRadius={4} style={styles.skeletonBadge} />
+                <Skeleton width="90%" height={22} borderRadius={4} style={styles.skeletonLineWide} />
+                <Skeleton width="70%" height={22} borderRadius={4} style={styles.skeletonLineNarrow} />
                 <Skeleton width="60%" height={14} borderRadius={4} />
             </View>
         );
     }
 
     return (
-        <Animated.View entering={FadeIn.duration(400)} style={styles.wrap}>
-            <LinearGradient
-                colors={[colors.primary, '#0b3b3b']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.card}
+        <View style={styles.wrap}>
+            <View
+                style={[styles.card, { backgroundColor: colors.primary }]}
             >
                 <View style={styles.topRow}>
                     <View style={[styles.badge, { backgroundColor: 'rgba(255,255,255,0.16)' }]}>
@@ -76,12 +71,23 @@ export function AyahOfTheDayCard() {
                         {ayah.surahEnglishName} ({ayah.surahName}) · {ayah.numberInSurah}
                     </ThemedText>
                 </View>
-            </LinearGradient>
-        </Animated.View>
+            </View>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    skeletonBadge: {
+        marginBottom: 16,
+    },
+    skeletonLineWide: {
+        marginBottom: 10,
+        alignSelf: 'flex-end',
+    },
+    skeletonLineNarrow: {
+        marginBottom: 16,
+        alignSelf: 'flex-end',
+    },
     wrap: {
         marginHorizontal: 14,
         marginTop: 8,

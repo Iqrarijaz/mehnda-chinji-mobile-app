@@ -105,6 +105,7 @@ export default function OnboardingScreen() {
                                 item={item}
                                 index={index}
                                 scrollX={scrollX}
+                                isActive={index === currentIndex}
                             />
                         )}
                         horizontal

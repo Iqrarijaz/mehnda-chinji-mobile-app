@@ -1,10 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/ThemedText';
 import { BackButton } from '@/components/common/BackButton';
@@ -135,9 +133,8 @@ export default function ManageCitiesScreen() {
                     </View>
                 ) : (
                     cities.map((c, i) => (
-                        <Animated.View
+                        <View
                             key={`${c.latitude}-${c.longitude}`}
-                            entering={FadeInDown.delay(i * 40)}
                             style={[styles.cityRow, { backgroundColor: colors.card }]}
                         >
                             <View style={{ flex: 1 }}>
@@ -158,7 +155,7 @@ export default function ManageCitiesScreen() {
                             <TouchableOpacity onPress={() => removeCity(i)} hitSlop={6} style={styles.reorderBtn}>
                                 <Ionicons name="trash-outline" size={18} color="#EF4444" />
                             </TouchableOpacity>
-                        </Animated.View>
+                        </View>
                     ))
                 )}
 

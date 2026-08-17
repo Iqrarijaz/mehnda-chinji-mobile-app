@@ -1,11 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Animated, {
-    SlideInLeft,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring } from 'react-native-reanimated';
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
@@ -54,61 +49,42 @@ interface Props {
 function NotificationItemComponent({ item, onPress, delay = 0 }: Props) {
     const { theme } = useTheme();
     const colors = Colors[theme];
-    const scale = useSharedValue(1);
-
-    const animStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }] }));
-
-    const handlePressIn = useCallback(() => {
-        scale.value = withSpring(0.97, { damping: 15 });
-    }, []);
-
-    const handlePressOut = useCallback(() => {
-        scale.value = withSpring(1, { damping: 12 });
-    }, []);
 
     const { icon, color } = getTypeStyle(item.type, colors.primary);
 
     return (
-        <Animated.View
-            entering={SlideInLeft.delay(delay).duration(400)}
-            style={animStyle}
+        <TouchableOpacity
+            onPress={() => onPress(item)}
+            activeOpacity={0.7}
+            style={[
+                styles.card,
+                { backgroundColor: item.isRead ? colors.card : `${colors.primary}14` },
+            ]}
         >
-            <TouchableOpacity
-                onPress={() => onPress(item)}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-                activeOpacity={1}
-                style={[
-                    styles.card,
-                    { backgroundColor: item.isRead ? colors.card : `${colors.primary}14` },
-                ]}
-            >
-                {/* Left: Icon */}
-                <View style={styles.iconWrap}>
-                    <View style={[styles.iconCircle, { backgroundColor: `${colors.primary}14` }]}>
-                        <Ionicons name={icon as any} size={18} color={color} />
-                    </View>
-                    {!item.isRead && <View style={[styles.badge, { backgroundColor: colors.primary }]} />}
+            {/* Left: Icon */}
+            <View style={styles.iconWrap}>
+                <View style={[styles.iconCircle, { backgroundColor: `${colors.primary}14` }]}>
+                    <Ionicons name={icon as any} size={18} color={color} />
                 </View>
+                {!item.isRead && <View style={[styles.badge, { backgroundColor: colors.primary }]} />}
+            </View>
 
-                {/* Middle: Content */}
-                <View style={styles.content}>
-                    <View style={styles.titleRow}>
-                        <ThemedText
-                            style={[styles.title, { color: colors.text }, !item.isRead && styles.titleUnread]}
-                            numberOfLines={1}
-                        >
-                            {item.title}
-                        </ThemedText>
-                        {!item.isRead && <View style={[styles.dot, { backgroundColor: colors.primary }]} />}
-                    </View>
-                    <ThemedText style={[styles.body, { color: colors.textSecondary }]} numberOfLines={2}>{item.body}</ThemedText>
-                    <ThemedText style={[styles.time, { color: colors.placeholder }]}>{formatTime(item.createdAt)}</ThemedText>
+            {/* Middle: Content */}
+            <View style={styles.content}>
+                <View style={styles.titleRow}>
+                    <ThemedText
+                        style={[styles.title, { color: colors.text }, !item.isRead && styles.titleUnread]}
+                        numberOfLines={1}
+                    >
+                        {item.title}
+                    </ThemedText>
+                    {!item.isRead && <View style={[styles.dot, { backgroundColor: colors.primary }]} />}
                 </View>
+                <ThemedText style={[styles.body, { color: colors.textSecondary }]} numberOfLines={2}>{item.body}</ThemedText>
+                <ThemedText style={[styles.time, { color: colors.placeholder }]}>{formatTime(item.createdAt)}</ThemedText>
+            </View>
 
-            </TouchableOpacity>
-        </Animated.View>
+        </TouchableOpacity>
     );
 }
 

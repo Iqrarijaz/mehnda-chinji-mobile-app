@@ -1,25 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-    LayoutChangeEvent,
-    NativeScrollEvent,
-    NativeSyntheticEvent,
     StyleSheet,
     TouchableOpacity,
-    View,
-    ScrollView
+    View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-    FadeIn,
-    FadeInDown,
-    Easing,
-    useSharedValue,
-    useAnimatedStyle,
-    withRepeat,
-    withSequence,
-    withTiming,
-    withDelay
-} from 'react-native-reanimated';
+import Skeleton from '@/components/common/Skeleton';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
@@ -112,43 +98,31 @@ const WeatherRow = React.memo(({
 WeatherRow.displayName = 'WeatherRow';
 
 // ── Skeleton Loader Component ──
-const Skeleton = React.memo(({ backgroundColor }: { backgroundColor: string }) => {
-    const shimmer = useSharedValue(0.4);
-    useEffect(() => {
-        shimmer.value = withRepeat(
-            withTiming(0.9, { duration: 850, easing: Easing.inOut(Easing.ease) }),
-            -1,
-            true
-        );
-    }, [shimmer]);
-    const animatedStyle = useAnimatedStyle(() => ({ opacity: shimmer.value }));
-    const Block = ({ w, h, mt = 0, br = Layout.borderRadius }: { w: number | string; h: number; mt?: number; br?: number }) => (
-        <Animated.View style={[{ width: w as any, height: h, borderRadius: br, backgroundColor: 'rgba(255,255,255,0.25)', marginTop: mt }, animatedStyle]} />
-    );
-    return (
-        <View style={styles.wrapper}>
-            <View style={[styles.card, { backgroundColor, minHeight: 88 }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <View style={{ flex: 1, paddingRight: 12 }}>
-                        <Block w={'60%'} h={18} />
-                        <Block w={'40%'} h={13} mt={6} />
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                            <Block w={48} h={18} br={4} />
-                            <Block w={48} h={18} mt={0} br={4} />
-                        </View>
+const WeatherSkeleton = React.memo(({ backgroundColor }: { backgroundColor: string }) => (
+    <View style={styles.wrapper}>
+        <View style={[styles.card, { backgroundColor, minHeight: 88 }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flex: 1, paddingRight: 12 }}>
+                    <Skeleton width={'60%'} height={18} />
+                    <View style={{ height: 6 }} />
+                    <Skeleton width={'40%'} height={13} />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                        <Skeleton width={48} height={18} borderRadius={4} />
+                        <View style={{ width: 6 }} />
+                        <Skeleton width={48} height={18} borderRadius={4} />
                     </View>
-                    <View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                            <Block w={38} h={38} br={19} />
-                            <Block w={46} h={32} br={6} />
-                        </View>
+                </View>
+                <View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Skeleton width={38} height={38} borderRadius={19} />
+                        <Skeleton width={46} height={32} borderRadius={6} />
                     </View>
                 </View>
             </View>
         </View>
-    );
-});
-Skeleton.displayName = 'Skeleton';
+    </View>
+));
+WeatherSkeleton.displayName = 'WeatherSkeleton';
 
 const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidgetProps) => {
     const { theme } = useTheme();
@@ -211,19 +185,10 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
         };
     }, [forecast]);
 
-    const [activePage, setActivePage] = useState(0);
-
-    // Auto carousel of 10 seconds: auto-shifts between Today (0) and Tomorrow (1)
-    useEffect(() => {
-        if (!tomorrow) return;
-        const timer = setInterval(() => {
-            setActivePage((prev) => (prev === 0 ? 1 : 0));
-        }, 10000);
-        return () => clearInterval(timer);
-    }, [tomorrow]);
+    const [activePage] = useState(0);
 
     if (!weather || isWeatherLoading) {
-        return <Skeleton backgroundColor={colors.primary} />;
+        return <WeatherSkeleton backgroundColor={colors.primary} />;
     }
 
     const temp = weather ? Math.round(weather.main.temp) : '--';
@@ -231,13 +196,13 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
     const city = (weather?.name || fallbackCity || '').split(',')[0].trim();
 
     return (
-        <Animated.View entering={FadeInDown.duration(450)} style={styles.wrapper}>
+        <View style={styles.wrapper}>
             <TouchableOpacity
                 activeOpacity={0.85}
                 onPress={onPress}
                 style={[styles.card, { backgroundColor: colors.primary, minHeight: 88 }]}
             >
-                <Animated.View key={activePage} entering={FadeIn.duration(500)}>
+                <View key={activePage}>
                     {activePage === 0 || !tomorrow ? (
                         <WeatherRow
                             icon={icon}
@@ -262,9 +227,9 @@ const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidget
                             colors={colors}
                         />
                     )}
-                </Animated.View>
+                </View>
             </TouchableOpacity>
-        </Animated.View>
+        </View>
     );
 });
 
@@ -298,10 +263,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.15,
         shadowRadius: 8,
         elevation: 3
-    },
-    weatherColWrap: {
-        width: '100%',
-        justifyContent: 'center'
     },
     weatherCol: {
         justifyContent: 'center'
@@ -383,10 +344,6 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         justifyContent: 'center'
     },
-    forecastTapArea: {
-        alignItems: 'flex-end',
-        justifyContent: 'center'
-    },
     tempIconRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -398,62 +355,4 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         lineHeight: 34
     },
-    forecastPillContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        marginTop: 4
-    },
-    updatedInner: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 3
-    },
-    updated: {
-        fontSize: 9.5,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.7)'
-    },
-    tapHintPill: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 2,
-        paddingHorizontal: 7,
-        paddingVertical: 3,
-        borderRadius: 12
-    },
-    tapHintText: {
-        fontSize: 9.5,
-        fontWeight: '800',
-        color: '#0F172A'
-    },
-    pagerFooterRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 8,
-        paddingTop: 6,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.1)'
-    },
-    pagerDotsContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5
-    },
-    pagerDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: 'rgba(255,255,255,0.3)'
-    },
-    swipeHintGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 3
-    },
-    swipeHintText: {
-        fontSize: 9.5,
-        fontWeight: '700'
-    }
 });

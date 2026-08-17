@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
@@ -103,10 +102,9 @@ export function UtilsGrid() {
                     {/* Same CategoryCard used by "Explore Categories" — same rounded
                         card, icon tile, and label treatment across the Home screen. */}
                     <View style={styles.grid}>
-                        {category.items.map((util, index) => (
-                            <Animated.View
+                        {category.items.map((util) => (
+                            <View
                                 key={util.id}
-                                entering={SlideInLeft.delay(100 + index * 80).duration(400)}
                                 style={styles.gridItem}
                             >
                                 <CategoryCard
@@ -114,7 +112,7 @@ export function UtilsGrid() {
                                     icon={util.image ?? util.icon}
                                     onPress={() => router.push(util.route as any)}
                                 />
-                            </Animated.View>
+                            </View>
                         ))}
                     </View>
                 </View>

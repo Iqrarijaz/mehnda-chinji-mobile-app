@@ -76,12 +76,6 @@ export const ConfirmationModal: React.FC<GlassConfirmationModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 16 },
     modalContent: {
         width: '85%',
         maxWidth: 320,

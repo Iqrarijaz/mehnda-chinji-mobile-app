@@ -1,17 +1,8 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import Svg, { Circle, Path } from 'react-native-svg';
-import Animated, {
-    Easing,
-    FadeInDown,
-    FadeInUp,
-    useAnimatedProps,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -19,8 +10,6 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
 import { Layout } from '@/constants/layout';
-
-const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 // Single calm heartbeat in an otherwise flat line.
 const ECG_PATH = 'M0 16 H132 L144 16 L152 4 L162 27 L170 16 H340';
@@ -58,42 +47,10 @@ export const HealthHeroHeader = React.memo(function HealthHeroHeader({
     const area = [place?.village, place?.city].filter(Boolean).map(capitalizeString).join(', ');
     const placeImage = place?.images?.length > 0 ? place.images[0] : null;
 
-    // The service tile "breathes": a slow, small scale oscillation.
-    const breathe = useSharedValue(0);
-    // A slow pulse sweeping along the heartbeat line.
-    const sweep = useSharedValue(0);
-
-    useEffect(() => {
-        breathe.value = withRepeat(
-            withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
-            -1,
-            true
-        );
-        sweep.value = withRepeat(
-            withTiming(1, { duration: 3200, easing: Easing.inOut(Easing.quad) }),
-            -1,
-            false
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const breatheStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 + breathe.value * 0.035 }] }));
-
-    const haloStyle = useAnimatedStyle(() => ({
-        opacity: 0.3 - breathe.value * 0.12,
-        transform: [{ scale: 1.12 + breathe.value * 0.1 }] }));
-
-    const sweepProps = useAnimatedProps(() => ({
-        strokeDashoffset: -ECG_SWEEP * sweep.value }));
-
     const BG = primaryColor || colors.primary;
 
     return (
-        <Animated.View
-            entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: BG }]}
-        >
+        <View style={[styles.container, { backgroundColor: BG }]}>
             {/* Healthcare decor: faint circles, cross, stethoscope curve */}
             <HealthBackgroundDecor limeColor={colors.lime} secondaryColor={colors.secondary} />
 
@@ -128,7 +85,7 @@ export const HealthHeroHeader = React.memo(function HealthHeroHeader({
             </View>
 
             {/* Identity row */}
-            <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.identityRow}>
+            <View style={styles.identityRow}>
                 <View style={styles.identityText}>
                     <View style={styles.chipRow}>
                         <View style={[styles.typeChip, { backgroundColor: colors.lime }]}>
@@ -156,19 +113,19 @@ export const HealthHeroHeader = React.memo(function HealthHeroHeader({
                 </View>
 
                 <View style={styles.tileWrap}>
-                    <Animated.View style={[styles.halo, haloStyle]} />
-                    <Animated.View style={[styles.serviceTile, breatheStyle]}>
+                    <View style={styles.halo} />
+                    <View style={styles.serviceTile}>
                         {placeImage ? (
                             <Image source={{ uri: placeImage }} style={styles.serviceImage} contentFit="cover" />
                         ) : (
                             <Ionicons name="medical" size={28} color="#FFFFFF" />
                         )}
-                    </Animated.View>
+                    </View>
                 </View>
-            </Animated.View>
+            </View>
 
             {/* Calm heartbeat line */}
-            <Animated.View entering={FadeInDown.delay(220).duration(450)} style={styles.ecgWrap}>
+            <View style={styles.ecgWrap}>
                 <Svg width="100%" height={32} viewBox="0 0 340 32" preserveAspectRatio="none">
                     <Path
                         d={ECG_PATH}
@@ -178,7 +135,7 @@ export const HealthHeroHeader = React.memo(function HealthHeroHeader({
                         strokeLinejoin="round"
                         fill="none"
                     />
-                    <AnimatedPath
+                    <Path
                         d={ECG_PATH}
                         stroke={colors.lime}
                         strokeWidth={2.5}
@@ -186,11 +143,10 @@ export const HealthHeroHeader = React.memo(function HealthHeroHeader({
                         strokeLinejoin="round"
                         fill="none"
                         strokeDasharray={`60 ${ECG_SWEEP - 60}`}
-                        animatedProps={sweepProps}
                     />
                 </Svg>
-            </Animated.View>
-        </Animated.View>
+            </View>
+        </View>
     );
 });
 

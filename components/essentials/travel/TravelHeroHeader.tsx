@@ -1,16 +1,8 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import Svg, { Circle, Path } from 'react-native-svg';
-import Animated, {
-    Easing,
-    FadeInDown,
-    FadeInUp,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -52,27 +44,10 @@ export const TravelHeroHeader = React.memo(function TravelHeroHeader({
     const typeLabel = place?.type ? capitalizeString(place.type) : 'Travel';
     const placeImage = place?.images?.length > 0 ? place.images[0] : null;
 
-    // The vehicle tile gently floats: a soft vertical bob.
-    const bob = useSharedValue(0);
-    useEffect(() => {
-        bob.value = withRepeat(
-            withTiming(1, { duration: 1900, easing: Easing.inOut(Easing.sin) }),
-            -1,
-            true
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const bobStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: -3 + bob.value * 6 }] }));
-
     const BG = primaryColor || '#0f172a';
 
     return (
-        <Animated.View
-            entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: BG }]}
-        >
+        <View style={[styles.container, { backgroundColor: BG }]}>
             {/* Route-inspired background decor */}
             <TravelBackgroundDecor limeColor={colors.lime} secondaryColor={colors.secondary} />
 
@@ -107,10 +82,7 @@ export const TravelHeroHeader = React.memo(function TravelHeroHeader({
             </View>
 
             {/* Identity row */}
-            <Animated.View
-                entering={FadeInDown.delay(100).duration(450)}
-                style={styles.identityRow}
-            >
+            <View style={styles.identityRow}>
                 <View style={styles.identityText}>
                     <View style={styles.chipRow}>
                         <View style={[styles.typeChip, { backgroundColor: colors.lime }]}>
@@ -131,21 +103,18 @@ export const TravelHeroHeader = React.memo(function TravelHeroHeader({
                     )}
                 </View>
 
-                <Animated.View style={[styles.vehicleTile, bobStyle]}>
+                <View style={styles.vehicleTile}>
                     {placeImage ? (
                         <Image source={{ uri: placeImage }} style={styles.vehicleImage} contentFit="cover" />
                     ) : (
                         <MaterialCommunityIcons name="bus-side" size={34} color="#FFFFFF" />
                     )}
-                </Animated.View>
-            </Animated.View>
+                </View>
+            </View>
 
             {/* Origin → destination ribbon */}
             {destination ? (
-                <Animated.View
-                    entering={FadeInDown.delay(220).duration(450)}
-                    style={styles.ribbon}
-                >
+                <View style={styles.ribbon}>
                     <View style={[styles.ribbonDot, { backgroundColor: colors.lime }]} />
                     <FlowingLine color="rgba(255,255,255,0.45)" style={styles.ribbonLine} />
                     <View style={styles.ribbonBus}>
@@ -153,9 +122,9 @@ export const TravelHeroHeader = React.memo(function TravelHeroHeader({
                     </View>
                     <FlowingLine color="rgba(255,255,255,0.45)" style={styles.ribbonLine} />
                     <Ionicons name="location" size={14} color={colors.secondary} />
-                </Animated.View>
+                </View>
             ) : null}
-        </Animated.View>
+        </View>
     );
 });
 

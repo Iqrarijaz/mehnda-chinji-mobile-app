@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { ThemedText } from '@/components/ThemedText';
 
 interface FAQItemProps {
     question: string;
@@ -35,14 +36,6 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
             transform: [{ rotate: `${rotate}deg` }] };
     });
 
-    const bodyStyle = useAnimatedStyle(() => {
-        const height = interpolate(animation.value, [0, 1], [0, 1]); // Simple toggle logic for Reanimated
-        return {
-            opacity: animation.value,
-            display: isOpen ? 'flex' : 'none', // Fallback for height if not using measured height
-        };
-    });
-
     return (
         <View style={[styles.container, { backgroundColor: colors.card }]}>
             <TouchableOpacity
@@ -50,7 +43,7 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
                 onPress={onToggle}
                 style={[styles.header, isOpen && { backgroundColor: `${colors.primary}14` }]}
             >
-                <Text allowFontScaling={false} style={[styles.question, { color: isOpen ? colors.primary : colors.text }]}>{question}</Text>
+                <ThemedText allowFontScaling={false} style={[styles.question, { color: isOpen ? colors.primary : colors.text }]}>{question}</ThemedText>
                 <Animated.View style={chevronStyle}>
                     <Ionicons
                         name="chevron-down"
@@ -66,7 +59,7 @@ const FAQItem: React.FC<FAQItemProps> = React.memo(({ question, answer, isOpen, 
                     exiting={FadeOut.duration(200)}
                     style={styles.answerContainer}
                 >
-                    <Text allowFontScaling={false} style={[styles.answer, { color: colors.textSecondary }]}>{answer}</Text>
+                    <ThemedText allowFontScaling={false} style={[styles.answer, { color: colors.textSecondary }]}>{answer}</ThemedText>
                 </Animated.View>
             )}
         </View>

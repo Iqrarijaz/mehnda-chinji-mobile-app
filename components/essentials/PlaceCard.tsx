@@ -194,30 +194,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden' },
-    tileHalo: {
-        position: 'absolute',
-        width: TILE_SIZE * 0.82,
-        height: TILE_SIZE * 0.82,
-        borderRadius: TILE_SIZE * 0.41 },
-    tileIconCircle: {
-        width: 44,
-        height: 44,
-        borderRadius: Layout.borderRadius,
-        alignItems: 'center',
-        justifyContent: 'center' },
     info: {
         flex: 1,
         gap: 3 },
-    typeChip: {
-        alignSelf: 'flex-start',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: Layout.borderRadius },
-    typeChipText: {
-        fontSize: 9,
-        fontWeight: '800',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5 },
     typeBadge: {
         position: 'absolute',
         top: 0,

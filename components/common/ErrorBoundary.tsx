@@ -1,6 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import LottieView from 'lottie-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { errorLogger } from '@/lib/errorLogger';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -23,12 +23,7 @@ const FallbackUI = React.memo(({ onRetry }: { onRetry: () => void }) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.lottieContainer}>
-        <LottieView
-          source={require('@/public/json/no_connection.json')}
-          autoPlay
-          loop
-          style={styles.lottie}
-        />
+        <Ionicons name="alert-circle-outline" size={96} color={colors.textSecondary} />
       </View>
 
       <View style={styles.textContainer}>
@@ -94,9 +89,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     justifyContent: 'center',
     alignItems: 'center' },
-  lottie: {
-    width: '100%',
-    height: '100%' },
   textContainer: {
     marginBottom: 24,
     alignItems: 'center' },

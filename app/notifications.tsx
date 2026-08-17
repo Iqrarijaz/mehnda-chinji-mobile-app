@@ -190,6 +190,7 @@ export default function NotificationsScreen() {
                 <View style={{ flex: 1 }}>
                     <FlashList
                         data={listData}
+                        estimatedItemSize={80}
                         renderItem={renderItem as any}
                         keyExtractor={(item: any, i: number) => `${item.type}-${i}`}
                         contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 32 }]}

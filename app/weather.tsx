@@ -359,14 +359,6 @@ const styles = StyleSheet.create({
         overflow: 'visible'
     },
 
-    backBtn: {
-        width: 46,
-        height: 46,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-
     bannerContainer: {
         justifyContent: 'center',
         marginBottom: 8

@@ -1,16 +1,8 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import Svg, { Circle, Path, Rect, Line } from 'react-native-svg';
-import Animated, {
-    Easing,
-    FadeInDown,
-    FadeInUp,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -51,31 +43,10 @@ export const GovtHeroHeader = React.memo(function GovtHeroHeader({
     const area = [place?.village, place?.city].filter(Boolean).map(capitalizeString).join(', ');
     const placeImage = place?.images?.length > 0 ? place.images[0] : null;
 
-    const pulse = useSharedValue(0);
-
-    useEffect(() => {
-        pulse.value = withRepeat(
-            withTiming(1, { duration: 2400, easing: Easing.inOut(Easing.sin) }),
-            -1,
-            true
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const haloStyle = useAnimatedStyle(() => ({
-        opacity: 0.16 + pulse.value * 0.13,
-        transform: [{ scale: 1.07 + pulse.value * 0.1 }] }));
-
-    const tileStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 + pulse.value * 0.02 }] }));
-
     const BG = primaryColor || '#1e2e4a'; // slate-blue government feel
 
     return (
-        <Animated.View
-            entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: BG }]}
-        >
+        <View style={[styles.container, { backgroundColor: BG }]}>
             {/* Civic / institutional decor */}
             <GovtBackgroundDecor limeColor={colors.lime} />
 
@@ -110,7 +81,7 @@ export const GovtHeroHeader = React.memo(function GovtHeroHeader({
             </View>
 
             {/* Identity row */}
-            <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.identityRow}>
+            <View style={styles.identityRow}>
                 <View style={styles.identityText}>
                     <View style={styles.chipRow}>
                         <View style={[styles.typeChip, { backgroundColor: colors.lime }]}>
@@ -140,19 +111,19 @@ export const GovtHeroHeader = React.memo(function GovtHeroHeader({
                 </View>
 
                 <View style={styles.tileWrap}>
-                    <Animated.View style={[styles.halo, haloStyle]} />
-                    <Animated.View style={[styles.serviceTile, tileStyle]}>
+                    <View style={styles.halo} />
+                    <View style={styles.serviceTile}>
                         {placeImage ? (
                             <Image source={{ uri: placeImage }} style={styles.serviceImage} contentFit="cover" />
                         ) : (
                             <MaterialCommunityIcons name="office-building" size={28} color="#FFFFFF" />
                         )}
-                    </Animated.View>
+                    </View>
                 </View>
-            </Animated.View>
+            </View>
 
             {/* Bottom accent line */}
-            <Animated.View entering={FadeInDown.delay(200).duration(450)} style={styles.accentLine}>
+            <View style={styles.accentLine}>
                 <Svg width="100%" height={12} viewBox="0 0 375 12" preserveAspectRatio="none">
                     <Path
                         d="M0 6 Q94 0 187 6 Q281 12 375 6"
@@ -161,8 +132,8 @@ export const GovtHeroHeader = React.memo(function GovtHeroHeader({
                         fill="none"
                     />
                 </Svg>
-            </Animated.View>
-        </Animated.View>
+            </View>
+        </View>
     );
 });
 

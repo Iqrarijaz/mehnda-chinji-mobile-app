@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Linking, Platform } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Linking, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { ThemedText } from '@/components/ThemedText';
 
 interface SupportContactCardProps {
     type: 'whatsapp' | 'call' | 'email';
@@ -27,16 +27,8 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
 }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
-    const scale = useSharedValue(1);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }] }));
 
     const handlePress = () => {
-        scale.value = withSpring(0.97, {}, () => {
-            scale.value = withSpring(1);
-        });
-
         let url = '';
         if (type === 'whatsapp') {
             const message = 'Hello, I need support with Rehbar app.';
@@ -69,17 +61,17 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
             onPress={handlePress}
             style={styles.touchable}
         >
-            <Animated.View style={[styles.card, { backgroundColor: colors.card }, animatedStyle]}>
+            <View style={[styles.card, { backgroundColor: colors.card }]}>
                 <View style={[styles.iconContainer, { backgroundColor: `${color}15` }]}>
                     <Ionicons name={icon} size={26} color={color} />
                 </View>
                 <View style={styles.content}>
-                    <Text allowFontScaling={false} style={[styles.title, { color: colors.text }]}>{title}</Text>
-                    <Text allowFontScaling={false} style={[styles.subtitle, { color: colors.textSecondary }]}>{subtitle}</Text>
-                    {!hideValue && <Text allowFontScaling={false} style={[styles.value, { color }]}>{value}</Text>}
+                    <ThemedText allowFontScaling={false} style={[styles.title, { color: colors.text }]}>{title}</ThemedText>
+                    <ThemedText allowFontScaling={false} style={[styles.subtitle, { color: colors.textSecondary }]}>{subtitle}</ThemedText>
+                    {!hideValue && <ThemedText allowFontScaling={false} style={[styles.value, { color }]}>{value}</ThemedText>}
                 </View>
                 <Ionicons name="chevron-forward" size={20} color={colors.placeholder} />
-            </Animated.View>
+            </View>
         </TouchableOpacity>
     );
 };

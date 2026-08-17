@@ -374,37 +374,6 @@ export default MarketplaceScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1 },
-    headerContainer: {
-        borderBottomLeftRadius: 28,
-        borderBottomRightRadius: 28,
-        paddingBottom: Platform.OS === 'android' ? 8 : 16 },
-    headerContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: Platform.OS === 'android' ? 18 : 20,
-        marginBottom: Platform.OS === 'android' ? 18 : 20 },
-    headerTitle: {
-        color: '#FFFFFF',
-        fontSize: 15.5,
-        fontWeight: 'bold' },
-    iconButton: {
-        width: 38,
-        height: 38,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.2)' },
-    rightActions: {
-        flexDirection: 'row',
-        alignItems: 'center' },
-    profileButton: {
-        width: 38,
-        height: 38,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden' },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 4,
         paddingBottom: 14 },
@@ -412,17 +381,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8 },
-    searchInputContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 42,
-        borderRadius: Layout.borderRadius,
-        paddingHorizontal: 13 },
-    searchInput: {
-        flex: 1,
-        fontSize: 12.5,
-        paddingVertical: 7 },
     filterButton: {
         width: 42,
         height: 42,

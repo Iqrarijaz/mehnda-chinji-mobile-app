@@ -1,16 +1,8 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import Svg, { Circle, Path } from 'react-native-svg';
-import Animated, {
-    Easing,
-    FadeInDown,
-    FadeInUp,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -51,33 +43,11 @@ export const ReligiousHeroHeader = React.memo(function ReligiousHeroHeader({
     const area = [place?.village, place?.city].filter(Boolean).map(capitalizeString).join(', ');
     const placeImage = place?.images?.length > 0 ? place.images[0] : null;
 
-    // Slow ambient glow on the icon tile
-    const glow = useSharedValue(0);
-
-    useEffect(() => {
-        glow.value = withRepeat(
-            withTiming(1, { duration: 2600, easing: Easing.inOut(Easing.sin) }),
-            -1,
-            true
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const glowStyle = useAnimatedStyle(() => ({
-        opacity: 0.18 + glow.value * 0.12,
-        transform: [{ scale: 1.08 + glow.value * 0.12 }] }));
-
-    const tileStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: 1 + glow.value * 0.025 }] }));
-
     // Hero bg: deep Islamic green
     const BG = primaryColor || '#1a5c3a';
 
     return (
-        <Animated.View
-            entering={FadeInUp.duration(450)}
-            style={[styles.container, { backgroundColor: BG }]}
-        >
+        <View style={[styles.container, { backgroundColor: BG }]}>
             {/* Geometric islamic-inspired decor */}
             <ReligiousBackgroundDecor limeColor={colors.lime} />
 
@@ -112,7 +82,7 @@ export const ReligiousHeroHeader = React.memo(function ReligiousHeroHeader({
             </View>
 
             {/* Identity row */}
-            <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.identityRow}>
+            <View style={styles.identityRow}>
                 <View style={styles.identityText}>
                     <View style={styles.chipRow}>
                         {/* Type pill */}
@@ -146,19 +116,19 @@ export const ReligiousHeroHeader = React.memo(function ReligiousHeroHeader({
 
                 {/* Glowing icon tile */}
                 <View style={styles.tileWrap}>
-                    <Animated.View style={[styles.halo, glowStyle]} />
-                    <Animated.View style={[styles.serviceTile, tileStyle]}>
+                    <View style={styles.halo} />
+                    <View style={styles.serviceTile}>
                         {placeImage ? (
                             <Image source={{ uri: placeImage }} style={styles.serviceImage} contentFit="cover" />
                         ) : (
                             <MaterialCommunityIcons name="mosque" size={28} color="#FFFFFF" />
                         )}
-                    </Animated.View>
+                    </View>
                 </View>
-            </Animated.View>
+            </View>
 
             {/* Subtle bottom wave */}
-            <Animated.View entering={FadeInDown.delay(200).duration(450)} style={styles.waveWrap}>
+            <View style={styles.waveWrap}>
                 <Svg width="100%" height={20} viewBox="0 0 375 20" preserveAspectRatio="none">
                     <Path
                         d="M0 10 Q94 0 187 10 Q281 20 375 10"
@@ -167,8 +137,8 @@ export const ReligiousHeroHeader = React.memo(function ReligiousHeroHeader({
                         fill="none"
                     />
                 </Svg>
-            </Animated.View>
-        </Animated.View>
+            </View>
+        </View>
     );
 });
 
