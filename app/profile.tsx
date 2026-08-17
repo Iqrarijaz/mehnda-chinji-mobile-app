@@ -5,7 +5,6 @@ import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
 import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
-import { ProfileHeaderBackground } from '@/components/profile/ProfileHeaderBackground';
 import { ThemedText } from '@/components/ThemedText';
 import { BackButton } from '@/components/common/BackButton';
 import { Colors } from '@/constants/colors';
@@ -196,9 +195,6 @@ export default function ProfileScreen() {
                 {/* Header — premium account dashboard hero */}
                 <View style={styles.header}>
                     <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.primary }]} />
-                    {/* Soft decor: circles, shield, brand accent dots — static, memoized,
-                        so it doesn't re-render on every keystroke below it. */}
-                    <ProfileHeaderBackground limeColor={colors.lime} secondaryColor={colors.secondary} />
 
                     <View style={[styles.headerTop, { paddingTop: insets.top + 10 }]}>
                         <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
