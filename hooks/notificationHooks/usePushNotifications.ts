@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { handleNotificationNavigation } from '@/utils/notificationNavigation';
+import { DISMISS_ACTION } from '@/utils/notificationCategories';
 
 
 export const usePushNotifications = () => {
@@ -121,7 +122,12 @@ export const usePushNotifications = () => {
             Notifications.addNotificationResponseReceivedListener(response => {
                 if (!isMounted) return;
                 const data = response.notification.request.content.data;
-                if (__DEV__) console.log('👉 Notification interaction:', response);
+                if (__DEV__) console.log('👉 Notification interaction:', response, response.actionIdentifier);
+
+                // "Dismiss" on a rich notification (View Item / Dismiss) is a no-op —
+                // the notification is already gone, nothing to navigate to. Every
+                // other case (a plain tap, or the "View Item" action) navigates as usual.
+                if (response.actionIdentifier === DISMISS_ACTION) return;
 
                 if (data) {
                     handleNotificationNavigation(data as Record<string, any>, router);

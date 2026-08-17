@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { SocketProvider } from '@/context/SocketContext';
 import * as Notifications from 'expo-notifications';
+import { registerNotificationCategories } from '@/utils/notificationCategories';
 import Sentry from '@/lib/sentry';
 import { useSocketNotifications } from '@/hooks/notificationHooks/useSocketNotifications';
 import { usePushNotifications } from '@/hooks/notificationHooks/usePushNotifications';
@@ -201,6 +202,8 @@ function DeferredHooks() {
         shouldSetBadge: false,
         shouldShowBanner: true,
         shouldShowList: true }) });
+
+    registerNotificationCategories();
   }, []);
 
   const { isAuthenticated } = useAuth();

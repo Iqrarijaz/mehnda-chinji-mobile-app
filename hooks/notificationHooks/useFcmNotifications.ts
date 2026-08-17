@@ -14,6 +14,8 @@ import { useAuth } from '@/context/AuthContext';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import { handleNotificationNavigation } from '@/utils/notificationNavigation';
+import { ITEM_ACTION_CATEGORY } from '@/utils/notificationCategories';
+import { downloadNotificationImage } from '@/utils/notificationImageCache';
 
 export const useFcmNotifications = () => {
     const [fcmToken, setFcmToken] = useState<string | null>(null);
@@ -108,14 +110,33 @@ export const useFcmNotifications = () => {
         // Handle foreground messages
         const unsubscribeOnMessage = onMessage(messagingInstance, async (remoteMessage) => {
             if (__DEV__) console.log('📩 A new FCM message arrived in foreground!', remoteMessage);
-            
+
             // Trigger a local notification so the user sees the FCM message in the foreground
             if (remoteMessage.notification) {
+                const data = (remoteMessage.data ?? {}) as Record<string, any>;
+                // A route/listingId means this notification links to something worth
+                // acting on directly — give it "View Item" / "Dismiss" buttons.
+                const isActionable = !!(data.route || data.listingId);
+
+                // iOS only: UNNotificationAttachment needs a local file, so download the
+                // image first. Android renders `notification.image` as a big-picture
+                // natively via Play Services for background/killed-state pushes — that
+                // path needs no client code at all, only the foreground one does.
+                let localImageUri: string | null = null;
+                if (Platform.OS === 'ios') {
+                    const imageUrl = remoteMessage.notification.android?.imageUrl || data.image || data.imageUrl;
+                    if (imageUrl) {
+                        localImageUri = await downloadNotificationImage(imageUrl);
+                    }
+                }
+
                 await Notifications.scheduleNotificationAsync({
                     content: {
                         title: remoteMessage.notification.title,
                         body: remoteMessage.notification.body,
                         data: remoteMessage.data,
+                        categoryIdentifier: isActionable ? ITEM_ACTION_CATEGORY : undefined,
+                        attachments: localImageUri ? [{ identifier: 'image', url: localImageUri, type: null }] : undefined,
                     },
                     trigger: null, // Show immediately
                 });
