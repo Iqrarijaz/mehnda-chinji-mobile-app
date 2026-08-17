@@ -114,7 +114,7 @@ export default function OnboardingScreen() {
                         bounces={false}
                         keyExtractor={(item: any) => item.id}
                         onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
-                            useNativeDriver: false })}
+                            useNativeDriver: true })}
                         scrollEventThrottle={16}
                         onViewableItemsChanged={viewableItemsChanged}
                         viewabilityConfig={viewConfig}
