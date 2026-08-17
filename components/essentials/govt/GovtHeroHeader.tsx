@@ -81,7 +81,7 @@ export const GovtHeroHeader = React.memo(function GovtHeroHeader({
             </View>
 
             {/* Identity row */}
-            <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.identityRow}>
+            <View style={styles.identityRow}>
                 <View style={styles.identityText}>
                     <View style={styles.chipRow}>
                         <View style={[styles.typeChip, { backgroundColor: colors.lime }]}>
@@ -111,19 +111,19 @@ export const GovtHeroHeader = React.memo(function GovtHeroHeader({
                 </View>
 
                 <View style={styles.tileWrap}>
-                    <Animated.View style={[styles.halo, haloStyle]} />
-                    <Animated.View style={[styles.serviceTile, tileStyle]}>
+                    <View style={styles.halo} />
+                    <View style={styles.serviceTile}>
                         {placeImage ? (
                             <Image source={{ uri: placeImage }} style={styles.serviceImage} contentFit="cover" />
                         ) : (
                             <MaterialCommunityIcons name="office-building" size={28} color="#FFFFFF" />
                         )}
-                    </Animated.View>
+                    </View>
                 </View>
-            </Animated.View>
+            </View>
 
             {/* Bottom accent line */}
-            <Animated.View entering={FadeInDown.delay(200).duration(450)} style={styles.accentLine}>
+            <View style={styles.accentLine}>
                 <Svg width="100%" height={12} viewBox="0 0 375 12" preserveAspectRatio="none">
                     <Path
                         d="M0 6 Q94 0 187 6 Q281 12 375 6"
@@ -132,8 +132,8 @@ export const GovtHeroHeader = React.memo(function GovtHeroHeader({
                         fill="none"
                     />
                 </Svg>
-            </Animated.View>
-        </Animated.View>
+            </View>
+        </View>
     );
 });
 

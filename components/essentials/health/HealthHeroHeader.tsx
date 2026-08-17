@@ -1,17 +1,8 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import Svg, { Circle, Path } from 'react-native-svg';
-import Animated, {
-    Easing,
-    FadeInDown,
-    FadeInUp,
-    useAnimatedProps,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -19,8 +10,6 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { capitalizeString } from '@/utils/string';
 import { Layout } from '@/constants/layout';
-
-const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 // Single calm heartbeat in an otherwise flat line.
 const ECG_PATH = 'M0 16 H132 L144 16 L152 4 L162 27 L170 16 H340';
