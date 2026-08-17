@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import React, { useRef } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackButton } from '@/components/common/BackButton';
@@ -9,6 +10,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
+import { CurrencyPickerSheet } from './CurrencyPickerSheet';
 
 interface CurrencyHeaderProps {
     lastUpdatedLabel: string | null;
@@ -18,6 +20,12 @@ interface CurrencyHeaderProps {
     onSearchChange: (text: string) => void;
     /** True when the device has no connectivity — rates shown are the last cached fetch. */
     isOffline?: boolean;
+    /** Currency the whole screen's rates are shown relative to (defaults to PKR). */
+    baseCurrencyCode: string;
+    /** Codes the user can currently pick as a new base — respects the free/unlocked tier. */
+    availableBaseCodes: string[];
+    favorites: string[];
+    onSelectBaseCurrency: (code: string) => void;
 }
 
 /**
@@ -31,10 +39,15 @@ export const CurrencyHeader = React.memo(function CurrencyHeader({
     searchQuery,
     onSearchChange,
     isOffline,
+    baseCurrencyCode,
+    availableBaseCodes,
+    favorites,
+    onSelectBaseCurrency,
 }: CurrencyHeaderProps) {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
+    const basePickerRef = useRef<BottomSheetModal>(null);
 
     return (
         <View style={[styles.header, { paddingTop: insets.top + 14, backgroundColor: colors.primary }]}>
@@ -61,6 +74,16 @@ export const CurrencyHeader = React.memo(function CurrencyHeader({
                             : 'Fetching latest rates…'}
                     </ThemedText>
                 </View>
+                <TouchableOpacity
+                    style={styles.baseChip}
+                    onPress={() => basePickerRef.current?.present()}
+                    activeOpacity={0.75}
+                    hitSlop={6}
+                >
+                    <ThemedText style={styles.baseChipLabel}>BASE</ThemedText>
+                    <ThemedText style={styles.baseChipCode}>{baseCurrencyCode}</ThemedText>
+                    <Ionicons name="chevron-down" size={11} color="#FFFFFF" />
+                </TouchableOpacity>
             </View>
 
             <View style={styles.searchRow}>
@@ -71,6 +94,14 @@ export const CurrencyHeader = React.memo(function CurrencyHeader({
                     style={[styles.searchBar, { backgroundColor: theme === 'dark' ? colors.cardBg : '#FFFFFF' }]}
                 />
             </View>
+
+            <CurrencyPickerSheet
+                ref={basePickerRef}
+                codes={availableBaseCodes}
+                favorites={favorites}
+                excludeCode={baseCurrencyCode}
+                onSelect={onSelectBaseCurrency}
+            />
         </View>
     );
 });
@@ -89,6 +120,26 @@ const styles = StyleSheet.create({
     },
     titleWrap: {
         flex: 1,
+    },
+    baseChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 9,
+        paddingVertical: 6,
+        borderRadius: 10,
+        backgroundColor: 'rgba(255,255,255,0.18)',
+    },
+    baseChipLabel: {
+        fontSize: 8.5,
+        fontWeight: '800',
+        color: 'rgba(255,255,255,0.75)',
+        letterSpacing: 0.3,
+    },
+    baseChipCode: {
+        fontSize: 11.5,
+        fontWeight: '800',
+        color: '#FFFFFF',
     },
     titleRow: {
         flexDirection: 'row',

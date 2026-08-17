@@ -12,9 +12,11 @@ import { useTheme } from '@/context/ThemeContext';
 import { CurrencyPickerSheet } from './CurrencyPickerSheet';
 
 interface CurrencyConverterProps {
-    /** 1 PKR expressed in each currency, as returned by the backend — undefined while loading. */
+    /** 1 unit of `baseCode` expressed in each currency — undefined while loading. */
     rates: Record<string, number> | undefined;
-    /** Non-PKR codes currently available to convert (respects the free/unlocked tier). */
+    /** Currency the other side of the converter is shown in (defaults to PKR). */
+    baseCode: string;
+    /** Non-base codes currently available to convert (respects the free/unlocked tier). */
     codes: string[];
     favorites: string[];
 }
@@ -34,40 +36,40 @@ function formatAmount(value: number): string {
  * of the Currency screen. Uses the already-fetched rates in memory — no
  * extra network calls.
  */
-export function CurrencyConverter({ rates, codes, favorites }: CurrencyConverterProps) {
+export function CurrencyConverter({ rates, baseCode, codes, favorites }: CurrencyConverterProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const pickerRef = useRef<BottomSheetModal>(null);
 
     const defaultCode = useMemo(() => {
-        const favNonPkr = favorites.find((c) => c !== 'PKR' && codes.includes(c));
-        if (favNonPkr) return favNonPkr;
+        const favNonBase = favorites.find((c) => c !== baseCode && codes.includes(c));
+        if (favNonBase) return favNonBase;
         const priority = DEFAULT_CODE_PRIORITY.find((c) => codes.includes(c));
         return priority ?? codes[0];
-    }, [codes, favorites]);
+    }, [codes, favorites, baseCode]);
 
     const [selectedCode, setSelectedCode] = useState(defaultCode);
-    const [direction, setDirection] = useState<'toPKR' | 'fromPKR'>('toPKR');
+    const [direction, setDirection] = useState<'toBase' | 'fromBase'>('toBase');
     const [amount, setAmount] = useState('1');
 
-    // Keep the selection valid if the available list changes (e.g. the unlock ad just expired).
+    // Keep the selection valid if the available list changes (e.g. the unlock ad just expired, or the base currency changed).
     useEffect(() => {
         if (defaultCode && !codes.includes(selectedCode)) setSelectedCode(defaultCode);
     }, [codes, defaultCode, selectedCode]);
 
-    const rate = selectedCode ? rates?.[selectedCode] : undefined; // 1 PKR = `rate` units of selectedCode
+    const rate = selectedCode ? rates?.[selectedCode] : undefined; // 1 unit of baseCode = `rate` units of selectedCode
 
-    const { currencyValue, pkrValue } = useMemo(() => {
+    const { currencyValue, baseValue } = useMemo(() => {
         const parsed = parseFloat(amount);
         const n = Number.isFinite(parsed) ? parsed : 0;
-        if (!rate || rate <= 0) return { currencyValue: 0, pkrValue: 0 };
-        return direction === 'toPKR'
-            ? { currencyValue: n, pkrValue: n / rate }
-            : { currencyValue: n * rate, pkrValue: n };
+        if (!rate || rate <= 0) return { currencyValue: 0, baseValue: 0 };
+        return direction === 'toBase'
+            ? { currencyValue: n, baseValue: n / rate }
+            : { currencyValue: n * rate, baseValue: n };
     }, [amount, direction, rate]);
 
     const handleSwap = useCallback(() => {
-        setDirection((d) => (d === 'toPKR' ? 'fromPKR' : 'toPKR'));
+        setDirection((d) => (d === 'toBase' ? 'fromBase' : 'toBase'));
     }, []);
 
     if (!selectedCode || !rate) return null; // nothing sensible to convert yet (still loading)
@@ -96,7 +98,7 @@ export function CurrencyConverter({ rates, codes, favorites }: CurrencyConverter
                     <Ionicons name="chevron-down" size={12} color={colors.primary} />
                 </TouchableOpacity>
 
-                {direction === 'toPKR' ? (
+                {direction === 'toBase' ? (
                     <TextInput
                         value={amount}
                         onChangeText={setAmount}
@@ -128,10 +130,10 @@ export function CurrencyConverter({ rates, codes, favorites }: CurrencyConverter
 
             <View style={styles.inputRow}>
                 <View style={[styles.currencyChip, { backgroundColor: colors.secondary + '18' }]}>
-                    <ThemedText style={[styles.chipCode, { color: colors.secondary }]}>PKR</ThemedText>
+                    <ThemedText style={[styles.chipCode, { color: colors.secondary }]}>{baseCode}</ThemedText>
                 </View>
 
-                {direction === 'fromPKR' ? (
+                {direction === 'fromBase' ? (
                     <TextInput
                         value={amount}
                         onChangeText={setAmount}
@@ -143,7 +145,7 @@ export function CurrencyConverter({ rates, codes, favorites }: CurrencyConverter
                     />
                 ) : (
                     <ThemedText style={styles.computedValue} numberOfLines={1}>
-                        {formatAmount(pkrValue)}
+                        {formatAmount(baseValue)}
                     </ThemedText>
                 )}
             </View>
@@ -152,7 +154,7 @@ export function CurrencyConverter({ rates, codes, favorites }: CurrencyConverter
                 ref={pickerRef}
                 codes={codes}
                 favorites={favorites}
-                excludeCode="PKR"
+                excludeCode={baseCode}
                 onSelect={setSelectedCode}
             />
         </View>

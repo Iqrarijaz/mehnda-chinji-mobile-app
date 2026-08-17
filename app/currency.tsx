@@ -21,7 +21,7 @@ import { currencyMatchesQuery, getCurrencyMeta, matchesAnyKnownCurrency } from '
 import { useTheme } from '@/context/ThemeContext';
 import { useExchangeRates } from '@/hooks/useCurrency';
 import { useIsOffline } from '@/hooks/useIsOffline';
-import { useFavoriteCurrencies, useIsPremiumUnlocked, useCurrencyStore } from '@/store/currencyStore';
+import { useFavoriteCurrencies, useIsPremiumUnlocked, useCurrencyStore, useBaseCurrencyCode, DEFAULT_BASE_CURRENCY } from '@/store/currencyStore';
 
 type CurrencyEntry = [code: string, rate: number];
 
@@ -36,6 +36,8 @@ export default function CurrencyScreen() {
     const favorites = useFavoriteCurrencies();
     const isOffline = useIsOffline();
     const { ratesData, isRatesLoading, isRatesFetching, ratesError, refetchRates } = useExchangeRates(isPremiumUnlocked);
+    const baseCurrencyCode = useBaseCurrencyCode();
+    const setBaseCurrencyCode = useCurrencyStore((s) => s.setBaseCurrencyCode);
     const { showAd, isShowing: isAdShowing, isAdLoaded } = useRewardedAd();
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -49,14 +51,39 @@ export default function CurrencyScreen() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Rates come down the wire relative to the backend's fixed base (PKR). When the
+    // user picks a different base currency, re-express every rate relative to that
+    // currency instead — dividing by its own PKR-relative rate turns "units of X per
+    // 1 PKR" into "units of X per 1 <selected base>".
+    const adjustedRates = useMemo(() => {
+        if (!ratesData?.rates) return undefined;
+        if (baseCurrencyCode === DEFAULT_BASE_CURRENCY) return ratesData.rates;
+        const baseRate = ratesData.rates[baseCurrencyCode];
+        if (!baseRate || baseRate <= 0) return ratesData.rates; // selected base not loaded yet — fall back to PKR-relative
+        const result: Record<string, number> = {};
+        for (const [code, rate] of Object.entries(ratesData.rates)) {
+            result[code] = rate / baseRate;
+        }
+        return result;
+    }, [ratesData, baseCurrencyCode]);
+
+    // Reset to the default base if the previously-selected one isn't in the
+    // currently-loaded rate set (e.g. a locked-tier user picked a currency that
+    // only exists in the unlocked list, then the unlock expired).
+    useEffect(() => {
+        if (ratesData?.rates && baseCurrencyCode !== DEFAULT_BASE_CURRENCY && !(baseCurrencyCode in ratesData.rates)) {
+            setBaseCurrencyCode(DEFAULT_BASE_CURRENCY);
+        }
+    }, [ratesData, baseCurrencyCode, setBaseCurrencyCode]);
+
     const currencyEntries: CurrencyEntry[] = useMemo(() => {
-        if (!ratesData?.rates) return [];
-        const entries = Object.entries(ratesData.rates) as CurrencyEntry[];
-        // PKR (the base currency) always leads, then pinned favorites in pin
+        if (!adjustedRates) return [];
+        const entries = Object.entries(adjustedRates) as CurrencyEntry[];
+        // The selected base currency always leads, then pinned favorites in pin
         // order, then everything else A-Z.
         entries.sort(([a], [b]) => {
-            if (a === 'PKR') return -1;
-            if (b === 'PKR') return 1;
+            if (a === baseCurrencyCode) return -1;
+            if (b === baseCurrencyCode) return 1;
             const favA = favorites.indexOf(a);
             const favB = favorites.indexOf(b);
             if (favA !== -1 || favB !== -1) {
@@ -67,12 +94,14 @@ export default function CurrencyScreen() {
             return a.localeCompare(b);
         });
         return entries;
-    }, [ratesData, favorites]);
+    }, [adjustedRates, baseCurrencyCode, favorites]);
 
-    const nonPkrCodes = useMemo(
-        () => currencyEntries.filter(([code]) => code !== 'PKR').map(([code]) => code),
-        [currencyEntries]
+    const nonBaseCodes = useMemo(
+        () => currencyEntries.filter(([code]) => code !== baseCurrencyCode).map(([code]) => code),
+        [currencyEntries, baseCurrencyCode]
     );
+
+    const allCodes = useMemo(() => currencyEntries.map(([code]) => code), [currencyEntries]);
 
     const filteredEntries = useMemo(() => {
         if (!searchQuery.trim()) return currencyEntries;
@@ -103,11 +132,11 @@ export default function CurrencyScreen() {
 
     const handleRowPress = useCallback((code: string) => {
         analyticsService.trackEvent(AnalyticsEvents.CURRENCY_ROW_CLICKED, { code });
-        if (code === 'PKR') return; // base currency has no meaningful trend against itself
+        if (code === baseCurrencyCode) return; // selected base currency has no meaningful trend against itself
         analyticsService.trackEvent(AnalyticsEvents.CURRENCY_TRENDS_VIEWED, { code });
         setSelectedTrendCurrency(code);
         trendsSheetRef.current?.present();
-    }, []);
+    }, [baseCurrencyCode]);
 
     const lastUpdatedLabel = useMemo(() => {
         if (!ratesData?.date) return null;
@@ -128,6 +157,10 @@ export default function CurrencyScreen() {
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 isOffline={isOffline}
+                baseCurrencyCode={baseCurrencyCode}
+                availableBaseCodes={allCodes}
+                favorites={favorites}
+                onSelectBaseCurrency={setBaseCurrencyCode}
             />
 
             {/* List */}
@@ -150,13 +183,14 @@ export default function CurrencyScreen() {
                         <CurrencyRow
                             code={code}
                             rate={rate}
+                            baseCode={baseCurrencyCode}
                             onPress={() => handleRowPress(code)}
                             isFavorite={favorites.includes(code)}
                             onToggleFavorite={() => toggleFavoriteCurrency(code)}
                         />
                     )}
                     ListHeaderComponent={
-                        <CurrencyConverter rates={ratesData?.rates} codes={nonPkrCodes} favorites={favorites} />
+                        <CurrencyConverter rates={adjustedRates} baseCode={baseCurrencyCode} codes={nonBaseCodes} favorites={favorites} />
                     }
                     contentContainerStyle={{
                         paddingTop: 12,

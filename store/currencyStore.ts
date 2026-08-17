@@ -8,6 +8,9 @@ export const CURRENCY_UNLOCK_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 /** Pinned currencies show at the top of the Currency screen and the Home widget. */
 export const MAX_FAVORITE_CURRENCIES = 4;
 
+/** The backend's own fixed base — rates come down the wire as "1 PKR = X <code>". */
+export const DEFAULT_BASE_CURRENCY = 'PKR';
+
 interface CurrencyState {
     /** Epoch ms the current unlock expires at, or null if never unlocked / expired. */
     unlockedUntil: number | null;
@@ -17,6 +20,9 @@ interface CurrencyState {
     favoriteCurrencies: string[];
     /** Adds/removes `code`; a no-op once MAX_FAVORITE_CURRENCIES is already pinned. */
     toggleFavoriteCurrency: (code: string) => void;
+    /** Currency the rate list & quick converter are shown relative to. Defaults to the backend's own base. */
+    baseCurrencyCode: string;
+    setBaseCurrencyCode: (code: string) => void;
 }
 
 export const useCurrencyStore = create<CurrencyState>()(
@@ -35,11 +41,17 @@ export const useCurrencyStore = create<CurrencyState>()(
                 }
                 return { favoriteCurrencies: [...state.favoriteCurrencies, code] };
             }),
+            baseCurrencyCode: DEFAULT_BASE_CURRENCY,
+            setBaseCurrencyCode: (code) => set({ baseCurrencyCode: code }),
         }),
         {
             name: 'currency-storage',
             storage: createJSONStorage(() => clientStorage),
-            partialize: (state) => ({ unlockedUntil: state.unlockedUntil, favoriteCurrencies: state.favoriteCurrencies }),
+            partialize: (state) => ({
+                unlockedUntil: state.unlockedUntil,
+                favoriteCurrencies: state.favoriteCurrencies,
+                baseCurrencyCode: state.baseCurrencyCode,
+            }),
         }
     )
 );
@@ -56,4 +68,9 @@ export function useIsPremiumUnlocked(): boolean {
 /** Pinned currency codes, in pin order — reactive, re-renders on change. */
 export function useFavoriteCurrencies(): string[] {
     return useCurrencyStore((s) => s.favoriteCurrencies);
+}
+
+/** Currency code the rate list & quick converter are currently shown relative to. */
+export function useBaseCurrencyCode(): string {
+    return useCurrencyStore((s) => s.baseCurrencyCode);
 }
