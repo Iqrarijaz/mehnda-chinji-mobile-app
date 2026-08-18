@@ -1,8 +1,6 @@
 import React from 'react';
 import { ThemedText } from '@/components/ThemedText';
-import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
-import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, usePathname } from 'expo-router';
@@ -22,13 +20,11 @@ export const NotificationIcon = React.memo(function NotificationIcon({
     badgeStyle,
     containerStyle
 }: NotificationIconProps) {
-    const { theme, isDark } = useTheme();
     const { isAuthenticated } = useAuth();
-    const colors = Colors[theme];
     const router = useRouter();
     const pathname = usePathname();
 
-    const iconColor = color || (isDark ? '#FFFFFF' : colors.primary);
+    const iconColor = color || '#FFFFFF';
 
     const { badgeQuery } = useNotificationsAPI({
         enabled: isAuthenticated
@@ -45,7 +41,7 @@ export const NotificationIcon = React.memo(function NotificationIcon({
                     router.push('/notifications');
                 }
             }}
-            style={[styles.iconButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9' }, containerStyle]}
+            style={[styles.iconButton, containerStyle]}
             activeOpacity={0.7}
         >
             <Ionicons name="notifications-outline" size={size} color={iconColor} />

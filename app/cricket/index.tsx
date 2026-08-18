@@ -6,7 +6,6 @@ import {
     RefreshControl,
     TouchableOpacity,
     ScrollView,
-    Modal,
     Platform
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -20,6 +19,7 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { TournamentCard } from '@/components/cricket/TournamentCard';
 import { CricketMatchCard } from '@/components/cricket/CricketMatchCard';
+import { ActionMenuItem } from '@/components/common/ActionMenu';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -48,7 +48,6 @@ export default function CricketFeedScreen() {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState<string>('ALL');
-    const [actionModalTournament, setActionModalTournament] = useState<Tournament | null>(null);
 
     const { useTournamentsFeedQuery } = useCricketAPI();
     const { data, isLoading, isError, refetch, isRefetching } = useTournamentsFeedQuery({});
@@ -130,9 +129,23 @@ export default function CricketFeedScreen() {
         router.push(`/cricket/match/${matchId}` as any);
     }, [router]);
 
-    const handleOpenActionMenu = useCallback((tournament: Tournament) => {
-        setActionModalTournament(tournament);
-    }, []);
+    const buildTournamentActions = useCallback((tournament: Tournament): ActionMenuItem[] => [
+        {
+            label: 'Manage & Edit Details',
+            icon: 'create-outline',
+            onPress: () => router.push(`/cricket/${tournament._id}` as any)
+        },
+        {
+            label: 'Schedule Match',
+            icon: 'calendar-outline',
+            onPress: () => router.push(`/cricket/${tournament._id}/schedule-match` as any)
+        },
+        {
+            label: 'Register Team',
+            icon: 'people-outline',
+            onPress: () => router.push(`/cricket/${tournament._id}/add-team` as any)
+        }
+    ], [router]);
 
     // Quick Action Highlight Circles mapped directly to filter states
     const quickCircles = useMemo(() => [
@@ -170,10 +183,10 @@ export default function CricketFeedScreen() {
             <TournamentCard
                 tournament={item}
                 onPress={() => handleSelectTournament(item._id)}
-                onEdit={canManage ? () => handleOpenActionMenu(item) : undefined}
+                actions={canManage ? buildTournamentActions(item) : undefined}
             />
         );
-    }, [user, handleSelectTournament, handleOpenActionMenu]);
+    }, [user, handleSelectTournament, buildTournamentActions]);
 
     const ListHeader = useMemo(() => (
         <View style={styles.headerFeedContainer}>
@@ -241,8 +254,6 @@ export default function CricketFeedScreen() {
                     placeholder="Search tournaments by name, city..."
                     style={{
                         backgroundColor: colors.cardBg,
-                        borderWidth: 1,
-                        borderColor: colors.border,
                         borderRadius: Layout.borderRadius
                     }}
                 />
@@ -361,72 +372,6 @@ export default function CricketFeedScreen() {
                     </TouchableOpacity>
                 )}
 
-                {/* Admin Action Menu Modal */}
-                <Modal
-                    visible={!!actionModalTournament}
-                    transparent
-                    animationType="fade"
-                    onRequestClose={() => setActionModalTournament(null)}
-                >
-                    <TouchableOpacity
-                        style={styles.modalOverlay}
-                        activeOpacity={1}
-                        onPress={() => setActionModalTournament(null)}
-                    >
-                        <View style={[styles.actionCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
-                            <View style={styles.actionCardHeader}>
-                                <ThemedText style={[styles.actionModalTitle, { color: colors.text }]} numberOfLines={1}>
-                                    {actionModalTournament?.name}
-                                </ThemedText>
-                                <TouchableOpacity onPress={() => setActionModalTournament(null)}>
-                                    <Ionicons name="close" size={20} color={colors.textSecondary} />
-                                </TouchableOpacity>
-                            </View>
-
-                            <TouchableOpacity
-                                style={styles.actionRowBtn}
-                                onPress={() => {
-                                    const tourneyId = actionModalTournament?._id;
-                                    setActionModalTournament(null);
-                                    if (tourneyId) router.push(`/cricket/${tourneyId}` as any);
-                                }}
-                            >
-                                <Ionicons name="create-outline" size={18} color={colors.primary} />
-                                <ThemedText style={[styles.actionRowText, { color: colors.text }]}>
-                                    Manage & Edit Details
-                                </ThemedText>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={styles.actionRowBtn}
-                                onPress={() => {
-                                    const tourneyId = actionModalTournament?._id;
-                                    setActionModalTournament(null);
-                                    if (tourneyId) router.push(`/cricket/${tourneyId}/schedule-match` as any);
-                                }}
-                            >
-                                <Ionicons name="calendar-outline" size={18} color={colors.primary} />
-                                <ThemedText style={[styles.actionRowText, { color: colors.text }]}>
-                                    Schedule Match
-                                </ThemedText>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={styles.actionRowBtn}
-                                onPress={() => {
-                                    const tourneyId = actionModalTournament?._id;
-                                    setActionModalTournament(null);
-                                    if (tourneyId) router.push(`/cricket/${tourneyId}/add-team` as any);
-                                }}
-                            >
-                                <Ionicons name="people-outline" size={18} color={colors.primary} />
-                                <ThemedText style={[styles.actionRowText, { color: colors.text }]}>
-                                    Register Team
-                                </ThemedText>
-                            </TouchableOpacity>
-                        </View>
-                    </TouchableOpacity>
-                </Modal>
             </View>
         </ErrorBoundary>
     );
@@ -551,43 +496,5 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'android' ? 48 : 52,
         width: Platform.OS === 'android' ? 48 : 52,
         borderRadius: (Platform.OS === 'android' ? 48 : 52) / 2
-    },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20
-    },
-    actionCard: {
-        width: '100%',
-        borderRadius: Layout.borderRadius,
-        borderWidth: 1,
-        padding: 16,
-        gap: 12
-    },
-    actionCardHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingBottom: 8,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(150,150,150,0.3)'
-    },
-    actionModalTitle: {
-        fontSize: 15,
-        fontWeight: '800',
-        flex: 1,
-        marginRight: 8
-    },
-    actionRowBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-        paddingVertical: 8
-    },
-    actionRowText: {
-        fontSize: 13,
-        fontWeight: '600'
     }
 });

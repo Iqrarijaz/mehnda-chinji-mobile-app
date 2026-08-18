@@ -17,6 +17,7 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { PointsTableCard } from '@/components/cricket/PointsTableCard';
 import { StatusBadge } from '@/components/cricket/StatusBadge';
+import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -49,6 +50,19 @@ export default function TournamentHubScreen() {
         router.push(`/cricket/match/${matchId}` as any);
     }, [router]);
 
+    const buildMatchActions = useCallback((match: CricketMatch): ActionMenuItem[] => [
+        {
+            label: 'Score / Manage Match',
+            icon: 'stats-chart-outline',
+            onPress: () => router.push(`/cricket/match/${match._id}/scorer` as any)
+        },
+        {
+            label: 'View Match Details',
+            icon: 'eye-outline',
+            onPress: () => handleOpenMatch(match._id)
+        }
+    ], [router, handleOpenMatch]);
+
     const renderMatchItem = useCallback(({ item }: { item: CricketMatch }) => (
         <TouchableOpacity
             style={[styles.matchCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
@@ -58,6 +72,16 @@ export default function TournamentHubScreen() {
             <View style={styles.matchHeader}>
                 <ThemedText style={[styles.stageText, { color: colors.primary }]} numberOfLines={1}>{item.matchTitle}</ThemedText>
                 <StatusBadge status={item.status} />
+                {canManage && (
+                    <View style={styles.matchActionMenu}>
+                        <ActionMenu
+                            actions={buildMatchActions(item)}
+                            triggerIcon="ellipsis-horizontal"
+                            triggerIconSize={16}
+                            triggerIconColor={colors.textSecondary}
+                        />
+                    </View>
+                )}
             </View>
 
             <View style={styles.teamsRow}>
@@ -76,7 +100,7 @@ export default function TournamentHubScreen() {
                 </ThemedText>
             )}
         </TouchableOpacity>
-    ), [colors, handleOpenMatch]);
+    ), [colors, handleOpenMatch, canManage, buildMatchActions]);
 
     if (isLoading) {
         return (
@@ -325,6 +349,7 @@ const styles = StyleSheet.create({
     actionBtnText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
     matchCard: { padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 8, gap: 6, borderWidth: 1 },
     matchHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+    matchActionMenu: { justifyContent: 'center', alignItems: 'center' },
     stageText: { fontSize: 11, fontWeight: '700', flex: 1 },
     teamsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     teamName: { fontSize: 13, fontWeight: '600', flex: 1 },
