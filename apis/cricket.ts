@@ -64,6 +64,18 @@ export async function registerTeam(tournamentId: string, payload: any) {
 }
 
 /**
+ * Update an existing team's details and roster (Admin only)
+ */
+export async function updateTeam(tournamentId: string, teamId: string, payload: any) {
+    const response = await apiClient.put(`/api/user/v1/cricket/tournaments/${tournamentId}/teams/${teamId}`, payload);
+    return response as unknown as {
+        success: boolean;
+        message: string;
+        data: Tournament;
+    };
+}
+
+/**
  * Schedule a fixture match in a tournament (Admin only)
  */
 export async function scheduleMatch(tournamentId: string, payload: any) {
