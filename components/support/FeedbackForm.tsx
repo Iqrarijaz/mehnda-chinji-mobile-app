@@ -6,7 +6,7 @@ import {
 import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import Animated, { SlideInLeft } from 'react-native-reanimated';
+
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { ThemedText } from '@/components/ThemedText';
@@ -16,7 +16,7 @@ interface FeedbackFormProps {
     isSubmitting: boolean;
 }
 
-const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) => {
+const FeedbackForm: React.FC<FeedbackFormProps> = React.memo(({ onSubmit, isSubmitting }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const [subject, setSubject] = useState('');
@@ -32,10 +32,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) =
     const isFormValid = subject.trim() && description.trim();
 
     return (
-        <Animated.View
-            entering={SlideInLeft.delay(600).duration(450)}
-            style={styles.container}
-        >
+        <View style={styles.container}>
             <ThemedText allowFontScaling={false} style={[styles.title, { color: colors.textSecondary }]}>Send us Feedback</ThemedText>
             <View style={[styles.card, { backgroundColor: colors.card }]}>
                 <FormInput
@@ -66,9 +63,9 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, isSubmitting }) =
                     icon="send"
                 />
             </View>
-        </Animated.View>
+        </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

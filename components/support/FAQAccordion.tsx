@@ -14,7 +14,7 @@ interface FAQAccordionProps {
     data: FAQ[];
 }
 
-const FAQAccordion: React.FC<FAQAccordionProps> = ({ data }) => {
+const FAQAccordion: React.FC<FAQAccordionProps> = React.memo(({ data }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -38,7 +38,7 @@ const FAQAccordion: React.FC<FAQAccordionProps> = ({ data }) => {
             ))}
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

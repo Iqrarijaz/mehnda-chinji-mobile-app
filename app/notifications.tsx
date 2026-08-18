@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     RefreshControl,
     StyleSheet,
@@ -47,7 +47,7 @@ function groupByDay(items: any[]): { label: string; data: any[] }[] {
 
 // ── Screen ───────────────────────────────────────────────────────────────────
 
-export default function NotificationsScreen() {
+const NotificationsScreen = React.memo(function NotificationsScreen() {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
@@ -190,7 +190,6 @@ export default function NotificationsScreen() {
                 <View style={{ flex: 1 }}>
                     <FlashList
                         data={listData}
-                        estimatedItemSize={80}
                         renderItem={renderItem as any}
                         keyExtractor={(item: any, i: number) => `${item.type}-${i}`}
                         contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 32 }]}
@@ -204,7 +203,9 @@ export default function NotificationsScreen() {
         </View>
         </ErrorBoundary>
     );
-}
+});
+
+export default NotificationsScreen;
 
 const styles = StyleSheet.create({
     container: { flex: 1 },

@@ -35,7 +35,7 @@ const SLIDES = [
         animation: require('../public/json/onboarding3.json') },
 ];
 
-export default function OnboardingScreen() {
+export default React.memo(function OnboardingScreen() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const scrollX = useRef(new Animated.Value(0)).current;
     const slidesRef = useRef<any>(null);
@@ -132,7 +132,7 @@ export default function OnboardingScreen() {
             </SafeAreaView>
         </Animated.View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {

@@ -23,7 +23,7 @@ interface OnboardingSlideProps {
     isActive?: boolean;
 }
 
-export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, scrollX, isActive = true }) => {
+export const OnboardingSlide: React.FC<OnboardingSlideProps> = React.memo(({ item, index, scrollX, isActive = true }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const lottieRef = useRef<LottieView>(null);
@@ -97,7 +97,7 @@ export const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ item, index, s
             </Animated.View>
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

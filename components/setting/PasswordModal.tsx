@@ -1,11 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-    FadeIn,
-    SlideInLeft,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming } from 'react-native-reanimated';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     ScrollView,
@@ -67,7 +61,6 @@ const InputField = React.memo(({
             onSubmitEditing={onSubmit}
             blurOnSubmit={returnKeyType === 'done'}
             autoCapitalize="none"
-            delay={delay}
             containerStyle={{ marginBottom: 16 }}
             rightAccessory={
                 <TouchableOpacity onPress={() => setSecure(s => !s)} activeOpacity={0.7} style={{ padding: 4 }}>
@@ -81,20 +74,15 @@ const InputField = React.memo(({
 // ── Strength Bar ──────────────────────────────────────────────────────────────
 const StrengthBar = React.memo(({ password }: { password: string }) => {
     const { level, label, color } = getStrength(password);
-    const barWidth = useSharedValue(0);
-    barWidth.value = withTiming(level, { duration: 400 });
-    const barStyle = useAnimatedStyle(() => ({
-        width: `${barWidth.value * 100}%`,
-        backgroundColor: color }));
 
     if (!password) return null;
     return (
-        <Animated.View entering={FadeIn.duration(300)} style={styles.strengthWrap}>
+        <View style={styles.strengthWrap}>
             <View style={styles.strengthTrack}>
-                <Animated.View style={[styles.strengthFill, barStyle]} />
+                <View style={[styles.strengthFill, { width: `${level * 100}%`, backgroundColor: color }]} />
             </View>
             <ThemedText style={[styles.strengthLabel, { color }]}>{label}</ThemedText>
-        </Animated.View>
+        </View>
     );
 });
 
@@ -160,9 +148,9 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
         <>
         <PremiumModal visible={visible} onClose={resetAndClose} type="centered">
 
-            <Animated.View entering={SlideInLeft.delay(60).duration(350)} style={styles.header}>
+            <View style={styles.header}>
                 <ThemedText style={styles.title}>Change Password</ThemedText>
-            </Animated.View>
+            </View>
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -204,9 +192,9 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
 
                 {/* Confirm mismatch hint */}
                 {confirmPassword.length > 0 && confirmPassword !== newPassword && (
-                    <Animated.View entering={FadeIn.duration(250)}>
+                    <View>
                         <ThemedText style={styles.mismatch}>Passwords don't match</ThemedText>
-                    </Animated.View>
+                    </View>
                 )}
 
                 {/* Buttons */}

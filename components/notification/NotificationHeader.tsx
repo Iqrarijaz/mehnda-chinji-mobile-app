@@ -80,30 +80,6 @@ const NotificationHeader = React.memo(({
 export default NotificationHeader;
 
 const styles = StyleSheet.create({
-    headerWrap: {
-        paddingBottom: 7,
-        borderBottomLeftRadius: Layout.headerBorderRadius,
-        borderBottomRightRadius: Layout.headerBorderRadius,
-        overflow: 'hidden',
-        zIndex: 2 },
-    headerTopRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16 },
-    backBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.18)',
-        justifyContent: 'center',
-        alignItems: 'center' },
-    headerTitleWrap: {
-        flex: 1,
-        alignItems: 'center' },
-    headerTitle: {
-        fontSize: 16.5,
-        fontWeight: '800',
-        color: 'rgba(255,255,255,1)' },
     markBtn: {
         width: 38,
         height: 38,

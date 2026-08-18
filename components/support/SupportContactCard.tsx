@@ -16,7 +16,7 @@ interface SupportContactCardProps {
     hideValue?: boolean;
 }
 
-const SupportContactCard: React.FC<SupportContactCardProps> = ({
+const SupportContactCard: React.FC<SupportContactCardProps> = React.memo(({
     type,
     title,
     subtitle,
@@ -57,7 +57,7 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
 
     return (
         <TouchableOpacity
-            activeOpacity={0.9}
+            activeOpacity={0.8}
             onPress={handlePress}
             style={styles.touchable}
         >
@@ -74,7 +74,7 @@ const SupportContactCard: React.FC<SupportContactCardProps> = ({
             </View>
         </TouchableOpacity>
     );
-};
+});
 
 const styles = StyleSheet.create({
     touchable: {

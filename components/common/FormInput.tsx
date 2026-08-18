@@ -10,7 +10,6 @@ export interface FormInputProps extends TextInputProps {
     label?: string;
     required?: boolean;
     icon?: keyof typeof Ionicons.glyphMap;
-    delay?: number;
     maxLength?: number;
     currentLength?: number;
     showCharCount?: boolean;
@@ -25,7 +24,6 @@ export const FormInput = React.memo(React.forwardRef<TextInput, FormInputProps>(
     label,
     required = false,
     icon,
-    delay = 0,
     maxLength,
     currentLength,
     showCharCount = false,

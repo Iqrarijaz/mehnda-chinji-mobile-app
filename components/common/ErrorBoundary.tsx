@@ -23,7 +23,7 @@ const FallbackUI = React.memo(({ onRetry }: { onRetry: () => void }) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.lottieContainer}>
-        <Ionicons name="alert-circle-outline" size={96} color={colors.textSecondary} />
+        <Ionicons name="alert-circle-outline" size={80} color={colors.textSecondary} />
       </View>
 
       <View style={styles.textContainer}>

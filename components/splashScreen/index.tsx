@@ -36,6 +36,8 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
     // after the handoff.
     const progress = useSharedValue(0);
     const containerOpacity = useSharedValue(1);
+    const logoScale = useSharedValue(0.8);
+    const logoOpacity = useSharedValue(0);
 
     const handoffDone = useRef(false);
 
@@ -53,8 +55,12 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
     useEffect(() => {
         // Fallback in case the image onLoad never fires.
         const timer = setTimeout(startHandoff, 400);
+
+        logoScale.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.back(1.5)) });
+        logoOpacity.value = withTiming(1, { duration: 600 });
+
         return () => clearTimeout(timer);
-    }, [startHandoff]);
+    }, [startHandoff, logoScale, logoOpacity]);
 
     useEffect(() => {
         if (!isAppReady) return;
@@ -88,8 +94,8 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
                 containerStyle,
             ]}
         >
-            {/* Static logo */}
-            <View style={styles.group}>
+            {/* Animated logo */}
+            <Animated.View style={[styles.group, { transform: [{ scale: logoScale }], opacity: logoOpacity }]}>
                 <Image
                     source={logoImg}
                     style={styles.logo}
@@ -97,7 +103,7 @@ function CustomSplashScreen({ isAppReady, onFinish }: Props) {
                     transition={0}
                     onLoad={startHandoff}
                 />
-            </View>
+            </Animated.View>
 
             <View style={styles.wordmarkContainer}>
                 <Animated.Text style={[styles.wordmark, { color: colors.text }]}>
@@ -174,4 +180,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CustomSplashScreen;
+export default React.memo(CustomSplashScreen);

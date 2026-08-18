@@ -84,7 +84,7 @@ const CATEGORIES: UtilCategory[] = [
     },
 ];
 
-export function UtilsGrid() {
+export const UtilsGrid = React.memo(function UtilsGrid() {
     const router = useRouter();
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -119,7 +119,7 @@ export function UtilsGrid() {
             ))}
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {

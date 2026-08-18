@@ -444,10 +444,6 @@ const styles = StyleSheet.create({
 
     content: {
         flex: 1 },
-    loaderContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center' },
     listContent: {
         padding: 13,
         paddingBottom: 36 },
@@ -474,13 +470,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         opacity: 0.6,
         letterSpacing: 0.5 },
-    typesContainer: {
-        paddingVertical: 10,
-        paddingHorizontal: 4,
-        backgroundColor: 'rgba(0,0,0,0.05)' },
-    typesScrollContent: {
-        paddingHorizontal: 10,
-        gap: 10 },
     searchSection: {
         paddingTop: Platform.OS === 'android' ? 2 : 12,
         paddingBottom: 4 },

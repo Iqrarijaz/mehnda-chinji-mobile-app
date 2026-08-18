@@ -14,7 +14,6 @@ import {
     ViewStyle
 } from 'react-native';
 import Animated, {
-    FadeInDown,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Avatar from '../ui/Avatar';
@@ -190,7 +189,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
 
             {/* ── Optional hero band ──────────────────────────────────────── */}
             {hero && (
-                <Animated.View entering={FadeInDown.delay(120).duration(450)} style={styles.heroBand}>
+                <View style={styles.heroBand}>
                     <View style={styles.heroIconWrap}>
                         <View style={styles.heroHalo} />
                         <View style={styles.heroTile}>
@@ -209,7 +208,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                         <ThemedText style={styles.heroSubtitle}>{hero.subtitle}</ThemedText>
                     ) : null}
 
-                </Animated.View>
+                </View>
             )}
         </View>
     );

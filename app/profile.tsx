@@ -23,7 +23,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo } from 'react';
 import {
     KeyboardAvoidingView,
     Platform,
@@ -35,7 +35,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-export default function ProfileScreen() {
+export default memo(function ProfileScreen() {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const { user, updateUser } = useAuth();
@@ -403,7 +403,7 @@ export default function ProfileScreen() {
             </View >
         </ErrorBoundary>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {

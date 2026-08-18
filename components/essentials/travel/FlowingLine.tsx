@@ -18,7 +18,7 @@ interface FlowingLineProps {
 /**
  * A static dashed line suggesting movement along a route.
  */
-export function FlowingLine({
+export const FlowingLine = React.memo(function FlowingLine({
     vertical = false,
     color,
     thickness = 2,
@@ -53,4 +53,4 @@ export function FlowingLine({
             )}
         </View>
     );
-}
+});

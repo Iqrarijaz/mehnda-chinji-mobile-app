@@ -41,7 +41,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { uploadUserImage, deleteUserImage } from '@/apis/essentials';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
-const BusinessRegistrationScreen = () => {
+const BusinessRegistrationScreen = React.memo(() => {
     const router = useRouter();
     const { editData: editDataParam } = useLocalSearchParams<{ editData?: string }>();
     const { user } = useAuth();
@@ -621,7 +621,7 @@ const BusinessRegistrationScreen = () => {
                             </View>
                         )}
 
-                        <View style={styles.buttonsRow}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 20 }}>
                             <CancelButton
                                 onPress={() => handleGoBack()}
                                 disabled={isPending || isUploadingImage}
@@ -670,7 +670,7 @@ const BusinessRegistrationScreen = () => {
         </View>
         </ErrorBoundary>
     );
-};
+});
 
 export default BusinessRegistrationScreen;
 
@@ -795,28 +795,4 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius },
 
     // ── Buttons row ──────────────────────────────────────────────────────
-    buttonsRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-        marginTop: 20 },
-    cancelButton: {
-        width: 120,
-        height: 40,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center' },
-    cancelText: {
-        fontSize: 12.5,
-        fontWeight: '600' },
-    submitButton: {
-        width: 160,
-        height: 40,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center' },
-    submitText: {
-        fontSize: 12.5,
-        fontWeight: '600',
-        color: '#FFFFFF' } });
+});

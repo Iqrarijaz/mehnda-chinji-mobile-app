@@ -14,7 +14,7 @@ const NetworkMonitor = () => {
 
     useEffect(() => {
         isOfflineRef.current = isOffline;
-    }, [isOffline]);
+    }, []);
 
     useEffect(() => {
         const unsubscribe = NetInfo.addEventListener(state => {

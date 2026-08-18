@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -45,7 +45,7 @@ function relativeWeatherTime(unixSec: number): string {
     return `${Math.floor(diffMin / 60)}h ago`;
 }
 
-export default function WeatherScreen() {
+const WeatherScreen = React.memo(function WeatherScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
 
@@ -334,7 +334,9 @@ export default function WeatherScreen() {
         </View>
         </ErrorBoundary>
     );
-}
+});
+
+export default WeatherScreen;
 
 const styles = StyleSheet.create({
     flex: {

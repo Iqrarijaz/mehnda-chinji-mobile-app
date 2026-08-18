@@ -268,7 +268,7 @@ export default function SettingsScreen() {
                                         />
                                     </View>
                                     <View style={styles.modalButtons}>
-                                        <TouchableOpacity style={[styles.modalButton, styles.cancelButton, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]} onPress={() => setIsEmailModalVisible(false)}>
+                                        <TouchableOpacity style={[styles.modalButton, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]} onPress={() => setIsEmailModalVisible(false)}>
                                             <ThemedText style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</ThemedText>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.primary }]} onPress={handleUpdateEmail} disabled={isUpdatingEmail}>
@@ -312,30 +312,6 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
 
     // Header
-    headerWrap: {
-        paddingBottom: 13,
-        borderBottomLeftRadius: Layout.borderRadius,
-        borderBottomRightRadius: Layout.borderRadius,
-        overflow: 'hidden',
-        zIndex: 2 },
-    headerTopRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16 },
-    backBtn: {
-        width: 42,
-        height: 42,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.18)',
-        justifyContent: 'center',
-        alignItems: 'center' },
-    headerTitleWrap: {
-        flex: 1,
-        alignItems: 'center' },
-    headerTitle: {
-        fontSize: 16.5,
-        fontWeight: '800',
-        color: '#FFFFFF' },
     tabContainer: {
         flexDirection: 'row',
         marginBottom: 8,
@@ -389,6 +365,5 @@ const styles = StyleSheet.create({
     input: { flex: 1, height: 50, fontSize: 12.5 },
     modalButtons: { flexDirection: 'row', width: '100%', gap: 12 },
     modalButton: { flex: 1, height: 50, borderRadius: Layout.borderRadius, justifyContent: 'center', alignItems: 'center' },
-    cancelButton: {},
     cancelButtonText: { fontWeight: '600' },
     confirmButtonText: { color: '#FFFFFF', fontWeight: '700' } });

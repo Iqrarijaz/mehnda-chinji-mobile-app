@@ -13,7 +13,6 @@ interface ModalPickerTriggerProps {
     value?: string | null;
     placeholder: string;
     onPress: () => void;
-    delay?: number;
     containerStyle?: any;
 }
 
@@ -24,7 +23,6 @@ export const ModalPickerTrigger = React.memo(function ModalPickerTrigger({
     value,
     placeholder,
     onPress,
-    delay = 0,
     containerStyle }: ModalPickerTriggerProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];

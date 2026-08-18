@@ -581,13 +581,7 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                             <Switch value={formData.negotiable} onValueChange={handleNegotiableToggle} trackColor={{ true: colors.primary }} />
                         </View>
 
-                        {/* <View style={styles.switchRow}>
-                            <View style={styles.switchLabelContainer}>
-                                <ThemedText style={[styles.switchLabel, { color: colors.text }]}>Show Contact Publicly</ThemedText>
-                                <ThemedText style={[styles.switchSub, { color: colors.textSecondary }]}>Let buyers see your number to call</ThemedText>
-                            </View>
-                            <Switch value={formData.showPhoneNumber} onValueChange={(val) => updateForm('showPhoneNumber', val)} trackColor={{ true: colors.primary }} />
-                        </View> */}
+
                     </View>
 
                     {/* Description */}
@@ -822,13 +816,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 12,
-        marginTop: 20 },
-    cancelButton: {
-        width: 120,
-        height: 40,
-        borderRadius: 30,
-        justifyContent: 'center',
-        alignItems: 'center' },
-    cancelText: {
-        fontSize: 12.5,
-        fontWeight: '600' } });
+        marginTop: 20 } });
