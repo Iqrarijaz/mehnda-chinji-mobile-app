@@ -65,7 +65,7 @@ const AccordionItem = ({ item, index }: { item: any, index: number }) => {
     const colors = Colors[theme];
 
     return (
-        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.accordionContainer, { backgroundColor: colors.card }]}>
+        <Animated.View entering={FadeInDown.delay(100 * index).duration(500)} style={[styles.accordionContainer, { backgroundColor: colors.surface }]}>
             <TouchableOpacity style={styles.accordionHeader} onPress={toggleAccordion} activeOpacity={0.7}>
                 <View style={styles.accordionTitleWrap}>
                     <View style={[styles.bulletPoint, { backgroundColor: colors.border }]} />
@@ -121,7 +121,7 @@ export default function PrivacyPolicyScreen() {
                 contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
                 showsVerticalScrollIndicator={false}
             >
-                <Animated.View entering={FadeInUp.delay(300).duration(500)} style={[styles.card, { backgroundColor: colors.card }]}>
+                <Animated.View entering={FadeInUp.delay(300).duration(500)} style={[styles.card, { backgroundColor: colors.surface }]}>
                     <View style={styles.cardHeader}>
                         <Ionicons name="lock-closed" size={24} color={colors.primary} />
                         <ThemedText style={[styles.cardHeaderText, { color: colors.text }]}>Summary</ThemedText>

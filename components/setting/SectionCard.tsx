@@ -16,7 +16,7 @@ export const SectionCard: React.FC<SectionCardProps> = React.memo(({ title, chil
     const colors = Colors[theme];
 
     return (
-        <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
+        <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
             {title ? <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>{title}</ThemedText> : null}
             {children}
         </View>
