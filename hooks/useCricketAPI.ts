@@ -11,6 +11,7 @@ import {
     registerTeam,
     updateTeam,
     scheduleMatch,
+    updateMatch,
     getMatchDetails,
     predictMatchWinner,
     postOverUpdate
@@ -142,6 +143,33 @@ export function useCricketAPI() {
                 type: 'error',
                 text1: 'Scheduling Failed',
                 text2: err.message || 'Could not schedule match.'
+            });
+        }
+    });
+
+    /**
+     * Update Match Fixture Mutation
+     */
+    const updateMatchMutation = useMutation({
+        mutationFn: ({ matchId, payload }: { matchId: string; payload: any }) =>
+            updateMatch(matchId, payload),
+        onSuccess: (res: any, variables) => {
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.match(variables.matchId) });
+            if (res?.data?.tournamentId) {
+                queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(res.data.tournamentId) });
+            }
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
+            Toast.show({
+                type: 'success',
+                text1: 'Match Updated',
+                text2: 'Match details updated successfully!'
+            });
+        },
+        onError: (err: any) => {
+            Toast.show({
+                type: 'error',
+                text1: 'Update Failed',
+                text2: err.message || 'Could not update match.'
             });
         }
     });
@@ -307,6 +335,7 @@ export function useCricketAPI() {
         registerTeamMutation,
         updateTeamMutation,
         scheduleMatchMutation,
+        updateMatchMutation,
         predictWinnerMutation,
         postOverMutation,
         useLiveMatchSocket

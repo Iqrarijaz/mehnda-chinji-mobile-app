@@ -1,16 +1,17 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import {
     View,
     StyleSheet,
     ScrollView,
+    TouchableOpacity,
     Platform,
     KeyboardAvoidingView
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ScreenHeader } from '@/components/common/ScreenHeader';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { LiveScorecardCard } from '@/components/cricket/LiveScorecardCard';
@@ -19,19 +20,32 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useCricketAPI } from '@/hooks/useCricketAPI';
-import { canUserManageTournament } from '@/types/cricket';
+import { Team, canUserManageTournament } from '@/types/cricket';
 
 export default function OverScorerPanelScreen() {
     const { id: matchId } = useLocalSearchParams<{ id: string }>();
     const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const { user } = useAuth();
 
-    const { useMatchDetailsQuery, postOverMutation } = useCricketAPI();
+    const { useMatchDetailsQuery, postOverMutation, useTournamentDetailsQuery } = useCricketAPI();
     const { data, isLoading, isError } = useMatchDetailsQuery(matchId || '');
 
     const match = data?.data;
+
+    // The match document only carries team id/name/logo, so the roster for the
+    // bowler picker has to come from the tournament's team list.
+    const { data: tournamentData } = useTournamentDetailsQuery(match?.tournamentId || '');
+
+    const currentInningForRoster = match?.currentInnings === 1 ? match?.innings1 : match?.innings2;
+    const bowlingTeam = useMemo(() => {
+        const teams = tournamentData?.data?.teams || [];
+        const bowlingTeamId = currentInningForRoster?.bowlingTeamId;
+        if (!bowlingTeamId) return undefined;
+        return teams.find((t: Team) => t._id === bowlingTeamId);
+    }, [tournamentData, currentInningForRoster]);
     const canManage = canUserManageTournament(user, match?.tournamentId);
 
     // Permission Guard: Non-admin protection
@@ -68,7 +82,27 @@ export default function OverScorerPanelScreen() {
     if (isLoading) {
         return (
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <ScreenHeader hero={{ title: "Live Scorer Panel" }} showMenuIcon={false} />
+                <View
+                    style={[
+                        styles.compactHeader,
+                        {
+                            backgroundColor: colors.primary,
+                            paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12)
+                        }
+                    ]}
+                >
+                    <View style={styles.topBarContent}>
+                        <TouchableOpacity
+                            style={styles.headerIconBtn}
+                            onPress={() => router.back()}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
+                        <ThemedText style={styles.headerTitle} numberOfLines={1}>Live Scorer Panel</ThemedText>
+                        <View style={{ width: 36 }} />
+                    </View>
+                </View>
                 <View style={styles.centerContainer}>
                     <ThemedText style={{ color: colors.textSecondary }}>Loading scorer panel...</ThemedText>
                 </View>
@@ -79,7 +113,27 @@ export default function OverScorerPanelScreen() {
     if (isError || !match) {
         return (
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <ScreenHeader hero={{ title: "Live Scorer Panel" }} showMenuIcon={false} />
+                <View
+                    style={[
+                        styles.compactHeader,
+                        {
+                            backgroundColor: colors.primary,
+                            paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12)
+                        }
+                    ]}
+                >
+                    <View style={styles.topBarContent}>
+                        <TouchableOpacity
+                            style={styles.headerIconBtn}
+                            onPress={() => router.back()}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
+                        <ThemedText style={styles.headerTitle} numberOfLines={1}>Live Scorer Panel</ThemedText>
+                        <View style={{ width: 36 }} />
+                    </View>
+                </View>
                 <View style={styles.centerContainer}>
                     <Ionicons name="alert-circle-outline" size={48} color={colors.danger} />
                     <ThemedText style={{ color: colors.text, fontWeight: '700', marginTop: 8 }}>
@@ -96,7 +150,27 @@ export default function OverScorerPanelScreen() {
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <ScreenHeader hero={{ title: `Scorer — ${match.matchTitle}` }} showMenuIcon={false} />
+                <View
+                    style={[
+                        styles.compactHeader,
+                        {
+                            backgroundColor: colors.primary,
+                            paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12)
+                        }
+                    ]}
+                >
+                    <View style={styles.topBarContent}>
+                        <TouchableOpacity
+                            style={styles.headerIconBtn}
+                            onPress={() => router.back()}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
+                        <ThemedText style={styles.headerTitle} numberOfLines={1}>{`Scorer — ${match.matchTitle}`}</ThemedText>
+                        <View style={{ width: 36 }} />
+                    </View>
+                </View>
 
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -112,6 +186,8 @@ export default function OverScorerPanelScreen() {
                                 nextOverNumber={nextOverNumber}
                                 onSubmitOver={handleSubmitOver}
                                 isLoading={postOverMutation.isPending}
+                                bowlingTeamName={bowlingTeam?.name}
+                                bowlerOptions={bowlingTeam?.players || []}
                             />
                         ) : (
                             <View style={styles.completedBox}>
@@ -133,6 +209,31 @@ export default function OverScorerPanelScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
+    compactHeader: {
+        paddingHorizontal: 12,
+        paddingBottom: 10,
+        borderRadius: 0
+    },
+    topBarContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 38
+    },
+    headerIconBtn: {
+        width: 36,
+        height: 36,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    headerTitle: {
+        fontSize: 17,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: 0.2,
+        flex: 1,
+        textAlign: 'center'
+    },
     centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     scrollContent: { padding: 14, gap: 12, paddingBottom: 40 },
     completedBox: { padding: 30, alignItems: 'center', gap: 6 },

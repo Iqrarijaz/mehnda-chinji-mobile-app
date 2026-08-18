@@ -28,7 +28,8 @@ import { Team, MatchStage } from '@/types/cricket';
 const STAGES: MatchStage[] = ['GROUP', 'QUARTER_FINAL', 'SEMI_FINAL', 'FINAL'];
 
 export default function ScheduleMatchScreen() {
-    const { id: tournamentId } = useLocalSearchParams<{ id: string }>();
+    const { id: tournamentId, matchId } = useLocalSearchParams<{ id: string; matchId?: string }>();
+    const isEditing = !!matchId;
     const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
@@ -42,16 +43,17 @@ export default function ScheduleMatchScreen() {
             Toast.show({
                 type: 'error',
                 text1: 'Access Denied',
-                text2: 'Only Cricket Admins can schedule matches.'
+                text2: 'Only Cricket Admins can manage matches.'
             });
             router.replace('/cricket' as any);
         }
     }, [isCricketAdmin, router]);
 
-    const { useTournamentDetailsQuery, scheduleMatchMutation } = useCricketAPI();
+    const { useTournamentDetailsQuery, scheduleMatchMutation, updateMatchMutation } = useCricketAPI();
     const { data } = useTournamentDetailsQuery(tournamentId || '');
     const tournament = data?.data;
     const teams: Team[] = tournament?.teams || [];
+    const matches = data?.matches || [];
 
     // Form State
     const [matchTitle, setMatchTitle] = useState('Group Match');
@@ -63,13 +65,45 @@ export default function ScheduleMatchScreen() {
     const [venue, setVenue] = useState('');
     const [maxOvers, setMaxOvers] = useState('10');
     const [scheduledAt, setScheduledAt] = useState(new Date().toISOString().split('T')[0]);
+    const [titleTouched, setTitleTouched] = useState(false);
+    const [matchStatus, setMatchStatus] = useState<string>('UPCOMING');
 
+    // Defaults for a brand-new fixture come from the tournament itself.
     useEffect(() => {
-        if (tournament) {
-            if (tournament.venue) setVenue(tournament.venue);
-            if (tournament.defaultMaxOvers) setMaxOvers(String(tournament.defaultMaxOvers));
+        if (isEditing || !tournament) return;
+        if (tournament.venue) setVenue(tournament.venue);
+        if (tournament.defaultMaxOvers) setMaxOvers(String(tournament.defaultMaxOvers));
+    }, [tournament, isEditing]);
+
+    // Editing an existing fixture: load its current values.
+    useEffect(() => {
+        if (!isEditing || !matches.length) return;
+        const existing = matches.find((m: any) => m._id === matchId);
+        if (!existing) return;
+        setMatchTitle(existing.matchTitle || '');
+        setStage(existing.stage || 'GROUP');
+        setTeamAId(existing.teamA?.id || '');
+        setTeamBId(existing.teamB?.id || '');
+        setVenue(existing.venue || '');
+        setMaxOvers(String(existing.maxOvers || 10));
+        if (existing.scheduledAt) setScheduledAt(String(existing.scheduledAt).split('T')[0]);
+        setMatchStatus(existing.status || 'UPCOMING');
+    }, [isEditing, matches, matchId]);
+
+    // The title is just a human label for the fixture ("Group A - Match #3")
+    // shown on cards and the scorecard — the stage is the structural field.
+    // Keep it filled in automatically from the picked teams so nobody has to
+    // invent one, while still allowing a custom label.
+    useEffect(() => {
+        if (isEditing || titleTouched) return;
+        const a = teams.find(t => t._id === teamAId);
+        const b = teams.find(t => t._id === teamBId);
+        if (a && b) {
+            setMatchTitle(`${a.shortName} vs ${b.shortName}`);
+        } else {
+            setMatchTitle(stage.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()) + ' Match');
         }
-    }, [tournament]);
+    }, [teamAId, teamBId, stage, teams, isEditing, titleTouched]);
 
     const handleSubmit = () => {
         if (!matchTitle.trim() || !teamAId || !teamBId) {
@@ -100,11 +134,19 @@ export default function ScheduleMatchScreen() {
             maxOvers: parseInt(maxOvers) || tournament?.defaultMaxOvers || 10
         };
 
-        scheduleMatchMutation.mutate({ tournamentId: tournamentId || '', payload }, {
-            onSuccess: () => {
-                router.back();
-            }
-        });
+        if (isEditing && matchId) {
+            // Teams and overs are locked server-side once a match is under way,
+            // so only send them while it's still UPCOMING.
+            const { teamAId: a, teamBId: b, maxOvers: o, ...rest } = payload;
+            const editPayload = matchStatus === 'UPCOMING' ? payload : rest;
+            updateMatchMutation.mutate({ matchId, payload: editPayload }, {
+                onSuccess: () => router.back()
+            });
+        } else {
+            scheduleMatchMutation.mutate({ tournamentId: tournamentId || '', payload }, {
+                onSuccess: () => router.back()
+            });
+        }
     };
 
     if (!isCricketAdmin) return null;
@@ -131,7 +173,7 @@ export default function ScheduleMatchScreen() {
                             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
                         </TouchableOpacity>
 
-                        <ThemedText style={styles.headerTitle}>Schedule Match</ThemedText>
+                        <ThemedText style={styles.headerTitle}>{isEditing ? 'Edit Match' : 'Schedule Match'}</ThemedText>
 
                         <View style={{ width: 36 }} />
                     </View>
@@ -143,7 +185,14 @@ export default function ScheduleMatchScreen() {
                 >
                     <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                         {/* Match Title & Stage */}
-                        <FormInput label="MATCH TITLE" required icon="pricetag-outline" placeholder="e.g. Group A - Match #3" value={matchTitle} onChangeText={setMatchTitle} />
+                        <FormInput
+                            label="MATCH TITLE"
+                            required
+                            icon="pricetag-outline"
+                            placeholder="e.g. Group A - Match #3"
+                            value={matchTitle}
+                            onChangeText={(val) => { setTitleTouched(true); setMatchTitle(val); }}
+                        />
 
                         {/* Stage Selector */}
                         <View style={styles.section}>
@@ -200,7 +249,11 @@ export default function ScheduleMatchScreen() {
 
                         {/* Submit Action */}
                         <View style={{ marginTop: 10 }}>
-                            <SubmitButton title="Schedule Match Fixture" onPress={handleSubmit} isLoading={scheduleMatchMutation.isPending} />
+                            <SubmitButton
+                                title={isEditing ? 'Update Match' : 'Schedule Match Fixture'}
+                                onPress={handleSubmit}
+                                isLoading={isEditing ? updateMatchMutation.isPending : scheduleMatchMutation.isPending}
+                            />
                         </View>
                     </ScrollView>
                 </KeyboardAvoidingView>
@@ -214,7 +267,7 @@ export default function ScheduleMatchScreen() {
                         if (matchedTeam) setTeamAId(matchedTeam._id);
                         setTeamAPickerVisible(false);
                     }}
-                    options={teams.map(t => ({ label: `${t.name} (${t.shortName})`, value: t._id }))}
+                    options={teams.filter(t => t._id !== teamBId).map(t => ({ label: `${t.name} (${t.shortName})`, value: t._id }))}
                     title="Select Team A"
                     currentValue={teamAId}
                 />
@@ -228,7 +281,7 @@ export default function ScheduleMatchScreen() {
                         if (matchedTeam) setTeamBId(matchedTeam._id);
                         setTeamBPickerVisible(false);
                     }}
-                    options={teams.map(t => ({ label: `${t.name} (${t.shortName})`, value: t._id }))}
+                    options={teams.filter(t => t._id !== teamAId).map(t => ({ label: `${t.name} (${t.shortName})`, value: t._id }))}
                     title="Select Team B"
                     currentValue={teamBId}
                 />
@@ -266,7 +319,7 @@ const styles = StyleSheet.create({
     section: { gap: 4 },
     label: { fontSize: 10, fontWeight: '600', letterSpacing: 0.3 },
     pillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
-    pill: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: Layout.borderRadius - 6 },
+    pill: { paddingHorizontal: 14, height: 30, justifyContent: 'center', borderRadius: 15 },
     pillText: { fontSize: 10.5, fontWeight: '600' },
     teamsList: { gap: 5 },
     teamItem: { padding: 9, borderRadius: Layout.borderRadius - 6 },
