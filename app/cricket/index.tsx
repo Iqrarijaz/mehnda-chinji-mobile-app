@@ -49,31 +49,31 @@ export default function CricketFeedScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState<string>('MATCHES');
 
-    const { useTournamentsFeedQuery } = useCricketAPI();
+    const { useTournamentsFeedQuery, useMatchesFeedQuery } = useCricketAPI();
     const { data, isLoading, isError, refetch, isRefetching } = useTournamentsFeedQuery({});
 
+    // Matches live in their own collection, so they need their own request —
+    // the tournaments feed carries only a per-player "matches" count, never
+    // the fixtures themselves.
+    const {
+        data: matchesData,
+        isLoading: isMatchesLoading,
+        refetch: refetchMatches,
+        isRefetching: isMatchesRefetching
+    } = useMatchesFeedQuery({});
+
     const tournamentsList: Tournament[] = data?.data || [];
+    const allMatches: CricketMatch[] = useMemo(() => matchesData?.data || [], [matchesData]);
 
-    // Extract all matches across tournaments for the match carousel
-    const allMatches = useMemo(() => {
-        const matches: CricketMatch[] = [];
-        tournamentsList.forEach((t: any) => {
-            if (Array.isArray(t.matches)) {
-                matches.push(...t.matches);
-            }
-        });
-        return matches;
-    }, [tournamentsList]);
-
-    // MATCHES and PREDICTIONS list fixtures; the rest list tournaments.
-    const isMatchMode = selectedFilter === 'MATCHES' || selectedFilter === 'PREDICTIONS';
+    // The Matches circle lists fixtures; the rest list tournaments.
+    const isMatchMode = selectedFilter === 'MATCHES';
 
     // Filter tournaments based on search query and status pill
     const filteredTournaments = useMemo(() => {
         let list = tournamentsList;
 
-        // Only the tournament-status circles narrow the list; MATCHES /
-        // PREDICTIONS aren't tournament statuses and are handled separately.
+        // Only the tournament-status circles narrow the list; MATCHES isn't
+        // a tournament status and is handled separately.
         if (selectedFilter !== 'ALL' && !isMatchMode) {
             list = list.filter(t => t.status === selectedFilter);
         }
@@ -93,12 +93,6 @@ export default function CricketFeedScreen() {
     const filteredMatches = useMemo(() => {
         let list = allMatches;
 
-        // A finished match can no longer be predicted, so the Predictions
-        // circle only surfaces fixtures that are still open to vote on.
-        if (selectedFilter === 'PREDICTIONS') {
-            list = list.filter(m => m.status === 'UPCOMING' || m.status === 'LIVE');
-        }
-
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();
             list = list.filter(m =>
@@ -110,7 +104,7 @@ export default function CricketFeedScreen() {
         }
 
         return list;
-    }, [allMatches, selectedFilter, searchQuery]);
+    }, [allMatches, searchQuery]);
 
     const handleOpenDrawer = useCallback(() => {
         let currentNav: any = navigation;
@@ -181,12 +175,6 @@ export default function CricketFeedScreen() {
             label: 'Matches',
             icon: 'baseball-outline' as keyof typeof Ionicons.glyphMap,
             filterKey: 'MATCHES'
-        },
-        {
-            id: 'PREDICTIONS',
-            label: 'Predictions',
-            icon: 'stats-chart-outline' as keyof typeof Ionicons.glyphMap,
-            filterKey: 'PREDICTIONS'
         },
         {
             id: 'ALL',
@@ -301,25 +289,12 @@ export default function CricketFeedScreen() {
             {/* Section Header */}
             <View style={styles.sectionHeaderRow}>
                 <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-                    {selectedFilter === 'PREDICTIONS'
-                        ? 'Predict & Win'
-                        : selectedFilter === 'MATCHES'
-                            ? 'All Matches'
-                            : 'Featured Tournaments'}
+                    {isMatchMode ? 'All Matches' : 'Featured Tournaments'}
                 </ThemedText>
                 <ThemedText style={[styles.sectionCount, { color: colors.textSecondary }]}>
                     {(isMatchMode ? filteredMatches.length : filteredTournaments.length)} available
                 </ThemedText>
             </View>
-
-            {selectedFilter === 'PREDICTIONS' && (
-                <View style={styles.predictHintRow}>
-                    <Ionicons name="information-circle-outline" size={13} color={colors.textSecondary} />
-                    <ThemedText style={[styles.predictHintText, { color: colors.textSecondary }]}>
-                        Open a match to cast your win prediction.
-                    </ThemedText>
-                </View>
-            )}
         </View>
     ), [
         colors,
@@ -400,14 +375,14 @@ export default function CricketFeedScreen() {
                     showsVerticalScrollIndicator={false}
                     refreshControl={
                         <RefreshControl
-                            refreshing={isRefetching}
-                            onRefresh={refetch}
+                            refreshing={isRefetching || isMatchesRefetching}
+                            onRefresh={() => { refetch(); refetchMatches(); }}
                             colors={[colors.primary]}
                             tintColor={colors.primary}
                         />
                     }
                     ListEmptyComponent={
-                        !isLoading ? (
+                        !(isMatchMode ? isMatchesLoading : isLoading) ? (
                             <View style={styles.emptyContainer}>
                                 <Ionicons name={isMatchMode ? 'baseball-outline' : 'trophy-outline'} size={44} color={colors.icon} />
                                 <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>
@@ -417,9 +392,7 @@ export default function CricketFeedScreen() {
                                     {searchQuery
                                         ? `Nothing matches "${searchQuery}".`
                                         : isMatchMode
-                                            ? (selectedFilter === 'PREDICTIONS'
-                                                ? 'No matches are open for predictions right now.'
-                                                : 'No matches have been scheduled yet.')
+                                            ? 'No matches have been scheduled yet.'
                                             : 'Check back soon for upcoming cricket tournaments!'}
                                 </ThemedText>
                             </View>
@@ -533,17 +506,6 @@ const styles = StyleSheet.create({
         fontWeight: '800'
     },
     sectionCount: {
-        fontSize: 11,
-        fontWeight: '500'
-    },
-    predictHintRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5,
-        paddingHorizontal: 10,
-        marginBottom: 8
-    },
-    predictHintText: {
         fontSize: 11,
         fontWeight: '500'
     },
