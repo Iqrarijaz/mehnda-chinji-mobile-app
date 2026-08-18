@@ -4,9 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
+import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
+import { SearchableDropdown } from '@/components/common/SearchableDropdown';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
+import { Player } from '@/types/cricket';
 
 interface OverScorerBoxProps {
     nextOverNumber: number;
@@ -19,6 +22,13 @@ interface OverScorerBoxProps {
         commentary?: string;
     }) => void;
     isLoading?: boolean;
+    /** Name of the team currently bowling — shown as the picker's context. */
+    bowlingTeamName?: string;
+    /**
+     * Full roster of the bowling side. Every player is offered, not just those
+     * tagged BOWLER — in club cricket anyone can be handed the ball.
+     */
+    bowlerOptions?: Player[];
 }
 
 const RUN_PRESETS = [0, 1, 2, 3, 4, 6];
@@ -26,12 +36,15 @@ const RUN_PRESETS = [0, 1, 2, 3, 4, 6];
 export const OverScorerBox = React.memo(function OverScorerBox({
     nextOverNumber,
     onSubmitOver,
-    isLoading = false
+    isLoading = false,
+    bowlingTeamName,
+    bowlerOptions = []
 }: OverScorerBoxProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
     const [bowlerName, setBowlerName] = useState('');
+    const [bowlerPickerVisible, setBowlerPickerVisible] = useState(false);
     const [runsScored, setRunsScored] = useState(0);
     const [wickets, setWickets] = useState(0);
     const [wides, setWides] = useState(0);
@@ -59,7 +72,7 @@ export const OverScorerBox = React.memo(function OverScorerBox({
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+        <View style={[styles.container, { backgroundColor: colors.cardBg }]}>
             <View style={styles.header}>
                 <Ionicons name="create-outline" size={18} color={colors.primary} />
                 <ThemedText style={[styles.headerTitle, { color: colors.text }]}>
@@ -67,15 +80,26 @@ export const OverScorerBox = React.memo(function OverScorerBox({
                 </ThemedText>
             </View>
 
-            {/* Bowler Name */}
-            <FormInput
-                label="BOWLER NAME"
-                required
-                icon="person-outline"
-                placeholder="Enter bowler name"
-                value={bowlerName}
-                onChangeText={setBowlerName}
-            />
+            {/* Bowler — picked from the bowling side's roster */}
+            {bowlerOptions.length > 0 ? (
+                <ModalPickerTrigger
+                    label={bowlingTeamName ? `BOWLER (${bowlingTeamName.toUpperCase()})` : 'BOWLER'}
+                    required
+                    icon="person-outline"
+                    value={bowlerName}
+                    placeholder="Select bowler"
+                    onPress={() => setBowlerPickerVisible(true)}
+                />
+            ) : (
+                <FormInput
+                    label="BOWLER NAME"
+                    required
+                    icon="person-outline"
+                    placeholder="Enter bowler name"
+                    value={bowlerName}
+                    onChangeText={setBowlerName}
+                />
+            )}
 
             {/* Runs Scored in Over */}
             <View style={styles.section}>
@@ -159,14 +183,29 @@ export const OverScorerBox = React.memo(function OverScorerBox({
                 isLoading={isLoading}
                 disabled={!bowlerName.trim()}
             />
+
+            <SearchableDropdown
+                visible={bowlerPickerVisible}
+                onClose={() => setBowlerPickerVisible(false)}
+                onSelect={(selected) => {
+                    setBowlerName(selected);
+                    setBowlerPickerVisible(false);
+                }}
+                currentValue={bowlerName}
+                options={bowlerOptions
+                    .filter(p => p.name?.trim())
+                    .map(p => ({ label: `${p.name} (${p.role.replace('_', ' ')})`, value: p.name }))}
+                title={bowlingTeamName ? `Select Bowler — ${bowlingTeamName}` : 'Select Bowler'}
+                placeholder="Search player..."
+            />
         </View>
     );
 });
 
 const styles = StyleSheet.create({
     container: {
-        padding: 14,
-        borderRadius: Layout.borderRadius,
+        padding: 10,
+        borderRadius: Layout.borderRadius - 4,
         marginBottom: 16,
         gap: 12
     },

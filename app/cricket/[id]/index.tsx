@@ -58,11 +58,16 @@ export default function TournamentHubScreen() {
             onPress: () => router.push(`/cricket/match/${match._id}/scorer` as any)
         },
         {
+            label: 'Edit Match Details',
+            icon: 'create-outline',
+            onPress: () => router.push(`/cricket/${id}/schedule-match?matchId=${match._id}` as any)
+        },
+        {
             label: 'View Match Details',
             icon: 'eye-outline',
             onPress: () => handleOpenMatch(match._id)
         }
-    ], [router, handleOpenMatch]);
+    ], [router, handleOpenMatch, id]);
 
     const buildTeamActions = useCallback((team: Team): ActionMenuItem[] => [
         {
@@ -71,6 +76,25 @@ export default function TournamentHubScreen() {
             onPress: () => router.push(`/cricket/${id}/add-team?teamId=${team._id}` as any)
         }
     ], [router, id]);
+
+    // One side of a fixture: logo (or initial tile) plus the team name.
+    // `alignEnd` mirrors the layout so the two sides face the centre "VS".
+    const renderMatchTeam = useCallback((team: CricketMatch['teamA'], alignEnd = false) => (
+        <View style={[styles.matchTeam, alignEnd && styles.matchTeamEnd]}>
+            {team.logo ? (
+                <Image source={{ uri: team.logo }} style={styles.matchTeamLogo} />
+            ) : (
+                <View style={[styles.matchTeamLogo, styles.matchTeamLogoFallback, { backgroundColor: `${colors.primary}20` }]}>
+                    <ThemedText style={[styles.matchTeamInitial, { color: colors.primary }]}>
+                        {team.name?.charAt(0)?.toUpperCase() || '?'}
+                    </ThemedText>
+                </View>
+            )}
+            <ThemedText style={[styles.teamName, { color: colors.text }]} numberOfLines={1}>
+                {capitalizeString(team.name)}
+            </ThemedText>
+        </View>
+    ), [colors]);
 
     const renderMatchItem = useCallback(({ item }: { item: CricketMatch }) => (
         <TouchableOpacity
@@ -81,35 +105,36 @@ export default function TournamentHubScreen() {
             <View style={styles.matchHeader}>
                 <ThemedText style={[styles.stageText, { color: colors.primary }]} numberOfLines={1}>{item.matchTitle}</ThemedText>
                 <StatusBadge status={item.status} />
-                {canManage && (
-                    <View style={styles.matchActionMenu}>
-                        <ActionMenu
-                            actions={buildMatchActions(item)}
-                            triggerIcon="ellipsis-horizontal"
-                            triggerIconSize={16}
-                            triggerIconColor={colors.textSecondary}
-                        />
-                    </View>
-                )}
             </View>
 
             <View style={styles.teamsRow}>
-                <ThemedText style={[styles.teamName, { color: colors.text }]}>{item.teamA.name}</ThemedText>
+                {renderMatchTeam(item.teamA)}
                 <ThemedText style={[styles.vsText, { color: colors.secondary }]}>VS</ThemedText>
-                <ThemedText style={[styles.teamName, { color: colors.text }]}>{item.teamB.name}</ThemedText>
+                {renderMatchTeam(item.teamB, true)}
             </View>
 
-            {item.result ? (
-                <ThemedText style={[styles.resultText, { color: colors.success }]} numberOfLines={1}>
-                    {item.result}
-                </ThemedText>
-            ) : (
-                <ThemedText style={[styles.venueText, { color: colors.textSecondary }]}>
-                    {item.venue} • Max {item.maxOvers} Overs
-                </ThemedText>
-            )}
+            {/* Venue / result line — action menu sits at its right edge */}
+            <View style={styles.matchFooter}>
+                {item.result ? (
+                    <ThemedText style={[styles.resultText, { color: colors.success }]} numberOfLines={1}>
+                        {item.result}
+                    </ThemedText>
+                ) : (
+                    <ThemedText style={[styles.venueText, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {item.venue} • Max {item.maxOvers} Overs
+                    </ThemedText>
+                )}
+                {canManage && (
+                    <ActionMenu
+                        actions={buildMatchActions(item)}
+                        triggerIcon="ellipsis-horizontal"
+                        triggerIconSize={18}
+                        triggerIconColor={colors.textSecondary}
+                    />
+                )}
+            </View>
         </TouchableOpacity>
-    ), [colors, handleOpenMatch, canManage, buildMatchActions]);
+    ), [colors, handleOpenMatch, canManage, buildMatchActions, renderMatchTeam]);
 
     if (isLoading) {
         return (
@@ -372,13 +397,18 @@ const styles = StyleSheet.create({
     actionBtnText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
     matchCard: { padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 8, gap: 6 },
     matchHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-    matchActionMenu: { justifyContent: 'center', alignItems: 'center' },
+    matchFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 2 },
+    matchTeam: { flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 },
+    matchTeamEnd: { justifyContent: 'flex-end' },
+    matchTeamLogo: { width: 24, height: 24, borderRadius: 12 },
+    matchTeamLogoFallback: { justifyContent: 'center', alignItems: 'center' },
+    matchTeamInitial: { fontSize: 11, fontWeight: '800' },
     stageText: { fontSize: 11, fontWeight: '700', flex: 1 },
     teamsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-    teamName: { fontSize: 13, fontWeight: '600', flex: 1 },
+    teamName: { fontSize: 13, fontWeight: '600', flexShrink: 1 },
     vsText: { fontSize: 11, fontWeight: '700' },
-    resultText: { fontSize: 11, fontWeight: '600' },
-    venueText: { fontSize: 10.5 },
+    resultText: { fontSize: 11, fontWeight: '600', flex: 1 },
+    venueText: { fontSize: 10.5, flex: 1 },
     teamTile: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 6, gap: 8 },
     logoCircle: { width: 38, height: 38, borderRadius: 19 },
     logoFallback: { justifyContent: 'center', alignItems: 'center' },
