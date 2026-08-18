@@ -106,13 +106,13 @@ export const CurrencyRow = React.memo(function CurrencyRow({ code, rate, baseCod
 
 const styles = StyleSheet.create({
     pressWrap: {
-        marginHorizontal: 20,
+        marginHorizontal: 14,
         marginBottom: 10,
     },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.cardBorderRadius,
+        borderRadius: Layout.cardBorderRadius - 2,
         paddingVertical: 10,
         paddingHorizontal: 12,
         minHeight: 44,

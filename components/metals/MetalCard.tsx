@@ -84,11 +84,11 @@ export const MetalCard = React.memo(function MetalCard({ meta, price, unit, kara
 
 const styles = StyleSheet.create({
     pressWrap: {
-        marginHorizontal: 20,
+        marginHorizontal: 14,
         marginBottom: 10,
     },
     card: {
-        borderRadius: Layout.cardBorderRadius,
+        borderRadius: Layout.cardBorderRadius - 2,
         overflow: 'hidden',
     },
     mainRow: {
