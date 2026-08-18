@@ -133,7 +133,7 @@ export default function CricketFeedScreen() {
         {
             label: 'Manage & Edit Details',
             icon: 'create-outline',
-            onPress: () => router.push(`/cricket/${tournament._id}` as any)
+            onPress: () => router.push(`/cricket/create-tournament?id=${tournament._id}` as any)
         },
         {
             label: 'Schedule Match',

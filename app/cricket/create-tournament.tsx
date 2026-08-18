@@ -8,7 +8,7 @@ import {
     Platform,
     KeyboardAvoidingView
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -31,6 +31,8 @@ import citiesDataFallback from '@/data/cities.json';
 import { Organizer, Guest } from '@/types/cricket';
 
 export default function CreateTournamentScreen() {
+    const { id: editTournamentId } = useLocalSearchParams<{ id?: string }>();
+    const isEditing = !!editTournamentId;
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
@@ -50,7 +52,9 @@ export default function CreateTournamentScreen() {
         }
     }, [isCricketAdmin, router]);
 
-    const { createTournamentMutation } = useCricketAPI();
+    const { createTournamentMutation, updateTournamentMutation, useTournamentDetailsQuery } = useCricketAPI();
+    const { data: editData } = useTournamentDetailsQuery(editTournamentId || '');
+    const existingTournament = editData?.data;
 
     // Form State
     const [name, setName] = useState('');
@@ -73,6 +77,34 @@ export default function CreateTournamentScreen() {
     const [guests, setGuests] = useState<Guest[]>([]);
 
     const [cityPickerVisible, setCityPickerVisible] = useState(false);
+
+    // Pre-fill the form once the tournament being edited has loaded
+    useEffect(() => {
+        if (!isEditing || !existingTournament) return;
+        setName(existingTournament.name || '');
+        setCity(existingTournament.city || '');
+        setVenue(existingTournament.venue || '');
+        const coords = existingTournament.location?.coordinates;
+        if (coords && coords.length === 2) {
+            setLng(String(coords[0]));
+            setLat(String(coords[1]));
+        }
+        setFormat(existingTournament.format || 'T10');
+        setDefaultMaxOvers(String(existingTournament.defaultMaxOvers || 10));
+        if (existingTournament.startDate) {
+            setStartDate(existingTournament.startDate.split('T')[0]);
+        }
+        setBannerImage(existingTournament.bannerImage || null);
+        setWinnerPrize(existingTournament.prizes?.winnerPrize || '');
+        setRunnerUpPrize(existingTournament.prizes?.runnerUpPrize || '');
+        setManOfSeriesPrize(existingTournament.prizes?.manOfTheSeriesPrize || '');
+        if (existingTournament.organizers?.length) {
+            setOrganizers(existingTournament.organizers);
+        }
+        if (existingTournament.guests?.length) {
+            setGuests(existingTournament.guests);
+        }
+    }, [isEditing, existingTournament]);
 
     // Pick & Compress Banner Image
     const handlePickBanner = useCallback(async () => {
@@ -152,11 +184,19 @@ export default function CreateTournamentScreen() {
             guests: guests.filter(g => g.name.trim())
         };
 
-        createTournamentMutation.mutate(payload, {
-            onSuccess: () => {
-                router.replace('/cricket' as any);
-            }
-        });
+        if (isEditing && editTournamentId) {
+            updateTournamentMutation.mutate({ tournamentId: editTournamentId, payload }, {
+                onSuccess: () => {
+                    router.back();
+                }
+            });
+        } else {
+            createTournamentMutation.mutate(payload, {
+                onSuccess: () => {
+                    router.replace('/cricket' as any);
+                }
+            });
+        }
     };
 
     if (!isCricketAdmin) return null;
@@ -183,7 +223,7 @@ export default function CreateTournamentScreen() {
                             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
                         </TouchableOpacity>
 
-                        <ThemedText style={styles.headerTitle}>Create Tournament</ThemedText>
+                        <ThemedText style={styles.headerTitle}>{isEditing ? 'Edit Tournament' : 'Create Tournament'}</ThemedText>
 
                         <View style={{ width: 36 }} />
                     </View>
@@ -311,9 +351,9 @@ export default function CreateTournamentScreen() {
                                 style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: Platform.OS === 'android' ? 46 : 50 }}
                             />
                             <SubmitButton
-                                title="Create Tournament"
+                                title={isEditing ? 'Update Tournament' : 'Create Tournament'}
                                 onPress={handleSubmit}
-                                isLoading={createTournamentMutation.isPending}
+                                isLoading={isEditing ? updateTournamentMutation.isPending : createTournamentMutation.isPending}
                                 style={{ width: 180, height: Platform.OS === 'android' ? 46 : 50, borderRadius: 28 }}
                             />
                         </View>

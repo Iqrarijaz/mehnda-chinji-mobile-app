@@ -50,8 +50,8 @@ export const ActionMenu: React.FC<ActionMenuProps> = React.memo(({
                     return (
                         <MenuOption key={index} onSelect={action.onPress}>
                             <View style={styles.menuItem}>
-                                <View style={[styles.menuIconTile, { backgroundColor: `${accent}18` }]}>
-                                    <Ionicons name={action.icon} size={15} color={accent} />
+                                <View style={styles.menuIconTile}>
+                                    <Ionicons name={action.icon} size={22} color={accent} />
                                 </View>
                                 <ThemedText style={[styles.menuText, { color: isDestructive ? '#EF4444' : colors.text }]}>
                                     {action.label}
@@ -78,9 +78,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 7,
         borderRadius: Layout.borderRadius },
     menuIconTile: {
-        width: 30,
-        height: 30,
-        borderRadius: Layout.borderRadius,
+        width: 26,
+        height: 26,
         justifyContent: 'center',
         alignItems: 'center' },
     menuText: {

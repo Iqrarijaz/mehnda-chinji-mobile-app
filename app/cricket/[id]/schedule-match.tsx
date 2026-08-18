@@ -10,8 +10,8 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ScreenHeader } from '@/components/common/ScreenHeader';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { ModalPickerTrigger } from '@/components/common/ModalPickerTrigger';
@@ -32,6 +32,7 @@ export default function ScheduleMatchScreen() {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const { user } = useAuth();
     const isCricketAdmin = !!user?.user?.isCricketAdmin;
 
@@ -111,7 +112,30 @@ export default function ScheduleMatchScreen() {
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <ScreenHeader hero={{ title: "Schedule Match" }} showMenuIcon={false} />
+                {/* Straight Compact Header — matches Create Tournament */}
+                <View
+                    style={[
+                        styles.compactHeader,
+                        {
+                            backgroundColor: colors.primary,
+                            paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12)
+                        }
+                    ]}
+                >
+                    <View style={styles.topBarContent}>
+                        <TouchableOpacity
+                            style={styles.headerIconBtn}
+                            onPress={() => router.back()}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
+
+                        <ThemedText style={styles.headerTitle}>Schedule Match</ThemedText>
+
+                        <View style={{ width: 36 }} />
+                    </View>
+                </View>
 
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -215,6 +239,29 @@ export default function ScheduleMatchScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
+    compactHeader: {
+        paddingHorizontal: 12,
+        paddingBottom: 10,
+        borderRadius: 0
+    },
+    topBarContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 38
+    },
+    headerIconBtn: {
+        width: 36,
+        height: 36,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    headerTitle: {
+        fontSize: 17,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: 0.2
+    },
     scrollContent: { padding: 14, gap: 10, paddingBottom: 40 },
     section: { gap: 4 },
     label: { fontSize: 10, fontWeight: '600', letterSpacing: 0.3 },
