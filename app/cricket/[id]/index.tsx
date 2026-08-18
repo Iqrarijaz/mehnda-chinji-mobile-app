@@ -23,6 +23,7 @@ import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useCricketAPI } from '@/hooks/useCricketAPI';
+import { capitalizeString } from '@/utils/string';
 import { CricketMatch, Team, canUserManageTournament } from '@/types/cricket';
 
 type TabType = 'fixtures' | 'teams' | 'standings';
@@ -63,9 +64,17 @@ export default function TournamentHubScreen() {
         }
     ], [router, handleOpenMatch]);
 
+    const buildTeamActions = useCallback((team: Team): ActionMenuItem[] => [
+        {
+            label: 'Edit Team & Roster',
+            icon: 'create-outline',
+            onPress: () => router.push(`/cricket/${id}/add-team?teamId=${team._id}` as any)
+        }
+    ], [router, id]);
+
     const renderMatchItem = useCallback(({ item }: { item: CricketMatch }) => (
         <TouchableOpacity
-            style={[styles.matchCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
+            style={[styles.matchCard, { backgroundColor: colors.cardBg }]}
             onPress={() => handleOpenMatch(item._id)}
             activeOpacity={0.8}
         >
@@ -263,16 +272,30 @@ export default function TournamentHubScreen() {
 
                             {tournament.teams && tournament.teams.length > 0 ? (
                                 tournament.teams.map((t: Team, idx: number) => (
-                                    <View key={t._id || idx} style={[styles.teamTile, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
-                                        <View style={[styles.logoCircle, { backgroundColor: `${colors.primary}20` }]}>
-                                            <ThemedText style={[styles.logoText, { color: colors.primary }]}>{t.shortName}</ThemedText>
-                                        </View>
+                                    <View key={t._id || idx} style={[styles.teamTile, { backgroundColor: colors.cardBg }]}>
+                                        {t.logo ? (
+                                            <Image source={{ uri: t.logo }} style={styles.logoCircle} />
+                                        ) : (
+                                            <View style={[styles.logoCircle, styles.logoFallback, { backgroundColor: `${colors.primary}20` }]}>
+                                                <ThemedText style={[styles.logoText, { color: colors.primary }]}>{t.shortName}</ThemedText>
+                                            </View>
+                                        )}
                                         <View style={{ flex: 1 }}>
-                                            <ThemedText style={[styles.teamTileName, { color: colors.text }]}>{t.name}</ThemedText>
-                                            <ThemedText style={[styles.teamTileSub, { color: colors.textSecondary }]}>
-                                                Captain: {t.captainName || 'N/A'} • {t.players?.length || 0} Players
+                                            <ThemedText style={[styles.teamTileName, { color: colors.text }]} numberOfLines={1}>
+                                                {capitalizeString(t.name)}
+                                            </ThemedText>
+                                            <ThemedText style={[styles.teamTileSub, { color: colors.textSecondary }]} numberOfLines={1}>
+                                                Captain: {t.captainName ? capitalizeString(t.captainName) : 'N/A'} • {t.players?.length || 0} Players
                                             </ThemedText>
                                         </View>
+                                        {canManage && (
+                                            <ActionMenu
+                                                actions={buildTeamActions(t)}
+                                                triggerIcon="ellipsis-horizontal"
+                                                triggerIconSize={18}
+                                                triggerIconColor={colors.textSecondary}
+                                            />
+                                        )}
                                     </View>
                                 ))
                             ) : (
@@ -347,7 +370,7 @@ const styles = StyleSheet.create({
     sectionTitle: { fontSize: 13, fontWeight: '700' },
     actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 46 : 50, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 6 },
     actionBtnText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
-    matchCard: { padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 8, gap: 6, borderWidth: 1 },
+    matchCard: { padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 8, gap: 6 },
     matchHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
     matchActionMenu: { justifyContent: 'center', alignItems: 'center' },
     stageText: { fontSize: 11, fontWeight: '700', flex: 1 },
@@ -356,8 +379,9 @@ const styles = StyleSheet.create({
     vsText: { fontSize: 11, fontWeight: '700' },
     resultText: { fontSize: 11, fontWeight: '600' },
     venueText: { fontSize: 10.5 },
-    teamTile: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 6, gap: 8, borderWidth: 1 },
-    logoCircle: { width: 38, height: 38, borderRadius: 19, justifyContent: 'center', alignItems: 'center' },
+    teamTile: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 6, gap: 8 },
+    logoCircle: { width: 38, height: 38, borderRadius: 19 },
+    logoFallback: { justifyContent: 'center', alignItems: 'center' },
     logoText: { fontSize: 12, fontWeight: '700' },
     teamTileName: { fontSize: 13, fontWeight: '600' },
     teamTileSub: { fontSize: 11 },

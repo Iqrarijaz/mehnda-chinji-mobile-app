@@ -9,6 +9,7 @@ import {
     updateTournament,
     assignTournamentAdmin,
     registerTeam,
+    updateTeam,
     scheduleMatch,
     getMatchDetails,
     predictMatchWinner,
@@ -94,6 +95,30 @@ export function useCricketAPI() {
                 type: 'error',
                 text1: 'Registration Failed',
                 text2: err.message || 'Could not register team.'
+            });
+        }
+    });
+
+    /**
+     * Update Team Mutation
+     */
+    const updateTeamMutation = useMutation({
+        mutationFn: ({ tournamentId, teamId, payload }: { tournamentId: string; teamId: string; payload: any }) =>
+            updateTeam(tournamentId, teamId, payload),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
+            Toast.show({
+                type: 'success',
+                text1: 'Team Updated',
+                text2: 'Team details updated successfully!'
+            });
+        },
+        onError: (err: any) => {
+            Toast.show({
+                type: 'error',
+                text1: 'Update Failed',
+                text2: err.message || 'Could not update team.'
             });
         }
     });
@@ -280,6 +305,7 @@ export function useCricketAPI() {
         updateTournamentMutation,
         assignTournamentAdminMutation,
         registerTeamMutation,
+        updateTeamMutation,
         scheduleMatchMutation,
         predictWinnerMutation,
         postOverMutation,

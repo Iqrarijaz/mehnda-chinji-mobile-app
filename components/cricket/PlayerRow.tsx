@@ -178,9 +178,11 @@ const styles = StyleSheet.create({
         gap: 4
     },
     rolePill: {
-        paddingHorizontal: 6,
-        paddingVertical: 3,
-        borderRadius: 4
+        paddingHorizontal: 10,
+        paddingVertical: 0,
+        height: 22,
+        justifyContent: 'center',
+        borderRadius: 11
     },
     rolePillText: {
         fontSize: 9.5,
@@ -190,9 +192,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 3,
-        paddingHorizontal: 6,
-        paddingVertical: 3,
-        borderRadius: 4
+        paddingHorizontal: 10,
+        paddingVertical: 0,
+        height: 22,
+        borderRadius: 11
     },
     captainText: {
         fontSize: 10.5
