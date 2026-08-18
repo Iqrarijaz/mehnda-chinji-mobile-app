@@ -50,7 +50,7 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({ match, on
         <TouchableOpacity
             style={[
                 styles.card,
-                { backgroundColor: colors.cardBg, borderColor: colors.border }
+                { backgroundColor: colors.cardBg }
             ]}
             onPress={onPress}
             activeOpacity={0.8}
@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
     card: {
         width: 270,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         padding: 12,
         marginRight: 10,
         justifyContent: 'space-between'

@@ -16,7 +16,7 @@ export const StatusBadge = React.memo(function StatusBadge({ status, size = 'sma
     const getStatusColor = () => {
         switch (status) {
             case 'LIVE': return '#EF4444';
-            case 'UPCOMING': return '#10B981'; // Green
+            case 'UPCOMING': return colors.primary;
             case 'COMPLETED': return colors.textSecondary;
             case 'ABANDONED': return colors.danger;
             default: return colors.textSecondary;

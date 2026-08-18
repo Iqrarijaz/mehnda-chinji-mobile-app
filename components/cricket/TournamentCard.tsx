@@ -15,17 +15,30 @@ interface TournamentCardProps {
     actions?: ActionMenuItem[];
 }
 
+/** Formats a tournament's ISO start date/time into a compact "6:00 PM" label. */
+function formatTournamentTime(iso?: string | null): string | null {
+    if (!iso) return null;
+    const date = new Date(iso);
+    if (isNaN(date.getTime())) return null;
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    const minutesStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    return `${hours}:${minutesStr} ${ampm}`;
+}
+
 export const TournamentCard = React.memo(function TournamentCard({ tournament, onPress, actions }: TournamentCardProps) {
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const colors = Colors[theme];
+    const startTime = formatTournamentTime(tournament.startDate);
 
     return (
         <TouchableOpacity
             style={[
                 styles.card,
                 {
-                    backgroundColor: colors.cardBg,
-                    borderColor: colors.border
+                    backgroundColor: colors.cardBg
                 }
             ]}
             onPress={onPress}
@@ -41,16 +54,24 @@ export const TournamentCard = React.memo(function TournamentCard({ tournament, o
                     </View>
                 )}
 
-                {/* Status Badge Overlay */}
-                <View style={[styles.statusOverlay, { backgroundColor: isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)' }]}>
+                {/* Status Badge — plain text, no pill background */}
+                <View style={styles.statusOverlay}>
                     <StatusBadge status={tournament.status} />
                 </View>
 
-                {/* Format Pill */}
-                <View style={[styles.formatBadge, { backgroundColor: colors.primary }]}>
-                    <ThemedText style={styles.formatText}>
-                        {tournament.format}
-                    </ThemedText>
+                {/* Format + Start Time */}
+                <View style={styles.topRightGroup}>
+                    {startTime && (
+                        <View style={styles.timeBadge}>
+                            <Ionicons name="time-outline" size={10} color="#FFFFFF" />
+                            <ThemedText style={styles.timeText}>{startTime}</ThemedText>
+                        </View>
+                    )}
+                    <View style={[styles.formatBadge, { backgroundColor: colors.primary }]}>
+                        <ThemedText style={styles.formatText}>
+                            {tournament.format}
+                        </ThemedText>
+                    </View>
                 </View>
             </View>
 
@@ -110,8 +131,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         marginHorizontal: 2,
         marginBottom: 10,
-        overflow: 'hidden',
-        borderWidth: 1
+        overflow: 'hidden'
     },
     imageContainer: {
         height: 105,
@@ -131,15 +151,31 @@ const styles = StyleSheet.create({
     statusOverlay: {
         position: 'absolute',
         top: 8,
-        left: 8,
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 12
+        left: 8
     },
-    formatBadge: {
+    topRightGroup: {
         position: 'absolute',
         top: 8,
         right: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4
+    },
+    timeBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
+        paddingHorizontal: 7,
+        paddingVertical: 3,
+        borderRadius: 12,
+        backgroundColor: 'rgba(0,0,0,0.45)'
+    },
+    timeText: {
+        fontSize: 9,
+        fontWeight: '700',
+        color: '#FFFFFF'
+    },
+    formatBadge: {
         paddingHorizontal: 8,
         paddingVertical: 3,
         borderRadius: 12
