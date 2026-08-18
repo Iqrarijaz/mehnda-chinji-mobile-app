@@ -92,7 +92,7 @@ export default function TermsAndConditionsScreen() {
             {/* ── Modern Header ──────────────────────────────────────── */}
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.headerWrap, { backgroundColor: colors.primary }]}>
                 <View style={[styles.headerTopRow, { paddingTop: insets.top + 8 }]}>
-                    <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
+                    <BackButton backgroundColor="transparent" color="#FFFFFF" size={22} />
                     <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.headerTitleWrap}>
                         <ThemedText style={styles.headerTitle}>Terms & Conditions</ThemedText>
                     </Animated.View>

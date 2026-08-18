@@ -81,7 +81,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
     hideAccountActions = false,
     decor,
     hero }: ScreenHeaderProps) {
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const { user } = useAuth();
     const colors = Colors[theme];
     const insets = useSafeAreaInsets();
@@ -144,8 +144,8 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                 {/* Left side: menu/back + optional extras */}
                 <View style={styles.leftSide}>
                     {showMenuIcon ? (
-                        <TouchableOpacity onPress={openDrawer} style={[styles.iconBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#FFFFFF' }]}>
-                            <Ionicons name="grid-outline" size={20} color={isDark ? '#FFFFFF' : colors.primary} />
+                        <TouchableOpacity onPress={openDrawer} style={styles.iconBtn}>
+                            <Ionicons name="grid-outline" size={20} color="#FFFFFF" />
                         </TouchableOpacity>
                     ) : (
                         <BackButton
@@ -158,8 +158,8 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                                     router.replace('/(drawer)/(tabs)' as any);
                                 }
                             }}
-                            backgroundColor={isDark ? 'rgba(255,255,255,0.1)' : '#FFFFFF'}
-                            color={isDark ? '#FFFFFF' : colors.primary}
+                            backgroundColor="transparent"
+                            color="#FFFFFF"
                             size={20}
                             style={{ marginRight: 0 }}
                         />
@@ -229,11 +229,9 @@ export const HeaderIconBtn = React.memo(function HeaderIconBtn({
         size?: number;
         badge?: React.ReactNode;
     }) {
-    const { theme, isDark } = useTheme();
-    const colors = Colors[theme];
     return (
-        <TouchableOpacity onPress={onPress} style={[styles.iconBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#FFFFFF', marginRight: 12 }, style]}>
-            <Ionicons name={name} size={size} color={isDark ? '#FFFFFF' : colors.primary} />
+        <TouchableOpacity onPress={onPress} style={[styles.iconBtn, { marginRight: 12 }, style]}>
+            <Ionicons name={name} size={size} color="#FFFFFF" />
             {badge}
         </TouchableOpacity>
     );
@@ -268,7 +266,6 @@ const styles = StyleSheet.create({
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
-        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center'
     },
