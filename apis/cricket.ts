@@ -76,6 +76,18 @@ export async function updateTeam(tournamentId: string, teamId: string, payload: 
 }
 
 /**
+ * Update a scheduled match's fixture details (Admin only)
+ */
+export async function updateMatch(matchId: string, payload: any) {
+    const response = await apiClient.put(`/api/user/v1/cricket/matches/${matchId}`, payload);
+    return response as unknown as {
+        success: boolean;
+        message: string;
+        data: CricketMatch;
+    };
+}
+
+/**
  * Schedule a fixture match in a tournament (Admin only)
  */
 export async function scheduleMatch(tournamentId: string, payload: any) {
