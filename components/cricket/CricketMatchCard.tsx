@@ -7,13 +7,16 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { CricketMatch, Innings } from '@/types/cricket';
+import { capitalizeString } from '@/utils/string';
 
 interface CricketMatchCardProps {
     match: CricketMatch;
     onPress: () => void;
+    /** Stretch to the container width instead of the fixed carousel width. */
+    fullWidth?: boolean;
 }
 
-export const CricketMatchCard = React.memo(function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
+export const CricketMatchCard = React.memo(function CricketMatchCard({ match, onPress, fullWidth = false }: CricketMatchCardProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -29,6 +32,13 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({ match, on
     const teamBInnings = inningsForTeam(match.teamB.id);
 
     const isLive = match.status === 'LIVE';
+
+    // Who won the toss and what they chose — null until a scorer records it.
+    const tossLabel = (() => {
+        if (!match.tossWinnerId || !match.tossDecision) return null;
+        const winner = match.tossWinnerId === match.teamA.id ? match.teamA.name : match.teamB.name;
+        return `${capitalizeString(winner)} won the toss & chose to ${match.tossDecision === 'BAT' ? 'bat' : 'bowl'}`;
+    })();
 
     const formatScore = (innings?: Innings | null) => {
         if (!innings) return null;
@@ -50,6 +60,7 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({ match, on
         <TouchableOpacity
             style={[
                 styles.card,
+                fullWidth && styles.cardFullWidth,
                 { backgroundColor: colors.cardBg }
             ]}
             onPress={onPress}
@@ -81,7 +92,7 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({ match, on
                             </View>
                         )}
                         <ThemedText style={[styles.teamName, { color: colors.text }]} numberOfLines={1}>
-                            {match.teamA.name}
+                            {capitalizeString(match.teamA.name)}
                         </ThemedText>
                     </View>
                     {teamAInnings ? formatScore(teamAInnings) : (
@@ -102,7 +113,7 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({ match, on
                             </View>
                         )}
                         <ThemedText style={[styles.teamName, { color: colors.text }]} numberOfLines={1}>
-                            {match.teamB.name}
+                            {capitalizeString(match.teamB.name)}
                         </ThemedText>
                     </View>
                     {teamBInnings ? formatScore(teamBInnings) : (
@@ -110,6 +121,16 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({ match, on
                     )}
                 </View>
             </View>
+
+            {/* Toss result */}
+            {tossLabel && (
+                <View style={styles.tossRow}>
+                    <Ionicons name="disc-outline" size={12} color={colors.secondary} />
+                    <ThemedText style={[styles.tossText, { color: colors.secondary }]} numberOfLines={1}>
+                        {tossLabel}
+                    </ThemedText>
+                </View>
+            )}
 
             {/* Summary / Result Text */}
             <View style={styles.summaryRow}>
@@ -136,6 +157,21 @@ const styles = StyleSheet.create({
         padding: 12,
         marginRight: 10,
         justifyContent: 'space-between'
+    },
+    cardFullWidth: {
+        width: '100%',
+        marginRight: 0
+    },
+    tossRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        marginBottom: 6
+    },
+    tossText: {
+        fontSize: 10,
+        fontWeight: '600',
+        flex: 1
     },
     headerRow: {
         flexDirection: 'row',

@@ -100,6 +100,18 @@ export async function scheduleMatch(tournamentId: string, payload: any) {
 }
 
 /**
+ * Record the toss result for a match (Admin / Scorer only)
+ */
+export async function recordToss(matchId: string, payload: { tossWinnerId: string; tossDecision: 'BAT' | 'BOWL' }) {
+    const response = await apiClient.patch(`/api/user/v1/cricket/matches/${matchId}/toss`, payload);
+    return response as unknown as {
+        success: boolean;
+        message: string;
+        data: CricketMatch;
+    };
+}
+
+/**
  * Fetch match details by ID
  */
 export async function getMatchDetails(matchId: string) {

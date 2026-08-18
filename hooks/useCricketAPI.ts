@@ -12,6 +12,7 @@ import {
     updateTeam,
     scheduleMatch,
     updateMatch,
+    recordToss,
     getMatchDetails,
     predictMatchWinner,
     postOverUpdate
@@ -198,6 +199,32 @@ export function useCricketAPI() {
     });
 
     /**
+     * Record Toss Mutation (Scorer Panel)
+     */
+    const recordTossMutation = useMutation({
+        mutationFn: ({ matchId, payload }: { matchId: string; payload: { tossWinnerId: string; tossDecision: 'BAT' | 'BOWL' } }) =>
+            recordToss(matchId, payload),
+        onSuccess: (res: any, variables) => {
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.match(variables.matchId) });
+            if (res?.data?.tournamentId) {
+                queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(res.data.tournamentId) });
+            }
+            Toast.show({
+                type: 'success',
+                text1: 'Toss Recorded',
+                text2: 'Batting order set from the toss result.'
+            });
+        },
+        onError: (err: any) => {
+            Toast.show({
+                type: 'error',
+                text1: 'Toss Failed',
+                text2: err.message || 'Could not record the toss.'
+            });
+        }
+    });
+
+    /**
      * Post Over Update Mutation (Scorer Panel)
      */
     const postOverMutation = useMutation({
@@ -338,6 +365,7 @@ export function useCricketAPI() {
         updateMatchMutation,
         predictWinnerMutation,
         postOverMutation,
+        recordTossMutation,
         useLiveMatchSocket
     };
 }
