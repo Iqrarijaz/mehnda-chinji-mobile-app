@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     searchWrap: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 14,
         marginTop: 14,
     },
     searchBar: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
         fontSize: 10.5,
         fontWeight: '800',
         letterSpacing: 0.7,
-        marginHorizontal: 20,
+        marginHorizontal: 14,
         marginBottom: 10,
     },
     listWrap: {

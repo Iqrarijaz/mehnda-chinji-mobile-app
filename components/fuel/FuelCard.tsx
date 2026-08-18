@@ -65,13 +65,13 @@ export const FuelCard = React.memo(function FuelCard({ meta, price, subtitle, tr
 
 const styles = StyleSheet.create({
     pressWrap: {
-        marginHorizontal: 20,
+        marginHorizontal: 14,
         marginBottom: 10,
     },
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.cardBorderRadius,
+        borderRadius: Layout.cardBorderRadius - 2,
         paddingVertical: 10,
         paddingHorizontal: 12,
         minHeight: 44,

@@ -163,12 +163,13 @@ export function CurrencyConverter({ rates, baseCode, codes, favorites }: Currenc
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.cardBorderRadius,
+        borderRadius: Layout.cardBorderRadius - 2,
         paddingHorizontal: 14,
         paddingTop: 8,
         paddingBottom: 16,
-        marginHorizontal: 20,
+        marginHorizontal: 14,
         marginTop: 14,
+        marginBottom: 14,
     },
     headerRow: {
         flexDirection: 'row',

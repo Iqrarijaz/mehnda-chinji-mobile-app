@@ -31,10 +31,10 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: Layout.cardBorderRadius,
+        borderRadius: Layout.cardBorderRadius - 2,
         paddingVertical: 10,
         paddingHorizontal: 12,
-        marginHorizontal: 20,
+        marginHorizontal: 14,
         marginBottom: 10,
     },
     textWrap: {
