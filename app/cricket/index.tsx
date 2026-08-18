@@ -47,7 +47,7 @@ export default function CricketFeedScreen() {
     const isCricketAdmin = !!user?.user?.isCricketAdmin;
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedFilter, setSelectedFilter] = useState<string>('ALL');
+    const [selectedFilter, setSelectedFilter] = useState<string>('MATCHES');
 
     const { useTournamentsFeedQuery } = useCricketAPI();
     const { data, isLoading, isError, refetch, isRefetching } = useTournamentsFeedQuery({});
@@ -65,11 +65,16 @@ export default function CricketFeedScreen() {
         return matches;
     }, [tournamentsList]);
 
+    // MATCHES and PREDICTIONS list fixtures; the rest list tournaments.
+    const isMatchMode = selectedFilter === 'MATCHES' || selectedFilter === 'PREDICTIONS';
+
     // Filter tournaments based on search query and status pill
     const filteredTournaments = useMemo(() => {
         let list = tournamentsList;
 
-        if (selectedFilter !== 'ALL') {
+        // Only the tournament-status circles narrow the list; MATCHES /
+        // PREDICTIONS aren't tournament statuses and are handled separately.
+        if (selectedFilter !== 'ALL' && !isMatchMode) {
             list = list.filter(t => t.status === selectedFilter);
         }
 
@@ -83,7 +88,29 @@ export default function CricketFeedScreen() {
         }
 
         return list;
-    }, [tournamentsList, selectedFilter, searchQuery]);
+    }, [tournamentsList, selectedFilter, searchQuery, isMatchMode]);
+
+    const filteredMatches = useMemo(() => {
+        let list = allMatches;
+
+        // A finished match can no longer be predicted, so the Predictions
+        // circle only surfaces fixtures that are still open to vote on.
+        if (selectedFilter === 'PREDICTIONS') {
+            list = list.filter(m => m.status === 'UPCOMING' || m.status === 'LIVE');
+        }
+
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            list = list.filter(m =>
+                m.matchTitle?.toLowerCase().includes(query) ||
+                m.teamA?.name?.toLowerCase().includes(query) ||
+                m.teamB?.name?.toLowerCase().includes(query) ||
+                m.venue?.toLowerCase().includes(query)
+            );
+        }
+
+        return list;
+    }, [allMatches, selectedFilter, searchQuery]);
 
     const handleOpenDrawer = useCallback(() => {
         let currentNav: any = navigation;
@@ -150,6 +177,18 @@ export default function CricketFeedScreen() {
     // Quick Action Highlight Circles mapped directly to filter states
     const quickCircles = useMemo(() => [
         {
+            id: 'MATCHES',
+            label: 'Matches',
+            icon: 'baseball-outline' as keyof typeof Ionicons.glyphMap,
+            filterKey: 'MATCHES'
+        },
+        {
+            id: 'PREDICTIONS',
+            label: 'Predictions',
+            icon: 'stats-chart-outline' as keyof typeof Ionicons.glyphMap,
+            filterKey: 'PREDICTIONS'
+        },
+        {
             id: 'ALL',
             label: 'Tournaments',
             icon: 'trophy-outline' as keyof typeof Ionicons.glyphMap,
@@ -190,8 +229,8 @@ export default function CricketFeedScreen() {
 
     const ListHeader = useMemo(() => (
         <View style={styles.headerFeedContainer}>
-            {/* Match Cards Carousel (Horizontal) */}
-            {allMatches.length > 0 ? (
+            {/* Match Cards Carousel (Horizontal) — hidden in match mode, where the main list already shows fixtures */}
+            {!isMatchMode && allMatches.length > 0 ? (
                 <View style={styles.carouselSection}>
                     <ScrollView
                         horizontal
@@ -251,7 +290,7 @@ export default function CricketFeedScreen() {
                 <SearchBar
                     value={searchQuery}
                     onChangeText={setSearchQuery}
-                    placeholder="Search tournaments by name, city..."
+                    placeholder={isMatchMode ? "Search matches by team, venue..." : "Search tournaments by name, city..."}
                     style={{
                         backgroundColor: colors.cardBg,
                         borderRadius: Layout.borderRadius
@@ -262,23 +301,47 @@ export default function CricketFeedScreen() {
             {/* Section Header */}
             <View style={styles.sectionHeaderRow}>
                 <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-                    Featured Tournaments
+                    {selectedFilter === 'PREDICTIONS'
+                        ? 'Predict & Win'
+                        : selectedFilter === 'MATCHES'
+                            ? 'All Matches'
+                            : 'Featured Tournaments'}
                 </ThemedText>
                 <ThemedText style={[styles.sectionCount, { color: colors.textSecondary }]}>
-                    {filteredTournaments.length} available
+                    {(isMatchMode ? filteredMatches.length : filteredTournaments.length)} available
                 </ThemedText>
             </View>
+
+            {selectedFilter === 'PREDICTIONS' && (
+                <View style={styles.predictHintRow}>
+                    <Ionicons name="information-circle-outline" size={13} color={colors.textSecondary} />
+                    <ThemedText style={[styles.predictHintText, { color: colors.textSecondary }]}>
+                        Open a match to cast your win prediction.
+                    </ThemedText>
+                </View>
+            )}
         </View>
     ), [
         colors,
         selectedFilter,
         allMatches,
-        tournamentsList.length,
+        isMatchMode,
         quickCircles,
         searchQuery,
+        filteredMatches.length,
         filteredTournaments.length,
         handleSelectMatch
     ]);
+
+    const renderMatchListItem = useCallback(({ item }: { item: CricketMatch }) => (
+        <View style={styles.matchListItem}>
+            <CricketMatchCard
+                match={item}
+                onPress={() => handleSelectMatch(item._id)}
+                fullWidth
+            />
+        </View>
+    ), [handleSelectMatch]);
 
     return (
         <ErrorBoundary>
@@ -329,9 +392,9 @@ export default function CricketFeedScreen() {
 
                 {/* Main Cricket Feed */}
                 <FlatList
-                    data={filteredTournaments}
+                    data={(isMatchMode ? filteredMatches : filteredTournaments) as any[]}
                     keyExtractor={(item) => item._id}
-                    renderItem={renderTournamentCard}
+                    renderItem={(isMatchMode ? renderMatchListItem : renderTournamentCard) as any}
                     ListHeaderComponent={ListHeader}
                     contentContainerStyle={styles.listContent}
                     showsVerticalScrollIndicator={false}
@@ -346,14 +409,18 @@ export default function CricketFeedScreen() {
                     ListEmptyComponent={
                         !isLoading ? (
                             <View style={styles.emptyContainer}>
-                                <Ionicons name="trophy-outline" size={44} color={colors.icon} />
+                                <Ionicons name={isMatchMode ? 'baseball-outline' : 'trophy-outline'} size={44} color={colors.icon} />
                                 <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>
-                                    No Tournaments Found
+                                    {isMatchMode ? 'No Matches Found' : 'No Tournaments Found'}
                                 </ThemedText>
                                 <ThemedText style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
                                     {searchQuery
-                                        ? `No tournaments match "${searchQuery}".`
-                                        : 'Check back soon for upcoming cricket tournaments!'}
+                                        ? `Nothing matches "${searchQuery}".`
+                                        : isMatchMode
+                                            ? (selectedFilter === 'PREDICTIONS'
+                                                ? 'No matches are open for predictions right now.'
+                                                : 'No matches have been scheduled yet.')
+                                            : 'Check back soon for upcoming cricket tournaments!'}
                                 </ThemedText>
                             </View>
                         ) : null
@@ -468,6 +535,20 @@ const styles = StyleSheet.create({
     sectionCount: {
         fontSize: 11,
         fontWeight: '500'
+    },
+    predictHintRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        paddingHorizontal: 10,
+        marginBottom: 8
+    },
+    predictHintText: {
+        fontSize: 11,
+        fontWeight: '500'
+    },
+    matchListItem: {
+        marginBottom: 10
     },
     listContent: {
         paddingHorizontal: 10,

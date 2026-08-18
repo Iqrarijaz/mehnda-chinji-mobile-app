@@ -16,6 +16,7 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { LiveScorecardCard } from '@/components/cricket/LiveScorecardCard';
 import { OverScorerBox } from '@/components/cricket/OverScorerBox';
+import { TossPanel } from '@/components/cricket/TossPanel';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -30,7 +31,7 @@ export default function OverScorerPanelScreen() {
     const insets = useSafeAreaInsets();
     const { user } = useAuth();
 
-    const { useMatchDetailsQuery, postOverMutation, useTournamentDetailsQuery } = useCricketAPI();
+    const { useMatchDetailsQuery, postOverMutation, recordTossMutation, useTournamentDetailsQuery } = useCricketAPI();
     const { data, isLoading, isError } = useMatchDetailsQuery(matchId || '');
 
     const match = data?.data;
@@ -76,6 +77,11 @@ export default function OverScorerPanelScreen() {
             }
         });
     }, [matchId, postOverMutation, router]);
+
+    const handleRecordToss = useCallback((payload: { tossWinnerId: string; tossDecision: 'BAT' | 'BOWL' }) => {
+        if (!matchId) return;
+        recordTossMutation.mutate({ matchId, payload });
+    }, [matchId, recordTossMutation]);
 
     if (!canManage) return null;
 
@@ -146,6 +152,7 @@ export default function OverScorerPanelScreen() {
 
     const currentInning = match.currentInnings === 1 ? match.innings1 : match.innings2;
     const nextOverNumber = (currentInning?.totalOvers || 0) + 1;
+    const hasToss = !!match.tossWinnerId && !!match.tossDecision;
 
     return (
         <ErrorBoundary>
@@ -180,15 +187,26 @@ export default function OverScorerPanelScreen() {
                         {/* Live Summary Header */}
                         <LiveScorecardCard match={match} />
 
+                        {/* Toss — must be recorded before any over can be scored */}
+                        {match.status !== 'COMPLETED' && (
+                            <TossPanel
+                                match={match}
+                                onSubmit={handleRecordToss}
+                                isLoading={recordTossMutation.isPending}
+                            />
+                        )}
+
                         {/* Over Scorer Input Panel */}
                         {match.status !== 'COMPLETED' ? (
-                            <OverScorerBox
-                                nextOverNumber={nextOverNumber}
-                                onSubmitOver={handleSubmitOver}
-                                isLoading={postOverMutation.isPending}
-                                bowlingTeamName={bowlingTeam?.name}
-                                bowlerOptions={bowlingTeam?.players || []}
-                            />
+                            hasToss ? (
+                                <OverScorerBox
+                                    nextOverNumber={nextOverNumber}
+                                    onSubmitOver={handleSubmitOver}
+                                    isLoading={postOverMutation.isPending}
+                                    bowlingTeamName={bowlingTeam?.name}
+                                    bowlerOptions={bowlingTeam?.players || []}
+                                />
+                            ) : null
                         ) : (
                             <View style={styles.completedBox}>
                                 <Ionicons name="checkmark-circle-outline" size={48} color={colors.success} />
