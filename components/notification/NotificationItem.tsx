@@ -63,10 +63,9 @@ function NotificationItemComponent({ item, onPress, delay = 0 }: Props) {
         >
             {/* Left: Icon */}
             <View style={styles.iconWrap}>
-                <View style={[styles.iconCircle, { backgroundColor: `${colors.primary}14` }]}>
-                    <Ionicons name={icon as any} size={18} color={color} />
+                <View style={styles.iconCircle}>
+                    <Ionicons name={icon as any} size={24} color={color} />
                 </View>
-                {!item.isRead && <View style={[styles.badge, { backgroundColor: colors.primary }]} />}
             </View>
 
             {/* Middle: Content */}
@@ -101,18 +100,11 @@ const styles = StyleSheet.create({
         marginBottom: 8 },
     iconWrap: { position: 'relative', marginRight: 10 },
     iconCircle: {
-        width: 34,
-        height: 34,
+        width: 36,
+        height: 36,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },
-    badge: {
-        position: 'absolute',
-        top: -3,
-        right: -3,
-        width: 11,
-        height: 11,
-        borderRadius: Layout.borderRadius },
     content: { flex: 1 },
     titleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
     title: { fontSize: 10.5, fontWeight: '600', flex: 1 },

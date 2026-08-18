@@ -14,7 +14,6 @@ import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import Toast from 'react-native-toast-message';
 
-import { ScreenHeader } from '@/components/common/ScreenHeader';
 import { FormInput } from '@/components/common/FormInput';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { CancelButton } from '@/components/common/CancelButton';
@@ -27,6 +26,7 @@ import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useCricketAPI } from '@/hooks/useCricketAPI';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import citiesDataFallback from '@/data/cities.json';
 import { Organizer, Guest } from '@/types/cricket';
 
@@ -34,6 +34,7 @@ export default function CreateTournamentScreen() {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const { user } = useAuth();
     const isCricketAdmin = !!user?.user?.isCricketAdmin;
 
@@ -163,7 +164,30 @@ export default function CreateTournamentScreen() {
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <ScreenHeader hero={{ title: "Create Tournament" }} showMenuIcon={false} />
+                {/* Straight Compact Header */}
+                <View
+                    style={[
+                        styles.compactHeader,
+                        {
+                            backgroundColor: colors.primary,
+                            paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12)
+                        }
+                    ]}
+                >
+                    <View style={styles.topBarContent}>
+                        <TouchableOpacity
+                            style={styles.headerIconBtn}
+                            onPress={() => router.back()}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
+
+                        <ThemedText style={styles.headerTitle}>Create Tournament</ThemedText>
+
+                        <View style={{ width: 36 }} />
+                    </View>
+                </View>
 
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -305,6 +329,29 @@ export default function CreateTournamentScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
+    compactHeader: {
+        paddingHorizontal: 12,
+        paddingBottom: 10,
+        borderRadius: 0
+    },
+    topBarContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 38
+    },
+    headerIconBtn: {
+        width: 36,
+        height: 36,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    headerTitle: {
+        fontSize: 17,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: 0.2
+    },
     scrollContent: { padding: 14, gap: 10, paddingBottom: 40 },
     bannerPicker: { height: 120, borderRadius: Layout.borderRadius, borderWidth: 0, overflow: 'hidden', marginBottom: 4 },
     bannerImage: { width: '100%', height: '100%' },

@@ -6,18 +6,15 @@ import {
     TouchableOpacity,
     Image,
     FlatList,
-    RefreshControl
+    RefreshControl,
+    Platform
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ScreenHeader } from '@/components/common/ScreenHeader';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
-import { PrizePoolCard } from '@/components/cricket/PrizePoolCard';
-import { OrganizerCard } from '@/components/cricket/OrganizerCard';
-import { GuestCard } from '@/components/cricket/GuestCard';
 import { PointsTableCard } from '@/components/cricket/PointsTableCard';
 import { StatusBadge } from '@/components/cricket/StatusBadge';
 import { Colors } from '@/constants/colors';
@@ -27,16 +24,17 @@ import { useTheme } from '@/context/ThemeContext';
 import { useCricketAPI } from '@/hooks/useCricketAPI';
 import { CricketMatch, Team, canUserManageTournament } from '@/types/cricket';
 
-type TabType = 'overview' | 'fixtures' | 'teams' | 'standings';
+type TabType = 'fixtures' | 'teams' | 'standings';
 
 export default function TournamentHubScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const { user } = useAuth();
 
-    const [activeTab, setActiveTab] = useState<TabType>('overview');
+    const [activeTab, setActiveTab] = useState<TabType>('fixtures');
 
     const { useTournamentDetailsQuery } = useCricketAPI();
     const { data, isLoading, isError, refetch, isRefetching } = useTournamentDetailsQuery(id || '');
@@ -83,7 +81,15 @@ export default function TournamentHubScreen() {
     if (isLoading) {
         return (
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <ScreenHeader hero={{ title: "Tournament Hub" }} showMenuIcon={false} />
+                <View style={[styles.compactHeader, { backgroundColor: colors.primary, paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12) }]}>
+                    <View style={styles.topBarContent}>
+                        <TouchableOpacity style={styles.headerIconBtn} onPress={() => router.back()}>
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
+                        <ThemedText style={styles.headerTitle}>Tournament Details</ThemedText>
+                        <View style={{ width: 36 }} />
+                    </View>
+                </View>
                 <View style={styles.centerContainer}>
                     <ThemedText style={{ color: colors.textSecondary }}>Loading tournament...</ThemedText>
                 </View>
@@ -94,7 +100,15 @@ export default function TournamentHubScreen() {
     if (isError || !tournament) {
         return (
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <ScreenHeader hero={{ title: "Tournament Hub" }} showMenuIcon={false} />
+                <View style={[styles.compactHeader, { backgroundColor: colors.primary, paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12) }]}>
+                    <View style={styles.topBarContent}>
+                        <TouchableOpacity style={styles.headerIconBtn} onPress={() => router.back()}>
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
+                        <ThemedText style={styles.headerTitle}>Tournament Details</ThemedText>
+                        <View style={{ width: 36 }} />
+                    </View>
+                </View>
                 <View style={styles.centerContainer}>
                     <Ionicons name="alert-circle-outline" size={48} color={colors.danger} />
                     <ThemedText style={{ color: colors.text, fontWeight: '700', marginTop: 8 }}>
@@ -105,27 +119,75 @@ export default function TournamentHubScreen() {
         );
     }
 
+    const tabLabels: Record<TabType, string> = {
+        fixtures: 'Fixtures',
+        teams: 'Teams',
+        standings: 'Standings'
+    };
+
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <ScreenHeader hero={{ title: tournament.name }} showMenuIcon={false} />
+                {/* Straight Compact Header */}
+                <View
+                    style={[
+                        styles.compactHeader,
+                        {
+                            backgroundColor: colors.primary,
+                            paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12)
+                        }
+                    ]}
+                >
+                    <View style={styles.topBarContent}>
+                        <TouchableOpacity
+                            style={styles.headerIconBtn}
+                            onPress={() => router.back()}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                        </TouchableOpacity>
 
-                {/* Segmented Tabs */}
-                <View style={[styles.tabBar, { backgroundColor: colors.surface }]}>
-                    {(['overview', 'fixtures', 'teams', 'standings'] as TabType[]).map((tab) => {
-                        const isActive = activeTab === tab;
-                        return (
-                            <TouchableOpacity
-                                key={tab}
-                                style={[styles.tabItem, isActive && { backgroundColor: colors.primary }]}
-                                onPress={() => setActiveTab(tab)}
-                            >
-                                <ThemedText style={[styles.tabText, { color: isActive ? '#FFFFFF' : colors.textSecondary }]}>
-                                    {tab.toUpperCase()}
-                                </ThemedText>
-                            </TouchableOpacity>
-                        );
-                    })}
+                        <ThemedText style={styles.headerTitle} numberOfLines={1}>
+                            {tournament.name}
+                        </ThemedText>
+
+                        <View style={{ width: 36 }} />
+                    </View>
+                </View>
+
+                {/* Rounded Pills Tab Bar (No Borders, Same Height) */}
+                <View style={styles.tabPillsWrapper}>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.tabPillsContainer}
+                    >
+                        {(['fixtures', 'teams', 'standings'] as TabType[]).map((tab) => {
+                            const isActive = activeTab === tab;
+                            return (
+                                <TouchableOpacity
+                                    key={tab}
+                                    style={[
+                                        styles.tabPill,
+                                        {
+                                            backgroundColor: isActive ? colors.primary : colors.cardBg
+                                        }
+                                    ]}
+                                    onPress={() => setActiveTab(tab)}
+                                    activeOpacity={0.8}
+                                >
+                                    <ThemedText
+                                        style={[
+                                            styles.tabPillText,
+                                            { color: isActive ? '#FFFFFF' : colors.textSecondary }
+                                        ]}
+                                    >
+                                        {tabLabels[tab]}
+                                    </ThemedText>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </ScrollView>
                 </View>
 
                 {/* Tab Views */}
@@ -134,56 +196,13 @@ export default function TournamentHubScreen() {
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} colors={[colors.primary]} tintColor={colors.primary} />}
                 >
-                    {activeTab === 'overview' && (
-                        <Animated.View entering={FadeInDown.duration(300)} style={styles.tabContent}>
-                            {/* Banner Hero */}
-                            <View style={styles.heroBanner}>
-                                {tournament.bannerImage ? (
-                                    <Image source={{ uri: tournament.bannerImage }} style={styles.bannerImg} />
-                                ) : (
-                                    <View style={[styles.defaultHero, { backgroundColor: `${colors.primary}20` }]}>
-                                        <Ionicons name="trophy-outline" size={50} color={colors.primary} />
-                                    </View>
-                                )}
-                                <View style={styles.heroInfo}>
-                                    <ThemedText style={styles.heroTitle}>{tournament.name}</ThemedText>
-                                    <ThemedText style={styles.heroSub}>{tournament.venue}, {tournament.city}</ThemedText>
-                                </View>
-                            </View>
-
-                            {/* Prizes Card */}
-                            {tournament.prizes && <PrizePoolCard prizes={tournament.prizes} />}
-
-                            {/* Organizers Section */}
-                            {tournament.organizers && tournament.organizers.length > 0 && (
-                                <View style={styles.section}>
-                                    <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Organizers</ThemedText>
-                                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                        {tournament.organizers.map((org, idx) => (
-                                            <OrganizerCard key={idx} organizer={org} />
-                                        ))}
-                                    </ScrollView>
-                                </View>
-                            )}
-
-                            {/* Chief Guests Section */}
-                            {tournament.guests && tournament.guests.length > 0 && (
-                                <View style={styles.section}>
-                                    <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Chief Guests</ThemedText>
-                                    {tournament.guests.map((g, idx) => (
-                                        <GuestCard key={idx} guest={g} />
-                                    ))}
-                                </View>
-                            )}
-                        </Animated.View>
-                    )}
-
                     {activeTab === 'fixtures' && (
-                        <Animated.View entering={FadeInDown.duration(300)} style={styles.tabContent}>
+                        <View style={styles.tabContent}>
                             {canManage && (
                                 <TouchableOpacity
                                     style={[styles.actionBtn, { backgroundColor: colors.primary }]}
                                     onPress={() => router.push(`/cricket/${id}/schedule-match` as any)}
+                                    activeOpacity={0.8}
                                 >
                                     <Ionicons name="add-circle-outline" size={18} color="#FFF" />
                                     <ThemedText style={styles.actionBtnText}>+ Schedule Match</ThemedText>
@@ -202,15 +221,16 @@ export default function TournamentHubScreen() {
                                     <ThemedText style={{ color: colors.textSecondary }}>No matches scheduled yet.</ThemedText>
                                 </View>
                             )}
-                        </Animated.View>
+                        </View>
                     )}
 
                     {activeTab === 'teams' && (
-                        <Animated.View entering={FadeInDown.duration(300)} style={styles.tabContent}>
+                        <View style={styles.tabContent}>
                             {canManage && (
                                 <TouchableOpacity
                                     style={[styles.actionBtn, { backgroundColor: colors.primary }]}
                                     onPress={() => router.push(`/cricket/${id}/add-team` as any)}
+                                    activeOpacity={0.8}
                                 >
                                     <Ionicons name="add-circle-outline" size={18} color="#FFF" />
                                     <ThemedText style={styles.actionBtnText}>+ Register Team</ThemedText>
@@ -236,13 +256,13 @@ export default function TournamentHubScreen() {
                                     <ThemedText style={{ color: colors.textSecondary }}>No teams registered yet.</ThemedText>
                                 </View>
                             )}
-                        </Animated.View>
+                        </View>
                     )}
 
                     {activeTab === 'standings' && (
-                        <Animated.View entering={FadeInDown.duration(300)} style={styles.tabContent}>
+                        <View style={styles.tabContent}>
                             <PointsTableCard teams={tournament.teams || []} />
-                        </Animated.View>
+                        </View>
                     )}
                 </ScrollView>
             </View>
@@ -253,22 +273,57 @@ export default function TournamentHubScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1 },
     centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    tabBar: { flexDirection: 'row', padding: 4, gap: 3 },
-    tabItem: { flex: 1, paddingVertical: 6, borderRadius: Layout.borderRadius - 6, alignItems: 'center' },
-    tabText: { fontSize: 10, fontWeight: '800' },
+    compactHeader: {
+        paddingHorizontal: 12,
+        paddingBottom: 10,
+        borderRadius: 0
+    },
+    topBarContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 38
+    },
+    headerIconBtn: {
+        width: 36,
+        height: 36,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    headerTitle: {
+        fontSize: 17,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: 0.2,
+        flex: 1,
+        textAlign: 'center'
+    },
+    tabPillsWrapper: {
+        paddingTop: 10,
+        paddingBottom: 6
+    },
+    tabPillsContainer: {
+        paddingHorizontal: 10,
+        gap: 8
+    },
+    tabPill: {
+        height: 36,
+        paddingHorizontal: 16,
+        borderRadius: 18,
+        borderWidth: 0,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    tabPillText: {
+        fontSize: 12,
+        fontWeight: '700'
+    },
     scrollContent: { padding: 10, paddingBottom: 40 },
     tabContent: { gap: 10 },
-    heroBanner: { height: 120, borderRadius: Layout.borderRadius, overflow: 'hidden', position: 'relative', marginBottom: 4 },
-    bannerImg: { width: '100%', height: '100%' },
-    defaultHero: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' },
-    heroInfo: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.6)', padding: 8 },
-    heroTitle: { color: '#FFF', fontSize: 15, fontWeight: '800' },
-    heroSub: { color: 'rgba(255,255,255,0.8)', fontSize: 11 },
-    section: { gap: 6 },
     sectionTitle: { fontSize: 13, fontWeight: '700' },
-    actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 8, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 6 },
+    actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 46 : 50, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 6 },
     actionBtnText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
-    matchCard: { padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 8, gap: 6 },
+    matchCard: { padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 8, gap: 6, borderWidth: 1 },
     matchHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
     stageText: { fontSize: 11, fontWeight: '700', flex: 1 },
     teamsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -276,7 +331,7 @@ const styles = StyleSheet.create({
     vsText: { fontSize: 11, fontWeight: '700' },
     resultText: { fontSize: 11, fontWeight: '600' },
     venueText: { fontSize: 10.5 },
-    teamTile: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 6, gap: 8 },
+    teamTile: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 6, gap: 8, borderWidth: 1 },
     logoCircle: { width: 38, height: 38, borderRadius: 19, justifyContent: 'center', alignItems: 'center' },
     logoText: { fontSize: 12, fontWeight: '700' },
     teamTileName: { fontSize: 13, fontWeight: '600' },

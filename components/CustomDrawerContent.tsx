@@ -74,19 +74,11 @@ const DrawerRow = memo(function DrawerRow({
             {isFocused && <View style={[styles.activeBar, { backgroundColor: colors.lime }]} />}
 
             {/* Icon tile */}
-            <View
-                style={[
-                    styles.iconTile,
-                    {
-                        backgroundColor: isFocused
-                            ? colors.primary
-                            : `${colors.primary}0D` },
-                ]}
-            >
+            <View style={styles.iconTile}>
                 <Ionicons
                     name={item.icon}
-                    size={18}
-                    color={isFocused ? '#FFFFFF' : colors.textSecondary}
+                    size={22}
+                    color={isFocused ? colors.primary : colors.textSecondary}
                 />
             </View>
 
@@ -126,18 +118,10 @@ const DarkModeDrawerRow = memo(function DarkModeDrawerRow({
             onPress={onToggle}
             style={styles.menuItem}
         >
-            <View
-                style={[
-                    styles.iconTile,
-                    {
-                        backgroundColor: isDark
-                            ? `${colors.primary}20`
-                            : `${colors.primary}0D` },
-                ]}
-            >
+            <View style={styles.iconTile}>
                 <Ionicons
                     name={isDark ? 'moon' : 'moon-outline'}
-                    size={18}
+                    size={22}
                     color={isDark ? colors.lime : colors.textSecondary}
                 />
             </View>
@@ -423,9 +407,8 @@ const styles = StyleSheet.create({
         width: 3,
         borderRadius: Layout.borderRadius },
     iconTile: {
-        width: 38,
-        height: 38,
-        borderRadius: Layout.borderRadius,
+        width: 28,
+        height: 28,
         alignItems: 'center',
         justifyContent: 'center' },
     menuLabel: {

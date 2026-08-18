@@ -21,7 +21,6 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import WeatherDaily from '@/components/weather/WeatherDaily';
 import WeatherHero from '@/components/weather/WeatherHero';
 import WeatherHourly from '@/components/weather/WeatherHourly';
-import RainRadar from '@/components/weather/RainRadar';
 import { BackButton } from '@/components/common/BackButton';
 
 import { WeatherCitySwitcher } from '@/components/weather/WeatherCitySwitcher';
@@ -310,9 +309,6 @@ const WeatherScreen = React.memo(function WeatherScreen() {
 
                     {/* Hourly */}
                     <WeatherHourly data={hourlyData} />
-
-                    {/* Animated live rain radar */}
-                    <RainRadar coords={effectiveCoords} />
 
                     {/* Daily */}
                     <WeatherDaily data={dailyData} />
