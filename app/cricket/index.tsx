@@ -49,21 +49,15 @@ export default function CricketFeedScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState<string>('MATCHES');
 
-    const { useTournamentsFeedQuery, useMatchesFeedQuery } = useCricketAPI();
+    const { useTournamentsFeedQuery } = useCricketAPI();
     const { data, isLoading, isError, refetch, isRefetching } = useTournamentsFeedQuery({});
 
-    // Matches live in their own collection, so they need their own request —
-    // the tournaments feed carries only a per-player "matches" count, never
-    // the fixtures themselves.
-    const {
-        data: matchesData,
-        isLoading: isMatchesLoading,
-        refetch: refetchMatches,
-        isRefetching: isMatchesRefetching
-    } = useMatchesFeedQuery({});
-
     const tournamentsList: Tournament[] = data?.data || [];
-    const allMatches: CricketMatch[] = useMemo(() => matchesData?.data || [], [matchesData]);
+
+    // The feed returns fixtures alongside tournaments. Matches are their own
+    // collection, so they can't be read off a tournament — the "matches"
+    // field on a tournament is a per-player count, not a list.
+    const allMatches: CricketMatch[] = useMemo(() => data?.matches || [], [data]);
 
     // The Matches circle lists fixtures; the rest list tournaments.
     const isMatchMode = selectedFilter === 'MATCHES';
@@ -375,14 +369,14 @@ export default function CricketFeedScreen() {
                     showsVerticalScrollIndicator={false}
                     refreshControl={
                         <RefreshControl
-                            refreshing={isRefetching || isMatchesRefetching}
-                            onRefresh={() => { refetch(); refetchMatches(); }}
+                            refreshing={isRefetching}
+                            onRefresh={refetch}
                             colors={[colors.primary]}
                             tintColor={colors.primary}
                         />
                     }
                     ListEmptyComponent={
-                        !(isMatchMode ? isMatchesLoading : isLoading) ? (
+                        !isLoading ? (
                             <View style={styles.emptyContainer}>
                                 <Ionicons name={isMatchMode ? 'baseball-outline' : 'trophy-outline'} size={44} color={colors.icon} />
                                 <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>

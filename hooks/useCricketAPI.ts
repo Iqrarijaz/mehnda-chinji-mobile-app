@@ -13,7 +13,6 @@ import {
     scheduleMatch,
     updateMatch,
     recordToss,
-    getMatchesFeed,
     getMatchDetails,
     predictMatchWinner,
     postOverUpdate
@@ -32,16 +31,6 @@ export function useCricketAPI() {
         useQuery({
             queryKey: CRICKET_QUERY_KEYS.feed(params),
             queryFn: () => getTournamentsFeed(params),
-            staleTime: 1000 * 60 * 2, // 2 minutes
-        });
-
-    /**
-     * Matches feed across all tournaments
-     */
-    const useMatchesFeedQuery = (params?: { status?: string; tournamentId?: string }) =>
-        useQuery({
-            queryKey: CRICKET_QUERY_KEYS.matches(params),
-            queryFn: () => getMatchesFeed(params),
             staleTime: 1000 * 60 * 2, // 2 minutes
         });
 
@@ -97,7 +86,6 @@ export function useCricketAPI() {
             registerTeam(tournamentId, payload),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
             Toast.show({
                 type: 'success',
                 text1: 'Team Registered',
@@ -121,7 +109,6 @@ export function useCricketAPI() {
             updateTeam(tournamentId, teamId, payload),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
@@ -146,7 +133,7 @@ export function useCricketAPI() {
             scheduleMatch(tournamentId, payload),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
                 text1: 'Match Scheduled',
@@ -170,7 +157,6 @@ export function useCricketAPI() {
             updateMatch(matchId, payload),
         onSuccess: (res: any, variables) => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.match(variables.matchId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
             if (res?.data?.tournamentId) {
                 queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(res.data.tournamentId) });
             }
@@ -221,6 +207,7 @@ export function useCricketAPI() {
             recordToss(matchId, payload),
         onSuccess: (res: any, variables) => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.match(variables.matchId) });
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             if (res?.data?.tournamentId) {
                 queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(res.data.tournamentId) });
             }
@@ -273,7 +260,6 @@ export function useCricketAPI() {
             updateTournament(tournamentId, payload),
         onSuccess: (res: any, variables) => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
@@ -298,7 +284,6 @@ export function useCricketAPI() {
             assignTournamentAdmin(tournamentId, targetUserId, action),
         onSuccess: (res, variables) => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
             Toast.show({
                 type: 'success',
                 text1: 'Admin Updated',
@@ -371,7 +356,6 @@ export function useCricketAPI() {
 
     return {
         useTournamentsFeedQuery,
-        useMatchesFeedQuery,
         useTournamentDetailsQuery,
         useMatchDetailsQuery,
         createTournamentMutation,

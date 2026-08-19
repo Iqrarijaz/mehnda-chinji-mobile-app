@@ -6,7 +6,6 @@ export const CRICKET_QUERY_KEYS = {
     feed: (params?: CricketFeedParams) => [...CRICKET_QUERY_KEYS.all, 'feed', params] as const,
     tournament: (id: string) => [...CRICKET_QUERY_KEYS.all, 'tournament', id] as const,
     match: (id: string) => [...CRICKET_QUERY_KEYS.all, 'match', id] as const,
-    matches: (params?: Record<string, any>) => [...CRICKET_QUERY_KEYS.all, 'matches', params] as const,
 };
 
 /**
@@ -18,6 +17,8 @@ export async function getTournamentsFeed(params?: CricketFeedParams) {
         success: boolean;
         message: string;
         data: Tournament[];
+        /** Fixtures across all tournaments — matches are their own collection. */
+        matches: CricketMatch[];
         pagination: {
             currentPage: number;
             totalPages: number;
@@ -97,18 +98,6 @@ export async function scheduleMatch(tournamentId: string, payload: any) {
         success: boolean;
         message: string;
         data: CricketMatch;
-    };
-}
-
-/**
- * Fetch matches across all tournaments
- */
-export async function getMatchesFeed(params?: { status?: string; tournamentId?: string; page?: number; limit?: number }) {
-    const response = await apiClient.get('/api/user/v1/cricket/matches', { params });
-    return response as unknown as {
-        success: boolean;
-        message: string;
-        data: CricketMatch[];
     };
 }
 
