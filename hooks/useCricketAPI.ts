@@ -96,8 +96,7 @@ export function useCricketAPI() {
         mutationFn: ({ tournamentId, payload }: { tournamentId: string; payload: any }) =>
             registerTeam(tournamentId, payload),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
                 text1: 'Team Registered',
@@ -119,9 +118,7 @@ export function useCricketAPI() {
     const updateTeamMutation = useMutation({
         mutationFn: ({ tournamentId, teamId, payload }: { tournamentId: string; teamId: string; payload: any }) =>
             updateTeam(tournamentId, teamId, payload),
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
@@ -144,9 +141,8 @@ export function useCricketAPI() {
     const scheduleMatchMutation = useMutation({
         mutationFn: ({ tournamentId, payload }: { tournamentId: string; payload: any }) =>
             scheduleMatch(tournamentId, payload),
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
                 text1: 'Match Scheduled',
@@ -168,12 +164,7 @@ export function useCricketAPI() {
     const updateMatchMutation = useMutation({
         mutationFn: ({ matchId, payload }: { matchId: string; payload: any }) =>
             updateMatch(matchId, payload),
-        onSuccess: (res: any, variables) => {
-            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.match(variables.matchId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
-            if (res?.data?.tournamentId) {
-                queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(res.data.tournamentId) });
-            }
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
@@ -197,7 +188,45 @@ export function useCricketAPI() {
         mutationFn: ({ matchId, predictedTeamId }: { matchId: string; predictedTeamId: string }) =>
             predictMatchWinner(matchId, predictedTeamId),
         onSuccess: (res, variables) => {
-            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.match(variables.matchId) });
+            // Optimistically update React Query cache across match feed and match detail queries
+            queryClient.setQueriesData({ queryKey: [...CRICKET_QUERY_KEYS.all] }, (oldData: any) => {
+                if (!oldData) return oldData;
+
+                // Array response (match feed / tournaments feed)
+                if (Array.isArray(oldData?.data)) {
+                    return {
+                        ...oldData,
+                        data: oldData.data.map((m: any) => {
+                            if (m._id === variables.matchId) {
+                                return {
+                                    ...m,
+                                    userPrediction: variables.predictedTeamId,
+                                    predictionsSummary: res?.data?.predictionsSummary || m.predictionsSummary
+                                };
+                            }
+                            return m;
+                        })
+                    };
+                }
+
+                // Single match details response
+                if (oldData?.data?._id === variables.matchId) {
+                    return {
+                        ...oldData,
+                        userPrediction: variables.predictedTeamId,
+                        data: {
+                            ...oldData.data,
+                            predictionsSummary: res?.data?.predictionsSummary || oldData.data.predictionsSummary
+                        }
+                    };
+                }
+
+                return oldData;
+            });
+
+            // Invalidate all cricket queries to force fresh background sync
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
+
             Toast.show({
                 type: 'success',
                 text1: 'Vote Recorded',
@@ -219,11 +248,8 @@ export function useCricketAPI() {
     const recordTossMutation = useMutation({
         mutationFn: ({ matchId, payload }: { matchId: string; payload: { tossWinnerId: string; tossDecision: 'BAT' | 'BOWL' } }) =>
             recordToss(matchId, payload),
-        onSuccess: (res: any, variables) => {
-            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.match(variables.matchId) });
-            if (res?.data?.tournamentId) {
-                queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(res.data.tournamentId) });
-            }
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
                 text1: 'Toss Recorded',
@@ -245,11 +271,8 @@ export function useCricketAPI() {
     const postOverMutation = useMutation({
         mutationFn: ({ matchId, payload }: { matchId: string; payload: any }) =>
             postOverUpdate(matchId, payload),
-        onSuccess: (res, variables) => {
-            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.match(variables.matchId) });
-            if (res.data?.tournamentId) {
-                queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(res.data.tournamentId) });
-            }
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
                 text1: 'Over Recorded',
@@ -271,9 +294,7 @@ export function useCricketAPI() {
     const updateTournamentMutation = useMutation({
         mutationFn: ({ tournamentId, payload }: { tournamentId: string; payload: any }) =>
             updateTournament(tournamentId, payload),
-        onSuccess: (res: any, variables) => {
-            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
+        onSuccess: (res: any) => {
             queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
@@ -296,9 +317,8 @@ export function useCricketAPI() {
     const assignTournamentAdminMutation = useMutation({
         mutationFn: ({ tournamentId, targetUserId, action }: { tournamentId: string; targetUserId: string; action: 'assign' | 'unassign' }) =>
             assignTournamentAdmin(tournamentId, targetUserId, action),
-        onSuccess: (res, variables) => {
-            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(variables.tournamentId) });
-            queryClient.invalidateQueries({ queryKey: [...CRICKET_QUERY_KEYS.all, 'matches'] });
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
             Toast.show({
                 type: 'success',
                 text1: 'Admin Updated',
@@ -329,18 +349,34 @@ export function useCricketAPI() {
                         if (!old) return old;
                         return { ...old, data: data.match };
                     });
+                    queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
                 }
             };
 
             const handlePredictionUpdated = (data: { matchId: string; predictionsSummary: any }) => {
                 if (data.matchId === matchId) {
-                    queryClient.setQueryData(CRICKET_QUERY_KEYS.match(matchId), (old: any) => {
-                        if (!old || !old.data) return old;
-                        return {
-                            ...old,
-                            data: { ...old.data, predictionsSummary: data.predictionsSummary }
-                        };
+                    queryClient.setQueriesData({ queryKey: [...CRICKET_QUERY_KEYS.all] }, (oldData: any) => {
+                        if (!oldData) return oldData;
+                        if (Array.isArray(oldData?.data)) {
+                            return {
+                                ...oldData,
+                                data: oldData.data.map((m: any) => {
+                                    if (m._id === matchId) {
+                                        return { ...m, predictionsSummary: data.predictionsSummary };
+                                    }
+                                    return m;
+                                })
+                            };
+                        }
+                        if (oldData?.data?._id === matchId) {
+                            return {
+                                ...oldData,
+                                data: { ...oldData.data, predictionsSummary: data.predictionsSummary }
+                            };
+                        }
+                        return oldData;
                     });
+                    queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
                 }
             };
 
@@ -350,9 +386,7 @@ export function useCricketAPI() {
                         if (!old) return old;
                         return { ...old, data: data.match };
                     });
-                    if (data.match.tournamentId) {
-                        queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.tournament(data.match.tournamentId) });
-                    }
+                    queryClient.invalidateQueries({ queryKey: CRICKET_QUERY_KEYS.all });
                 }
             };
 

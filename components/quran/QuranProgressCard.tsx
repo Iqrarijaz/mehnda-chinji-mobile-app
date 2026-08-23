@@ -87,6 +87,8 @@ export function QuranProgressCard({ surahs }: QuranProgressCardProps) {
             <View style={styles.row}>
                 <QuranProgressRing
                     progress={stats.surahProgress}
+                    size={50}
+                    strokeWidth={5}
                     color={colors.primary}
                     trackColor={theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}
                 >
@@ -98,13 +100,13 @@ export function QuranProgressCard({ surahs }: QuranProgressCardProps) {
                 <View style={styles.statsWrap}>
                     <ThemedText style={[styles.statsTitle, { color: colors.text }]}>Your Progress</ThemedText>
                     <View style={styles.statLine}>
-                        <Ionicons name="bookmark" size={12} color={colors.primary} />
+                        <Ionicons name="bookmark" size={11} color={colors.primary} />
                         <ThemedText style={[styles.statText, { color: colors.textSecondary }]}>
                             {stats.surahCount}/{TOTAL_SURAHS} Surahs completed
                         </ThemedText>
                     </View>
                     <View style={styles.statLine}>
-                        <Ionicons name="layers" size={12} color={colors.secondary} />
+                        <Ionicons name="layers" size={11} color={colors.secondary} />
                         <ThemedText style={[styles.statText, { color: colors.textSecondary }]}>
                             ~{stats.estimatedJuz}/{TOTAL_JUZ} Juz (estimated)
                         </ThemedText>
@@ -127,11 +129,11 @@ export function QuranProgressCard({ surahs }: QuranProgressCardProps) {
                                         : `Day ${goalStatus.daysElapsed + 1} · ${goalStatus.daysRemaining} days left · ${goalStatus.onTrack ? 'on track' : 'behind pace'}`}
                             </ThemedText>
                         </View>
-                        <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+                        <Ionicons name="chevron-forward" size={14} color={colors.textSecondary} />
                     </TouchableOpacity>
                 ) : (
                     <TouchableOpacity style={styles.setGoalBtn} onPress={() => setGoalModalVisible(true)}>
-                        <Ionicons name="flag-outline" size={15} color={colors.primary} />
+                        <Ionicons name="flag-outline" size={13} color={colors.primary} />
                         <ThemedText style={[styles.setGoalText, { color: colors.primary }]}>
                             Set a &quot;Complete the Quran&quot; goal
                         </ThemedText>
@@ -152,28 +154,28 @@ export function QuranProgressCard({ surahs }: QuranProgressCardProps) {
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: Layout.cardBorderRadius,
-        padding: 14,
-        marginBottom: 14,
+        borderRadius: Layout.borderRadius,
+        padding: 10,
+        marginBottom: 12,
     },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 16,
+        gap: 12,
     },
-    ringPercent: { fontSize: 15, fontWeight: '800' },
-    statsWrap: { flex: 1, gap: 6 },
-    statsTitle: { fontSize: 13.5, fontWeight: '800', marginBottom: 2 },
-    statLine: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-    statText: { fontSize: 11.5, fontWeight: '600' },
+    ringPercent: { fontSize: 11, fontWeight: '800' },
+    statsWrap: { flex: 1, gap: 3 },
+    statsTitle: { fontSize: 12, fontWeight: '800', marginBottom: 1 },
+    statLine: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+    statText: { fontSize: 10.5, fontWeight: '600' },
     goalWrap: {
-        marginTop: 14,
-        paddingTop: 12,
+        marginTop: 8,
+        paddingTop: 8,
         borderTopWidth: StyleSheet.hairlineWidth,
     },
-    goalRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    goalLabel: { fontSize: 9.5, fontWeight: '800', letterSpacing: 0.5, marginBottom: 3 },
-    goalStatus: { fontSize: 12.5, fontWeight: '700' },
-    setGoalBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, paddingVertical: 4 },
-    setGoalText: { fontSize: 12.5, fontWeight: '700' },
+    goalRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    goalLabel: { fontSize: 8.5, fontWeight: '800', letterSpacing: 0.5, marginBottom: 2 },
+    goalStatus: { fontSize: 11, fontWeight: '700' },
+    setGoalBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 2 },
+    setGoalText: { fontSize: 11, fontWeight: '700' },
 });

@@ -147,7 +147,7 @@ SurahCard.displayName = 'SurahCard';
 const styles = StyleSheet.create({
     card: {
         borderRadius: Layout.borderRadius,
-        padding: 11,
+        padding: 12,
         marginBottom: 12,
         gap: 12 },
     topRow: {

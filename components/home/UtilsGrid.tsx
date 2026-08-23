@@ -41,7 +41,7 @@ const CATEGORIES: UtilCategory[] = [
             {
                 id: 'qibla',
                 label: 'Qibla',
-                icon: 'compass-outline',
+                image: require('@/assets/icons/qibla.webp'),
                 route: '/qibla'
             },
         ]
@@ -70,18 +70,18 @@ const CATEGORIES: UtilCategory[] = [
             },
         ]
     },
-    {
-        id: 'sports',
-        title: 'Local Sports & Community',
-        items: [
-            {
-                id: 'cricket',
-                label: 'Cricket Hub',
-                icon: 'trophy-outline',
-                route: '/cricket'
-            },
-        ]
-    },
+    // {
+    //     id: 'sports',
+    //     title: 'Local Sports & Community',
+    //     items: [
+    //         {
+    //             id: 'cricket',
+    //             label: 'Cricket Hub',
+    //             icon: 'trophy-outline',
+    //             route: '/cricket'
+    //         },
+    //     ]
+    // },
 ];
 
 export const UtilsGrid = React.memo(function UtilsGrid() {

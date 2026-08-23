@@ -29,7 +29,10 @@ class AdMobService {
       // 1. Handle User Consent (UMP)
       await this.handleConsent();
 
-      // 2. Initialize AdMob SDK
+      // 2. Configure & Initialize AdMob SDK
+      await mobileAds().setRequestConfiguration({
+        testDeviceIdentifiers: __DEV__ ? ['EMULATOR'] : [],
+      });
       const adapterStatuses = await mobileAds().initialize();
       console.log('[AdMobService] SDK Initialized', adapterStatuses);
 

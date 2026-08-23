@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
         borderRadius: Layout.cardBorderRadius,
         paddingVertical: 11,
         paddingHorizontal: 12,
-        marginBottom: 14,
+        marginBottom: 12,
         gap: 10,
     },
     iconCircle: {

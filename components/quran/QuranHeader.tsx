@@ -3,9 +3,10 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React, { memo } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Layout } from '@/constants/layout';
+import { BackButton } from '@/components/common/BackButton';
 
 interface QuranHeaderProps {
     title: string;
@@ -24,9 +25,8 @@ interface QuranHeaderProps {
 }
 
 /**
- * Premium Quran hero header on brand primary with faint crescent/star decor.
- * The title sits centered at the top with the back button on the left; any
- * controls (reader Play/Auto/EN) render as a centered row below.
+ * Premium Quran compact header on brand primary with faint crescent/star decor.
+ * The title sits centered at the top with a custom back button on the left.
  */
 export const QuranHeader = memo(({
     title,
@@ -47,9 +47,13 @@ export const QuranHeader = memo(({
 
             {/* Title row: back left, title centered */}
             <View style={styles.topRow}>
-                <TouchableOpacity onPress={onBack} style={styles.navButton} activeOpacity={0.8}>
-                    <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
-                </TouchableOpacity>
+                <BackButton
+                    onPress={onBack}
+                    color="#FFFFFF"
+                    backgroundColor="rgba(255,255,255,0.18)"
+                    size={16}
+                    style={styles.navButton}
+                />
 
                 <View style={styles.titleWrap}>
                     <ThemedText
@@ -79,47 +83,44 @@ QuranHeader.displayName = 'QuranHeader';
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 13,
-        paddingBottom: 15,
-        borderBottomLeftRadius: 28,
-        borderBottomRightRadius: 28,
+        paddingBottom: 10,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
         overflow: 'hidden' },
     topRow: {
-        minHeight: 40,
+        minHeight: 34,
         justifyContent: 'center',
         alignItems: 'center' },
     navButton: {
         position: 'absolute',
         left: 0,
-        width: 38,
-        height: 38,
-        borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.18)',
-        justifyContent: 'center',
-        alignItems: 'center' },
+        width: 32,
+        height: 32,
+        borderRadius: Layout.borderRadius },
     titleWrap: {
         alignItems: 'center',
-        paddingHorizontal: 48 },
+        paddingHorizontal: 40 },
     title: {
-        fontSize: 15.5,
+        fontSize: 14.5,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.2,
         textAlign: 'center' },
     titleArabic: {
         fontFamily: 'NotoNastaliqUrdu-Regular',
-        fontSize: 16.5 },
+        fontSize: 15.5 },
     subtitle: {
-        fontSize: 10.5,
+        fontSize: 9.5,
         color: 'rgba(255,255,255,0.8)',
         fontWeight: '500',
-        marginTop: 3,
+        marginTop: 2,
         textAlign: 'center' },
     controlsRow: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         flexWrap: 'wrap',
-        marginTop: 14 } });
+        marginTop: 10 } });
 
 const QuranBackgroundDecor = memo(({ lime, secondary }: { lime: string; secondary: string }) => (
     <Svg style={StyleSheet.absoluteFill} viewBox="0 0 375 130" preserveAspectRatio="xMinYMin slice">

@@ -2,7 +2,6 @@ import {
   RewardedAd,
   AdEventType,
   RewardedAdEventType,
-  TestIds,
 } from 'react-native-google-mobile-ads';
 import { AppState, AppStateStatus } from 'react-native';
 
@@ -115,10 +114,10 @@ class RewardedService {
    * Create Ad
    * ----------------------------------------
    */
-  private createAd(fallbackToTest = false) {
+  private createAd() {
     this.cleanupAd();
 
-    const unitId = fallbackToTest ? TestIds.REWARDED : AD_UNIT_IDS.REWARDED;
+    const unitId = AD_UNIT_IDS.REWARDED;
     this.currentUnitId = unitId;
 
     try {
@@ -260,12 +259,7 @@ class RewardedService {
           this.isShowing = false;
           this.isLoaded = false;
           this.isPreloading = false;
-
-          const isFallbackPossible = this.currentUnitId === AD_UNIT_IDS.REWARDED && AD_UNIT_IDS.REWARDED !== TestIds.REWARDED;
-
-          if (!isFallbackPossible) {
-            this.showPending = false;
-          }
+          this.showPending = false;
 
           useAdsStore
             .getState()
@@ -280,23 +274,7 @@ class RewardedService {
           );
 
           this.cleanupAd();
-
-          // Fallback to Test ID if the live ad unit ID fails
-          if (isFallbackPossible) {
-            console.log('[RewardedService] Live Rewarded ad failed. Trying Test Rewarded ID fallback...');
-            this.createAd(true);
-            this.isPreloading = true;
-            this.loadStartTime = Date.now();
-            try {
-              this.rewarded?.load();
-            } catch (err) {
-              console.error('[RewardedService] Fallback load failed:', err);
-              this.isPreloading = false;
-              this.handleLoadError();
-            }
-          } else {
-            this.handleLoadError();
-          }
+          this.handleLoadError();
         },
       );
 

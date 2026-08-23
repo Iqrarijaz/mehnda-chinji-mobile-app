@@ -8,11 +8,10 @@ import {
     ScrollView,
     Platform
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DrawerActions } from '@react-navigation/native';
-import { useNavigation } from 'expo-router';
 
 import { SearchBar } from '@/components/common/SearchBar';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
@@ -31,12 +30,12 @@ interface QuickActionCircle {
     id: string;
     label: string;
     icon: keyof typeof Ionicons.glyphMap;
-    badge?: string;
-    onPress: () => void;
+    filterKey: string;
+    onPress?: () => void;
 }
 
 export default function CricketFeedScreen() {
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const colors = Colors[theme];
     const router = useRouter();
     const navigation = useNavigation();
@@ -49,12 +48,14 @@ export default function CricketFeedScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState<string>('MATCHES');
 
-    const { useTournamentsFeedQuery, useMatchesFeedQuery } = useCricketAPI();
+    const { useTournamentsFeedQuery, useMatchesFeedQuery, predictWinnerMutation } = useCricketAPI();
     const { data, isLoading, isError, refetch, isRefetching } = useTournamentsFeedQuery({});
 
-    // Matches live in their own collection, so they need their own request —
-    // the tournaments feed carries only a per-player "matches" count, never
-    // the fixtures themselves.
+    const handlePredictWinner = useCallback((matchId: string, teamId: string) => {
+        predictWinnerMutation.mutate({ matchId, predictedTeamId: teamId });
+    }, [predictWinnerMutation]);
+
+    // Matches live in their own collection, so they need their own request
     const {
         data: matchesData,
         isLoading: isMatchesLoading,
@@ -72,75 +73,43 @@ export default function CricketFeedScreen() {
     const filteredTournaments = useMemo(() => {
         let list = tournamentsList;
 
-        // Only the tournament-status circles narrow the list; MATCHES isn't
-        // a tournament status and is handled separately.
-        if (selectedFilter !== 'ALL' && !isMatchMode) {
+        if (selectedFilter !== 'ALL' && selectedFilter !== 'MATCHES') {
             list = list.filter(t => t.status === selectedFilter);
         }
 
         if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
+            const q = searchQuery.toLowerCase().trim();
             list = list.filter(t =>
-                t.name.toLowerCase().includes(query) ||
-                t.city.toLowerCase().includes(query) ||
-                t.venue.toLowerCase().includes(query)
+                t.name.toLowerCase().includes(q) ||
+                t.city.toLowerCase().includes(q) ||
+                t.venue.toLowerCase().includes(q)
             );
         }
 
         return list;
-    }, [tournamentsList, selectedFilter, searchQuery, isMatchMode]);
+    }, [tournamentsList, selectedFilter, searchQuery]);
 
+    // Filter matches based on search query
     const filteredMatches = useMemo(() => {
-        let list = allMatches;
-
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            list = list.filter(m =>
-                m.matchTitle?.toLowerCase().includes(query) ||
-                m.teamA?.name?.toLowerCase().includes(query) ||
-                m.teamB?.name?.toLowerCase().includes(query) ||
-                m.venue?.toLowerCase().includes(query)
-            );
-        }
-
-        return list;
+        if (!searchQuery.trim()) return allMatches;
+        const q = searchQuery.toLowerCase().trim();
+        return allMatches.filter(m =>
+            m.matchTitle.toLowerCase().includes(q) ||
+            m.teamA.name.toLowerCase().includes(q) ||
+            m.teamB.name.toLowerCase().includes(q) ||
+            m.venue.toLowerCase().includes(q)
+        );
     }, [allMatches, searchQuery]);
 
-    const handleOpenDrawer = useCallback(() => {
-        let currentNav: any = navigation;
-        let drawerNav: any = null;
 
-        while (currentNav) {
-            try {
-                const state = currentNav.getState?.();
-                if (state?.type === 'drawer' || typeof currentNav.openDrawer === 'function') {
-                    drawerNav = currentNav;
-                    break;
-                }
-            } catch (e) {
-                // Ignore state inspection errors
-            }
-            currentNav = currentNav.getParent ? currentNav.getParent() : null;
-        }
 
-        if (drawerNav) {
-            try {
-                if (typeof drawerNav.openDrawer === 'function') {
-                    drawerNav.openDrawer();
-                } else {
-                    drawerNav.dispatch(DrawerActions.openDrawer());
-                }
-            } catch (err) {
-                router.push('/(drawer)/(tabs)' as any);
-            }
+    const handleBackPress = useCallback(() => {
+        if (router.canGoBack()) {
+            router.back();
         } else {
-            if (router.canGoBack()) {
-                router.back();
-            } else {
-                router.replace('/(drawer)/(tabs)' as any);
-            }
+            router.replace('/(drawer)/(tabs)' as any);
         }
-    }, [navigation, router]);
+    }, [router]);
 
     const handleSelectTournament = useCallback((id: string) => {
         router.push(`/cricket/${id}` as any);
@@ -164,39 +133,38 @@ export default function CricketFeedScreen() {
         {
             label: 'Register Team',
             icon: 'people-outline',
-            onPress: () => router.push(`/cricket/${tournament._id}/add-team` as any)
+            onPress: () => router.push(`/cricket/${tournament._id}/register-team` as any)
         }
     ], [router]);
 
-    // Quick Action Highlight Circles mapped directly to filter states
-    const quickCircles = useMemo(() => [
+    const quickCircles: QuickActionCircle[] = useMemo(() => [
         {
-            id: 'MATCHES',
+            id: 'circle_matches',
             label: 'Matches',
             icon: 'baseball-outline' as keyof typeof Ionicons.glyphMap,
             filterKey: 'MATCHES'
         },
         {
-            id: 'ALL',
-            label: 'Tournaments',
+            id: 'circle_all',
+            label: 'All Tourneys',
             icon: 'trophy-outline' as keyof typeof Ionicons.glyphMap,
             filterKey: 'ALL'
         },
         {
-            id: 'LIVE',
-            label: 'Live Matches',
-            icon: 'flame-outline' as keyof typeof Ionicons.glyphMap,
-            filterKey: 'LIVE'
-        },
-        {
-            id: 'UPCOMING',
+            id: 'circle_upcoming',
             label: 'Upcoming',
             icon: 'calendar-outline' as keyof typeof Ionicons.glyphMap,
             filterKey: 'UPCOMING'
         },
         {
-            id: 'COMPLETED',
-            label: 'Results',
+            id: 'circle_live',
+            label: 'Live',
+            icon: 'flame-outline' as keyof typeof Ionicons.glyphMap,
+            filterKey: 'LIVE'
+        },
+        {
+            id: 'circle_completed',
+            label: 'Completed',
             icon: 'checkmark-done-circle-outline' as keyof typeof Ionicons.glyphMap,
             filterKey: 'COMPLETED'
         }
@@ -217,7 +185,7 @@ export default function CricketFeedScreen() {
 
     const ListHeader = useMemo(() => (
         <View style={styles.headerFeedContainer}>
-            {/* Match Cards Carousel (Horizontal) — hidden in match mode, where the main list already shows fixtures */}
+            {/* Match Cards Carousel (Horizontal) — hidden in match mode */}
             {!isMatchMode && allMatches.length > 0 ? (
                 <View style={styles.carouselSection}>
                     <ScrollView
@@ -230,6 +198,9 @@ export default function CricketFeedScreen() {
                                 key={match._id}
                                 match={match}
                                 onPress={() => handleSelectMatch(match._id)}
+                                canManage={isCricketAdmin}
+                                onPredictWinner={(teamId) => handlePredictWinner(match._id, teamId)}
+                                userPrediction={(match as any).userPrediction}
                             />
                         ))}
                     </ScrollView>
@@ -292,20 +263,22 @@ export default function CricketFeedScreen() {
                     {isMatchMode ? 'All Matches' : 'Featured Tournaments'}
                 </ThemedText>
                 <ThemedText style={[styles.sectionCount, { color: colors.textSecondary }]}>
-                    {(isMatchMode ? filteredMatches.length : filteredTournaments.length)} available
+                    {isMatchMode ? `${filteredMatches.length} Matches` : `${filteredTournaments.length} Tournaments`}
                 </ThemedText>
             </View>
         </View>
     ), [
+        allMatches,
         colors,
         selectedFilter,
-        allMatches,
         isMatchMode,
         quickCircles,
         searchQuery,
         filteredMatches.length,
         filteredTournaments.length,
-        handleSelectMatch
+        handleSelectMatch,
+        isCricketAdmin,
+        handlePredictWinner
     ]);
 
     const renderMatchListItem = useCallback(({ item }: { item: CricketMatch }) => (
@@ -313,10 +286,13 @@ export default function CricketFeedScreen() {
             <CricketMatchCard
                 match={item}
                 onPress={() => handleSelectMatch(item._id)}
+                canManage={isCricketAdmin}
+                onPredictWinner={(teamId) => handlePredictWinner(item._id, teamId)}
+                userPrediction={(item as any).userPrediction}
                 fullWidth
             />
         </View>
-    ), [handleSelectMatch]);
+    ), [handleSelectMatch, isCricketAdmin, handlePredictWinner]);
 
     return (
         <ErrorBoundary>
@@ -332,13 +308,13 @@ export default function CricketFeedScreen() {
                     ]}
                 >
                     <View style={styles.topBarContent}>
-                        {/* Action Menu Icon */}
+                        {/* Back Icon */}
                         <TouchableOpacity
                             style={styles.headerIconBtn}
-                            onPress={handleOpenDrawer}
+                            onPress={handleBackPress}
                             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                         >
-                            <Ionicons name="menu-outline" size={24} color="#FFFFFF" />
+                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
                         </TouchableOpacity>
 
                         {/* Clean Standard Title */}
@@ -348,70 +324,84 @@ export default function CricketFeedScreen() {
                         <View style={styles.headerRightActions}>
                             <TouchableOpacity
                                 style={styles.headerIconBtn}
-                                onPress={() => router.push('/notifications' as any)}
+                                onPress={() => refetch()}
                                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                             >
-                                <Ionicons name="notifications-outline" size={22} color="#FFFFFF" />
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={styles.headerIconBtn}
-                                onPress={() => router.push('/settings' as any)}
-                                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                            >
-                                <Ionicons name="settings-outline" size={22} color="#FFFFFF" />
+                                <Ionicons name="refresh-outline" size={20} color="#FFFFFF" />
                             </TouchableOpacity>
                         </View>
                     </View>
                 </View>
 
-                {/* Main Cricket Feed */}
-                <FlatList
-                    data={(isMatchMode ? filteredMatches : filteredTournaments) as any[]}
-                    keyExtractor={(item) => item._id}
-                    renderItem={(isMatchMode ? renderMatchListItem : renderTournamentCard) as any}
-                    ListHeaderComponent={ListHeader}
-                    contentContainerStyle={styles.listContent}
-                    showsVerticalScrollIndicator={false}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={isRefetching || isMatchesRefetching}
-                            onRefresh={() => { refetch(); refetchMatches(); }}
-                            colors={[colors.primary]}
-                            tintColor={colors.primary}
-                        />
-                    }
-                    ListEmptyComponent={
-                        !(isMatchMode ? isMatchesLoading : isLoading) ? (
-                            <View style={styles.emptyContainer}>
-                                <Ionicons name={isMatchMode ? 'baseball-outline' : 'trophy-outline'} size={44} color={colors.icon} />
-                                <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>
-                                    {isMatchMode ? 'No Matches Found' : 'No Tournaments Found'}
-                                </ThemedText>
-                                <ThemedText style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-                                    {searchQuery
-                                        ? `Nothing matches "${searchQuery}".`
-                                        : isMatchMode
-                                            ? 'No matches have been scheduled yet.'
-                                            : 'Check back soon for upcoming cricket tournaments!'}
-                                </ThemedText>
-                            </View>
-                        ) : null
-                    }
-                />
+                {/* Content List */}
+                {isMatchMode ? (
+                    <FlatList
+                        data={filteredMatches}
+                        keyExtractor={(item) => item._id}
+                        renderItem={renderMatchListItem}
+                        ListHeaderComponent={ListHeader}
+                        contentContainerStyle={styles.listContent}
+                        showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isMatchesRefetching}
+                                onRefresh={refetchMatches}
+                                colors={[colors.primary]}
+                                tintColor={colors.primary}
+                            />
+                        }
+                        ListEmptyComponent={
+                            !isMatchesLoading ? (
+                                <View style={styles.emptyContainer}>
+                                    <Ionicons name="baseball-outline" size={48} color={colors.textSecondary} />
+                                    <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>No Matches Found</ThemedText>
+                                    <ThemedText style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                                        There are no scheduled or live matches right now.
+                                    </ThemedText>
+                                </View>
+                            ) : null
+                        }
+                    />
+                ) : (
+                    <FlatList
+                        data={filteredTournaments}
+                        keyExtractor={(item) => item._id}
+                        renderItem={renderTournamentCard}
+                        ListHeaderComponent={ListHeader}
+                        contentContainerStyle={styles.listContent}
+                        showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isRefetching}
+                                onRefresh={refetch}
+                                colors={[colors.primary]}
+                                tintColor={colors.primary}
+                            />
+                        }
+                        ListEmptyComponent={
+                            !isLoading ? (
+                                <View style={styles.emptyContainer}>
+                                    <Ionicons name="trophy-outline" size={48} color={colors.textSecondary} />
+                                    <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>No Tournaments Found</ThemedText>
+                                    <ThemedText style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                                        Try adjusting your search query or filter options.
+                                    </ThemedText>
+                                </View>
+                            ) : null
+                        }
+                    />
+                )}
 
-                {/* Admin Floating Action Button */}
+                {/* FAB: Create Tournament (Admin Only) */}
                 {isCricketAdmin && (
                     <TouchableOpacity
                         style={[styles.fab, { backgroundColor: colors.primary }]}
                         onPress={() => router.push('/cricket/create-tournament' as any)}
                         activeOpacity={0.8}
-                        accessibilityLabel="Create Tournament"
                     >
-                        <Ionicons name="add" size={26} color="#FFFFFF" />
+                        <Ionicons name="add-outline" size={24} color="#FFFFFF" />
                     </TouchableOpacity>
                 )}
-
             </View>
         </ErrorBoundary>
     );
@@ -423,7 +413,8 @@ const styles = StyleSheet.create({
     },
     compactHeader: {
         paddingHorizontal: 12,
-        paddingBottom: 8
+        paddingBottom: 10,
+        borderRadius: 0
     },
     topBarContent: {
         flexDirection: 'row',
@@ -455,13 +446,13 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     carouselContainer: {
-        paddingHorizontal: 10
+        paddingHorizontal: 12
     },
     circlesSection: {
         marginBottom: 10
     },
     circlesContainer: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 12,
         gap: 12
     },
     circleItem: {
@@ -491,14 +482,14 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     searchSection: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 12,
         marginBottom: 8
     },
     sectionHeaderRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 10,
+        paddingHorizontal: 12,
         marginBottom: 8
     },
     sectionTitle: {
@@ -513,7 +504,7 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     listContent: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 12,
         paddingBottom: 90
     },
     emptyContainer: {

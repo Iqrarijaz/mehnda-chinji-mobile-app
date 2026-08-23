@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
 import { ThemedText } from '@/components/ThemedText';
 import { StatusBadge } from '@/components/cricket/StatusBadge';
 import { Colors } from '@/constants/colors';
@@ -12,15 +13,64 @@ import { capitalizeString } from '@/utils/string';
 interface CricketMatchCardProps {
     match: CricketMatch;
     onPress: () => void;
-    /** Stretch to the container width instead of the fixed carousel width. */
+    canManage?: boolean;
+    onPredictWinner?: (teamId: string) => void;
+    userPrediction?: string;
+    /** Stretch to full width */
     fullWidth?: boolean;
 }
 
-export const CricketMatchCard = React.memo(function CricketMatchCard({ match, onPress, fullWidth = false }: CricketMatchCardProps) {
+export const CricketMatchCard = React.memo(function CricketMatchCard({
+    match,
+    onPress,
+    canManage = false,
+    onPredictWinner,
+    userPrediction,
+    fullWidth = false
+}: CricketMatchCardProps) {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    const currentInning = match.currentInnings === 1 ? match.innings1 : match.innings2;
+    const isLive = match.status === 'LIVE';
+
+    const formatScheduledTime = (dateStr: string) => {
+        if (!dateStr) return '';
+        try {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            const datePart = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const timePart = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            return `${datePart} • ${timePart}`;
+        } catch {
+            return dateStr;
+        }
+    };
+
+    const handleCardPress = () => {
+        if (match.status === 'UPCOMING' && !canManage) {
+            Toast.show({
+                type: 'info',
+                text1: 'Match Scheduled',
+                text2: 'Match has not started yet. Admin scoring panel opens at match start.'
+            });
+            return;
+        }
+        onPress();
+    };
+
+    // Calculate prediction probabilities
+    const summary = match.predictionsSummary;
+    const probA = summary?.teamAProbability ?? 50;
+    const probB = summary?.teamBProbability ?? 50;
+
+    // Green for higher prediction, Red for lower prediction
+    const isHigherA = probA > probB;
+    const isHigherB = probB > probA;
+
+    const colorA = isHigherA ? '#10B981' : (isHigherB ? '#EF4444' : colors.primary);
+    const colorB = isHigherB ? '#10B981' : (isHigherA ? '#EF4444' : colors.primary);
+
+    const selectedTeamId = userPrediction || (match as any).userPrediction;
 
     const inningsForTeam = (teamId: string): Innings | null | undefined => {
         if (match.innings1?.battingTeamId === teamId) return match.innings1;
@@ -31,31 +81,6 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({ match, on
     const teamAInnings = inningsForTeam(match.teamA.id);
     const teamBInnings = inningsForTeam(match.teamB.id);
 
-    const isLive = match.status === 'LIVE';
-
-    // Who won the toss and what they chose — null until a scorer records it.
-    const tossLabel = (() => {
-        if (!match.tossWinnerId || !match.tossDecision) return null;
-        const winner = match.tossWinnerId === match.teamA.id ? match.teamA.name : match.teamB.name;
-        return `${capitalizeString(winner)} won the toss & chose to ${match.tossDecision === 'BAT' ? 'bat' : 'bowl'}`;
-    })();
-
-    const formatScore = (innings?: Innings | null) => {
-        if (!innings) return null;
-        return (
-            <View style={styles.scoreWrap}>
-                <ThemedText style={[styles.runsText, { color: colors.text }]}>
-                    {innings.totalRuns}{innings.totalWickets < 10 ? `/${innings.totalWickets}` : ''}
-                </ThemedText>
-                {innings.totalOvers > 0 && (
-                    <ThemedText style={[styles.oversText, { color: colors.textSecondary }]}>
-                        ({innings.totalOvers} ov)
-                    </ThemedText>
-                )}
-            </View>
-        );
-    };
-
     return (
         <TouchableOpacity
             style={[
@@ -63,88 +88,135 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({ match, on
                 fullWidth && styles.cardFullWidth,
                 { backgroundColor: colors.cardBg }
             ]}
-            onPress={onPress}
+            onPress={handleCardPress}
             activeOpacity={0.8}
         >
-            {/* Header: Status + Stage/Venue */}
+            {/* Header: Status + Scheduled Time & Venue */}
             <View style={styles.headerRow}>
                 <View style={styles.statusWrap}>
                     {isLive && <View style={[styles.liveDot, { backgroundColor: '#EF4444' }]} />}
                     <StatusBadge status={match.status} />
                 </View>
-                <ThemedText style={[styles.stageText, { color: colors.textSecondary }]} numberOfLines={1}>
-                    {match.stage} • {match.venue}
+
+                <ThemedText style={[styles.scheduleText, { color: colors.textSecondary }]} numberOfLines={1}>
+                    {match.scheduledAt ? formatScheduledTime(match.scheduledAt) : match.venue}
                 </ThemedText>
             </View>
 
-            {/* Teams & Scores Block */}
-            <View style={styles.teamsBlock}>
-                {/* Team A */}
-                <View style={styles.teamRow}>
-                    <View style={styles.teamInfo}>
-                        {match.teamA.logo ? (
-                            <Image source={{ uri: match.teamA.logo }} style={styles.teamLogo} />
-                        ) : (
-                            <View style={[styles.teamLogoFallback, { backgroundColor: `${colors.primary}1A` }]}>
-                                <ThemedText style={[styles.logoText, { color: colors.primary }]}>
-                                    {match.teamA.name.charAt(0)}
-                                </ThemedText>
-                            </View>
-                        )}
-                        <ThemedText style={[styles.teamName, { color: colors.text }]} numberOfLines={1}>
+            {/* Single Line Teams & Logo Row (Centered to Icon) */}
+            <View style={styles.singleLineRow}>
+                {/* Team A (Name Right Aligned, Logo on Right, Centered Vertically) */}
+                <View style={styles.teamSideLeft}>
+                    <View style={styles.nameScoreCol}>
+                        <ThemedText style={[styles.teamNameLeft, { color: colors.text }]} numberOfLines={1}>
                             {capitalizeString(match.teamA.name)}
                         </ThemedText>
+                        {teamAInnings && (
+                            <ThemedText style={[styles.scoreText, { color: colors.primary }]}>
+                                {teamAInnings.totalRuns}/{teamAInnings.totalWickets} ({teamAInnings.totalOvers} ov)
+                            </ThemedText>
+                        )}
                     </View>
-                    {teamAInnings ? formatScore(teamAInnings) : (
-                        <ThemedText style={[styles.yetToBat, { color: colors.placeholder }]}>Yet to bat</ThemedText>
+                    {match.teamA.logo ? (
+                        <Image source={{ uri: match.teamA.logo }} style={styles.largeLogo} />
+                    ) : (
+                        <View style={[styles.largeLogoFallback, { backgroundColor: `${colors.primary}1A` }]}>
+                            <ThemedText style={[styles.logoText, { color: colors.primary }]}>
+                                {match.teamA.name.charAt(0).toUpperCase()}
+                            </ThemedText>
+                        </View>
                     )}
                 </View>
 
-                {/* Team B */}
-                <View style={styles.teamRow}>
-                    <View style={styles.teamInfo}>
-                        {match.teamB.logo ? (
-                            <Image source={{ uri: match.teamB.logo }} style={styles.teamLogo} />
-                        ) : (
-                            <View style={[styles.teamLogoFallback, { backgroundColor: `${colors.primary}1A` }]}>
-                                <ThemedText style={[styles.logoText, { color: colors.primary }]}>
-                                    {match.teamB.name.charAt(0)}
-                                </ThemedText>
-                            </View>
-                        )}
-                        <ThemedText style={[styles.teamName, { color: colors.text }]} numberOfLines={1}>
+                {/* Center VS Text (Transparent Background) */}
+                <View style={styles.vsContainer}>
+                    <ThemedText style={[styles.vsText, { color: colors.secondary }]}>VS</ThemedText>
+                </View>
+
+                {/* Team B (Logo on Left, Name Left Aligned, Centered Vertically) */}
+                <View style={styles.teamSideRight}>
+                    {match.teamB.logo ? (
+                        <Image source={{ uri: match.teamB.logo }} style={styles.largeLogo} />
+                    ) : (
+                        <View style={[styles.largeLogoFallback, { backgroundColor: `${colors.primary}1A` }]}>
+                            <ThemedText style={[styles.logoText, { color: colors.primary }]}>
+                                {match.teamB.name.charAt(0).toUpperCase()}
+                            </ThemedText>
+                        </View>
+                    )}
+                    <View style={styles.nameScoreColRight}>
+                        <ThemedText style={[styles.teamNameRight, { color: colors.text }]} numberOfLines={1}>
                             {capitalizeString(match.teamB.name)}
                         </ThemedText>
+                        {teamBInnings && (
+                            <ThemedText style={[styles.scoreText, { color: colors.primary }]}>
+                                {teamBInnings.totalRuns}/{teamBInnings.totalWickets} ({teamBInnings.totalOvers} ov)
+                            </ThemedText>
+                        )}
                     </View>
-                    {teamBInnings ? formatScore(teamBInnings) : (
-                        <ThemedText style={[styles.yetToBat, { color: colors.placeholder }]}>Yet to bat</ThemedText>
-                    )}
                 </View>
             </View>
 
-            {/* Toss result */}
-            {tossLabel && (
-                <View style={styles.tossRow}>
-                    <Ionicons name="disc-outline" size={12} color={colors.secondary} />
-                    <ThemedText style={[styles.tossText, { color: colors.secondary }]} numberOfLines={1}>
-                        {tossLabel}
+            {/* Summary / Result Bar */}
+            {match.result ? (
+                <View style={styles.summaryRow}>
+                    <ThemedText style={[styles.resultText, { color: colors.success }]} numberOfLines={1}>
+                        {match.result}
+                    </ThemedText>
+                </View>
+            ) : (
+                <View style={styles.summaryRow}>
+                    <ThemedText style={[styles.venueSubText, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {match.venue} • {match.maxOvers} Overs
                     </ThemedText>
                 </View>
             )}
 
-            {/* Summary / Result Text */}
-            <View style={styles.summaryRow}>
-                <ThemedText style={[styles.summaryText, { color: colors.textSecondary }]} numberOfLines={1}>
-                    {match.result || (isLive && currentInning ? `Live • CRR: ${(currentInning.totalRuns / (currentInning.totalOvers || 1)).toFixed(1)}` : `Scheduled match`)}
-                </ThemedText>
-            </View>
+            {/* Compact Prediction Section */}
+            <View style={[styles.predictionContainer, { backgroundColor: colors.surface }]}>
+                <View style={styles.predictionBarRow}>
+                    <TouchableOpacity
+                        style={[
+                            styles.predictBtn,
+                            {
+                                backgroundColor: selectedTeamId === match.teamA.id ? colorA : `${colorA}15`
+                            }
+                        ]}
+                        onPress={() => onPredictWinner?.(match.teamA.id)}
+                        activeOpacity={0.8}
+                    >
+                        <ThemedText
+                            style={[
+                                styles.predictBtnText,
+                                { color: selectedTeamId === match.teamA.id ? '#FFFFFF' : colorA }
+                            ]}
+                            numberOfLines={1}
+                        >
+                            {capitalizeString(match.teamA.name)} {probA}%
+                        </ThemedText>
+                    </TouchableOpacity>
 
-            {/* Card Footer: Details Button */}
-            <View style={[styles.footer, { borderTopColor: `${colors.border}66` }]}>
-                <ThemedText style={[styles.scheduleBtnText, { color: colors.primary }]}>
-                    Match Details
-                </ThemedText>
-                <Ionicons name="chevron-forward" size={14} color={colors.primary} />
+                    <TouchableOpacity
+                        style={[
+                            styles.predictBtn,
+                            {
+                                backgroundColor: selectedTeamId === match.teamB.id ? colorB : `${colorB}15`
+                            }
+                        ]}
+                        onPress={() => onPredictWinner?.(match.teamB.id)}
+                        activeOpacity={0.8}
+                    >
+                        <ThemedText
+                            style={[
+                                styles.predictBtnText,
+                                { color: selectedTeamId === match.teamB.id ? '#FFFFFF' : colorB }
+                            ]}
+                            numberOfLines={1}
+                        >
+                            {capitalizeString(match.teamB.name)} {probB}%
+                        </ThemedText>
+                    </TouchableOpacity>
+                </View>
             </View>
         </TouchableOpacity>
     );
@@ -152,118 +224,139 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({ match, on
 
 const styles = StyleSheet.create({
     card: {
-        width: 270,
+        width: 300,
         borderRadius: Layout.borderRadius,
-        padding: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
         marginRight: 10,
-        justifyContent: 'space-between'
+        gap: 4,
+        borderWidth: 0
     },
     cardFullWidth: {
         width: '100%',
         marginRight: 0
     },
-    tossRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        marginBottom: 6
-    },
-    tossText: {
-        fontSize: 10,
-        fontWeight: '600',
-        flex: 1
-    },
     headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 10
+        justifyContent: 'space-between'
     },
     statusWrap: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6
+        gap: 4
     },
     liveDot: {
-        width: 7,
-        height: 7,
-        borderRadius: 4
+        width: 6,
+        height: 6,
+        borderRadius: 3
     },
-    stageText: {
+    scheduleText: {
         fontSize: 10,
         fontWeight: '600',
         flex: 1,
         textAlign: 'right'
     },
-    teamsBlock: {
-        gap: 10,
-        marginBottom: 10
-    },
-    teamRow: {
+    singleLineRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        paddingVertical: 4
     },
-    teamInfo: {
+    teamSideLeft: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
+        flex: 1,
+        justifyContent: 'flex-end'
+    },
+    teamSideRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        flex: 1,
+        justifyContent: 'flex-start'
+    },
+    nameScoreCol: {
+        alignItems: 'flex-end',
+        justifyContent: 'center',
         flex: 1
     },
-    teamLogo: {
-        width: 24,
-        height: 24,
-        borderRadius: 12
+    nameScoreColRight: {
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        flex: 1
     },
-    teamLogoFallback: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
+    teamNameLeft: {
+        fontSize: 12.5,
+        fontWeight: '700',
+        textAlign: 'right'
+    },
+    teamNameRight: {
+        fontSize: 12.5,
+        fontWeight: '700',
+        textAlign: 'left'
+    },
+    scoreText: {
+        fontSize: 9.5,
+        fontWeight: '800',
+        marginTop: 1
+    },
+    largeLogo: {
+        width: 48,
+        height: 48,
+        borderRadius: 24
+    },
+    largeLogoFallback: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
         justifyContent: 'center',
         alignItems: 'center'
     },
     logoText: {
+        fontSize: 17,
+        fontWeight: '800'
+    },
+    vsContainer: {
+        paddingHorizontal: 4,
+        marginHorizontal: 4,
+        backgroundColor: 'transparent'
+    },
+    vsText: {
         fontSize: 11,
         fontWeight: '800'
-    },
-    teamName: {
-        fontSize: 13,
-        fontWeight: '700',
-        flex: 1
-    },
-    scoreWrap: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4
-    },
-    runsText: {
-        fontSize: 13,
-        fontWeight: '800'
-    },
-    oversText: {
-        fontSize: 10,
-        fontWeight: '500'
-    },
-    yetToBat: {
-        fontSize: 10,
-        fontWeight: '500'
     },
     summaryRow: {
-        marginBottom: 8
+        alignItems: 'center'
     },
-    summaryText: {
-        fontSize: 11,
+    resultText: {
+        fontSize: 10.5,
+        fontWeight: '700'
+    },
+    venueSubText: {
+        fontSize: 10,
         fontWeight: '500'
     },
-    footer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 8,
-        borderTopWidth: 1
+    predictionContainer: {
+        padding: 4,
+        borderRadius: Layout.borderRadius - 4
     },
-    scheduleBtnText: {
-        fontSize: 11,
+    predictionBarRow: {
+        flexDirection: 'row',
+        gap: 6
+    },
+    predictBtn: {
+        flex: 1,
+        paddingVertical: 5,
+        paddingHorizontal: 6,
+        borderRadius: 12,
+        borderWidth: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    predictBtnText: {
+        fontSize: 10,
         fontWeight: '700'
     }
 });

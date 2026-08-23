@@ -38,7 +38,7 @@ function formatAxisDate(dateStr: string) {
  * Built on react-native-chart-kit (already used for WeatherHourly) rather
  * than a bespoke chart, to match this app's established charting approach.
  */
-export function TrendChart({ points, width, height = 170 }: TrendChartProps) {
+export function TrendChart({ points, width, height = 140 }: TrendChartProps) {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -56,7 +56,7 @@ export function TrendChart({ points, width, height = 170 }: TrendChartProps) {
     if (!stats) {
         return (
             <View style={[styles.emptyWrap, { height }]}>
-                <ThemedText style={{ color: colors.textSecondary, fontSize: 13 }}>
+                <ThemedText style={{ color: colors.textSecondary, fontSize: 12.5 }}>
                     Not enough history yet — check back tomorrow.
                 </ThemedText>
             </View>
@@ -85,7 +85,7 @@ export function TrendChart({ points, width, height = 170 }: TrendChartProps) {
                     </ThemedText>
                 </View>
                 <View style={[styles.changeBadge, { backgroundColor: lineColor + '18' }]}>
-                    <Ionicons name={isPositive ? 'trending-up' : 'trending-down'} size={14} color={lineColor} />
+                    <Ionicons name={isPositive ? 'trending-up' : 'trending-down'} size={13} color={lineColor} />
                     <ThemedText style={[styles.changeText, { color: lineColor }]}>
                         {isPositive ? '+' : ''}{stats.changePct.toFixed(2)}%
                     </ThemedText>
@@ -120,7 +120,7 @@ export function TrendChart({ points, width, height = 170 }: TrendChartProps) {
                         stroke: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
                         strokeDasharray: '4',
                     },
-                    propsForLabels: { fontSize: 10 },
+                    propsForLabels: { fontSize: 9.5 },
                 }}
                 segments={3}
                 style={styles.chart}
@@ -146,41 +146,45 @@ const styles = StyleSheet.create({
     headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 12,
-    },
-    rangeLabel: {
-        fontSize: 11,
-        fontWeight: '500',
+        alignItems: 'center',
+        paddingHorizontal: 12,
         marginBottom: 2,
     },
+    rangeLabel: {
+        fontSize: 10.5,
+        fontWeight: '500',
+        marginBottom: 1,
+    },
     rangeValue: {
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '700',
     },
     changeBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 10,
-        paddingVertical: 6,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
         borderRadius: 20,
-        gap: 4,
+        gap: 3,
     },
     changeText: {
-        fontSize: 13,
+        fontSize: 11.5,
         fontWeight: '700',
     },
     chart: {
-        marginLeft: -16, // chart-kit pads its own y-axis labels; pull flush with the card
+        marginLeft: -16, // pull flush with card left edge so graph spans full width
+        paddingRight: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
     },
     axisRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 4,
-        paddingHorizontal: 4,
+        marginTop: 2,
+        paddingHorizontal: 12,
     },
     axisLabel: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '500',
     },
 });

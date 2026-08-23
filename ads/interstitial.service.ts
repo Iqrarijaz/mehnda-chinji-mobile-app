@@ -1,7 +1,6 @@
 import {
   InterstitialAd,
   AdEventType,
-  TestIds,
 } from 'react-native-google-mobile-ads';
 import {
   AppState,
@@ -214,10 +213,10 @@ class InterstitialService {
    * Create Ad
    * ----------------------------------------
    */
-  private createAd(fallbackToTest = false, customUnitId?: string, preservePending = false) {
+  private createAd(customUnitId?: string, preservePending = false) {
     this.cleanupAd(preservePending);
 
-    const unitId = customUnitId || (fallbackToTest ? TestIds.INTERSTITIAL : AD_UNIT_IDS.INTERSTITIAL);
+    const unitId = customUnitId || AD_UNIT_IDS.INTERSTITIAL;
     this.currentUnitId = unitId;
 
     try {
@@ -355,12 +354,6 @@ class InterstitialService {
           this.isLoaded = false;
           this.isLoading = false;
 
-          const isFallbackPossible = this.currentUnitId !== TestIds.INTERSTITIAL;
-
-          if (!isFallbackPossible) {
-            this.showPending = false;
-          }
-
           useAdsStore
             .getState()
             .setAdLoaded(
@@ -376,39 +369,27 @@ class InterstitialService {
             },
           );
 
-          this.cleanupAd(isFallbackPossible);
-
-          // Fallback logic: Try alternate production ID first, then Test ID
+          // Retry with alternate backup production ID if primary fails, otherwise back off
           const primaryProdId = AD_UNIT_IDS.INTERSTITIAL;
           const backupProdId = 'ca-app-pub-1707254546231644/3460596415';
 
-          if (isFallbackPossible) {
-            if (this.currentUnitId === primaryProdId && primaryProdId !== backupProdId) {
-              console.log('[InterstitialService] Live Interstitial failed. Trying backup production ID...');
-              this.createAd(false, backupProdId, true);
-              this.isLoading = true;
-              this.loadStartTime = Date.now();
-              try {
-                this.interstitial?.load();
-              } catch (err) {
-                console.error('[InterstitialService] Backup production load failed:', err);
-                this.isLoading = false;
-                this.handleLoadError();
-              }
-            } else {
-              console.log('[InterstitialService] Live Interstitial failed. Trying Test Interstitial ID fallback...');
-              this.createAd(true, undefined, true);
-              this.isLoading = true;
-              this.loadStartTime = Date.now();
-              try {
-                this.interstitial?.load();
-              } catch (err) {
-                console.error('[InterstitialService] Fallback test load failed:', err);
-                this.isLoading = false;
-                this.handleLoadError();
-              }
+          if (this.currentUnitId === primaryProdId && primaryProdId !== backupProdId) {
+            console.log('[InterstitialService] Primary Interstitial failed. Trying backup production ID...');
+            this.cleanupAd(true);
+            this.createAd(backupProdId, true);
+            this.isLoading = true;
+            this.loadStartTime = Date.now();
+            try {
+              this.interstitial?.load();
+            } catch (err) {
+              console.error('[InterstitialService] Backup production load failed:', err);
+              this.isLoading = false;
+              this.showPending = false;
+              this.handleLoadError();
             }
           } else {
+            this.showPending = false;
+            this.cleanupAd(false);
             this.handleLoadError();
           }
         },

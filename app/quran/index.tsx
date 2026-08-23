@@ -49,7 +49,7 @@ const skeletonStyles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        padding: 11,
+        padding: 12,
         marginBottom: 12,
     },
 });
@@ -237,8 +237,7 @@ export default function QuranListScreen() {
             {/* Custom Header using QuranHeader */}
             <QuranHeader
                 title="The Holy Quran"
-                subtitle="Read & listen to the verses"
-                paddingTop={insets.top + 16}
+                paddingTop={insets.top + 10}
                 onBack={handleBack}
             />
 
@@ -397,14 +396,15 @@ const styles = StyleSheet.create({
     backgroundImage: { flex: 1 },
     headerAddon: {
         paddingHorizontal: 16,
+        paddingTop: 16,
         paddingBottom: 0 },
     searchBarContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        paddingHorizontal: 10,
-        height: 42,
-        marginTop: 16,
+        paddingHorizontal: 12,
+        height: 44,
+        marginTop: 0,
         marginBottom: 12 },
     searchIcon: { marginRight: 8 },
     searchInput: { flex: 1, fontSize: 12.5, paddingVertical: 7 },
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderRadius: Layout.borderRadius,
         padding: 4,
-        marginBottom: 16 },
+        marginBottom: 12 },
     segmentedTab: {
         flex: 1,
         flexDirection: 'row',
@@ -447,7 +447,8 @@ const styles = StyleSheet.create({
     // List
     listContent: {
         paddingHorizontal: 16,
-        paddingVertical: 13 },
+        paddingTop: 0,
+        paddingBottom: 16 },
     // States
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     loadingText: { marginTop: 12, fontSize: 12.5 },

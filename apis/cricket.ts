@@ -13,7 +13,7 @@ export const CRICKET_QUERY_KEYS = {
  * Fetch tournaments feed with optional filters
  */
 export async function getTournamentsFeed(params?: CricketFeedParams) {
-    const response = await apiClient.get('/api/public/v1/cricket/tournaments', { params });
+    const response = await apiClient.get('/api/user/v1/cricket/tournaments', { params });
     return response as unknown as {
         success: boolean;
         message: string;
@@ -31,7 +31,7 @@ export async function getTournamentsFeed(params?: CricketFeedParams) {
  * Fetch tournament details by ID
  */
 export async function getTournamentDetails(id: string) {
-    const response = await apiClient.get(`/api/public/v1/cricket/tournaments/${id}`);
+    const response = await apiClient.get(`/api/user/v1/cricket/tournaments/${id}`);
     return response as unknown as {
         success: boolean;
         message: string;
@@ -128,7 +128,7 @@ export async function recordToss(matchId: string, payload: { tossWinnerId: strin
  * Fetch match details by ID
  */
 export async function getMatchDetails(matchId: string) {
-    const response = await apiClient.get(`/api/public/v1/cricket/matches/${matchId}`);
+    const response = await apiClient.get(`/api/user/v1/cricket/matches/${matchId}`);
     return response as unknown as {
         success: boolean;
         message: string;

@@ -23,7 +23,9 @@ const BannerAd: React.FC<BannerAdProps> = ({ style, placement }) => {
     }
   }, [canShow]);
 
-  if (!canShow || !isMounted || loadFailed) {
+  const bannerUnitId = AD_UNIT_IDS.BANNER;
+
+  if (!canShow || !isMounted || loadFailed || !bannerUnitId) {
     return null;
   }
 
@@ -35,7 +37,7 @@ const BannerAd: React.FC<BannerAdProps> = ({ style, placement }) => {
         </View>
       )}
       <AdMobBanner
-        unitId={AD_UNIT_IDS.BANNER}
+        unitId={bannerUnitId}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
         onAdLoaded={() => {
           setIsLoaded(true);

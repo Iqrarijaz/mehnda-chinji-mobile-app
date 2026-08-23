@@ -31,6 +31,14 @@ export default function DrawerLayout() {
                         title: 'Main App',
                         drawerItemStyle: isAuthenticated ? {} : { display: 'none' } }}
                 />
+                <Drawer.Screen
+                    name="cricket/index"
+                    options={{
+                        drawerLabel: 'Cricket Hub',
+                        title: 'Cricket Hub',
+                        drawerItemStyle: { display: 'none' }
+                    }}
+                />
             </Drawer>
         </View>
     );

@@ -21,8 +21,7 @@ export interface RateTrendsSheetProps {
     onDismiss?: () => void;
 }
 
-const CONTENT_H_PADDING = 20;
-const CARD_PADDING = 14;
+const CONTENT_H_PADDING = 12;
 
 /**
  * Shared `@gorhom/bottom-sheet` trend sheet used by both the Currency and
@@ -34,7 +33,8 @@ export const RateTrendsSheet = forwardRef<BottomSheetModal, RateTrendsSheetProps
         const { theme } = useTheme();
         const colors = Colors[theme];
         const { width: windowWidth } = useWindowDimensions();
-        const chartWidth = windowWidth - CONTENT_H_PADDING * 2 - CARD_PADDING * 2;
+        // Graph takes full card width from right to left (+16 accounts for chart-kit axis offset)
+        const chartWidth = windowWidth - CONTENT_H_PADDING * 2 + 16;
 
         const handleClose = useCallback(() => {
             (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
@@ -54,7 +54,7 @@ export const RateTrendsSheet = forwardRef<BottomSheetModal, RateTrendsSheetProps
                 enableDynamicSizing
                 backdropComponent={renderBackdrop}
                 backgroundStyle={{ backgroundColor: colors.background }}
-                handleIndicatorStyle={{ backgroundColor: colors.secondary, width: 40 }}
+                handleIndicatorStyle={{ backgroundColor: colors.secondary, width: 36 }}
                 enablePanDownToClose
                 onDismiss={onDismiss}
             >
@@ -80,7 +80,7 @@ export const RateTrendsSheet = forwardRef<BottomSheetModal, RateTrendsSheetProps
                             style={[styles.closeButton, { backgroundColor: colors.cardBg }]}
                             hitSlop={8}
                         >
-                            <Ionicons name="close" size={20} color={colors.text} />
+                            <Ionicons name="close" size={18} color={colors.text} />
                         </TouchableOpacity>
                     </View>
 
@@ -91,7 +91,7 @@ export const RateTrendsSheet = forwardRef<BottomSheetModal, RateTrendsSheetProps
                             </View>
                         ) : isError ? (
                             <View style={styles.loadingWrap}>
-                                <Ionicons name="cloud-offline-outline" size={26} color={colors.textSecondary} />
+                                <Ionicons name="cloud-offline-outline" size={24} color={colors.textSecondary} />
                                 <ThemedText style={[styles.errorText, { color: colors.textSecondary }]}>
                                     Couldn&apos;t load trend data. Please try again later.
                                 </ThemedText>
@@ -111,31 +111,32 @@ RateTrendsSheet.displayName = 'RateTrendsSheet';
 const styles = StyleSheet.create({
     content: {
         paddingHorizontal: CONTENT_H_PADDING,
-        paddingTop: 12,
-        paddingBottom: 28,
+        paddingTop: 4,
+        paddingBottom: 16,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        alignItems: 'center',
+        paddingHorizontal: 2,
     },
     headerLeft: {
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
-        marginRight: 12,
+        marginRight: 8,
     },
     headerText: {
         flex: 1,
-        marginLeft: 12,
+        marginLeft: 10,
     },
     titleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: 6,
     },
     title: {
-        fontSize: 17,
+        fontSize: 16,
         fontWeight: '800',
         flexShrink: 1,
     },
@@ -143,44 +144,46 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        paddingHorizontal: 7,
-        paddingVertical: 3,
+        paddingHorizontal: 6,
+        paddingVertical: 2.5,
         borderRadius: 20,
     },
     liveDot: {
-        width: 5,
-        height: 5,
+        width: 4.5,
+        height: 4.5,
         borderRadius: 2.5,
     },
     liveText: {
-        fontSize: 9,
+        fontSize: 8.5,
         fontWeight: '800',
         letterSpacing: 0.4,
     },
     subtitle: {
-        fontSize: 12.5,
-        marginTop: 3,
+        fontSize: 11.5,
+        marginTop: 2,
     },
     closeButton: {
-        width: 34,
-        height: 34,
-        borderRadius: 17,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
     },
     chartCard: {
-        borderRadius: Layout.cardBorderRadius,
-        padding: CARD_PADDING,
-        marginTop: 18,
+        borderRadius: Layout.borderRadius,
+        paddingVertical: 8,
+        paddingHorizontal: 0,
+        marginTop: 10,
+        overflow: 'hidden',
     },
     loadingWrap: {
-        height: 170,
+        height: 140,
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 8,
+        gap: 6,
     },
     errorText: {
-        fontSize: 12.5,
+        fontSize: 11.5,
         textAlign: 'center',
     },
 });

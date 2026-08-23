@@ -29,6 +29,7 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
     { label: 'Home', icon: 'home-outline', route: '/(drawer)/(tabs)', section: 'Main' },
+    // { label: 'Cricket Hub', icon: 'trophy-outline', route: '/(drawer)/cricket', section: 'Main' },
     { label: 'Bazaar', icon: 'storefront-outline', route: '/(drawer)/(tabs)/marketplace', section: 'Main' },
     { label: 'Business', icon: 'briefcase-outline', route: '/(drawer)/(tabs)/business', section: 'Main' },
     { label: 'Profile', icon: 'person-outline', route: '/profile', section: 'Account' },
@@ -292,7 +293,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                     <Ionicons name="log-out-outline" size={18} color={colors.secondary} style={{ marginRight: 8 }} />
                     <ThemedText style={[styles.logoutText, { color: colors.secondary }]}>Sign Out</ThemedText>
                 </TouchableOpacity>
-                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.7'}</ThemedText>
+                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.8'}</ThemedText>
             </View>
             <LoaderOverlay visible={isLoggingOut} text="Logging out..." />
         </View>
