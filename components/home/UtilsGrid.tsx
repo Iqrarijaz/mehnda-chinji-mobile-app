@@ -1,115 +1,49 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
+import { resolveIcon, useHomePageConfig } from '@/hooks/useHomePageConfig';
 import { CategoryCard } from './CategoryCard';
 
-interface UtilItem {
-    id: string;
-    label: string;
-    image?: any;
-    icon?: React.ComponentProps<typeof Ionicons>['name'];
-    route: string;
-}
-
-interface UtilCategory {
-    id: string;
-    title: string;
-    items: UtilItem[];
-}
-
-const CATEGORIES: UtilCategory[] = [
-    {
-        id: 'islamic',
-        title: 'Islamic Utilities',
-        items: [
-            {
-                id: 'quran',
-                label: 'Quran',
-                image: require('@/assets/icons/quran_icon.webp'),
-                route: '/quran'
-            },
-            {
-                id: 'prayers',
-                label: 'Prayers',
-                image: require('@/assets/icons/prayer_icon.webp'),
-                route: '/prayerTimes'
-            },
-            {
-                id: 'qibla',
-                label: 'Qibla',
-                image: require('@/assets/icons/qibla.webp'),
-                route: '/qibla'
-            },
-        ]
-    },
-    {
-        id: 'finance',
-        title: 'Finance & Rates',
-        items: [
-            {
-                id: 'currency',
-                label: 'Currency',
-                image: require('@/assets/icons/currency.webp'),
-                route: '/currency'
-            },
-            {
-                id: 'metals',
-                label: 'Metals & Gold',
-                image: require('@/assets/icons/gold_rate.webp'),
-                route: '/metals'
-            },
-            {
-                id: 'fuel',
-                label: 'Fuel Prices',
-                image: require('@/assets/icons/fuel.webp'),
-                route: '/fuel'
-            },
-        ]
-    },
-    // {
-    //     id: 'sports',
-    //     title: 'Local Sports & Community',
-    //     items: [
-    //         {
-    //             id: 'cricket',
-    //             label: 'Cricket Hub',
-    //             icon: 'trophy-outline',
-    //             route: '/cricket'
-    //         },
-    //     ]
-    // },
-];
+/**
+ * Daily Utilities.
+ *
+ * The groups and their items come from the same HOME_PAGE_CONFIG document that
+ * feeds Explore Categories, so admins can reorder them, retitle them, swap
+ * icons, or gate a whole group to specific app versions — the way the Cricket
+ * Hub group ships only to builds that have the screen.
+ */
 
 export const UtilsGrid = React.memo(function UtilsGrid() {
     const router = useRouter();
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    // Only render categories that have items populated
-    const activeCategories = React.useMemo(() => CATEGORIES.filter(cat => cat.items.length > 0), []);
+    // Already filtered to what this build should show, and ordered — a group
+    // left with no visible items is dropped rather than rendered as a bare
+    // heading.
+    const { utilities } = useHomePageConfig();
 
     return (
         <View style={styles.container}>
-            {activeCategories.map((category) => (
-                <View key={category.id} style={styles.categoryContainer}>
+            {utilities.map((group) => (
+                <View key={group.id} style={styles.categoryContainer}>
                     <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-                        {category.title}
+                        {group.title}
                     </ThemedText>
                     {/* Same CategoryCard used by "Explore Categories" — same rounded
                         card, icon tile, and label treatment across the Home screen. */}
                     <View style={styles.grid}>
-                        {category.items.map((util) => (
+                        {group.items.map((util) => (
                             <View
                                 key={util.id}
                                 style={styles.gridItem}
                             >
                                 <CategoryCard
                                     label={util.label}
-                                    icon={util.image ?? util.icon}
+                                    icon={resolveIcon(util)}
                                     onPress={() => router.push(util.route as any)}
                                 />
                             </View>
