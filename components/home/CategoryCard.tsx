@@ -9,17 +9,29 @@ import { Layout } from '@/constants/layout';
 
 interface CategoryCardProps {
     label: string;
+    /**
+     * A bundled asset (the number `require` returns), a remote image as
+     * `{ uri }`, or an Ionicons name. The home layout is admin-editable, so any
+     * of the three can arrive for the same card.
+     */
     icon: any;
     onPress: () => void;
     isSelected?: boolean;
     compact?: boolean;
 }
 
+/** A remote `{ uri }` and a bundled asset both draw as images; a string is a glyph. */
+function isImageSource(icon: any): boolean {
+    if (typeof icon === 'number') return true;
+    if (icon && typeof icon === 'object' && typeof icon.uri === 'string') return true;
+    return false;
+}
+
 export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, compact }: CategoryCardProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const accentColor = colors.primary;
-    const isImageAsset = typeof icon !== 'string';
+    const isImageAsset = isImageSource(icon);
 
     return (
         <TouchableOpacity

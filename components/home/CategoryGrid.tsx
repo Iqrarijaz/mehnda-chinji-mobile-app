@@ -4,10 +4,12 @@ import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-nat
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { ThemedText } from '@/components/ThemedText';
-import { CATEGORIES_CONFIG, MORE_CATEGORIES_CONFIG, PLACE_CATEGORY_MAPPING } from '@/constants/categories';
+import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
+import { resolveIcon, useHomePageConfig } from '@/hooks/useHomePageConfig';
+import type { HomeConfigItem } from '@/constants/homePageConfig';
 import { CategoryCard } from './CategoryCard';
 
 export const CategoryGrid = React.memo(function CategoryGrid() {
@@ -16,33 +18,38 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
     const { theme } = useTheme();
     const colors = (Colors as any)[theme];
 
-    const handlePress = useCallback((category: string) => {
-        const categoryLabel = PLACE_CATEGORY_MAPPING[category] || category;
+    // Shared with UtilsGrid — one HOME_PAGE_CONFIG request feeds both.
+    const { categories, moreCategories } = useHomePageConfig();
+
+    const handlePress = useCallback((category: HomeConfigItem) => {
+        const categoryLabel = PLACE_CATEGORY_MAPPING[category.id] || category.label || category.id;
         analyticsService.trackEvent(AnalyticsEvents.CATEGORY_CLICKED, {
-            category,
+            category: category.id,
             categoryLabel
         });
-        router.push(`/listing/${category}` as any);
+        // Honour the route the layout configures; fall back to the listing
+        // convention so an entry added without one still navigates.
+        router.push((category.route || `/listing/${category.id}`) as any);
     }, [router]);
 
     return (
         <View style={styles.container}>
             <ThemedText style={styles.sectionTitle}>Explore Categories</ThemedText>
             <View style={styles.grid}>
-                {CATEGORIES_CONFIG.map((cat) => (
+                {categories.map((cat) => (
                     <View
                         key={cat.id}
                         style={styles.gridItem}
                     >
                         <CategoryCard
                             label={cat.label}
-                            icon={cat.icon}
-                            onPress={() => handlePress(cat.id)}
+                            icon={resolveIcon(cat)}
+                            onPress={() => handlePress(cat)}
                         />
                     </View>
                 ))}
 
-                {MORE_CATEGORIES_CONFIG.length > 0 && (
+                {moreCategories.length > 0 && (
                     <View
                         style={styles.gridItem}
                     >
@@ -67,17 +74,17 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                             <ThemedText style={[styles.modalTitle, { color: colors.text }]}>More Categories</ThemedText>
                         </View>
                         <ScrollView contentContainerStyle={styles.modalGrid} showsVerticalScrollIndicator={false}>
-                            {MORE_CATEGORIES_CONFIG.map((cat) => (
+                            {moreCategories.map((cat) => (
                                 <View
                                     key={cat.id}
                                     style={styles.gridItem}
                                 >
                                     <CategoryCard
                                         label={cat.label}
-                                        icon={cat.icon}
+                                        icon={resolveIcon(cat)}
                                         onPress={() => {
                                             setIsModalVisible(false);
-                                            handlePress(cat.id);
+                                            handlePress(cat);
                                         }}
                                     />
                                 </View>
