@@ -2,9 +2,6 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getConfiguration } from '@/apis/public';
 import {
-    CATEGORIES_CONFIG,
-    MORE_CATEGORIES_CONFIG,
-    DEFAULT_UTILITIES_CONFIG,
     CategoryInfo,
     UtilCategoryConfig,
     resolveIcon,
@@ -16,6 +13,9 @@ export interface HomePageConfigData {
     moreCategories: CategoryInfo[];
     utilities: UtilCategoryConfig[];
     isLoading: boolean;
+    isFetching: boolean;
+    isError: boolean;
+    error: any;
     isRefetching: boolean;
     refetch: () => void;
 }
@@ -23,25 +23,35 @@ export interface HomePageConfigData {
 export function useHomePageConfig(): HomePageConfigData {
     const currentVersion = useMemo(() => getCurrentAppVersion(), []);
 
-    const { data, isLoading, isRefetching, refetch } = useQuery({
+    const {
+        data,
+        isLoading,
+        isFetching,
+        isError,
+        error,
+        isRefetching,
+        refetch,
+    } = useQuery({
         queryKey: ['configuration', 'HOME_PAGE_CONFIG'],
         queryFn: async () => {
             const res: any = await getConfiguration('HOME_PAGE_CONFIG');
-            // Support both standard envelope and nested data structures
-            return res?.data?.data || res?.data || res;
+            // Support direct response, standard envelope, and Mongo document shapes
+            const doc = res?.data !== undefined ? res.data : res;
+            const payload = doc?.data !== undefined ? doc.data : doc;
+            return payload;
         },
         staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     });
 
     const parsedConfig = useMemo(() => {
-        const remoteData = data?.data || data;
+        const remoteData = (data?.data !== undefined ? data.data : data) || {};
 
         // --- 1. Explore Categories ---
-        let rawCategories: CategoryInfo[] = CATEGORIES_CONFIG;
-        if (remoteData?.categories && Array.isArray(remoteData.categories) && remoteData.categories.length > 0) {
+        let rawCategories: CategoryInfo[] = [];
+        if (remoteData?.categories && Array.isArray(remoteData.categories)) {
             rawCategories = remoteData.categories.map((cat: any) => ({
                 id: cat.id,
-                label: cat.label || cat.name,
+                label: cat.label || cat.name || '',
                 icon: resolveIcon(cat.icon, cat.id),
                 route: cat.route || `/listing/${cat.id}`,
                 isActive: cat.isActive !== false,
@@ -55,11 +65,11 @@ export function useHomePageConfig(): HomePageConfigData {
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
         // --- 2. More Categories ---
-        let rawMoreCategories: CategoryInfo[] = MORE_CATEGORIES_CONFIG;
+        let rawMoreCategories: CategoryInfo[] = [];
         if (remoteData?.moreCategories && Array.isArray(remoteData.moreCategories)) {
             rawMoreCategories = remoteData.moreCategories.map((cat: any) => ({
                 id: cat.id,
-                label: cat.label || cat.name,
+                label: cat.label || cat.name || '',
                 icon: resolveIcon(cat.icon, cat.id),
                 route: cat.route || `/listing/${cat.id}`,
                 isActive: cat.isActive !== false,
@@ -73,20 +83,20 @@ export function useHomePageConfig(): HomePageConfigData {
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
         // --- 3. Utilities Sections ---
-        let rawUtilities: UtilCategoryConfig[] = DEFAULT_UTILITIES_CONFIG;
-        if (remoteData?.utilities && Array.isArray(remoteData.utilities) && remoteData.utilities.length > 0) {
+        let rawUtilities: UtilCategoryConfig[] = [];
+        if (remoteData?.utilities && Array.isArray(remoteData.utilities)) {
             rawUtilities = remoteData.utilities.map((group: any) => ({
                 id: group.id,
-                title: group.title || group.name,
+                title: group.title || group.name || '',
                 isActive: group.isActive !== false,
                 order: typeof group.order === 'number' ? group.order : 0,
                 appVersions: group.appVersions || [],
                 items: (group.items || []).map((item: any) => ({
                     id: item.id,
-                    label: item.label || item.name,
+                    label: item.label || item.name || '',
                     icon: resolveIcon(item.icon || item.image, item.id),
                     image: resolveIcon(item.image || item.icon, item.id),
-                    route: item.route,
+                    route: item.route || '',
                     isActive: item.isActive !== false,
                     order: typeof item.order === 'number' ? item.order : 0,
                     appVersions: item.appVersions || [],
@@ -115,6 +125,9 @@ export function useHomePageConfig(): HomePageConfigData {
     return {
         ...parsedConfig,
         isLoading,
+        isFetching,
+        isError,
+        error,
         isRefetching,
         refetch,
     };

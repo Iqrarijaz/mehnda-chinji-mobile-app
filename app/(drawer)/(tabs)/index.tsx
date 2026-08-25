@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, RefreshControl } from 'react-native';
 
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { GlobalSearchOverlay } from '@/components/common/GlobalSearchOverlay';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { UtilsGrid } from '@/components/home/UtilsGrid';
 import { HomeHeader } from '@/components/home/HomeHeader';
+import { HomeSkeleton } from '@/components/home/HomeSkeleton';
 import BannerAd from '@/ads/components/BannerAd';
 import { ThemedView } from '@/components/ThemedView';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -16,16 +17,17 @@ import messaging from '@react-native-firebase/messaging';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { useHomePageConfig } from '@/hooks/useHomePageConfig';
-import { RefreshControl } from 'react-native';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const colors = Colors[theme];
-  const { isRefetching, refetch } = useHomePageConfig();
+  const { categories, utilities, isLoading, isRefetching, refetch } = useHomePageConfig();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isSearchActive, setIsSearchActive] = React.useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = React.useState(false);
+
+  const showSkeleton = isLoading && categories.length === 0 && utilities.length === 0;
 
   React.useEffect(() => {
     // Subscribe to marketplace reminders so already registered users receive them
@@ -37,59 +39,68 @@ export default function HomeScreen() {
 
   return (
     <ErrorBoundary>
-    <ThemedView style={styles.container}>
-      {/* Header */}
-      <HomeHeader
-        setIsSearchActive={setIsSearchActive}
-      />
-      <BannerAd placement="home" />
-
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={!isSearchActive}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefetching}
-              onRefresh={refetch}
-              colors={[colors.primary]}
-              tintColor={colors.primary}
-            />
-          }
-        >
-          {/* Categories */}
-          <CategoryGrid />
-
-          {/* Daily Utilities */}
-          <UtilsGrid />
-        </ScrollView>
-
-        {isSearchActive && (
-          <GlobalSearchOverlay
-            searchQuery={searchQuery}
-            onClose={() => setIsSearchActive(false)}
-            onSearchChange={setSearchQuery}
-            topPadding={0}
-            onAction={(action) => {
-              if (action === 'change-password') {
-                setIsPasswordModalVisible(true);
-              }
-            }}
-          />
-        )}
-        <PasswordModal
-          visible={isPasswordModalVisible}
-          onClose={() => setIsPasswordModalVisible(false)}
+      <ThemedView style={styles.container}>
+        {/* Header */}
+        <HomeHeader
+          setIsSearchActive={setIsSearchActive}
         />
-      </View>
-    </ThemedView>
+        <BannerAd placement="home" />
+
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={!isSearchActive}
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefetching}
+                onRefresh={refetch}
+                colors={[colors.primary]}
+                tintColor={colors.primary}
+              />
+            }
+          >
+            {showSkeleton ? (
+              <HomeSkeleton />
+            ) : (
+              <>
+                {/* Dynamic Categories */}
+                <CategoryGrid />
+
+                {/* Dynamic Daily Utilities */}
+                <UtilsGrid />
+              </>
+            )}
+          </ScrollView>
+
+          {isSearchActive && (
+            <GlobalSearchOverlay
+              searchQuery={searchQuery}
+              onClose={() => setIsSearchActive(false)}
+              onSearchChange={setSearchQuery}
+              topPadding={0}
+              onAction={(action) => {
+                if (action === 'change-password') {
+                  setIsPasswordModalVisible(true);
+                }
+              }}
+            />
+          )}
+          <PasswordModal
+            visible={isPasswordModalVisible}
+            onClose={() => setIsPasswordModalVisible(false)}
+          />
+        </View>
+      </ThemedView>
     </ErrorBoundary>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1 },
+    flex: 1,
+  },
   scrollContent: {
-    paddingTop: 0 } });
+    paddingTop: 0,
+  },
+});

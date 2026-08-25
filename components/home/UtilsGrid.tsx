@@ -25,6 +25,10 @@ export const UtilsGrid = React.memo(function UtilsGrid() {
     // heading.
     const { utilities } = useHomePageConfig();
 
+    if (!utilities || utilities.length === 0) {
+        return null;
+    }
+
     return (
         <View style={styles.container}>
             {utilities.map((group) => (

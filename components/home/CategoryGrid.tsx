@@ -31,6 +31,10 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
         router.push((category.route || `/listing/${category.id}`) as any);
     }, [router]);
 
+    if (!categories || categories.length === 0) {
+        return null;
+    }
+
     return (
         <View style={styles.container}>
             <ThemedText style={styles.sectionTitle}>Explore Categories</ThemedText>

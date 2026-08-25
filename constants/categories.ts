@@ -73,15 +73,7 @@ export interface CategoryInfo {
     appVersions?: string[];
 }
 
-export const CATEGORIES_CONFIG: CategoryInfo[] = [
-    { id: 'emergency', label: 'Emergency', icon: require('@/assets/icons/emergency.webp'), route: '/listing/emergency', isActive: true, order: 1, appVersions: [] },
-    { id: 'education', label: 'Education', icon: require('@/assets/icons/education_icon.webp'), route: '/listing/education', isActive: true, order: 2, appVersions: [] },
-    { id: 'religious', label: 'Religious', icon: require('@/assets/icons/religious.webp'), route: '/listing/religious', isActive: true, order: 3, appVersions: [] },
-    { id: 'health', label: 'Health', icon: require('@/assets/icons/health.webp'), route: '/listing/health', isActive: true, order: 4, appVersions: [] },
-    { id: 'govt', label: 'Govt Offices', icon: require('@/assets/icons/govt_office.webp'), route: '/listing/govt', isActive: true, order: 5, appVersions: [] },
-    { id: 'banks', label: 'Banks', icon: require('@/assets/icons/bank.webp'), route: '/listing/banks', isActive: true, order: 6, appVersions: [] },
-    { id: 'travel', label: 'Travel', icon: require('@/assets/icons/travel.webp'), route: '/listing/travel', isActive: true, order: 7, appVersions: [] },
-];
+export const CATEGORIES_CONFIG: CategoryInfo[] = [];
 
 export const MORE_CATEGORIES_CONFIG: CategoryInfo[] = [];
 
@@ -105,100 +97,7 @@ export interface UtilCategoryConfig {
     items: UtilItemConfig[];
 }
 
-export const DEFAULT_UTILITIES_CONFIG: UtilCategoryConfig[] = [
-    {
-        id: 'islamic',
-        title: 'Islamic Utilities',
-        isActive: true,
-        order: 1,
-        appVersions: [],
-        items: [
-            {
-                id: 'quran',
-                label: 'Quran',
-                image: require('@/assets/icons/quran_icon.webp'),
-                route: '/quran',
-                isActive: true,
-                order: 1,
-                appVersions: [],
-            },
-            {
-                id: 'prayers',
-                label: 'Prayers',
-                image: require('@/assets/icons/prayer_icon.webp'),
-                route: '/prayerTimes',
-                isActive: true,
-                order: 2,
-                appVersions: [],
-            },
-            {
-                id: 'qibla',
-                label: 'Qibla',
-                image: require('@/assets/icons/qibla.webp'),
-                route: '/qibla',
-                isActive: true,
-                order: 3,
-                appVersions: [],
-            },
-        ],
-    },
-    {
-        id: 'finance',
-        title: 'Finance & Rates',
-        isActive: true,
-        order: 2,
-        appVersions: [],
-        items: [
-            {
-                id: 'currency',
-                label: 'Currency',
-                image: require('@/assets/icons/currency.webp'),
-                route: '/currency',
-                isActive: true,
-                order: 1,
-                appVersions: [],
-            },
-            {
-                id: 'metals',
-                label: 'Metals & Gold',
-                image: require('@/assets/icons/gold_rate.webp'),
-                route: '/metals',
-                isActive: true,
-                order: 2,
-                appVersions: [],
-            },
-            {
-                id: 'fuel',
-                label: 'Fuel Prices',
-                image: require('@/assets/icons/fuel.webp'),
-                route: '/fuel',
-                isActive: true,
-                order: 3,
-                appVersions: [],
-            },
-        ],
-    },
-    {
-        id: 'sports',
-        title: 'Local Sports & Community',
-        isActive: true,
-        order: 3,
-        appVersions: ['2.0.8', '2.0.9'],
-        items: [
-            {
-                id: 'cricket',
-                label: 'Cricket Hub',
-                icon: 'trophy-outline',
-                route: '/cricket',
-                isActive: true,
-                order: 1,
-                appVersions: ['2.0.8', '2.0.9'],
-            },
-        ],
-    },
-];
+export const DEFAULT_UTILITIES_CONFIG: UtilCategoryConfig[] = [];
 
-export const PLACE_CATEGORIES = CATEGORIES_CONFIG.map((cat) => ({
-    key: cat.label,
-    value: cat.id.toUpperCase(),
-}));
+export const PLACE_CATEGORIES: { key: string; value: string }[] = [];
+
