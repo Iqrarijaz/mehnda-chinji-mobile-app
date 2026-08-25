@@ -116,4 +116,11 @@ const styles = StyleSheet.create({
     countBadgeText: {
         fontSize: 9,
         fontWeight: '800',
-        color: '#FFFFFF' } });
+        color: '#FFFFFF',
+        // ThemedText's base style carries lineHeight 24, which is taller than
+        // this 16px circle — the glyph sat below centre. A tight line box plus
+        // no Android font padding lets justifyContent actually centre it.
+        lineHeight: 11,
+        includeFontPadding: false,
+        textAlign: 'center',
+        textAlignVertical: 'center' } });
