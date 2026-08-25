@@ -10,6 +10,7 @@ import { useSystemPushNotifications } from '@/hooks/notificationHooks/useSystemP
 import { useAppOpenAd } from '@/ads/hooks/useAppOpenAd';
 import { useIsRestoring } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { homePageConfigQueryOptions } from '@/hooks/useHomePageConfig';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
@@ -344,6 +345,13 @@ function RootLayout() {
       <PersistQueryClientProvider
         client={queryClient}
         persistOptions={{ persister: asyncStoragePersister }}
+        // Warm the home layout as the app opens, after restoration so a fresh
+        // cached copy short-circuits the request. Home then paints from cache
+        // instead of mounting and waiting on the network. Fire-and-forget: a
+        // failure here just leaves Home to fetch, and to show what we bundle.
+        onSuccess={() => {
+          queryClient.prefetchQuery(homePageConfigQueryOptions()).catch(() => { });
+        }}
       >
         <GestureHandlerRootView style={{ flex: 1 }}>
           <ThemeProvider>
