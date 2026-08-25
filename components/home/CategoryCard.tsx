@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image } from 'expo-image';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
@@ -56,7 +57,9 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
                         <Image
                             source={resolvedImageSource}
                             style={[styles.imageIcon, compact && styles.imageIconCompact]}
-                            resizeMode="contain"
+                            contentFit="contain"
+                            cachePolicy="memory-disk"
+                            transition={150}
                         />
                     ) : (
                         <Ionicons name={icon as any} size={compact ? 24 : 28} color={accentColor} />

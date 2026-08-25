@@ -4,7 +4,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 
-export const ListingCard = ({ children, style, ...rest }: ViewProps) => {
+export const ListingCard = React.memo(({ children, style, ...rest }: ViewProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -22,7 +22,7 @@ export const ListingCard = ({ children, style, ...rest }: ViewProps) => {
             {children}
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     card: {

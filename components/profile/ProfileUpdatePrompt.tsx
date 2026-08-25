@@ -40,6 +40,7 @@ export const ProfileUpdatePrompt = React.memo(({
                         source={require('@/public/json/edit_profile.json')}
                         autoPlay
                         loop={false}
+                        renderMode="HARDWARE"
                         style={styles.lottie}
                     />
                 </View>

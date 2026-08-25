@@ -18,7 +18,7 @@ interface AyahActionsModalProps {
     onShareImage: () => void;
 }
 
-export function AyahActionsModal({
+export const AyahActionsModal: React.FC<AyahActionsModalProps> = React.memo(({
     visible,
     onClose,
     verseLabel,
@@ -26,7 +26,7 @@ export function AyahActionsModal({
     isBookmarked,
     onToggleBookmark,
     onShareText,
-    onShareImage }: AyahActionsModalProps) {
+    onShareImage }: AyahActionsModalProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -64,7 +64,7 @@ export function AyahActionsModal({
             </TouchableOpacity>
         </Modal>
     );
-}
+});
 
 const styles = StyleSheet.create({
     backdrop: {

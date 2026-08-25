@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { SubmitButton } from '@/components/common/SubmitButton';
@@ -46,7 +47,13 @@ export const TossPanel = React.memo(function TossPanel({ match, onSubmit, isLoad
                 activeOpacity={0.8}
             >
                 {team.logo ? (
-                    <Image source={{ uri: team.logo }} style={styles.teamLogo} />
+                    <Image
+                        source={{ uri: team.logo }}
+                        style={styles.teamLogo}
+                        contentFit="cover"
+                        cachePolicy="memory-disk"
+                        transition={150}
+                    />
                 ) : (
                     <View style={[styles.teamLogo, styles.teamLogoFallback, { backgroundColor: isSelected ? 'rgba(255,255,255,0.25)' : `${colors.primary}1A` }]}>
                         <ThemedText style={[styles.teamInitial, { color: isSelected ? '#FFFFFF' : colors.primary }]}>

@@ -3,9 +3,9 @@ import {
     View,
     TouchableOpacity,
     StyleSheet,
-    Platform,
-    Image
+    Platform
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Device from 'expo-device';
@@ -327,7 +327,13 @@ export const LoginForm = React.memo(function LoginForm() {
                     disabled={formData.googleLoading}
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Image source={require('../../assets/icons/google.webp')} style={{ width: 20, height: 20, marginRight: 8 }} />
+                        <Image
+                            source={require('../../assets/icons/google.webp')}
+                            style={{ width: 20, height: 20, marginRight: 8 }}
+                            contentFit="contain"
+                            cachePolicy="memory-disk"
+                            transition={150}
+                        />
                         <ThemedText style={[styles.loginButtonText, { color: colors.text }]}>Sign in with Google</ThemedText>
                     </View>
                 </TouchableOpacity>

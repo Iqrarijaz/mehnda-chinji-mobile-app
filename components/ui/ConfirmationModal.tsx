@@ -18,7 +18,7 @@ interface GlassConfirmationModalProps {
     type?: 'danger' | 'info';
 }
 
-export const ConfirmationModal: React.FC<GlassConfirmationModalProps> = ({
+export const ConfirmationModal: React.FC<GlassConfirmationModalProps> = React.memo(({
     visible,
     onClose,
     onConfirm,
@@ -73,7 +73,7 @@ export const ConfirmationModal: React.FC<GlassConfirmationModalProps> = ({
             </View>
         </PremiumModal>
     );
-};
+});
 
 const styles = StyleSheet.create({
     modalContent: {

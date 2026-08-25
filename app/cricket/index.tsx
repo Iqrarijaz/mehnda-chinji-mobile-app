@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
     View,
     StyleSheet,
@@ -6,9 +6,11 @@ import {
     RefreshControl,
     TouchableOpacity,
     ScrollView,
-    Platform
+    Platform,
+    BackHandler,
+    PanResponder
 } from 'react-native';
-import { useRouter, useNavigation } from 'expo-router';
+import { useRouter, useNavigation, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DrawerActions } from '@react-navigation/native';
@@ -64,7 +66,29 @@ export default function CricketFeedScreen() {
     } = useMatchesFeedQuery({});
 
     const tournamentsList: Tournament[] = data?.data || [];
-    const allMatches: CricketMatch[] = useMemo(() => matchesData?.data || [], [matchesData]);
+
+    // Map tournament IDs to tournament names
+    const tournamentMap = useMemo(() => {
+        const map = new Map<string, string>();
+        tournamentsList.forEach((t) => {
+            if (t._id && t.name) {
+                map.set(String(t._id), t.name);
+            }
+        });
+        return map;
+    }, [tournamentsList]);
+
+    // Matches sorted with LIVE fixtures always first at top
+    const allMatches: CricketMatch[] = useMemo(() => {
+        const raw = matchesData?.data || [];
+        return [...raw].sort((a, b) => {
+            if (a.status === 'LIVE' && b.status !== 'LIVE') return -1;
+            if (b.status === 'LIVE' && a.status !== 'LIVE') return 1;
+            if (a.status === 'UPCOMING' && b.status !== 'UPCOMING') return -1;
+            if (b.status === 'UPCOMING' && a.status !== 'UPCOMING') return 1;
+            return new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime();
+        });
+    }, [matchesData]);
 
     // The Matches circle lists fixtures; the rest list tournaments.
     const isMatchMode = selectedFilter === 'MATCHES';
@@ -89,26 +113,51 @@ export default function CricketFeedScreen() {
         return list;
     }, [tournamentsList, selectedFilter, searchQuery]);
 
-    // Filter matches based on search query
+    // Filter matches based on search query and preserve LIVE-first sorting
     const filteredMatches = useMemo(() => {
-        if (!searchQuery.trim()) return allMatches;
-        const q = searchQuery.toLowerCase().trim();
-        return allMatches.filter(m =>
-            m.matchTitle.toLowerCase().includes(q) ||
-            m.teamA.name.toLowerCase().includes(q) ||
-            m.teamB.name.toLowerCase().includes(q) ||
-            m.venue.toLowerCase().includes(q)
-        );
-    }, [allMatches, searchQuery]);
+        let list = allMatches;
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase().trim();
+            list = list.filter(m => {
+                const tName = tournamentMap.get(String(m.tournamentId)) || (m.tournamentId as any)?.name || m.tournamentName || '';
+                return (
+                    m.matchTitle.toLowerCase().includes(q) ||
+                    m.teamA.name.toLowerCase().includes(q) ||
+                    m.teamB.name.toLowerCase().includes(q) ||
+                    m.venue.toLowerCase().includes(q) ||
+                    tName.toLowerCase().includes(q)
+                );
+            });
+        }
+        return list;
+    }, [allMatches, searchQuery, tournamentMap]);
 
 
+
+    // Android hardware back handler: navigates cleanly to Home
+    useEffect(() => {
+        const backAction = () => {
+            router.replace('/(drawer)/(tabs)' as any);
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+        return () => backHandler.remove();
+    }, [router]);
+
+    // Edge swipe (left-to-right) pan responder to navigate to Home
+    const panResponder = useMemo(() => PanResponder.create({
+        onMoveShouldSetPanResponder: (_, gestureState) => {
+            return gestureState.dx > 35 && Math.abs(gestureState.dy) < 35 && gestureState.x0 < 90;
+        },
+        onPanResponderRelease: (_, gestureState) => {
+            if (gestureState.dx > 50) {
+                router.replace('/(drawer)/(tabs)' as any);
+            }
+        }
+    }), [router]);
 
     const handleBackPress = useCallback(() => {
-        if (router.canGoBack()) {
-            router.back();
-        } else {
-            router.replace('/(drawer)/(tabs)' as any);
-        }
+        router.replace('/(drawer)/(tabs)' as any);
     }, [router]);
 
     const handleSelectTournament = useCallback((id: string) => {
@@ -197,6 +246,7 @@ export default function CricketFeedScreen() {
                             <CricketMatchCard
                                 key={match._id}
                                 match={match}
+                                tournamentName={tournamentMap.get(String(match.tournamentId)) || (match.tournamentId as any)?.name || match.tournamentName}
                                 onPress={() => handleSelectMatch(match._id)}
                                 canManage={isCricketAdmin}
                                 onPredictWinner={(teamId) => handlePredictWinner(match._id, teamId)}
@@ -249,7 +299,7 @@ export default function CricketFeedScreen() {
                 <SearchBar
                     value={searchQuery}
                     onChangeText={setSearchQuery}
-                    placeholder={isMatchMode ? "Search matches by team, venue..." : "Search tournaments by name, city..."}
+                    placeholder={isMatchMode ? "Search matches by team, venue, tournament..." : "Search tournaments by name, city..."}
                     style={{
                         backgroundColor: colors.cardBg,
                         borderRadius: Layout.borderRadius
@@ -278,13 +328,15 @@ export default function CricketFeedScreen() {
         filteredTournaments.length,
         handleSelectMatch,
         isCricketAdmin,
-        handlePredictWinner
+        handlePredictWinner,
+        tournamentMap
     ]);
 
     const renderMatchListItem = useCallback(({ item }: { item: CricketMatch }) => (
         <View style={styles.matchListItem}>
             <CricketMatchCard
                 match={item}
+                tournamentName={tournamentMap.get(String(item.tournamentId)) || (item.tournamentId as any)?.name || item.tournamentName}
                 onPress={() => handleSelectMatch(item._id)}
                 canManage={isCricketAdmin}
                 onPredictWinner={(teamId) => handlePredictWinner(item._id, teamId)}
@@ -292,11 +344,12 @@ export default function CricketFeedScreen() {
                 fullWidth
             />
         </View>
-    ), [handleSelectMatch, isCricketAdmin, handlePredictWinner]);
+    ), [handleSelectMatch, isCricketAdmin, handlePredictWinner, tournamentMap]);
 
     return (
         <ErrorBoundary>
-            <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
+            <View style={[styles.container, { backgroundColor: colors.background }]} {...panResponder.panHandlers}>
                 {/* Standard Compact Header Bar */}
                 <View
                     style={[
@@ -342,6 +395,11 @@ export default function CricketFeedScreen() {
                         ListHeaderComponent={ListHeader}
                         contentContainerStyle={styles.listContent}
                         showsVerticalScrollIndicator={false}
+                        initialNumToRender={6}
+                        maxToRenderPerBatch={8}
+                        windowSize={5}
+                        updateCellsBatchingPeriod={50}
+                        removeClippedSubviews={Platform.OS === 'android'}
                         refreshControl={
                             <RefreshControl
                                 refreshing={isMatchesRefetching}
@@ -370,6 +428,11 @@ export default function CricketFeedScreen() {
                         ListHeaderComponent={ListHeader}
                         contentContainerStyle={styles.listContent}
                         showsVerticalScrollIndicator={false}
+                        initialNumToRender={6}
+                        maxToRenderPerBatch={8}
+                        windowSize={5}
+                        updateCellsBatchingPeriod={50}
+                        removeClippedSubviews={Platform.OS === 'android'}
                         refreshControl={
                             <RefreshControl
                                 refreshing={isRefetching}
@@ -446,13 +509,13 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     carouselContainer: {
-        paddingHorizontal: 12
+        paddingHorizontal: 0
     },
     circlesSection: {
         marginBottom: 10
     },
     circlesContainer: {
-        paddingHorizontal: 12,
+        paddingHorizontal: 0,
         gap: 12
     },
     circleItem: {
@@ -482,15 +545,15 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     searchSection: {
-        paddingHorizontal: 12,
-        marginBottom: 8
+        paddingHorizontal: 0,
+        marginBottom: 10
     },
     sectionHeaderRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 12,
-        marginBottom: 8
+        paddingHorizontal: 0,
+        marginBottom: 10
     },
     sectionTitle: {
         fontSize: 15.5,

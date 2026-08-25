@@ -4,10 +4,10 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
-    Image,
     Platform,
     KeyboardAvoidingView
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -241,7 +241,13 @@ export default function CreateTournamentScreen() {
                             activeOpacity={0.8}
                         >
                             {bannerImage ? (
-                                <Image source={{ uri: bannerImage }} style={styles.bannerImage} />
+                                <Image
+                                    source={{ uri: bannerImage }}
+                                    style={styles.bannerImage}
+                                    contentFit="cover"
+                                    cachePolicy="memory-disk"
+                                    transition={150}
+                                />
                             ) : (
                                 <View style={styles.bannerPlaceholder}>
                                     <Ionicons name="camera-outline" size={32} color={colors.primary} />

@@ -48,6 +48,7 @@ const ThankYouModalComponent: React.FC<ThankYouModalProps> = ({
                             source={source}
                             autoPlay
                             loop={loop}
+                            renderMode="HARDWARE"
                             style={styles.lottie}
                         />
                     </View>

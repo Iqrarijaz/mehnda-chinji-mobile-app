@@ -4,14 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 /**
  * Bundled home-screen layout.
  *
- * The live layout comes from the HOME_PAGE_CONFIG document, but the app must
- * render a correct home screen before that request lands — on first launch, on
- * a cold start offline, and if the request fails outright. These defaults are
- * that floor, and they mirror the seeded document.
- *
- * They also supply the icons. Every id here owns a bundled asset, so the remote
- * document can leave `icon` empty and still render; a remote URL or an Ionicons
- * name simply takes precedence when one is set.
+ * The live layout comes from the HOME_PAGE_CONFIG document fetched from backend.
+ * These defaults act as a resilient floor before the document lands.
  */
 
 export type {
@@ -22,30 +16,30 @@ export type {
 
 import type { HomePageConfig } from '@/utils/homePageLayout';
 
-/** Anything the card can draw: a bundled asset, a remote URL, or an icon name. */
+/** Anything the card can draw: a remote URL, a bundled asset number, or an icon name. */
 export type ResolvedIcon = number | { uri: string } | ComponentProps<typeof Ionicons>['name'];
 
 /**
- * Bundled asset per id. `require` has to be a literal, so this map is the only
- * place local icons can be looked up by a string coming from the API.
+ * Fallback vector icon per id when backend does not provide a custom remote icon URL.
  */
-export const LOCAL_ICONS: Record<string, number> = {
-    emergency: require('@/assets/icons/emergency.webp'),
-    education: require('@/assets/icons/education_icon.webp'),
-    religious: require('@/assets/icons/religious.webp'),
-    health: require('@/assets/icons/health.webp'),
-    govt: require('@/assets/icons/govt_office.webp'),
-    banks: require('@/assets/icons/bank.webp'),
-    travel: require('@/assets/icons/travel.webp'),
-    quran: require('@/assets/icons/quran_icon.webp'),
-    prayers: require('@/assets/icons/prayer_icon.webp'),
-    qibla: require('@/assets/icons/qibla.webp'),
-    currency: require('@/assets/icons/currency.webp'),
-    metals: require('@/assets/icons/gold_rate.webp'),
-    fuel: require('@/assets/icons/fuel.webp'),
+export const LOCAL_ICONS: Record<string, ComponentProps<typeof Ionicons>['name']> = {
+    emergency: 'warning-outline',
+    education: 'school-outline',
+    religious: 'moon-outline',
+    health: 'medkit-outline',
+    govt: 'business-outline',
+    banks: 'card-outline',
+    travel: 'airplane-outline',
+    quran: 'book-outline',
+    prayers: 'time-outline',
+    qibla: 'compass-outline',
+    currency: 'cash-outline',
+    metals: 'diamond-outline',
+    fuel: 'flame-outline',
+    cricket: 'trophy-outline',
 };
 
-/** Used when an id has neither a remote icon nor a bundled asset. */
+/** Used when an id has neither a remote icon nor a predefined vector icon. */
 export const FALLBACK_ICON: ComponentProps<typeof Ionicons>['name'] = 'apps-outline';
 
 export const DEFAULT_HOME_PAGE_CONFIG: HomePageConfig = {

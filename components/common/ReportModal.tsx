@@ -48,7 +48,7 @@ const REPORT_REASONS = [
     'Other'
 ];
 
-export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
+export const ReportModal = React.memo(forwardRef<ReportModalRef, ReportModalProps>(
     ({ targetId, targetType }, ref) => {
         const { theme, isDark } = useTheme();
         const colors = Colors[theme];
@@ -273,7 +273,7 @@ export const ReportModal = forwardRef<ReportModalRef, ReportModalProps>(
             </BottomSheetModal>
         );
     }
-);
+));
 
 const styles = StyleSheet.create({
     container: {

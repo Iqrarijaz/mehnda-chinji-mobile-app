@@ -18,7 +18,7 @@ interface FuelHeaderProps {
  * screens read as a matched set, with a lime "PSO" badge as this screen's
  * own accent (this screen only ever shows PSO's official pump prices).
  */
-export function FuelHeader({ lastUpdatedLabel }: FuelHeaderProps) {
+export const FuelHeader: React.FC<FuelHeaderProps> = React.memo(({ lastUpdatedLabel }: FuelHeaderProps) => {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -41,7 +41,7 @@ export function FuelHeader({ lastUpdatedLabel }: FuelHeaderProps) {
             </View>
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     header: {

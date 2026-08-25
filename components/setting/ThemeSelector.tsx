@@ -48,8 +48,8 @@ export const ThemeSelector: React.FC = React.memo(() => {
     return (
         <View style={styles.wrap}>
             <View style={styles.labelRow}>
-                <View style={[styles.iconWrap, { backgroundColor: `${colors.primary}14` }]}>
-                    <Ionicons name="contrast-outline" size={20} color={colors.primary} />
+                <View style={styles.iconWrap}>
+                    <Ionicons name="contrast-outline" size={24} color={colors.primary} />
                 </View>
                 <View style={{ flex: 1 }}>
                     <ThemedText style={[styles.label, { color: colors.text }]}>Appearance</ThemedText>
@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
     wrap: { paddingHorizontal: 11, paddingTop: 4, paddingBottom: 14 },
     labelRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
     iconWrap: {
-        width: 38, height: 38, borderRadius: Layout.borderRadius,
-        justifyContent: 'center', alignItems: 'center', marginRight: 14 },
+        width: 32, height: 32,
+        justifyContent: 'center', alignItems: 'center', marginRight: 12 },
     label: { fontSize: 12.5, fontWeight: '600', letterSpacing: -0.1 },
     subtitle: { fontSize: 10.5, fontWeight: '400', marginTop: 1 },
     track: {

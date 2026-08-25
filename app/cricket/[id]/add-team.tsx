@@ -4,10 +4,10 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
-    Image,
     Platform,
     KeyboardAvoidingView
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -229,7 +229,13 @@ export default function AddTeamScreen() {
                                 activeOpacity={0.8}
                             >
                                 {logo ? (
-                                    <Image source={{ uri: logo }} style={styles.logoImage} />
+                                    <Image
+                                        source={{ uri: logo }}
+                                        style={styles.logoImage}
+                                        contentFit="cover"
+                                        cachePolicy="memory-disk"
+                                        transition={150}
+                                    />
                                 ) : (
                                     <View style={styles.logoPlaceholder}>
                                         <Ionicons name="shield-outline" size={26} color={colors.primary} />

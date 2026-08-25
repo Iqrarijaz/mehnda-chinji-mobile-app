@@ -17,7 +17,7 @@ interface MetalsHeaderProps {
  * primary-colored rounded-bottom band so the two "rates" screens read as a
  * matched pair, with a secondary-tinted "24K" badge as this screen's own accent.
  */
-export function MetalsHeader({ lastUpdatedLabel }: MetalsHeaderProps) {
+export const MetalsHeader: React.FC<MetalsHeaderProps> = React.memo(({ lastUpdatedLabel }: MetalsHeaderProps) => {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -40,7 +40,7 @@ export function MetalsHeader({ lastUpdatedLabel }: MetalsHeaderProps) {
             </View>
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     header: {

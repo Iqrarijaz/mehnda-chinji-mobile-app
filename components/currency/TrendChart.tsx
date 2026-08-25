@@ -38,7 +38,7 @@ function formatAxisDate(dateStr: string) {
  * Built on react-native-chart-kit (already used for WeatherHourly) rather
  * than a bespoke chart, to match this app's established charting approach.
  */
-export function TrendChart({ points, width, height = 140 }: TrendChartProps) {
+export const TrendChart: React.FC<TrendChartProps> = React.memo(({ points, width, height = 140 }: TrendChartProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -136,7 +136,7 @@ export function TrendChart({ points, width, height = 140 }: TrendChartProps) {
             </View>
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     emptyWrap: {

@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { View, Modal, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
 
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
@@ -34,7 +35,9 @@ const EmptyFeedBackModalComponent = ({ visible, onClose }: EmptyFeedBackModalPro
                         <Image
                             source={require('@/assets/icons/empty_input.webp')}
                             style={styles.image}
-                            resizeMode="contain"
+                            contentFit="contain"
+                            cachePolicy="memory-disk"
+                            transition={150}
                         />
                     </View>
                     <ThemedText style={[styles.modalSubtitle, { color: colors.textSecondary }]}>

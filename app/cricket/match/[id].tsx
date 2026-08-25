@@ -4,7 +4,6 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
-    Image,
     RefreshControl,
     Platform
 } from 'react-native';
@@ -283,10 +282,49 @@ export default function SpectatorMatchScreen() {
                                         <ThemedText style={styles.overBadgeText}>Ov {o.overNumber}</ThemedText>
                                     </View>
                                     <View style={{ flex: 1 }}>
-                                        <ThemedText style={[styles.bowlerText, { color: colors.text }]}>{o.bowlerName}</ThemedText>
-                                        {o.commentary ? (
-                                            <ThemedText style={[styles.commText, { color: colors.textSecondary }]}>{o.commentary}</ThemedText>
-                                        ) : null}
+                                        <ThemedText style={[styles.bowlerText, { color: colors.text }]}>
+                                            {o.bowlerName}{o.strikerName ? ` • Bat: ${o.strikerName}` : ''}
+                                        </ThemedText>
+                                        {o.balls && o.balls.length > 0 ? (
+                                            <View style={styles.ballsPillRow}>
+                                                {o.balls.map((b, bIdx) => (
+                                                    <View
+                                                        key={b._id || bIdx}
+                                                        style={[
+                                                            styles.miniBallChip,
+                                                            {
+                                                                backgroundColor: b.isWicket
+                                                                    ? colors.danger
+                                                                    : b.isWide
+                                                                    ? '#EAB308'
+                                                                    : b.isNoBall
+                                                                    ? '#F97316'
+                                                                    : b.runs === 4
+                                                                    ? '#3B82F6'
+                                                                    : b.runs === 6
+                                                                    ? '#8B5CF6'
+                                                                    : `${colors.primary}20`
+                                                            }
+                                                        ]}
+                                                    >
+                                                        <ThemedText
+                                                            style={[
+                                                                styles.miniBallText,
+                                                                {
+                                                                    color: b.isWicket || b.isNoBall || b.runs === 4 || b.runs === 6 ? '#FFFFFF' : (b.isWide ? '#000000' : colors.text)
+                                                                }
+                                                            ]}
+                                                        >
+                                                            {b.isWicket ? 'W' : (b.isWide ? (b.runs > 0 ? `Wd+${b.runs}` : 'Wd') : (b.isNoBall ? (b.runs > 0 ? `Nb+${b.runs}` : 'Nb') : String(b.runs)))}
+                                                        </ThemedText>
+                                                    </View>
+                                                ))}
+                                            </View>
+                                        ) : (
+                                            o.commentary ? (
+                                                <ThemedText style={[styles.commText, { color: colors.textSecondary }]}>{o.commentary}</ThemedText>
+                                            ) : null
+                                        )}
                                     </View>
                                     <View style={styles.runsBox}>
                                         <ThemedText style={[styles.runsText, { color: colors.primary }]}>
@@ -463,6 +501,16 @@ const styles = StyleSheet.create({
     overBadgeText: { color: '#FFF', fontSize: 10, fontWeight: '800' },
     bowlerText: { fontSize: 12, fontWeight: '700' },
     commText: { fontSize: 10.5 },
+    ballsPillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
+    miniBallChip: {
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 6,
+        minWidth: 20,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    miniBallText: { fontSize: 9.5, fontWeight: '800' },
     runsBox: { alignItems: 'flex-end' },
     runsText: { fontSize: 12, fontWeight: '800' },
     wktText: { fontSize: 10, fontWeight: '700' },

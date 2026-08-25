@@ -20,14 +20,14 @@ interface ShareAyahCardProps {
  * self-contained (fixed colours) so the exported image looks the same regardless
  * of the viewer's theme.
  */
-export function ShareAyahCard({
+export const ShareAyahCard: React.FC<ShareAyahCardProps> = React.memo(({
     arabic,
     translation,
     surahName,
     surahEnglishName,
     verseNumber,
     primary,
-    lime }: ShareAyahCardProps) {
+    lime }: ShareAyahCardProps) => {
     return (
         <LinearGradient
             colors={[primary, '#0b3b3b']}
@@ -54,7 +54,7 @@ export function ShareAyahCard({
             </View>
         </LinearGradient>
     );
-}
+});
 
 const styles = StyleSheet.create({
     card: {

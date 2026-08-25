@@ -26,7 +26,7 @@ const DailyRow = React.memo(({ day, date, icon, high, low, pop, weekMin, weekMax
                 <ThemedText style={[styles.day, { color: colors.text }]}>{day}</ThemedText>
                 <ThemedText style={[styles.date, { color: colors.textSecondary }]}>{date}</ThemedText>
             </View>
-            <Ionicons name={getIconName(icon) as any} size={20} color={colors.primary} style={{ marginHorizontal: 8 }} />
+            <Ionicons name={getIconName(icon) as any} size={24} color={colors.primary} style={{ marginHorizontal: 8 }} />
             {pop > 0 ? <ThemedText style={[styles.pop, { color: RAIN_BLUE }]}>{pop}%</ThemedText> : <View style={{ width: 40 }} />}
             <View style={styles.temps}>
                 <ThemedText style={[styles.low, { color: colors.textSecondary }]}>{low}°</ThemedText>

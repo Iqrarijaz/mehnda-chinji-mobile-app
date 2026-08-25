@@ -54,7 +54,7 @@ export default function SettingsScreen() {
     const handleCheckUpdate = async () => {
         try {
             const info = await fetchAppVersionInfo();
-            const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.8';
+            const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.9';
             const { isOptional, isMandatory } = checkUpdateStatus(currentVersion, info.latestVersion, info.minRequiredVersion);
             const isAvailable = isOptional || isMandatory;
 
@@ -126,11 +126,11 @@ export default function SettingsScreen() {
                         </SectionCard>
 
                         <SectionCard title="Session" delay={200}>
-                            <SettingRowItem icon="log-out-outline" label="Logout" color="#EF4444" iconColor="#EF4444" iconBg="rgba(239, 68, 68, 0.08)" showChevron={false} onPress={handleLogout} isLast />
+                            <SettingRowItem icon="log-out-outline" label="Logout" color="#EF4444" iconColor="#EF4444" showChevron={false} onPress={handleLogout} isLast />
                         </SectionCard>
 
                         <SectionCard title="Danger Zone" delay={300}>
-                            <SettingRowItem icon="trash-outline" label="Delete Account" subtitle="This action cannot be undone" color="#F87171" iconColor="#F87171" iconBg="rgba(248, 113, 113, 0.08)" showChevron={false} onPress={() => setIsDeleteModalVisible(true)} isLast />
+                            <SettingRowItem icon="trash-outline" label="Delete Account" subtitle="This action cannot be undone" color="#F87171" iconColor="#F87171" showChevron={false} onPress={() => setIsDeleteModalVisible(true)} isLast />
                         </SectionCard>
                     </View>
                 );
@@ -206,7 +206,7 @@ export default function SettingsScreen() {
                             >
                                 <Ionicons
                                     name={tab.icon as any}
-                                    size={16}
+                                    size={18}
                                     color={isActive ? '#FFFFFF' : 'rgba(255,255,255,0.6)'}
                                 />
                                 <ThemedText style={[
@@ -231,7 +231,7 @@ export default function SettingsScreen() {
 
                 {/* Version */}
                 <View style={styles.versionWrap}>
-                    <ThemedText style={[styles.versionText, { color: colors.placeholder }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.8'}</ThemedText>
+                    <ThemedText style={[styles.versionText, { color: colors.placeholder }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.9'}</ThemedText>
                 </View>
             </ScrollView>
 

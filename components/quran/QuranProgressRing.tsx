@@ -16,14 +16,14 @@ interface QuranProgressRingProps {
  * A plain circular progress ring (SVG) with arbitrary center content —
  * used for the Quran completion tracker's "X% complete" display.
  */
-export function QuranProgressRing({
+export const QuranProgressRing: React.FC<QuranProgressRingProps> = React.memo(({
     progress,
     size = 84,
     strokeWidth = 8,
     color,
     trackColor,
     children,
-}: QuranProgressRingProps) {
+}: QuranProgressRingProps) => {
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
     const clamped = Math.max(0, Math.min(1, progress));
@@ -57,7 +57,7 @@ export function QuranProgressRing({
             <View style={styles.center}>{children}</View>
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     center: {

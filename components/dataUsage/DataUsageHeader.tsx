@@ -12,7 +12,7 @@ interface DataUsageHeaderProps {
     onBack: () => void;
 }
 
-export const DataUsageHeader = ({ onReset, onBack }: DataUsageHeaderProps) => {
+export const DataUsageHeader = React.memo(({ onReset, onBack }: DataUsageHeaderProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     return (
@@ -36,7 +36,7 @@ export const DataUsageHeader = ({ onReset, onBack }: DataUsageHeaderProps) => {
             </View>
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

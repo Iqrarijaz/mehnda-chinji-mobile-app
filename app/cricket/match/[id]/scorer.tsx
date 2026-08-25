@@ -47,6 +47,13 @@ export default function OverScorerPanelScreen() {
         if (!bowlingTeamId) return undefined;
         return teams.find((t: Team) => t._id === bowlingTeamId);
     }, [tournamentData, currentInningForRoster]);
+
+    const battingTeam = useMemo(() => {
+        const teams = tournamentData?.data?.teams || [];
+        const battingTeamId = currentInningForRoster?.battingTeamId;
+        if (!battingTeamId) return undefined;
+        return teams.find((t: Team) => t._id === battingTeamId);
+    }, [tournamentData, currentInningForRoster]);
     const canManage = canUserManageTournament(user, match?.tournamentId);
 
     // Permission Guard: Non-admin protection
@@ -205,6 +212,8 @@ export default function OverScorerPanelScreen() {
                                     isLoading={postOverMutation.isPending}
                                     bowlingTeamName={bowlingTeam?.name}
                                     bowlerOptions={bowlingTeam?.players || []}
+                                    battingTeamName={battingTeam?.name}
+                                    batsmanOptions={battingTeam?.players || []}
                                 />
                             ) : null
                         ) : (

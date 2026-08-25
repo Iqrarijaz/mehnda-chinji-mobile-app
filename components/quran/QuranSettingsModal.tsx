@@ -16,7 +16,7 @@ interface FontSliderProps {
 }
 
 /** Pure-JS slider (no native dependency) for the Arabic font size. */
-function FontSlider({ value, onChange, trackColor, fillColor }: FontSliderProps) {
+const FontSlider = React.memo(({ value, onChange, trackColor, fillColor }: FontSliderProps) => {
     const widthRef = useRef(0);
     const onChangeRef = useRef(onChange);
     onChangeRef.current = onChange;
@@ -50,7 +50,7 @@ function FontSlider({ value, onChange, trackColor, fillColor }: FontSliderProps)
             </View>
         </View>
     );
-}
+});
 
 interface QuranSettingsModalProps {
     visible: boolean;
@@ -59,11 +59,11 @@ interface QuranSettingsModalProps {
     onFontSize: (v: number) => void;
 }
 
-export function QuranSettingsModal({
+export const QuranSettingsModal: React.FC<QuranSettingsModalProps> = React.memo(({
     visible,
     onClose,
     fontSize,
-    onFontSize }: QuranSettingsModalProps) {
+    onFontSize }: QuranSettingsModalProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
     const [preview] = useState('إِنَّ ٱللَّهَ مَعَ ٱلصَّٰبِرِينَ');
@@ -125,7 +125,7 @@ export function QuranSettingsModal({
             </TouchableOpacity>
         </Modal>
     );
-}
+});
 
 const styles = StyleSheet.create({
     backdrop: {

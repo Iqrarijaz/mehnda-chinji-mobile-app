@@ -34,8 +34,8 @@ const Tile = React.memo(({ icon, accent, value, label, sub }: TileProps) => {
     const colors = Colors[theme];
     return (
         <View style={styles.tile}>
-            <View style={[styles.iconWrap, { backgroundColor: isDark ? `${accent}26` : `${accent}18` }]}>
-                <Ionicons name={icon} size={18} color={accent} />
+            <View style={styles.iconWrap}>
+                <Ionicons name={icon} size={24} color={accent} />
             </View>
             <View style={{ flex: 1 }}>
                 <ThemedText style={[styles.label, { color: colors.textSecondary }]}>{label}</ThemedText>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
         marginBottom: 14,
         paddingRight: 7 },
     iconWrap: {
-        width: 42, height: 42, borderRadius: Layout.borderRadius,
+        width: 32, height: 32,
         justifyContent: 'center', alignItems: 'center' },
     label: { fontSize: 10, fontWeight: '600' },
     valueRow: { flexDirection: 'row', alignItems: 'baseline', gap: 3, marginTop: 1 },

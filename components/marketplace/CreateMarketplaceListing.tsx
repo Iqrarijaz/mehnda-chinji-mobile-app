@@ -6,9 +6,9 @@ import {
     Platform,
     ScrollView,
     Switch,
-    Image,
     KeyboardAvoidingView,
     TextInput } from 'react-native';
+import { Image } from 'expo-image';
 import Toast from 'react-native-toast-message';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import * as yup from 'yup';
@@ -602,7 +602,13 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll} contentContainerStyle={{ paddingTop: 8, paddingRight: 8, paddingBottom: 8 }}>
                             {formData.images.map((imgUrl, idx) => (
                                 <View key={imgUrl} style={styles.imageThumbnailContainer}>
-                                    <Image source={{ uri: imgUrl }} style={styles.imageThumbnail} />
+                                    <Image
+                                        source={{ uri: imgUrl }}
+                                        style={styles.imageThumbnail}
+                                        contentFit="cover"
+                                        cachePolicy="memory-disk"
+                                        transition={150}
+                                    />
                                     <TouchableOpacity style={styles.removeImageBtn} onPress={() => removeImage(idx)}>
                                         <Ionicons name="close-circle" size={30} color="#EF4444" />
                                     </TouchableOpacity>

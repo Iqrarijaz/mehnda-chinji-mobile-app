@@ -23,7 +23,7 @@ interface QuranGoalModalProps {
 }
 
 /** Simple preset picker for "Complete the Quran in X days". */
-export function QuranGoalModal({ visible, onClose, onSelect, onClearGoal, hasActiveGoal }: QuranGoalModalProps) {
+export const QuranGoalModal: React.FC<QuranGoalModalProps> = React.memo(({ visible, onClose, onSelect, onClearGoal, hasActiveGoal }: QuranGoalModalProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const [selected, setSelected] = useState<number | null>(null);
@@ -85,7 +85,7 @@ export function QuranGoalModal({ visible, onClose, onSelect, onClearGoal, hasAct
             </View>
         </Modal>
     );
-}
+});
 
 const styles = StyleSheet.create({
     overlay: {

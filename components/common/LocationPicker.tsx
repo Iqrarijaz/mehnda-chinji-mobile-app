@@ -371,6 +371,10 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                                     keyExtractor={(item, index) => `${item.latitude}-${item.longitude}-${index}`}
                                     keyboardShouldPersistTaps="handled"
                                     style={[styles.resultsListFS, { backgroundColor: colors.background }]}
+                                    initialNumToRender={5}
+                                    maxToRenderPerBatch={5}
+                                    windowSize={3}
+                                    removeClippedSubviews={Platform.OS === 'android'}
                                     renderItem={({ item }) => (
                                         <TouchableOpacity
                                             style={[styles.resultRow, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', borderBottomWidth: 0 }]}

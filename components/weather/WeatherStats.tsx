@@ -15,8 +15,8 @@ const StatItem = React.memo(({ icon, label, value, accent }: StatItemProps) => {
 
     return (
         <View style={styles.statItem}>
-            <View style={[styles.iconWrap, { backgroundColor: isDark ? `${accent}26` : `${accent}18` }]}>
-                <Ionicons name={icon as any} size={20} color={accent} />
+            <View style={styles.iconWrap}>
+                <Ionicons name={icon as any} size={26} color={accent} />
             </View>
             <ThemedText style={[styles.value, { color: colors.text }]}>{value}</ThemedText>
             <ThemedText style={[styles.label, { color: colors.textSecondary }]}>{label}</ThemedText>
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     grid: { flexDirection: 'row', justifyContent: 'space-between' },
     statItem: { flex: 1, alignItems: 'center', gap: 4 },
     iconWrap: {
-        width: 44, height: 44, borderRadius: Layout.borderRadius,
+        width: 36, height: 36,
         justifyContent: 'center', alignItems: 'center', marginBottom: 4 },
     value: { fontSize: 12.5, fontWeight: '800' },
     label: { fontSize: 10, fontWeight: '600' } });

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { StatusBadge } from '@/components/cricket/StatusBadge';
@@ -47,7 +48,13 @@ export const TournamentCard = React.memo(function TournamentCard({ tournament, o
             {/* Banner Image */}
             <View style={styles.imageContainer}>
                 {tournament.bannerImage ? (
-                    <Image source={{ uri: tournament.bannerImage }} style={styles.bannerImage} resizeMode="cover" />
+                    <Image
+                        source={{ uri: tournament.bannerImage }}
+                        style={styles.bannerImage}
+                        contentFit="cover"
+                        cachePolicy="memory-disk"
+                        transition={150}
+                    />
                 ) : (
                     <View style={[styles.defaultBanner, { backgroundColor: `${colors.primary}1A` }]}>
                         <Ionicons name="trophy-outline" size={36} color={colors.primary} />

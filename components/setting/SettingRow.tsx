@@ -30,8 +30,8 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
     subtitle,
     onPress,
     color,
-    iconColor = '#006666',
-    iconBg = 'rgba(0, 150, 136, 0.08)',
+    iconColor,
+    iconBg,
     showChevron = true,
     isToggle = false,
     toggleValue = false,
@@ -41,6 +41,7 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
     const { theme } = useTheme();
     const colors = Colors[theme];
     const textColor = color || colors.text;
+    const effectiveIconColor = iconColor || colors.primary;
 
     return (
         <TouchableOpacity
@@ -53,8 +54,8 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
             disabled={isToggle}
         >
             <View style={styles.settingRowLeft}>
-                <View style={[styles.settingIconWrap, { backgroundColor: iconBg }]}>
-                    <Ionicons name={icon} size={20} color={iconColor} />
+                <View style={[styles.settingIconWrap, iconBg ? { backgroundColor: iconBg } : undefined]}>
+                    <Ionicons name={icon} size={24} color={effectiveIconColor} />
                 </View>
                 <View style={styles.settingTextWrap}>
                     <ThemedText style={[styles.settingLabel, { color: textColor }]}>{label}</ThemedText>
@@ -87,12 +88,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flex: 1 },
     settingIconWrap: {
-        width: 38,
-        height: 38,
-        borderRadius: Layout.borderRadius,
+        width: 32,
+        height: 32,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 14 },
+        marginRight: 12 },
     settingTextWrap: {
         flex: 1 },
     settingLabel: {

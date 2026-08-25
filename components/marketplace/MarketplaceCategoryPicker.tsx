@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
     SectionList,
     Modal,
@@ -43,7 +43,7 @@ interface SectionData {
     data: CategoryItem[];
 }
 
-export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentCategory, currentType }: MarketplaceCategoryPickerProps) {
+export const MarketplaceCategoryPicker: React.FC<MarketplaceCategoryPickerProps> = React.memo(({ visible, onClose, onSelect, currentCategory, currentType }: MarketplaceCategoryPickerProps) => {
     const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
@@ -185,7 +185,7 @@ export function MarketplaceCategoryPicker({ visible, onClose, onSelect, currentC
             </View>
         </Modal>
     );
-}
+});
 
 const styles = StyleSheet.create({
     modalOverlay: {

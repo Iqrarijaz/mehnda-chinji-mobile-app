@@ -15,7 +15,7 @@ interface EmptyListingStateProps {
     onAdd?: () => void;
 }
 
-const EmptyListingState: React.FC<EmptyListingStateProps> = ({ activeTab, categoryTitle, onAdd }) => {
+const EmptyListingState: React.FC<EmptyListingStateProps> = React.memo(({ activeTab, categoryTitle, onAdd }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -56,7 +56,7 @@ const EmptyListingState: React.FC<EmptyListingStateProps> = ({ activeTab, catego
             )}
         </Animated.View>
     );
-};
+});
 
 export default EmptyListingState;
 

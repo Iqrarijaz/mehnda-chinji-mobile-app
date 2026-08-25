@@ -86,7 +86,7 @@ const WeatherHourly = React.memo(({ data }: WeatherHourlyProps) => {
                             <View key={i} style={[styles.iconCell, { width: chartWidth / data.length }]}>
                                 <Ionicons
                                     name={getIconName(h.icon) as any}
-                                    size={16}
+                                    size={20}
                                     color={i === selectedIndex ? colors.primary : colors.textSecondary}
                                 />
                             </View>

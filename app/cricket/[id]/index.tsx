@@ -4,11 +4,11 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
-    Image,
     FlatList,
     RefreshControl,
     Platform
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -103,7 +103,9 @@ export default function TournamentHubScreen() {
             activeOpacity={0.8}
         >
             <View style={styles.matchHeader}>
-                <ThemedText style={[styles.stageText, { color: colors.primary }]} numberOfLines={1}>{item.matchTitle}</ThemedText>
+                <ThemedText style={[styles.stageText, { color: colors.primary }]} numberOfLines={1}>
+                    {capitalizeString(item.matchTitle)}
+                </ThemedText>
                 <StatusBadge status={item.status} />
             </View>
 
@@ -121,7 +123,7 @@ export default function TournamentHubScreen() {
                     </ThemedText>
                 ) : (
                     <ThemedText style={[styles.venueText, { color: colors.textSecondary }]} numberOfLines={1}>
-                        {item.venue} • Max {item.maxOvers} Overs
+                        📍 {capitalizeString(item.venue)} • Max {item.maxOvers} Overs
                     </ThemedText>
                 )}
                 {canManage && (
@@ -273,6 +275,10 @@ export default function TournamentHubScreen() {
                                     keyExtractor={(item) => item._id}
                                     renderItem={renderMatchItem}
                                     scrollEnabled={false}
+                                    initialNumToRender={6}
+                                    maxToRenderPerBatch={8}
+                                    windowSize={5}
+                                    removeClippedSubviews={Platform.OS === 'android'}
                                 />
                             ) : (
                                 <View style={styles.emptyBox}>
@@ -299,7 +305,13 @@ export default function TournamentHubScreen() {
                                 tournament.teams.map((t: Team, idx: number) => (
                                     <View key={t._id || idx} style={[styles.teamTile, { backgroundColor: colors.cardBg }]}>
                                         {t.logo ? (
-                                            <Image source={{ uri: t.logo }} style={styles.logoCircle} />
+                                            <Image
+                                                source={{ uri: t.logo }}
+                                                style={styles.logoCircle}
+                                                contentFit="cover"
+                                                cachePolicy="memory-disk"
+                                                transition={150}
+                                            />
                                         ) : (
                                             <View style={[styles.logoCircle, styles.logoFallback, { backgroundColor: `${colors.primary}20` }]}>
                                                 <ThemedText style={[styles.logoText, { color: colors.primary }]}>{t.shortName}</ThemedText>

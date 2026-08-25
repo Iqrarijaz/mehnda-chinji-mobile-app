@@ -293,7 +293,7 @@ const CustomDrawerContentComponent = (props: DrawerContentComponentProps) => {
                     <Ionicons name="log-out-outline" size={18} color={colors.secondary} style={{ marginRight: 8 }} />
                     <ThemedText style={[styles.logoutText, { color: colors.secondary }]}>Sign Out</ThemedText>
                 </TouchableOpacity>
-                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.8'}</ThemedText>
+                <ThemedText style={[styles.versionText, { color: colors.textSecondary }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.9'}</ThemedText>
             </View>
             <LoaderOverlay visible={isLoggingOut} text="Logging out..." />
         </View>

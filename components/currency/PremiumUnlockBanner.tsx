@@ -17,7 +17,7 @@ interface PremiumUnlockBannerProps {
  * Sticky bottom banner offering the "watch a rewarded ad to unlock all
  * 160+ currencies for 24h" upgrade. Shown only while the free tier is active.
  */
-export function PremiumUnlockBanner({ onPress, isAdLoaded, isAdShowing }: PremiumUnlockBannerProps) {
+export const PremiumUnlockBanner: React.FC<PremiumUnlockBannerProps> = React.memo(({ onPress, isAdLoaded, isAdShowing }: PremiumUnlockBannerProps) => {
     return (
         <Animated.View entering={FadeInUp.duration(400)} style={styles.wrapper}>
             <TouchableOpacity
@@ -56,7 +56,7 @@ export function PremiumUnlockBanner({ onPress, isAdLoaded, isAdShowing }: Premiu
             </TouchableOpacity>
         </Animated.View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     wrapper: {

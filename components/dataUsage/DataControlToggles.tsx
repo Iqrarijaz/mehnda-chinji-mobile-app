@@ -15,7 +15,7 @@ interface ToggleRowProps {
     colors: typeof Colors.light;
 }
 
-const ToggleRow = ({ label, description, value, onValueChange, delay, colors }: ToggleRowProps) => {
+const ToggleRow = React.memo(({ label, description, value, onValueChange, delay, colors }: ToggleRowProps) => {
     return (
         <Animated.View entering={SlideInLeft.delay(delay).duration(450)} style={styles.row}>
             <View style={styles.textContainer}>
@@ -31,9 +31,9 @@ const ToggleRow = ({ label, description, value, onValueChange, delay, colors }: 
             />
         </Animated.View>
     );
-};
+});
 
-export const DataControlToggles = ({
+export const DataControlToggles = React.memo(({
     settings,
     onToggle
 }: {
@@ -78,7 +78,7 @@ export const DataControlToggles = ({
             </View>
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

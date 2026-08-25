@@ -7,7 +7,7 @@ import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
-export const DataUsageEmptyState = () => {
+export const DataUsageEmptyState = React.memo(() => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     return (
@@ -21,7 +21,7 @@ export const DataUsageEmptyState = () => {
             </ThemedText>
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

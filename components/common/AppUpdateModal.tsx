@@ -59,6 +59,7 @@ export const AppUpdateModal = React.memo(({
                             source={require('@/public/json/loading.json')}
                             autoPlay
                             loop
+                            renderMode="HARDWARE"
                             style={styles.lottie}
                         />
                     </View>

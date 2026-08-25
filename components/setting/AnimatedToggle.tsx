@@ -17,7 +17,7 @@ interface AnimatedToggleProps {
     primaryColor?: string;
 }
 
-export const AnimatedToggle: React.FC<AnimatedToggleProps> = ({
+export const AnimatedToggle: React.FC<AnimatedToggleProps> = React.memo(({
     value,
     onValueChange,
     primaryColor = '#006666' }) => {
@@ -42,7 +42,7 @@ export const AnimatedToggle: React.FC<AnimatedToggleProps> = ({
             </Animated.View>
         </TouchableOpacity>
     );
-};
+});
 
 const styles = StyleSheet.create({
     toggleTrack: {

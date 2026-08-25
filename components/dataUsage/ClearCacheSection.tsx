@@ -7,7 +7,7 @@ import { Layout } from '@/constants/layout';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 
-export const ClearCacheSection = ({ onClear }: { onClear: () => Promise<void> }) => {
+export const ClearCacheSection = React.memo(({ onClear }: { onClear: () => Promise<void> }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const [clearing, setClearing] = useState(false);
@@ -46,7 +46,7 @@ export const ClearCacheSection = ({ onClear }: { onClear: () => Promise<void> })
             </View>
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

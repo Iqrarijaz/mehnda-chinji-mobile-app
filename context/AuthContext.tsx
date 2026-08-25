@@ -83,16 +83,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [router]);
 
     const login = useCallback(async (payload: any) => {
-        // Handle nested data if present
-        const source = payload.data || payload;
-        const userData = source.userData || (source.id ? source : null);
-
-        if (!userData) {
-            console.error('Invalid login data - userData not found');
+        if (!payload) {
+            console.error('Invalid login data - payload is null or undefined');
             return;
         }
 
-        const authData = { user: userData, token: source.token || payload.token };
+        let parsed = payload;
+        if (typeof parsed === 'string') {
+            try {
+                parsed = JSON.parse(parsed);
+            } catch (e) {
+                console.error('Failed to parse login response string:', e);
+            }
+        }
+
+        // Handle nested data if present
+        const source = parsed.data || parsed;
+        const userData = source.userData || source.user || (source._id || source.id ? source : null);
+        const token = source.token || parsed.token;
+
+        if (!userData || !token) {
+            console.error('Invalid login data - userData or token not found', { parsed, source });
+            return;
+        }
+
+        const authData = { user: userData, token };
         // Cache token in memory — interceptor reads from here, no more disk I/O per request
         if (authData.token) tokenCache.set(authData.token);
         setUser(authData);

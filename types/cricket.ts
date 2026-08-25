@@ -105,10 +105,30 @@ export interface Tournament {
     updatedAt?: string;
 }
 
+export interface BallRecord {
+    _id?: string;
+    ballNumber: number;
+    strikerName?: string;
+    nonStrikerName?: string;
+    bowlerName?: string;
+    runs: number;
+    isWicket?: boolean;
+    isWide?: boolean;
+    isNoBall?: boolean;
+    isBye?: boolean;
+    isLegBye?: boolean;
+    wicketType?: string;
+    totalRuns: number;
+    commentary?: string;
+}
+
 export interface OverRecord {
     _id?: string;
     overNumber: number;
     bowlerName: string;
+    strikerName?: string;
+    nonStrikerName?: string;
+    batsmanName?: string;
     runsScored: number;
     wickets: number;
     extras: {
@@ -116,6 +136,7 @@ export interface OverRecord {
         noBalls: number;
         byesLegByes: number;
     };
+    balls?: BallRecord[];
     commentary?: string;
 }
 
@@ -140,7 +161,8 @@ export interface PredictionsSummary {
 
 export interface CricketMatch {
     _id: string;
-    tournamentId: string;
+    tournamentId: string | { _id: string; name: string; venue?: string; city?: string };
+    tournamentName?: string;
     matchTitle: string;
     stage: MatchStage;
     teamA: {

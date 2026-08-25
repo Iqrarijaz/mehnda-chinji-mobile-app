@@ -7,7 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import React, { memo, useState } from 'react';
-import { Alert, Image, Linking, StyleSheet, View } from 'react-native';
+import { Alert, Linking, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { ActionMenu, ActionMenuItem } from '../common/ActionMenu';
@@ -168,7 +169,13 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
                 {/* Listing Image */}
                 {item.images && item.images.length > 0 ? (
                     <View style={styles.imageContainer}>
-                        <Image source={{ uri: item.images[0] }} style={styles.image} resizeMode="cover" />
+                        <Image
+                            source={{ uri: item.images[0] }}
+                            style={styles.image}
+                            contentFit="cover"
+                            cachePolicy="memory-disk"
+                            transition={150}
+                        />
                         {(isOwner && showActions) && renderStatusBadge()}
                         {item.images.length > 1 && (
                             <View style={styles.imageBadge}>

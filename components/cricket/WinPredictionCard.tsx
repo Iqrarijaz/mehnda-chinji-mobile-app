@@ -6,6 +6,7 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { PredictionsSummary } from '@/types/cricket';
+import { capitalizeString } from '@/utils/string';
 
 interface WinPredictionCardProps {
     teamAName: string;
@@ -74,7 +75,7 @@ export const WinPredictionCard = React.memo(function WinPredictionCard({
                 >
                     {isVotedA && <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />}
                     <ThemedText style={[styles.btnText, { color: isVotedA ? '#FFFFFF' : colors.primary }]}>
-                        {teamAName}
+                        {capitalizeString(teamAName)}
                     </ThemedText>
                 </TouchableOpacity>
 
@@ -90,7 +91,7 @@ export const WinPredictionCard = React.memo(function WinPredictionCard({
                 >
                     {isVotedB && <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />}
                     <ThemedText style={[styles.btnText, { color: isVotedB ? '#FFFFFF' : colors.secondary }]}>
-                        {teamBName}
+                        {capitalizeString(teamBName)}
                     </ThemedText>
                 </TouchableOpacity>
             </View>

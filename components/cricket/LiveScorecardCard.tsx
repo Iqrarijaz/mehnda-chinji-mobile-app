@@ -7,6 +7,7 @@ import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { CricketMatch, Innings } from '@/types/cricket';
+import { capitalizeString } from '@/utils/string';
 
 interface LiveScorecardCardProps {
     match: CricketMatch;
@@ -35,13 +36,13 @@ export const LiveScorecardCard = React.memo(function LiveScorecardCard({ match }
     };
 
     const teamALine: TeamScoreLine = {
-        name: match.teamA.name,
+        name: capitalizeString(match.teamA.name),
         innings: inningsForTeam(match.teamA.id),
         hasBatted: !!inningsForTeam(match.teamA.id),
         isBatting: currentInning?.battingTeamId === match.teamA.id && match.status === 'LIVE'
     };
     const teamBLine: TeamScoreLine = {
-        name: match.teamB.name,
+        name: capitalizeString(match.teamB.name),
         innings: inningsForTeam(match.teamB.id),
         hasBatted: !!inningsForTeam(match.teamB.id),
         isBatting: currentInning?.battingTeamId === match.teamB.id && match.status === 'LIVE'
@@ -86,7 +87,9 @@ export const LiveScorecardCard = React.memo(function LiveScorecardCard({ match }
             {/* Status Header */}
             <View style={styles.header}>
                 <StatusBadge status={match.status} />
-                <ThemedText style={styles.stageText} numberOfLines={1}>{match.matchTitle}</ThemedText>
+                <ThemedText style={styles.stageText} numberOfLines={1}>
+                    {capitalizeString(match.matchTitle)}
+                </ThemedText>
             </View>
 
             {/* Side-by-side Team Scores */}

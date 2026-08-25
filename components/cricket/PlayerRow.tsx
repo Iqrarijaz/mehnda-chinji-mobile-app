@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { FormInput } from '@/components/common/FormInput';
@@ -43,7 +44,13 @@ export const PlayerRow = React.memo(function PlayerRow({
                     activeOpacity={0.7}
                 >
                     {player.image ? (
-                        <Image source={{ uri: player.image }} style={styles.avatar} />
+                        <Image
+                            source={{ uri: player.image }}
+                            style={styles.avatar}
+                            contentFit="cover"
+                            cachePolicy="memory-disk"
+                            transition={150}
+                        />
                     ) : (
                         <View style={[styles.initialsAvatar, { backgroundColor: `${colors.primary}20` }]}>
                             <ThemedText style={[styles.initialsText, { color: colors.primary }]}>

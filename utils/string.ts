@@ -1,5 +1,9 @@
-export const capitalizeString = (str?: string): string => {
+export const capitalizeString = (str?: string | null): string => {
     if (!str || typeof str !== 'string') return '';
-    const words = str.toLowerCase().split(' ');
-    return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return str
+        .toLowerCase()
+        .trim()
+        .split(/\s+/)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
 };

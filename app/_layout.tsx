@@ -11,6 +11,7 @@ import { useAppOpenAd } from '@/ads/hooks/useAppOpenAd';
 import { useIsRestoring } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { homePageConfigQueryOptions } from '@/hooks/useHomePageConfig';
+import { CRICKET_QUERY_KEYS, getTournamentsFeed } from '@/apis/cricket';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
@@ -123,6 +124,7 @@ function DrawerLayout() {
           <Stack.Screen name="currency" />
           <Stack.Screen name="metals" />
           <Stack.Screen name="fuel" />
+          <Stack.Screen name="cricket" />
           <Stack.Screen name="dataUsage" />
           <Stack.Screen name="manageNotifications" />
           <Stack.Screen name="terms" />
@@ -345,12 +347,15 @@ function RootLayout() {
       <PersistQueryClientProvider
         client={queryClient}
         persistOptions={{ persister: asyncStoragePersister }}
-        // Warm the home layout as the app opens, after restoration so a fresh
-        // cached copy short-circuits the request. Home then paints from cache
-        // instead of mounting and waiting on the network. Fire-and-forget: a
-        // failure here just leaves Home to fetch, and to show what we bundle.
+        // Warm the home layout and cricket feeds as the app opens, after restoration
+        // so fresh cached copies short-circuit the network request.
         onSuccess={() => {
           queryClient.prefetchQuery(homePageConfigQueryOptions()).catch(() => { });
+          queryClient.prefetchQuery({
+            queryKey: CRICKET_QUERY_KEYS.feed({ status: 'ALL', page: 1, limit: 20 }),
+            queryFn: () => getTournamentsFeed({ status: 'ALL', page: 1, limit: 20 }),
+            staleTime: 1000 * 60 * 15,
+          }).catch(() => { });
         }}
       >
         <GestureHandlerRootView style={{ flex: 1 }}>

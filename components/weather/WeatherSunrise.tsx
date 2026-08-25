@@ -20,16 +20,16 @@ const WeatherSunrise = React.memo(({ sunrise, sunset }: WeatherSunriseProps) => 
         ]}>
             <View style={styles.row}>
                 <View style={styles.item}>
-                    <View style={[styles.iconWrap, { backgroundColor: `${colors.secondary}18` }]}>
-                        <Ionicons name="sunny" size={24} color={colors.secondary} />
+                    <View style={styles.iconWrap}>
+                        <Ionicons name="sunny" size={32} color={colors.secondary} />
                     </View>
                     <ThemedText style={[styles.label, { color: colors.textSecondary }]}>Sunrise</ThemedText>
                     <ThemedText style={[styles.time, { color: colors.text }]}>{sunrise}</ThemedText>
                 </View>
                 <View style={[styles.divider, { backgroundColor: colors.border }]} />
                 <View style={styles.item}>
-                    <View style={[styles.iconWrap, { backgroundColor: `${SUNSET_INDIGO}18` }]}>
-                        <Ionicons name="moon" size={22} color={SUNSET_INDIGO} />
+                    <View style={styles.iconWrap}>
+                        <Ionicons name="moon" size={30} color={SUNSET_INDIGO} />
                     </View>
                     <ThemedText style={[styles.label, { color: colors.textSecondary }]}>Sunset</ThemedText>
                     <ThemedText style={[styles.time, { color: colors.text }]}>{sunset}</ThemedText>
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     row: { flexDirection: 'row', alignItems: 'center' },
     item: { flex: 1, alignItems: 'center', gap: 6 },
     iconWrap: {
-        width: 56, height: 56, borderRadius: 28,
+        width: 44, height: 44,
         justifyContent: 'center', alignItems: 'center' },
     divider: { width: 1, height: 76 },
     label: { fontSize: 10.5, fontWeight: '600' },

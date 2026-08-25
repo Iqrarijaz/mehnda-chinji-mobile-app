@@ -24,7 +24,7 @@ interface DeleteAccountModalProps {
     colors: any;
 }
 
-export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible, onClose, colors }) => {
+export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = React.memo(({ visible, onClose, colors }) => {
     const { logout } = useAuth();
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -110,7 +110,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ visible,
         <LoaderOverlay visible={isDeleting} text="Deleting your account..." />
         </>
     );
-};
+});
 
 const styles = StyleSheet.create({
     modalHeader: {

@@ -32,7 +32,7 @@ interface QuranProgressCardProps {
  * line up with Surah ones), and an optional "complete the Quran in X days"
  * goal with a simple on-track/behind indicator.
  */
-export function QuranProgressCard({ surahs }: QuranProgressCardProps) {
+export const QuranProgressCard: React.FC<QuranProgressCardProps> = React.memo(({ surahs }: QuranProgressCardProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
 
@@ -150,7 +150,7 @@ export function QuranProgressCard({ surahs }: QuranProgressCardProps) {
             />
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     card: {

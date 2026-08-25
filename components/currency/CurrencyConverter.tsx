@@ -36,7 +36,7 @@ function formatAmount(value: number): string {
  * of the Currency screen. Uses the already-fetched rates in memory — no
  * extra network calls.
  */
-export function CurrencyConverter({ rates, baseCode, codes, favorites }: CurrencyConverterProps) {
+export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({ rates, baseCode, codes, favorites }: CurrencyConverterProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const pickerRef = useRef<BottomSheetModal>(null);
@@ -159,7 +159,7 @@ export function CurrencyConverter({ rates, baseCode, codes, favorites }: Currenc
             />
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     card: {

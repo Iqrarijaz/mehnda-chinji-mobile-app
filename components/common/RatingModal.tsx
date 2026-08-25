@@ -45,6 +45,7 @@ const RatingModalComponent: React.FC<RatingModalProps> = ({ visible, onClose }) 
                             source={require('@/public/json/rating.json')}
                             autoPlay
                             loop={false}
+                            renderMode="HARDWARE"
                             style={styles.lottie}
                         />
                     </View>

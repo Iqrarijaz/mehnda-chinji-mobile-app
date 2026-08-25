@@ -15,7 +15,7 @@ export function getCurrentAppVersion(): string {
     return (
         Application.nativeApplicationVersion ||
         process.env.EXPO_PUBLIC_APP_VERSION ||
-        '2.0.8'
+        '2.0.9'
     );
 }
 
