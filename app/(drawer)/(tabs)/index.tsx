@@ -22,12 +22,16 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const colors = Colors[theme];
-  const { categories, utilities, isLoading, isRefetching, refetch } = useHomePageConfig();
+  const { categories, utilities, isLoading, isFetching, isRefetching, refetch } = useHomePageConfig();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isSearchActive, setIsSearchActive] = React.useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = React.useState(false);
 
-  const showSkeleton = isLoading && categories.length === 0 && utilities.length === 0;
+  // isLoading alone is false whenever the query is merely paused — restoring
+  // from disk, or offline — so the screen fell through to two grids that render
+  // null on an empty list, i.e. nothing at all with no loader. Skeleton whenever
+  // a fetch is genuinely in flight and there is still nothing to draw.
+  const showSkeleton = (isLoading || isFetching) && categories.length === 0 && utilities.length === 0;
 
   React.useEffect(() => {
     // Subscribe to marketplace reminders so already registered users receive them
