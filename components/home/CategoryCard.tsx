@@ -20,18 +20,25 @@ interface CategoryCardProps {
     compact?: boolean;
 }
 
-/** A remote `{ uri }` and a bundled asset both draw as images; a string is a glyph. */
-function isImageSource(icon: any): boolean {
-    if (typeof icon === 'number') return true;
-    if (icon && typeof icon === 'object' && typeof icon.uri === 'string') return true;
-    return false;
+/** A remote `{ uri }`, string URL, and a bundled asset number all draw as images; otherwise an icon name glyph. */
+function getImageSource(icon: any): any | null {
+    if (typeof icon === 'number') return icon;
+    if (icon && typeof icon === 'object' && typeof icon.uri === 'string') return icon;
+    if (typeof icon === 'string') {
+        const trimmed = icon.trim();
+        if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
+            return { uri: trimmed };
+        }
+    }
+    return null;
 }
 
 export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, compact }: CategoryCardProps) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
     const accentColor = colors.primary;
-    const isImageAsset = isImageSource(icon);
+    const resolvedImageSource = getImageSource(icon);
+    const isImageAsset = resolvedImageSource !== null;
 
     return (
         <TouchableOpacity
@@ -47,7 +54,7 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
                 <View style={[styles.iconContainer, compact && styles.iconContainerCompact, { backgroundColor: isImageAsset ? 'transparent' : accentColor + '12' }]}>
                     {isImageAsset ? (
                         <Image
-                            source={icon}
+                            source={resolvedImageSource}
                             style={[styles.imageIcon, compact && styles.imageIconCompact]}
                             resizeMode="contain"
                         />

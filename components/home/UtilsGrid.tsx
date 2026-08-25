@@ -4,16 +4,15 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
-import { resolveIcon, useHomePageConfig } from '@/hooks/useHomePageConfig';
+import { useHomePageConfig } from '@/hooks/useHomePageConfig';
 import { CategoryCard } from './CategoryCard';
 
 /**
  * Daily Utilities.
  *
- * The groups and their items come from the same HOME_PAGE_CONFIG document that
- * feeds Explore Categories, so admins can reorder them, retitle them, swap
- * icons, or gate a whole group to specific app versions — the way the Cricket
- * Hub group ships only to builds that have the screen.
+ * The groups and their items come from the single HOME_PAGE_CONFIG document that
+ * feeds Explore Categories, allowing administrators to reorder them, retitle them,
+ * toggle icons, or gate items/groups to specific app versions.
  */
 
 export const UtilsGrid = React.memo(function UtilsGrid() {
@@ -43,7 +42,7 @@ export const UtilsGrid = React.memo(function UtilsGrid() {
                             >
                                 <CategoryCard
                                     label={util.label}
-                                    icon={resolveIcon(util)}
+                                    icon={util.icon ?? util.image}
                                     onPress={() => router.push(util.route as any)}
                                 />
                             </View>

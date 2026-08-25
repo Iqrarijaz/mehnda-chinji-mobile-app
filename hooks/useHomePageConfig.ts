@@ -1,97 +1,121 @@
-import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import * as Application from 'expo-application';
-
+import { useQuery } from '@tanstack/react-query';
 import { getConfiguration } from '@/apis/public';
 import {
-    DEFAULT_HOME_PAGE_CONFIG,
-    FALLBACK_ICON,
-    LOCAL_ICONS,
-    type ResolvedIcon,
-} from '@/constants/homePageConfig';
-import {
-    classifyIcon,
-    selectVisibleGroups,
-    selectVisibleItems,
-    type HomeConfigItem,
-    type HomePageConfig,
-} from '@/utils/homePageLayout';
+    CATEGORIES_CONFIG,
+    MORE_CATEGORIES_CONFIG,
+    DEFAULT_UTILITIES_CONFIG,
+    CategoryInfo,
+    UtilCategoryConfig,
+    resolveIcon,
+} from '@/constants/categories';
+import { getCurrentAppVersion, isItemActiveAndSupported } from '@/utils/configVersionFilter';
 
-export { isItemActiveAndSupported } from '@/utils/homePageLayout';
-
-/**
- * The whole home screen from one request.
- *
- * Explore Categories, More Categories and every Daily Utilities group live in a
- * single HOME_PAGE_CONFIG document, so opening Home costs one call instead of
- * one per section. The layout is cached hard — it changes when an admin edits
- * it, not on a timer — and falls back to the bundled defaults while loading,
- * offline, or if the request fails, so the screen is never empty.
- */
-
-const CONFIG_TYPE = 'HOME_PAGE_CONFIG';
-const TWELVE_HOURS = 1000 * 60 * 60 * 12;
-
-export const HOME_PAGE_CONFIG_QUERY_KEY = ['configuration', CONFIG_TYPE] as const;
-
-/**
- * The version this build reports. Prefers the real native version and falls
- * back to the bundled env value, matching how the rest of the app resolves it.
- */
-export function getCurrentAppVersion(): string {
-    return Application.nativeApplicationVersion || process.env.EXPO_PUBLIC_APP_VERSION || '';
+export interface HomePageConfigData {
+    categories: CategoryInfo[];
+    moreCategories: CategoryInfo[];
+    utilities: UtilCategoryConfig[];
+    isLoading: boolean;
+    isRefetching: boolean;
+    refetch: () => void;
 }
 
-/**
- * Pick what the card should draw for an entry.
- *
- * A remote URL wins, then anything else non-empty is treated as an Ionicons
- * name, then the bundled asset for that id, and finally a neutral glyph. This
- * ordering is what lets the document ship `icon: null` and still render.
- */
-export function resolveIcon(item: HomeConfigItem): ResolvedIcon {
-    const classified = classifyIcon(item.icon);
+export function useHomePageConfig(): HomePageConfigData {
+    const currentVersion = useMemo(() => getCurrentAppVersion(), []);
 
-    if (classified.kind === 'remote') return { uri: classified.uri };
-    if (classified.kind === 'name') return classified.name as ResolvedIcon;
-    return LOCAL_ICONS[item.id] ?? FALLBACK_ICON;
-}
-
-export function useHomePageConfig() {
-    const { data, isLoading, refetch } = useQuery({
-        queryKey: HOME_PAGE_CONFIG_QUERY_KEY,
-        queryFn: () => getConfiguration(CONFIG_TYPE),
-        staleTime: TWELVE_HOURS,
-        gcTime: TWELVE_HOURS * 2,
-        refetchOnWindowFocus: false,
+    const { data, isLoading, isRefetching, refetch } = useQuery({
+        queryKey: ['configuration', 'HOME_PAGE_CONFIG'],
+        queryFn: async () => {
+            const res: any = await getConfiguration('HOME_PAGE_CONFIG');
+            // Support both standard envelope and nested data structures
+            return res?.data?.data || res?.data || res;
+        },
+        staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     });
 
-    const version = getCurrentAppVersion();
+    const parsedConfig = useMemo(() => {
+        const remoteData = data?.data || data;
 
-    const config = useMemo<HomePageConfig>(() => {
-        const remote = (data as any)?.data?.data;
-        // Only trust a payload that actually looks like a layout; a half-written
-        // document should fall back rather than blank the home screen.
-        if (remote && Array.isArray(remote.categories)) {
-            return remote as HomePageConfig;
+        // --- 1. Explore Categories ---
+        let rawCategories: CategoryInfo[] = CATEGORIES_CONFIG;
+        if (remoteData?.categories && Array.isArray(remoteData.categories) && remoteData.categories.length > 0) {
+            rawCategories = remoteData.categories.map((cat: any) => ({
+                id: cat.id,
+                label: cat.label || cat.name,
+                icon: resolveIcon(cat.icon, cat.id),
+                route: cat.route || `/listing/${cat.id}`,
+                isActive: cat.isActive !== false,
+                order: typeof cat.order === 'number' ? cat.order : 0,
+                appVersions: cat.appVersions || [],
+            }));
         }
-        return DEFAULT_HOME_PAGE_CONFIG;
-    }, [data]);
 
-    const categories = useMemo(
-        () => selectVisibleItems(config.categories, version),
-        [config.categories, version]
-    );
+        const filteredCategories = rawCategories
+            .filter((cat) => isItemActiveAndSupported(cat, currentVersion))
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-    const moreCategories = useMemo(
-        () => selectVisibleItems(config.moreCategories, version),
-        [config.moreCategories, version]
-    );
+        // --- 2. More Categories ---
+        let rawMoreCategories: CategoryInfo[] = MORE_CATEGORIES_CONFIG;
+        if (remoteData?.moreCategories && Array.isArray(remoteData.moreCategories)) {
+            rawMoreCategories = remoteData.moreCategories.map((cat: any) => ({
+                id: cat.id,
+                label: cat.label || cat.name,
+                icon: resolveIcon(cat.icon, cat.id),
+                route: cat.route || `/listing/${cat.id}`,
+                isActive: cat.isActive !== false,
+                order: typeof cat.order === 'number' ? cat.order : 0,
+                appVersions: cat.appVersions || [],
+            }));
+        }
 
-    const utilities = useMemo(
-        () => selectVisibleGroups(config.utilities, version),
-        [config.utilities, version]
-    );
+        const filteredMoreCategories = rawMoreCategories
+            .filter((cat) => isItemActiveAndSupported(cat, currentVersion))
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-    return { categories, moreCategories, utilities, isLoading, refetch };
+        // --- 3. Utilities Sections ---
+        let rawUtilities: UtilCategoryConfig[] = DEFAULT_UTILITIES_CONFIG;
+        if (remoteData?.utilities && Array.isArray(remoteData.utilities) && remoteData.utilities.length > 0) {
+            rawUtilities = remoteData.utilities.map((group: any) => ({
+                id: group.id,
+                title: group.title || group.name,
+                isActive: group.isActive !== false,
+                order: typeof group.order === 'number' ? group.order : 0,
+                appVersions: group.appVersions || [],
+                items: (group.items || []).map((item: any) => ({
+                    id: item.id,
+                    label: item.label || item.name,
+                    icon: resolveIcon(item.icon || item.image, item.id),
+                    image: resolveIcon(item.image || item.icon, item.id),
+                    route: item.route,
+                    isActive: item.isActive !== false,
+                    order: typeof item.order === 'number' ? item.order : 0,
+                    appVersions: item.appVersions || [],
+                })),
+            }));
+        }
+
+        const filteredUtilities = rawUtilities
+            .filter((group) => isItemActiveAndSupported(group, currentVersion))
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map((group) => ({
+                ...group,
+                items: (group.items || [])
+                    .filter((item) => isItemActiveAndSupported(item, currentVersion))
+                    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+            }))
+            .filter((group) => group.items.length > 0);
+
+        return {
+            categories: filteredCategories,
+            moreCategories: filteredMoreCategories,
+            utilities: filteredUtilities,
+        };
+    }, [data, currentVersion]);
+
+    return {
+        ...parsedConfig,
+        isLoading,
+        isRefetching,
+        refetch,
+    };
 }

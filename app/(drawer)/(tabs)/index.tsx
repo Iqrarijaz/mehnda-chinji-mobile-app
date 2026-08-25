@@ -13,8 +13,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PasswordModal } from '@/components/setting/PasswordModal';
 import messaging from '@react-native-firebase/messaging';
 
+import { useTheme } from '@/context/ThemeContext';
+import { Colors } from '@/constants/colors';
+import { useHomePageConfig } from '@/hooks/useHomePageConfig';
+import { RefreshControl } from 'react-native';
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+  const colors = Colors[theme];
+  const { isRefetching, refetch } = useHomePageConfig();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isSearchActive, setIsSearchActive] = React.useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = React.useState(false);
@@ -41,6 +49,14 @@ export default function HomeScreen() {
           contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]}
           showsVerticalScrollIndicator={false}
           scrollEnabled={!isSearchActive}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={refetch}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
         >
           {/* Categories */}
           <CategoryGrid />

@@ -4,12 +4,11 @@ import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-nat
 
 import { AnalyticsEvents, analyticsService } from '@/analytics';
 import { ThemedText } from '@/components/ThemedText';
-import { PLACE_CATEGORY_MAPPING } from '@/constants/categories';
+import { PLACE_CATEGORY_MAPPING, CategoryInfo } from '@/constants/categories';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import { resolveIcon, useHomePageConfig } from '@/hooks/useHomePageConfig';
-import type { HomeConfigItem } from '@/constants/homePageConfig';
+import { useHomePageConfig } from '@/hooks/useHomePageConfig';
 import { CategoryCard } from './CategoryCard';
 
 export const CategoryGrid = React.memo(function CategoryGrid() {
@@ -18,10 +17,10 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
     const { theme } = useTheme();
     const colors = (Colors as any)[theme];
 
-    // Shared with UtilsGrid — one HOME_PAGE_CONFIG request feeds both.
+    // Shared with UtilsGrid — one single HOME_PAGE_CONFIG request feeds both.
     const { categories, moreCategories } = useHomePageConfig();
 
-    const handlePress = useCallback((category: HomeConfigItem) => {
+    const handlePress = useCallback((category: CategoryInfo) => {
         const categoryLabel = PLACE_CATEGORY_MAPPING[category.id] || category.label || category.id;
         analyticsService.trackEvent(AnalyticsEvents.CATEGORY_CLICKED, {
             category: category.id,
@@ -43,7 +42,7 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                     >
                         <CategoryCard
                             label={cat.label}
-                            icon={resolveIcon(cat)}
+                            icon={cat.icon}
                             onPress={() => handlePress(cat)}
                         />
                     </View>
@@ -81,10 +80,10 @@ export const CategoryGrid = React.memo(function CategoryGrid() {
                                 >
                                     <CategoryCard
                                         label={cat.label}
-                                        icon={resolveIcon(cat)}
+                                        icon={cat.icon}
                                         onPress={() => {
-                                            setIsModalVisible(false);
-                                            handlePress(cat);
+                                             setIsModalVisible(false);
+                                             handlePress(cat);
                                         }}
                                     />
                                 </View>
