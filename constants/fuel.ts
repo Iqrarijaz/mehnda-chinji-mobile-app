@@ -60,3 +60,39 @@ export const OCTANE_PLUS_META: FuelProductMeta = {
 export function getFuelProductMeta(key: string): FuelProductMeta {
     return FUEL_PRODUCTS_META[key] ?? { ...FUEL_PRODUCT_FALLBACK_META, label: key.charAt(0).toUpperCase() + key.slice(1) };
 }
+
+/**
+ * Products offered as tabs on the Fuel screen, in display order.
+ *
+ * A subset of what PSO publishes: these four are what people actually compare.
+ * `octane_plus` sits inline here even though it is priced per city — the screen
+ * shows a representative national figure and a city breakdown alongside it.
+ */
+export const FUEL_TAB_KEYS = ['petrol', OCTANE_PLUS_KEY, 'lpg', 'hsd'] as const;
+
+export type FuelTabKey = (typeof FUEL_TAB_KEYS)[number];
+
+/** Short labels, since the full names do not fit a segmented control. */
+export const FUEL_TAB_SHORT_LABELS: Record<string, string> = {
+    petrol: 'Petrol',
+    [OCTANE_PLUS_KEY]: 'Octane 95',
+    lpg: 'LPG',
+    hsd: 'Diesel',
+};
+
+/** Metadata for any tab key, including the per-city Octane Plus product. */
+export function getFuelTabMeta(key: string): FuelProductMeta {
+    return key === OCTANE_PLUS_KEY ? OCTANE_PLUS_META : getFuelProductMeta(key);
+}
+
+/** LPG is sold by weight, so a cylinder estimate replaces the trend chart. */
+export const LPG_KEY = 'lpg';
+
+/** Standard Pakistani cylinder sizes, used for the LPG estimate card. */
+export const LPG_CYLINDERS = [
+    { id: 'domestic', label: 'Domestic Cylinder', kg: 11.8 },
+    { id: 'commercial', label: 'Commercial Cylinder', kg: 45.4 },
+];
+
+/** Cities surfaced on the Octane Plus card before the full sheet is opened. */
+export const OCTANE_FEATURED_CITIES = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Peshawar', 'Multan'];

@@ -80,11 +80,12 @@ const NotificationHeader = React.memo(({
 export default NotificationHeader;
 
 const styles = StyleSheet.create({
+    // Deliberately background-less, matching the notification bell in
+    // components/common/NotificationIcon so the two header icons read as a pair.
     markBtn: {
         width: 38,
         height: 38,
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center' },
     headerSubtitleWrap: {
