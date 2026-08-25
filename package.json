@@ -99,5 +99,8 @@
     "source-map-explorer": "^2.5.3",
     "typescript": "~5.9.2"
   },
+  "overrides": {
+    "eslint-module-utils": "2.12.1"
+  },
   "private": true
 }
