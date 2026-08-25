@@ -1,4 +1,5 @@
 import * as Application from 'expo-application';
+import Constants from 'expo-constants';
 
 export interface VersionFilterableItem {
     id?: string;
@@ -8,14 +9,22 @@ export interface VersionFilterableItem {
     [key: string]: any;
 }
 
-/**Valid@123
- * Returns the client application version string (e.g. "2.0.8").
+/**
+ * The version this build reports, used to evaluate `appVersions` gates.
+ *
+ * Native binary first, then the bundled env value, then the version declared in
+ * app.json. That last step used to be a hardcoded "2.0.8": harmless while the
+ * app really was 2.0.8, but the moment the release is bumped a build that
+ * cannot read its own version would claim to be the old one and show — or hide
+ * — the wrong version-gated sections. Reading expoConfig keeps it honest,
+ * because that is the same value the release is built from.
  */
 export function getCurrentAppVersion(): string {
     return (
         Application.nativeApplicationVersion ||
         process.env.EXPO_PUBLIC_APP_VERSION ||
-        '2.0.8'
+        Constants.expoConfig?.version ||
+        ''
     );
 }
 

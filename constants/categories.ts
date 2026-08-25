@@ -31,36 +31,51 @@ export const LOCAL_ICONS: Record<string, any> = {
     google: require('@/assets/icons/google.webp'),
 };
 
+/** Drawn when an entry has no icon and its id owns no bundled asset. */
+export const FALLBACK_ICON = 'apps-outline';
+
 /**
- * Resolves an icon identifier into either an image source (require/URI object) or an Ionicons name string.
+ * Resolves a configured icon into an image source or an Ionicons name.
+ *
+ * Order matters, and mirrors what the admin portal offers in its item editor —
+ * "https://… or trophy-outline or local key":
+ *
+ *   1. already-resolved sources (a bundled require, a { uri }) pass through
+ *   2. an http/https/data URL becomes a remote image
+ *   3. a known LOCAL_ICONS key becomes that bundled asset
+ *   4. any other non-empty string is an Ionicons name
+ *   5. only when nothing is configured do we fall back to the id's bundled asset
+ *
+ * Step 4 must come before step 5. Falling back on a non-empty value would mean
+ * an admin typing a glyph name for an id that happens to own bundled artwork —
+ * "flame-outline" on emergency — silently kept the old picture, so the change
+ * looked like it had done nothing.
  */
 export function resolveIcon(icon: any, fallbackKey?: string): any {
-    if (!icon && fallbackKey && LOCAL_ICONS[fallbackKey]) {
-        return LOCAL_ICONS[fallbackKey];
-    }
     if (typeof icon === 'number') {
         return icon;
     }
     if (icon && typeof icon === 'object' && typeof icon.uri === 'string') {
         return icon;
     }
-    if (typeof icon === 'string') {
-        const trimmed = icon.trim();
+
+    const trimmed = typeof icon === 'string' ? icon.trim() : '';
+
+    if (trimmed) {
         if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
             return { uri: trimmed };
         }
         if (LOCAL_ICONS[trimmed]) {
             return LOCAL_ICONS[trimmed];
         }
-        if (fallbackKey && LOCAL_ICONS[fallbackKey]) {
-            return LOCAL_ICONS[fallbackKey];
-        }
-        return trimmed; // Treated as Ionicons name
+        return trimmed; // Ionicons name
     }
+
+    // Nothing configured (null, "", or whitespace): use what the app ships.
     if (fallbackKey && LOCAL_ICONS[fallbackKey]) {
         return LOCAL_ICONS[fallbackKey];
     }
-    return icon;
+    return FALLBACK_ICON;
 }
 
 export interface CategoryInfo {
