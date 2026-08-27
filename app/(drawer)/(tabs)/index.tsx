@@ -48,7 +48,7 @@ export default function HomeScreen() {
         <HomeHeader
           setIsSearchActive={setIsSearchActive}
         />
-        <BannerAd placement="home" />
+        {/* <BannerAd placement="home" /> */}
 
         <View style={{ flex: 1 }}>
           <ScrollView
