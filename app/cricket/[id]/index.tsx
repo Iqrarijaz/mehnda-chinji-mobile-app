@@ -12,11 +12,13 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { PointsTableCard } from '@/components/cricket/PointsTableCard';
+import { KnockoutBracketView } from '@/components/cricket/KnockoutBracketView';
+import { PlayerLeaderboardCard } from '@/components/cricket/PlayerLeaderboardCard';
 import { StatusBadge } from '@/components/cricket/StatusBadge';
+import { CricketTournamentDetailsSkeleton } from '@/components/cricket/skeletons';
 import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -26,7 +28,15 @@ import { useCricketAPI } from '@/hooks/useCricketAPI';
 import { capitalizeString } from '@/utils/string';
 import { CricketMatch, Team, canUserManageTournament } from '@/types/cricket';
 
-type TabType = 'fixtures' | 'teams' | 'standings';
+type TabType = 'fixtures' | 'bracket' | 'teams' | 'standings' | 'leaderboard';
+
+const tabLabels: Record<TabType, string> = {
+    fixtures: 'Fixtures',
+    bracket: 'Playoffs',
+    teams: 'Teams',
+    standings: 'Points Table',
+    leaderboard: 'Leaderboard'
+};
 
 export default function TournamentHubScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -37,6 +47,7 @@ export default function TournamentHubScreen() {
     const { user } = useAuth();
 
     const [activeTab, setActiveTab] = useState<TabType>('fixtures');
+    const [leaderboardType, setLeaderboardType] = useState<'batting' | 'bowling'>('batting');
 
     const { useTournamentDetailsQuery } = useCricketAPI();
     const { data, isLoading, isError, refetch, isRefetching } = useTournamentDetailsQuery(id || '');
@@ -45,7 +56,7 @@ export default function TournamentHubScreen() {
     const matches: CricketMatch[] = data?.matches || [];
 
     const createdById = typeof tournament?.createdBy === 'object' ? tournament?.createdBy?._id : tournament?.createdBy;
-    const canManage = canUserManageTournament(user, id, createdById, tournament?.admins);
+    const canManage = canUserManageTournament(user, id || '', createdById, tournament?.admins);
 
     const handleOpenMatch = useCallback((matchId: string) => {
         router.push(`/cricket/match/${matchId}` as any);
@@ -53,21 +64,16 @@ export default function TournamentHubScreen() {
 
     const buildMatchActions = useCallback((match: CricketMatch): ActionMenuItem[] => [
         {
-            label: 'Score / Manage Match',
-            icon: 'stats-chart-outline',
-            onPress: () => router.push(`/cricket/match/${match._id}/scorer` as any)
-        },
-        {
-            label: 'Edit Match Details',
+            label: 'Score Match (Admin)',
             icon: 'create-outline',
-            onPress: () => router.push(`/cricket/${id}/schedule-match?matchId=${match._id}` as any)
+            onPress: () => router.push(`/cricket/match/${match._id}/scorer` as any)
         },
         {
             label: 'View Match Details',
             icon: 'eye-outline',
             onPress: () => handleOpenMatch(match._id)
         }
-    ], [router, handleOpenMatch, id]);
+    ], [router, handleOpenMatch]);
 
     const buildTeamActions = useCallback((team: Team): ActionMenuItem[] => [
         {
@@ -140,20 +146,9 @@ export default function TournamentHubScreen() {
 
     if (isLoading) {
         return (
-            <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <View style={[styles.compactHeader, { backgroundColor: colors.primary, paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12) }]}>
-                    <View style={styles.topBarContent}>
-                        <TouchableOpacity style={styles.headerIconBtn} onPress={() => router.back()}>
-                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-                        </TouchableOpacity>
-                        <ThemedText style={styles.headerTitle}>Tournament Details</ThemedText>
-                        <View style={{ width: 36 }} />
-                    </View>
-                </View>
-                <View style={styles.centerContainer}>
-                    <ThemedText style={{ color: colors.textSecondary }}>Loading tournament...</ThemedText>
-                </View>
-            </View>
+            <ErrorBoundary>
+                <CricketTournamentDetailsSkeleton />
+            </ErrorBoundary>
         );
     }
 
@@ -178,12 +173,6 @@ export default function TournamentHubScreen() {
             </View>
         );
     }
-
-    const tabLabels: Record<TabType, string> = {
-        fixtures: 'Fixtures',
-        teams: 'Teams',
-        standings: 'Standings'
-    };
 
     return (
         <ErrorBoundary>
@@ -222,7 +211,7 @@ export default function TournamentHubScreen() {
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={styles.tabPillsContainer}
                     >
-                        {(['fixtures', 'teams', 'standings'] as TabType[]).map((tab) => {
+                        {(['fixtures', 'bracket', 'teams', 'standings', 'leaderboard'] as TabType[]).map((tab) => {
                             const isActive = activeTab === tab;
                             return (
                                 <TouchableOpacity
@@ -288,6 +277,15 @@ export default function TournamentHubScreen() {
                         </View>
                     )}
 
+                    {activeTab === 'bracket' && (
+                        <View style={styles.tabContent}>
+                            <KnockoutBracketView
+                                matches={matches}
+                                onSelectMatch={handleOpenMatch}
+                            />
+                        </View>
+                    )}
+
                     {activeTab === 'teams' && (
                         <View style={styles.tabContent}>
                             {canManage && (
@@ -346,6 +344,82 @@ export default function TournamentHubScreen() {
                     {activeTab === 'standings' && (
                         <View style={styles.tabContent}>
                             <PointsTableCard teams={tournament.teams || []} />
+                        </View>
+                    )}
+
+                    {activeTab === 'leaderboard' && (
+                        <View style={styles.tabContent}>
+                            {/* Sub-toggle: Batting (Orange Cap) vs Bowling (Purple Cap) */}
+                            <View style={[styles.leaderboardToggleRow, { backgroundColor: colors.surface }]}>
+                                <TouchableOpacity
+                                    style={[
+                                        styles.leaderboardToggleBtn,
+                                        leaderboardType === 'batting' && { backgroundColor: '#EA580C' }
+                                    ]}
+                                    onPress={() => setLeaderboardType('batting')}
+                                    activeOpacity={0.8}
+                                >
+                                    <ThemedText
+                                        style={[
+                                            styles.leaderboardToggleText,
+                                            { color: leaderboardType === 'batting' ? '#FFFFFF' : colors.textSecondary }
+                                        ]}
+                                    >
+                                        👑 Top Batsmen (Runs)
+                                    </ThemedText>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={[
+                                        styles.leaderboardToggleBtn,
+                                        leaderboardType === 'bowling' && { backgroundColor: '#9333EA' }
+                                    ]}
+                                    onPress={() => setLeaderboardType('bowling')}
+                                    activeOpacity={0.8}
+                                >
+                                    <ThemedText
+                                        style={[
+                                            styles.leaderboardToggleText,
+                                            { color: leaderboardType === 'bowling' ? '#FFFFFF' : colors.textSecondary }
+                                        ]}
+                                    >
+                                        👑 Top Bowlers (Wickets)
+                                    </ThemedText>
+                                </TouchableOpacity>
+                            </View>
+
+                            {/* Players List */}
+                            {leaderboardType === 'batting' ? (
+                                (data?.leaderboard?.topBatsmen && data.leaderboard.topBatsmen.length > 0) ? (
+                                    data.leaderboard.topBatsmen.map((player: any, idx: number) => (
+                                        <PlayerLeaderboardCard
+                                            key={player.name + idx}
+                                            player={player}
+                                            rank={idx + 1}
+                                            type="batting"
+                                        />
+                                    ))
+                                ) : (
+                                    <View style={styles.emptyBox}>
+                                        <ThemedText style={{ color: colors.textSecondary }}>No batting statistics recorded yet.</ThemedText>
+                                    </View>
+                                )
+                            ) : (
+                                (data?.leaderboard?.topBowlers && data.leaderboard.topBowlers.length > 0) ? (
+                                    data.leaderboard.topBowlers.map((player: any, idx: number) => (
+                                        <PlayerLeaderboardCard
+                                            key={player.name + idx}
+                                            player={player}
+                                            rank={idx + 1}
+                                            type="bowling"
+                                        />
+                                    ))
+                                ) : (
+                                    <View style={styles.emptyBox}>
+                                        <ThemedText style={{ color: colors.textSecondary }}>No bowling statistics recorded yet.</ThemedText>
+                                    </View>
+                                )
+                            )}
                         </View>
                     )}
                 </ScrollView>
@@ -426,6 +500,24 @@ const styles = StyleSheet.create({
     logoFallback: { justifyContent: 'center', alignItems: 'center' },
     logoText: { fontSize: 12, fontWeight: '700' },
     teamTileName: { fontSize: 13, fontWeight: '600' },
-    teamTileSub: { fontSize: 11 },
-    emptyBox: { padding: 20, alignItems: 'center' }
+    teamTileSub: { fontSize: 11, marginTop: 2 },
+    emptyBox: { padding: 20, alignItems: 'center' },
+    leaderboardToggleRow: {
+        flexDirection: 'row',
+        borderRadius: 24,
+        padding: 3,
+        marginBottom: 8,
+        gap: 4
+    },
+    leaderboardToggleBtn: {
+        flex: 1,
+        height: 36,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    leaderboardToggleText: {
+        fontSize: 11.5,
+        fontWeight: '800'
+    }
 });

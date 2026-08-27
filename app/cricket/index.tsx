@@ -20,12 +20,17 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { TournamentCard } from '@/components/cricket/TournamentCard';
 import { CricketMatchCard } from '@/components/cricket/CricketMatchCard';
+import { CricketNotificationModal } from '@/components/cricket/CricketNotificationModal';
+import { CricketHubSkeleton } from '@/components/cricket/skeletons';
 import { ActionMenuItem } from '@/components/common/ActionMenu';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useCricketAPI } from '@/hooks/useCricketAPI';
+import { useNotificationStore } from '@/store/notificationStore';
+import { useTooltipStore } from '@/store/tooltipStore';
+import Tooltip from 'react-native-walkthrough-tooltip';
 import { Tournament, CricketMatch, canUserManageTournament } from '@/types/cricket';
 
 interface QuickActionCircle {
@@ -42,16 +47,49 @@ export default function CricketFeedScreen() {
     const router = useRouter();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
-    const { user } = useAuth();
-
-    // Check if user has administrative rights for cricket
-    const isCricketAdmin = !!user?.user?.isCricketAdmin;
+    const { user, isCricketAdmin } = useAuth();
 
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState<string>('MATCHES');
 
+    // Notification topic subscription state
+    const isCricketSubscribed = useNotificationStore(state => state.preferences.cricket ?? true);
+    const isSavingNotification = useNotificationStore(state => state.isSaving);
+    const setPreference = useNotificationStore(state => state.setPreference);
+
+    const [showNotificationModal, setShowNotificationModal] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
+
+    const viewedTooltips = useTooltipStore(state => state.viewedTooltips);
+    const markAsViewed = useTooltipStore(state => state.markAsViewed);
+    const tooltipId = 'cricket-hub-notification-hint';
+
     const { useTournamentsFeedQuery, useMatchesFeedQuery, predictWinnerMutation } = useCricketAPI();
     const { data, isLoading, isError, refetch, isRefetching } = useTournamentsFeedQuery({});
+
+    // First visit onboarding tooltip timer
+    useEffect(() => {
+        if (!viewedTooltips[tooltipId] && !isLoading) {
+            const timer = setTimeout(() => setShowTooltip(true), 600);
+            return () => clearTimeout(timer);
+        }
+    }, [viewedTooltips, isLoading]);
+
+    const handleCloseTooltip = useCallback(() => {
+        markAsViewed(tooltipId);
+        setShowTooltip(false);
+    }, [markAsViewed]);
+
+    const handleOpenNotificationModal = useCallback(() => {
+        if (showTooltip) {
+            handleCloseTooltip();
+        }
+        setShowNotificationModal(true);
+    }, [showTooltip, handleCloseTooltip]);
+
+    const handleToggleCricketNotification = useCallback(() => {
+        setPreference('cricket', !isCricketSubscribed);
+    }, [setPreference, isCricketSubscribed]);
 
     const handlePredictWinner = useCallback((matchId: string, teamId: string) => {
         predictWinnerMutation.mutate({ matchId, predictedTeamId: teamId });
@@ -119,20 +157,16 @@ export default function CricketFeedScreen() {
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase().trim();
             list = list.filter(m => {
-                const tName = tournamentMap.get(String(m.tournamentId)) || (m.tournamentId as any)?.name || m.tournamentName || '';
                 return (
-                    m.matchTitle.toLowerCase().includes(q) ||
+                    m.matchTitle?.toLowerCase().includes(q) ||
                     m.teamA.name.toLowerCase().includes(q) ||
                     m.teamB.name.toLowerCase().includes(q) ||
-                    m.venue.toLowerCase().includes(q) ||
-                    tName.toLowerCase().includes(q)
+                    m.venue.toLowerCase().includes(q)
                 );
             });
         }
         return list;
-    }, [allMatches, searchQuery, tournamentMap]);
-
-
+    }, [allMatches, searchQuery]);
 
     // Android hardware back handler: navigates cleanly to Home
     useEffect(() => {
@@ -182,7 +216,7 @@ export default function CricketFeedScreen() {
         {
             label: 'Register Team',
             icon: 'people-outline',
-            onPress: () => router.push(`/cricket/${tournament._id}/register-team` as any)
+            onPress: () => router.push(`/cricket/${tournament._id}/add-team` as any)
         }
     ], [router]);
 
@@ -234,7 +268,6 @@ export default function CricketFeedScreen() {
 
     const ListHeader = useMemo(() => (
         <View style={styles.headerFeedContainer}>
-            {/* Match Cards Carousel (Horizontal) — hidden in match mode */}
             {!isMatchMode && allMatches.length > 0 ? (
                 <View style={styles.carouselSection}>
                     <ScrollView
@@ -257,7 +290,6 @@ export default function CricketFeedScreen() {
                 </View>
             ) : null}
 
-            {/* Quick Action Highlight Circles */}
             <View style={styles.circlesSection}>
                 <ScrollView
                     horizontal
@@ -294,7 +326,6 @@ export default function CricketFeedScreen() {
                 </ScrollView>
             </View>
 
-            {/* Search Input Bar with Card Background */}
             <View style={styles.searchSection}>
                 <SearchBar
                     value={searchQuery}
@@ -307,7 +338,6 @@ export default function CricketFeedScreen() {
                 />
             </View>
 
-            {/* Section Header */}
             <View style={styles.sectionHeaderRow}>
                 <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
                     {isMatchMode ? 'All Matches' : 'Featured Tournaments'}
@@ -346,11 +376,21 @@ export default function CricketFeedScreen() {
         </View>
     ), [handleSelectMatch, isCricketAdmin, handlePredictWinner, tournamentMap]);
 
+    const isInitialLoading = (isLoading && tournamentsList.length === 0) || (isMatchesLoading && allMatches.length === 0);
+
+    if (isInitialLoading) {
+        return (
+            <ErrorBoundary>
+                <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
+                <CricketHubSkeleton />
+            </ErrorBoundary>
+        );
+    }
+
     return (
         <ErrorBoundary>
             <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
             <View style={[styles.container, { backgroundColor: colors.background }]} {...panResponder.panHandlers}>
-                {/* Standard Compact Header Bar */}
                 <View
                     style={[
                         styles.compactHeader,
@@ -373,15 +413,49 @@ export default function CricketFeedScreen() {
                         {/* Clean Standard Title */}
                         <ThemedText style={styles.headerTitle}>Cricket Hub</ThemedText>
 
-                        {/* Right Actions */}
+                        {/* Right Actions: Notification Bell with Onboarding Tooltip */}
                         <View style={styles.headerRightActions}>
-                            <TouchableOpacity
-                                style={styles.headerIconBtn}
-                                onPress={() => refetch()}
-                                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                            <Tooltip
+                                isVisible={showTooltip}
+                                content={
+                                    <TouchableOpacity
+                                        style={[
+                                            styles.tooltipPill,
+                                            { backgroundColor: theme === 'dark' ? '#1E293B' : '#FFFFFF' }
+                                        ]}
+                                        onPress={handleOpenNotificationModal}
+                                        activeOpacity={0.9}
+                                    >
+                                        <Ionicons name="notifications" size={15} color={colors.primary} />
+                                        <ThemedText style={[styles.tooltipText, { color: colors.text }]}>
+                                            Tap here for match & tournament alerts!
+                                        </ThemedText>
+                                        <TouchableOpacity onPress={handleCloseTooltip} style={styles.tooltipClose}>
+                                            <Ionicons name="close-circle" size={16} color={colors.textSecondary} />
+                                        </TouchableOpacity>
+                                    </TouchableOpacity>
+                                }
+                                placement="bottom"
+                                onClose={handleCloseTooltip}
+                                contentStyle={styles.tooltipContent}
+                                backgroundColor="rgba(0,0,0,0.3)"
                             >
-                                <Ionicons name="refresh-outline" size={20} color="#FFFFFF" />
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.headerIconBtn}
+                                    onPress={handleOpenNotificationModal}
+                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                    activeOpacity={0.7}
+                                >
+                                    <Ionicons
+                                        name={isCricketSubscribed ? "notifications" : "notifications-outline"}
+                                        size={22}
+                                        color="#FFFFFF"
+                                    />
+                                    {isCricketSubscribed && (
+                                        <View style={styles.activeNotificationDot} />
+                                    )}
+                                </TouchableOpacity>
+                            </Tooltip>
                         </View>
                     </View>
                 </View>
@@ -465,6 +539,15 @@ export default function CricketFeedScreen() {
                         <Ionicons name="add-outline" size={24} color="#FFFFFF" />
                     </TouchableOpacity>
                 )}
+
+                {/* Cricket Topic Notification Subscription Modal */}
+                <CricketNotificationModal
+                    visible={showNotificationModal}
+                    onClose={() => setShowNotificationModal(false)}
+                    isSubscribed={isCricketSubscribed}
+                    onToggle={handleToggleCricketNotification}
+                    isSaving={isSavingNotification}
+                />
             </View>
         </ErrorBoundary>
     );
@@ -489,7 +572,8 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        position: 'relative'
     },
     headerTitle: {
         fontSize: 17,
@@ -501,6 +585,42 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4
+    },
+    tooltipContent: {
+        padding: 0,
+        borderRadius: Layout.borderRadius,
+        backgroundColor: 'transparent'
+    },
+    tooltipPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: Layout.borderRadius,
+        gap: 8,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4
+    },
+    tooltipText: {
+        fontSize: 11.5,
+        fontWeight: '700'
+    },
+    tooltipClose: {
+        padding: 2
+    },
+    activeNotificationDot: {
+        position: 'absolute',
+        top: 6,
+        right: 6,
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#10B981',
+        borderWidth: 1.5,
+        borderColor: '#FFFFFF'
     },
     headerFeedContainer: {
         paddingTop: 8

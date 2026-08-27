@@ -2,7 +2,7 @@ import { Colors } from '@/constants/colors';
 import { SocketProvider } from '@/context/SocketContext';
 import * as Notifications from 'expo-notifications';
 import { registerNotificationCategories } from '@/utils/notificationCategories';
-import Sentry from '@/lib/sentry';
+
 import { useSocketNotifications } from '@/hooks/notificationHooks/useSocketNotifications';
 import { usePushNotifications } from '@/hooks/notificationHooks/usePushNotifications';
 import { useFcmNotifications } from '@/hooks/notificationHooks/useFcmNotifications';
@@ -352,8 +352,8 @@ function RootLayout() {
         onSuccess={() => {
           queryClient.prefetchQuery(homePageConfigQueryOptions()).catch(() => { });
           queryClient.prefetchQuery({
-            queryKey: CRICKET_QUERY_KEYS.feed({ status: 'ALL', page: 1, limit: 20 }),
-            queryFn: () => getTournamentsFeed({ status: 'ALL', page: 1, limit: 20 }),
+            queryKey: CRICKET_QUERY_KEYS.feed({ page: 1, limit: 20 }),
+            queryFn: () => getTournamentsFeed({ page: 1, limit: 20 }),
             staleTime: 1000 * 60 * 15,
           }).catch(() => { });
         }}
@@ -385,8 +385,4 @@ function RootLayout() {
   );
 }
 
-const SentryRootLayout = Sentry.wrap(RootLayout);
-
-export default function AppLayout() {
-  return <SentryRootLayout />;
-}
+export default RootLayout;

@@ -85,10 +85,18 @@ const ManageNotificationsScreen = React.memo(function ManageNotificationsScreen(
                     />
                 }
             >
-                <NotificationSectionCard title="General Updates">
-
+                <NotificationSectionCard title="Sports & Community">
                     <NotificationToggleRow
                         index={1}
+                        icon="trophy-outline"
+                        color="#10B981" // Emerald / Cricket Green
+                        label="Cricket Updates"
+                        description="New tournaments, match schedules, and fixture alerts"
+                        value={preferences.cricket}
+                        onValueChange={() => togglePreference('cricket')}
+                    />
+                    <NotificationToggleRow
+                        index={2}
                         icon="business-outline"
                         color="#0D9488" // Teal
                         label="Business Updates"

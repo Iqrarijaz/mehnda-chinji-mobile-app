@@ -1,7 +1,5 @@
 import {
     getRemoteConfig,
-    setConfigSettings,
-    setDefaults,
     fetchAndActivate,
     getValue
 } from '@react-native-firebase/remote-config';
@@ -20,17 +18,16 @@ export const initConfig = async () => {
     try {
         const rc = getRemoteConfig();
         const configKey = __DEV__ ? 'dev_api_base_url' : 'prod_api_url';
-        // Set the fetch interval. In development, we want instant updates (0).
-        // In production, we usually use a higher value (e.g., 3600 seconds / 1 hour).
         const minimumFetchIntervalMillis = __DEV__ ? 0 : 3600000;
-        await setConfigSettings(rc, {
-            minimumFetchIntervalMillis,
-        });
 
-        // Set default values – crucial for reliability
-        await setDefaults(rc, {
+        rc.settings = {
+            minimumFetchIntervalMillis,
+            fetchTimeoutMillis: 60000,
+        };
+
+        rc.defaultConfig = {
             [configKey]: fallbackUrl,
-        });
+        };
 
         // Fetch and activate the latest values from the server
         await fetchAndActivate(rc);

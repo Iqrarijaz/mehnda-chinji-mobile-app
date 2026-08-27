@@ -34,8 +34,7 @@ export default function ScheduleMatchScreen() {
     const colors = Colors[theme];
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { user } = useAuth();
-    const isCricketAdmin = !!user?.user?.isCricketAdmin;
+    const { user, isCricketAdmin } = useAuth();
 
     // Permission Guard
     useEffect(() => {

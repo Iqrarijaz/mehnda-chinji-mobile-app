@@ -1,11 +1,12 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     StyleSheet,
     ScrollView,
     TouchableOpacity,
     RefreshControl,
-    Platform
+    Platform,
+    Image
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +16,8 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ThemedText } from '@/components/ThemedText';
 import { LiveScorecardCard } from '@/components/cricket/LiveScorecardCard';
 import { WinPredictionCard } from '@/components/cricket/WinPredictionCard';
+import { BallTimelineRow } from '@/components/cricket/BallTimelineRow';
+import { CricketMatchDetailsSkeleton } from '@/components/cricket/skeletons';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
@@ -31,6 +34,16 @@ export default function SpectatorMatchScreen() {
     const insets = useSafeAreaInsets();
     const { user } = useAuth();
 
+    const [selectedHistoryInnings, setSelectedHistoryInnings] = useState<1 | 2 | null>(null);
+    const [expandedOvers, setExpandedOvers] = useState<Record<number, boolean>>({});
+
+    const toggleOverExpand = useCallback((overNumber: number) => {
+        setExpandedOvers((prev) => ({
+            ...prev,
+            [overNumber]: !prev[overNumber]
+        }));
+    }, []);
+
     const { useMatchDetailsQuery, useTournamentDetailsQuery, predictWinnerMutation, useLiveMatchSocket } = useCricketAPI();
     const { data, isLoading, isError, refetch, isRefetching } = useMatchDetailsQuery(matchId || '');
 
@@ -39,10 +52,12 @@ export default function SpectatorMatchScreen() {
 
     const match = data?.data;
     const userPrediction = data?.userPrediction;
-    const canManage = canUserManageTournament(user, match?.tournamentId);
+    const canManage = canUserManageTournament(user, (match?.tournamentId as any)?._id ?? match?.tournamentId);
+
 
     // Fetch tournament details to display full player squad
-    const { data: tourneyData } = useTournamentDetailsQuery(match?.tournamentId || '');
+    const tournamentIdStr = (match?.tournamentId as any)?._id || (typeof match?.tournamentId === 'string' ? match?.tournamentId : '');
+    const { data: tourneyData } = useTournamentDetailsQuery(tournamentIdStr);
     const tournament = tourneyData?.data;
 
     const teamAObject = tournament?.teams?.find((t: any) => t._id === match?.teamA?.id || t.name === match?.teamA?.name);
@@ -58,20 +73,9 @@ export default function SpectatorMatchScreen() {
 
     if (isLoading) {
         return (
-            <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <View style={[styles.compactHeader, { backgroundColor: colors.primary, paddingTop: insets.top + (Platform.OS === 'android' ? 8 : 12) }]}>
-                    <View style={styles.topBarContent}>
-                        <TouchableOpacity style={styles.headerIconBtn} onPress={() => router.back()}>
-                            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-                        </TouchableOpacity>
-                        <ThemedText style={styles.headerTitle}>Match Details</ThemedText>
-                        <View style={{ width: 36 }} />
-                    </View>
-                </View>
-                <View style={styles.centerContainer}>
-                    <ThemedText style={{ color: colors.textSecondary }}>Loading match details...</ThemedText>
-                </View>
-            </View>
+            <ErrorBoundary>
+                <CricketMatchDetailsSkeleton />
+            </ErrorBoundary>
         );
     }
 
@@ -97,8 +101,11 @@ export default function SpectatorMatchScreen() {
         );
     }
 
-    const currentInning = match.currentInnings === 1 ? match.innings1 : match.innings2;
-    const oversList: OverRecord[] = currentInning?.overs || [];
+    const activeHistoryInnings = selectedHistoryInnings ?? (match.currentInnings === 2 ? 2 : 1);
+    const innings1Overs: OverRecord[] = match.innings1?.overs || [];
+    const innings2Overs: OverRecord[] = match.innings2?.overs || [];
+    const totalOversRecorded = innings1Overs.length + innings2Overs.length;
+    const activeOversList: OverRecord[] = activeHistoryInnings === 1 ? innings1Overs : innings2Overs;
 
     const getRoleLabel = (p: Player) => {
         switch (p.role) {
@@ -270,74 +277,170 @@ export default function SpectatorMatchScreen() {
                     </View>
 
                     {/* Over-by-Over History List (If match has started) */}
-                    {oversList.length > 0 && (
+                    {totalOversRecorded > 0 && (
                         <View style={styles.overSection}>
-                            <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-                                Inning {match.currentInnings} Over History ({oversList.length})
-                            </ThemedText>
+                            <View style={styles.overSectionHeaderRow}>
+                                <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+                                    Over History
+                                </ThemedText>
 
-                            {oversList.slice().reverse().map((o, idx) => (
-                                <View key={o._id || idx} style={[styles.overRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
-                                    <View style={[styles.overBadge, { backgroundColor: colors.primary }]}>
-                                        <ThemedText style={styles.overBadgeText}>Ov {o.overNumber}</ThemedText>
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <ThemedText style={[styles.bowlerText, { color: colors.text }]}>
-                                            {o.bowlerName}{o.strikerName ? ` • Bat: ${o.strikerName}` : ''}
-                                        </ThemedText>
-                                        {o.balls && o.balls.length > 0 ? (
-                                            <View style={styles.ballsPillRow}>
-                                                {o.balls.map((b, bIdx) => (
-                                                    <View
-                                                        key={b._id || bIdx}
-                                                        style={[
-                                                            styles.miniBallChip,
-                                                            {
-                                                                backgroundColor: b.isWicket
-                                                                    ? colors.danger
-                                                                    : b.isWide
-                                                                    ? '#EAB308'
-                                                                    : b.isNoBall
-                                                                    ? '#F97316'
-                                                                    : b.runs === 4
-                                                                    ? '#3B82F6'
-                                                                    : b.runs === 6
-                                                                    ? '#8B5CF6'
-                                                                    : `${colors.primary}20`
-                                                            }
-                                                        ]}
-                                                    >
-                                                        <ThemedText
-                                                            style={[
-                                                                styles.miniBallText,
-                                                                {
-                                                                    color: b.isWicket || b.isNoBall || b.runs === 4 || b.runs === 6 ? '#FFFFFF' : (b.isWide ? '#000000' : colors.text)
-                                                                }
-                                                            ]}
-                                                        >
-                                                            {b.isWicket ? 'W' : (b.isWide ? (b.runs > 0 ? `Wd+${b.runs}` : 'Wd') : (b.isNoBall ? (b.runs > 0 ? `Nb+${b.runs}` : 'Nb') : String(b.runs)))}
-                                                        </ThemedText>
-                                                    </View>
-                                                ))}
-                                            </View>
-                                        ) : (
-                                            o.commentary ? (
-                                                <ThemedText style={[styles.commText, { color: colors.textSecondary }]}>{o.commentary}</ThemedText>
-                                            ) : null
-                                        )}
-                                    </View>
-                                    <View style={styles.runsBox}>
-                                        <ThemedText style={[styles.runsText, { color: colors.primary }]}>
-                                            {o.runsScored} runs
-                                        </ThemedText>
-                                        {o.wickets > 0 ? (
-                                            <ThemedText style={[styles.wktText, { color: colors.danger }]}>
-                                                {o.wickets} wkt
+                                {(innings1Overs.length > 0 && (innings2Overs.length > 0 || match.currentInnings === 2)) && (
+                                    <View style={[styles.inningsTabRow, { backgroundColor: `${colors.primary}12` }]}>
+                                        <TouchableOpacity
+                                            style={[
+                                                styles.inningsTabBtn,
+                                                activeHistoryInnings === 1 && { backgroundColor: colors.primary }
+                                            ]}
+                                            onPress={() => setSelectedHistoryInnings(1)}
+                                            activeOpacity={0.8}
+                                        >
+                                            <ThemedText
+                                                style={[
+                                                    styles.inningsTabText,
+                                                    { color: activeHistoryInnings === 1 ? '#FFFFFF' : colors.textSecondary }
+                                                ]}
+                                            >
+                                                1st Innings ({innings1Overs.length})
                                             </ThemedText>
-                                        ) : null}
+                                        </TouchableOpacity>
+
+                                        <TouchableOpacity
+                                            style={[
+                                                styles.inningsTabBtn,
+                                                activeHistoryInnings === 2 && { backgroundColor: colors.primary }
+                                            ]}
+                                            onPress={() => setSelectedHistoryInnings(2)}
+                                            activeOpacity={0.8}
+                                        >
+                                            <ThemedText
+                                                style={[
+                                                    styles.inningsTabText,
+                                                    { color: activeHistoryInnings === 2 ? '#FFFFFF' : colors.textSecondary }
+                                                ]}
+                                            >
+                                                2nd Innings ({innings2Overs.length})
+                                            </ThemedText>
+                                        </TouchableOpacity>
                                     </View>
+                                )}
+                            </View>
+
+                            {activeOversList.length > 0 ? (
+                                activeOversList.slice().reverse().map((o, idx) => {
+                                    const isExpanded = !!expandedOvers[o.overNumber];
+                                    const hasBalls = o.balls && o.balls.length > 0;
+                                    return (
+                                        <View
+                                            key={o._id || idx}
+                                            style={[
+                                                styles.overRowContainer,
+                                                { backgroundColor: colors.cardBg, borderColor: colors.border }
+                                            ]}
+                                        >
+                                            {/* Header summary row (tappable to expand) */}
+                                            <TouchableOpacity
+                                                style={styles.overRowHeader}
+                                                onPress={() => toggleOverExpand(o.overNumber)}
+                                                activeOpacity={0.7}
+                                            >
+                                                <View style={[styles.overBadge, { backgroundColor: colors.primary }]}>
+                                                    <ThemedText style={styles.overBadgeText}>Ov {o.overNumber}</ThemedText>
+                                                </View>
+                                                <View style={{ flex: 1 }}>
+                                                    <ThemedText style={[styles.bowlerText, { color: colors.text }]}>
+                                                        {o.bowlerName}{o.strikerName ? ` • Bat: ${o.strikerName}` : ''}
+                                                    </ThemedText>
+                                                    {hasBalls && o.balls ? (
+                                                        <View style={styles.ballsPillRow}>
+                                                            {o.balls.map((b, bIdx) => (
+                                                                <View
+                                                                    key={b._id || bIdx}
+                                                                    style={[
+                                                                        styles.miniBallChip,
+                                                                        {
+                                                                            backgroundColor: b.isWicket
+                                                                                ? colors.danger
+                                                                                : b.isWide
+                                                                                ? '#EAB308'
+                                                                                : b.isNoBall
+                                                                                ? '#F97316'
+                                                                                : b.runs === 4
+                                                                                ? '#3B82F6'
+                                                                                : b.runs === 6
+                                                                                ? '#8B5CF6'
+                                                                                : `${colors.primary}20`
+                                                                        }
+                                                                    ]}
+                                                                >
+                                                                    <ThemedText
+                                                                        style={[
+                                                                            styles.miniBallText,
+                                                                            {
+                                                                                color: b.isWicket || b.isNoBall || b.runs === 4 || b.runs === 6 ? '#FFFFFF' : (b.isWide ? '#000000' : colors.text)
+                                                                            }
+                                                                        ]}
+                                                                    >
+                                                                        {b.isWicket ? 'W' : (b.isWide ? (b.runs > 0 ? `Wd+${b.runs}` : 'Wd') : (b.isNoBall ? (b.runs > 0 ? `Nb+${b.runs}` : 'Nb') : String(b.runs)))}
+                                                                    </ThemedText>
+                                                                </View>
+                                                            ))}
+                                                        </View>
+                                                    ) : (
+                                                        o.commentary ? (
+                                                            <ThemedText style={[styles.commText, { color: colors.textSecondary }]}>{o.commentary}</ThemedText>
+                                                        ) : null
+                                                    )}
+                                                </View>
+                                                <View style={styles.runsBox}>
+                                                    <ThemedText style={[styles.runsText, { color: colors.primary }]}>
+                                                        {o.runsScored} runs
+                                                    </ThemedText>
+                                                    {o.wickets > 0 ? (
+                                                        <ThemedText style={[styles.wktText, { color: colors.danger }]}>
+                                                            {o.wickets} wkt
+                                                        </ThemedText>
+                                                    ) : null}
+                                                </View>
+                                                <Ionicons
+                                                    name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                                                    size={16}
+                                                    color={colors.textSecondary}
+                                                    style={{ marginLeft: 4 }}
+                                                />
+                                            </TouchableOpacity>
+
+                                            {/* Expanded Ball-by-Ball Timeline */}
+                                            {isExpanded && (
+                                                <View style={[styles.expandedBallsBox, { borderTopColor: colors.border }]}>
+                                                    <ThemedText style={[styles.expandedBallsTitle, { color: colors.textSecondary }]}>
+                                                        Ball-by-Ball Timeline
+                                                    </ThemedText>
+                                                    {hasBalls && o.balls ? (
+                                                        o.balls.map((ballItem, bIndex) => (
+                                                            <BallTimelineRow
+                                                                key={ballItem._id || bIndex}
+                                                                ball={ballItem}
+                                                                ballIndex={bIndex}
+                                                                isLast={bIndex === o.balls!.length - 1}
+                                                            />
+                                                        ))
+                                                    ) : (
+                                                        <ThemedText style={[styles.noBallDetailText, { color: colors.textSecondary }]}>
+                                                            Individual ball breakdown not recorded for this over.
+                                                        </ThemedText>
+                                                    )}
+                                                </View>
+                                            )}
+                                        </View>
+                                    );
+                                })
+                            ) : (
+                                <View style={[styles.overRowContainer, styles.emptyOverBox, { backgroundColor: colors.cardBg }]}>
+                                    <ThemedText style={{ color: colors.textSecondary, fontSize: 12 }}>
+                                        No overs recorded yet in this innings
+                                    </ThemedText>
                                 </View>
-                            ))}
+                            )}
                         </View>
                     )}
                 </ScrollView>
@@ -495,8 +598,40 @@ const styles = StyleSheet.create({
         paddingVertical: 10
     },
     overSection: { gap: 6, marginTop: 4 },
+    overSectionHeaderRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 6
+    },
     sectionTitle: { fontSize: 13, fontWeight: '800' },
-    overRow: { flexDirection: 'row', alignItems: 'center', padding: 8, borderRadius: Layout.borderRadius - 4, gap: 8 },
+    inningsTabRow: {
+        flexDirection: 'row',
+        borderRadius: 20,
+        padding: 2,
+        gap: 2
+    },
+    inningsTabBtn: {
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 16
+    },
+    inningsTabText: {
+        fontSize: 10.5,
+        fontWeight: '700'
+    },
+    overRowContainer: {
+        borderRadius: Layout.borderRadius - 4,
+        borderWidth: 1,
+        overflow: 'hidden'
+    },
+    overRowHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 8,
+        gap: 8
+    },
     overBadge: { paddingHorizontal: 6, paddingVertical: 3, borderRadius: 6 },
     overBadgeText: { color: '#FFF', fontSize: 10, fontWeight: '800' },
     bowlerText: { fontSize: 12, fontWeight: '700' },
@@ -514,6 +649,32 @@ const styles = StyleSheet.create({
     runsBox: { alignItems: 'flex-end' },
     runsText: { fontSize: 12, fontWeight: '800' },
     wktText: { fontSize: 10, fontWeight: '700' },
+    expandedBallsBox: {
+        borderTopWidth: StyleSheet.hairlineWidth,
+        paddingHorizontal: 8,
+        paddingTop: 8,
+        paddingBottom: 4
+    },
+    expandedBallsTitle: {
+        fontSize: 10.5,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        marginBottom: 4,
+        marginLeft: 4
+    },
+    noBallDetailText: {
+        fontSize: 11,
+        fontStyle: 'italic',
+        textAlign: 'center',
+        paddingVertical: 8
+    },
+    emptyOverBox: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 14,
+        borderWidth: 0
+    },
     scorerFab: {
         position: 'absolute',
         bottom: 20,

@@ -195,6 +195,33 @@ export interface CricketMatch {
     createdAt?: string;
 }
 
+export interface PlayerBattingStat {
+    name: string;
+    runs: number;
+    balls: number;
+    fours: number;
+    sixes: number;
+    strikeRate: number;
+    innings?: number;
+}
+
+export interface PlayerBowlingStat {
+    name: string;
+    wickets: number;
+    runsConceded: number;
+    ballsBowled: number;
+    overs: number;
+    economy: number;
+    maidens?: number;
+}
+
+export interface TournamentLeaderboard {
+    topBatsmen: PlayerBattingStat[];
+    topBowlers: PlayerBowlingStat[];
+    orangeCap: PlayerBattingStat | null;
+    purpleCap: PlayerBowlingStat | null;
+}
+
 export interface CricketFeedParams {
     status?: TournamentStatus;
     city?: string;

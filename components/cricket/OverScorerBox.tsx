@@ -84,10 +84,18 @@ export const OverScorerBox = React.memo(function OverScorerBox({
     const { theme } = useTheme();
     const colors = Colors[theme];
 
-    // Batsmen & Bowler state
-    const [strikerName, setStrikerName] = useState('');
+    // Batsmen state (atomic pair to prevent race condition on rapid swap)
+    const [batsmen, setBatsmen] = useState<{ striker: string; nonStriker: string }>({ striker: '', nonStriker: '' });
+    const strikerName = batsmen.striker;
+    const nonStrikerName = batsmen.nonStriker;
+    const setStrikerName = useCallback((name: string) => {
+        setBatsmen((prev) => ({ ...prev, striker: name }));
+    }, []);
+    const setNonStrikerName = useCallback((name: string) => {
+        setBatsmen((prev) => ({ ...prev, nonStriker: name }));
+    }, []);
+
     const [strikerPickerVisible, setStrikerPickerVisible] = useState(false);
-    const [nonStrikerName, setNonStrikerName] = useState('');
     const [nonStrikerPickerVisible, setNonStrikerPickerVisible] = useState(false);
     const [bowlerName, setBowlerName] = useState('');
     const [bowlerPickerVisible, setBowlerPickerVisible] = useState(false);
@@ -97,16 +105,16 @@ export const OverScorerBox = React.memo(function OverScorerBox({
     const [selectedBallIndex, setSelectedBallIndex] = useState<number>(0);
     const [customCommentary, setCustomCommentary] = useState('');
 
-    const activeBall = balls[selectedBallIndex] || balls[0];
+    const activeBallIndex = Math.min(selectedBallIndex, Math.max(0, balls.length - 1));
+    const activeBall = balls[activeBallIndex] || balls[0];
 
-    // Swap Strike helper
+    // Swap Strike helper (atomic functional update)
     const handleSwapStrike = useCallback(() => {
-        setStrikerName((prevStriker) => {
-            const nextStriker = nonStrikerName;
-            setNonStrikerName(prevStriker);
-            return nextStriker;
-        });
-    }, [nonStrikerName]);
+        setBatsmen((prev) => ({
+            striker: prev.nonStriker,
+            nonStriker: prev.striker
+        }));
+    }, []);
 
     // Apply outcome to the selected ball
     const handleRecordBallOutcome = useCallback((options: {
@@ -129,9 +137,9 @@ export const OverScorerBox = React.memo(function OverScorerBox({
 
         setBalls((prevBalls) => {
             const newBalls = [...prevBalls];
-            const current = newBalls[selectedBallIndex] || { ...prevBalls[0] };
+            const current = newBalls[activeBallIndex] || { ...prevBalls[0] };
 
-            newBalls[selectedBallIndex] = {
+            newBalls[activeBallIndex] = {
                 ...current,
                 isLegal,
                 strikerName: strikerName.trim(),
@@ -153,7 +161,7 @@ export const OverScorerBox = React.memo(function OverScorerBox({
 
             if (!isLegal && legalBallsScored < 6 && totalLegalBalls < 6 + (newBalls.length - 6)) {
                 // Ensure there is at least one upcoming legal ball slot
-                const hasUpcomingUnscored = newBalls.some((b, i) => i > selectedBallIndex && !b.isScored);
+                const hasUpcomingUnscored = newBalls.some((b, i) => i > activeBallIndex && !b.isScored);
                 if (!hasUpcomingUnscored) {
                     newBalls.push({
                         id: `extra-ball-${newBalls.length + 1}-${Date.now()}`,
@@ -181,12 +189,9 @@ export const OverScorerBox = React.memo(function OverScorerBox({
             handleSwapStrike();
         }
 
-        // Auto-advance to the next ball if available
-        setSelectedBallIndex((prevIdx) => {
-            const nextIdx = prevIdx + 1;
-            return nextIdx < balls.length ? nextIdx : prevIdx;
-        });
-    }, [selectedBallIndex, strikerName, nonStrikerName, bowlerName, balls.length, handleSwapStrike]);
+        // Auto-advance to the next ball
+        setSelectedBallIndex((prevIdx) => prevIdx + 1);
+    }, [activeBallIndex, strikerName, nonStrikerName, bowlerName, handleSwapStrike]);
 
     // Computed totals from the balls array
     const scoredBalls = useMemo(() => balls.filter(b => b.isScored), [balls]);
@@ -195,6 +200,7 @@ export const OverScorerBox = React.memo(function OverScorerBox({
     const totalWickets = useMemo(() => scoredBalls.filter(b => b.isWicket).length, [scoredBalls]);
     const totalWides = useMemo(() => scoredBalls.filter(b => b.isWide).length, [scoredBalls]);
     const totalNoBalls = useMemo(() => scoredBalls.filter(b => b.isNoBall).length, [scoredBalls]);
+    const totalByesLegByes = useMemo(() => scoredBalls.filter(b => b.isBye || b.isLegBye).reduce((sum, b) => sum + b.runs, 0), [scoredBalls]);
 
     // Live Batsman stats in this over
     const strikerStats = useMemo(() => {
@@ -256,7 +262,7 @@ export const OverScorerBox = React.memo(function OverScorerBox({
             batsmanName: strikerName.trim() || undefined,
             runsScored: totalRunsScored,
             wickets: totalWickets,
-            extras: { wides: totalWides, noBalls: totalNoBalls, byesLegByes: 0 },
+            extras: { wides: totalWides, noBalls: totalNoBalls, byesLegByes: totalByesLegByes },
             balls: ballRecords,
             commentary: autoCommentary || undefined
         });
@@ -269,7 +275,7 @@ export const OverScorerBox = React.memo(function OverScorerBox({
 
     // Helper to render Ball Chip in timeline
     const renderBallTimelineChip = (ball: BallItem, index: number) => {
-        const isSelected = selectedBallIndex === index;
+        const isSelected = activeBallIndex === index;
         let badgeLabel = `#${index + 1}`;
         let badgeBg = colors.surface;
         let textColor = colors.text;
@@ -452,7 +458,7 @@ export const OverScorerBox = React.memo(function OverScorerBox({
                         BALL DELIVERY TIMELINE (TAP TO EDIT)
                     </ThemedText>
                     <ThemedText style={[styles.activeBallLabel, { color: colors.primary }]}>
-                        Editing: Ball #{selectedBallIndex + 1}
+                        Editing: Ball #{activeBallIndex + 1}
                     </ThemedText>
                 </View>
 
@@ -466,7 +472,7 @@ export const OverScorerBox = React.memo(function OverScorerBox({
             <View style={[styles.ballActionPanel, { backgroundColor: colors.surface }]}>
                 <View style={styles.ballActionHeader}>
                     <ThemedText style={[styles.ballActionTitle, { color: colors.text }]}>
-                        Score Ball #{selectedBallIndex + 1} {strikerName ? `(Facing: ${strikerName})` : ''}
+                        Score Ball #{activeBallIndex + 1} {strikerName ? `(Facing: ${strikerName})` : ''}
                     </ThemedText>
                     {activeBall.isScored && (
                         <View style={[styles.scoredIndicator, { backgroundColor: `${colors.success}20` }]}>

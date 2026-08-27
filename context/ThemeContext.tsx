@@ -16,7 +16,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType>({
     theme: 'light',
-    themePreference: 'system',
+    themePreference: 'light',
     setThemePreference: async () => { },
     isDark: false,
     toggleTheme: () => { },
@@ -29,7 +29,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Android and iOS), so 'system' preference stays in sync automatically —
     // no manual Appearance listener needed.
     const systemColorScheme = _useColorScheme();
-    const [themePreference, setThemePreferenceState] = useState<ThemePreference>('system');
+    const [themePreference, setThemePreferenceState] = useState<ThemePreference>('light');
     const [hydrated, setHydrated] = useState(false);
 
     useEffect(() => {

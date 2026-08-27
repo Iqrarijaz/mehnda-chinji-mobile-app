@@ -18,6 +18,7 @@ interface AuthContextType {
     logout: () => void;
     updateUser: (data: any) => Promise<void>;
     isAuthenticated: boolean;
+    isCricketAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -27,6 +28,7 @@ const AuthContext = createContext<AuthContextType>({
     logout: () => { },
     updateUser: async () => { },
     isAuthenticated: false,
+    isCricketAdmin: false,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -193,14 +195,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }, [user, loading, segments]);
 
+    const isCricketAdmin = useMemo(() => !!user?.user?.isCricketAdmin, [user]);
+
     const authValue = useMemo(() => ({
         user,
         loading,
         login,
         logout,
         updateUser,
-        isAuthenticated
-    }), [user, loading, login, logout, updateUser, isAuthenticated]);
+        isAuthenticated,
+        isCricketAdmin
+    }), [user, loading, login, logout, updateUser, isAuthenticated, isCricketAdmin]);
 
     return (
         <AuthContext.Provider value={authValue}>

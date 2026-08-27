@@ -49,18 +49,6 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({
         }
     };
 
-    const handleCardPress = () => {
-        if (match.status === 'UPCOMING' && !canManage) {
-            Toast.show({
-                type: 'info',
-                text1: 'Match Scheduled',
-                text2: 'Match has not started yet. Admin scoring panel opens at match start.'
-            });
-            return;
-        }
-        onPress();
-    };
-
     // Calculate prediction probabilities
     const summary = match.predictionsSummary;
     const probA = summary?.teamAProbability ?? 50;
@@ -89,7 +77,7 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({
                 fullWidth && styles.cardFullWidth,
                 { backgroundColor: colors.cardBg }
             ]}
-            onPress={handleCardPress}
+            onPress={onPress}
             activeOpacity={0.8}
         >
             {/* Header: Tournament on Left, LIVE / Status on Right */}
@@ -208,7 +196,7 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({
                     <TouchableOpacity
                         style={[
                             styles.compactVoteBtn,
-                            selectedTeamId === match.teamA.id && { backgroundColor: `${colorA}20`, borderColor: colorA }
+                            selectedTeamId === match.teamA.id && { backgroundColor: `${colorA}20` }
                         ]}
                         onPress={() => onPredictWinner?.(match.teamA.id)}
                         activeOpacity={0.7}
@@ -232,7 +220,7 @@ export const CricketMatchCard = React.memo(function CricketMatchCard({
                     <TouchableOpacity
                         style={[
                             styles.compactVoteBtn,
-                            selectedTeamId === match.teamB.id && { backgroundColor: `${colorB}20`, borderColor: colorB }
+                            selectedTeamId === match.teamB.id && { backgroundColor: `${colorB}20` }
                         ]}
                         onPress={() => onPredictWinner?.(match.teamB.id)}
                         activeOpacity={0.7}
@@ -266,8 +254,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 10,
         marginRight: 10,
-        gap: 6,
-        borderWidth: 0
+        gap: 6
     },
     cardFullWidth: {
         width: '100%',
@@ -414,8 +401,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 6,
-        borderWidth: 1,
-        borderColor: 'transparent',
         flexShrink: 1
     },
     voteTeamName: {

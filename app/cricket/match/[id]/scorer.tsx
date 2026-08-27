@@ -38,7 +38,8 @@ export default function OverScorerPanelScreen() {
 
     // The match document only carries team id/name/logo, so the roster for the
     // bowler picker has to come from the tournament's team list.
-    const { data: tournamentData } = useTournamentDetailsQuery(match?.tournamentId || '');
+    const tournamentIdStr = typeof match?.tournamentId === 'object' ? (match?.tournamentId as any)?._id : (match?.tournamentId || '');
+    const { data: tournamentData } = useTournamentDetailsQuery(tournamentIdStr);
 
     const currentInningForRoster = match?.currentInnings === 1 ? match?.innings1 : match?.innings2;
     const bowlingTeam = useMemo(() => {
@@ -54,7 +55,8 @@ export default function OverScorerPanelScreen() {
         if (!battingTeamId) return undefined;
         return teams.find((t: Team) => t._id === battingTeamId);
     }, [tournamentData, currentInningForRoster]);
-    const canManage = canUserManageTournament(user, match?.tournamentId);
+    const canManage = canUserManageTournament(user, (match?.tournamentId as any)?._id ?? match?.tournamentId);
+
 
     // Permission Guard: Non-admin protection
     useEffect(() => {

@@ -3,7 +3,7 @@
  * Currently logs to console, but can be extended to use services like Sentry or Bugsnag.
  */
 
-import Sentry from './sentry';
+import { recordError } from './crashlytics';
 
 export interface ErrorDetails {
   componentName?: string;
@@ -17,8 +17,8 @@ export interface ErrorDetails {
 class ErrorLogger {
   log(error: Error | any, details: ErrorDetails = {}) {
     const timestamp = new Date().toISOString();
-    let message;
-    let stack;
+    let message: string;
+    let stack: string | undefined;
     
     if (error instanceof Error) {
         message = error.message;
@@ -36,8 +36,9 @@ class ErrorLogger {
         stack,
       });
     } else {
-      // In production, send to remote logging service
-      Sentry.captureException(error, { extra: details });
+      // In production, send to remote logging service (Firebase Crashlytics)
+      const errObj = error instanceof Error ? error : new Error(message);
+      recordError(errObj, Object.keys(details).length ? JSON.stringify(details) : undefined);
       console.warn(`[ErrorLogger] ${timestamp} ${message}`, details);
     }
   }

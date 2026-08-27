@@ -6,5 +6,5 @@ export const NOTIFICATION_TOPICS: Record<string, string> = {
     govt: 'govt',
     health: 'health',
     religious: 'religious',
-
+    cricket: 'cricket',
 };

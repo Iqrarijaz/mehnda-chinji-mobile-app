@@ -5,7 +5,6 @@ import { NOTIFICATION_TOPICS } from '@/constants/notificationTopics';
 import { getMessaging, subscribeToTopic, unsubscribeFromTopic } from '@react-native-firebase/messaging';
 
 export interface NotificationPreferences {
-
     business: boolean;
     education: boolean;
     emergency: boolean;
@@ -14,6 +13,7 @@ export interface NotificationPreferences {
     religious: boolean;
     weather: boolean;
     prayer: boolean;
+    cricket: boolean;
 }
 
 interface NotificationState {
@@ -26,7 +26,6 @@ interface NotificationState {
 }
 
 const DEFAULT_PREFERENCES: NotificationPreferences = {
-
     business: false,
     education: false,
     emergency: false,
@@ -35,6 +34,7 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
     religious: true,
     weather: true,
     prayer: true,
+    cricket: true,
 };
 
 const syncFCMSubscriptions = async (prefs: NotificationPreferences) => {
@@ -116,12 +116,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
             if (!response.success) {
                 throw new Error(response.message || 'Update failed');
             }
-            // Toast on success (optional, but requested for feedback)
-            Toast.show({
-                type: 'success',
-                text1: 'Preferences Updated',
-                text2: `Successfully toggled ${key} notifications.`
-            });
         } catch (error: any) {
             // Rollback on failure
             set({ preferences: previousPrefs });

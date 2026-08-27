@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./public/icon.png",
     "scheme": "rehbarcommunityapp",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "backgroundColor": "#E6F4FE",
     "newArchEnabled": true,
     "ios": {
@@ -70,6 +70,7 @@
       "expo-router",
       "expo-secure-store",
       "@react-native-firebase/app",
+      "@react-native-firebase/crashlytics",
       [
         "expo-location",
         {
