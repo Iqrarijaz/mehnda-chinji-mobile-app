@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     },
     cancelBtn: {
         flex: 1,
-        height: 42,
+        height: Layout.buttonHeight,
         borderRadius: Layout.borderRadius,
         alignItems: 'center',
         justifyContent: 'center'
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     },
     primaryBtn: {
         flex: 1.4,
-        height: 42,
+        height: Layout.buttonHeight,
         borderRadius: Layout.borderRadius,
         alignItems: 'center',
         justifyContent: 'center'

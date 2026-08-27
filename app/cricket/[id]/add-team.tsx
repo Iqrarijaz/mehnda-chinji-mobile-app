@@ -304,8 +304,8 @@ const styles = StyleSheet.create({
         height: 38
     },
     headerIconBtn: {
-        width: 36,
-        height: 36,
+        width: Layout.iconButtonSize,
+        height: Layout.iconButtonSize,
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -340,6 +340,6 @@ const styles = StyleSheet.create({
     logoHint: { fontSize: 11, fontWeight: '600' },
     sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
     sectionTitle: { fontSize: 13, fontWeight: '700' },
-    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 46 : 50, borderRadius: Layout.borderRadius - 6, gap: 6, marginBottom: 8, marginTop: 2 },
+    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Layout.buttonHeight, borderRadius: Layout.borderRadius - 6, gap: 6, marginBottom: 8, marginTop: 2 },
     addBtnText: { fontSize: 12, fontWeight: '700' }
 });

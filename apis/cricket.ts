@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { CricketFeedParams, Tournament, CricketMatch, PredictionsSummary } from '@/types/cricket';
+import { CricketFeedParams, Tournament, CricketMatch, PredictionsSummary, TournamentLeaderboard } from '@/types/cricket';
 
 export const CRICKET_QUERY_KEYS = {
     all: ['cricket'] as const,
@@ -37,6 +37,7 @@ export async function getTournamentDetails(id: string) {
         message: string;
         data: Tournament;
         matches: CricketMatch[];
+        leaderboard: TournamentLeaderboard;
     };
 }
 

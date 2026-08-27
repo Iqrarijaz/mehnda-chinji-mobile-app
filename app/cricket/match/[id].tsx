@@ -475,8 +475,8 @@ const styles = StyleSheet.create({
         height: 38
     },
     headerIconBtn: {
-        width: 36,
-        height: 36,
+        width: Layout.iconButtonSize,
+        height: Layout.iconButtonSize,
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -613,9 +613,11 @@ const styles = StyleSheet.create({
         gap: 2
     },
     inningsTabBtn: {
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 16
+        height: Layout.pillHeight,
+        paddingHorizontal: 12,
+        borderRadius: Layout.pillHeight / 2,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     inningsTabText: {
         fontSize: 10.5,

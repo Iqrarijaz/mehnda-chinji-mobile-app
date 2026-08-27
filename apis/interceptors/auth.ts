@@ -3,6 +3,7 @@ import * as Device from 'expo-device';
 import { secureStorage } from '@/utils/storage';
 import { tokenCache } from '@/lib/tokenCache';
 import { getDeviceInfo } from '@/lib/deviceInfo';
+import { refreshAccessToken } from './refresh';
 
 /**
  * Resolves the current auth token (in-memory cache first, SecureStore as a
@@ -51,18 +52,49 @@ export async function attachAuthHeaders(config: any): Promise<void> {
 }
 
 /**
- * Handles session expiration on 401 responses (excluding the login request
- * itself). Clears the cached token and persisted user data; redirection is
- * handled reactively elsewhere via the tokenCache listener (AuthContext).
+ * Signs the user out locally. Redirection is handled reactively elsewhere via
+ * the tokenCache listener (AuthContext).
  */
-export function handleUnauthorized(error: any): void {
+function forceSignOut(): void {
+    tokenCache.setSessionExpired(true);
+    tokenCache.clear();
+    secureStorage.removeItem('userData');
+}
+
+/**
+ * Handles a 401 by trying to renew the session before giving up on it.
+ *
+ * Returns a promise for the replayed request when the token was renewed, or
+ * `null` when the caller should carry on down the error pipeline. Previously
+ * every 401 signed the user out on the spot, which meant an access token
+ * lapsing — an ordinary, expected event — looked identical to being revoked.
+ *
+ * Requests excluded from this:
+ *  - login and refresh calls, where a 401 is the answer, not a stale token;
+ *  - a request already replayed once, guarded by `_retriedAfterRefresh`, so a
+ *    server that returns 401 no matter what cannot drive an endless loop.
+ */
+export async function handleUnauthorized(error: any, apiClient: any): Promise<any | null> {
     const config = error.config as any;
     const status = error.response?.status;
-    const isLoginRequest = config?.url?.includes('login');
 
-    if (status === 401 && !isLoginRequest) {
-        tokenCache.setSessionExpired(true);
-        tokenCache.clear();
-        secureStorage.removeItem('userData');
+    if (status !== 401 || !config) return null;
+
+    const url: string = config.url || '';
+    if (url.includes('login') || url.includes('refresh-token')) return null;
+
+    if (config._retriedAfterRefresh) {
+        forceSignOut();
+        return null;
     }
+
+    const newToken = await refreshAccessToken();
+    if (!newToken) {
+        forceSignOut();
+        return null;
+    }
+
+    config._retriedAfterRefresh = true;
+    config.headers = { ...(config.headers || {}), Authorization: `Bearer ${newToken}` };
+    return apiClient(config);
 }

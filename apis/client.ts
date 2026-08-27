@@ -58,14 +58,18 @@ apiClient.interceptors.response.use(
         trackIfSlow(response.config?.metadata?.startTime, response.config?.url, response.config?.method);
         return response.data;
     },
-    (error: AxiosError) => {
+    async (error: AxiosError) => {
         const config = error.config as any;
 
         // Still track usage even on error if response exists
         trackErrorUsage(error);
 
-        // Handle Session Expiration (Unified 401 Handling)
-        handleUnauthorized(error);
+        // Session renewal (unified 401 handling). Returns a promise for the
+        // replayed request when the token was renewed, so the caller never sees
+        // the 401 at all; null means the session is genuinely gone and the
+        // error should continue down this pipeline.
+        const replayed = await handleUnauthorized(error, apiClient);
+        if (replayed) return replayed;
 
         // Retry Logic — short-circuits here and skips the rest of this handler when retrying
         const retry = retryIfEligible(error, apiClient);
