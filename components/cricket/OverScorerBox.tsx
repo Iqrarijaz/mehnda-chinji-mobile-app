@@ -315,11 +315,7 @@ export const OverScorerBox = React.memo(function OverScorerBox({
         return (
             <TouchableOpacity
                 key={ball.id}
-                style={[
-                    styles.ballChip,
-                    { backgroundColor: badgeBg },
-                    isSelected && { borderColor: colors.primary, borderWidth: 2 }
-                ]}
+                style={[styles.ballChip, { backgroundColor: badgeBg }]}
                 onPress={() => setSelectedBallIndex(index)}
                 activeOpacity={0.8}
             >
@@ -329,6 +325,13 @@ export const OverScorerBox = React.memo(function OverScorerBox({
                 <ThemedText style={[styles.ballSubText, { color: isSelected ? colors.primary : colors.textSecondary }]}>
                     B{index + 1}
                 </ThemedText>
+                {/* Selection marker. An underline rather than a border: it reads
+                    over both the neutral surface of an unscored ball and the
+                    strong fills of a scored one, and leaves the chip box the
+                    same size selected or not. */}
+                {isSelected ? (
+                    <View style={[styles.ballChipSelectedBar, { backgroundColor: colors.primary }]} />
+                ) : null}
             </TouchableOpacity>
         );
     };
@@ -679,9 +682,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 8
+        height: Layout.pillHeight,
+        paddingHorizontal: 12,
+        borderRadius: Layout.pillHeight / 2
     },
     swapStrikeText: {
         fontSize: 10.5,
@@ -726,6 +729,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 2
     },
+    ballChipSelectedBar: {
+        position: 'absolute',
+        left: 8,
+        right: 8,
+        bottom: 5,
+        height: 3,
+        borderRadius: 2
+    },
     ballChipText: {
         fontSize: 14,
         fontWeight: '900'
@@ -766,7 +777,7 @@ const styles = StyleSheet.create({
     },
     outcomeBtn: {
         flex: 1,
-        height: 38,
+        height: Layout.buttonHeight,
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center'
@@ -781,7 +792,7 @@ const styles = StyleSheet.create({
     },
     extraBtn: {
         flex: 1,
-        height: 36,
+        height: Layout.buttonHeight,
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center'

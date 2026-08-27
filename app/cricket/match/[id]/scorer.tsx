@@ -18,6 +18,7 @@ import { LiveScorecardCard } from '@/components/cricket/LiveScorecardCard';
 import { OverScorerBox } from '@/components/cricket/OverScorerBox';
 import { TossPanel } from '@/components/cricket/TossPanel';
 import { Colors } from '@/constants/colors';
+import { Layout } from '@/constants/layout';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useCricketAPI } from '@/hooks/useCricketAPI';
@@ -250,8 +251,8 @@ const styles = StyleSheet.create({
         height: 38
     },
     headerIconBtn: {
-        width: 36,
-        height: 36,
+        width: Layout.iconButtonSize,
+        height: Layout.iconButtonSize,
         alignItems: 'center',
         justifyContent: 'center'
     },

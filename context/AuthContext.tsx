@@ -8,6 +8,9 @@ import { useAdsStore } from '@/store/ads.store';
 
 type UserData = {
     token: string;
+    // Optional: a backend that predates refresh support returns no such token,
+    // and the app falls back to signing out when the access token lapses.
+    refreshToken?: string | null;
     user: any;
 } | null;
 
@@ -47,6 +50,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const parsed = JSON.parse(storedUser);
                     // Populate in-memory cache immediately — interceptor uses this from now on
                     if (parsed.token) tokenCache.set(parsed.token);
+                    // The 401 handler needs this to renew the session without a re-login.
+                    if (parsed.refreshToken) tokenCache.setRefresh(parsed.refreshToken);
                     setUser(parsed);
                     setIsPremium(parsed.user?.isPremium || false);
                     if (parsed.user?.notificationPreferences) {
@@ -103,15 +108,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const source = parsed.data || parsed;
         const userData = source.userData || source.user || (source._id || source.id ? source : null);
         const token = source.token || parsed.token;
+        const refreshToken = source.refreshToken || parsed.refreshToken || null;
 
         if (!userData || !token) {
             console.error('Invalid login data - userData or token not found', { parsed, source });
             return;
         }
 
-        const authData = { user: userData, token };
+        const authData = { user: userData, token, refreshToken };
         // Cache token in memory — interceptor reads from here, no more disk I/O per request
         if (authData.token) tokenCache.set(authData.token);
+        // Absent on a backend that predates refresh support; the app then behaves
+        // exactly as it did before, signing out when the access token lapses.
+        if (refreshToken) tokenCache.setRefresh(refreshToken);
         setUser(authData);
         setIsPremium(userData.isPremium || false);
 
@@ -156,7 +165,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (!prev) return prev;
 
             const finalUserData = { ...prev.user, ...newUserData };
-            const updatedAuthData = { ...prev, user: finalUserData };
+
+            // Take the tokens from the cache, not from `prev`. A background
+            // refresh may have rotated them since this state was last set, in
+            // which case `prev` holds a token the server has already retired —
+            // writing it back would overwrite the live one with a dead one.
+            const updatedAuthData = {
+                ...prev,
+                user: finalUserData,
+                token: tokenCache.get() ?? prev.token,
+                refreshToken: tokenCache.getRefresh() ?? prev.refreshToken,
+            };
 
             // Run side effects outside the synchronous render phase
             setTimeout(() => {

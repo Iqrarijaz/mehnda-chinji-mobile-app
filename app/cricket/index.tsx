@@ -569,8 +569,8 @@ const styles = StyleSheet.create({
         height: 38
     },
     headerIconBtn: {
-        width: 36,
-        height: 36,
+        width: Layout.iconButtonSize,
+        height: Layout.iconButtonSize,
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative'

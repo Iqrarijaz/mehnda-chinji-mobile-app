@@ -443,8 +443,8 @@ const styles = StyleSheet.create({
         height: 38
     },
     headerIconBtn: {
-        width: 36,
-        height: 36,
+        width: Layout.iconButtonSize,
+        height: Layout.iconButtonSize,
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -465,10 +465,9 @@ const styles = StyleSheet.create({
         gap: 8
     },
     tabPill: {
-        height: 36,
+        height: Layout.pillHeight,
         paddingHorizontal: 16,
-        borderRadius: 18,
-        borderWidth: 0,
+        borderRadius: Layout.pillHeight / 2,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -479,7 +478,7 @@ const styles = StyleSheet.create({
     scrollContent: { padding: 10, paddingBottom: 40 },
     tabContent: { gap: 10 },
     sectionTitle: { fontSize: 13, fontWeight: '700' },
-    actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 46 : 50, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 6 },
+    actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Layout.buttonHeight, borderRadius: Layout.borderRadius - 4, gap: 6, marginBottom: 6 },
     actionBtnText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
     matchCard: { padding: 10, borderRadius: Layout.borderRadius - 4, marginBottom: 8, gap: 6 },
     matchHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
@@ -511,8 +510,8 @@ const styles = StyleSheet.create({
     },
     leaderboardToggleBtn: {
         flex: 1,
-        height: 36,
-        borderRadius: 20,
+        height: Layout.pillHeight,
+        borderRadius: Layout.pillHeight / 2,
         justifyContent: 'center',
         alignItems: 'center'
     },

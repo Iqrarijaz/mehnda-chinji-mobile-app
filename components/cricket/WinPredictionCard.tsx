@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: 8,
+        height: Layout.buttonHeight,
         paddingHorizontal: 10,
         borderRadius: Layout.borderRadius - 4,
         gap: 4

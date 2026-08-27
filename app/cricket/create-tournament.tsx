@@ -387,8 +387,8 @@ const styles = StyleSheet.create({
         height: 38
     },
     headerIconBtn: {
-        width: 36,
-        height: 36,
+        width: Layout.iconButtonSize,
+        height: Layout.iconButtonSize,
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     sectionTitle: { fontSize: 13, fontWeight: '700' },
     dynamicCard: { padding: 10, borderRadius: Layout.borderRadius - 4, borderWidth: 0, gap: 8, marginBottom: 6 },
     dynamicRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Platform.OS === 'android' ? 46 : 50, borderRadius: Layout.borderRadius - 6, gap: 6, marginBottom: 6, marginTop: 2 },
+    addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: Layout.buttonHeight, borderRadius: Layout.borderRadius - 6, gap: 6, marginBottom: 6, marginTop: 2 },
     addBtnText: { fontSize: 12, fontWeight: '700' },
     actionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 12 }
 });
