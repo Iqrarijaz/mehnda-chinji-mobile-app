@@ -1,240 +1,36 @@
-import React, { useMemo, useState } from 'react';
-import {
-    StyleSheet,
-    TouchableOpacity,
-    View
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useMemo } from 'react';
+import { ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
+
 import Skeleton from '@/components/common/Skeleton';
 import { Colors } from '@/constants/colors';
-import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { useWeather } from '@/hooks/useWeather';
 import { useWeatherLocation } from '@/hooks/useWeatherLocation';
+import { buildDailyForecast } from '@/utils/forecastDaily';
 import { getWeatherIconName } from '@/utils/weatherTheme';
 import { ThemedText } from '../ThemedText';
+
+const WEATHER_BG = require('@/assets/images/widgets/weather_bg.png');
+
+// The plate is authored 2:1 with its safe zones measured at that ratio, so the
+// card tracks that aspect and the art is never cropped in the common case.
+//
+// MIN_CARD_HEIGHT is the floor the content genuinely needs: on a narrow phone
+// (~328pt of card width) pure aspect sizing yields a box too short for the
+// stack below, and since the card clips its overflow the strip would be
+// silently cut off rather than visibly break. Below that width the card grows
+// slightly taller than 2:1 and cover-crops a few percent off the sides, which
+// the safe zones absorb.
+const CARD_ASPECT = 1.9;
+const MIN_CARD_HEIGHT = 168;
 
 interface HomeHeaderWeatherWidgetProps {
     onPress?: () => void;
 }
 
-// ── One horizontal weather row: icon + temp beside info stack ──────
-interface WeatherRowProps {
-    icon?: string;
-    temp: number | string;
-    conditionLine: string;
-    cityLabel: string;
-    high: number | null;
-    low: number | null;
-    pop?: number;
-    colors: typeof Colors.light;
-    dayLabel?: string;
-}
-
-const WeatherRow = React.memo(({
-    icon,
-    temp,
-    conditionLine,
-    cityLabel,
-    high,
-    low,
-    pop,
-    colors,
-    dayLabel
-}: WeatherRowProps) => {
-    return (
-        <View style={styles.weatherCol}>
-            <View style={styles.weatherRow}>
-                {/* Left Side: City, Day Badge & Conditions */}
-                <View style={styles.weatherInfoBlockLeft}>
-                    <View style={styles.cityHeaderRow}>
-                        <ThemedText style={styles.cityLabelHuge} numberOfLines={1}>
-                            {cityLabel}
-                        </ThemedText>
-                        {dayLabel ? (
-                            <View style={[styles.dayBadge, { backgroundColor: colors.lime }]}>
-                                <ThemedText style={styles.dayBadgeText}>{dayLabel}</ThemedText>
-                            </View>
-                        ) : null}
-                    </View>
-
-                    <ThemedText style={styles.conditionCity} numberOfLines={1}>
-                        {conditionLine}
-                    </ThemedText>
-
-                    <View style={styles.hiLoRow}>
-                        <View style={styles.hiLoChip}>
-                            <Ionicons name="arrow-up" size={10} color={colors.lime} />
-                            <ThemedText style={[styles.highLow, { color: colors.lime }]}>
-                                {high != null ? `${high}°` : '--'}
-                            </ThemedText>
-                        </View>
-                        <View style={[styles.hiLoChip, { marginLeft: 6 }]}>
-                            <Ionicons name="arrow-down" size={10} color="rgba(255,255,255,0.7)" />
-                            <ThemedText style={[styles.highLow, { color: 'rgba(255,255,255,0.85)' }]}>
-                                {low != null ? `${low}°` : '--'}
-                            </ThemedText>
-                        </View>
-                        {pop ? (
-                            <View style={styles.popPill}>
-                                <Ionicons name="rainy" size={10} color="#38BDF8" />
-                                <ThemedText style={styles.popPillText}>{pop}% rain</ThemedText>
-                            </View>
-                        ) : null}
-                    </View>
-                </View>
-
-                {/* Right Side: Icon & Temp */}
-                <View style={styles.iconTempBlockRight}>
-                    <View style={styles.tempIconRow}>
-                        <Ionicons name={getWeatherIconName(icon)} size={38} color="#FFFFFF" />
-                        <ThemedText style={styles.tempHuge}>{temp}°</ThemedText>
-                    </View>
-                </View>
-            </View>
-        </View>
-    );
-});
-WeatherRow.displayName = 'WeatherRow';
-
-// ── Skeleton Loader Component ──
-const WeatherSkeleton = React.memo(({ backgroundColor }: { backgroundColor: string }) => (
-    <View style={styles.wrapper}>
-        <View style={[styles.card, { backgroundColor, minHeight: 88 }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <View style={{ flex: 1, paddingRight: 12 }}>
-                    <Skeleton width={'60%'} height={18} />
-                    <View style={{ height: 6 }} />
-                    <Skeleton width={'40%'} height={13} />
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                        <Skeleton width={48} height={18} borderRadius={4} />
-                        <View style={{ width: 6 }} />
-                        <Skeleton width={48} height={18} borderRadius={4} />
-                    </View>
-                </View>
-                <View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                        <Skeleton width={38} height={38} borderRadius={19} />
-                        <Skeleton width={46} height={32} borderRadius={6} />
-                    </View>
-                </View>
-            </View>
-        </View>
-    </View>
-));
-WeatherSkeleton.displayName = 'WeatherSkeleton';
-
-const HomeHeaderWeatherWidget = React.memo(({ onPress }: HomeHeaderWeatherWidgetProps) => {
-    const { theme } = useTheme();
-    const colors = Colors[theme];
-
-    // Current location when permitted, else profile/default city
-    const { coords, fallbackCity } = useWeatherLocation();
-    const { weather, forecast, isWeatherLoading } = useWeather(
-        fallbackCity,
-        coords ? { lat: coords.latitude, lon: coords.longitude } : null,
-    );
-
-    const icon = weather?.weather?.[0]?.icon;
-
-    // Today's high / low
-    const { high, low } = useMemo(() => {
-        const list = (forecast as any)?.list;
-        if (Array.isArray(list) && list.length) {
-            const todayStr = new Date().toISOString().slice(0, 10);
-            const temps = list
-                .filter((i: any) => new Date(i.dt * 1000).toISOString().slice(0, 10) === todayStr)
-                .map((i: any) => i.main?.temp)
-                .filter((t: any) => typeof t === 'number');
-            if (temps.length) return { high: Math.round(Math.max(...temps)), low: Math.round(Math.min(...temps)) };
-        }
-        return {
-            high: weather ? Math.round(weather.main.temp_max) : null,
-            low: weather ? Math.round(weather.main.temp_min) : null
-        };
-    }, [forecast, weather]);
-
-    // Tomorrow's outlook
-    const tomorrow = useMemo(() => {
-        const list = (forecast as any)?.list;
-        if (!Array.isArray(list) || !list.length) return null;
-
-        const tomorrowDate = new Date();
-        tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-        const tomorrowStr = tomorrowDate.toISOString().slice(0, 10);
-
-        const dayItems = list.filter((i: any) => new Date(i.dt * 1000).toISOString().slice(0, 10) === tomorrowStr);
-        if (!dayItems.length) return null;
-
-        const temps = dayItems.map((i: any) => i.main?.temp).filter((t: any) => typeof t === 'number');
-        const pops = dayItems.map((i: any) => i.pop).filter((p: any) => typeof p === 'number');
-        const middayItem = dayItems.reduce((closest: any, item: any) => {
-            const hour = new Date(item.dt * 1000).getHours();
-            const closestHour = closest ? new Date(closest.dt * 1000).getHours() : -99;
-            return Math.abs(hour - 12) < Math.abs(closestHour - 12) ? item : closest;
-        }, null);
-
-        if (!temps.length || !middayItem) return null;
-
-        return {
-            high: Math.round(Math.max(...temps)),
-            low: Math.round(Math.min(...temps)),
-            icon: middayItem.weather?.[0]?.icon as string | undefined,
-            condition: middayItem.weather?.[0]?.main ?? '—',
-            pop: pops.length ? Math.round(Math.max(...pops) * 100) : 0,
-        };
-    }, [forecast]);
-
-    const [activePage] = useState(0);
-
-    if (!weather || isWeatherLoading) {
-        return <WeatherSkeleton backgroundColor={colors.primary} />;
-    }
-
-    const temp = weather ? Math.round(weather.main.temp) : '--';
-    const condition = weather?.weather?.[0]?.main ?? '—';
-    const city = (weather?.name || fallbackCity || '').split(',')[0].trim();
-
-    return (
-        <View style={styles.wrapper}>
-            <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={onPress}
-                style={[styles.card, { backgroundColor: colors.primary, minHeight: 88 }]}
-            >
-                <View key={activePage}>
-                    {activePage === 0 || !tomorrow ? (
-                        <WeatherRow
-                            icon={icon}
-                            temp={temp}
-                            conditionLine={condition}
-                            cityLabel={city}
-                            dayLabel="Today"
-                            high={high}
-                            low={low}
-                            colors={colors}
-                        />
-                    ) : (
-                        <WeatherRow
-                            icon={tomorrow.icon}
-                            temp={tomorrow.high}
-                            conditionLine={tomorrow.condition}
-                            cityLabel={city}
-                            dayLabel="Tomorrow"
-                            high={tomorrow.high}
-                            low={tomorrow.low}
-                            pop={tomorrow.pop}
-                            colors={colors}
-                        />
-                    )}
-                </View>
-            </TouchableOpacity>
-        </View>
-    );
-});
-
-HomeHeaderWeatherWidget.displayName = 'HomeHeaderWeatherWidget';
-export default HomeHeaderWeatherWidget;
+/** OpenWeather returns metres per second under units=metric. */
+const msToKmh = (ms: number) => Math.round(ms * 3.6);
 
 function relativeTime(unixSec?: number): string {
     if (!unixSec) return '';
@@ -245,114 +41,223 @@ function relativeTime(unixSec?: number): string {
     return `${h}h ago`;
 }
 
+// ── Small pieces ───────────────────────────────────────────────────────────
+
+const Metric = React.memo(function Metric({
+    icon, value, label,
+}: { icon: keyof typeof Ionicons.glyphMap; value: string; label: string }) {
+    return (
+        <View style={styles.metric}>
+            <Ionicons name={icon} size={11} color="rgba(255,255,255,0.72)" />
+            <View>
+                <ThemedText style={styles.metricValue}>{value}</ThemedText>
+                <ThemedText style={styles.metricLabel}>{label}</ThemedText>
+            </View>
+        </View>
+    );
+});
+
+const DayColumn = React.memo(function DayColumn({
+    label, icon, high, isToday,
+}: { label: string; icon?: string; high: number; isToday: boolean }) {
+    return (
+        <View style={[styles.day, isToday && styles.dayToday]}>
+            <ThemedText style={[styles.dayLabel, isToday && styles.dayLabelToday]} numberOfLines={1}>
+                {label.toUpperCase()}
+            </ThemedText>
+            <Ionicons name={getWeatherIconName(icon)} size={13} color="#FCC968" />
+            <ThemedText style={styles.dayTemp}>{high}°</ThemedText>
+        </View>
+    );
+});
+
+const WeatherSkeleton = React.memo(function WeatherSkeleton() {
+    return (
+        <View style={styles.wrapper}>
+            <View style={[styles.card, styles.skeletonCard]}>
+                <Skeleton width={96} height={18} borderRadius={9} />
+                <View style={{ height: 10 }} />
+                <Skeleton width={'52%'} height={40} borderRadius={8} />
+                <View style={{ height: 10 }} />
+                <Skeleton width={'42%'} height={14} borderRadius={6} />
+                <View style={{ flex: 1 }} />
+                <Skeleton width={'100%'} height={40} borderRadius={10} />
+            </View>
+        </View>
+    );
+});
+
+// ── Widget ─────────────────────────────────────────────────────────────────
+
+const HomeHeaderWeatherWidget = React.memo(function HomeHeaderWeatherWidget({
+    onPress,
+}: HomeHeaderWeatherWidgetProps) {
+    const { theme } = useTheme();
+    const colors = Colors[theme];
+
+    const { coords, fallbackCity } = useWeatherLocation();
+    const { weather, forecast, isWeatherLoading } = useWeather(
+        fallbackCity,
+        coords ? { lat: coords.latitude, lon: coords.longitude } : null,
+    );
+
+    const days = useMemo(() => buildDailyForecast((forecast as any)?.list, 5), [forecast]);
+
+    // Today's range comes from the forecast when it is loaded, since the current
+    // observation's own min/max covers only the reporting window.
+    const { high, low } = useMemo(() => {
+        if (days.length) return { high: days[0].high, low: days[0].low };
+        return {
+            high: weather ? Math.round(weather.main.temp_max) : null,
+            low: weather ? Math.round(weather.main.temp_min) : null,
+        };
+    }, [days, weather]);
+
+    if (!weather || isWeatherLoading) return <WeatherSkeleton />;
+
+    const temp = Math.round(weather.main.temp);
+    const condition = weather.weather?.[0]?.main ?? '—';
+    const icon = weather.weather?.[0]?.icon;
+    const city = (weather.name || fallbackCity || '').split(',')[0].trim();
+    const updated = relativeTime(weather.dt);
+
+    return (
+        <View style={styles.wrapper}>
+            <TouchableOpacity activeOpacity={0.92} onPress={onPress} style={styles.card}>
+                <ImageBackground
+                    source={WEATHER_BG}
+                    style={styles.bg}
+                    imageStyle={styles.bgImage}
+                    resizeMode="cover"
+                >
+                    {/* No scrim over the plate: its own gradients were tuned until
+                        every safe zone cleared AA against white, and stacking
+                        another one would only dull the art without helping. */}
+                    <View style={styles.content}>
+                        {/* Header */}
+                        <View style={styles.headerRow}>
+                            <View style={[styles.pill, { backgroundColor: colors.accent }]}>
+                                <ThemedText style={styles.pillText}>WEATHER NOW</ThemedText>
+                            </View>
+                            <View style={styles.locationRow}>
+                                <Ionicons name="location" size={10} color="rgba(255,255,255,0.78)" />
+                                <ThemedText style={styles.locationText} numberOfLines={1}>
+                                    {city}
+                                </ThemedText>
+                            </View>
+                            {updated ? (
+                                <ThemedText style={styles.updated} numberOfLines={1}>{updated}</ThemedText>
+                            ) : null}
+                        </View>
+
+                        {/* Primary metric */}
+                        <View style={styles.tempRow}>
+                            <ThemedText style={styles.temp}>{temp}</ThemedText>
+                            <ThemedText style={styles.degree}>°C</ThemedText>
+                            <Ionicons
+                                name={getWeatherIconName(icon)}
+                                size={22}
+                                color="#FFFFFF"
+                                style={styles.conditionIcon}
+                            />
+                        </View>
+
+                        <View style={styles.conditionRow}>
+                            <ThemedText style={styles.condition} numberOfLines={1}>{condition}</ThemedText>
+                            <ThemedText style={styles.range}>
+                                {high != null ? `H ${high}°` : 'H --'} · {low != null ? `L ${low}°` : 'L --'}
+                            </ThemedText>
+                        </View>
+
+                        {/* Compact metrics */}
+                        <View style={styles.metricsRow}>
+                            <Metric icon="water-outline" value={`${weather.main.humidity}%`} label="HUMIDITY" />
+                            <Metric icon="navigate-outline" value={`${msToKmh(weather.wind.speed)} km/h`} label="WIND" />
+                            <Metric icon="thermometer-outline" value={`${Math.round(weather.main.feels_like)}°`} label="FEELS" />
+                        </View>
+
+                        {/* 5-day strip. Hidden rather than shown empty while the
+                            forecast is still in flight -- the current conditions
+                            above already carry the card. */}
+                        {days.length > 0 ? (
+                            <View style={styles.strip}>
+                                {days.map(d => (
+                                    <DayColumn
+                                        key={d.date}
+                                        label={d.label}
+                                        icon={d.icon}
+                                        high={d.high}
+                                        isToday={d.label === 'Today'}
+                                    />
+                                ))}
+                            </View>
+                        ) : null}
+
+                    </View>
+                </ImageBackground>
+            </TouchableOpacity>
+        </View>
+    );
+});
+
+HomeHeaderWeatherWidget.displayName = 'HomeHeaderWeatherWidget';
+export default HomeHeaderWeatherWidget;
+
 const styles = StyleSheet.create({
-    wrapper: {
-        width: '100%',
-        marginTop: 4,
-        marginBottom: 14
-    },
+    wrapper: { width: '100%', marginTop: 4, marginBottom: 14 },
     card: {
-        borderRadius: Layout.borderRadius,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        backgroundColor: 'rgba(255,255,255,0.12)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.18)',
+        width: '100%',
+        aspectRatio: CARD_ASPECT,
+        minHeight: MIN_CARD_HEIGHT,
+        borderRadius: 22,
+        overflow: 'hidden',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 3
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.18,
+        shadowRadius: 12,
+        elevation: 4,
     },
-    weatherCol: {
-        justifyContent: 'center'
+    skeletonCard: {
+        backgroundColor: 'rgba(255,255,255,0.10)',
+        padding: 14,
     },
-    weatherRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%'
-    },
-    weatherInfoBlockLeft: {
+    bg: { flex: 1 },
+    bgImage: { borderRadius: 22 },
+    content: { flex: 1, paddingHorizontal: 14, paddingVertical: 11 },
+
+    headerRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    pill: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 7 },
+    pillText: { fontSize: 8, fontWeight: '900', color: '#222831', letterSpacing: 0.6 },
+    locationRow: { flexDirection: 'row', alignItems: 'center', gap: 3, flex: 1 },
+    locationText: { fontSize: 10.5, fontWeight: '700', color: 'rgba(255,255,255,0.82)', flexShrink: 1 },
+
+    tempRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 3 },
+    temp: { fontSize: 40, fontWeight: '900', color: '#FFFFFF', lineHeight: 42, letterSpacing: -1 },
+    degree: { fontSize: 14, fontWeight: '800', color: 'rgba(255,255,255,0.88)', marginTop: 5, marginLeft: 1 },
+    conditionIcon: { marginLeft: 10, marginTop: 9 },
+
+    conditionRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: -2 },
+    condition: { fontSize: 12, fontWeight: '800', color: '#FFFFFF', flexShrink: 1 },
+    range: { fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.78)' },
+
+    metricsRow: { flexDirection: 'row', gap: 13, marginTop: 6 },
+    metric: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+    metricValue: { fontSize: 11, fontWeight: '800', color: '#FFFFFF', lineHeight: 13 },
+    metricLabel: { fontSize: 7, fontWeight: '800', color: 'rgba(255,255,255,0.6)', letterSpacing: 0.5 },
+
+    strip: { flexDirection: 'row', gap: 5, marginTop: 'auto' },
+    day: {
         flex: 1,
-        justifyContent: 'center',
-        paddingRight: 8
-    },
-    cityHeaderRow: {
-        flexDirection: 'row',
         alignItems: 'center',
-        gap: 6
+        paddingVertical: 4,
+        borderRadius: 10,
+        backgroundColor: 'rgba(255,255,255,0.10)',
+        gap: 1,
     },
-    cityLabelHuge: {
-        fontSize: 16,
-        fontWeight: '800',
-        color: '#FFFFFF',
-        letterSpacing: 0.2
-    },
-    dayBadge: {
-        paddingHorizontal: 6,
-        paddingVertical: 0,
-        borderRadius: 6
-    },
-    dayBadgeText: {
-        fontSize: 9,
-        fontWeight: '800',
-        color: '#0F172A',
-        textTransform: 'uppercase'
-    },
-    conditionCity: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.9)',
-        marginTop: 2
-    },
-    hiLoRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 6,
-        flexWrap: 'wrap'
-    },
-    hiLoChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.15)',
-        paddingHorizontal: 5,
-        paddingVertical: 2,
-        borderRadius: 4
-    },
-    highLow: {
-        fontSize: 10.5,
-        fontWeight: '800',
-        marginLeft: 2
-    },
-    popPill: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 3,
-        marginLeft: 6,
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 6,
-        backgroundColor: 'rgba(56, 189, 248, 0.2)'
-    },
-    popPillText: {
-        fontSize: 9.5,
-        fontWeight: '700',
-        color: '#38BDF8'
-    },
-    iconTempBlockRight: {
-        alignItems: 'flex-end',
-        justifyContent: 'center'
-    },
-    tempIconRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6
-    },
-    tempHuge: {
-        fontSize: 32,
-        fontWeight: '800',
-        color: '#FFFFFF',
-        lineHeight: 34
-    },
+    dayToday: { backgroundColor: 'rgba(255,255,255,0.18)' },
+    dayLabel: { fontSize: 7, fontWeight: '800', color: 'rgba(255,255,255,0.68)', letterSpacing: 0.4 },
+    dayLabelToday: { color: '#FCC968' },
+    dayTemp: { fontSize: 10, fontWeight: '900', color: '#FFFFFF' },
+
+    updated: { fontSize: 9, fontWeight: '600', color: 'rgba(255,255,255,0.6)' },
 });
