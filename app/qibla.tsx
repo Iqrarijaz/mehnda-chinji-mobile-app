@@ -1,233 +1,461 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
-import { Stack } from 'expo-router';
-import * as Location from 'expo-location';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming, Easing } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Linking from 'expo-linking';
+import * as Location from 'expo-location';
+import { Stack } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
+import Animated, {
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSequence,
+    withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackButton } from '@/components/common/BackButton';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { CompassDial } from '@/components/qibla/CompassDial';
+import { QiblaMessageState } from '@/components/qibla/QiblaMessageState';
+import { QiblaStats } from '@/components/qibla/QiblaStats';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
-import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { getCurrentCoords } from '@/utils/locationService';
+import {
+    ALIGNMENT_THRESHOLD_DEG,
+    alignmentOffset,
+    compassPoint,
+    formatDistance,
+    qiblaFrom,
+    shortestAngleDelta,
+} from '@/utils/qibla';
 
-// The Kaaba, Masjid al-Haram, Mecca.
-const KAABA = { latitude: 21.4225, longitude: 39.8262 };
+/**
+ * Why these are separate states: `getCurrentCoords` returns null for four quite
+ * different reasons, and the screen used to collapse them into one "couldn't
+ * get your location" message with nothing to tap. Each of these needs a
+ * different sentence and a different button, because the fix is different --
+ * granting a permission, re-enabling a system service, or simply retrying.
+ */
+type ScreenStatus =
+    | 'loading'
+    | 'permission-denied'   // refused, but the OS will still let us ask
+    | 'permission-blocked'  // refused permanently; only Settings can undo it
+    | 'services-disabled'   // permission fine, device location switched off
+    | 'location-failed'     // permitted and enabled, but no fix came back
+    | 'no-compass'          // no magnetometer; bearing still shown numerically
+    | 'ready';
 
-const DIAL_SIZE = 280;
-
-function toRad(deg: number) { return (deg * Math.PI) / 180; }
-function toDeg(rad: number) { return (rad * 180) / Math.PI; }
-
-/** Great-circle initial bearing from (lat1,lon1) to (lat2,lon2) — 0-360°, 0 = true north. */
-function calculateBearing(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const phi1 = toRad(lat1);
-    const phi2 = toRad(lat2);
-    const deltaLambda = toRad(lon2 - lon1);
-    const y = Math.sin(deltaLambda) * Math.cos(phi2);
-    const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(deltaLambda);
-    return (toDeg(Math.atan2(y, x)) + 360) % 360;
-}
-
-/** Great-circle distance in km between two coordinates (haversine). */
-function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371;
-    const phi1 = toRad(lat1);
-    const phi2 = toRad(lat2);
-    const deltaPhi = toRad(lat2 - lat1);
-    const deltaLambda = toRad(lon2 - lon1);
-    const a = Math.sin(deltaPhi / 2) ** 2 + Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-/** Shortest signed angular delta from `current` to `target`, in (-180, 180]. */
-function shortestAngleDelta(target: number, current: number): number {
-    return (((target - current) % 360) + 540) % 360 - 180;
-}
-
-type ScreenStatus = 'loading' | 'no-permission' | 'no-location' | 'no-compass' | 'ready';
+const HEADING_TWEEN_MS = 110;
 
 export default function QiblaScreen() {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
+    const { width, height } = useWindowDimensions();
 
     const [status, setStatus] = useState<ScreenStatus>('loading');
+    const [busy, setBusy] = useState(false);
     const [qiblaBearing, setQiblaBearing] = useState<number | null>(null);
     const [distanceKm, setDistanceKm] = useState<number | null>(null);
-    const [accuracy, setAccuracy] = useState<number>(0);
+    const [offsetDeg, setOffsetDeg] = useState<number | null>(null);
+    const [aligned, setAligned] = useState(false);
+    const [lowAccuracy, setLowAccuracy] = useState(false);
 
-    // Continuous (unbounded) rotation so the dial always animates the short
-    // way round instead of snapping back through 0°/360° every full turn.
-    const rotation = useSharedValue(0);
-    const continuousRotation = useRef(0);
+    // The dial is sized from the viewport and clamped: wide enough to read on a
+    // small phone, never so tall that the stats card is pushed off a short one.
+    const dialSize = Math.round(
+        Math.max(200, Math.min(320, width - 72, (height - insets.top - insets.bottom) * 0.42)),
+    );
 
-    useEffect(() => {
-        let headingSubscription: Location.LocationSubscription | null = null;
-        let isMounted = true;
+    // One continuous, unbounded rotation drives both dial layers. The rose sits
+    // at -heading and the marker at rose + bearing, so deriving one from the
+    // other is what guarantees they can never drift apart. Unbounded means the
+    // dial always turns the short way instead of unwinding through 0°/360°.
+    const rose = useSharedValue(0);
+    const bearingSV = useSharedValue(0);
+    const continuous = useRef(0);
+    const fade = useSharedValue(0);
+    const pulse = useSharedValue(1);
 
-        const start = async () => {
-            const coords = await getCurrentCoords({ requestPermission: true });
-            if (!isMounted) return;
+    const headingSub = useRef<Location.LocationSubscription | null>(null);
+    const mounted = useRef(true);
+    const statusRef = useRef<ScreenStatus>(status);
+    const bearingRef = useRef<number | null>(null);
+    const lastOffsetRef = useRef<number | null>(null);
+    const lowAccuracyRef = useRef(false);
+    const alignedRef = useRef(false);
 
-            if (!coords) {
-                const { status: permStatus } = await Location.getForegroundPermissionsAsync();
-                setStatus(permStatus === Location.PermissionStatus.GRANTED ? 'no-location' : 'no-permission');
+    const roseStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${rose.value}deg` }] }));
+    const markerStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${rose.value + bearingSV.value}deg` }],
+    }));
+    const contentStyle = useAnimatedStyle(() => ({
+        opacity: fade.value,
+        transform: [{ scale: 0.96 + fade.value * 0.04 }],
+    }));
+    const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }));
+
+    const stopHeading = useCallback(() => {
+        headingSub.current?.remove();
+        headingSub.current = null;
+    }, []);
+
+    const startHeading = useCallback(async (bearing: number) => {
+        stopHeading();
+        try {
+            headingSub.current = await Location.watchHeadingAsync((heading) => {
+                if (!mounted.current) return;
+
+                // trueHeading is -1 until the device has a geomagnetic model;
+                // magHeading is the honest fallback until then.
+                const deviceHeading = heading.trueHeading >= 0 ? heading.trueHeading : heading.magHeading;
+                if (!Number.isFinite(deviceHeading)) return;
+
+                // Android reports 0-3; anything under 2 is worth a calibration
+                // nudge. Guarded like the readout below: this fires on every
+                // sensor sample, and the value changes very rarely.
+                const noisy = heading.accuracy > 0 && heading.accuracy < 2;
+                if (noisy !== lowAccuracyRef.current) {
+                    lowAccuracyRef.current = noisy;
+                    setLowAccuracy(noisy);
+                }
+
+                const target = -deviceHeading;
+                continuous.current += shortestAngleDelta(target, continuous.current % 360);
+                rose.value = withTiming(continuous.current, {
+                    duration: HEADING_TWEEN_MS,
+                    easing: Easing.out(Easing.quad),
+                });
+
+                // Re-render only when the whole degree changes, so a device held
+                // still does not re-render the tree on every sensor sample.
+                const offset = alignmentOffset(bearing, deviceHeading);
+                const rounded = Math.round(offset);
+                if (rounded !== lastOffsetRef.current) {
+                    lastOffsetRef.current = rounded;
+                    setOffsetDeg(offset);
+                }
+
+                const nowAligned = offset <= ALIGNMENT_THRESHOLD_DEG;
+                if (nowAligned !== alignedRef.current) {
+                    alignedRef.current = nowAligned;
+                    setAligned(nowAligned);
+                    if (nowAligned) {
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => { });
+                    }
+                }
+            });
+            return true;
+        } catch (error) {
+            if (__DEV__) console.warn('Qibla: compass/heading unavailable', error);
+            return false;
+        }
+    }, [rose, stopHeading]);
+
+    /**
+     * Resolves location and decides which state to show. `interactive` is true
+     * when the user tapped a button: only then may we raise the system
+     * permission prompt, so arriving on the screen never fires a dialog the
+     * user did not ask for.
+     */
+    const resolve = useCallback(async (interactive: boolean) => {
+        if (!mounted.current) return;
+        setBusy(true);
+
+        try {
+            let perm = await Location.getForegroundPermissionsAsync();
+
+            if (perm.status !== Location.PermissionStatus.GRANTED && interactive && perm.canAskAgain) {
+                perm = await Location.requestForegroundPermissionsAsync();
+            }
+
+            if (!mounted.current) return;
+
+            if (perm.status !== Location.PermissionStatus.GRANTED) {
+                setStatus(perm.canAskAgain ? 'permission-denied' : 'permission-blocked');
                 return;
             }
 
-            const bearing = calculateBearing(coords.latitude, coords.longitude, KAABA.latitude, KAABA.longitude);
-            const distance = calculateDistanceKm(coords.latitude, coords.longitude, KAABA.latitude, KAABA.longitude);
-            setQiblaBearing(bearing);
-            setDistanceKm(distance);
-
-            try {
-                headingSubscription = await Location.watchHeadingAsync((heading) => {
-                    if (!isMounted) return;
-                    setAccuracy(heading.accuracy);
-
-                    const deviceHeading = heading.trueHeading >= 0 ? heading.trueHeading : heading.magHeading;
-                    // Dial rotates so its fixed Kaaba marker (drawn at the dial's top)
-                    // points at the real-world bearing to Mecca as the phone turns.
-                    const target = bearing - deviceHeading;
-                    const delta = shortestAngleDelta(target, continuousRotation.current % 360);
-                    continuousRotation.current += delta;
-
-                    rotation.value = withTiming(continuousRotation.current, {
-                        duration: 120,
-                        easing: Easing.out(Easing.quad),
-                    });
-                });
-                setStatus('ready');
-            } catch (error) {
-                if (__DEV__) console.warn('Qibla: compass/heading unavailable', error);
-                setStatus('no-compass');
+            const servicesOn = await Location.hasServicesEnabledAsync();
+            if (!mounted.current) return;
+            if (!servicesOn) {
+                setStatus('services-disabled');
+                return;
             }
-        };
 
-        start();
+            const position = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Balanced,
+            });
+            if (!mounted.current) return;
 
+            const { latitude, longitude } = position.coords;
+            if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                setStatus('location-failed');
+                return;
+            }
+
+            const { bearing, distanceKm: dist } = qiblaFrom(latitude, longitude);
+            setQiblaBearing(bearing);
+            setDistanceKm(dist);
+            bearingSV.value = bearing;
+            bearingRef.current = bearing;
+
+            const hasCompass = await startHeading(bearing);
+            if (!mounted.current) return;
+
+            setStatus(hasCompass ? 'ready' : 'no-compass');
+            fade.value = withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) });
+        } catch (error) {
+            if (__DEV__) console.warn('Qibla: location lookup failed', error);
+            if (mounted.current) setStatus('location-failed');
+        } finally {
+            if (mounted.current) setBusy(false);
+        }
+    }, [bearingSV, fade, startHeading]);
+
+    useEffect(() => { statusRef.current = status; }, [status]);
+
+    useEffect(() => {
+        mounted.current = true;
+        resolve(false);
         return () => {
-            isMounted = false;
-            headingSubscription?.remove();
+            mounted.current = false;
+            stopHeading();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [resolve, stopHeading]);
+
+    // Coming back from Settings is the whole point of sending someone there, so
+    // re-check on foreground rather than leaving a stale error on screen.
+    useEffect(() => {
+        const sub = AppState.addEventListener('change', (next) => {
+            if (next !== 'active') return;
+            if (statusRef.current === 'ready') {
+                // The heading stream stops while backgrounded and does not
+                // resume on its own, which would leave a dial frozen at
+                // whatever angle it held when the user left.
+                if (bearingRef.current !== null) startHeading(bearingRef.current);
+                return;
+            }
+            resolve(false);
+        });
+        return () => sub.remove();
+    }, [resolve, startHeading]);
+
+    // A soft breathing pulse only while aligned — motion that means something,
+    // rather than motion for its own sake.
+    useEffect(() => {
+        if (aligned) {
+            pulse.value = withRepeat(
+                withSequence(
+                    withTiming(1.03, { duration: 900, easing: Easing.inOut(Easing.quad) }),
+                    withTiming(1, { duration: 900, easing: Easing.inOut(Easing.quad) }),
+                ),
+                -1,
+                true,
+            );
+        } else {
+            pulse.value = withTiming(1, { duration: 220 });
+        }
+    }, [aligned, pulse]);
+
+    /** App permission page — where a blocked location permission is re-granted. */
+    const openAppSettings = useCallback(() => {
+        Linking.openSettings().catch(() => { });
     }, []);
 
-    const dialAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: `${rotation.value}deg` }],
-    }));
+    /**
+     * System location toggle. Android exposes it as an intent, so we can land
+     * the user on the exact switch. iOS has no such deep link, so the app's own
+     * settings page is the closest reachable destination.
+     */
+    const openLocationSettings = useCallback(() => {
+        if (Platform.OS === 'android') {
+            Linking.sendIntent('android.settings.LOCATION_SOURCE_SETTINGS')
+                .catch(() => { Linking.openSettings().catch(() => { }); });
+            return;
+        }
+        Linking.openSettings().catch(() => { });
+    }, []);
 
-    const renderBody = useCallback(() => {
+    const renderBody = () => {
         if (status === 'loading') {
             return (
-                <View style={styles.centerWrap}>
-                    <ActivityIndicator size="large" color={colors.primary} />
-                    <ThemedText style={[styles.centerText, { color: colors.textSecondary }]}>
-                        Getting your location…
-                    </ThemedText>
-                </View>
+                <QiblaMessageState
+                    colors={colors}
+                    icon="compass-outline"
+                    title="Finding your position"
+                    message="Just a moment while we work out which way the Kaaba is from here."
+                    busy
+                />
             );
         }
 
-        if (status === 'no-permission' || status === 'no-location') {
+        if (status === 'permission-denied') {
             return (
-                <View style={styles.centerWrap}>
-                    <Ionicons name="location-outline" size={48} color={colors.textSecondary} />
-                    <ThemedText style={[styles.centerTitle, { color: colors.text }]}>Location needed</ThemedText>
-                    <ThemedText style={[styles.centerText, { color: colors.textSecondary }]}>
-                        {status === 'no-permission'
-                            ? 'Allow location access so the Qibla direction can be calculated for where you are.'
-                            : "Couldn't get your current location. Make sure location services are turned on and try again."}
-                    </ThemedText>
-                </View>
+                <QiblaMessageState
+                    colors={colors}
+                    icon="location-outline"
+                    title="Location access needed"
+                    message="The Qibla direction depends on where you are, so the compass needs your location to point the right way. It is only used on your device to work out the direction."
+                    actionLabel="Allow Location Access"
+                    actionIcon="navigate-circle-outline"
+                    onAction={() => resolve(true)}
+                    busy={busy}
+                />
+            );
+        }
+
+        if (status === 'permission-blocked') {
+            return (
+                <QiblaMessageState
+                    colors={colors}
+                    tone="warning"
+                    icon="lock-closed-outline"
+                    title="Location is turned off for this app"
+                    message="Location permission was declined earlier, so we can no longer ask from inside the app. You can turn it back on in Settings, then come straight back here."
+                    actionLabel="Open Settings"
+                    actionIcon="settings-outline"
+                    onAction={openAppSettings}
+                    footnote="This screen refreshes on its own when you return."
+                />
+            );
+        }
+
+        if (status === 'services-disabled') {
+            return (
+                <QiblaMessageState
+                    colors={colors}
+                    tone="warning"
+                    icon="navigate-outline"
+                    title="Location services are off"
+                    message="Your device's location is switched off, so we cannot work out your position. Turn it on and the compass will start straight away."
+                    actionLabel="Turn On Location"
+                    actionIcon="settings-outline"
+                    onAction={openLocationSettings}
+                    footnote="This screen refreshes on its own when you return."
+                />
+            );
+        }
+
+        if (status === 'location-failed') {
+            return (
+                <QiblaMessageState
+                    colors={colors}
+                    icon="cloud-offline-outline"
+                    title="Couldn't get a location fix"
+                    message="We have permission, but no position came back. This usually clears up outdoors or near a window."
+                    actionLabel="Try Again"
+                    actionIcon="refresh-outline"
+                    onAction={() => resolve(true)}
+                    busy={busy}
+                />
             );
         }
 
         if (status === 'no-compass') {
             return (
-                <View style={styles.centerWrap}>
-                    <Ionicons name="compass-outline" size={48} color={colors.textSecondary} />
-                    <ThemedText style={[styles.centerTitle, { color: colors.text }]}>Compass unavailable</ThemedText>
-                    <ThemedText style={[styles.centerText, { color: colors.textSecondary }]}>
-                        This device doesn&apos;t have a working magnetometer, so a live compass isn&apos;t possible here.
-                        {qiblaBearing !== null && ` Qibla is ${Math.round(qiblaBearing)}° from true north.`}
-                    </ThemedText>
-                </View>
+                <QiblaMessageState
+                    colors={colors}
+                    icon="compass-outline"
+                    title="No compass on this device"
+                    message="This device has no magnetometer, so the dial cannot follow which way you are facing. The bearing below is still accurate for your location."
+                    footnote={
+                        qiblaBearing !== null
+                            ? `Qibla is ${Math.round(qiblaBearing)}° (${compassPoint(qiblaBearing)}) from true north.`
+                            : undefined
+                    }
+                />
             );
         }
 
         return (
-            <View style={styles.compassWrap}>
-                {accuracy > 0 && accuracy < 2 && (
-                    <View style={[styles.calibrateBanner, { backgroundColor: `${colors.primary}14` }]}>
-                        <Ionicons name="refresh-outline" size={14} color={colors.primary} />
-                        <ThemedText style={[styles.calibrateText, { color: colors.primary }]}>
-                            Move your phone in a figure-8 to calibrate the compass
-                        </ThemedText>
-                    </View>
-                )}
+            <Animated.View style={[styles.body, contentStyle]}>
+                <View
+                    style={[
+                        styles.banner,
+                        {
+                            backgroundColor: aligned ? `${colors.success}1A` : lowAccuracy ? `${colors.warning}1A` : colors.cardBg,
+                        },
+                    ]}
+                >
+                    <Ionicons
+                        name={aligned ? 'checkmark-circle' : lowAccuracy ? 'sync-outline' : 'information-circle-outline'}
+                        size={15}
+                        color={aligned ? colors.success : lowAccuracy ? colors.warning : colors.textSecondary}
+                    />
+                    <ThemedText
+                        style={[
+                            styles.bannerText,
+                            { color: aligned ? colors.success : lowAccuracy ? colors.warning : colors.textSecondary },
+                        ]}
+                        numberOfLines={2}
+                    >
+                        {aligned
+                            ? 'You are facing the Qibla'
+                            : lowAccuracy
+                                ? 'Move your phone in a figure-8 to calibrate'
+                                : 'Turn slowly until the marker meets the pointer'}
+                    </ThemedText>
+                </View>
 
-                <View style={styles.dialOuter}>
-                    {/* Fixed pointer representing the top of the phone / direction it's facing. */}
-                    <View style={[styles.facingPointer, { borderBottomColor: colors.secondary }]} />
+                <View style={styles.dialArea}>
+                    <Animated.View style={[{ width: dialSize, height: dialSize }, pulseStyle]}>
+                        <CompassDial
+                            size={dialSize}
+                            colors={colors}
+                            roseStyle={roseStyle}
+                            markerStyle={markerStyle}
+                            aligned={aligned}
+                            offsetDeg={offsetDeg}
+                        />
 
-                    <Animated.View style={[styles.dial, { backgroundColor: colors.cardBg, borderColor: colors.border }, dialAnimatedStyle]}>
-                        <View style={styles.tick_N}><ThemedText style={[styles.tickLabel, { color: colors.text }]}>N</ThemedText></View>
-                        <View style={styles.tick_E}><ThemedText style={[styles.tickLabel, { color: colors.textSecondary }]}>E</ThemedText></View>
-                        <View style={styles.tick_S}><ThemedText style={[styles.tickLabel, { color: colors.textSecondary }]}>S</ThemedText></View>
-                        <View style={styles.tick_W}><ThemedText style={[styles.tickLabel, { color: colors.textSecondary }]}>W</ThemedText></View>
-
-                        <View style={styles.kaabaMarker}>
-                            <View style={[styles.kaabaIconCircle, { backgroundColor: colors.primary }]}>
-                                <Ionicons name="triangle" size={14} color="#FFFFFF" />
-                            </View>
+                        {/* Fixed reference pointer: the direction the phone is
+                            facing. Anchored to the dial itself, so it stays on
+                            the rim whatever size the dial resolves to. */}
+                        <View style={styles.pointer} pointerEvents="none">
+                            <Ionicons
+                                name="caret-down"
+                                size={22}
+                                color={aligned ? colors.success : colors.secondary}
+                            />
                         </View>
-
-                        <View style={[styles.dialCenterDot, { backgroundColor: colors.secondary }]} />
                     </Animated.View>
                 </View>
 
-                <ThemedText style={[styles.helperText, { color: colors.textSecondary }]}>
-                    Line up the marker with the pointer at the top — that&apos;s the direction of the Qibla.
-                </ThemedText>
-
-                <View style={[styles.statsRow, { backgroundColor: colors.cardBg }]}>
-                    <View style={styles.statItem}>
-                        <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>BEARING</ThemedText>
-                        <ThemedText style={[styles.statValue, { color: colors.text }]}>
-                            {qiblaBearing !== null ? `${Math.round(qiblaBearing)}°` : '—'}
-                        </ThemedText>
-                    </View>
-                    <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-                    <View style={styles.statItem}>
-                        <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>DISTANCE TO MECCA</ThemedText>
-                        <ThemedText style={[styles.statValue, { color: colors.text }]}>
-                            {distanceKm !== null ? `${Math.round(distanceKm).toLocaleString()} km` : '—'}
-                        </ThemedText>
-                    </View>
-                </View>
-            </View>
+                <QiblaStats
+                    colors={colors}
+                    bearing={qiblaBearing !== null ? `${Math.round(qiblaBearing)}°` : '—'}
+                    bearingHint={qiblaBearing !== null ? compassPoint(qiblaBearing) : undefined}
+                    distance={distanceKm !== null ? formatDistance(distanceKm) : '—'}
+                />
+            </Animated.View>
         );
-    }, [status, accuracy, qiblaBearing, distanceKm, colors, dialAnimatedStyle]);
+    };
 
     return (
         <ErrorBoundary>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
                 <Stack.Screen options={{ headerShown: false }} />
 
-                <View style={[styles.header, { paddingTop: insets.top + 14, backgroundColor: colors.primary }]}>
+                <LinearGradient
+                    colors={[colors.primary, theme === 'dark' ? '#0E4A4A' : '#004C4C']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={[styles.header, { paddingTop: insets.top + 14 }]}
+                >
                     <View style={styles.headerRow}>
                         <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={20} />
-                        <View style={{ flex: 1, marginLeft: 12 }}>
+                        <View style={styles.headerText}>
                             <ThemedText style={styles.title}>Qibla Compass</ThemedText>
                             <ThemedText style={styles.subtitle}>Find the direction of the Kaaba</ThemedText>
                         </View>
                     </View>
-                </View>
+                </LinearGradient>
 
                 {renderBody()}
             </View>
@@ -239,66 +467,35 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     header: {
         paddingHorizontal: 16,
-        paddingBottom: 16,
+        paddingBottom: 18,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
     },
     headerRow: { flexDirection: 'row', alignItems: 'center' },
-    title: { fontSize: 17, fontWeight: '800', color: '#FFFFFF' },
-    subtitle: { fontSize: 11, fontWeight: '600', color: 'rgba(255,255,255,0.85)', marginTop: 2 },
+    headerText: { flex: 1, marginLeft: 12 },
+    title: { fontSize: 18, fontWeight: '800', color: '#FFFFFF' },
+    subtitle: { fontSize: 11.5, fontWeight: '600', color: 'rgba(255,255,255,0.85)', marginTop: 2 },
 
-    centerWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40, gap: 10 },
-    centerTitle: { fontSize: 15.5, fontWeight: '800', marginTop: 4 },
-    centerText: { fontSize: 12.5, textAlign: 'center', lineHeight: 20 },
+    body: { flex: 1, alignItems: 'center', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 20 },
 
-    compassWrap: { flex: 1, alignItems: 'center', paddingTop: 28, paddingHorizontal: 20 },
-    calibrateBanner: {
-        flexDirection: 'row', alignItems: 'center', gap: 8,
-        borderRadius: Layout.borderRadius, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 20,
+    banner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        borderRadius: Layout.borderRadius,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        maxWidth: 340,
     },
-    calibrateText: { fontSize: 11, fontWeight: '700', flexShrink: 1 },
+    bannerText: { fontSize: 11.5, fontWeight: '700', flexShrink: 1 },
 
-    dialOuter: { width: DIAL_SIZE, height: DIAL_SIZE, alignItems: 'center', justifyContent: 'center' },
-    facingPointer: {
+    dialArea: { flex: 1, alignItems: 'center', justifyContent: 'center', width: '100%' },
+    pointer: {
         position: 'absolute',
-        top: -4,
-        width: 0,
-        height: 0,
-        borderLeftWidth: 8,
-        borderRightWidth: 8,
-        borderBottomWidth: 14,
-        borderLeftColor: 'transparent',
-        borderRightColor: 'transparent',
+        top: -20,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
         zIndex: 2,
     },
-    dial: {
-        width: DIAL_SIZE,
-        height: DIAL_SIZE,
-        borderRadius: DIAL_SIZE / 2,
-        borderWidth: 2,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    tick_N: { position: 'absolute', top: 14 },
-    tick_E: { position: 'absolute', right: 16 },
-    tick_S: { position: 'absolute', bottom: 14 },
-    tick_W: { position: 'absolute', left: 16 },
-    tickLabel: { fontSize: 13, fontWeight: '800' },
-    kaabaMarker: { position: 'absolute', top: 22, alignItems: 'center' },
-    kaabaIconCircle: {
-        width: 30, height: 30, borderRadius: 15,
-        alignItems: 'center', justifyContent: 'center',
-    },
-    dialCenterDot: { width: 8, height: 8, borderRadius: 4 },
-
-    helperText: { fontSize: 11.5, textAlign: 'center', marginTop: 24, paddingHorizontal: 20, lineHeight: 18 },
-
-    statsRow: {
-        flexDirection: 'row', width: '100%', borderRadius: Layout.borderRadius,
-        marginTop: 24, paddingVertical: 14,
-    },
-    statItem: { flex: 1, alignItems: 'center', gap: 4 },
-    statDivider: { width: StyleSheet.hairlineWidth },
-    statLabel: { fontSize: 9.5, fontWeight: '800', letterSpacing: 0.5 },
-    statValue: { fontSize: 15.5, fontWeight: '800' },
 });
