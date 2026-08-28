@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useCallback, memo } from 'react';
+import React, { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LoaderOverlay } from '@/components/common/LoaderOverlay';
 import { FlashList } from '@shopify/flash-list';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useNavigation, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -38,6 +38,7 @@ function FeedbackCardSkeleton({ colors }: { colors: any }) {
 
 export default function FeedbackScreen() {
     const router = useRouter();
+    const navigation = useNavigation();
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const colors = Colors[theme];
@@ -84,6 +85,31 @@ export default function FeedbackScreen() {
             router.replace('/(drawer)/(tabs)' as any);
         }
     }, [router]);
+
+    // The Back button's fallback (replace with Home when there's no history to
+    // pop into) only runs for a press on that button. The modal's native
+    // swipe-to-dismiss gesture bypasses it entirely and just pops the screen,
+    // which — with no history underneath — can leave the user looking at
+    // whatever the navigator reveals instead of Home. This makes the two
+    // paths match: when there IS history, a swipe already behaves exactly
+    // like the button (a plain pop), so it's left alone; only the no-history
+    // case is redirected.
+    //
+    // `bypassNextRemoval` exists because router.replace() itself removes this
+    // screen too, which would otherwise retrigger this same listener and,
+    // since canGoBack() is still false at that point, loop.
+    const bypassNextRemoval = useRef(false);
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
+            if (bypassNextRemoval.current || router.canGoBack()) {
+                return;
+            }
+            e.preventDefault();
+            bypassNextRemoval.current = true;
+            router.replace('/(drawer)/(tabs)' as any);
+        });
+        return unsubscribe;
+    }, [navigation, router]);
 
     const handleSubmit = useCallback(() => {
         if (!message.trim()) {
@@ -159,7 +185,13 @@ export default function FeedbackScreen() {
 
             {/* Header */}
             <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.background }]}>
-                <BackButton backgroundColor="rgba(255,255,255,0.18)" color="#FFFFFF" size={22} />
+                <BackButton
+                    onPress={handleGoBack}
+                    icon="close"
+                    backgroundColor="rgba(255,255,255,0.18)"
+                    color="#FFFFFF"
+                    size={22}
+                />
                 <View style={{ flex: 1, marginLeft: 12 }}>
                     <ThemedText style={styles.screenTitle}>Feedback</ThemedText>
                 </View>

@@ -71,7 +71,22 @@ class InterstitialService {
   private showPendingTimer: ReturnType<typeof setTimeout> | null =
     null;
   private showPending = false;
-  private readonly SHOW_PENDING_TIMEOUT = 5000;
+  // How long a forced show() waits for a still-loading ad before giving up on
+  // auto-showing it. This is the only thing standing between "ad was
+  // requested" and "ad was actually shown" for the six create/update flows
+  // that call show(true) right after a success action.
+  //
+  // 5000ms was tuned against Google's TestIds, which fill in well under a
+  // second because they skip the real ad auction entirely. Production ad
+  // units go through a genuine mediation waterfall (AppLovin/Facebook/Unity
+  // are all wired up in app.json) and can easily take longer than that to
+  // fill, especially on a cold session or a weak connection — so the forced
+  // show was frequently timing out before its own preload finished, and the
+  // ad that eventually loaded was simply never shown. This is why "works in
+  // dev, silently fails in production" was possible without any dev-only
+  // branch in the code: the bug only needed dev's ads to be *faster*, not
+  // fundamentally different.
+  private readonly SHOW_PENDING_TIMEOUT = 20000;
 
   private loadStartTime = 0;
   private loadedAt = 0;
@@ -609,9 +624,19 @@ class InterstitialService {
      */
     if (this.isAdExpired()) {
       this.cleanupAd();
-      this.load();
 
-      return false;
+      if (!force) {
+        this.load();
+        return false;
+      }
+
+      // A forced show represents a completed user action (listing created,
+      // business registered, essential added) — it gets exactly one shot.
+      // Previously this branch returned unconditionally, which silently
+      // dropped that shot whenever the preloaded ad happened to be stale
+      // (loaded over an hour earlier), even for force=true. Falling through
+      // to the "ad not ready" path below queues a fresh load and arms the
+      // pending-show window instead of discarding the request.
     }
 
     /**
@@ -644,7 +669,7 @@ class InterstitialService {
     /**
      * If forced, queue the show request.
      * The LOADED event will auto-show it.
-     * Timeout after 5s to prevent stale popups.
+     * Timeout after SHOW_PENDING_TIMEOUT to prevent stale popups.
      */
     if (force) {
       this.showPending = true;

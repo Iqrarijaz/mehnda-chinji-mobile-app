@@ -69,7 +69,7 @@ export function useBusinessAPI(options?: UseBusinessAPIOptions) {
         onSuccess: (res: any) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
-                Toast.show({ type: 'success', text1: 'Success', text2: 'Business registered!' });
+                // Success is communicated via the caller's ThankYouModal, not a toast.
                 if (onRegisterSuccess) onRegisterSuccess();
             }
         },
@@ -83,7 +83,7 @@ export function useBusinessAPI(options?: UseBusinessAPIOptions) {
         onSuccess: (res: any) => {
             if (res.success) {
                 queryClient.invalidateQueries({ queryKey: BUSINESS_QUERY_KEYS.myBusiness() });
-                Toast.show({ type: 'success', text1: 'Success', text2: 'Business updated!' });
+                // Success is communicated via the caller's ThankYouModal, not a toast.
                 if (onUpdateSuccess) onUpdateSuccess();
             }
         },

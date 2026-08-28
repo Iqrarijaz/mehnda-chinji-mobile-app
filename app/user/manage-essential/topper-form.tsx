@@ -155,7 +155,6 @@ const TopperForm = () => {
             return addTopper(essentialId, payload);
         },
         onSuccess: () => {
-            Toast.show({ type: 'success', text1: isEditing ? 'Updated' : 'Added' });
             queryClient.invalidateQueries({ queryKey: ['my-essential-request', essentialId] });
             handleGoBack();
         },

@@ -236,13 +236,9 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
             }
             return createMarketplaceListing(payload);
         },
-        onSuccess: (res: any) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.all });
-            Toast.show({
-                type: 'success',
-                text1: listingToEdit ? 'Listing Updated' : 'Listing Submitted',
-                text2: res.message || 'Your marketplace listing is pending admin audit!'
-            });
+            // Success is communicated via the ThankYouModal below, not a toast.
             if (!listingToEdit) {
                 setFormData({
                     title: '',

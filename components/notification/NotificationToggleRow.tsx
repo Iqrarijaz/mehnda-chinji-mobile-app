@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { ThemedText } from '@/components/ThemedText';
-import { Layout } from '@/constants/layout';
 
 interface NotificationToggleRowProps {
     label: string;
@@ -31,9 +30,7 @@ const NotificationToggleRow: React.FC<NotificationToggleRowProps> = React.memo((
 
     return (
         <View style={styles.container}>
-            <View style={[styles.iconContainer, { backgroundColor: `${color}18` }]}>
-                <Ionicons name={icon} size={22} color={color} />
-            </View>
+            <Ionicons name={icon} size={26} color={color} style={styles.icon} />
             <View style={styles.content}>
                 <ThemedText style={[styles.label, { color: colors.text }]}>{label}</ThemedText>
                 <ThemedText style={[styles.descriptionText, { color: colors.textSecondary }]} numberOfLines={2}>
@@ -56,12 +53,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 11 },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center',
+    icon: {
         marginRight: 14 },
     content: {
         flex: 1,

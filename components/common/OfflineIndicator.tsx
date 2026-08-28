@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, Platform } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -9,16 +9,23 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
-import { Layout } from '@/constants/layout';
+import { Colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 
 interface OfflineIndicatorProps {
     visible: boolean;
 }
 
-const OFFLINE_COLOR = '#F59E0B'; // Amber - classic warning color
+// Near-black rather than white: white-on-amber measures 2.15:1 in light theme
+// and 1.67:1 in dark, both well under the 4.5:1 AA floor for text this size.
+// This value clears 8.65:1 / 11.13:1 against the light/dark warning tokens —
+// the same fix already applied to the amber action button in QiblaMessageState.
+const ON_WARNING_TEXT = '#1A1200';
 
 const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({ visible }) => {
     const insets = useSafeAreaInsets();
+    const { theme } = useTheme();
+    const colors = Colors[theme];
     const translateY = useSharedValue(-100);
 
     useEffect(() => {
@@ -38,9 +45,11 @@ const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({ visible }) => {
 
     return (
         <Animated.View style={[styles.container, animatedStyle]}>
-            <View style={styles.content}>
-                <Ionicons name="cloud-offline-outline" size={20} color="#FFFFFF" />
-                <ThemedText style={styles.text}>No Internet Connection</ThemedText>
+            <View style={[styles.pill, { backgroundColor: colors.warning }]}>
+                <Ionicons name="cloud-offline-outline" size={13} color={ON_WARNING_TEXT} />
+                <ThemedText style={[styles.text, { color: ON_WARNING_TEXT }]}>
+                    No Internet Connection
+                </ThemedText>
             </View>
         </Animated.View>
     );
@@ -54,27 +63,20 @@ const styles = StyleSheet.create({
         right: 20,
         zIndex: 9999,
         alignItems: 'center' },
-    content: {
+    pill: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: OFFLINE_COLOR,
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: Layout.borderRadius,
-        gap: 10,
-        ...Platform.select({
-            ios: {
-
-
-
-
-            },
-            android: {
-
-            } }) },
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 999,
+        gap: 6,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.15,
+        shadowRadius: 6,
+        elevation: 4 },
     text: {
-        color: '#FFFFFF',
-        fontSize: 12.5,
-        fontWeight: '600' } });
+        fontSize: 11,
+        fontWeight: '700' } });
 
 export default React.memo(OfflineIndicator);

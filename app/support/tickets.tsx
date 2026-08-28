@@ -23,7 +23,7 @@ import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { FlashList } from '@shopify/flash-list';
-import { LoaderOverlay } from '@/components/common/LoaderOverlay';
+import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 const { width } = Dimensions.get('window');
@@ -62,6 +62,7 @@ export default function TicketListScreen() {
     const queryClient = useQueryClient();
 
     const [selectedFilter, setSelectedFilter] = useState('all');
+    const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
     const handleBack = () => {
         if (router.canGoBack()) {
@@ -84,6 +85,7 @@ export default function TicketListScreen() {
         onSuccess: () => {
             Toast.show({ type: 'success', text1: 'Ticket Deleted' });
             queryClient.invalidateQueries({ queryKey: ['support_tickets'] });
+            setDeleteTarget(null);
         },
         onError: (error: any) => {
             Alert.alert('Error', error.message || 'Failed to delete ticket.');
@@ -91,14 +93,11 @@ export default function TicketListScreen() {
     });
 
     const handleDelete = (id: string) => {
-        Alert.alert(
-            'Delete Ticket',
-            'Are you sure you want to delete this ticket?',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Delete', style: 'destructive', onPress: () => deleteMutation.mutate(id) }
-            ]
-        );
+        setDeleteTarget(id);
+    };
+
+    const confirmDelete = () => {
+        if (deleteTarget) deleteMutation.mutate(deleteTarget);
     };
 
     const getStatusColor = (status: string) => {
@@ -290,7 +289,16 @@ export default function TicketListScreen() {
                     </View>
                 )}
             </View>
-            <LoaderOverlay visible={deleteMutation.isPending} text="Deleting ticket..." />
+            <CleanConfirmationModal
+                visible={!!deleteTarget}
+                onClose={() => setDeleteTarget(null)}
+                onConfirm={confirmDelete}
+                title="Delete Ticket"
+                message="Are you sure you want to delete this ticket?"
+                confirmText="Delete"
+                type="danger"
+                isLoading={deleteMutation.isPending}
+            />
         </GestureHandlerRootView>
         </ErrorBoundary>
     );

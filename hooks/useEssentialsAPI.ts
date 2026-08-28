@@ -47,12 +47,9 @@ export function useEssentialsAPI(options?: UseEssentialsAPIOptions) {
             }
             return submitEssential(payload);
         },
-        onSuccess: (data, variables) => {
-            Toast.show({
-                type: 'success',
-                text1: variables.isEditing ? 'Updated' : 'Submitted',
-                text2: variables.isEditing ? 'Request updated successfully.' : 'Request submitted successfully pending approval.',
-            });
+        onSuccess: () => {
+            // Success is communicated via the caller's ThankYouModal (on create)
+            // or by simply closing the form (on edit), not a toast.
             queryClient.invalidateQueries({ queryKey: ['my-essential-requests'] });
         },
         onError: (error: any) => {

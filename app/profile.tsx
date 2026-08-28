@@ -77,9 +77,7 @@ export default memo(function ProfileScreen() {
         phone: '',
         gender: '',
         city: '',
-        village: '',
-        emailVerified: false,
-        otpVerified: false });
+        village: '' });
 
     const [cityPickerVisible, setCityPickerVisible] = useState(false);
     const [villagePickerVisible, setVillagePickerVisible] = useState(false);
@@ -94,9 +92,7 @@ export default memo(function ProfileScreen() {
             phone: user?.user?.phone || '',
             gender: user?.user?.gender || '',
             city: user?.user?.city || '',
-            village: toTitleCase(user?.user?.village || ''),
-            emailVerified: user?.user?.emailVerified || false,
-            otpVerified: user?.user?.otpVerified || false };
+            village: toTitleCase(user?.user?.village || '') };
     }, [user, toTitleCase]);
 
     // Initialize form only when currentData changes (e.g., initial load or backend refresh)
@@ -216,12 +212,6 @@ export default memo(function ProfileScreen() {
                             <ThemedText style={styles.userName} numberOfLines={1}>
                                 {currentData.name || 'Welcome'}
                             </ThemedText>
-                            {(currentData.otpVerified || currentData.emailVerified) && (
-                                <View style={[styles.verifiedChip, { backgroundColor: colors.lime }]}>
-                                    <Ionicons name="checkmark-circle" size={11} color="#1E293B" />
-                                    <ThemedText style={styles.verifiedText}>Verified</ThemedText>
-                                </View>
-                            )}
                         </View>
                         <ThemedText style={styles.subtitleText}>
                             Keep your profile complete for better community trust
@@ -428,19 +418,6 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         letterSpacing: 0.2,
         flexShrink: 1 },
-    verifiedChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 3,
-        paddingHorizontal: 7,
-        paddingVertical: 3,
-        borderRadius: Layout.borderRadius },
-    verifiedText: {
-        fontSize: 8.5,
-        fontWeight: '800',
-        color: '#1E293B',
-        textTransform: 'uppercase',
-        letterSpacing: 0.4 },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',

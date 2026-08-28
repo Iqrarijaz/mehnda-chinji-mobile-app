@@ -116,6 +116,7 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = Rea
                         <PressableScale
                             onPress={onClose}
                             disabled={isLoading}
+                            containerStyle={styles.flexOne}
                             style={[
                                 styles.button,
                                 styles.cancelBtn,
@@ -130,6 +131,7 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = Rea
                         <PressableScale
                             onPress={onConfirm}
                             disabled={isLoading}
+                            containerStyle={styles.flexOne}
                             style={[
                                 styles.button,
                                 styles.confirmBtn,
@@ -191,6 +193,13 @@ const styles = StyleSheet.create({
         gap: 10,
         marginTop: 4,
         width: '100%' },
+    // PressableScale's outer Animated.View (the actual flex participant in
+    // actionsContainer's row) needs its own sizing via containerStyle — the
+    // `style` prop only reaches the inner Pressable. Without this, `flex: 1`
+    // below has no row-relative parent to size against and both buttons
+    // collapse to fit-content, effectively disappearing from the modal.
+    flexOne: {
+        flex: 1 },
     button: {
         flex: 1,
         height: 40,

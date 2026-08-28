@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import React, { memo, useState } from 'react';
-import { Alert, Linking, StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import { Image } from 'expo-image';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
@@ -29,6 +29,7 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
     const router = useRouter();
     const queryClient = useQueryClient();
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showMarkSoldConfirm, setShowMarkSoldConfirm] = useState(false);
     const [showPhoneErrorModal, setShowPhoneErrorModal] = useState(false);
 
     const isOwner = user?.user?._id && item.sellerId && (item.sellerId._id || item.sellerId).toString() === user.user._id.toString();
@@ -120,15 +121,8 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
     );
 
     const confirmMarkSold = React.useCallback(() => {
-        Alert.alert(
-            "Mark as Sold",
-            "Mark this item as sold? It will no longer be visible in public listings.",
-            [
-                { text: "Cancel", style: "cancel" },
-                { text: "Yes, Mark Sold", onPress: () => markSoldMutation.mutate() }
-            ]
-        );
-    }, [markSoldMutation]);
+        setShowMarkSoldConfirm(true);
+    }, []);
 
     const actions = React.useMemo(() => {
         const baseActions: ActionMenuItem[] = [
@@ -218,6 +212,20 @@ export const MarketplaceCard = memo(({ item, colors, onEdit, showActions }: Mark
                 message="Are you sure you want to remove this listing? This action cannot be undone."
                 type="danger"
                 confirmText="Delete"
+                cancelText="Cancel"
+            />
+
+            <ConfirmationModal
+                visible={showMarkSoldConfirm}
+                onClose={() => setShowMarkSoldConfirm(false)}
+                onConfirm={() => {
+                    setShowMarkSoldConfirm(false);
+                    markSoldMutation.mutate();
+                }}
+                title="Mark as Sold"
+                message="Mark this item as sold? It will no longer be visible in public listings."
+                type="info"
+                confirmText="Yes, Mark Sold"
                 cancelText="Cancel"
             />
 
