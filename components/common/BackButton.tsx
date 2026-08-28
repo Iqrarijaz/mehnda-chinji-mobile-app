@@ -11,6 +11,8 @@ interface BackButtonProps {
     backgroundColor?: string;
     style?: StyleProp<ViewStyle>;
     size?: number;
+    /** e.g. 'close' for a modal-presented screen. Defaults to the plain back arrow. */
+    icon?: keyof typeof Ionicons.glyphMap;
 }
 
 export const BackButton = React.memo(function BackButton({
@@ -19,6 +21,7 @@ export const BackButton = React.memo(function BackButton({
     backgroundColor,
     style,
     size = 18,
+    icon = 'arrow-back',
 }: BackButtonProps) {
     const router = useRouter();
     const { theme } = useTheme();
@@ -44,7 +47,7 @@ export const BackButton = React.memo(function BackButton({
             ]}
             activeOpacity={0.8}
         >
-            <Ionicons name="arrow-back" size={size} color={color || colors.primary} />
+            <Ionicons name={icon} size={size} color={color || colors.primary} />
         </TouchableOpacity>
     );
 });

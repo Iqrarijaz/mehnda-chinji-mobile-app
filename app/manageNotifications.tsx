@@ -8,7 +8,7 @@ import {
     RefreshControl } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -64,9 +64,6 @@ const ManageNotificationsScreen = React.memo(function ManageNotificationsScreen(
                     </View>
                     <View style={{ width: 42 }} />
                 </View>
-                <Animated.View entering={FadeIn.delay(400).duration(500)} style={styles.headerSubtitleWrap}>
-                    <ThemedText style={styles.headerSubtitle}>Control which notifications you receive</ThemedText>
-                </Animated.View>
             </Animated.View>
 
             {/* ── Content ─────────────────────────────────────────── */}
@@ -196,7 +193,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1 },
     headerWrap: {
-        paddingBottom: 20,
+        paddingBottom: 14,
         borderBottomLeftRadius: Layout.headerBorderRadius,
         borderBottomRightRadius: Layout.headerBorderRadius,
         overflow: 'hidden',
@@ -219,13 +216,6 @@ const styles = StyleSheet.create({
         fontSize: 16.5,
         fontWeight: '800',
         color: '#FFFFFF' },
-    headerSubtitleWrap: {
-        alignItems: 'center',
-        marginTop: 8 },
-    headerSubtitle: {
-        fontSize: 10,
-        color: 'rgba(255,255,255,0.75)',
-        fontWeight: '500' },
     scrollView: {
         flex: 1,
         marginTop: -30,

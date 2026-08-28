@@ -21,11 +21,20 @@ import {
     searchPlaces,
     reverseGeocode,
     getCurrentCoords,
+    isValidCoordinate,
     PlaceResult } from '@/utils/locationService';
+import { clientStorage } from '@/utils/storage';
 import { SubmitButton } from './SubmitButton';
 import { LocationLoadingModal } from './LocationLoadingModal';
 import { BackButton } from './BackButton';
 import { Layout } from '@/constants/layout';
+
+// Last location the user picked in ANY LocationPicker, kept in MMKV so it
+// survives across app sessions (unlike component state, which resets every
+// time a form screen remounts). Reopening the picker with no value yet
+// reuses this instead of defaulting to a bare map of Pakistan and making the
+// user search or hit "current location" all over again.
+const LAST_LOCATION_STORAGE_KEY = 'location_picker:last_selected';
 
 // MapLibre is fully free and needs no API key/token; pass null to satisfy the
 // Mapbox-compatible API surface.
@@ -102,6 +111,35 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
         }
     }, [value]);
 
+    // Seed from the last MMKV-remembered location when this picker mounts
+    // with nothing already selected — e.g. a fresh visit to a form that
+    // hasn't been filled in yet. Only runs once at mount: it should not
+    // fight the user's own choices made afterwards (including explicitly
+    // clearing the location, which removes the cache entry below rather
+    // than leaving this effect free to reinstate it).
+    useEffect(() => {
+        if (value) return;
+        let cancelled = false;
+        (async () => {
+            const raw = await clientStorage.getItem(LAST_LOCATION_STORAGE_KEY);
+            if (cancelled || !raw) return;
+            try {
+                const saved = JSON.parse(raw) as LocationValue;
+                if (!isValidCoordinate(saved.latitude, saved.longitude)) return;
+                setSelectedCoord({ latitude: saved.latitude, longitude: saved.longitude });
+                setSelectedAddress(saved.address ?? null);
+                // initialCameraConfig was already memoized at mount using the
+                // (then-null) value, so the map needs an explicit nudge to
+                // actually show the restored point once it arrives.
+                moveCamera(saved.latitude, saved.longitude, 13);
+            } catch {
+                // Corrupt cache entry — ignore it, fall back to the default map.
+            }
+        })();
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const AnimatedView = delay > 0 ? Animated.View : View;
     const animatedProps = delay > 0 ? { entering: FadeInDown.delay(delay) } : {};
 
@@ -167,10 +205,19 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
         }
     };
 
+    // Every path that commits a location (search result, current-location
+    // fix, marker confirm, or the final Done button) goes through here, so
+    // there is exactly one place that writes the MMKV cache — no call site
+    // can commit a location and forget to remember it.
+    const commitLocation = (loc: LocationValue) => {
+        onChange(loc);
+        clientStorage.setItem(LAST_LOCATION_STORAGE_KEY, JSON.stringify(loc)).catch(() => {});
+    };
+
     const selectPlace = (place: PlaceResult) => {
         setSelectedCoord({ latitude: place.latitude, longitude: place.longitude });
         setSelectedAddress(place.displayName);
-        onChange({
+        commitLocation({
             latitude: place.latitude,
             longitude: place.longitude,
             address: place.displayName,
@@ -181,6 +228,11 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
         setQuery(place.displayName);
     };
 
+    // The only path that touches GPS: an explicit tap on "use current
+    // location". Nothing else in this component requests a location fix —
+    // opening the picker restores the last commit from MMKV instead (see the
+    // mount effect above), and confirming a marker position just reverse
+    // geocodes the point already on the map.
     const useCurrentLocation = async () => {
         setLocating(true);
         try {
@@ -194,7 +246,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
             const address = await reverseGeocode(coords.latitude, coords.longitude);
             const resolvedAddress = address || 'Current Location';
             setSelectedAddress(resolvedAddress);
-            onChange({
+            commitLocation({
                 latitude: coords.latitude,
                 longitude: coords.longitude,
                 address: resolvedAddress,
@@ -211,7 +263,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
         const address = await reverseGeocode(selectedCoord.latitude, selectedCoord.longitude);
         const resolvedAddress = address || selectedAddress || 'Selected store location';
         setSelectedAddress(resolvedAddress);
-        onChange({
+        commitLocation({
           latitude: selectedCoord.latitude,
           longitude: selectedCoord.longitude,
           address: resolvedAddress,
@@ -234,7 +286,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
           address = await reverseGeocode(selectedCoord.latitude, selectedCoord.longitude);
           setLocating(false);
         }
-        onChange({
+        commitLocation({
             latitude: selectedCoord.latitude,
             longitude: selectedCoord.longitude,
             address: address || 'Selected location' });
@@ -243,6 +295,9 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
 
     const clearLocation = () => {
         onChange(null);
+        // Otherwise the mount effect above would reinstate the very location
+        // the user just explicitly removed the next time this picker opens.
+        clientStorage.removeItem(LAST_LOCATION_STORAGE_KEY).catch(() => {});
         closeModal();
     };
 
@@ -270,7 +325,13 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                             {label} <ThemedText style={{ color: colors.icon, fontWeight: '400' }}>(Optional)</ThemedText>
                         </ThemedText>
                         {value ? (
-                            <TouchableOpacity onPress={() => onChange(null)} hitSlop={8}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    onChange(null);
+                                    clientStorage.removeItem(LAST_LOCATION_STORAGE_KEY).catch(() => {});
+                                }}
+                                hitSlop={8}
+                            >
                                 <ThemedText style={{ color: '#EF4444', fontSize: 10.5, fontWeight: '700' }}>Remove</ThemedText>
                             </TouchableOpacity>
                         ) : null}

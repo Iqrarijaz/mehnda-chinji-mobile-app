@@ -158,6 +158,7 @@ export const ScreenHeader = React.memo(function ScreenHeader({
                                     router.replace('/(drawer)/(tabs)' as any);
                                 }
                             }}
+                            icon={backIcon}
                             backgroundColor="transparent"
                             color="#FFFFFF"
                             size={20}

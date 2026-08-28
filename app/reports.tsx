@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, TextInput, Alert, Platform } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, TextInput, Platform } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ActionMenu, ActionMenuItem } from '@/components/common/ActionMenu';
 import { useRouter } from 'expo-router';
@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
 import { BackButton } from '@/components/common/BackButton';
+import { CleanConfirmationModal } from '@/components/common/CleanConfirmationModal';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
 import { Layout } from '@/constants/layout';
@@ -43,6 +44,7 @@ export default function ReportsScreen() {
 
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [selectedReport, setSelectedReport] = useState<any>(null);
+    const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
     const [editReason, setEditReason] = useState('');
     const [editDescription, setEditDescription] = useState('');
 
@@ -58,6 +60,7 @@ export default function ReportsScreen() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['my-reports'] });
             Toast.show({ type: 'success', text1: 'Deleted', text2: 'Report deleted successfully' });
+            setDeleteTarget(null);
         },
         onError: (error: any) => {
             Toast.show({ type: 'error', text1: 'Error', text2: error.response?.data?.message || 'Failed to delete report' });
@@ -84,14 +87,11 @@ export default function ReportsScreen() {
     };
 
     const handleDelete = (id: string) => {
-        Alert.alert(
-            "Delete Report",
-            "Are you sure you want to delete this report?",
-            [
-                { text: "Cancel", style: "cancel" },
-                { text: "Delete", style: "destructive", onPress: () => deleteMutation.mutate(id) }
-            ]
-        );
+        setDeleteTarget(id);
+    };
+
+    const confirmDelete = () => {
+        if (deleteTarget) deleteMutation.mutate(deleteTarget);
     };
 
     const handleSaveEdit = () => {
@@ -254,8 +254,18 @@ export default function ReportsScreen() {
                 </View>
             </Modal>
             <LoaderOverlay
-                visible={deleteMutation.isPending || updateMutation.isPending}
-                text={deleteMutation.isPending ? 'Deleting report...' : 'Updating report...'}
+                visible={updateMutation.isPending}
+                text="Updating report..."
+            />
+            <CleanConfirmationModal
+                visible={!!deleteTarget}
+                onClose={() => setDeleteTarget(null)}
+                onConfirm={confirmDelete}
+                title="Delete Report"
+                message="Are you sure you want to delete this report?"
+                confirmText="Delete"
+                type="danger"
+                isLoading={deleteMutation.isPending}
             />
         </View>
         </ErrorBoundary>
