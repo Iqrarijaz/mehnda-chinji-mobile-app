@@ -14,6 +14,7 @@ export interface NotificationPreferences {
     weather: boolean;
     prayer: boolean;
     cricket: boolean;
+    fuel: boolean;
 }
 
 interface NotificationState {
@@ -35,6 +36,7 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
     weather: true,
     prayer: true,
     cricket: true,
+    fuel: true,
 };
 
 const syncFCMSubscriptions = async (prefs: NotificationPreferences) => {

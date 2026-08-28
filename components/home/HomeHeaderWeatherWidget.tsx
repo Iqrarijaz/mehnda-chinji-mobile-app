@@ -1,10 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
-import { ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+    ImageBackground,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 import Skeleton from '@/components/common/Skeleton';
-import { Colors } from '@/constants/colors';
-import { useTheme } from '@/context/ThemeContext';
 import { useWeather } from '@/hooks/useWeather';
 import { useWeatherLocation } from '@/hooks/useWeatherLocation';
 import { buildDailyForecast } from '@/utils/forecastDaily';
@@ -13,15 +16,6 @@ import { ThemedText } from '../ThemedText';
 
 const WEATHER_BG = require('@/assets/images/widgets/weather_bg.png');
 
-// The plate is authored 2:1 with its safe zones measured at that ratio, so the
-// card tracks that aspect and the art is never cropped in the common case.
-//
-// MIN_CARD_HEIGHT is the floor the content genuinely needs: on a narrow phone
-// (~328pt of card width) pure aspect sizing yields a box too short for the
-// stack below, and since the card clips its overflow the strip would be
-// silently cut off rather than visibly break. Below that width the card grows
-// slightly taller than 2:1 and cover-crops a few percent off the sides, which
-// the safe zones absorb.
 const CARD_ASPECT = 2.4;
 const MIN_CARD_HEIGHT = 118;
 
@@ -67,9 +61,6 @@ const WeatherSkeleton = React.memo(function WeatherSkeleton() {
 const HomeHeaderWeatherWidget = React.memo(function HomeHeaderWeatherWidget({
     onPress,
 }: HomeHeaderWeatherWidgetProps) {
-    const { theme } = useTheme();
-    const colors = Colors[theme];
-
     const { coords, fallbackCity } = useWeatherLocation();
     const { weather, forecast, isWeatherLoading } = useWeather(
         fallbackCity,
@@ -78,8 +69,6 @@ const HomeHeaderWeatherWidget = React.memo(function HomeHeaderWeatherWidget({
 
     const days = useMemo(() => buildDailyForecast((forecast as any)?.list, 5), [forecast]);
 
-    // Today's range comes from the forecast when it is loaded, since the current
-    // observation's own min/max covers only the reporting window.
     const { high, low } = useMemo(() => {
         if (days.length) return { high: days[0].high, low: days[0].low };
         return {
@@ -104,9 +93,6 @@ const HomeHeaderWeatherWidget = React.memo(function HomeHeaderWeatherWidget({
                     imageStyle={styles.bgImage}
                     resizeMode="cover"
                 >
-                    {/* No scrim over the plate: its own gradients were tuned until
-                        every safe zone cleared AA against white, and stacking
-                        another one would only dull the art without helping. */}
                     <View style={styles.content}>
                         {/* Primary metric */}
                         <View style={styles.tempRow}>

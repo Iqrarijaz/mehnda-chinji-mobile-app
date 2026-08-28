@@ -34,11 +34,14 @@ export default function HomeScreen() {
   const showSkeleton = (isLoading || isFetching) && categories.length === 0 && utilities.length === 0;
 
   React.useEffect(() => {
-    // Subscribe to marketplace reminders so already registered users receive them
+    // Subscribe to marketplace reminders and fuel price updates so already registered users receive them
     messaging()
       .subscribeToTopic('marketplace_reminder')
-      .then(() => console.log('Subscribed to marketplace_reminder from Home'))
-      .catch(err => console.log('Failed to subscribe to topic', err));
+      .catch(err => console.log('Failed to subscribe to marketplace_reminder topic', err));
+
+    messaging()
+      .subscribeToTopic('fuel_prices')
+      .catch(err => console.log('Failed to subscribe to fuel_prices topic', err));
   }, []);
 
   return (

@@ -54,7 +54,7 @@ export default function SettingsScreen() {
     const handleCheckUpdate = async () => {
         try {
             const info = await fetchAppVersionInfo();
-            const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.9';
+            const currentVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '3.0.0';
             const { isOptional, isMandatory } = checkUpdateStatus(currentVersion, info.latestVersion, info.minRequiredVersion);
             const isAvailable = isOptional || isMandatory;
 
@@ -231,7 +231,7 @@ export default function SettingsScreen() {
 
                 {/* Version */}
                 <View style={styles.versionWrap}>
-                    <ThemedText style={[styles.versionText, { color: colors.placeholder }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '2.0.9'}</ThemedText>
+                    <ThemedText style={[styles.versionText, { color: colors.placeholder }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '3.0.0'}</ThemedText>
                 </View>
             </ScrollView>
 
