@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import HomeHeaderWeatherWidget from './HomeHeaderWeatherWidget';
+import { HomeInfoCarousel } from './HomeInfoCarousel';
 import { ScreenHeader, HeaderIconBtn } from '../common/ScreenHeader';
 
 interface HomeHeaderProps {
@@ -21,7 +21,10 @@ export const HomeHeader = React.memo(({ setIsSearchActive }: HomeHeaderProps) =>
                     />
                 }
             >
-                <HomeHeaderWeatherWidget onPress={() => router.push('/weather')} />
+                <HomeInfoCarousel
+                    onWeatherPress={() => router.push('/weather')}
+                    onFuelPress={() => router.push('/fuel')}
+                />
             </ScreenHeader>
         </View>
     );

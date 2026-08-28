@@ -8,9 +8,11 @@ live React Native component laid over the top.
 
 | File | Size | Use |
 |---|---|---|
-| `weather_bg.png` | 400×200 | 1x |
-| `weather_bg@2x.png` | 800×400 | 2x |
-| `weather_bg@3x.png` | 1200×600 | 3x |
+| `weather_bg.png` / `@2x` / `@3x` | 400×200 · 800×400 · 1200×600 | weather slide |
+| `fuel_bg.png` / `@2x` / `@3x` | 400×200 · 800×400 · 1200×600 | fuel slide |
+
+Both are 2:1 and consumed by the same card in `HomeInfoCarousel`, so they must
+stay the same aspect as each other.
 
 React Native picks the right density automatically — reference only the base
 name:
@@ -59,16 +61,46 @@ a glyph can land on:
 If a light-theme variant is ever wanted, it needs its own plate rather than a
 re-tint — the composition assumes light-on-dark throughout.
 
+## fuel_bg safe zones
+
+The fuel slide carries two price rows on the left and a trend line per row, so
+its calm region is much wider than the weather plate's and the ornament — energy
+waves and a gauge sweep — is pushed right to the edge.
+
+| Zone | Mean | Worst | AA (4.5:1) |
+|---|---|---|---|
+| Header | 14.34 | 12.18 | pass |
+| Petrol row | 14.35 | 12.34 | pass |
+| Octane row | 15.53 | 13.37 | pass |
+| Carousel dots | 15.66 | 14.41 | pass |
+
+**The chart lane has a hard right limit.** Contrast falls below AA past roughly
+90% of the card width, where the ember glow and gauge sit:
+
+| Lane right edge | Worst-case | Text (4.5:1) |
+|---|---|---|
+| 96% | 3.73 | fail |
+| 92% | 4.28 | fail |
+| **90%** | **4.64** | **pass** |
+| 88% | 4.94 | pass |
+
+`FuelSlide` sizes its sparkline to end at 88%. Widen it and the line starts
+crossing the bright corner — re-measure before changing `SPARK_W`.
+
+The weather plate's dot band was checked too, since the carousel now draws
+pagination inside the card: 10.78 worst case, comfortably clear.
+
 ## Regenerating
 
-`weather_bg.svg` is the artwork and opens in any vector editor. `weather_bg.build.py`
-is the generator: it emits that SVG, rasterises it through cairo at 2x and
-reduces with Lanczos, then adds fine grain (wide gradients band badly on OLED
+Each plate has a `.svg` (the artwork, opens in any vector editor) and a
+`.build.py` (the generator: emits that SVG, rasterises through cairo at 2x,
+reduces with Lanczos, then adds fine grain — wide gradients band badly on OLED
 without it).
 
 ```
 pip install numpy Pillow cairosvg
 python3 weather_bg.build.py <output-dir>
+python3 fuel_bg.build.py <output-dir>
 ```
 
 Editing the SVG by hand is fine for one-off tweaks. Change the generator if you
