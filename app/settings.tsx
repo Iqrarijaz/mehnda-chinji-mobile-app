@@ -231,7 +231,7 @@ export default function SettingsScreen() {
 
                 {/* Version */}
                 <View style={styles.versionWrap}>
-                    <ThemedText style={[styles.versionText, { color: colors.placeholder }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '3.0.0'}</ThemedText>
+                    <ThemedText style={[styles.versionText, { color: colors.placeholder }]}>Rehbar v{process.env.EXPO_PUBLIC_APP_VERSION ?? '3.0.1'}</ThemedText>
                 </View>
             </ScrollView>
 
