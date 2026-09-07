@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { errorLogger } from '@/lib/errorLogger';
 import { useTheme } from '@/context/ThemeContext';
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     textAlign: 'center' },
   modalButton: {
     width: 120,
-    height: 40,
+    height: Platform.OS === 'android' ? 46 : 50,
     borderRadius: Layout.borderRadius,
     justifyContent: 'center',
     alignItems: 'center' },

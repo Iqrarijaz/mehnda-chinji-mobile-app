@@ -625,7 +625,6 @@ const styles = StyleSheet.create({
     },
     overRowContainer: {
         borderRadius: Layout.borderRadius - 4,
-        borderWidth: 1,
         overflow: 'hidden'
     },
     overRowHeader: {

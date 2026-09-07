@@ -12,7 +12,7 @@ export const DataUsageEmptyState = React.memo(() => {
     const colors = Colors[theme];
     return (
         <Animated.View entering={FadeIn.delay(300)} style={styles.container}>
-            <Animated.View entering={SlideInUp.delay(400).springify()} style={[styles.iconWrapper, { backgroundColor: colors.surface }]}>
+            <Animated.View entering={SlideInUp.delay(400).springify()} style={styles.iconWrapper}>
                 <Ionicons name="stats-chart" size={60} color={colors.disabled} />
             </Animated.View>
             <ThemedText style={[styles.title, { color: colors.textSecondary }]}>No data recorded yet</ThemedText>

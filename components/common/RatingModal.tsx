@@ -3,6 +3,7 @@ import {
     View,
     StyleSheet,
     Modal,
+    Platform,
     TouchableOpacity } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { ThemedText } from '../ThemedText';
@@ -124,8 +125,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 7,
         marginTop: 8 },
     modalButton: {
-        width: 100,
-        height: 36,
+        minWidth: 110,
+        height: Platform.OS === 'android' ? 46 : 50,
+        paddingHorizontal: 16,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },

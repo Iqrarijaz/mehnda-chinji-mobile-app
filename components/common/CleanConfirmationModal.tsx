@@ -1,16 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
-import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
-import Animated, {
-    FadeIn,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming } from 'react-native-reanimated';
+import React from 'react';
+import { ActivityIndicator, Modal, StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { Layout } from '@/constants/layout';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
-import { PressableScale } from '@/components/essentials/shared/PressableScale';
 
 interface CleanConfirmationModalProps {
     visible: boolean;
@@ -85,11 +79,8 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = Rea
             animationType="fade"
             statusBarTranslucent
         >
-            <Animated.View
-                entering={FadeIn.duration(200)}
-                style={styles.modalOverlay}
-            >
-                <Animated.View
+            <View style={styles.modalOverlay}>
+                <View
                     style={[
                         styles.modalContent,
                         { backgroundColor: colors.card },
@@ -97,8 +88,8 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = Rea
                 >
                     {/* Header */}
                     <View style={styles.header}>
-                        <View style={[styles.iconWrapper, { backgroundColor: typeStyles.iconBg }]}>
-                            <Ionicons name={typeStyles.iconName} size={28} color={typeStyles.iconColor} />
+                        <View style={styles.iconWrapper}>
+                            <Ionicons name={typeStyles.iconName} size={32} color={typeStyles.iconColor} />
                         </View>
                     </View>
 
@@ -113,25 +104,25 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = Rea
 
                     {/* Action Buttons */}
                     <View style={styles.actionsContainer}>
-                        <PressableScale
+                        <TouchableOpacity
                             onPress={onClose}
                             disabled={isLoading}
-                            containerStyle={styles.flexOne}
+                            activeOpacity={0.7}
                             style={[
                                 styles.button,
                                 styles.cancelBtn,
-                                { backgroundColor: colors.inputBackground, borderColor: colors.border }
+                                { backgroundColor: colors.inputBackground }
                             ]}
                         >
                             <ThemedText style={[styles.cancelBtnText, { color: colors.text }]}>
                                 {cancelText}
                             </ThemedText>
-                        </PressableScale>
+                        </TouchableOpacity>
 
-                        <PressableScale
+                        <TouchableOpacity
                             onPress={onConfirm}
                             disabled={isLoading}
-                            containerStyle={styles.flexOne}
+                            activeOpacity={0.8}
                             style={[
                                 styles.button,
                                 styles.confirmBtn,
@@ -143,10 +134,10 @@ export const CleanConfirmationModal: React.FC<CleanConfirmationModalProps> = Rea
                             ) : (
                                 <ThemedText style={styles.confirmBtnText}>{confirmText}</ThemedText>
                             )}
-                        </PressableScale>
+                        </TouchableOpacity>
                     </View>
-                </Animated.View>
-            </Animated.View>
+                </View>
+            </View>
         </Modal>
     );
 });
@@ -156,63 +147,64 @@ CleanConfirmationModal.displayName = 'CleanConfirmationModal';
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(0,0,0,0.55)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24 },
+        padding: 24,
+    },
     modalContent: {
         width: '100%',
         maxWidth: 320,
-        borderRadius: 20,
-        padding: 16,
-        alignItems: 'center' },
+        borderRadius: Layout.borderRadius,
+        padding: 20,
+        alignItems: 'center',
+    },
     header: {
         alignItems: 'center',
-        marginBottom: 8 },
+        marginBottom: 8,
+    },
     iconWrapper: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 10 },
+        justifyContent: 'center',
+        marginBottom: 6,
+    },
     title: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: '700',
         textAlign: 'center',
-        marginBottom: 4 },
+        marginBottom: 6,
+    },
     message: {
-        fontSize: 11,
-        color: '#64748B',
+        fontSize: 13,
         textAlign: 'center',
-        lineHeight: 16,
-        marginBottom: 16,
-        fontWeight: '500' },
+        lineHeight: 18,
+        marginBottom: 20,
+        fontWeight: '500',
+        paddingHorizontal: 4,
+    },
     actionsContainer: {
         flexDirection: 'row',
-        gap: 10,
-        marginTop: 4,
-        width: '100%' },
-    // PressableScale's outer Animated.View (the actual flex participant in
-    // actionsContainer's row) needs its own sizing via containerStyle — the
-    // `style` prop only reaches the inner Pressable. Without this, `flex: 1`
-    // below has no row-relative parent to size against and both buttons
-    // collapse to fit-content, effectively disappearing from the modal.
-    flexOne: {
-        flex: 1 },
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        width: '100%',
+    },
     button: {
         flex: 1,
-        height: 40,
+        height: Platform.OS === 'android' ? 46 : 50,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 999 },
-    cancelBtn: {
-        borderWidth: 1 },
+        borderRadius: Layout.borderRadius,
+    },
+    cancelBtn: {},
     cancelBtnText: {
-        fontSize: 11.5,
-        fontWeight: '700' },
+        fontSize: 13,
+        fontWeight: '700',
+    },
     confirmBtn: {},
     confirmBtnText: {
-        fontSize: 11.5,
+        fontSize: 13,
         fontWeight: '700',
-        color: '#FFFFFF' } });
+        color: '#FFFFFF',
+    },
+});

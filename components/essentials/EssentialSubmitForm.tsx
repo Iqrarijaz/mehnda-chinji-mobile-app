@@ -733,14 +733,14 @@ const EssentialSubmitForm = React.memo(({
                 <CancelButton
                     onPress={onCancel}
                     disabled={isPending || isUploading}
-                    style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 38 }}
+                    style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9' }}
                 />
                 <SubmitButton
                     title={isEditing ? 'Update' : 'Post Now'}
                     onPress={handleSubmit}
                     isLoading={isPending || isUploading}
                     disabled={isPending || isUploading || (isEditing && !hasChanges)}
-                    style={{ width: 160, height: 38, borderRadius: 28 }}
+                    style={{ width: 160, borderRadius: 28 }}
                 />
             </View>
             <LoaderOverlay

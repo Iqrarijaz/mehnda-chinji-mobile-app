@@ -17,8 +17,8 @@ interface StatProps {
 function Stat({ colors, icon, label, value, hint }: StatProps) {
     return (
         <View style={styles.item}>
-            <View style={[styles.iconWrap, { backgroundColor: `${colors.primary}14` }]}>
-                <Ionicons name={icon} size={15} color={colors.primary} />
+            <View style={styles.iconWrap}>
+                <Ionicons name={icon} size={18} color={colors.primary} />
             </View>
             <ThemedText style={[styles.label, { color: colors.textSecondary }]}>{label}</ThemedText>
             <ThemedText style={[styles.value, { color: colors.text }]} numberOfLines={1}>{value}</ThemedText>
@@ -39,7 +39,7 @@ interface QiblaStatsProps {
 /** Bearing and distance, side by side beneath the dial. */
 function QiblaStatsComponent({ colors, bearing, bearingHint, distance }: QiblaStatsProps) {
     return (
-        <View style={[styles.row, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={[styles.row, { backgroundColor: colors.card }]}>
             <Stat colors={colors} icon="navigate-outline" label="QIBLA BEARING" value={bearing} hint={bearingHint} />
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <Stat colors={colors} icon="footsteps-outline" label="DISTANCE TO MECCA" value={distance} />
@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '100%',
         borderRadius: Layout.cardBorderRadius,
-        borderWidth: StyleSheet.hairlineWidth,
         paddingVertical: 16,
     },
     item: { flex: 1, alignItems: 'center', paddingHorizontal: 8 },

@@ -112,11 +112,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
     }, [value]);
 
     // Seed from the last MMKV-remembered location when this picker mounts
-    // with nothing already selected — e.g. a fresh visit to a form that
-    // hasn't been filled in yet. Only runs once at mount: it should not
-    // fight the user's own choices made afterwards (including explicitly
-    // clearing the location, which removes the cache entry below rather
-    // than leaving this effect free to reinstate it).
+    // with nothing already selected.
     useEffect(() => {
         if (value) return;
         let cancelled = false;
@@ -128,17 +124,39 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                 if (!isValidCoordinate(saved.latitude, saved.longitude)) return;
                 setSelectedCoord({ latitude: saved.latitude, longitude: saved.longitude });
                 setSelectedAddress(saved.address ?? null);
-                // initialCameraConfig was already memoized at mount using the
-                // (then-null) value, so the map needs an explicit nudge to
-                // actually show the restored point once it arrives.
-                moveCamera(saved.latitude, saved.longitude, 13);
+                moveCamera(saved.latitude, saved.longitude, 14);
             } catch {
-                // Corrupt cache entry — ignore it, fall back to the default map.
+                // Corrupt cache entry — ignore it
             }
         })();
         return () => { cancelled = true; };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const openModal = async () => {
+        setModalVisible(true);
+        if (!selectedCoord) {
+            try {
+                const raw = await clientStorage.getItem(LAST_LOCATION_STORAGE_KEY);
+                if (raw) {
+                    const saved = JSON.parse(raw) as LocationValue;
+                    if (isValidCoordinate(saved.latitude, saved.longitude)) {
+                        setSelectedCoord({ latitude: saved.latitude, longitude: saved.longitude });
+                        setSelectedAddress(saved.address ?? null);
+                        setTimeout(() => {
+                            moveCamera(saved.latitude, saved.longitude, 14);
+                        }, 250);
+                        return;
+                    }
+                }
+            } catch {
+                // Ignore corrupt entry
+            }
+        } else {
+            setTimeout(() => {
+                moveCamera(selectedCoord.latitude, selectedCoord.longitude, 14);
+            }, 250);
+        }
+    };
 
     const AnimatedView = delay > 0 ? Animated.View : View;
     const animatedProps = delay > 0 ? { entering: FadeInDown.delay(delay) } : {};
@@ -339,7 +357,7 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
 
                     <TouchableOpacity
                         style={[styles.trigger, { backgroundColor: inputBg, minHeight: 80, paddingVertical: 10, alignItems: 'flex-start' }]}
-                        onPress={() => setModalVisible(true)}
+                        onPress={openModal}
                         activeOpacity={0.7}
                     >
                         <Ionicons
@@ -358,14 +376,14 @@ export const LocationPicker = React.memo(function LocationPicker({ label = 'LOCA
                 </>
             ) : variant === 'button' ? (
                 <TouchableOpacity
-                    onPress={() => setModalVisible(true)}
+                    onPress={openModal}
                     style={{ backgroundColor: colors.lime, paddingHorizontal: 8, paddingVertical: 4, borderRadius: Layout.borderRadius, flexDirection: 'row', alignItems: 'center' }}
                 >
                     <Ionicons name="location" size={12} color="#FFF" style={{ marginRight: 4 }} />
                     <ThemedText style={{ color: '#FFF', fontSize: 9, fontWeight: '600' }}>{label === 'LOCATION' ? 'Current Location' : label}</ThemedText>
                 </TouchableOpacity>
             ) : (
-                <TouchableOpacity onPress={() => setModalVisible(true)} hitSlop={8}>
+                <TouchableOpacity onPress={openModal} hitSlop={8}>
                     <Ionicons name="location" size={20} color={colors.lime} />
                 </TouchableOpacity>
             )}
@@ -588,11 +606,6 @@ const styles = StyleSheet.create({
     floatingIconBadge: {
         padding: 12,
         borderRadius: 100,
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
     },
     centerPinWrap: {
         ...StyleSheet.absoluteFillObject,

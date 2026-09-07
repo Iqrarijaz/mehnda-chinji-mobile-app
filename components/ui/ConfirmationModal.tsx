@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { PremiumModal } from '../common/PremiumModal';
 import { Layout } from '@/constants/layout';
@@ -15,7 +15,8 @@ interface GlassConfirmationModalProps {
     message: string;
     confirmText?: string;
     cancelText?: string;
-    type?: 'danger' | 'info';
+    type?: 'danger' | 'info' | 'warning' | 'success';
+    isLoading?: boolean;
 }
 
 export const ConfirmationModal: React.FC<GlassConfirmationModalProps> = React.memo(({
@@ -26,24 +27,38 @@ export const ConfirmationModal: React.FC<GlassConfirmationModalProps> = React.me
     message,
     confirmText = 'Confirm',
     cancelText = 'Cancel',
-    type = 'info'
+    type = 'info',
+    isLoading = false
 }) => {
     const { theme } = useTheme();
     const colors = Colors[theme];
+
+    const getIconColor = () => {
+        switch (type) {
+            case 'danger':
+                return { bg: `${colors.danger}15`, color: colors.danger, btnBg: colors.danger, icon: 'trash-outline' as const };
+            case 'warning':
+                return { bg: `${colors.warning}15`, color: colors.warning, btnBg: colors.warning, icon: 'warning-outline' as const };
+            case 'success':
+                return { bg: `${colors.success}15`, color: colors.success, btnBg: colors.success, icon: 'checkmark-circle-outline' as const };
+            case 'info':
+            default:
+                return { bg: `${colors.primary}15`, color: colors.primary, btnBg: colors.primary, icon: 'information-circle-outline' as const };
+        }
+    };
+
+    const typeConfig = getIconColor();
 
     return (
         <PremiumModal visible={visible} onClose={onClose} type="centered" sheetStyle={{ backgroundColor: 'transparent', paddingHorizontal: 0, paddingBottom: 0, paddingTop: 0 }}>
             <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
                 {/* Header with Icon */}
                 <View style={styles.header}>
-                    <View style={[
-                        styles.iconWrapper,
-                        { backgroundColor: type === 'danger' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)' }
-                    ]}>
+                    <View style={styles.iconWrapper}>
                         <Ionicons
-                            name={type === 'danger' ? "alert-circle" : "information-circle"}
+                            name={typeConfig.icon}
                             size={32}
-                            color={type === 'danger' ? "#ef4444" : "#3b82f6"}
+                            color={typeConfig.color}
                         />
                     </View>
                     <ThemedText style={[styles.title, { color: colors.text }]}>{title}</ThemedText>
@@ -55,16 +70,18 @@ export const ConfirmationModal: React.FC<GlassConfirmationModalProps> = React.me
                 {/* Footer Actions */}
                 <View style={styles.footer}>
                     <TouchableOpacity
-                        style={styles.cancelBtn}
+                        style={[styles.button, styles.cancelBtn, { backgroundColor: colors.inputBackground }]}
                         onPress={onClose}
+                        disabled={isLoading}
                         activeOpacity={0.7}
                     >
-                        <ThemedText style={[styles.cancelText, { color: colors.textSecondary }]}>{cancelText}</ThemedText>
+                        <ThemedText style={[styles.cancelText, { color: colors.text }]}>{cancelText}</ThemedText>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={[styles.confirmBtnWrapper, { backgroundColor: type === 'danger' ? '#ef4444' : colors.primary }]}
+                        style={[styles.button, styles.confirmBtnWrapper, { backgroundColor: typeConfig.btnBg }]}
                         onPress={onConfirm}
+                        disabled={isLoading}
                         activeOpacity={0.8}
                     >
                         <ThemedText style={styles.confirmBtnText}>{confirmText}</ThemedText>
@@ -75,55 +92,63 @@ export const ConfirmationModal: React.FC<GlassConfirmationModalProps> = React.me
     );
 });
 
+ConfirmationModal.displayName = 'ConfirmationModal';
+
 const styles = StyleSheet.create({
     modalContent: {
-        width: '85%',
+        width: '100%',
         maxWidth: 320,
         alignSelf: 'center',
         borderRadius: Layout.borderRadius,
-        padding: 16,
-        overflow: 'hidden' },
+        padding: 20,
+        alignItems: 'center',
+    },
     header: {
         alignItems: 'center',
-        marginBottom: 12 },
+        marginBottom: 8,
+    },
     iconWrapper: {
-        width: 48,
-        height: 48,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8 },
+        justifyContent: 'center',
+        marginBottom: 6,
+    },
     title: {
-        fontSize: 15.5,
-        fontWeight: '800',
-        textAlign: 'center' },
-    message: {
-        fontSize: 12.5,
+        fontSize: 16,
+        fontWeight: '700',
         textAlign: 'center',
-        lineHeight: 20,
+        marginBottom: 6,
+    },
+    message: {
+        fontSize: 13,
+        textAlign: 'center',
+        lineHeight: 18,
         marginBottom: 20,
-        paddingHorizontal: 8 },
+        paddingHorizontal: 4,
+        fontWeight: '500',
+    },
     footer: {
         flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         gap: 12,
-        justifyContent: 'center' },
-    cancelBtn: {
-        width: 120,
-        height: 40,
+        width: '100%',
+    },
+    button: {
+        flex: 1,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(128, 128, 128, 0.1)' },
+    },
+    cancelBtn: {},
     cancelText: {
-        fontSize: 12.5,
-        fontWeight: '600' },
-    confirmBtnWrapper: {
-        width: 120,
-        height: 40,
-        borderRadius: Layout.borderRadius,
-        justifyContent: 'center',
-        alignItems: 'center' },
+        fontSize: 13,
+        fontWeight: '700',
+    },
+    confirmBtnWrapper: {},
     confirmBtnText: {
-        fontSize: 12.5,
-        fontWeight: '600',
-        color: '#FFFFFF' } });
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#FFFFFF',
+    },
+});

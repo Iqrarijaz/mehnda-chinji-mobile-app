@@ -140,13 +140,10 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 12,
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         marginBottom: 8,
         gap: 10
     },
-    topCard: {
-        borderWidth: 1.5
-    },
+    topCard: {},
     rankBadge: {
         width: 26,
         height: 26,

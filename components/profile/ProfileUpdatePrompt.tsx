@@ -2,6 +2,7 @@ import React from 'react';
 import {
     StyleSheet,
     View,
+    Platform,
     TouchableOpacity } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { PremiumModal } from '../common/PremiumModal';
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
         gap: 12 },
     primaryBtn: {
         width: 150,
-        height: 40,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },

@@ -81,8 +81,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 8,
         borderRadius: Layout.borderRadius - 4,
-        gap: 8,
-        borderWidth: 1
+        gap: 8
     },
     ballsPillRow: {
         flexDirection: 'row',

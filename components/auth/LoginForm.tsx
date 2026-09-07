@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
         fontWeight: '600'
     },
     loginButton: {
-        height: 44,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',

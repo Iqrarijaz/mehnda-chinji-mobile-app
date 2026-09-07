@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Modal, StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     },
     presetText: { fontSize: 13.5, fontWeight: '700' },
     confirmBtn: {
-        height: 50,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius,
         alignItems: 'center',
         justifyContent: 'center',

@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useRef, useState } from 'react';
 import {
     ActivityIndicator,
+    Platform,
     ScrollView,
     StyleSheet,
     TextInput,
@@ -93,7 +94,8 @@ interface PasswordModalProps {
 }
 
 export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible, onClose }) => {
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
+    const colors = Colors[theme];
     const { updateUser } = useAuth();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -146,16 +148,20 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
 
     return (
         <>
-        <PremiumModal visible={visible} onClose={resetAndClose} type="centered">
-
+        <PremiumModal
+            visible={visible}
+            onClose={resetAndClose}
+            type="centered"
+            sheetStyle={{ width: '90%', maxWidth: 400, borderRadius: Layout.borderRadius, padding: 18 }}
+        >
             <View style={styles.header}>
-                <ThemedText style={styles.title}>Change Password</ThemedText>
+                <ThemedText style={[styles.title, { color: colors.text }]}>Change Password</ThemedText>
             </View>
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{ paddingBottom: 10 }}
+                contentContainerStyle={{ paddingBottom: 6 }}
             >
                 {/* Inputs */}
                 <InputField
@@ -199,6 +205,17 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
 
                 {/* Buttons */}
                 <View style={styles.actions}>
+                    <TouchableOpacity
+                        onPress={resetAndClose}
+                        style={[
+                            styles.cancelBtn,
+                            { backgroundColor: colors.inputBackground }
+                        ]}
+                        activeOpacity={0.7}
+                    >
+                        <ThemedText style={[styles.cancelText, { color: colors.text }]}>Cancel</ThemedText>
+                    </TouchableOpacity>
+
                     <View style={{ flex: 1 }}>
                         <SubmitButton
                             title="Update"
@@ -207,10 +224,6 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
                             isLoading={isLoading}
                         />
                     </View>
-
-                    <TouchableOpacity onPress={resetAndClose} style={styles.cancelBtn} activeOpacity={0.7}>
-                        <ThemedText style={styles.cancelText}>Cancel</ThemedText>
-                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </PremiumModal>
@@ -219,19 +232,21 @@ export const PasswordModal: React.FC<PasswordModalProps> = React.memo(({ visible
     );
 });
 
+PasswordModal.displayName = 'PasswordModal';
+
 const styles = StyleSheet.create({
-
-
     // Header
     header: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 16 },
+        marginBottom: 14,
+    },
     title: {
-        fontSize: 12.5,
-        fontWeight: '800',
+        fontSize: 16,
+        fontWeight: '700',
         textAlign: 'center',
-        marginBottom: 3 },
+        marginBottom: 2,
+    },
 
     // Strength bar
     strengthWrap: {
@@ -240,20 +255,24 @@ const styles = StyleSheet.create({
         gap: 10,
         marginTop: -6,
         marginBottom: 14,
-        marginHorizontal: 2 },
+        marginHorizontal: 2,
+    },
     strengthTrack: {
         flex: 1,
         height: 4,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#E2E8F0',
-        overflow: 'hidden' },
+        overflow: 'hidden',
+    },
     strengthFill: {
         height: '100%',
-        borderRadius: Layout.borderRadius },
+        borderRadius: Layout.borderRadius,
+    },
     strengthLabel: {
         fontSize: 10,
         fontWeight: '700',
-        width: 42 },
+        width: 42,
+    },
 
     // Mismatch
     mismatch: {
@@ -262,18 +281,27 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginTop: -8,
         marginBottom: 10,
-        marginLeft: 4 },
+        marginLeft: 4,
+    },
 
     // Buttons
-    actions: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 12 },
+    actions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 6,
+        gap: 12,
+        width: '100%',
+    },
     cancelBtn: {
         flex: 1,
-        height: 40,
+        height: Platform.OS === 'android' ? 46 : 50,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        backgroundColor: 'transparent' },
+    },
     cancelText: {
-        fontSize: 12.5,
-        color: '#94A3B8',
-        fontWeight: '600' } });
+        fontSize: 13,
+        fontWeight: '700',
+    },
+});

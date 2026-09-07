@@ -139,8 +139,8 @@ export default function TermsAndConditionsScreen() {
             <Modal visible={infoModalVisible} transparent animationType="fade">
                 <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
                     <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
-                        <View style={[styles.modalIconWrap, { backgroundColor: colors.background }]}>
-                            <Ionicons name="shield-checkmark" size={32} color={colors.primary} />
+                        <View style={styles.modalIconWrap}>
+                            <Ionicons name="shield-checkmark" size={36} color={colors.primary} />
                         </View>
                         <ThemedText style={[styles.modalTitle, { color: colors.text }]}>Why do we need this?</ThemedText>
                         <ThemedText style={[styles.modalBody, { color: colors.textSecondary }]}>
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         flex: 1 },
     acceptButton: {
-        height: 52,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
         marginBottom: 24 },
     modalBtn: {
         width: '100%',
-        height: 50,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },

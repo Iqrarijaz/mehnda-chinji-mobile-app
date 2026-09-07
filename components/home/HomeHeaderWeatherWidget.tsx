@@ -46,11 +46,25 @@ const WeatherSkeleton = React.memo(function WeatherSkeleton() {
     return (
         <View style={styles.wrapper}>
             <View style={[styles.card, styles.skeletonCard]}>
-                <Skeleton width={'45%'} height={30} borderRadius={8} />
-                <View style={{ height: 6 }} />
-                <Skeleton width={'35%'} height={12} borderRadius={5} />
-                <View style={{ height: 8 }} />
-                <Skeleton width={'80%'} height={14} borderRadius={5} />
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <Skeleton width={70} height={36} borderRadius={8} />
+                        <Skeleton width={24} height={24} borderRadius={12} />
+                    </View>
+                    <Skeleton width={60} height={18} borderRadius={6} />
+                </View>
+                <View style={{ height: 10 }} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Skeleton width={90} height={14} borderRadius={5} />
+                    <Skeleton width={70} height={14} borderRadius={5} />
+                </View>
+                <View style={{ height: 12 }} />
+                <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>
+                    <Skeleton width={50} height={12} borderRadius={4} />
+                    <Skeleton width={50} height={12} borderRadius={4} />
+                    <Skeleton width={50} height={12} borderRadius={4} />
+                    <Skeleton width={50} height={12} borderRadius={4} />
+                </View>
             </View>
         </View>
     );
@@ -146,15 +160,11 @@ const styles = StyleSheet.create({
         minHeight: MIN_CARD_HEIGHT,
         borderRadius: 20,
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.16,
-        shadowRadius: 10,
-        elevation: 3,
     },
     skeletonCard: {
         backgroundColor: 'rgba(255,255,255,0.10)',
-        padding: 12,
+        padding: 14,
+        justifyContent: 'space-between',
     },
     bg: { flex: 1 },
     bgImage: { borderRadius: 20 },

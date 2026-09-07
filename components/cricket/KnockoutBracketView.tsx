@@ -251,18 +251,10 @@ const styles = StyleSheet.create({
     },
     bracketCard: {
         borderRadius: Layout.borderRadius,
-        borderWidth: 1,
         padding: 10,
         gap: 8,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.08,
-        shadowRadius: 3
     },
-    grandFinalCard: {
-        borderWidth: 1.5
-    },
+    grandFinalCard: {},
     cardHeader: {
         flexDirection: 'row',
         alignItems: 'center',

@@ -598,11 +598,6 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         borderRadius: Layout.borderRadius,
         gap: 8,
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 4
     },
     tooltipText: {
         fontSize: 11.5,
@@ -619,8 +614,6 @@ const styles = StyleSheet.create({
         height: 8,
         borderRadius: 4,
         backgroundColor: '#10B981',
-        borderWidth: 1.5,
-        borderColor: '#FFFFFF'
     },
     headerFeedContainer: {
         paddingTop: 8
@@ -646,7 +639,6 @@ const styles = StyleSheet.create({
         width: 54,
         height: 54,
         borderRadius: 27,
-        borderWidth: 2,
         padding: 2,
         justifyContent: 'center',
         alignItems: 'center'

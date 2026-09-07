@@ -153,11 +153,15 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
         } });
 
     return (
-        <PremiumModal visible={visible} onClose={onClose} type="centered">
-
+        <PremiumModal
+            visible={visible}
+            onClose={onClose}
+            type="centered"
+            sheetStyle={{ width: '90%', maxWidth: 400, borderRadius: Layout.borderRadius, padding: 18 }}
+        >
             <View style={styles.header}>
-                <ThemedText style={styles.title}>Active Sessions</ThemedText>
-                <ThemedText style={styles.subtitle}>Manage devices currently logged in</ThemedText>
+                <ThemedText style={[styles.title, { color: colors.text }]}>Active Sessions</ThemedText>
+                <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>Manage devices currently logged in</ThemedText>
             </View>
 
             <ScrollView
@@ -174,7 +178,7 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
                 ) : sessions.length === 0 ? (
                     <View style={styles.empty}>
                         <Ionicons name="phone-portrait-outline" size={40} color="#CBD5E1" />
-                        <ThemedText style={styles.emptyText}>No active sessions found</ThemedText>
+                        <ThemedText style={[styles.emptyText, { color: colors.textSecondary }]}>No active sessions found</ThemedText>
                     </View>
                 ) : (
                     sessions.map((session, i) => (
@@ -197,6 +201,7 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
                 <TouchableOpacity
                     style={[styles.modalButton, { backgroundColor: colors.primary }]}
                     onPress={onClose}
+                    activeOpacity={0.8}
                 >
                     <ThemedText style={styles.modalButtonText}>Done</ThemedText>
                 </TouchableOpacity>
@@ -205,32 +210,44 @@ export const ActiveSessionsModal: React.FC<ActiveSessionsModalProps> = React.mem
     );
 });
 
+ActiveSessionsModal.displayName = 'ActiveSessionsModal';
+
 const styles = StyleSheet.create({
     header: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 12 },
+        marginBottom: 14,
+    },
     title: {
-        fontSize: 12.5,
-        fontWeight: '800',
+        fontSize: 16,
+        fontWeight: '700',
         textAlign: 'center',
-        marginBottom: 3 },
+        marginBottom: 2,
+    },
     subtitle: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: '500',
-        textAlign: 'center' },
+        textAlign: 'center',
+    },
 
     // Session card
-    list: { maxHeight: '55%' },
-    listContent: { paddingBottom: 7 },
+    list: {
+        maxHeight: 320,
+        flexGrow: 0,
+    },
+    listContent: {
+        paddingBottom: 2,
+        flexGrow: 0,
+    },
     card: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: Layout.borderRadius,
-        padding: 8,
-        marginBottom: 8 },
+        padding: 10,
+        marginBottom: 8,
+    },
     cardCurrent: {
-        backgroundColor: 'rgba(0,102,102,0.08)', // Using alpha for consistent branding
+        backgroundColor: 'rgba(0,102,102,0.08)',
     },
     iconCircle: {
         width: 38,
@@ -239,65 +256,79 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,102,102,0.08)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12 },
+        marginRight: 12,
+    },
     iconCircleCurrent: {
-        backgroundColor: 'rgba(0,102,102,0.12)' },
+        backgroundColor: 'rgba(0,102,102,0.14)',
+    },
     info: { flex: 1 },
     nameRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
         marginBottom: 2,
-        flexWrap: 'wrap' },
+        flexWrap: 'wrap',
+    },
     deviceName: {
-        fontSize: 10.5,
+        fontSize: 13,
         fontWeight: '700',
-        flexShrink: 1 },
+        flexShrink: 1,
+    },
     badge: {
         backgroundColor: 'rgba(0,102,102,0.14)',
         paddingHorizontal: 7,
         paddingVertical: 2,
-        borderRadius: Layout.borderRadius },
+        borderRadius: Layout.borderRadius,
+    },
     badgeText: {
         fontSize: 9,
         fontWeight: '700',
         color: '#006666',
         textTransform: 'uppercase',
-        letterSpacing: 0.5 },
+        letterSpacing: 0.5,
+    },
     meta: {
-        fontSize: 10,
+        fontSize: 11,
         color: '#94A3B8',
-        fontWeight: '500' },
+        fontWeight: '500',
+    },
     revokeBtn: {
-        width: 30,
-        height: 30,
+        width: 32,
+        height: 32,
         borderRadius: Layout.borderRadius,
         backgroundColor: '#FEF2F2',
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 10 },
+        marginLeft: 10,
+    },
 
     // Empty
     empty: {
         alignItems: 'center',
-        paddingVertical: 36,
-        gap: 12 },
+        paddingVertical: 24,
+        gap: 8,
+    },
     emptyText: {
-        fontSize: 10,
-        color: '#94A3B8',
-        fontWeight: '500' },
+        fontSize: 12,
+        fontWeight: '500',
+    },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 16 },
+        marginTop: 14,
+        width: '100%',
+    },
     modalButton: {
-        width: 120,
-        height: 40,
+        width: '100%',
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
-        alignItems: 'center' },
+        alignItems: 'center',
+    },
     modalButtonText: {
         color: '#FFFFFF',
-        fontSize: 12.5,
-        fontWeight: '600' } });
+        fontSize: 13,
+        fontWeight: '700',
+    },
+});

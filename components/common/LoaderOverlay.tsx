@@ -80,13 +80,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
-        // Strictly flat design - no shadows or elevation
-        elevation: 0,
-        shadowColor: 'transparent',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0,
-        shadowRadius: 0
     },
     waveContainer: {
         flexDirection: 'row',

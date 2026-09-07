@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 7 },
     submitButton: {
-        height: 46,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },

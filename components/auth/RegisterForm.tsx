@@ -508,11 +508,11 @@ const styles = StyleSheet.create({
     inputBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        height: 50,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius - 2,
         paddingHorizontal: 11 },
     registerButton: {
-        height: 44,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',

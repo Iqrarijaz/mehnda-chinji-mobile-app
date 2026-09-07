@@ -12,7 +12,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PasswordModal } from '@/components/setting/PasswordModal';
-import messaging from '@react-native-firebase/messaging';
+import { getMessaging, subscribeToTopic } from '@react-native-firebase/messaging';
 
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/colors';
@@ -35,13 +35,16 @@ export default function HomeScreen() {
 
   React.useEffect(() => {
     // Subscribe to marketplace reminders and fuel price updates so already registered users receive them
-    messaging()
-      .subscribeToTopic('marketplace_reminder')
-      .catch(err => console.log('Failed to subscribe to marketplace_reminder topic', err));
+    try {
+      const msg = getMessaging();
+      subscribeToTopic(msg, 'marketplace_reminder')
+        .catch(err => console.log('Failed to subscribe to marketplace_reminder topic', err));
 
-    messaging()
-      .subscribeToTopic('fuel_prices')
-      .catch(err => console.log('Failed to subscribe to fuel_prices topic', err));
+      subscribeToTopic(msg, 'fuel_prices')
+        .catch(err => console.log('Failed to subscribe to fuel_prices topic', err));
+    } catch (e) {
+      console.log('Messaging init error', e);
+    }
   }, []);
 
   return (

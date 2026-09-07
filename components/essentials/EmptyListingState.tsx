@@ -4,7 +4,7 @@ import { Colors } from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Layout } from '@/constants/layout';
 
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         gap: 6,
         marginTop: 20,
         paddingHorizontal: 16,
-        height: 44,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius },
     addButtonText: {
         color: '#FFFFFF',

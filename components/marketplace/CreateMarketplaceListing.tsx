@@ -627,13 +627,13 @@ export const CreateMarketplaceListing: React.FC<CreateMarketplaceListingProps> =
                         <CancelButton
                             onPress={onClose}
                             disabled={mutation.isPending || isUploadingImages}
-                            style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9', height: 38 }}
+                            style={{ backgroundColor: isDark ? '#334155' : '#F1F5F9' }}
                         />
                         <SubmitButton
                             title={listingToEdit ? 'Update' : 'Post Now'}
                             onPress={handleSubmit}
                             isLoading={mutation.isPending || isUploadingImages}
-                            style={{ width: 160, height: 38, borderRadius: 28 }}
+                            style={{ width: 160, borderRadius: 28 }}
                         />
                     </View>
 

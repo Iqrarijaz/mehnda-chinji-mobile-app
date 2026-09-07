@@ -62,8 +62,8 @@ const SupportContactCard: React.FC<SupportContactCardProps> = React.memo(({
             style={styles.touchable}
         >
             <View style={[styles.card, { backgroundColor: colors.card }]}>
-                <View style={[styles.iconContainer, { backgroundColor: `${color}15` }]}>
-                    <Ionicons name={icon} size={26} color={color} />
+                <View style={styles.iconContainer}>
+                    <Ionicons name={icon} size={28} color={color} />
                 </View>
                 <View style={styles.content}>
                     <ThemedText allowFontScaling={false} style={[styles.title, { color: colors.text }]}>{title}</ThemedText>

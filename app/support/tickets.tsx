@@ -13,6 +13,7 @@ import {
     Animated,
     Dimensions,
     LayoutAnimation,
+    Platform,
     RefreshControl,
     ScrollView,
     StyleSheet,
@@ -223,7 +224,7 @@ export default function TicketListScreen() {
 
     const renderEmpty = () => (
         <View style={styles.emptyContainer}>
-            <View style={[styles.emptyIconBg, { backgroundColor: colors.primary + '10' }]}>
+            <View style={styles.emptyIconBg}>
                 <Ionicons name="chatbubbles-outline" size={80} color={colors.primary} style={{ opacity: 0.8 }} />
             </View>
             <ThemedText style={styles.emptyTitle}>No support tickets yet</ThemedText>
@@ -427,8 +428,9 @@ const styles = StyleSheet.create({
     createButton: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         paddingHorizontal: 20,
-        paddingVertical: 11,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius },
     createButtonText: {
         color: '#FFFFFF',

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { View, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Modal, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import LottieView from 'lottie-react-native';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
         alignItems: 'center' },
     modalButton: {
         width: 120,
-        height: 40,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },

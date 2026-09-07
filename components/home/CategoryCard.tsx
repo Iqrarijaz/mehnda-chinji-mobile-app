@@ -52,7 +52,7 @@ export const CategoryCard = React.memo(({ label, icon, onPress, isSelected, comp
                 { backgroundColor: colors.cardBg },
                 compact && styles.cardCompact
             ]}>
-                <View style={[styles.iconContainer, compact && styles.iconContainerCompact, { backgroundColor: isImageAsset ? 'transparent' : accentColor + '12' }]}>
+                <View style={[styles.iconContainer, compact && styles.iconContainerCompact]}>
                     {isImageAsset ? (
                         <Image
                             source={resolvedImageSource}

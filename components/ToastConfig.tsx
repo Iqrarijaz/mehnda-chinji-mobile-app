@@ -70,10 +70,10 @@ const ToastLayout = ({
             <FloatingBlob color={`${accent}26`} />
 
             {/* Icon */}
-            <View style={[styles.iconWrapper, { backgroundColor: colors.card }]}>
+            <View style={styles.iconWrapper}>
                 <Ionicons
                     name={isSuccess ? 'checkmark' : 'alert'}
-                    size={18}
+                    size={20}
                     color={accent}
                 />
             </View>

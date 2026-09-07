@@ -88,8 +88,7 @@ const styles = StyleSheet.create({
     predictionCard: {
         borderRadius: Layout.borderRadius,
         padding: 12,
-        gap: 8,
-        borderWidth: 1
+        gap: 8
     },
     predictionHeader: {
         flexDirection: 'row',

@@ -350,6 +350,6 @@ const styles = StyleSheet.create({
     inputLabel: { fontSize: 12.5, fontWeight: '600', marginBottom: 8, marginTop: 16 },
     input: { borderRadius: Layout.borderRadius, padding: 10, fontSize: 12.5 },
     textArea: { height: 100 },
-    saveBtn: { height: 50, borderRadius: Layout.borderRadius, justifyContent: 'center', alignItems: 'center', marginTop: 24 },
+    saveBtn: { height: Platform.OS === 'android' ? 46 : 50, borderRadius: Layout.borderRadius, justifyContent: 'center', alignItems: 'center', marginTop: 24 },
     saveBtnText: { color: '#FFFFFF', fontSize: 13.5, fontWeight: '700' }
 });

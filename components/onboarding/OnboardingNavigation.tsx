@@ -159,14 +159,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 40,
+    height: Platform.OS === 'android' ? 46 : 50,
     paddingHorizontal: 13,
     borderRadius: Layout.borderRadius },
   backBtnText: {
     fontSize: 11.5,
     fontWeight: '600' },
   nextBtn: {
-    height: 40,
+    height: Platform.OS === 'android' ? 46 : 50,
     borderRadius: Layout.borderRadius,
     paddingHorizontal: 20,
     justifyContent: 'center',

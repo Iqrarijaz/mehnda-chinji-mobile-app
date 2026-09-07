@@ -40,7 +40,7 @@ export default function FeedbackScreen() {
     const router = useRouter();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const colors = Colors[theme];
 
     const queryClient = useQueryClient();
@@ -79,29 +79,15 @@ export default function FeedbackScreen() {
     });
 
     const handleGoBack = useCallback(() => {
-        if (router.canGoBack()) {
-            router.back();
-        } else {
-            router.replace('/(drawer)/(tabs)' as any);
-        }
+        router.replace('/(drawer)/(tabs)' as any);
     }, [router]);
 
-    // The Back button's fallback (replace with Home when there's no history to
-    // pop into) only runs for a press on that button. The modal's native
-    // swipe-to-dismiss gesture bypasses it entirely and just pops the screen,
-    // which — with no history underneath — can leave the user looking at
-    // whatever the navigator reveals instead of Home. This makes the two
-    // paths match: when there IS history, a swipe already behaves exactly
-    // like the button (a plain pop), so it's left alone; only the no-history
-    // case is redirected.
-    //
-    // `bypassNextRemoval` exists because router.replace() itself removes this
-    // screen too, which would otherwise retrigger this same listener and,
-    // since canGoBack() is still false at that point, loop.
+    // Ensure swipe-back gesture and any back removal navigate directly to Home page,
+    // matching the behavior of the Back button.
     const bypassNextRemoval = useRef(false);
     useEffect(() => {
         const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
-            if (bypassNextRemoval.current || router.canGoBack()) {
+            if (bypassNextRemoval.current) {
                 return;
             }
             e.preventDefault();
@@ -187,10 +173,10 @@ export default function FeedbackScreen() {
             <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.background }]}>
                 <BackButton
                     onPress={handleGoBack}
-                    icon="close"
-                    backgroundColor="rgba(255,255,255,0.18)"
-                    color="#FFFFFF"
-                    size={22}
+                    icon="arrow-back"
+                    backgroundColor={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'}
+                    color={colors.text}
+                    size={20}
                 />
                 <View style={{ flex: 1, marginLeft: 12 }}>
                     <ThemedText style={styles.screenTitle}>Feedback</ThemedText>
@@ -377,7 +363,7 @@ const styles = StyleSheet.create({
         fontSize: 12.5,
         marginBottom: 24 },
     submitButton: {
-        height: 52,
+        height: Platform.OS === 'android' ? 46 : 50,
         borderRadius: Layout.borderRadius,
         justifyContent: 'center',
         alignItems: 'center' },

@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
     infoCard: {
         borderRadius: Layout.borderRadius,
         padding: 12,
-        borderWidth: 1,
         marginBottom: 4
     },
     badgeRow: {
@@ -130,8 +129,7 @@ const styles = StyleSheet.create({
     matchCard: {
         borderRadius: Layout.borderRadius,
         padding: 12,
-        gap: 10,
-        borderWidth: 1
+        gap: 10
     },
     matchHeader: {
         flexDirection: 'row',

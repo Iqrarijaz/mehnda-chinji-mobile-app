@@ -54,7 +54,7 @@ export const SettingRowItem: React.FC<SettingRowItemProps> = React.memo(({
             disabled={isToggle}
         >
             <View style={styles.settingRowLeft}>
-                <View style={[styles.settingIconWrap, iconBg ? { backgroundColor: iconBg } : undefined]}>
+                <View style={styles.settingIconWrap}>
                     <Ionicons name={icon} size={24} color={effectiveIconColor} />
                 </View>
                 <View style={styles.settingTextWrap}>

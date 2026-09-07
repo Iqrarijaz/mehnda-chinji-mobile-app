@@ -12,8 +12,8 @@ const NotificationEmptyState = React.memo(() => {
     const colors = Colors[theme];
     return (
         <Animated.View entering={FadeIn.delay(200).duration(500)} style={styles.container}>
-            <View style={[styles.iconWrap, { backgroundColor: `${colors.primary}14` }]}>
-                <Ionicons name="notifications-off-outline" size={32} color={colors.primary} />
+            <View style={styles.iconWrap}>
+                <Ionicons name="notifications-off-outline" size={36} color={colors.primary} />
             </View>
             <ThemedText style={[styles.title, { color: colors.text }]}>No notifications yet</ThemedText>
             <ThemedText style={[styles.subtitle, { color: colors.placeholder }]}>We'll notify you{'\n'}when something happens</ThemedText>

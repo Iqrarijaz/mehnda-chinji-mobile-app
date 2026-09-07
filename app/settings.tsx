@@ -362,8 +362,8 @@ const styles = StyleSheet.create({
         borderRadius: Layout.borderRadius,
         paddingHorizontal: 12,
         marginBottom: 24 },
-    input: { flex: 1, height: 50, fontSize: 12.5 },
+    input: { flex: 1, height: Platform.OS === 'android' ? 46 : 50, fontSize: 12.5 },
     modalButtons: { flexDirection: 'row', width: '100%', gap: 12 },
-    modalButton: { flex: 1, height: 50, borderRadius: Layout.borderRadius, justifyContent: 'center', alignItems: 'center' },
+    modalButton: { flex: 1, height: Platform.OS === 'android' ? 46 : 50, borderRadius: Layout.borderRadius, justifyContent: 'center', alignItems: 'center' },
     cancelButtonText: { fontWeight: '600' },
     confirmButtonText: { color: '#FFFFFF', fontWeight: '700' } });
