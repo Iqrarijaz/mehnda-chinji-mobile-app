@@ -11,7 +11,6 @@ import { useAppOpenAd } from '@/ads/hooks/useAppOpenAd';
 import { useIsRestoring } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { homePageConfigQueryOptions } from '@/hooks/useHomePageConfig';
-import { CRICKET_QUERY_KEYS, getTournamentsFeed } from '@/apis/cricket';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
@@ -347,15 +346,17 @@ function RootLayout() {
       <PersistQueryClientProvider
         client={queryClient}
         persistOptions={{ persister: asyncStoragePersister }}
-        // Warm the home layout and cricket feeds as the app opens, after restoration
-        // so fresh cached copies short-circuit the network request.
+        // Warm the home layout as the app opens, after restoration, so a fresh
+        // cached copy short-circuits the network request. Deliberately NOT
+        // prefetching the cricket feed here: that endpoint requires a session,
+        // and this callback fires before AuthContext has restored one, so it
+        // ran on every launch including a brand-new, never-logged-in install.
+        // The resulting 401 was indistinguishable from an expired session and
+        // triggered a false "Session Expired" modal before the user ever saw
+        // the login screen. Cricket Hub already fetches on demand via
+        // useCricketAPI() once a real session exists.
         onSuccess={() => {
           queryClient.prefetchQuery(homePageConfigQueryOptions()).catch(() => { });
-          queryClient.prefetchQuery({
-            queryKey: CRICKET_QUERY_KEYS.feed({ page: 1, limit: 20 }),
-            queryFn: () => getTournamentsFeed({ page: 1, limit: 20 }),
-            staleTime: 1000 * 60 * 15,
-          }).catch(() => { });
         }}
       >
         <GestureHandlerRootView style={{ flex: 1 }}>

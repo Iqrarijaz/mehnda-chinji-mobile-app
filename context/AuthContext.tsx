@@ -70,24 +70,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Reactive Session Expiry: Listen for token clearance from API client
     useEffect(() => {
         const unsubscribe = tokenCache.onClear(() => {
-            if (tokenCache.isSessionExpired()) {
+            // `user !== null` guards against a request that was never
+            // authenticated (e.g. a background prefetch firing before login)
+            // getting 401'd and being mistaken for an expired session — the
+            // interceptor already avoids forceSignOut() for that case, but
+            // this is the belt-and-suspenders check for any other path that
+            // might clear the cache with isSessionExpired set.
+            if (tokenCache.isSessionExpired() && user !== null) {
                 // Clear state immediately to stop the 'ping-pong' redirect loop
                 setUser(null);
-                
+
                 // Redirect with the 'expired' flag – this bypasses the standard protection effect
-                // which otherwise might redirect without the query param 
+                // which otherwise might redirect without the query param
                 router.replace('/(auth)/login?expired=true');
-                
+
                 // Reset the flag for the next session
                 tokenCache.setSessionExpired(false);
             } else {
                 // Manual or other logout
                 setUser(null);
+                tokenCache.setSessionExpired(false);
             }
         });
 
         return () => unsubscribe();
-    }, [router]);
+    }, [router, user]);
 
     const login = useCallback(async (payload: any) => {
         if (!payload) {
