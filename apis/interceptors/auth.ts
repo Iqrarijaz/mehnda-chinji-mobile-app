@@ -71,6 +71,11 @@ function forceSignOut(): void {
  *
  * Requests excluded from this:
  *  - login and refresh calls, where a 401 is the answer, not a stale token;
+ *  - a request that was never authenticated in the first place (no
+ *    Authorization header and nothing cached to refresh) — a request like
+ *    this failing with 401 says nothing about a session, since there wasn't
+ *    one. Signing the user "out" of a session that never existed is what
+ *    produced a false Session Expired modal on a brand-new install;
  *  - a request already replayed once, guarded by `_retriedAfterRefresh`, so a
  *    server that returns 401 no matter what cannot drive an endless loop.
  */
@@ -82,6 +87,10 @@ export async function handleUnauthorized(error: any, apiClient: any): Promise<an
 
     const url: string = config.url || '';
     if (url.includes('login') || url.includes('refresh-token')) return null;
+
+    const hasAuthHeader = !!config.headers?.Authorization;
+    const hasCachedToken = !!tokenCache.get() || !!tokenCache.getRefresh();
+    if (!hasAuthHeader && !hasCachedToken) return null;
 
     if (config._retriedAfterRefresh) {
         forceSignOut();
